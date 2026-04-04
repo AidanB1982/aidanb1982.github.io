@@ -146,6 +146,52 @@ a, a:visited, a:active {
     gap: 25px;
 }
 
+/* LIGHT SWEEP CONTAINER */
+.book-feature img,
+.book img {
+    position: relative;
+    overflow: hidden;
+}
+
+/* WRAP for effect */
+.book-feature img,
+.book img {
+    display: block;
+}
+
+/* LIGHT SWEEP EFFECT */
+.book-feature img::after,
+.book img::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,0.25),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+}
+
+/* ANIMATE ON HOVER */
+.book-feature:hover img::after,
+.book:hover img::after {
+    animation: sweep 0.8s ease forwards;
+}
+
+@keyframes sweep {
+    100% {
+        left: 125%;
+    }
+}
+
+/* FEATURE HOVER */
 .book-feature img {
     width: 180px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
@@ -197,7 +243,7 @@ a, a:visited, a:active {
     margin: 50px auto;
 }
 
-/* TEXTURED BOOK SECTION */
+/* TEXTURED SECTION */
 .section.texture {
     position: relative;
     background: #E8E6E1;
@@ -205,19 +251,16 @@ a, a:visited, a:active {
     overflow: hidden;
 }
 
-/* FIXED TEXTURE */
 .section.texture::before {
     content: "";
     position: absolute;
     inset: 0;
     background: url('stone.png');
     background-size: cover;
-    background-position: center;
-    opacity: 0.18; /* ✅ FIXED */
+    opacity: 0.18;
     pointer-events: none;
 }
 
-/* VIGNETTE */
 .section.texture::after {
     content: "";
     position: absolute;
