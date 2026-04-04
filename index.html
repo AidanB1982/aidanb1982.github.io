@@ -32,14 +32,18 @@ a, a:visited, a:active {
 }
 
 /* NAV */
-.nav {
+ .nav {
     position: fixed;
-    top: 25px;
-    right: 50px;
+    top: 20px;
+    right: 40px;
     z-index: 1000;
+    padding: 10px 18px;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    border-radius: 4px;
 }
 
-.nav a {
+ a {
     margin-left: 24px;
     font-size: 12px;
     letter-spacing: 2px;
@@ -63,7 +67,7 @@ a, a:visited, a:active {
     transition: 0.3s;
 }
 
-.nav a:hover::after {
+ a:hover::after {
     width: 100%;
 }
 
