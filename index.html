@@ -6,12 +6,11 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Literary and psychological fiction shaped by place, memory, and unease.">
 
 <style>
 
 /* =========================
-   RESET + BASE
+   BASE
 ========================= */
 body {
     margin: 0;
@@ -26,12 +25,12 @@ img {
 }
 
 a {
-    color: inherit;
     text-decoration: none;
+    color: inherit;
 }
 
 /* =========================
-   NAV (CLEAN + FLOATING)
+   NAV
 ========================= */
 .nav {
     position: absolute;
@@ -54,7 +53,7 @@ a {
 }
 
 /* =========================
-   HERO (CINEMATIC)
+   HERO
 ========================= */
 .hero {
     position: relative;
@@ -63,7 +62,6 @@ a {
     align-items: center;
     justify-content: center;
     text-align: center;
-    overflow: hidden;
 }
 
 .hero::before {
@@ -71,48 +69,42 @@ a {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.9)),
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
         url('forest.png');
     background-size: cover;
     background-position: center;
-    animation: zoom 30s ease-in-out infinite alternate;
 }
 
 .hero-inner {
     position: relative;
     z-index: 2;
-    max-width: 600px;
 }
 
 .hero img {
     width: 220px;
-    margin: 0 auto 25px;
+    margin: 0 auto 20px;
     opacity: 0;
-    animation: fade 2s forwards;
+    animation: fadeUp 1.5s forwards;
 }
 
 .hero p {
-    line-height: 1.7;
-    font-size: 16px;
     opacity: 0;
-    animation: fade 3s forwards;
+    animation: fadeUp 2.2s forwards;
 }
 
-/* BUTTON */
 .button {
     display: inline-block;
-    margin-top: 20px;
+    margin-top: 15px;
     font-size: 12px;
     letter-spacing: 2px;
-    text-transform: uppercase;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
-    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+
     opacity: 0;
-    animation: fade 4s forwards;
+    animation: fadeUp 3s forwards;
 }
 
 /* =========================
-   SECTION BASE
+   SECTIONS
 ========================= */
 .section {
     padding: 120px 20px;
@@ -131,16 +123,6 @@ a {
 }
 
 /* =========================
-   TEXT
-========================= */
-.intro {
-    text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.8;
-}
-
-/* =========================
    FEATURED
 ========================= */
 .featured {
@@ -151,15 +133,9 @@ a {
 }
 
 .featured img {
-    width: 100%;
-    max-width: 260px;
+    width: 260px;
     margin: 0 auto;
     box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-    transition: 0.4s;
-}
-
-.featured img:hover {
-    transform: scale(1.05);
 }
 
 /* =========================
@@ -174,23 +150,30 @@ a {
 
 .book {
     text-align: center;
-    transition: 0.4s;
 }
 
 .book img {
     width: 200px;
     margin: 0 auto;
     box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    transition: 0.4s;
-}
-
-.book:hover img {
-    transform: translateY(-8px) scale(1.03);
 }
 
 .book p {
     margin-top: 12px;
-    font-size: 14px;
+}
+
+/* =========================
+   SCROLL ANIMATION
+========================= */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s ease;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* =========================
@@ -229,7 +212,6 @@ a {
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .footer-center img {
@@ -237,22 +219,23 @@ a {
 }
 
 /* =========================
-   ANIMATION
+   ANIMATIONS
 ========================= */
-@keyframes fade {
-    to { opacity: 1; }
-}
-
-@keyframes zoom {
-    from { transform: scale(1.05); }
-    to { transform: scale(1.15); }
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* =========================
    MOBILE
 ========================= */
 @media (max-width: 900px) {
-
     .grid {
         grid-template-columns: 1fr;
     }
@@ -287,16 +270,14 @@ a {
 <div class="hero">
     <div class="hero-inner">
         <img src="logo (1).png">
-        <p>
-            Literary and psychological fiction shaped by place, memory, and unease.
-        </p>
+        <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
         <a href="publications.html" class="button">Explore Publications</a>
     </div>
 </div>
 
 <!-- ABOUT -->
-<div class="section">
-    <div class="container intro">
+<div class="section reveal">
+    <div class="container" style="text-align:center;">
         <p>
             Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
         </p>
@@ -306,7 +287,7 @@ a {
 <div class="divider"></div>
 
 <!-- FEATURED -->
-<div class="section dark">
+<div class="section dark reveal">
     <div class="container featured">
 
         <img src="book6.jpg">
@@ -316,9 +297,7 @@ a {
             <p>Some memories return. Others refuse to leave.</p>
             <p>The recursion spreads. Voices rise.</p>
 
-            <a href="https://mybook.to/Holdfast" target="_blank" class="button">
-                Preorder
-            </a>
+            <a href="#" class="button">Preorder</a>
         </div>
 
     </div>
@@ -327,24 +306,24 @@ a {
 <div class="divider"></div>
 
 <!-- BOOKS -->
-<div class="section">
+<div class="section reveal">
     <div class="container">
 
-        <h2 style="text-align:center; font-weight: normal;">Current Publications</h2>
+        <h2 style="text-align:center;">Current Publications</h2>
 
         <div class="grid">
 
-            <div class="book">
+            <div class="book reveal">
                 <img src="book1.jpg">
                 <p>Dour Hill House</p>
             </div>
 
-            <div class="book">
+            <div class="book reveal">
                 <img src="book2.jpg">
                 <p>Corrour</p>
             </div>
 
-            <div class="book">
+            <div class="book reveal">
                 <img src="book3.jpg">
                 <p>The Black Bothy</p>
             </div>
@@ -368,13 +347,28 @@ a {
         </div>
 
         <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
+            <a href="#">Publications</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
         </div>
 
     </div>
 </div>
+
+<!-- SCROLL SCRIPT -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+});
+
+document.querySelectorAll('.reveal').forEach(el => {
+    observer.observe(el);
+});
+</script>
 
 </body>
 </html>
