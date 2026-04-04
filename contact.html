@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact | Blackwood Publishing</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Georgia, serif;
+            background-image: url('stone.png');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #2c2c2c;
+        }
+
+        /* HEADER */
+        .header {
+            position: relative;
+            height: 35vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .header-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.85),
+                rgba(22,22,25,0.85)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-logo {
+            width: 160px;
+            filter: invert(1);
+            margin-bottom: 10px;
+        }
+
+        .nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #F1F1F1;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .header h1 {
+            color: #F1F1F1;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        /* SECTION */
+        .section {
+            padding: 60px 20px;
+            text-align: center;
+            background-color: rgba(232, 228, 220, 0.55);
+            margin: -30px auto 0;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .section p {
+            max-width: 600px;
+            margin: 15px auto;
+            line-height: 1.7;
+        }
+
+        .divider {
+            width: 80px;
+            height: 1px;
+            background: #999;
+            margin: 40px auto;
+        }
+
+        /* FORM */
+        .contact-form {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            padding: 12px;
+            border: 1px solid rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.6);
+            font-family: Georgia, serif;
+            font-size: 14px;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+        }
+
+        .contact-form button {
+            padding: 12px;
+            background: #5F7D76;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-family: Georgia, serif;
+        }
+
+        .contact-form button:hover {
+            background: #4e6a63;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: relative;
+            padding: 80px 20px;
+            color: #F1F1F1;
+        }
+
+        .footer::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.6),
+                rgba(22,22,25,0.6)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-center img {
+            width: 80px;
+            filter: invert(1);
+        }
+
+        .footer a {
+            color: #F1F1F1;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+        <img src="logo.png" class="header-logo">
+
+        <div class="nav">
+            <a href="index.html">Home</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="author.html">Author</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <h1>Contact</h1>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+
+    <p>
+        For enquiries, collaborations, or general correspondence, use the form below.
+    </p>
+
+    <div class="divider"></div>
+
+    <!-- FORM -->
+    <form action="https://formspree.io/f/mbdpplkw" method="POST" class="contact-form">
+
+        <input type="text" name="name" placeholder="Name" required>
+
+        <input type="email" name="email" placeholder="Email" required>
+
+        <textarea name="message" placeholder="Message" rows="6" required></textarea>
+
+        <button type="submit">Send Message</button>
+
+    </form>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <div class="footer-content">
+
+        <div>
+            <p>Blackwood Publishing</p>
+            <p>Independent Literary Imprint</p>
+        </div>
+
+        <div class="footer-center">
+            <img src="seal.png">
+        </div>
+
+        <div>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
