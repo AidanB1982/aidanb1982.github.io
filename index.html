@@ -32,7 +32,7 @@ a, a:visited, a:active {
 }
 
 /* =========================
-   NAV (FIXED + ALIGNED)
+   NAV (FIXED + PROPERLY ANCHORED)
 ========================= */
 .nav {
     position: fixed;
@@ -42,24 +42,23 @@ a, a:visited, a:active {
     z-index: 1000;
 
     background: linear-gradient(
-        rgba(10,10,12,0.85),
-        rgba(10,10,12,0.4),
+        rgba(10,10,12,0.95),
+        rgba(10,10,12,0.6),
         transparent
     );
 }
 
-/* keeps nav aligned with content */
 .nav-inner {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 18px 20px;
+    padding: 16px 20px;
 
     display: flex;
     justify-content: flex-end;
 }
 
 .nav a {
-    margin-left: 28px;
+    margin-left: 26px;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -70,14 +69,7 @@ a, a:visited, a:active {
 .nav a:hover {
     opacity: 1;
 }
-.nav {
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-/* underline */
+
 .nav a::after {
     content: "";
     position: absolute;
@@ -94,12 +86,13 @@ a, a:visited, a:active {
 }
 
 /* =========================
-   HEADER
+   HEADER (NOW PROPERLY OFFSET)
 ========================= */
-
 .header {
     position: relative;
     height: 35vh;
+    padding-top: 60px; /* 🔥 FIXES FLOATING ISSUE */
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -110,7 +103,7 @@ a, a:visited, a:active {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
+        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
         url('forest.png');
     background-size: cover;
     background-position: center;
@@ -133,18 +126,10 @@ a, a:visited, a:active {
     letter-spacing: 2px;
     font-size: 18px;
 }
-.header {
-    position: relative;
-    height: 35vh;
-    padding-top: 70px; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
+
 /* SECTION */
 .section {
-    padding: 50px 20px;
+    padding: 60px 20px;
 }
 
 .container {
@@ -174,7 +159,7 @@ a, a:visited, a:active {
 
 .book-feature:hover img {
     transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 35px 90px rgba(0,0,0,0.8);
+    box-shadow: 0 35px 90px rgba(0,0,0,0.85);
     filter: brightness(1.05);
 }
 
@@ -208,7 +193,6 @@ a, a:visited, a:active {
 
 .link:hover {
     opacity: 1;
-    letter-spacing: 1px;
 }
 
 /* DIVIDER */
@@ -219,7 +203,9 @@ a, a:visited, a:active {
     margin: 50px auto;
 }
 
-/* BOOK GRID */
+/* =========================
+   BOOK GRID (DROP SHADOW FIX)
+========================= */
 .section.texture {
     background: #E8E6E1;
     color: #1c1c1c;
@@ -231,17 +217,21 @@ a, a:visited, a:active {
     gap: 60px;
 }
 
+/* 🔥 SHADOW ADDED HERE */
 .book img {
     width: 190px;
-    transition: 0.4s;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+    transition: all 0.4s ease;
 }
 
 .book:hover img {
     transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 35px 80px rgba(0,0,0,0.35);
 }
 
 .book p {
     color: #1c1c1c;
+    margin-top: 12px;
 }
 
 /* ANIMATION */
@@ -268,7 +258,7 @@ a, a:visited, a:active {
 
 <body>
 
-<!-- NAV (NOW PROPERLY STRUCTURED) -->
+<!-- NAV -->
 <div class="nav">
     <div class="nav-inner">
         <a href="index.html">Home</a>
@@ -327,17 +317,17 @@ a, a:visited, a:active {
 
 <div class="grid">
 
-<a href="https://mybook.to/DourHillHouse" target="_blank" class="book reveal">
+<a href="https://mybook.to/DourHillHouse" class="book reveal">
 <img src="book1.jpg">
 <p>Dour Hill House</p>
 </a>
 
-<a href="https://mybook.to/Corrour" target="_blank" class="book reveal">
+<a href="https://mybook.to/Corrour" class="book reveal">
 <img src="book2.jpg">
 <p>Corrour</p>
 </a>
 
-<a href="https://mybook.to/BlackBothy" target="_blank" class="book reveal">
+<a href="https://mybook.to/BlackBothy" class="book reveal">
 <img src="book3.jpg">
 <p>The Black Bothy</p>
 </a>
@@ -355,7 +345,6 @@ const observer = new IntersectionObserver(entries => {
         }
     });
 });
-
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 
