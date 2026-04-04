@@ -249,3 +249,53 @@ img {
         text-align: center;
     }
 }
+/* =========================
+   HARD FIXES (DO NOT REMOVE)
+========================= */
+
+/* FORCE CONTAINER CENTERING */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* GRID FIX */
+.grid-3 {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    justify-items: center;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* BOOK FIX */
+.book {
+    text-align: center;
+}
+
+/* IMAGE LOCK */
+.book img {
+    width: 220px !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto;
+}
+
+/* FOOTER LOGO FIX */
+.footer-center img {
+    width: 70px !important;
+    height: auto;
+}
+
+/* PREVENT RANDOM IMAGE BLOBS */
+img {
+    max-width: 100%;
+    height: auto;
+}
