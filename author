@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Author | Blackwood Publishing</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Georgia, serif;
+            background-image: url('stone.png');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #2c2c2c;
+        }
+
+        /* HEADER */
+        .header {
+            position: relative;
+            height: 35vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .header-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.85),
+                rgba(22,22,25,0.85)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-logo {
+            width: 160px;
+            filter: invert(1);
+            margin-bottom: 10px;
+        }
+
+        .nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #F1F1F1;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .header h1 {
+            color: #F1F1F1;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        /* SECTION */
+        .section {
+            padding: 60px 20px;
+            background-color: rgba(232, 228, 220, 0.55);
+            margin: -30px auto 0;
+            width: 90%;
+            max-width: 900px;
+        }
+
+        .author-wrapper {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .author-image {
+            width: 240px;
+            height: 320px;
+            object-fit: cover;
+        }
+
+        .author-text {
+            flex: 1;
+        }
+
+        .author-text p {
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+
+        .divider {
+            width: 80px;
+            height: 1px;
+            background: #999;
+            margin: 40px 0;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: relative;
+            padding: 80px 20px;
+            color: #F1F1F1;
+        }
+
+        .footer::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.6),
+                rgba(22,22,25,0.6)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-center img {
+            width: 80px;
+            filter: invert(1);
+        }
+
+        .footer a {
+            color: #F1F1F1;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .author-wrapper {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .author-text {
+                text-align: center;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+        <img src="logo.png" class="header-logo">
+
+        <div class="nav">
+            <a href="index.html">Home</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="author.html">Author</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <h1>The Author</h1>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+
+    <div class="author-wrapper">
+
+        <img src="author.jpg" class="author-image">
+
+        <div class="author-text">
+
+            <p>
+                The work published under Blackwood is concerned with place, memory, and the slow accumulation of unease. 
+                Landscapes are not passive settings but active presences, shaping the lives that move through them.
+            </p>
+
+            <p>
+                Many of the stories are set in remote or transitional environments. Locations where distance alters perception, 
+                and where isolation allows something quieter to emerge. The focus is often less on events themselves and more on 
+                their persistence, how they settle, return, and repeat.
+            </p>
+
+            <p>
+                Influenced by the geography and atmosphere of the Scottish Highlands, the writing draws on a sense of continuity 
+                between past and present. The boundary between what has happened and what remains is not always stable.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <p>
+        These stories are not designed to resolve cleanly. They remain, in some form, after they end.
+    </p>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <div class="footer-content">
+
+        <div>
+            <p>Blackwood Publishing</p>
+            <p>Independent Literary Imprint</p>
+        </div>
+
+        <div class="footer-center">
+            <img src="seal.png">
+        </div>
+
+        <div>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
