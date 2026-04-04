@@ -87,62 +87,70 @@
         margin: 40px auto;
     }
 
-    /* MAIL CLEAN — FIXED */
+    /* MAIL */
 #mlb2-28459496 form {
     display: flex !important;
-    gap: 10px !important;
-    max-width: 420px;
-    margin: 20px auto !important;
-    justify-content: center;
+    max-width: 460px;
+    margin: 25px auto !important;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
 }
 
 /* INPUT */
 #mlb2-28459496 input[type="email"] {
     flex: 1 !important;
-    padding: 12px !important;
-    font-size: 15px !important;
+    padding: 10px 0 !important;
 
-    background: rgba(255,255,255,0.15) !important;
-    border: 1px solid rgba(0,0,0,0.2) !important;
+    background: transparent !important;
+    border: none !important;
 
-    color: #1C1C1C !important;
     font-family: Georgia, serif !important;
+    font-size: 15px !important;
+    color: #1C1C1C !important;
 }
 
 /* PLACEHOLDER */
 #mlb2-28459496 input::placeholder {
-    color: rgba(0,0,0,0.5) !important;
+    color: rgba(0,0,0,0.45) !important;
+    letter-spacing: 0.5px;
+}
+
+/* REMOVE BLUE OUTLINE */
+#mlb2-28459496 input:focus {
+    outline: none !important;
 }
 
 /* BUTTON */
 #mlb2-28459496 button {
-    padding: 12px 18px !important;
-    font-size: 14px !important;
-
-    background: #5F7D76 !important;
-    color: #F1F1F1 !important;
-
+    background: none !important;
     border: none !important;
-    cursor: pointer;
+
     font-family: Georgia, serif !important;
+    font-size: 14px !important;
+    letter-spacing: 1px;
+
+    color: #5F7D76 !important;
+    cursor: pointer;
+
+    padding-left: 15px !important;
 }
 
-/* HOVER */
+/* BUTTON HOVER */
 #mlb2-28459496 button:hover {
-    background: #4e6a63 !important;
+    opacity: 0.6;
 }
 
-/* REMOVE STACKED LAYOUT */
+/* REMOVE MAILERLITE SPACING */
 #mlb2-28459496 .ml-form-formContent,
 #mlb2-28459496 .ml-form-fieldRow {
     margin: 0 !important;
 }
 
-/* CENTER DISCLAIMER TEXT */
+/* DISCLAIMER */
 #mlb2-28459496 .ml-form-embedPermissionsContent {
     text-align: center !important;
     font-size: 12px !important;
     opacity: 0.6;
+    margin-top: 10px;
 }
 
     /* FOOTER */
