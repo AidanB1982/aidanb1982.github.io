@@ -141,12 +141,12 @@ a, a:visited, a:active {
 
 @keyframes fogFast {
     from { background-position: 0 -40; }
-    to { background-position: 2000px 0; }
+    to { background-position: 2000px -40; }
 }
 
 @keyframes fogSlow {
     from { background-position: 0 -20; }
-    to { background-position: 1500px 0; }
+    to { background-position: 1500px -20; }
 }
 
 /* HEADER CONTENT */
@@ -237,6 +237,9 @@ a, a:visited, a:active {
     position: absolute;
     inset: 0;
     background: url('stone.png');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
     opacity: 0.15;
 }
 
