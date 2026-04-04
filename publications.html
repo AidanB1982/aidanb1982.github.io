@@ -82,7 +82,7 @@ body {
 .series-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 100px 60px;
+    gap: 120px 80px;
     max-width: 1000px;
     margin: 0 auto;
 }
@@ -134,6 +134,10 @@ body {
     height: 390px;
     margin: 20px auto;
     overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .carousel img {
@@ -160,9 +164,8 @@ body {
 
 /* HOVER */
 .series:hover .carousel img.active {
-    transform: translateY(-6px) scale(1.04);
-    box-shadow:
-        0 25px 60px rgba(0,0,0,0.5);
+    transform: translateY(-8px) scale(1.03);
+    filter: drop-shadow(0 28px 60px rgba(0,0,0,0.6));
 }
 
 /* VIGNETTE */
