@@ -1,84 +1,59 @@
-lets go big with the home page 
-
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="google-site-verification" content="y6l2EwItL3h92JpCwreVdGN0FGKEpl9p83V6WcyaQVI" />
     <title>Blackwood Publishing</title>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Blackwood Publishing creates literary and psychological fiction rooted in place, memory, and unease. Discover atmospheric novels by Aidan Blackwood.">
+    <meta name="description" content="Literary and psychological fiction shaped by place, memory, and unease.">
 
-    <meta property="og:title" content="Blackwood Publishing">
-    <meta property="og:description" content="Literary and psychological fiction shaped by place, memory, and unease.">
-    <meta property="og:image" content="https://blackwoodpublishing.co.uk/preview.jpg">
-    <meta property="og:url" content="https://blackwoodpublishing.co.uk/">
+    <link rel="stylesheet" href="styles.css">
 
     <style>
-
-        body {
-            margin: 0;
-            font-family: Georgia, serif;
-            background-image: url('stone.png');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #1C1C1C;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        h1, h2, h3 {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        h2 { font-size: 28px; }
-        h3 { font-size: 20px; }
-
-        p {
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
         /* HERO */
         .hero {
             position: relative;
-            height: 60vh;
+            height: 70vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             text-align: center;
-            color: white;
+            color: #F1F1F1;
+            overflow: hidden;
         }
 
         .hero::before {
             content: "";
             position: absolute;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background:
-                linear-gradient(rgba(22,22,25,0.7), rgba(22,22,25,0.7)),
+                linear-gradient(rgba(12,12,14,0.8), rgba(12,12,14,0.8)),
                 url('forest.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            z-index: 0;
+            transform: scale(1.05);
         }
 
-        .hero-content {
+        .hero-inner {
             position: relative;
             z-index: 1;
+            max-width: 720px;
+            animation: fadeUp 1.5s ease forwards;
         }
 
         .hero img {
-            width: 260px;
+            width: 240px;
             margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeIn 2s ease forwards;
         }
 
         .hero p {
-            max-width: 520px;
-            margin: 0 auto;
+            opacity: 0;
+            animation: fadeIn 2.5s ease forwards;
         }
 
         /* NAV */
@@ -89,178 +64,59 @@ lets go big with the home page
             z-index: 2;
         }
 
-        .nav a {
-            margin-left: 24px;
-            text-decoration: none;
-            color: #F1F1F1;
-            font-size: 13px;
-            letter-spacing: 1.8px;
-            text-transform: uppercase;
-            opacity: 0.9;
-            transition: all 0.25s ease;
-        }
-
-        .nav a:hover {
-            opacity: 1;
-            letter-spacing: 2.5px;
-        }
-
-        /* BUTTON */
-        .button {
-            margin-top: 22px;
-            padding: 14px 30px;
-            background: #5F7D76;
-            color: #F1F1F1;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-radius: 2px;
-        }
-
-        .button:hover {
-            background: #4e6a63;
-        }
-
-        /* SECTION */
-        .section {
-            padding: 60px 20px;
-            text-align: center;
-            background-color: #E8E6E1;
-            margin: -40px auto 0;
-            width: 90%;
-            max-width: 1100px;
-        }
-
-        .section p {
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        /* DIVIDER */
-        .divider {
-            width: 600px;
-            height: 1px;
-            background: rgba(0,0,0,0.2);
-            margin: 50px auto;
-        }
-
         /* FEATURED */
         .featured {
-            margin-top: 40px;
-            display: flex;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 60px;
             align-items: center;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
         }
 
         .featured img {
-            width: 260px;
-            height: 380px;
+            width: 280px;
+            height: 400px;
             object-fit: cover;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+            transition: transform 0.5s ease;
         }
 
-        .featured-text {
-            max-width: 400px;
-            text-align: left;
+        .featured img:hover {
+            transform: scale(1.05);
         }
 
-        .featured-text h3 {
-            margin-top: 0;
+        /* GRID */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 50px;
         }
 
-        .featured-text p {
-            margin-bottom: 12px;
-        }
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
 
-        /* BOOK GRID */
-        .books {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        .book {
-            width: 220px;
-        }
-
-        .book img {
-            width: 100%;
-            height: 320px;
-            object-fit: cover;
-        }
-
-        .book a {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 18px;
-            background: #5F7D76;
-            color: #F1F1F1;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        /* FOOTER */
-        .footer {
-            position: relative;
-            width: 100%;
-            padding: 90px 20px 70px;
-            margin-top: 80px;
-            color: #F1F1F1;
-        }
-
-        .footer::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
-                url('forest.png');
-            background-size: cover;
-            background-position: center;
-        }
-
-        .footer-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .footer-left p:first-child {
-            font-size: 16px;
-            letter-spacing: 1px;
-        }
-
-        .footer-center img {
-            width: 70px;
-            filter: invert(1);
-        }
-
-        .footer-right a {
-            margin-left: 18px;
-            text-decoration: none;
-            color: #F1F1F1;
-            font-size: 13px;
-            letter-spacing: 1px;
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                flex-direction: column;
+            .featured {
+                grid-template-columns: 1fr;
                 text-align: center;
             }
         }
 
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
     </style>
 </head>
 
@@ -277,72 +133,90 @@ lets go big with the home page
 
 <!-- HERO -->
 <div class="hero">
-    <div class="hero-content">
+    <div class="hero-inner">
+
         <img src="logo (1).png">
 
         <p>
-            Publishing literary and psychological fiction shaped by atmosphere, place, and memory.
+            Literary and psychological fiction shaped by place, memory, and unease.
         </p>
 
         <a href="publications.html" class="button">Explore Publications</a>
+
     </div>
 </div>
 
-<!-- CONTENT -->
+<!-- ABOUT -->
 <div class="section">
+    <div class="intro">
+        <h2>Blackwood Publishing</h2>
+        <p>
+            An independent imprint exploring atmosphere, landscape, and the quiet persistence of memory.
+        </p>
+    </div>
+</div>
 
-    <h2>About Blackwood Publishing</h2>
-
-    <p>
-        Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in place, memory, and unease.
-    </p>
-
-    <div class="divider"></div>
-
-    <h2>Featured Release</h2>
-
-    <div class="featured">
-        <img src="book6.jpg">
-
-        <div class="featured-text">
-            <h3>Holdfast</h3>
-            <p>Some memories return. Others won’t let go.</p>
-            <p>The recursion spreads. Voices rise. What was buried begins to surface again.</p>
-            <a href="https://mybook.to/Holdfast" target="_blank" class="button">Preorder</a>
-        </div>
+<!-- FEATURED -->
+<div class="section">
+    <div class="intro">
+        <h2>Featured Release</h2>
     </div>
 
-    <div class="divider"></div>
+    <div class="featured">
 
-    <h2>Current Publications</h2>
+        <img src="book6.jpg">
 
-    <div class="books">
+        <div>
+            <h3>Holdfast</h3>
+
+            <p>Some memories return. Others refuse to leave.</p>
+
+            <p>
+                The recursion spreads. Voices rise. What was buried begins to surface again.
+            </p>
+
+            <a href="https://mybook.to/Holdfast" target="_blank" class="button">
+                Preorder
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- BOOKS -->
+<div class="section">
+    <div class="intro">
+        <h2>Current Publications</h2>
+    </div>
+
+    <div class="grid-2">
+
         <div class="book">
             <img src="book1.jpg">
             <p>Dour Hill House</p>
-            <a href="https://mybook.to/DourHillHouse" target="_blank">Read More</a>
+            <a href="#" class="button">View</a>
         </div>
 
         <div class="book">
             <img src="book2.jpg">
             <p>Corrour</p>
-            <a href="https://mybook.to/Corrour" target="_blank">Read More</a>
+            <a href="#" class="button">View</a>
         </div>
 
         <div class="book">
             <img src="book3.jpg">
             <p>The Black Bothy</p>
-            <a href="https://mybook.to/BlackBothy" target="_blank">Read More</a>
+            <a href="#" class="button">View</a>
         </div>
-    </div>
 
+    </div>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
     <div class="footer-content">
 
-        <div class="footer-left">
+        <div>
             <p>Blackwood Publishing</p>
             <p>Independent Literary Imprint</p>
         </div>
@@ -359,6 +233,19 @@ lets go big with the home page
 
     </div>
 </div>
+
+<!-- SCROLL REVEAL -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+});
+
+document.querySelectorAll('.book').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
