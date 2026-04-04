@@ -135,10 +135,6 @@
             text-align: left;
         }
 
-        .featured-text h3 {
-            margin-bottom: 10px;
-        }
-
         /* DIVIDER */
         .divider {
             width: 600px;
@@ -180,17 +176,22 @@
             font-size: 13px;
         }
 
-        /* FOOTER */
+        /* FIXED FOOTER */
         .footer {
             position: relative;
+            width: 100%;
             padding: 80px 20px;
+            margin-top: 60px;
             color: #F1F1F1;
-            text-align: center;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .footer::before {
             content: "";
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             background: linear-gradient(
@@ -200,12 +201,13 @@
             url('forest.png');
             background-size: cover;
             background-position: center;
+            z-index: 0;
         }
 
         .footer-content {
             position: relative;
             z-index: 1;
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
@@ -223,6 +225,10 @@
             text-decoration: none;
             color: #F1F1F1;
             font-size: 14px;
+        }
+
+        .footer-right a:hover {
+            opacity: 0.7;
         }
 
     </style>
@@ -261,38 +267,26 @@
         Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in place, memory, and unease.
     </p>
 
-    <!-- FEATURED RELEASE -->
     <div class="divider"></div>
 
     <h2>Featured Release</h2>
 
     <div class="featured">
-
         <img src="book6.jpg">
 
         <div class="featured-text">
             <h3>Holdfast</h3>
-
-            <p>
-                Some memories return. Others won’t let go.
-            </p>
-
-            <p>
-                The recursion spreads. Voices rise. What was buried begins to surface again.
-            </p>
-
+            <p>Some memories return. Others won’t let go.</p>
+            <p>The recursion spreads. Voices rise. What was buried begins to surface again.</p>
             <a href="https://mybook.to/Holdfast" target="_blank" class="button">Read Now</a>
         </div>
-
     </div>
 
-    <!-- CURRENT BOOKS -->
     <div class="divider"></div>
 
     <h2>Current Publications</h2>
 
     <div class="books">
-
         <div class="book">
             <img src="book1.jpg">
             <p>Dour Hill House</p>
@@ -310,7 +304,6 @@
             <p>The Black Bothy</p>
             <a href="https://mybook.to/BlackBothy" target="_blank">Read More</a>
         </div>
-
     </div>
 
 </div>
