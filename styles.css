@@ -86,13 +86,10 @@ img {
    SECTION
 ========================= */
 .section {
-    padding: 90px 20px;
+    padding: 100px 20px;
     background-color: #E8E6E1;
-    margin: 0 auto;
-    width: 90%;
-    max-width: 1100px;
+    width: 100%;
 }
-
 .section:first-of-type {
     margin-top: -60px;
 }
@@ -124,8 +121,10 @@ img {
 .grid-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
+    gap: 80px;
     justify-items: center;
+    max-width: 1000px;
+    margin: 60px auto 0;
 }
 
 @media (max-width: 900px) {
@@ -247,4 +246,31 @@ img {
         flex-direction: column;
         text-align: center;
     }
+}
+
+.featured {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.featured img {
+    width: 100%;
+    max-width: 300px;
+}
+.featured {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.featured img {
+    width: 100%;
+    max-width: 300px;
 }
