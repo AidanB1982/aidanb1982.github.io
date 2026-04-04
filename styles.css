@@ -1,140 +1,251 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="google-site-verification" content="y6l2EwItL3h92JpCwreVdGN0FGKEpl9p83V6WcyaQVI" />
-    <title>Blackwood Publishing</title>
+/* =========================
+   GLOBAL
+========================= */
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #1C1C1C;
+    -webkit-font-smoothing: antialiased;
+}
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* 🔥 CRITICAL FIX (your issue) */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
 
-    <meta name="description" content="Blackwood Publishing creates literary and psychological fiction rooted in place, memory, and unease.">
+/* CONTAINER */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
 
-    <link rel="stylesheet" href="styles.css">
-</head>
+/* =========================
+   HEADER
+========================= */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-<body>
+.header-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
 
-<!-- HERO -->
-<div class="header" style="height: 65vh;">
-    <div class="header-overlay"></div>
+.header-inner {
+    position: relative;
+    z-index: 1;
+}
 
-    <div class="header-inner">
+.header-logo {
+    width: 150px;
+    margin-bottom: 10px;
+}
 
-        <img src="logo (1).png" class="header-logo">
+.header h1 {
+    color: #F1F1F1;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
 
-        <div class="nav">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
+/* =========================
+   NAV
+========================= */
+.nav a {
+    margin: 0 16px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 13px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    opacity: 0.9;
+    transition: opacity 0.25s ease;
+}
 
-        <h1 style="margin-top: 20px;">Blackwood Publishing</h1>
+.nav a:hover {
+    opacity: 1;
+}
 
-        <p style="color:#dcdcdc; max-width:500px; margin:15px auto;">
-            Literary and psychological fiction shaped by place, memory, and unease.
-        </p>
+/* =========================
+   SECTION
+========================= */
+.section {
+    padding: 90px 20px;
+    background-color: #E8E6E1;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 1100px;
+}
 
-        <a href="publications.html" class="button">Explore Publications</a>
+.section:first-of-type {
+    margin-top: -60px;
+}
 
-    </div>
-</div>
+.section.narrow {
+    max-width: 800px;
+}
 
-<!-- ABOUT -->
-<div class="section narrow">
+/* =========================
+   TEXT
+========================= */
+.intro {
+    max-width: 700px;
+    margin: 0 auto 60px;
+    line-height: 1.7;
+    text-align: center;
+    font-size: 15px;
+}
 
-    <div class="intro">
-        <p>
-            Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in atmosphere, place, and memory.
-        </p>
-    </div>
+/* =========================
+   GRID
+========================= */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 80px 60px;
+}
 
-</div>
+@media (max-width: 800px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+}
 
-<!-- FEATURED -->
-<div class="section">
+/* =========================
+   BOOKS
+========================= */
+.book {
+    text-align: center;
+}
 
-    <div class="container grid-2">
+/* 🔥 FIXED IMAGE SIZE */
+.book img {
+    width: 240px;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
 
-        <div class="book visible">
-            <img src="book6.jpg">
-        </div>
+/* animation support */
+.book.animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
 
-        <div>
-            <h2>Holdfast</h2>
+.book.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-            <p>
-                Some memories return. Others refuse to leave.
-            </p>
+.book p {
+    max-width: 420px;
+    margin: 12px auto;
+    line-height: 1.6;
+    opacity: 0.9;
+}
 
-            <p>
-                The recursion spreads. Voices rise. What was buried begins to surface again.
-            </p>
+/* =========================
+   BUTTON
+========================= */
+.button {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #5F7D76;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(95,125,118,0.4);
+    padding-bottom: 3px;
+    transition: opacity 0.25s ease;
+}
 
-            <a href="https://mybook.to/Holdfast" target="_blank" class="button">Preorder</a>
-        </div>
+.button:hover {
+    opacity: 0.6;
+}
 
-    </div>
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    position: relative;
+    padding: 90px 20px 70px;
+    margin-top: 100px;
+    color: #F1F1F1;
+}
 
-</div>
+.footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
+    url('forest.png');
+    background-size: cover;
+}
 
-<!-- PUBLICATIONS -->
-<div class="section">
+.footer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
 
-    <h2 style="text-align:center;">Current Publications</h2>
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
 
-    <div class="container grid-2" style="margin-top:50px;">
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
 
-        <div class="book visible">
-            <img src="book1.jpg">
-            <p>Dour Hill House</p>
-            <a href="https://mybook.to/DourHillHouse" target="_blank" class="button">View</a>
-        </div>
+.footer-center img {
+    width: 70px;
+    filter: invert(1);
+}
 
-        <div class="book visible">
-            <img src="book2.jpg">
-            <p>Corrour</p>
-            <a href="https://mybook.to/Corrour" target="_blank" class="button">View</a>
-        </div>
+.footer-right a {
+    margin-left: 18px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 13px;
+    opacity: 0.85;
+}
 
-        <div class="book visible">
-            <img src="book3.jpg">
-            <p>The Black Bothy</p>
-            <a href="https://mybook.to/BlackBothy" target="_blank" class="button">View</a>
-        </div>
+.footer-right a:hover {
+    opacity: 1;
+}
 
-        <div class="book visible">
-            <img src="book4.jpg">
-            <p>The Drowned Fjord</p>
-            <a href="https://mybook.to/DrownedFjord" target="_blank" class="button">View</a>
-        </div>
-
-    </div>
-
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-    <div class="footer-content">
-
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
-
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div class="footer-right">
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
-
-    </div>
-</div>
-
-</body>
-</html>
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
