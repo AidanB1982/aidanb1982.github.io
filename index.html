@@ -7,9 +7,7 @@
 
 <style>
 
-/* =========================
-   BASE
-========================= */
+/* ========================= BASE ========================= */
 body {
     margin: 0;
     font-family: Georgia, serif;
@@ -48,16 +46,10 @@ a {
     color: inherit;
 }
 
-/* =========================
-   TYPOGRAPHY
-========================= */
-h1, h2, h3 {
-    font-weight: 500;
-    letter-spacing: 0.4px;
-}
-
+/* ========================= TYPOGRAPHY ========================= */
 h2 {
     font-size: 32px;
+    font-weight: 500;
 }
 
 p {
@@ -65,14 +57,11 @@ p {
     line-height: 1.7;
 }
 
-/* =========================
-   NAV
-========================= */
+/* ========================= NAV ========================= */
 .nav {
     position: absolute;
     top: 25px;
     right: 50px;
-    z-index: 10;
 }
 
 .nav a {
@@ -87,7 +76,6 @@ p {
 .nav a::after {
     content: "";
     position: absolute;
-    left: 0;
     bottom: -4px;
     width: 0;
     height: 1px;
@@ -99,9 +87,7 @@ p {
     width: 100%;
 }
 
-/* =========================
-   HERO
-========================= */
+/* ========================= HERO ========================= */
 .hero {
     position: relative;
     height: 38vh;
@@ -120,7 +106,6 @@ p {
         linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)),
         url('forest.png');
     background-size: cover;
-    background-position: center;
 }
 
 .hero-inner {
@@ -130,7 +115,7 @@ p {
 
 .hero img {
     width: 170px;
-    margin: 0 auto 12px;
+    margin-bottom: 12px;
 }
 
 .hero p {
@@ -138,12 +123,9 @@ p {
     opacity: 0.9;
 }
 
-/* =========================
-   SECTIONS
-========================= */
+/* ========================= SECTIONS ========================= */
 .section {
     padding: 50px 20px;
-    background: transparent;
     color: #E8E6E1;
 }
 
@@ -152,9 +134,7 @@ p {
     margin: 0 auto;
 }
 
-/* =========================
-   FEATURED (FOCAL POINT)
-========================= */
+/* ========================= FEATURED ========================= */
 .featured {
     display: grid;
     grid-template-columns: 200px 1fr;
@@ -164,30 +144,19 @@ p {
 
 .featured img {
     width: 200px;
-    margin: 0 auto;
     box-shadow: 0 25px 70px rgba(0,0,0,0.6);
     transition: 0.4s;
 }
 
 .featured img:hover {
     transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 35px 90px rgba(0,0,0,0.8);
-}
-
-.featured-text {
-    max-width: 420px;
-}
-
-.featured-text h2 {
-    margin-bottom: 12px;
 }
 
 .featured-text p {
     opacity: 0.8;
-    margin-bottom: 10px;
 }
 
-/* PREORDER LINK */
+/* PREORDER */
 .preorder {
     display: inline-block;
     margin-top: 12px;
@@ -195,25 +164,9 @@ p {
     letter-spacing: 2px;
     text-transform: uppercase;
     border-bottom: 1px solid rgba(255,255,255,0.4);
-    transition: 0.3s;
 }
 
-.preorder:hover {
-    opacity: 1;
-}
-
-/* =========================
-   INTRO (NOW UNDER HOLDAST)
-========================= */
-.intro {
-    margin-top: 30px;
-    font-size: 14px;
-    opacity: 0.7;
-}
-
-/* =========================
-   DIVIDER
-========================= */
+/* ========================= DIVIDER ========================= */
 .divider {
     width: 120px;
     height: 1px;
@@ -221,9 +174,7 @@ p {
     margin: 50px auto;
 }
 
-/* =========================
-   TEXTURED BOOK SECTION
-========================= */
+/* ========================= BOOK SECTION ========================= */
 .section.texture {
     position: relative;
     background: #E8E6E1;
@@ -238,9 +189,7 @@ p {
     opacity: 0.25;
 }
 
-/* =========================
-   BOOK GRID
-========================= */
+/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -249,7 +198,9 @@ p {
 }
 
 .book {
+    display: block;
     text-align: center;
+    cursor: pointer;
 }
 
 .book img {
@@ -264,14 +215,11 @@ p {
     box-shadow: 0 30px 70px rgba(0,0,0,0.35);
 }
 
-.book p {
-    margin-top: 12px;
-    font-size: 14px;
+.book:hover p {
+    opacity: 0.7;
 }
 
-/* =========================
-   FOOTER
-========================= */
+/* ========================= FOOTER ========================= */
 .footer {
     position: relative;
     padding: 80px 20px;
@@ -284,38 +232,23 @@ p {
     background:
         linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
         url('forest.png');
-    background-size: cover;
 }
 
 .footer-content {
     position: relative;
-    z-index: 1;
     max-width: 1000px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
 }
 
-.footer-center img {
-    width: 60px;
-}
-
-/* =========================
-   MOBILE
-========================= */
+/* ========================= MOBILE ========================= */
 @media (max-width: 900px) {
     .grid {
         grid-template-columns: 1fr;
     }
-
     .featured {
         grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        gap: 25px;
         text-align: center;
     }
 }
@@ -339,9 +272,7 @@ p {
 <div class="hero-inner">
 <img src="logo (1).png">
 <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
-<p class="intro">
-Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
-</p>
+<p>Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.</p>
 </div>
 </div>
 
@@ -353,12 +284,9 @@ Blackwood Publishing explores atmosphere, landscape, and the quiet persistence o
 
 <div class="featured-text">
 <h2>Holdfast</h2>
-
 <p>Some memories return. Others refuse to leave.</p>
 <p>The recursion spreads. Voices rise.</p>
-
-<a href="#" class="preorder">Preorder</a>
-
+<a href="https://mybook.to/Holdfast" target="_blank" class="preorder">Preorder</a>
 </div>
 
 </div>
@@ -374,20 +302,20 @@ Blackwood Publishing explores atmosphere, landscape, and the quiet persistence o
 
 <div class="grid">
 
-<div class="book">
+<a href="https://mybook.to/DourHillHouse" target="_blank" class="book">
 <img src="book1.jpg">
 <p>Dour Hill House</p>
-</div>
+</a>
 
-<div class="book">
+<a href="https://mybook.to/Corrour" target="_blank" class="book">
 <img src="book2.jpg">
 <p>Corrour</p>
-</div>
+</a>
 
-<div class="book">
+<a href="https://mybook.to/BlackBothy" target="_blank" class="book">
 <img src="book3.jpg">
 <p>The Black Bothy</p>
-</div>
+</a>
 
 </div>
 
@@ -401,10 +329,6 @@ Blackwood Publishing explores atmosphere, landscape, and the quiet persistence o
 <div>
 <p>Blackwood Publishing</p>
 <p>Independent Literary Imprint</p>
-</div>
-
-<div class="footer-center">
-<img src="seal.png">
 </div>
 
 <div>
