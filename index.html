@@ -49,7 +49,7 @@ a {
 }
 
 /* =========================
-   TYPOGRAPHY SYSTEM (BIG UPGRADE)
+   TYPOGRAPHY
 ========================= */
 h1, h2, h3 {
     font-weight: 500;
@@ -57,11 +57,7 @@ h1, h2, h3 {
 }
 
 h2 {
-    font-size: 30px;
-}
-
-h3 {
-    font-size: 20px;
+    font-size: 32px;
 }
 
 p {
@@ -146,12 +142,7 @@ p {
    SECTIONS
 ========================= */
 .section {
-    padding: 30px 20px;
-    background: transparent;
-    color: #E8E6E1;
-}
-
-.section.dark {
+    padding: 50px 20px;
     background: transparent;
     color: #E8E6E1;
 }
@@ -162,22 +153,12 @@ p {
 }
 
 /* =========================
-   INTRO
-========================= */
-.intro {
-    max-width: 640px;
-    margin: 0 auto;
-    text-align: center;
-    color: #E8E6E1;
-}
-
-/* =========================
-   FEATURED (REFINED)
+   FEATURED (FOCAL POINT)
 ========================= */
 .featured {
     display: grid;
     grid-template-columns: 200px 1fr;
-    gap: 10px;
+    gap: 30px;
     align-items: center;
 }
 
@@ -193,12 +174,51 @@ p {
     box-shadow: 0 35px 90px rgba(0,0,0,0.8);
 }
 
-.featured div {
-    max-width: 380px;
+.featured-text {
+    max-width: 420px;
 }
 
-.featured p {
+.featured-text h2 {
+    margin-bottom: 12px;
+}
+
+.featured-text p {
     opacity: 0.8;
+    margin-bottom: 10px;
+}
+
+/* PREORDER LINK */
+.preorder {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+    transition: 0.3s;
+}
+
+.preorder:hover {
+    opacity: 1;
+}
+
+/* =========================
+   INTRO (NOW UNDER HOLDAST)
+========================= */
+.intro {
+    margin-top: 30px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+/* =========================
+   DIVIDER
+========================= */
+.divider {
+    width: 120px;
+    height: 1px;
+    background: rgba(255,255,255,0.15);
+    margin: 50px auto;
 }
 
 /* =========================
@@ -216,7 +236,6 @@ p {
     inset: 0;
     background: url('stone.png');
     opacity: 0.25;
-    pointer-events: none;
 }
 
 /* =========================
@@ -226,7 +245,7 @@ p {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 60px;
-    margin-top: 50px;
+    margin-top: 40px;
 }
 
 .book {
@@ -248,16 +267,6 @@ p {
 .book p {
     margin-top: 12px;
     font-size: 14px;
-}
-
-/* =========================
-   DIVIDER
-========================= */
-.divider {
-    width: 120px;
-    height: 1px;
-    background: rgba(255,255,255,0.15);
-    margin: 10px auto;
 }
 
 /* =========================
@@ -289,20 +298,6 @@ p {
 
 .footer-center img {
     width: 60px;
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s ease;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 /* =========================
@@ -347,51 +342,50 @@ p {
 </div>
 </div>
 
-<!-- ABOUT -->
-<div class="section reveal">
-<div class="container intro">
-<p>
-Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
-</p>
-</div>
-</div>
-
-<div class="divider"></div>
-
 <!-- FEATURED -->
-<div class="section dark reveal">
+<div class="section">
 <div class="container featured">
+
 <img src="book6.jpg">
 
-<div>
+<div class="featured-text">
 <h2>Holdfast</h2>
+
 <p>Some memories return. Others refuse to leave.</p>
 <p>The recursion spreads. Voices rise.</p>
+
+<a href="#" class="preorder">Preorder</a>
+
+<p class="intro">
+Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
+</p>
+
 </div>
+
 </div>
 </div>
 
 <div class="divider"></div>
 
 <!-- BOOKS -->
-<div class="section texture reveal">
+<div class="section texture">
 <div class="container">
 
 <h2 style="text-align:center;">Current Publications</h2>
 
 <div class="grid">
 
-<div class="book reveal">
+<div class="book">
 <img src="book1.jpg">
 <p>Dour Hill House</p>
 </div>
 
-<div class="book reveal">
+<div class="book">
 <img src="book2.jpg">
 <p>Corrour</p>
 </div>
 
-<div class="book reveal">
+<div class="book">
 <img src="book3.jpg">
 <p>The Black Bothy</p>
 </div>
@@ -422,19 +416,6 @@ Blackwood Publishing explores atmosphere, landscape, and the quiet persistence o
 
 </div>
 </div>
-
-<!-- SCROLL ANIMATION -->
-<script>
-const observer = new IntersectionObserver(entries => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-entry.target.classList.add('visible');
-}
-});
-});
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-</script>
 
 </body>
 </html>
