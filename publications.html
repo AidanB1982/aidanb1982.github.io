@@ -350,14 +350,31 @@ body {
 document.querySelectorAll('.carousel').forEach(carousel => {
     const images = carousel.querySelectorAll('img');
     let index = 0;
+    let interval;
 
-    setInterval(() => {
-        images[index].classList.remove('active');
-        index = (index + 1) % images.length;
-        images[index].classList.add('active');
-    }, 3500);
+    function startCarousel() {
+        interval = setInterval(() => {
+            images[index].classList.remove('active');
+            index = (index + 1) % images.length;
+            images[index].classList.add('active');
+        }, 3500);
+    }
+
+    function stopCarousel() {
+        clearInterval(interval);
+    }
+
+    // start initially
+    startCarousel();
+
+    // pause on hover
+    carousel.addEventListener('mouseenter', stopCarousel);
+
+    // resume on leave
+    carousel.addEventListener('mouseleave', startCarousel);
 });
 
+/* SCROLL FADE */
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -368,6 +385,7 @@ const observer = new IntersectionObserver(entries => {
 
 document.querySelectorAll('.series').forEach(el => observer.observe(el));
 </script>
+
 
 </body>
 </html>
