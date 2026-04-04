@@ -17,7 +17,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* HEADER */
+/* HEADER (MATCHED) */
 .header {
     position: relative;
     height: 35vh;
@@ -43,19 +43,19 @@ body {
 }
 
 .header-logo {
-    width: 140px;
+    width: 150px;
     margin-bottom: 10px;
 }
 
 .header h1 {
     color: #F1F1F1;
     font-weight: 500;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
 }
 
 /* NAV */
 .nav a {
-    margin: 0 15px;
+    margin: 0 16px;
     text-decoration: none;
     color: #F1F1F1;
     font-size: 13px;
@@ -71,7 +71,7 @@ body {
 /* SECTION */
 .section {
     padding: 70px 20px;
-    background-color: #E8E6E1;
+    background-color: rgba(232, 228, 220, 0.6);
     margin: -40px auto 0;
     width: 90%;
     max-width: 1100px;
@@ -80,84 +80,101 @@ body {
 
 /* INTRO */
 .intro {
-    max-width: 700px;
+    max-width: 680px;
     margin: 0 auto 60px;
     line-height: 1.7;
 }
 
 .intro em {
-    font-size: 18px;
     display: block;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    font-style: italic;
 }
 
-/* BOOK GRID */
+/* GRID */
 .books {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 80px 50px;
+    gap: 90px 60px;
 }
 
 @media (max-width: 800px) {
     .books {
         grid-template-columns: 1fr;
-        gap: 60px;
+        gap: 70px;
     }
 }
 
+/* BOOK */
 .book {
     text-align: center;
+
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease;
 }
 
-/* COVER */
+.book.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* IMAGE */
 .book img {
     width: 240px;
     height: 360px;
     object-fit: cover;
+
     box-shadow:
-        0 12px 28px rgba(0,0,0,0.35),
-        0 3px 8px rgba(0,0,0,0.25);
-    transition: all 0.4s ease;
+        0 18px 45px rgba(0,0,0,0.4),
+        0 4px 12px rgba(0,0,0,0.25);
+
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.book img:hover {
+/* HOVER */
+.book:hover img {
     transform: translateY(-6px) scale(1.03);
     box-shadow:
-        0 25px 55px rgba(0,0,0,0.5);
+        0 30px 70px rgba(0,0,0,0.55);
 }
 
 /* TEXT */
 .book h3 {
     margin-top: 18px;
     font-size: 18px;
+    letter-spacing: 0.5px;
 }
 
 .book p {
     max-width: 380px;
-    margin: 10px auto;
+    margin: 12px auto;
     line-height: 1.6;
     font-size: 15px;
     opacity: 0.9;
 }
 
-/* BUTTON */
+/* BUTTON (REFINED) */
 .button {
     display: inline-block;
-    margin-top: 12px;
-    padding: 12px 26px;
-    background: #5F7D76;
-    color: #F1F1F1;
-    text-decoration: none;
+    margin-top: 6px;
+
     font-size: 13px;
     letter-spacing: 1px;
     text-transform: uppercase;
+
+    color: #5F7D76;
+    text-decoration: none;
+
+    border-bottom: 1px solid rgba(95,125,118,0.4);
+    padding-bottom: 3px;
 }
 
 .button:hover {
-    background: #4e6a63;
+    opacity: 0.6;
 }
 
-/* FOOTER (unchanged structure, slight polish) */
+/* FOOTER */
 .footer {
     position: relative;
     padding: 90px 20px 70px;
@@ -174,6 +191,17 @@ body {
     background-size: cover;
 }
 
+.footer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
+
 .footer-content {
     position: relative;
     z-index: 1;
@@ -186,14 +214,16 @@ body {
     flex-wrap: wrap;
 }
 
-.footer-left p:first-child {
-    font-size: 16px;
-    letter-spacing: 1px;
+.footer-left p {
+    margin: 4px 0;
+    font-size: 14px;
+    opacity: 0.85;
 }
 
 .footer-center img {
     width: 70px;
     filter: invert(1);
+    opacity: 0.9;
 }
 
 .footer-right a {
@@ -202,8 +232,14 @@ body {
     color: #F1F1F1;
     font-size: 13px;
     letter-spacing: 1px;
+    opacity: 0.85;
 }
 
+.footer-right a:hover {
+    opacity: 1;
+}
+
+/* MOBILE */
 @media (max-width: 768px) {
     .footer-content {
         flex-direction: column;
@@ -239,45 +275,45 @@ body {
 <div class="section">
 
 <div class="intro">
-<p><em>“Memory is not linear. But you are.”</em></p>
+    <em>“Memory is not linear. But you are.”</em>
 
-<p>
-A folk-horror and paranormal mystery series exploring the fractures between memory, place, and reality — from haunted archives to drowned fjords, abandoned bothies to recursive distortions in time.
-</p>
+    <p>
+    A folk-horror and paranormal mystery series exploring the fractures between memory, place, and reality.
+    </p>
 
-<p>
-Each work stands alone. But the recursion connects them all.
-</p>
+    <p>
+    Each work stands alone. But the recursion connects them all.
+    </p>
 </div>
 
 <div class="books">
 
 <div class="book">
-<img src="book3.jpg">
-<h3>The Black Bothy</h3>
-<p>Some places keep what they take. A missing sister. A shifting bothy. And something that remembers.</p>
-<a href="https://mybook.to/BlackBothy" target="_blank" class="button">View Book</a>
+    <img src="book3.jpg">
+    <h3>The Black Bothy</h3>
+    <p>Some places keep what they take. A missing sister. A shifting bothy. And something that remembers.</p>
+    <a href="https://mybook.to/BlackBothy" target="_blank" class="button">View Book</a>
 </div>
 
 <div class="book">
-<img src="book4.jpg">
-<h3>The Drowned Fjord</h3>
-<p>The drowned remember. A Norwegian fjord where echoes arrive before sound and something waits beneath.</p>
-<a href="https://mybook.to/DrownedFjord" target="_blank" class="button">View Book</a>
+    <img src="book4.jpg">
+    <h3>The Drowned Fjord</h3>
+    <p>The drowned remember. A Norwegian fjord where echoes arrive before sound.</p>
+    <a href="https://mybook.to/DrownedFjord" target="_blank" class="button">View Book</a>
 </div>
 
 <div class="book">
-<img src="book5.jpg">
-<h3>The Erased Archivist</h3>
-<p>To read is to agree. A book that rewrites history and erases those who open it.</p>
-<a href="https://mybook.to/ErasedArchivist" target="_blank" class="button">View Book</a>
+    <img src="book5.jpg">
+    <h3>The Erased Archivist</h3>
+    <p>A book that rewrites history and erases those who open it.</p>
+    <a href="https://mybook.to/ErasedArchivist" target="_blank" class="button">View Book</a>
 </div>
 
 <div class="book">
-<img src="book6.jpg">
-<h3>Holdfast</h3>
-<p>Coming June 2026. The recursion returns. This time, it wants everything.</p>
-<a href="https://mybook.to/Holdfast" target="_blank" class="button">View Book</a>
+    <img src="book6.jpg">
+    <h3>Holdfast</h3>
+    <p>Coming June 2026. The recursion returns.</p>
+    <a href="https://mybook.to/Holdfast" target="_blank" class="button">View Book</a>
 </div>
 
 </div>
@@ -304,6 +340,19 @@ Each work stands alone. But the recursion connects them all.
 
     </div>
 </div>
+
+<!-- FADE-IN SCRIPT -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.book').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
