@@ -202,14 +202,49 @@ a, a:visited, a:active {
 
 /* BOOK GRID */
 .section.texture {
+    position: relative;
     background: #E8E6E1;
     color: #1c1c1c;
+    overflow: hidden;
+}
+
+/* TEXTURE LAYER */
+.section.texture::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: url('stone.png');
+    background-size: cover;
+    background-position: center;
+
+    opacity: 0.18; /*
+    pointer-events: none;
+}
+
+/* SOFT VIGNETTE (makes it feel expensive) */
+.section.texture::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: radial-gradient(
+        circle at center,
+        transparent 40%,
+        rgba(0,0,0,0.08) 100%
+    );
+
+    pointer-events: none;
 }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 60px;
+}
+    .book {
+    position: relative;
+    z-index: 1;
 }
 
 /* BOOK SHADOW */
