@@ -74,11 +74,20 @@
             background-color: rgba(232, 228, 220, 0.55);
             margin: -30px auto 0;
             width: 90%;
-            max-width: 1000px;
+            max-width: 1100px;
         }
 
-        .series {
-            margin-bottom: 60px;
+        /* GRID */
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 60px 40px;
+        }
+
+        @media (max-width: 800px) {
+            .series-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .series h2 {
@@ -86,7 +95,7 @@
         }
 
         .series p {
-            max-width: 600px;
+            max-width: 400px;
             margin: 0 auto 20px;
             line-height: 1.6;
         }
@@ -123,14 +132,6 @@
 
         .button:hover {
             background: #4e6a63;
-        }
-
-        /* DIVIDER */
-        .divider {
-            width: 60px;
-            height: 1px;
-            background: #999;
-            margin: 40px auto;
         }
 
         /* FOOTER */
@@ -199,76 +200,74 @@
 <!-- CONTENT -->
 <div class="section">
 
-    <!-- ARCHIVE FILES -->
-    <div class="series">
-        <h2>The Archive Files</h2>
+    <div class="series-grid">
 
-        <div class="carousel">
-            <img src="images/book3.jpg" class="active">
-            <img src="images/book4.jpg">
-            <img src="images/book5.jpg">
-            <img src="images/book6.jpg">
+        <!-- ARCHIVE FILES -->
+        <div class="series">
+            <h2>The Archive Files</h2>
+
+            <div class="carousel">
+                <img src="book3.jpg" class="active">
+                <img src="Book4.jpg">
+                <img src="Book5.jpg">
+                <img src="book6.jpg">
+            </div>
+
+            <p>
+                Psychological and atmospheric fiction exploring memory, landscape, and the quiet persistence of buried truths.
+            </p>
+
+            <a href="archive-files.html" class="button">View Series</a>
         </div>
 
-        <p>
-            Psychological and atmospheric fiction exploring memory, landscape, and the quiet persistence of buried truths.
-        </p>
+        <!-- CURSED BOTHIES -->
+        <div class="series">
+            <h2>The Cursed Bothies</h2>
 
-        <a href="archive-files.html" class="button">View Series</a>
-    </div>
+            <div class="carousel">
+                <img src="book2.jpg" class="active">
+                <img src="book7.png">
+                <img src="book8.jpg">
+            </div>
 
-    <div class="divider"></div>
+            <p>
+                Remote Highland bothies, isolation, and ancient forces that do not remain dormant.
+            </p>
 
-    <!-- CURSED BOTHIES -->
-    <div class="series">
-        <h2>The Cursed Bothies</h2>
-
-        <div class="carousel">
-            <img src="images/book2.jpg" class="active">
-            <img src="images/book7.jpg">
-            <img src="images/book8.jpg">
+            <a href="cursed-bothies.html" class="button">View Series</a>
         </div>
 
-        <p>
-            Remote Highland bothies, isolation, and ancient forces that do not remain dormant.
-        </p>
+        <!-- HARD SILENCE -->
+        <div class="series">
+            <h2>Hard Silence</h2>
 
-        <a href="cursed-bothies.html" class="button">View Series</a>
-    </div>
+            <div class="carousel">
+                <img src="book9.png" class="active">
+                <img src="book10.jpg">
+            </div>
 
-    <div class="divider"></div>
+            <p>
+                Dark Scottish crime fiction rooted in loyalty, violence, and consequence.
+            </p>
 
-    <!-- HARD SILENCE -->
-    <div class="series">
-        <h2>Hard Silence</h2>
-
-        <div class="carousel">
-            <img src="images/book9.jpg" class="active">
-            <img src="images/book10.jpg">
+            <a href="hard-silence.html" class="button">View Series</a>
         </div>
 
-        <p>
-            Dark Scottish crime fiction rooted in loyalty, violence, and consequence.
-        </p>
+        <!-- STANDALONE -->
+        <div class="series">
+            <h2>Standalone Works</h2>
 
-        <a href="hard-silence.html" class="button">View Series</a>
-    </div>
+            <div class="carousel">
+                <img src="book1.jpg" class="active">
+            </div>
 
-    <div class="divider"></div>
+            <p>
+                Independent works focused on atmosphere, place, and psychological tension.
+            </p>
 
-    <!-- STANDALONE -->
-    <div class="series">
-        <h2>Standalone Works</h2>
-
-        <div class="carousel">
-            <img src="images/book1.jpg" class="active">
+            <a href="standalone.html" class="button">View Titles</a>
         </div>
 
-        <p>
-            Independent works focused on atmosphere, place, and psychological tension.
-        </p>
-
-        <a href="standalone.html" class="button">View Titles</a>
     </div>
 
 </div>
