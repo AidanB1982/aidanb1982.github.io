@@ -32,18 +32,28 @@ a, a:visited, a:active {
 }
 
 /* =========================
-   NAV (FIXED + PROPERLY ANCHORED)
+   HEADER (NAV LIVES HERE)
 ========================= */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* NAV (NOW ATTACHED TO HEADER) */
 .nav {
-    position: fixed;
+    position: absolute; /* 🔥 KEY CHANGE */
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: 10;
 
     background: linear-gradient(
-        rgba(10,10,12,0.95),
-        rgba(10,10,12,0.6),
+        rgba(10,10,12,0.85),
+        rgba(10,10,12,0.4),
         transparent
     );
 }
@@ -51,7 +61,7 @@ a, a:visited, a:active {
 .nav-inner {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 16px 20px;
+    padding: 18px 20px;
 
     display: flex;
     justify-content: flex-end;
@@ -85,20 +95,7 @@ a, a:visited, a:active {
     width: 100%;
 }
 
-/* =========================
-   HEADER (NOW PROPERLY OFFSET)
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    padding-top: 60px; /* 🔥 FIXES FLOATING ISSUE */
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
+/* HEADER BACKGROUND */
 .header-overlay {
     position: absolute;
     inset: 0;
@@ -113,6 +110,7 @@ a, a:visited, a:active {
 .header-inner {
     position: relative;
     z-index: 1;
+    margin-top: 40px; /* 🔥 slight push below nav */
 }
 
 .header-logo {
@@ -160,7 +158,6 @@ a, a:visited, a:active {
 .book-feature:hover img {
     transform: translateY(-6px) scale(1.03);
     box-shadow: 0 35px 90px rgba(0,0,0,0.85);
-    filter: brightness(1.05);
 }
 
 /* TEXT */
@@ -203,9 +200,7 @@ a, a:visited, a:active {
     margin: 50px auto;
 }
 
-/* =========================
-   BOOK GRID (DROP SHADOW FIX)
-========================= */
+/* BOOK GRID */
 .section.texture {
     background: #E8E6E1;
     color: #1c1c1c;
@@ -217,16 +212,16 @@ a, a:visited, a:active {
     gap: 60px;
 }
 
-/* 🔥 SHADOW ADDED HERE */
+/* BOOK SHADOW */
 .book img {
     width: 190px;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     transition: all 0.4s ease;
 }
 
 .book:hover img {
     transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 35px 80px rgba(0,0,0,0.35);
+    box-shadow: 0 40px 90px rgba(0,0,0,0.35);
 }
 
 .book p {
@@ -258,25 +253,26 @@ a, a:visited, a:active {
 
 <body>
 
-<!-- NAV -->
-<div class="nav">
-    <div class="nav-inner">
-        <a href="index.html">Home</a>
-        <a href="publications.html">Publications</a>
-        <a href="about.html">About</a>
-        <a href="author.html">Author</a>
-        <a href="contact.html">Contact</a>
-    </div>
-</div>
-
-<!-- HEADER -->
+<!-- HEADER (NAV INSIDE) -->
 <div class="header">
+
+    <div class="nav">
+        <div class="nav-inner">
+            <a href="index.html">Home</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="author.html">Author</a>
+            <a href="contact.html">Contact</a>
+        </div>
+    </div>
+
     <div class="header-overlay"></div>
 
     <div class="header-inner">
         <img src="logo (1).png" class="header-logo">
         <h1>Literary and psychological fiction shaped by place, memory, and unease.</h1>
     </div>
+
 </div>
 
 <!-- FEATURED -->
