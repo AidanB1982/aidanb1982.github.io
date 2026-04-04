@@ -16,7 +16,7 @@ body {
     overflow-x: hidden;
 }
 
-/* STONE TEXTURE */
+/* TEXTURE */
 body::before {
     content: "";
     position: fixed;
@@ -48,7 +48,6 @@ a, a:visited, a:active {
 .nav {
     position: absolute;
     top: 0;
-    left: 0;
     width: 100%;
     z-index: 10;
 
@@ -95,7 +94,7 @@ a, a:visited, a:active {
     width: 100%;
 }
 
-/* HEADER BACKGROUND */
+/* HEADER BG */
 .header-overlay {
     position: absolute;
     inset: 0;
@@ -107,45 +106,35 @@ a, a:visited, a:active {
     background-attachment: fixed;
 }
 
-/* 🌫️ FOG LAYERS */
+/* FOG */
 .header-fog {
     position: absolute;
     inset: 0;
     pointer-events: none;
 }
 
-/* BACK FOG */
 .fog-back {
     background: url('fog.png') repeat-x;
     background-size: cover;
     opacity: 0.25;
     z-index: 2;
-
-    mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
-
-    animation: fogDriftSlow 160s linear infinite;
+    animation: fogSlow 160s linear infinite;
 }
 
-/* FRONT FOG */
 .fog-front {
     background: url('fog.png') repeat-x;
     background-size: cover;
     opacity: 0.35;
     z-index: 3;
-
-    mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
-
-    animation: fogDrift 100s linear infinite;
+    animation: fogFast 100s linear infinite;
 }
 
-@keyframes fogDrift {
+@keyframes fogFast {
     from { background-position: 0 0; }
     to { background-position: 2000px 0; }
 }
 
-@keyframes fogDriftSlow {
+@keyframes fogSlow {
     from { background-position: 0 0; }
     to { background-position: 1500px 0; }
 }
@@ -158,17 +147,15 @@ a, a:visited, a:active {
 
 .header-logo {
     width: 150px;
-    margin-bottom: 10px;
 }
 
 .header h1 {
     font-size: 18px;
     letter-spacing: 2px;
-    font-weight: 500;
 }
 
 /* =========================
-   SECTION
+   FEATURED SECTION
 ========================= */
 .section {
     padding: 80px 20px;
@@ -179,17 +166,72 @@ a, a:visited, a:active {
     margin: 0 auto;
 }
 
+/* 2 COLUMN */
+.featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+}
+
+/* BOOK FEATURE */
+.book-feature {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 25px;
+    align-items: center;
+}
+
+/* IMAGE */
+.book-feature img {
+    width: 180px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    transition: 0.4s;
+}
+
+.book-feature:hover img {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.85);
+}
+
+/* TEXT */
+.book-text h2 {
+    font-size: 28px;
+}
+
+.book-text p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    opacity: 0.5;
+}
+
+/* LINK */
+.link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+    transition: 0.3s;
+}
+
+.link:hover {
+    opacity: 1;
+}
+
 /* =========================
-   TEXTURED SECTION
+   BOOK GRID
 ========================= */
 .section.texture {
     position: relative;
     background: #E8E6E1;
     color: #1c1c1c;
-    overflow: hidden;
 }
 
-/* STONE OVERLAY */
 .section.texture::before {
     content: "";
     position: absolute;
@@ -198,17 +240,6 @@ a, a:visited, a:active {
     opacity: 0.15;
 }
 
-/* VIGNETTE */
-.section.texture::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.06));
-}
-
-/* =========================
-   GRID
-========================= */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -217,50 +248,24 @@ a, a:visited, a:active {
     margin-top: 50px;
 }
 
-/* =========================
-   BOOK
-========================= */
 .book {
-    position: relative;
     text-align: center;
-    z-index: 1;
-    transition: transform 0.4s ease;
 }
 
-/* GLOW */
-.book::before {
-    content: "";
-    position: absolute;
-    bottom: -12px;
-    width: 120px;
-    height: 30px;
-    background: radial-gradient(rgba(0,0,0,0.25), transparent);
-    filter: blur(10px);
-    opacity: 0;
-    transition: 0.4s;
-}
-
-/* IMAGE */
+/* SHADOW + GLOW */
 .book img {
     width: 200px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-    transition: all 0.4s ease;
+    transition: 0.4s;
 }
 
-/* HOVER */
 .book:hover img {
     transform: translateY(-12px) scale(1.05);
     box-shadow: 0 45px 100px rgba(0,0,0,0.35);
 }
 
-.book:hover::before {
-    opacity: 1;
-}
-
-/* TEXT */
 .book p {
     margin-top: 14px;
-    font-size: 15px;
 }
 
 /* =========================
@@ -269,7 +274,7 @@ a, a:visited, a:active {
 .reveal {
     opacity: 0;
     transform: translateY(40px);
-    transition: all 1s ease;
+    transition: 1s;
 }
 
 .reveal.visible {
@@ -279,6 +284,10 @@ a, a:visited, a:active {
 
 /* MOBILE */
 @media (max-width: 900px) {
+    .featured {
+        grid-template-columns: 1fr;
+    }
+
     .grid {
         grid-template-columns: 1fr;
     }
@@ -303,8 +312,6 @@ a, a:visited, a:active {
     </div>
 
     <div class="header-overlay"></div>
-
-    <!-- 🌫️ FOG -->
     <div class="header-fog fog-back"></div>
     <div class="header-fog fog-front"></div>
 
@@ -315,7 +322,37 @@ a, a:visited, a:active {
 
 </div>
 
-<!-- BOOK SECTION -->
+<!-- FEATURED -->
+<div class="section">
+<div class="container featured">
+
+<!-- HOLDFAST -->
+<div class="book-feature reveal">
+<img src="book6.jpg">
+<div class="book-text">
+<p class="eyebrow">Featured Title</p>
+<h2>Holdfast</h2>
+<p>Some memories return. Others refuse to leave.</p>
+<a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
+</div>
+</div>
+
+<!-- CORROUR -->
+<div class="book-feature reveal">
+<img src="book13.png">
+<div class="book-text">
+<p class="eyebrow">Limited Edition</p>
+<h2>Corrour Bothy</h2>
+<p><strong>Founder’s Foil Edition</strong></p>
+<p>Limited to fifty hand-numbered copies.</p>
+<a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- BOOK GRID -->
 <div class="section texture">
 <div class="container">
 
@@ -344,26 +381,14 @@ a, a:visited, a:active {
 </div>
 
 <script>
-
-/* REVEAL */
 const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.classList.add('visible');
+}
+});
 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-/* PARALLAX */
-window.addEventListener("scroll", () => {
-    const scrollY = window.scrollY;
-    document.querySelectorAll(".book").forEach((book, i) => {
-        const depth = (i + 1) * 0.03;
-        book.style.transform = `translateY(${scrollY * depth * -0.3}px)`;
-    });
-});
-
 </script>
 
 </body>
