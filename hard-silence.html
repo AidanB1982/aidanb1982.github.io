@@ -2,31 +2,21 @@
 <html>
 <head>
 <title>Hard Silence | Blackwood Publishing</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
-
-    <meta name="keywords" content="literary fiction, psychological fiction, independent publisher, Scottish fiction, atmospheric fiction, Aidan Blackwood">
-
-    <meta name="author" content="Aidan Blackwood">
-    <meta property="og:title" content="Blackwood Publishing">
-    <meta property="og:description" content="Literary and psychological fiction shaped by place, memory, and unease.">
-    <meta property="og:image" content="https://blackwoodpublishing.co.uk/preview.jpg">
-    <meta property="og:url" content="https://blackwoodpublishing.co.uk/">
-    <meta property="og:type" content="website">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 body {
     margin: 0;
     font-family: Georgia, serif;
     background-image: url('stone.png');
     background-size: cover;
     background-attachment: fixed;
-    color: #d6d6d6;
+    color: #dcdcdc;
 }
 
-/* HEADER */
+/* HEADER (MATCHED SYSTEM) */
 .header {
     position: relative;
     height: 35vh;
@@ -38,12 +28,8 @@ body {
 
 .header-overlay {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.9)
-    ),
+    inset: 0;
+    background: linear-gradient(rgba(8,8,10,0.9), rgba(8,8,10,0.9)),
     url('forest.png');
     background-size: cover;
     background-position: center;
@@ -56,34 +42,36 @@ body {
 }
 
 .header-logo {
-    width: 140px;
+    width: 150px;
     margin-bottom: 10px;
 }
 
 .header h1 {
     color: #f1f1f1;
-    font-weight: normal;
+    font-weight: 500;
     letter-spacing: 2px;
 }
 
 /* NAV */
 .nav a {
-    margin: 0 15px;
+    margin: 0 16px;
     text-decoration: none;
     color: #f1f1f1;
-    font-size: 14px;
-    letter-spacing: 1px;
+    font-size: 13px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    opacity: 0.85;
 }
 
 .nav a:hover {
-    opacity: 0.6;
+    opacity: 1;
 }
 
 /* SECTION */
 .section {
-    padding: 60px 20px;
-    background-color: rgba(20,20,22,0.85);
-    margin: -30px auto 0;
+    padding: 70px 20px;
+    background-color: rgba(18,18,20,0.92);
+    margin: -40px auto 0;
     width: 90%;
     max-width: 1100px;
     text-align: center;
@@ -91,8 +79,8 @@ body {
 
 /* INTRO */
 .intro {
-    max-width: 700px;
-    margin: 0 auto 50px;
+    max-width: 680px;
+    margin: 0 auto 60px;
     line-height: 1.7;
     color: #cfcfcf;
 }
@@ -101,92 +89,97 @@ body {
     display: block;
     margin-bottom: 20px;
     color: #ffffff;
+    font-style: italic;
 }
 
-/* BOOK GRID */
+/* GRID */
 .book-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 60px 40px;
+    gap: 80px 60px;
 }
 
 @media (max-width: 800px) {
     .book-grid {
         grid-template-columns: 1fr;
+        gap: 70px;
     }
 }
 
+/* BOOK */
 .book {
-    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease;
 }
 
-/* COVER */
+.book.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* IMAGE */
 .book img {
     width: 240px;
     height: 360px;
     object-fit: cover;
 
     box-shadow:
-        0 15px 40px rgba(0,0,0,0.7),
-        0 5px 12px rgba(0,0,0,0.5);
+        0 20px 50px rgba(0,0,0,0.8),
+        0 6px 16px rgba(0,0,0,0.6);
 
     transition: all 0.4s ease;
 }
 
-.book img:hover {
+.book:hover img {
     transform: translateY(-6px) scale(1.03);
 }
 
 /* TEXT */
 .book p {
     max-width: 400px;
-    margin: 15px auto;
+    margin: 14px auto;
     line-height: 1.6;
     color: #bdbdbd;
 }
 
-/* BUTTON */
+/* BUTTON (MINIMAL – MATCH SITE) */
 .button {
     display: inline-block;
-    margin-top: 10px;
-    padding: 10px 22px;
-    background: #3f5450;
-    color: #f1f1f1;
+    margin-top: 6px;
+
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+
+    color: #8fa7a1;
     text-decoration: none;
-    font-size: 14px;
+
+    border-bottom: 1px solid rgba(143,167,161,0.4);
+    padding-bottom: 3px;
 }
 
 .button:hover {
-    background: #2f3f3c;
+    opacity: 0.6;
 }
 
-/* FOOTER */
+/* FOOTER (UNCHANGED SYSTEM) */
 .footer {
     position: relative;
-    width: 100%;
     padding: 90px 20px 70px;
-    margin-top: 80px;
+    margin-top: 100px;
     color: #F1F1F1;
-    box-sizing: border-box;
-    overflow: hidden;
 }
 
-/* background */
 .footer::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        rgba(18,18,20,0.85),
-        rgba(18,18,20,0.85)
-    ),
+    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
     url('forest.png');
     background-size: cover;
-    background-position: center;
-    z-index: 0;
 }
 
-/* subtle top divider */
 .footer::after {
     content: "";
     position: absolute;
@@ -198,7 +191,6 @@ body {
     background: rgba(255,255,255,0.08);
 }
 
-/* layout */
 .footer-content {
     position: relative;
     z-index: 1;
@@ -208,25 +200,21 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 40px;
     flex-wrap: wrap;
 }
 
-/* LEFT */
 .footer-left p {
     margin: 4px 0;
     font-size: 14px;
     opacity: 0.85;
 }
 
-/* CENTER (seal) */
 .footer-center img {
     width: 70px;
     filter: invert(1);
     opacity: 0.9;
 }
 
-/* RIGHT NAV */
 .footer-right a {
     margin-left: 18px;
     text-decoration: none;
@@ -234,32 +222,19 @@ body {
     font-size: 13px;
     letter-spacing: 1px;
     opacity: 0.85;
-    transition: all 0.25s ease;
 }
 
 .footer-right a:hover {
     opacity: 1;
-    letter-spacing: 1.5px;
 }
 
-/* MOBILE */
 @media (max-width: 768px) {
     .footer-content {
         flex-direction: column;
         text-align: center;
     }
-
-    .footer-right a {
-        margin: 0 10px;
-    }
 }
 
-.footer a {
-    color: #f1f1f1;
-    margin-left: 15px;
-    text-decoration: none;
-    font-size: 14px;
-}
 </style>
 </head>
 
@@ -291,7 +266,7 @@ body {
 <p><em>“Silence is power.”</em></p>
 
 <p>
-In Dumbarton’s forgotten corners, loyalty is currency, silence decides who survives, and violence is never wasted.
+In Dumbarton’s forgotten corners, loyalty is currency, silence decides who survives.
 </p>
 
 <p>
@@ -305,36 +280,21 @@ Pain made him. Silence sharpened him. Now, the streets belong to him.
 
 <div class="book-grid">
 
-<!-- BOOK 1 -->
 <div class="book">
 <img src="book9.png">
-
-<p>
-Left for dead by a gang with no fear, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.
-</p>
-
+<p>Left for dead, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.</p>
 <a href="https://mybook.to/echoesofvengeance" target="_blank" class="button">Read Now</a>
 </div>
 
-<!-- BOOK 2 -->
 <div class="book">
 <img src="book10.jpg">
-
-<p>
-Jamie is no longer a victim. Feared and silent, he enforces order—until the day he decides to break it.
-</p>
-
+<p>Jamie is no longer a victim. Feared and silent, he enforces order—until he decides to break it.</p>
 <a href="https://mybook.to/RedStreets" target="_blank" class="button">Read Now</a>
 </div>
 
-<!-- BOOK 3 -->
 <div class="book">
 <img src="book12.jpg">
-
-<p>
-A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
-</p>
-
+<p>A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.</p>
 <a href="#" class="button">Coming 2027</a>
 </div>
 
@@ -362,6 +322,19 @@ A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
 
     </div>
 </div>
+
+<!-- FADE-IN -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.book').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
