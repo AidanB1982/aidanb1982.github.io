@@ -113,22 +113,22 @@ a, a:visited, a:active {
     pointer-events: none;
 
     background: url('fog.png') repeat-x;
-    background-size: 120%;
+    background-size: 140%;
 
     /* smooth edge fade */
     mask-image: linear-gradient(
         to right,
         transparent 0%,
-        black 18%,
-        black 82%,
+        black 25%,
+        black 75%,
         transparent 100%
     );
 
     -webkit-mask-image: linear-gradient(
         to right,
         transparent 0%,
-        black 18%,
-        black 82%,
+        black 25%,
+        black 75%,
         transparent 100%
     );
 }
@@ -408,6 +408,28 @@ entry.target.classList.add('visible');
 });
 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* EXISTING REVEAL */
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* 🔥 NEW: FOG PARALLAX */
+window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+
+    const fogFront = document.querySelector(".fog-front");
+    const fogBack = document.querySelector(".fog-back");
+
+    if (fogFront && fogBack) {
+        fogFront.style.transform = `translateY(${scrollY * 0.03}px)`;
+        fogBack.style.transform = `translateY(${scrollY * 0.015}px)`;
+    }
+});
 </script>
 
 </body>
