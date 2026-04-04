@@ -16,7 +16,7 @@
         /* HERO */
         .hero {
             position: relative;
-            height: 70vh; /* reduced from 90 */
+            height: 60vh; /* reduced again */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,8 +30,8 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(
-                rgba(22,22,25,0.65),
-                rgba(22,22,25,0.65)
+                rgba(22,22,25,0.7),
+                rgba(22,22,25,0.7)
             ),
             url('forest.png');
             background-size: cover;
@@ -48,7 +48,7 @@
         /* NAV */
         .nav {
             position: absolute;
-            top: 30px;
+            top: 25px;
             right: 40px;
             z-index: 2;
         }
@@ -67,21 +67,21 @@
 
         /* LOGO */
         .hero img {
-            width: 220px;
+            width: 300px; /* increased */
             margin-bottom: 20px;
-            filter: invert(1); /* remove if using white logo */
+            filter: invert(1);
         }
 
         .hero p {
             max-width: 600px;
             margin: 0 auto;
-            font-size: 17px;
+            font-size: 16px;
             line-height: 1.6;
         }
 
         .button {
-            margin-top: 25px;
-            padding: 12px 26px;
+            margin-top: 20px;
+            padding: 12px 24px;
             background: #5F7D76;
             color: #F1F1F1;
             text-decoration: none;
@@ -92,24 +92,32 @@
             background: #4e6a63;
         }
 
-        /* FLOATING SECTION */
+        /* SECTION */
         .section {
             padding: 60px 20px;
             text-align: center;
-            background-color: rgba(232, 228, 220, 0.95);
-            margin: -50px auto 0;
+            background-color: rgba(232, 228, 220, 0.88); /* slightly reduced */
+            margin: -40px auto 0;
             width: 90%;
             max-width: 1100px;
         }
 
         .section h2 {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .section p {
             max-width: 700px;
             margin: 0 auto;
             line-height: 1.6;
+        }
+
+        /* DIVIDER LINE */
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: #aaa;
+            margin: 40px auto;
         }
 
         /* BOOK GRID */
@@ -154,7 +162,7 @@
         }
 
         .footer img {
-            width: 80px;
+            width: 70px;
             margin-bottom: 15px;
             filter: invert(1);
         }
@@ -175,7 +183,7 @@
 <!-- HERO -->
 <div class="hero">
     <div class="hero-content">
-        <img src="logo.png" alt="Blackwood Logo">
+        <img src="logo.png">
 
         <p>
             Publishing literary and psychological fiction shaped by atmosphere, place, and memory.
@@ -185,17 +193,18 @@
     </div>
 </div>
 
-<!-- ABOUT -->
+<!-- CONTENT -->
 <div class="section">
+
     <h2>About Blackwood Publishing</h2>
+
     <p>
-        Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in place, memory, and unease.
+        Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in place, memory, and unease. 
         Our titles explore the quiet forces that shape lives over time — landscapes that remember, houses that listen, and histories that refuse to remain buried.
     </p>
-</div>
 
-<!-- BOOKS -->
-<div class="section">
+    <div class="divider"></div>
+
     <h2>Current Publications</h2>
 
     <div class="books">
@@ -219,6 +228,7 @@
         </div>
 
     </div>
+
 </div>
 
 <!-- FOOTER -->
