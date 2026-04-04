@@ -11,15 +11,18 @@
     <link rel="stylesheet" href="styles.css">
 
     <style>
-        /* HERO ONLY (keep custom here) */
+        /* =========================
+           HERO (CINEMATIC)
+        ========================= */
         .hero {
             position: relative;
-            height: 70vh;
+            height: 90vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             color: #F1F1F1;
+            overflow: hidden;
         }
 
         .hero::before {
@@ -27,52 +30,113 @@
             position: absolute;
             inset: 0;
             background:
-                linear-gradient(rgba(12,12,14,0.8), rgba(12,12,14,0.8)),
+                linear-gradient(rgba(10,10,12,0.75), rgba(10,10,12,0.85)),
                 url('forest.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            transform: scale(1.08);
         }
 
         .hero-inner {
             position: relative;
             z-index: 1;
-            max-width: 700px;
+            max-width: 720px;
+            animation: fadeUp 1.5s ease forwards;
         }
 
         .hero img {
-            width: 220px;
-            margin-bottom: 20px;
+            width: 260px;
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeIn 2s ease forwards;
         }
 
         .hero p {
-            color: #dcdcdc;
+            font-size: 17px;
+            line-height: 1.7;
+            opacity: 0;
+            animation: fadeIn 2.5s ease forwards;
         }
 
-        /* FIX NAV COLOR */
-        .nav a {
-            color: #F1F1F1 !important;
+        /* NAV FLOATING */
+        .nav {
+            position: absolute;
+            top: 30px;
+            right: 50px;
+            z-index: 2;
         }
 
         /* FEATURED */
         .featured {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 60px;
+            grid-template-columns: 320px 1fr;
+            gap: 80px;
             align-items: center;
         }
 
         .featured img {
             width: 100%;
-            max-width: 280px;
-            height: auto;
+            max-width: 320px;
+            box-shadow: 0 40px 90px rgba(0,0,0,0.6);
+            transition: transform 0.6s ease;
         }
 
-        @media (max-width: 800px) {
+        .featured img:hover {
+            transform: scale(1.04);
+        }
+
+        /* PUBLICATIONS GRID */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
             .featured {
                 grid-template-columns: 1fr;
                 text-align: center;
             }
+        }
+
+        /* BOOK ENHANCEMENT */
+        .book img {
+            width: 220px;
+            margin: 0 auto;
+            transition: all 0.4s ease;
+        }
+
+        .book:hover img {
+            transform: translateY(-8px) scale(1.04);
+        }
+
+        .book p {
+            margin-top: 12px;
+            font-size: 15px;
+        }
+
+        /* DIVIDER */
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: rgba(0,0,0,0.3);
+            margin: 50px auto;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -105,86 +169,69 @@
 
 <!-- ABOUT -->
 <div class="section narrow">
-    <div class="container">
-
-        <div class="intro">
-            <h2>Blackwood Publishing</h2>
-            <p>
-                An independent imprint exploring atmosphere, landscape, and the quiet persistence of memory.
-            </p>
-        </div>
-
+    <div class="intro">
+        <p>
+            Blackwood Publishing is an independent imprint exploring landscape, memory, and the quiet persistence of what remains.
+        </p>
     </div>
 </div>
+
+<div class="divider"></div>
 
 <!-- FEATURED -->
 <div class="section">
-    <div class="container">
+    <div class="container featured">
 
-        <div class="intro">
-            <h2>Featured Release</h2>
-        </div>
+        <img src="book6.jpg">
 
-        <div class="featured">
+        <div>
+            <h2>Holdfast</h2>
 
-            <img src="book6.jpg">
+            <p>
+                Some memories return. Others refuse to leave.
+            </p>
 
-            <div>
-                <h3>Holdfast</h3>
+            <p>
+                The recursion spreads. Voices rise. What was buried begins to surface again.
+            </p>
 
-                <p>Some memories return. Others refuse to leave.</p>
-
-                <p>
-                    The recursion spreads. Voices rise. What was buried begins to surface again.
-                </p>
-
-                <a href="https://mybook.to/Holdfast" target="_blank" class="button">
-                    Preorder
-                </a>
-            </div>
-
+            <a href="https://mybook.to/Holdfast" target="_blank" class="button">
+                Preorder
+            </a>
         </div>
 
     </div>
 </div>
 
+<div class="divider"></div>
+
 <!-- PUBLICATIONS -->
 <div class="section">
-    <div class="container">
 
-        <div class="intro">
-            <h2>Current Publications</h2>
+    <h2 style="text-align:center;">Current Publications</h2>
+
+    <div class="container grid-3">
+
+        <div class="book">
+            <img src="book1.jpg">
+            <p>Dour Hill House</p>
+            <a href="https://mybook.to/DourHillHouse" target="_blank" class="button">View</a>
         </div>
 
-        <div class="grid-2">
+        <div class="book">
+            <img src="book2.jpg">
+            <p>Corrour</p>
+            <a href="https://mybook.to/Corrour" target="_blank" class="button">View</a>
+        </div>
 
-            <div class="book animate">
-                <img src="book1.jpg">
-                <p>Dour Hill House</p>
-                <a href="https://mybook.to/DourHillHouse" target="_blank" class="button">View</a>
-            </div>
-
-            <div class="book animate">
-                <img src="book2.jpg">
-                <p>Corrour</p>
-                <a href="https://mybook.to/Corrour" target="_blank" class="button">View</a>
-            </div>
-
-            <div class="book animate">
-                <img src="book3.jpg">
-                <p>The Black Bothy</p>
-                <a href="https://mybook.to/BlackBothy" target="_blank" class="button">View</a>
-            </div>
-
-            <div class="book animate">
-                <img src="book4.jpg">
-                <p>The Drowned Fjord</p>
-                <a href="https://mybook.to/DrownedFjord" target="_blank" class="button">View</a>
-            </div>
-
+        <div class="book">
+            <img src="book3.jpg">
+            <p>The Black Bothy</p>
+            <a href="https://mybook.to/BlackBothy" target="_blank" class="button">View</a>
         </div>
 
     </div>
+
 </div>
 
 <!-- FOOTER -->
@@ -208,19 +255,6 @@
 
     </div>
 </div>
-
-<!-- SCROLL ANIMATION -->
-<script>
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-});
-
-document.querySelectorAll('.book.animate').forEach(el => observer.observe(el));
-</script>
 
 </body>
 </html>
