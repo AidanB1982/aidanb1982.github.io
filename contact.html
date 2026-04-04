@@ -1,163 +1,179 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Contact | Blackwood Publishing</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact | Blackwood Publishing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
+<meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
 
-    <meta name="keywords" content="literary fiction, psychological fiction, independent publisher, Scottish fiction, atmospheric fiction, Aidan Blackwood">
+<style>
 
-    <meta name="author" content="Aidan Blackwood">
-    <meta property="og:title" content="Blackwood Publishing">
-    <meta property="og:description" content="Literary and psychological fiction shaped by place, memory, and unease.">
-    <meta property="og:image" content="https://blackwoodpublishing.co.uk/preview.jpg">
-    <meta property="og:url" content="https://blackwoodpublishing.co.uk/">
-    <meta property="og:type" content="website">
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #1C1C1C;
+    -webkit-font-smoothing: antialiased;
+}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Georgia, serif;
-            background-image: url('stone.png');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #2c2c2c;
-        }
+/* HEADER (CONSISTENT) */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-        /* HEADER */
-        .header {
-            position: relative;
-            height: 35vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
+.header-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
 
-        .header-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                rgba(22,22,25,0.85),
-                rgba(22,22,25,0.85)
-            ),
-            url('forest.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
+.header-inner {
+    position: relative;
+    z-index: 1;
+}
 
-        .header-inner {
-            position: relative;
-            z-index: 1;
-        }
+.header-logo {
+    width: 150px;
+    margin-bottom: 10px;
+}
 
-        .header-logo {
-            width: 160px;
-            margin-bottom: 10px;
-        }
+.header h1 {
+    color: #F1F1F1;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
 
-        .nav a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: #F1F1F1;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
+/* NAV */
+.nav a {
+    margin: 0 16px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 13px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
 
-        .header h1 {
-            color: #F1F1F1;
-            font-weight: normal;
-            letter-spacing: 2px;
-        }
+.nav a:hover {
+    opacity: 1;
+}
 
-        /* SECTION */
-        .section {
-            padding: 60px 20px;
-            text-align: center;
-            background-color: rgba(232, 228, 220, 0.55);
-            margin: -30px auto 0;
-            width: 90%;
-            max-width: 800px;
-        }
+/* SECTION */
+.section {
+    padding: 70px 20px;
+    text-align: center;
+    background-color: rgba(232, 228, 220, 0.6);
+    margin: -40px auto 0;
+    width: 90%;
+    max-width: 700px;
+}
 
-        .section p {
-            max-width: 600px;
-            margin: 15px auto;
-            line-height: 1.7;
-        }
+.section p {
+    max-width: 520px;
+    margin: 15px auto;
+    line-height: 1.7;
+}
 
-        .divider {
-            width: 80px;
-            height: 1px;
-            background: #999;
-            margin: 40px auto;
-        }
+/* DIVIDER */
+.divider {
+    width: 80px;
+    height: 1px;
+    background: rgba(0,0,0,0.3);
+    margin: 40px auto;
+}
 
-        /* FORM */
-        .contact-form {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+/* FORM (REFINED STYLE) */
+.contact-form {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
 
-        .contact-form input,
-        .contact-form textarea {
-            padding: 12px;
-            border: 1px solid rgba(0,0,0,0.2);
-            background: rgba(255,255,255,0.6);
-            font-family: Georgia, serif;
-            font-size: 14px;
-        }
+/* INPUTS */
+.contact-form input,
+.contact-form textarea {
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.25);
+    background: transparent;
+    padding: 10px 0;
 
-        .contact-form textarea {
-            resize: vertical;
-        }
+    font-family: Georgia, serif;
+    font-size: 15px;
+    color: #1C1C1C;
+}
 
-        .contact-form button {
-            padding: 12px;
-            background: #5F7D76;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-family: Georgia, serif;
-        }
+/* PLACEHOLDER */
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: rgba(0,0,0,0.45);
+    letter-spacing: 0.5px;
+}
 
-        .contact-form button:hover {
-            background: #4e6a63;
-        }
+/* FOCUS */
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-bottom: 1px solid #5F7D76;
+}
 
-        /* FOOTER */
-        .footer {
+/* TEXTAREA */
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* BUTTON */
+.contact-form button {
+    margin-top: 10px;
+    background: none;
+    border: none;
+
+    font-family: Georgia, serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+
+    color: #5F7D76;
+    cursor: pointer;
+}
+
+/* BUTTON HOVER */
+.contact-form button:hover {
+    opacity: 0.6;
+}
+
+/* FOOTER */
+.footer {
     position: relative;
     width: 100%;
     padding: 90px 20px 70px;
     margin-top: 80px;
     color: #F1F1F1;
-    box-sizing: border-box;
     overflow: hidden;
 }
 
-/* background */
 .footer::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        rgba(18,18,20,0.85),
-        rgba(18,18,20,0.85)
-    ),
+    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
     url('forest.png');
     background-size: cover;
     background-position: center;
-    z-index: 0;
 }
 
-/* subtle top divider */
 .footer::after {
     content: "";
     position: absolute;
@@ -169,7 +185,6 @@
     background: rgba(255,255,255,0.08);
 }
 
-/* layout */
 .footer-content {
     position: relative;
     z-index: 1;
@@ -179,25 +194,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 40px;
     flex-wrap: wrap;
 }
 
-/* LEFT */
 .footer-left p {
     margin: 4px 0;
     font-size: 14px;
     opacity: 0.85;
 }
 
-/* CENTER (seal) */
 .footer-center img {
     width: 70px;
     filter: invert(1);
     opacity: 0.9;
 }
 
-/* RIGHT NAV */
 .footer-right a {
     margin-left: 18px;
     text-decoration: none;
@@ -205,15 +216,21 @@
     font-size: 13px;
     letter-spacing: 1px;
     opacity: 0.85;
-    transition: all 0.25s ease;
 }
 
 .footer-right a:hover {
     opacity: 1;
-    letter-spacing: 1.5px;
 }
 
-    </style>
+/* MOBILE */
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+</style>
 </head>
 
 <body>
@@ -240,18 +257,17 @@
 <!-- CONTENT -->
 <div class="section">
 
-    <p>
-        For enquiries, collaborations, or general correspondence, use the form below.
-    </p>
+<p>
+    For enquiries, collaborations, or general correspondence, use the form below.
+</p>
 
-    <div class="divider"></div>
+<div class="divider"></div>
 
-    <!-- FORM -->
-    <form action="https://formspree.io/f/mbdpplkw" method="POST" class="contact-form">
+<form action="https://formspree.io/f/mbdpplkw" method="POST" class="contact-form">
 
     <input type="text" name="name" placeholder="Name" required>
     <input type="email" name="email" placeholder="Email" required>
-    <textarea name="message" placeholder="Message" rows="6" required></textarea>
+    <textarea name="message" placeholder="Message" required></textarea>
 
     <input type="hidden" name="_redirect" value="https://yourdomain.com/thank-you.html">
 
