@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>The Cursed Bothies | Blackwood Publishing</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Georgia, serif;
+            background-image: url('stone.png');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #2c2c2c;
+        }
+
+        /* HEADER */
+        .header {
+            position: relative;
+            height: 35vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .header-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.8),
+                rgba(22,22,25,0.8)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: 0;
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .header-logo {
+            width: 160px;
+            margin-bottom: 10px;
+            filter: invert(1);
+        }
+
+        .nav {
+            margin-bottom: 10px;
+        }
+
+        .nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #F1F1F1;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav a:hover {
+            opacity: 0.7;
+        }
+
+        .header h1 {
+            color: #F1F1F1;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        /* CONTENT */
+        .section {
+            padding: 60px 20px;
+            text-align: center;
+            background-color: rgba(232, 228, 220, 0.55);
+            margin: -30px auto 0;
+            width: 90%;
+            max-width: 1100px;
+        }
+
+        .intro {
+            max-width: 700px;
+            margin: 0 auto 50px;
+            line-height: 1.7;
+        }
+
+        .intro em {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        /* BOOK GRID */
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 60px 40px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 800px) {
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .book {
+            text-align: center;
+        }
+
+        .book img {
+            width: 240px;
+            height: 360px;
+            object-fit: cover;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+            transition: transform 0.4s ease;
+        }
+
+        .book img:hover {
+            transform: scale(1.05);
+        }
+
+        .book p {
+            max-width: 400px;
+            margin: 15px auto;
+            line-height: 1.6;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 22px;
+            background: #5F7D76;
+            color: #F1F1F1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .button:hover {
+            background: #4e6a63;
+        }
+
+        /* FOOTER */
+        .footer {
+            position: relative;
+            padding: 60px 20px;
+            color: #F1F1F1;
+        }
+
+        .footer::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.85),
+                rgba(22,22,25,0.85)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-center img {
+            width: 80px;
+            filter: invert(1);
+        }
+
+        .footer a {
+            color: #F1F1F1;
+            margin-left: 15px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+
+        <img src="logo.png" class="header-logo">
+
+        <div class="nav">
+            <a href="index.html">Home</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="author.html">Author</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <h1>The Cursed Bothies</h1>
+
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+
+    <div class="intro">
+        <em>“The bothy waits.”</em>
+
+        <p>
+            Deep in the Scottish Highlands stand the bothies—stone shelters built for survival in the wild. Places of refuge. Places of silence.
+        </p>
+
+        <p>
+            But some walls remember too much.
+        </p>
+
+        <p>
+            The Cursed Bothies is a series of interconnected Highland horror novels rooted in isolation, fractured memory, grief, and the quiet dread of the landscape itself. Each book centres on a different bothy, yet beneath the snow, the wind, and the miles of empty ground, something threads them together.
+        </p>
+
+        <p>
+            The land watches. The weather erases. And what is buried does not stay buried.
+        </p>
+
+        <p>
+            Enter the bothy. Leave altered.
+        </p>
+    </div>
+
+    <div class="book-grid">
+
+        <!-- CORROUR -->
+        <div class="book">
+            <img src="book2.jpg">
+
+            <p>
+                A storm traps strangers inside a remote Highland shelter. When an ancient object is disturbed, the bothy begins to change—and something unseen begins to feed.
+            </p>
+
+            <a href="https://mybook.to/Corrour" target="_blank" class="button">Read Now</a>
+        </div>
+
+        <!-- GUALACHULAIN -->
+        <div class="book">
+            <img src="book7.png">
+
+            <p>
+                A father and daughter seek refuge in the Highlands, but grief opens the door to something waiting in the dark.
+            </p>
+
+            <a href="https://mybook.to/Gualachulain" target="_blank" class="button">Preorder</a>
+        </div>
+
+        <!-- CAMBAN -->
+        <div class="book">
+            <img src="book8.jpg">
+
+            <p>
+                A documentary crew searching for folklore find something real. Their recordings begin to change—and so do they.
+            </p>
+
+            <a href="https://mybook.to/Camban" target="_blank" class="button">Preorder</a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    <div class="footer-content">
+
+        <div>
+            <p>Blackwood Publishing</p>
+            <p>Independent Literary Imprint</p>
+        </div>
+
+        <div class="footer-center">
+            <img src="seal.png">
+        </div>
+
+        <div>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
