@@ -10,147 +10,175 @@
 
    <style>
 
-    /* ===== CRITICAL FIXES ===== */
-    .container {
-        max-width: 1100px;
-        margin: 0 auto;
-        width: 100%;
-    }
+/* RESET */
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #1C1C1C;
+}
 
-    img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-    }
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
 
-    /* ===== FILM GRAIN ===== */
-    body::after {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-        opacity: 0.06;
-        pointer-events: none;
-        z-index: 9999;
-    }
+/* HERO */
+.hero {
+    position: relative;
+    height: 95vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #F1F1F1;
+}
 
-    /* ===== HERO ===== */
-    .hero {
-        position: relative;
-        height: 95vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: #F1F1F1;
-        overflow: hidden;
-    }
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(8,8,10,0.75), rgba(8,8,10,0.9)),
+        url('forest.png');
+    background-size: cover;
+    background-position: center;
+}
 
-    .hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-            linear-gradient(rgba(8,8,10,0.75), rgba(8,8,10,0.9)),
-            url('forest.png');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        animation: slowZoom 30s ease-in-out infinite alternate;
-    }
+.hero-inner {
+    position: relative;
+    z-index: 1;
+}
 
-    .hero-inner {
-        position: relative;
-        z-index: 1;
-        max-width: 720px;
-    }
+.hero img {
+    width: 240px;
+    margin: 0 auto 20px;
+}
 
-    .hero img {
-        width: 240px;
-        margin: 0 auto 20px;
-    }
+/* NAV */
+.nav {
+    position: absolute;
+    top: 30px;
+    right: 50px;
+}
 
-    .hero p {
-        font-size: 16px;
-        line-height: 1.7;
-    }
+.nav a {
+    margin-left: 20px;
+    color: #F1F1F1;
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+}
 
-    /* ===== NAV ===== */
-    .nav {
-        position: absolute;
-        top: 30px;
-        right: 50px;
-        z-index: 2;
-    }
+/* SECTIONS */
+.section {
+    padding: 100px 20px;
+    background-color: #E8E6E1;
+    width: 100%;
+}
 
-    /* ===== FEATURED ===== */
-    .featured {
-        display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: 80px;
-        align-items: center;
-    }
+.section.narrow {
+    max-width: 800px;
+    margin: 0 auto;
+}
 
-    .featured img {
-        width: 100%;
-        max-width: 320px;
-        margin: 0 auto;
-    }
+.intro {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
 
-    /* ===== GRID FIX ===== */
-    .grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 60px;
-        justify-items: center;
-        margin-top: 50px;
-    }
+/* FEATURED */
+.featured {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
-    @media (max-width: 900px) {
-        .grid-3 {
-            grid-template-columns: 1fr;
-        }
+.featured img {
+    width: 100%;
+    max-width: 300px;
+}
 
-        .featured {
-            grid-template-columns: 1fr;
-            text-align: center;
-        }
-    }
+/* BOOK GRID */
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 80px;
+    justify-items: center;
+    max-width: 1000px;
+    margin: 60px auto 0;
+}
 
-    /* ===== BOOKS ===== */
-    .book {
-        text-align: center;
-    }
+.book {
+    text-align: center;
+}
 
-    .book img {
-        width: 220px;
-        margin: 0 auto;
-    }
+.book img {
+    width: 220px;
+}
 
-    .book p {
-        margin-top: 12px;
-    }
+.book p {
+    margin-top: 12px;
+}
 
-    /* ===== DIVIDER ===== */
-    .divider {
-        width: 60px;
-        height: 1px;
-        background: rgba(0,0,0,0.25);
-        margin: 60px auto;
-    }
+/* BUTTON */
+.button {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #5F7D76;
+    font-size: 13px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(95,125,118,0.4);
+}
 
-    /* ===== FOOTER FIX ===== */
-    .footer-center img {
-        width: 70px;
-    }
+/* DIVIDER */
+.divider {
+    width: 60px;
+    height: 1px;
+    background: rgba(0,0,0,0.25);
+    margin: 60px auto;
+}
 
-    /* ===== ANIMATION ===== */
-    @keyframes slowZoom {
-        from { transform: scale(1.05); }
-        to { transform: scale(1.12); }
-    }
+/* FOOTER */
+.footer {
+    position: relative;
+    padding: 80px 20px;
+    color: #F1F1F1;
+}
 
-    </style>
+.footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
+        url('forest.png');
+    background-size: cover;
+}
+
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-center img {
+    width: 70px;
+}
+
+</style>
 </head>
 
 <body>
