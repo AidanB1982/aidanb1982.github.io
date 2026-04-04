@@ -82,6 +82,8 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 60px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
         @media (max-width: 800px) {
@@ -90,13 +92,24 @@
             }
         }
 
+        /* SERIES BLOCK */
+        .series {
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 10px;
+        }
+
+        .series:hover {
+            transform: translateY(-8px);
+        }
+
         .series h2 {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .series p {
             max-width: 400px;
-            margin: 0 auto 20px;
+            margin: 15px auto;
             line-height: 1.6;
         }
 
@@ -106,6 +119,7 @@
             width: 180px;
             height: 270px;
             margin: 20px auto;
+            overflow: hidden;
         }
 
         .carousel img {
@@ -114,11 +128,16 @@
             height: 100%;
             object-fit: cover;
             opacity: 0;
-            transition: opacity 1.5s ease;
+            transition: opacity 1.5s ease, transform 0.5s ease;
         }
 
         .carousel img.active {
             opacity: 1;
+        }
+
+        /* IMAGE HOVER (nice subtle zoom) */
+        .series:hover .carousel img.active {
+            transform: scale(1.05);
         }
 
         /* BUTTON */
@@ -128,6 +147,9 @@
             color: #F1F1F1;
             text-decoration: none;
             font-size: 14px;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background 0.3s ease;
         }
 
         .button:hover {
