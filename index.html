@@ -8,23 +8,34 @@
 
     <meta name="description" content="Blackwood Publishing creates literary and psychological fiction rooted in place, memory, and unease. Discover atmospheric novels by Aidan Blackwood.">
 
-    <meta name="keywords" content="literary fiction, psychological fiction, independent publisher, Scottish fiction, atmospheric fiction, Aidan Blackwood">
-
-    <meta name="author" content="Aidan Blackwood">
     <meta property="og:title" content="Blackwood Publishing">
     <meta property="og:description" content="Literary and psychological fiction shaped by place, memory, and unease.">
     <meta property="og:image" content="https://blackwoodpublishing.co.uk/preview.jpg">
     <meta property="og:url" content="https://blackwoodpublishing.co.uk/">
-    <meta property="og:type" content="website">
 
     <style>
+
         body {
             margin: 0;
             font-family: Georgia, serif;
             background-image: url('stone.png');
             background-size: cover;
             background-attachment: fixed;
-            color: #2c2c2c;
+            color: #1C1C1C;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3 {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        h2 { font-size: 28px; }
+        h3 { font-size: 20px; }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
         }
 
         /* HERO */
@@ -43,11 +54,9 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                rgba(22,22,25,0.7),
-                rgba(22,22,25,0.7)
-            ),
-            url('forest.png');
+            background:
+                linear-gradient(rgba(22,22,25,0.7), rgba(22,22,25,0.7)),
+                url('forest.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -59,6 +68,16 @@
             z-index: 1;
         }
 
+        .hero img {
+            width: 260px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
         /* NAV */
         .nav {
             position: absolute;
@@ -68,38 +87,33 @@
         }
 
         .nav a {
-            margin-left: 20px;
+            margin-left: 24px;
             text-decoration: none;
             color: #F1F1F1;
-            font-size: 14px;
-            letter-spacing: 1px;
+            font-size: 13px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            transition: all 0.25s ease;
         }
 
         .nav a:hover {
-            opacity: 0.7;
+            opacity: 1;
+            letter-spacing: 2.5px;
         }
 
-        /* LOGO */
-        .hero img {
-            width: 300px;
-            margin-bottom: 20px;
-        }
-
-        .hero p {
-            max-width: 480px;
-            margin: 0 auto;
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
+        /* BUTTON */
         .button {
-            margin-top: 18px;
-            padding: 10px 22px;
-            background: #586f69;
+            margin-top: 22px;
+            padding: 14px 30px;
+            background: #5F7D76;
             color: #F1F1F1;
             text-decoration: none;
             display: inline-block;
-            font-size: 14px;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 2px;
         }
 
         .button:hover {
@@ -110,20 +124,23 @@
         .section {
             padding: 60px 20px;
             text-align: center;
-            background-color: rgba(232, 228, 220, 0.55);
+            background-color: #E8E6E1;
             margin: -40px auto 0;
             width: 90%;
             max-width: 1100px;
         }
 
-        .section h2 {
-            margin-bottom: 15px;
-        }
-
         .section p {
             max-width: 680px;
             margin: 0 auto;
-            line-height: 1.6;
+        }
+
+        /* DIVIDER */
+        .divider {
+            width: 600px;
+            height: 1px;
+            background: rgba(0,0,0,0.2);
+            margin: 50px auto;
         }
 
         /* FEATURED */
@@ -148,12 +165,12 @@
             text-align: left;
         }
 
-        /* DIVIDER */
-        .divider {
-            width: 600px;
-            height: 1px;
-            background: #999;
-            margin: 50px auto;
+        .featured-text h3 {
+            margin-top: 0;
+        }
+
+        .featured-text p {
+            margin-bottom: 12px;
         }
 
         /* BOOK GRID */
@@ -161,7 +178,7 @@
             margin-top: 40px;
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 40px;
             flex-wrap: wrap;
         }
 
@@ -175,113 +192,71 @@
             object-fit: cover;
         }
 
-        .book p {
-            margin: 10px 0;
-        }
-
         .book a {
             display: inline-block;
             margin-top: 10px;
-            padding: 8px 16px;
+            padding: 10px 18px;
             background: #5F7D76;
             color: #F1F1F1;
             text-decoration: none;
             font-size: 13px;
         }
 
-        /* FIXED FOOTER */
+        /* FOOTER */
         .footer {
-    position: relative;
-    width: 100%;
-    padding: 90px 20px 70px;
-    margin-top: 80px;
-    color: #F1F1F1;
-    box-sizing: border-box;
-    overflow: hidden;
-}
+            position: relative;
+            width: 100%;
+            padding: 90px 20px 70px;
+            margin-top: 80px;
+            color: #F1F1F1;
+        }
 
-/* background */
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        rgba(18,18,20,0.85),
-        rgba(18,18,20,0.85)
-    ),
-    url('forest.png');
-    background-size: cover;
-    background-position: center;
-    z-index: 0;
-}
+        .footer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
+                url('forest.png');
+            background-size: cover;
+            background-position: center;
+        }
 
-/* subtle top divider */
-.footer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 1px;
-    background: rgba(255,255,255,0.08);
-}
+        .footer-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-/* layout */
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
+        .footer-left p:first-child {
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 40px;
-    flex-wrap: wrap;
-}
+        .footer-center img {
+            width: 70px;
+            filter: invert(1);
+        }
 
-/* LEFT */
-.footer-left p {
-    margin: 4px 0;
-    font-size: 14px;
-    opacity: 0.85;
-}
+        .footer-right a {
+            margin-left: 18px;
+            text-decoration: none;
+            color: #F1F1F1;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
 
-/* CENTER (seal) */
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-    opacity: 0.9;
-}
-
-/* RIGHT NAV */
-.footer-right a {
-    margin-left: 18px;
-    text-decoration: none;
-    color: #F1F1F1;
-    font-size: 13px;
-    letter-spacing: 1px;
-    opacity: 0.85;
-    transition: all 0.25s ease;
-}
-
-.footer-right a:hover {
-    opacity: 1;
-    letter-spacing: 1.5px;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .footer-right a {
-        margin: 0 10px;
-    }
-}
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
 
     </style>
 </head>
