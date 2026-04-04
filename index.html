@@ -32,9 +32,7 @@ a, a:visited, a:active {
     text-decoration: none;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 .header {
     position: relative;
     height: 40vh;
@@ -50,7 +48,6 @@ a, a:visited, a:active {
     top: 0;
     width: 100%;
     z-index: 10;
-
     background: linear-gradient(
         rgba(10,10,12,0.9),
         rgba(10,10,12,0.5),
@@ -75,9 +72,7 @@ a, a:visited, a:active {
     position: relative;
 }
 
-.nav a:hover {
-    opacity: 1;
-}
+.nav a:hover { opacity: 1; }
 
 .nav a::after {
     content: "";
@@ -106,16 +101,15 @@ a, a:visited, a:active {
     background-attachment: fixed;
 }
 
-/* FOG BASE */
+/* FOG */
 .header-fog {
     position: absolute;
     inset: 0;
     pointer-events: none;
 
     background: url('fog.png') repeat-x;
-    background-size: 140%;
+    background-size: 130%;
 
-    /* smooth edge fade */
     mask-image: linear-gradient(
         to right,
         transparent 0%,
@@ -133,21 +127,18 @@ a, a:visited, a:active {
     );
 }
 
-/* BACK LAYER */
 .fog-back {
     opacity: 0.25;
     z-index: 2;
     animation: fogSlow 160s linear infinite;
 }
 
-/* FRONT LAYER */
 .fog-front {
     opacity: 0.35;
     z-index: 3;
     animation: fogFast 100s linear infinite;
 }
 
-/* ANIMATION */
 @keyframes fogFast {
     from { background-position: 0 0; }
     to { background-position: 2000px 0; }
@@ -173,9 +164,7 @@ a, a:visited, a:active {
     letter-spacing: 2px;
 }
 
-/* =========================
-   FEATURED SECTION
-========================= */
+/* SECTION */
 .section {
     padding: 80px 20px;
 }
@@ -185,14 +174,13 @@ a, a:visited, a:active {
     margin: 0 auto;
 }
 
-/* 2 COLUMN */
+/* FEATURED */
 .featured {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 80px;
 }
 
-/* BOOK FEATURE */
 .book-feature {
     display: grid;
     grid-template-columns: 180px 1fr;
@@ -200,7 +188,6 @@ a, a:visited, a:active {
     align-items: center;
 }
 
-/* IMAGE */
 .book-feature img {
     width: 180px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
@@ -212,7 +199,6 @@ a, a:visited, a:active {
     box-shadow: 0 40px 100px rgba(0,0,0,0.85);
 }
 
-/* TEXT */
 .book-text h2 {
     font-size: 28px;
 }
@@ -228,7 +214,6 @@ a, a:visited, a:active {
     opacity: 0.5;
 }
 
-/* LINK */
 .link {
     display: inline-block;
     margin-top: 12px;
@@ -238,13 +223,9 @@ a, a:visited, a:active {
     transition: 0.3s;
 }
 
-.link:hover {
-    opacity: 1;
-}
+.link:hover { opacity: 1; }
 
-/* =========================
-   BOOK GRID
-========================= */
+/* BOOK GRID */
 .section.texture {
     position: relative;
     background: #E8E6E1;
@@ -267,11 +248,6 @@ a, a:visited, a:active {
     margin-top: 50px;
 }
 
-.book {
-    text-align: center;
-}
-
-/* SHADOW + GLOW */
 .book img {
     width: 200px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
@@ -287,9 +263,7 @@ a, a:visited, a:active {
     margin-top: 14px;
 }
 
-/* =========================
-   ANIMATION
-========================= */
+/* ANIMATION */
 .reveal {
     opacity: 0;
     transform: translateY(40px);
@@ -306,7 +280,6 @@ a, a:visited, a:active {
     .featured {
         grid-template-columns: 1fr;
     }
-
     .grid {
         grid-template-columns: 1fr;
     }
@@ -345,7 +318,6 @@ a, a:visited, a:active {
 <div class="section">
 <div class="container featured">
 
-<!-- HOLDFAST -->
 <div class="book-feature reveal">
 <img src="book6.jpg">
 <div class="book-text">
@@ -356,9 +328,8 @@ a, a:visited, a:active {
 </div>
 </div>
 
-<!-- CORROUR -->
 <div class="book-feature reveal">
-<img src="book13.jpg">
+<img src="book13.png">
 <div class="book-text">
 <p class="eyebrow">Limited Edition</p>
 <h2>Corrour Bothy</h2>
@@ -400,15 +371,8 @@ a, a:visited, a:active {
 </div>
 
 <script>
-const observer = new IntersectionObserver(entries => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-entry.target.classList.add('visible');
-}
-});
-});
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-/* EXISTING REVEAL */
+
+/* REVEAL */
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -418,7 +382,7 @@ const observer = new IntersectionObserver(entries => {
 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-/* 🔥 NEW: FOG PARALLAX */
+/* FOG PARALLAX */
 window.addEventListener("scroll", () => {
     const scrollY = window.scrollY;
 
@@ -426,10 +390,11 @@ window.addEventListener("scroll", () => {
     const fogBack = document.querySelector(".fog-back");
 
     if (fogFront && fogBack) {
-        fogFront.style.transform = `translateY(${scrollY * 0.03}px)`;
-        fogBack.style.transform = `translateY(${scrollY * 0.015}px)`;
+        fogFront.style.transform = `translateY(${scrollY * 0.02}px)`;
+        fogBack.style.transform = `translateY(${scrollY * 0.01}px)`;
     }
 });
+
 </script>
 
 </body>
