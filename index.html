@@ -13,25 +13,45 @@
             color: #2c2c2c;
         }
 
-        /* HERO WITH PARALLAX EFFECT */
+        /* HERO WITH GRADIENT OVERLAY */
         .hero {
-            background-image: url('forest.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            position: relative;
             height: 90vh;
-            color: white;
-            text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 20px;
+            align-items: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
         }
 
-        .hero h1 {
-            font-size: 52px;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(22,22,25,0.6),
+                rgba(22,22,25,0.6)
+            ),
+            url('forest.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero img {
+            width: 280px;
+            margin-bottom: 20px;
         }
 
         .hero p {
@@ -44,18 +64,17 @@
         .button {
             margin-top: 25px;
             padding: 14px 28px;
-            background: #6b7a6e;
-            color: white;
+            background: #5F7D76;
+            color: #F1F1F1;
             text-decoration: none;
             display: inline-block;
-            transition: 0.3s;
         }
 
         .button:hover {
-            background: #5a675d;
+            background: #4e6a63;
         }
 
-        /* FLOATING STONE SECTION */
+        /* FLOATING SECTION */
         .section {
             padding: 60px 20px;
             text-align: center;
@@ -63,7 +82,6 @@
             margin: -60px auto 0;
             width: 90%;
             max-width: 1100px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
         .section h2 {
@@ -103,22 +121,23 @@
             display: inline-block;
             margin-top: 10px;
             padding: 10px 18px;
-            background: #6b7a6e;
-            color: white;
+            background: #5F7D76;
+            color: #F1F1F1;
             text-decoration: none;
             font-size: 14px;
         }
 
-        .book a:hover {
-            background: #5a675d;
+        /* FOOTER WITH SEAL */
+        .footer {
+            padding: 60px 20px;
+            text-align: center;
+            background: rgba(22,22,25,0.9);
+            color: #F1F1F1;
         }
 
-        .footer {
-            padding: 40px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            margin-top: 60px;
+        .footer img {
+            width: 90px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -127,11 +146,15 @@
 
 <!-- HERO -->
 <div class="hero">
-    <h1>BLACKWOOD PUBLISHING</h1>
-    <p>
-        Publishing literary and psychological fiction shaped by atmosphere, place, and memory.
-    </p>
-    <a href="#" class="button">View Publications</a>
+    <div class="hero-content">
+        <img src="logo.png" alt="Blackwood Logo">
+
+        <p>
+            Publishing literary and psychological fiction shaped by atmosphere, place, and memory.
+        </p>
+
+        <a href="#" class="button">View Publications</a>
+    </div>
 </div>
 
 <!-- ABOUT -->
@@ -172,6 +195,7 @@
 
 <!-- FOOTER -->
 <div class="footer">
+    <img src="seal.png" alt="Blackwood Seal">
     <p>Blackwood Publishing</p>
     <p>Independent Literary Imprint</p>
 </div>
