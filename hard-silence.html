@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hard Silence | Blackwood Publishing</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #d6d6d6;
+}
+
+/* HEADER */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.header-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(10,10,12,0.9),
+        rgba(10,10,12,0.9)
+    ),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.header-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.header-logo {
+    width: 140px;
+    margin-bottom: 10px;
+    filter: invert(1);
+}
+
+.header h1 {
+    color: #f1f1f1;
+    font-weight: normal;
+    letter-spacing: 2px;
+}
+
+/* NAV */
+.nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #f1f1f1;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+
+.nav a:hover {
+    opacity: 0.6;
+}
+
+/* SECTION */
+.section {
+    padding: 60px 20px;
+    background-color: rgba(20,20,22,0.85);
+    margin: -30px auto 0;
+    width: 90%;
+    max-width: 1100px;
+    text-align: center;
+}
+
+/* INTRO */
+.intro {
+    max-width: 700px;
+    margin: 0 auto 50px;
+    line-height: 1.7;
+    color: #cfcfcf;
+}
+
+.intro em {
+    display: block;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+/* BOOK GRID */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px 40px;
+}
+
+@media (max-width: 800px) {
+    .book-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.book {
+    text-align: center;
+}
+
+/* COVER */
+.book img {
+    width: 240px;
+    height: 360px;
+    object-fit: cover;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,0.7),
+        0 5px 12px rgba(0,0,0,0.5);
+
+    transition: all 0.4s ease;
+}
+
+.book img:hover {
+    transform: translateY(-6px) scale(1.03);
+}
+
+/* TEXT */
+.book p {
+    max-width: 400px;
+    margin: 15px auto;
+    line-height: 1.6;
+    color: #bdbdbd;
+}
+
+/* BUTTON */
+.button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 22px;
+    background: #3f5450;
+    color: #f1f1f1;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.button:hover {
+    background: #2f3f3c;
+}
+
+/* FOOTER */
+.footer {
+    position: relative;
+    padding: 60px 20px;
+    color: #d6d6d6;
+}
+
+.footer::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        rgba(10,10,12,0.95),
+        rgba(10,10,12,0.95)
+    ),
+    url('forest.png');
+}
+
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-center img {
+    width: 80px;
+    filter: invert(1);
+}
+
+.footer a {
+    color: #f1f1f1;
+    margin-left: 15px;
+    text-decoration: none;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+        <img src="logo.png" class="header-logo">
+
+        <div class="nav">
+            <a href="index.html">Home</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="author.html">Author</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <h1>Hard Silence</h1>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+
+<div class="intro">
+<p><em>“Silence is power.”</em></p>
+
+<p>
+In Dumbarton’s forgotten corners, loyalty is currency, silence decides who survives, and violence is never wasted.
+</p>
+
+<p>
+Hard Silence is a dark crime series set in Scotland’s broken housing schemes, where trauma is buried and control is everything.
+</p>
+
+<p>
+Pain made him. Silence sharpened him. Now, the streets belong to him.
+</p>
+</div>
+
+<div class="book-grid">
+
+<!-- BOOK 1 -->
+<div class="book">
+<img src="book9.png">
+
+<p>
+Left for dead by a gang with no fear, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.
+</p>
+
+<a href="https://mybook.to/echoesofvengeance" target="_blank" class="button">Read Now</a>
+</div>
+
+<!-- BOOK 2 -->
+<div class="book">
+<img src="book10.jpg">
+
+<p>
+Jamie is no longer a victim. Feared and silent, he enforces order—until the day he decides to break it.
+</p>
+
+<a href="https://mybook.to/RedStreets" target="_blank" class="button">Read Now</a>
+</div>
+
+<!-- BOOK 3 -->
+<div class="book">
+<img src="book-placeholder.jpg">
+
+<p>
+A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
+</p>
+
+<a href="#" class="button">Coming 2027</a>
+</div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+<div class="footer-content">
+
+<div>
+<p>Blackwood Publishing</p>
+<p>Independent Literary Imprint</p>
+</div>
+
+<div class="footer-center">
+<img src="seal.png">
+</div>
+
+<div>
+<a href="publications.html">Publications</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
