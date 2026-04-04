@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>The Archive Files | Blackwood Publishing</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #2c2c2c;
+}
+
+/* HEADER */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.header-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.header-inner {
+    position: relative;
+    z-index: 1;
+}
+
+.header-logo {
+    width: 140px;
+    margin-bottom: 10px;
+    filter: invert(1);
+}
+
+.header h1 {
+    color: #F1F1F1;
+    font-weight: normal;
+}
+
+/* NAV */
+.nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 14px;
+}
+
+/* SECTION */
+.section {
+    padding: 60px 20px;
+    background-color: rgba(232,228,220,0.6);
+    margin: -30px auto 0;
+    width: 90%;
+    max-width: 1100px;
+    text-align: center;
+}
+
+/* INTRO */
+.intro {
+    max-width: 700px;
+    margin: 0 auto 50px;
+    line-height: 1.7;
+}
+
+/* BOOK GRID */
+.books {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px 40px;
+}
+
+@media (max-width: 800px) {
+    .books {
+        grid-template-columns: 1fr;
+    }
+}
+
+.book {
+    text-align: center;
+}
+
+/* COVER */
+.book img {
+    width: 240px;
+    height: 360px;
+    object-fit: cover;
+    box-shadow:
+        0 12px 28px rgba(0,0,0,0.35),
+        0 3px 8px rgba(0,0,0,0.25);
+    transition: all 0.4s ease;
+}
+
+.book img:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow:
+        0 20px 45px rgba(0,0,0,0.55);
+}
+
+/* TEXT */
+.book h3 {
+    margin-top: 15px;
+}
+
+.book p {
+    max-width: 400px;
+    margin: 10px auto;
+    line-height: 1.6;
+}
+
+/* BUTTON */
+.button {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background: #5F7D76;
+    color: #F1F1F1;
+    text-decoration: none;
+}
+
+.button:hover {
+    background: #4e6a63;
+}
+
+/* FOOTER */
+.footer {
+    position: relative;
+    padding: 60px 20px;
+    color: #F1F1F1;
+}
+
+.footer::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
+    url('forest.png');
+}
+
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-center img {
+    width: 80px;
+    filter: invert(1);
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+        <img src="logo.png" class="header-logo">
+
+        <div class="nav">
+            <a href="index.html">Home</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="author.html">Author</a>
+            <a href="contact.html">Contact</a>
+        </div>
+
+        <h1>The Archive Files</h1>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+
+<div class="intro">
+<p><em>“Memory is not linear. But you are.”</em></p>
+
+<p>
+A folk-horror and paranormal mystery series exploring the eerie fractures between memory, place, and reality. From haunted archives to drowned fjords, abandoned Highland bothies to recursion glitches spreading through time.
+</p>
+
+<p>
+Each book is a standalone. But the recursion connects them all.
+</p>
+</div>
+
+<div class="books">
+
+<!-- BOOK 1 -->
+<div class="book">
+<img src="book3.jpg">
+<h3>The Black Bothy</h3>
+<p>Some places keep what they take. A missing sister. A shifting bothy. And something that remembers.</p>
+<a href="https://mybook.to/BlackBothy" target="_blank" class="button">View Book</a>
+</div>
+
+<!-- BOOK 2 -->
+<div class="book">
+<img src="book4.jpg">
+<h3>The Drowned Fjord</h3>
+<p>The drowned remember. A Norwegian fjord where echoes arrive before sound—and something waits beneath.</p>
+<a href="https://mybook.to/DrownedFjord" target="_blank" class="button">View Book</a>
+</div>
+
+<!-- BOOK 3 -->
+<div class="book">
+<img src="book5.jpg">
+<h3>The Erased Archivist</h3>
+<p>To read is to agree. A book that rewrites history—and erases those who open it.</p>
+<a href="https://mybook.to/ErasedArchivist" target="_blank" class="button">View Book</a>
+</div>
+
+<!-- BOOK 4 -->
+<div class="book">
+<img src="book6.jpg">
+<h3>Holdfast</h3>
+<p>Coming June 2026. The recursion returns. This time, it wants everything.</p>
+<a href="https://mybook.to/Holdfast" target="_blank" class="button">View Book</a>
+</div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+<div class="footer-content">
+
+<div>
+<p>Blackwood Publishing</p>
+<p>Independent Literary Imprint</p>
+</div>
+
+<div class="footer-center">
+<img src="seal.png">
+</div>
+
+<div>
+<a href="publications.html">Publications</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
