@@ -25,15 +25,13 @@ body::before {
     z-index: -1;
 }
 
-/* FIX ALL LINK STATES */
-a,
-a:visited,
-a:active {
+/* LINKS FIX */
+a, a:visited, a:active {
     color: inherit;
     text-decoration: none;
 }
 
-/* NAV (FIXED) */
+/* NAV */
 .nav {
     position: fixed;
     top: 25px;
@@ -112,30 +110,37 @@ a:active {
     margin: 0 auto;
 }
 
-/* FEATURED 2-COLUMN */
+/* FEATURED */
 .featured {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
-    align-items: start;
 }
 
-/* BOOK BLOCK */
+/* BOOK FEATURE */
 .book-feature {
     display: grid;
     grid-template-columns: 180px 1fr;
     gap: 25px;
+    transition: 0.4s ease;
+}
+
+/* ✨ FEATURE HOVER UPGRADE */
+.book-feature:hover img {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 35px 90px rgba(0,0,0,0.8);
+    filter: brightness(1.05);
 }
 
 .book-feature img {
     width: 180px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    transition: all 0.4s ease;
 }
 
 /* TEXT */
 .book-text h2 {
     font-size: 28px;
-    margin-bottom: 10px;
 }
 
 .book-text p {
@@ -149,18 +154,15 @@ a:active {
     letter-spacing: 2px;
     text-transform: uppercase;
     opacity: 0.5;
-    margin-bottom: 8px;
 }
 
-/* LINK (CONTROLLED STYLE) */
+/* LINKS */
 .link {
     display: inline-block;
     margin-top: 12px;
     font-size: 12px;
     letter-spacing: 2px;
-    text-transform: uppercase;
     border-bottom: 1px solid rgba(255,255,255,0.4);
-    color: #E8E6E1;
     opacity: 0.85;
     transition: 0.3s;
 }
@@ -193,7 +195,6 @@ a:active {
 .book {
     display: block;
     text-align: center;
-    cursor: pointer;
 }
 
 .book img {
@@ -210,9 +211,25 @@ a:active {
     color: #1c1c1c;
 }
 
-.book:hover p {
-    opacity: 0.7;
+/* =========================
+   ANIMATION SYSTEM
+========================= */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease;
 }
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* stagger */
+.reveal:nth-child(1) { transition-delay: 0.1s; }
+.reveal:nth-child(2) { transition-delay: 0.2s; }
+.reveal:nth-child(3) { transition-delay: 0.3s; }
 
 /* MOBILE */
 @media (max-width: 900px) {
@@ -228,15 +245,15 @@ a:active {
 
 <!-- NAV -->
 <div class="nav">
-<a href="#">Home.html</a>
-<a href="#">Publications.html</a>
-<a href="#">About.html</a>
-<a href="#">Author.html</a>
-<a href="#">Contact.html</a>
+<a href="index.html">Home</a>
+<a href="publications.html">Publications</a>
+<a href="about.html">About</a>
+<a href="author.html">Author</a>
+<a href="contact.html">Contact</a>
 </div>
 
 <!-- HERO -->
-<div class="hero">
+<div class="hero reveal">
 <div class="hero-inner">
 <img src="logo (1).png">
 <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
@@ -244,36 +261,26 @@ a:active {
 </div>
 
 <!-- FEATURED -->
-<div class="section">
+<div class="section reveal">
 <div class="container featured">
 
-<!-- HOLDFAST -->
-<div class="book-feature">
+<div class="book-feature reveal">
 <img src="book6.jpg">
-
 <div class="book-text">
 <p class="eyebrow">Featured Title</p>
 <h2>Holdfast</h2>
-
 <p>Some memories return. Others refuse to leave.</p>
-<p>The recursion spreads. Voices rise.</p>
-
 <a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
 </div>
 </div>
 
-<!-- CORROUR LIMITED -->
-<div class="book-feature">
+<div class="book-feature reveal">
 <img src="book13.png">
-
 <div class="book-text">
 <p class="eyebrow">Limited Edition</p>
 <h2>Corrour Bothy</h2>
-
 <p><strong>Founder’s Foil Edition</strong></p>
 <p>Limited to fifty hand-numbered copies.</p>
-<p>Includes signed collector card, bookmark, and tote.</p>
-
 <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
 </div>
 </div>
@@ -284,24 +291,24 @@ a:active {
 <div class="divider"></div>
 
 <!-- BOOKS -->
-<div class="section texture">
+<div class="section texture reveal">
 <div class="container">
 
 <h2 style="text-align:center;">Current Publications</h2>
 
 <div class="grid">
 
-<a href="https://mybook.to/DourHillHouse" target="_blank" class="book">
+<a href="https://mybook.to/DourHillHouse" target="_blank" class="book reveal">
 <img src="book1.jpg">
 <p>Dour Hill House</p>
 </a>
 
-<a href="https://mybook.to/Corrour" target="_blank" class="book">
+<a href="https://mybook.to/Corrour" target="_blank" class="book reveal">
 <img src="book2.jpg">
 <p>Corrour</p>
 </a>
 
-<a href="https://mybook.to/BlackBothy" target="_blank" class="book">
+<a href="https://mybook.to/BlackBothy" target="_blank" class="book reveal">
 <img src="book3.jpg">
 <p>The Black Bothy</p>
 </a>
@@ -310,6 +317,18 @@ a:active {
 
 </div>
 </div>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+});
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
