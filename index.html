@@ -31,9 +31,7 @@ a, a:visited, a:active {
     text-decoration: none;
 }
 
-/* =========================
-   HEADER (NAV LIVES HERE)
-========================= */
+/* HEADER */
 .header {
     position: relative;
     height: 35vh;
@@ -43,9 +41,9 @@ a, a:visited, a:active {
     text-align: center;
 }
 
-/* NAV (NOW ATTACHED TO HEADER) */
+/* NAV */
 .nav {
-    position: absolute; 
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -95,7 +93,7 @@ a, a:visited, a:active {
     width: 100%;
 }
 
-/* HEADER BACKGROUND */
+/* HEADER BG */
 .header-overlay {
     position: absolute;
     inset: 0;
@@ -148,7 +146,6 @@ a, a:visited, a:active {
     gap: 25px;
 }
 
-/* FEATURE HOVER */
 .book-feature img {
     width: 180px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
@@ -200,7 +197,7 @@ a, a:visited, a:active {
     margin: 50px auto;
 }
 
-/* BOOK GRID */
+/* TEXTURED BOOK SECTION */
 .section.texture {
     position: relative;
     background: #E8E6E1;
@@ -208,46 +205,39 @@ a, a:visited, a:active {
     overflow: hidden;
 }
 
-/* TEXTURE LAYER */
+/* FIXED TEXTURE */
 .section.texture::before {
     content: "";
     position: absolute;
     inset: 0;
-
     background: url('stone.png');
     background-size: cover;
     background-position: center;
-
-    opacity: 0.18; /*
+    opacity: 0.18; /* ✅ FIXED */
     pointer-events: none;
 }
 
-/* SOFT VIGNETTE (makes it feel expensive) */
+/* VIGNETTE */
 .section.texture::after {
     content: "";
     position: absolute;
     inset: 0;
-
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.08) 100%
-    );
-
+    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.08) 100%);
     pointer-events: none;
 }
 
+/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 60px;
 }
-    .book {
+
+.book {
     position: relative;
     z-index: 1;
 }
 
-/* BOOK SHADOW */
 .book img {
     width: 190px;
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
@@ -288,7 +278,6 @@ a, a:visited, a:active {
 
 <body>
 
-<!-- HEADER (NAV INSIDE) -->
 <div class="header">
 
     <div class="nav">
@@ -310,7 +299,6 @@ a, a:visited, a:active {
 
 </div>
 
-<!-- FEATURED -->
 <div class="section reveal">
 <div class="container featured">
 
@@ -340,7 +328,6 @@ a, a:visited, a:active {
 
 <div class="divider"></div>
 
-<!-- BOOKS -->
 <div class="section texture reveal">
 <div class="container">
 
