@@ -11,14 +11,15 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* 🔥 CRITICAL FIX (your issue) */
 img {
     max-width: 100%;
     height: auto;
     display: block;
 }
 
-/* CONTAINER */
+/* =========================
+   LAYOUT
+========================= */
 .container {
     max-width: 1100px;
     margin: 0 auto;
@@ -112,12 +113,25 @@ img {
 }
 
 /* =========================
-   GRID
+   GRID SYSTEM
 ========================= */
 .grid-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 80px 60px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    justify-items: center;
+}
+
+@media (max-width: 900px) {
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 800px) {
@@ -134,24 +148,9 @@ img {
     text-align: center;
 }
 
-/* 🔥 FIXED IMAGE SIZE */
 .book img {
-    width: 240px;
-    max-width: 100%;
-    height: auto;
+    width: 220px;
     margin: 0 auto;
-}
-
-/* animation support */
-.book.animate {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease;
-}
-
-.book.visible {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 .book p {
@@ -248,54 +247,4 @@ img {
         flex-direction: column;
         text-align: center;
     }
-}
-/* =========================
-   HARD FIXES (DO NOT REMOVE)
-========================= */
-
-/* FORCE CONTAINER CENTERING */
-.container {
-    max-width: 1100px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-/* GRID FIX */
-.grid-3 {
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
-    justify-items: center;
-}
-
-/* MOBILE */
-@media (max-width: 900px) {
-    .grid-3 {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* BOOK FIX */
-.book {
-    text-align: center;
-}
-
-/* IMAGE LOCK */
-.book img {
-    width: 220px !important;
-    height: auto !important;
-    display: block;
-    margin: 0 auto;
-}
-
-/* FOOTER LOGO FIX */
-.footer-center img {
-    width: 70px !important;
-    height: auto;
-}
-
-/* PREVENT RANDOM IMAGE BLOBS */
-img {
-    max-width: 100%;
-    height: auto;
 }
