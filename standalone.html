@@ -1,229 +1,230 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Standalone Works | Blackwood Publishing</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Standalone Works | Blackwood Publishing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
+<style>
 
-    <meta name="keywords" content="literary fiction, psychological fiction, independent publisher, Scottish fiction, atmospheric fiction, Aidan Blackwood">
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #1C1C1C;
+    -webkit-font-smoothing: antialiased;
+}
 
-    <meta name="author" content="Aidan Blackwood">
-    <meta property="og:title" content="Blackwood Publishing">
-    <meta property="og:description" content="Literary and psychological fiction shaped by place, memory, and unease.">
-    <meta property="og:image" content="https://blackwoodpublishing.co.uk/preview.jpg">
-    <meta property="og:url" content="https://blackwoodpublishing.co.uk/">
-    <meta property="og:type" content="website">
+/* HEADER (MATCH SYSTEM) */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Georgia, serif;
-            background-image: url('stone.png');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #2c2c2c;
-        }
+.header-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
 
-        /* HEADER */
-        .header {
-            position: relative;
-            height: 35vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
+.header-inner {
+    position: relative;
+    z-index: 1;
+}
 
-        .header-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                rgba(22,22,25,0.8),
-                rgba(22,22,25,0.8)
-            ),
-            url('forest.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
+.header-logo {
+    width: 150px;
+    margin-bottom: 10px;
+}
 
-        .header-inner {
-            position: relative;
-            z-index: 1;
-        }
+.header h1 {
+    color: #F1F1F1;
+    font-weight: 500;
+    letter-spacing: 2px;
+}
 
-        .header-logo {
-            width: 140px;
-            margin-bottom: 10px;
-        }
+/* NAV */
+.nav a {
+    margin: 0 16px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 13px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
 
-        .header h1 {
-            color: #F1F1F1;
-            font-weight: normal;
-            letter-spacing: 2px;
-        }
+.nav a:hover {
+    opacity: 1;
+}
 
-        /* NAV */
-        .nav a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: #F1F1F1;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
+/* SECTION */
+.section {
+    padding: 70px 20px;
+    background-color: #E8E6E1;
+    margin: -40px auto 0;
+    width: 90%;
+    max-width: 900px;
+    text-align: center;
+}
 
-        .nav a:hover {
-            opacity: 0.7;
-        }
+/* INTRO */
+.intro {
+    max-width: 650px;
+    margin: 0 auto 70px;
+    line-height: 1.7;
+    font-size: 15px;
+}
 
-        /* SECTION */
-        .section {
-            padding: 60px 20px;
-            text-align: center;
-            background-color: rgba(232, 228, 220, 0.55);
-            margin: -40px auto 0;
-            width: 90%;
-            max-width: 900px;
-        }
+/* BOOK */
+.book {
+    margin: 90px 0;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease;
+}
 
-        .intro {
-            max-width: 650px;
-            margin: 0 auto 50px;
-            line-height: 1.7;
-        }
+.book.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-        /* BOOK BLOCK */
-        .book {
-            margin: 70px 0;
-        }
+/* IMAGE */
+.book img {
+    width: 240px;
+    height: 360px;
+    object-fit: cover;
 
-        .book img {
-            width: 240px;
-            height: 360px;
-            object-fit: cover;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-            transition: transform 0.3s ease;
-        }
+    box-shadow:
+        0 18px 40px rgba(0,0,0,0.45),
+        0 4px 10px rgba(0,0,0,0.25);
 
-        .book img:hover {
-            transform: scale(1.04);
-        }
+    transition: all 0.4s ease;
+}
 
-        .book h2 {
-            margin-top: 20px;
-            font-weight: normal;
-        }
+.book:hover img {
+    transform: translateY(-6px) scale(1.03);
+}
 
-        .book p {
-            max-width: 600px;
-            margin: 15px auto;
-            line-height: 1.6;
-        }
+/* TITLE */
+.book h2 {
+    margin-top: 20px;
+    font-weight: normal;
+    letter-spacing: 0.5px;
+}
 
-        .button {
-            margin-top: 15px;
-            padding: 10px 22px;
-            background: #5F7D76;
-            color: #F1F1F1;
-            text-decoration: none;
-            font-size: 14px;
-            display: inline-block;
-        }
+/* TEXT */
+.book p {
+    max-width: 520px;
+    margin: 12px auto;
+    line-height: 1.6;
+    font-size: 15px;
+    opacity: 0.9;
+}
 
-        .button:hover {
-            background: #4e6a63;
-        }
+/* BUTTON (MATCH SYSTEM) */
+.button {
+    display: inline-block;
+    margin-top: 8px;
 
-        /* FOOTER (UPGRADED) */
-        .footer {
-            position: relative;
-            width: 100%;
-            padding: 90px 20px 70px;
-            margin-top: 80px;
-            color: #F1F1F1;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 
-        .footer::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                rgba(18,18,20,0.85),
-                rgba(18,18,20,0.85)
-            ),
-            url('forest.png');
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
-        }
+    color: #5F7D76;
+    text-decoration: none;
 
-        .footer::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 1px;
-            background: rgba(255,255,255,0.08);
-        }
+    border-bottom: 1px solid rgba(95,125,118,0.4);
+    padding-bottom: 3px;
+}
 
-        .footer-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
+.button:hover {
+    opacity: 0.6;
+}
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
+/* FOOTER (UNCHANGED SYSTEM) */
+.footer {
+    position: relative;
+    padding: 90px 20px 70px;
+    margin-top: 100px;
+    color: #F1F1F1;
+}
 
-        .footer-left p {
-            margin: 4px 0;
-            font-size: 14px;
-            opacity: 0.85;
-        }
+.footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
+    url('forest.png');
+    background-size: cover;
+}
 
-        .footer-center img {
-            width: 70px;
-            filter: invert(1);
-            opacity: 0.9;
-        }
+.footer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
 
-        .footer-right a {
-            margin-left: 18px;
-            text-decoration: none;
-            color: #F1F1F1;
-            font-size: 13px;
-            letter-spacing: 1px;
-            opacity: 0.85;
-            transition: all 0.25s ease;
-        }
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
 
-        .footer-right a:hover {
-            opacity: 1;
-            letter-spacing: 1.5px;
-        }
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
 
-        @media (max-width: 768px) {
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
+.footer-left p {
+    margin: 4px 0;
+    font-size: 14px;
+    opacity: 0.85;
+}
 
-            .footer-right a {
-                margin: 0 10px;
-            }
-        }
+.footer-center img {
+    width: 70px;
+    filter: invert(1);
+    opacity: 0.9;
+}
 
-    </style>
+.footer-right a {
+    margin-left: 18px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 13px;
+    letter-spacing: 1px;
+    opacity: 0.85;
+}
+
+.footer-right a:hover {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+</style>
 </head>
 
 <body>
@@ -233,7 +234,6 @@
     <div class="header-overlay"></div>
 
     <div class="header-inner">
-
         <img src="logo (1).png" class="header-logo">
 
         <div class="nav">
@@ -245,58 +245,53 @@
         </div>
 
         <h1>Standalone Works</h1>
-
     </div>
 </div>
 
 <!-- CONTENT -->
 <div class="section">
 
-    <div class="intro">
-        <p>
-            Independent works exploring atmosphere, memory, and psychological tension. 
-            These stories stand alone, shaped by place, unease, and the quiet persistence of what lingers.
-        </p>
-    </div>
+<div class="intro">
+<p>
+Independent works exploring atmosphere, memory, and psychological tension. 
+These stories stand alone, shaped by place, unease, and the quiet persistence of what lingers.
+</p>
+</div>
 
-    <!-- DOUR HILL HOUSE -->
-    <div class="book">
+<!-- BOOK 1 -->
+<div class="book">
+<a href="https://mybook.to/DourHillHouse" target="_blank">
+<img src="book1.jpg">
+</a>
 
-        <a href="https://mybook.to/DourHillHouse" target="_blank">
-            <img src="book1.jpg">
-        </a>
+<h2>Dour Hill House</h2>
 
-        <h2>Dour Hill House</h2>
+<p>
+When Clara inherits Dour Hill House, she hopes for a new beginning. 
+Instead, her daughter whispers to the mirror—and something whispers back.
+</p>
 
-        <p>
-            When Clara inherits Dour Hill House, she hopes for a new beginning. 
-            Instead, her daughter whispers to the mirror and something whispers back.
-        </p>
+<a href="https://mybook.to/DourHillHouse" target="_blank" class="button">Read More</a>
+</div>
 
-        <a href="https://mybook.to/DourHillHouse" target="_blank" class="button">Read More</a>
+<!-- BOOK 2 -->
+<div class="book">
+<a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank">
+<img src="book11.png">
+</a>
 
-    </div>
+<h2>The Red-Clad Collector</h2>
 
-    <!-- RED-CLAD COLLECTOR -->
-    <div class="book">
+<p>
+Every Christmas, a child disappears. No footprints. No explanation. Just one less memory.
+</p>
 
-        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank">
-            <img src="book11.png">
-        </a>
+<p>
+A dark holiday fable of identity, myth, and the things that take us when no one is looking.
+</p>
 
-        <h2>The Red-Clad Collector</h2>
-
-        <p>
-            Every Christmas, a child disappears. No footprints. No explanation. Just one less memory.
-        </p>
-
-        <p>
-            A dark holiday fable of identity, myth, and the things that take us when no one is looking.
-        </p>
-
-        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" class="button">Read More</a>
-
-    </div>
+<a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" class="button">Read More</a>
+</div>
 
 </div>
 
@@ -321,6 +316,19 @@
 
     </div>
 </div>
+
+<!-- FADE-IN -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.book').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
