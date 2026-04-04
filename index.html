@@ -113,12 +113,38 @@
             line-height: 1.6;
         }
 
+        /* FEATURED */
+        .featured {
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .featured img {
+            width: 260px;
+            height: 380px;
+            object-fit: cover;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .featured-text {
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .featured-text h3 {
+            margin-bottom: 10px;
+        }
+
         /* DIVIDER */
         .divider {
             width: 600px;
             height: 1px;
             background: #999;
-            margin: 40px auto;
+            margin: 50px auto;
         }
 
         /* BOOK GRID */
@@ -154,7 +180,7 @@
             font-size: 13px;
         }
 
-        /* FOOTER (NEW DESIGN) */
+        /* FOOTER */
         .footer {
             position: relative;
             padding: 80px 20px;
@@ -167,8 +193,6 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            top: 0;
-            left: 0;
             background: linear-gradient(
                 rgba(22,22,25,0.5),
                 rgba(22,22,25,0.5)
@@ -176,7 +200,6 @@
             url('forest.png');
             background-size: cover;
             background-position: center;
-            z-index: 0;
         }
 
         .footer-content {
@@ -190,14 +213,6 @@
             flex-wrap: wrap;
         }
 
-        .footer-left {
-            text-align: left;
-        }
-
-        .footer-left p {
-            margin: 5px 0;
-        }
-
         .footer-center img {
             width: 80px;
             filter: invert(1);
@@ -208,27 +223,6 @@
             text-decoration: none;
             color: #F1F1F1;
             font-size: 14px;
-        }
-
-        .footer-right a:hover {
-            opacity: 0.7;
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                flex-direction: column;
-                gap: 20px;
-                text-align: center;
-            }
-
-            .footer-left,
-            .footer-right {
-                text-align: center;
-            }
-
-            .footer-right a {
-                margin: 0 10px;
-            }
         }
 
     </style>
@@ -264,10 +258,35 @@
     <h2>About Blackwood Publishing</h2>
 
     <p>
-        Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in place, memory, and unease. 
-        Our titles explore the quiet forces that shape lives over time. Landscapes that remember, houses that listen, and histories that refuse to remain buried.
+        Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction rooted in place, memory, and unease.
     </p>
 
+    <!-- FEATURED RELEASE -->
+    <div class="divider"></div>
+
+    <h2>Featured Release</h2>
+
+    <div class="featured">
+
+        <img src="book6.jpg">
+
+        <div class="featured-text">
+            <h3>Holdfast</h3>
+
+            <p>
+                Some memories return. Others won’t let go.
+            </p>
+
+            <p>
+                The recursion spreads. Voices rise. What was buried begins to surface again.
+            </p>
+
+            <a href="https://mybook.to/Holdfast" target="_blank" class="button">Read Now</a>
+        </div>
+
+    </div>
+
+    <!-- CURRENT BOOKS -->
     <div class="divider"></div>
 
     <h2>Current Publications</h2>
@@ -277,7 +296,7 @@
         <div class="book">
             <img src="book1.jpg">
             <p>Dour Hill House</p>
-            <a href="https://mybook.to/DourHill" target="_blank">Read More</a>
+            <a href="https://mybook.to/DourHillHouse" target="_blank">Read More</a>
         </div>
 
         <div class="book">
@@ -300,7 +319,7 @@
 <div class="footer">
     <div class="footer-content">
 
-        <div class="footer-left">
+        <div>
             <p>Blackwood Publishing</p>
             <p>Independent Literary Imprint</p>
         </div>
@@ -310,9 +329,9 @@
         </div>
 
         <div class="footer-right">
-            <a href="#">Publications</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
+            <a href="publications.html">Publications</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
         </div>
 
     </div>
