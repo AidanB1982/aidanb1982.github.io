@@ -106,27 +106,48 @@ a, a:visited, a:active {
     background-attachment: fixed;
 }
 
-/* FOG */
+/* FOG BASE */
 .header-fog {
     position: absolute;
     inset: 0;
     pointer-events: none;
-}back {
+
     background: url('fog.png') repeat-x;
-    background-size: cover;
+    background-size: 120%;
+
+    /* smooth edge fade */
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 18%,
+        black 82%,
+        transparent 100%
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        black 18%,
+        black 82%,
+        transparent 100%
+    );
+}
+
+/* BACK LAYER */
+.fog-back {
     opacity: 0.25;
     z-index: 2;
     animation: fogSlow 160s linear infinite;
 }
 
+/* FRONT LAYER */
 .fog-front {
-    background: url('fog.png') repeat-x;
-    background-size: cover;
     opacity: 0.35;
     z-index: 3;
     animation: fogFast 100s linear infinite;
 }
 
+/* ANIMATION */
 @keyframes fogFast {
     from { background-position: 0 0; }
     to { background-position: 2000px 0; }
