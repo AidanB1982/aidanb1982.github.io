@@ -6,13 +6,12 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="description" content="Literary and psychological fiction shaped by place, memory, and unease.">
 
     <link rel="stylesheet" href="styles.css">
 
     <style>
-        /* HERO */
+        /* HERO ONLY (keep custom here) */
         .hero {
             position: relative;
             height: 70vh;
@@ -21,7 +20,6 @@
             justify-content: center;
             text-align: center;
             color: #F1F1F1;
-            overflow: hidden;
         }
 
         .hero::before {
@@ -34,37 +32,29 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            transform: scale(1.05);
         }
 
         .hero-inner {
             position: relative;
             z-index: 1;
-            max-width: 720px;
-            animation: fadeUp 1.5s ease forwards;
+            max-width: 700px;
         }
 
         .hero img {
-            width: 240px;
+            width: 220px;
             margin-bottom: 20px;
-            opacity: 0;
-            animation: fadeIn 2s ease forwards;
         }
 
         .hero p {
-            opacity: 0;
-            animation: fadeIn 2.5s ease forwards;
+            color: #dcdcdc;
         }
 
-        /* NAV */
-        .nav {
-            position: absolute;
-            top: 25px;
-            right: 40px;
-            z-index: 2;
+        /* FIX NAV COLOR */
+        .nav a {
+            color: #F1F1F1 !important;
         }
 
-        /* FEATURED (FIXED WITH CONTAINER) */
+        /* FEATURED */
         .featured {
             display: grid;
             grid-template-columns: 280px 1fr;
@@ -73,40 +63,16 @@
         }
 
         .featured img {
-            width: 280px;
-            height: 400px;
-            object-fit: cover;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.5);
-            transition: transform 0.5s ease;
+            width: 100%;
+            max-width: 280px;
+            height: auto;
         }
 
-        .featured img:hover {
-            transform: scale(1.05);
-        }
-
-        /* IMPORTANT: DO NOT override .grid-2 anymore */
-
-        @media (max-width: 900px) {
+        @media (max-width: 800px) {
             .featured {
                 grid-template-columns: 1fr;
                 text-align: center;
             }
-        }
-
-        /* ANIMATIONS */
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
         }
     </style>
 </head>
@@ -139,11 +105,15 @@
 
 <!-- ABOUT -->
 <div class="section narrow">
-    <div class="intro">
-        <h2>Blackwood Publishing</h2>
-        <p>
-            An independent imprint exploring atmosphere, landscape, and the quiet persistence of memory.
-        </p>
+    <div class="container">
+
+        <div class="intro">
+            <h2>Blackwood Publishing</h2>
+            <p>
+                An independent imprint exploring atmosphere, landscape, and the quiet persistence of memory.
+            </p>
+        </div>
+
     </div>
 </div>
 
@@ -178,7 +148,7 @@
     </div>
 </div>
 
-<!-- BOOKS -->
+<!-- PUBLICATIONS -->
 <div class="section">
     <div class="container">
 
@@ -239,7 +209,7 @@
     </div>
 </div>
 
-<!-- SCROLL REVEAL -->
+<!-- SCROLL ANIMATION -->
 <script>
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
