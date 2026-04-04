@@ -13,15 +13,16 @@ body {
     font-family: Georgia, serif;
     background: #0e0e10;
     color: #e6e6e6;
+    overflow-x: hidden;
 }
 
-/* BACKGROUND TEXTURE */
+/* STONE TEXTURE */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background: url('stone.png');
-    opacity: 0.30;
+    opacity: 0.25;
     z-index: -1;
 }
 
@@ -36,7 +37,7 @@ a, a:visited, a:active {
 ========================= */
 .header {
     position: relative;
-    height: 35vh;
+    height: 40vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,32 +107,53 @@ a, a:visited, a:active {
     background-attachment: fixed;
 }
 
-/* 🌫️ REAL FOG LAYER (your fog.png) */
+/* 🌫️ FOG LAYERS */
 .header-fog {
     position: absolute;
     inset: 0;
-    z-index: 2;
     pointer-events: none;
+}
 
-    background: url('fog.png');
+/* BACK FOG */
+.fog-back {
+    background: url('fog.png') repeat-x;
     background-size: cover;
-    background-repeat: no-repeat;
-    opacity: 0.18;
+    opacity: 0.25;
+    z-index: 2;
 
-    animation: fogDrift 90s linear infinite;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
+
+    animation: fogDriftSlow 160s linear infinite;
+}
+
+/* FRONT FOG */
+.fog-front {
+    background: url('fog.png') repeat-x;
+    background-size: cover;
+    opacity: 0.35;
+    z-index: 3;
+
+    mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+
+    animation: fogDrift 100s linear infinite;
 }
 
 @keyframes fogDrift {
-    0%   { transform: translateX(-10%) scale(1.1); }
-    50%  { transform: translateX(10%) scale(1.2); }
-    100% { transform: translateX(-10%) scale(1.1); }
+    from { background-position: 0 0; }
+    to { background-position: 2000px 0; }
+}
+
+@keyframes fogDriftSlow {
+    from { background-position: 0 0; }
+    to { background-position: 1500px 0; }
 }
 
 /* HEADER CONTENT */
 .header-inner {
     position: relative;
-    z-index: 3;
-    margin-top: 40px;
+    z-index: 5;
 }
 
 .header-logo {
@@ -140,17 +162,16 @@ a, a:visited, a:active {
 }
 
 .header h1 {
-    color: #F1F1F1;
-    font-weight: 500;
-    letter-spacing: 2px;
     font-size: 18px;
+    letter-spacing: 2px;
+    font-weight: 500;
 }
 
 /* =========================
    SECTION
 ========================= */
 .section {
-    padding: 60px 20px;
+    padding: 80px 20px;
 }
 
 .container {
@@ -159,7 +180,7 @@ a, a:visited, a:active {
 }
 
 /* =========================
-   TEXTURED BOOK SECTION
+   TEXTURED SECTION
 ========================= */
 .section.texture {
     position: relative;
@@ -168,22 +189,21 @@ a, a:visited, a:active {
     overflow: hidden;
 }
 
-/* texture layer */
+/* STONE OVERLAY */
 .section.texture::before {
     content: "";
     position: absolute;
     inset: 0;
     background: url('stone.png');
-    background-size: cover;
-    opacity: 0.16;
+    opacity: 0.15;
 }
 
-/* soft vignette */
+/* VIGNETTE */
 .section.texture::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.06) 100%);
+    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.06));
 }
 
 /* =========================
@@ -198,22 +218,20 @@ a, a:visited, a:active {
 }
 
 /* =========================
-   BOOK CARD
+   BOOK
 ========================= */
 .book {
     position: relative;
-    z-index: 1;
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    z-index: 1;
+    transition: transform 0.4s ease;
 }
 
-/* 🔥 GLOW LAYER */
+/* GLOW */
 .book::before {
     content: "";
     position: absolute;
-    bottom: -10px;
+    bottom: -12px;
     width: 120px;
     height: 30px;
     background: radial-gradient(rgba(0,0,0,0.25), transparent);
@@ -229,25 +247,20 @@ a, a:visited, a:active {
     transition: all 0.4s ease;
 }
 
-/* HOVER EFFECT */
+/* HOVER */
 .book:hover img {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 40px 90px rgba(0,0,0,0.35);
+    transform: translateY(-12px) scale(1.05);
+    box-shadow: 0 45px 100px rgba(0,0,0,0.35);
 }
 
-/* 🔥 GLOW ACTIVATES */
 .book:hover::before {
     opacity: 1;
-    transform: scale(1.2);
 }
 
 /* TEXT */
 .book p {
     margin-top: 14px;
     font-size: 15px;
-    text-align: center;
-    color: #1c1c1c;
-    max-width: 220px;
 }
 
 /* =========================
@@ -255,7 +268,7 @@ a, a:visited, a:active {
 ========================= */
 .reveal {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
     transition: all 1s ease;
 }
 
@@ -279,7 +292,6 @@ a, a:visited, a:active {
 <!-- HEADER -->
 <div class="header">
 
-    <!-- NAV -->
     <div class="nav">
         <div class="nav-inner">
             <a href="index.html">Home</a>
@@ -291,7 +303,10 @@ a, a:visited, a:active {
     </div>
 
     <div class="header-overlay"></div>
-    <div class="header-fog"></div>
+
+    <!-- 🌫️ FOG -->
+    <div class="header-fog fog-back"></div>
+    <div class="header-fog fog-front"></div>
 
     <div class="header-inner">
         <img src="logo (1).png" class="header-logo">
@@ -300,8 +315,8 @@ a, a:visited, a:active {
 
 </div>
 
-<!-- BOOKS -->
-<div class="section texture reveal">
+<!-- BOOK SECTION -->
+<div class="section texture">
 <div class="container">
 
 <h2 style="text-align:center;">Current Publications</h2>
@@ -329,6 +344,8 @@ a, a:visited, a:active {
 </div>
 
 <script>
+
+/* REVEAL */
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -337,6 +354,16 @@ const observer = new IntersectionObserver(entries => {
     });
 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* PARALLAX */
+window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+    document.querySelectorAll(".book").forEach((book, i) => {
+        const depth = (i + 1) * 0.03;
+        book.style.transform = `translateY(${scrollY * depth * -0.3}px)`;
+    });
+});
+
 </script>
 
 </body>
