@@ -1,215 +1,229 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Publications | Blackwood Publishing</title>
+<title>Publications | Blackwood Publishing</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Georgia, serif;
-            background-image: url('stone.png');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #2c2c2c;
-        }
+<style>
+body {
+    margin: 0;
+    font-family: Georgia, serif;
+    background-image: url('stone.png');
+    background-size: cover;
+    background-attachment: fixed;
+    color: #2c2c2c;
+}
 
-        /* HEADER */
-        .header {
-            position: relative;
-            height: 35vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
+/* HEADER */
+.header {
+    position: relative;
+    height: 35vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
 
-        .header-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                rgba(22,22,25,0.8),
-                rgba(22,22,25,0.8)
-            ),
-            url('forest.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            z-index: 0;
-        }
+.header-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    z-index: 0;
+}
 
-        .header-inner {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-        }
+.header-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
 
-        .header-logo {
-            width: 160px;
-            margin-bottom: 10px;
-            filter: invert(1);
-        }
+.header-logo {
+    width: 160px;
+    margin-bottom: 10px;
+    filter: invert(1);
+}
 
-        .header h1 {
-            color: #F1F1F1;
-            font-weight: normal;
-            letter-spacing: 2px;
-        }
+.header h1 {
+    color: #F1F1F1;
+    font-weight: normal;
+    letter-spacing: 2px;
+}
 
-        /* NAV */
-        .nav {
-            margin-bottom: 10px;
-        }
+/* NAV */
+.nav {
+    margin-bottom: 10px;
+}
 
-        .nav a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: #F1F1F1;
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
+.nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #F1F1F1;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
 
-        .nav a:hover {
-            opacity: 0.7;
-        }
+.nav a:hover {
+    opacity: 0.7;
+}
 
-        /* SECTION */
-        .section {
-            padding: 60px 20px;
-            text-align: center;
-            background-color: rgba(232, 228, 220, 0.55);
-            margin: -30px auto 0;
-            width: 90%;
-            max-width: 1100px;
-        }
+/* SECTION */
+.section {
+    padding: 60px 20px;
+    text-align: center;
+    background-color: rgba(232, 228, 220, 0.55);
+    margin: -30px auto 0;
+    width: 90%;
+    max-width: 1100px;
+}
 
-        /* GRID */
-        .series-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 60px 40px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+/* GRID */
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
-        @media (max-width: 800px) {
-            .series-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+@media (max-width: 800px) {
+    .series-grid {
+        grid-template-columns: 1fr;
+    }
+}
 
-        /* SERIES */
-        .series {
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
+/* SERIES */
+.series {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease;
+}
 
-        .series:hover {
-            transform: translateY(-8px);
-        }
+.series.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-        .series h2 {
-            margin-bottom: 15px;
-        }
+.series h2 {
+    margin-bottom: 15px;
+}
 
-        .series p {
-            max-width: 400px;
-            margin: 15px auto;
-            line-height: 1.6;
-        }
+.series p {
+    max-width: 400px;
+    margin: 15px auto;
+    line-height: 1.6;
+}
 
-        /* CLICKABLE COVER */
-        .series a {
-            text-decoration: none;
-            color: inherit;
-            display: inline-block;
-        }
+/* CLICKABLE */
+.series a {
+    text-decoration: none;
+    color: inherit;
+}
 
-        /* CAROUSEL */
-        .carousel {
-            position: relative;
-            width: 240px;
-            height: 360px;
-            margin: 20px auto;
-            overflow: hidden;
-        }
+/* CAROUSEL */
+.carousel {
+    position: relative;
+    width: 240px;
+    height: 360px;
+    margin: 20px auto;
+    overflow: hidden;
+}
 
-        .carousel img {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            top:0;
-            left:0;
-            opacity: 0;
-            transition: opacity 1.5s ease, transform 0.5s ease;
-        }
+.carousel img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    opacity: 0;
 
-        .carousel img.active {
-            opacity: 1;
-        }
+    transition: opacity 1.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
 
-        /* IMAGE HOVER */
-        .series:hover .carousel img.active {
-            transform: scale(1.05);
-        }
+    box-shadow:
+        0 12px 28px rgba(0,0,0,0.35),
+        0 3px 8px rgba(0,0,0,0.25);
+}
 
-        /* FOOTER */
-        .footer {
-            position: relative;
-            padding: 60px 20px;
-            color: #F1F1F1;
-        }
+.carousel img.active {
+    opacity: 1;
+}
 
-        .footer::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                rgba(22,22,25,0.85),
-                rgba(22,22,25,0.85)
-            ),
-            url('forest.png');
-            background-size: cover;
-            background-position: center;
-            z-index: 0;
-        }
+/* HOVER */
+.series:hover .carousel img.active {
+    transform: scale(1.05) translateY(-6px);
+    box-shadow:
+        0 22px 50px rgba(0,0,0,0.55),
+        0 6px 16px rgba(0,0,0,0.35);
+}
 
-        .footer-content {
-            position: relative;
-            z-index: 1;
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+/* VIGNETTE */
+.carousel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0,0,0,0) 55%,
+        rgba(0,0,0,0.3) 100%
+    );
+}
 
-        .footer-center img {
-            width: 80px;
-            filter: invert(1);
-        }
+/* FOOTER */
+.footer {
+    position: relative;
+    padding: 60px 20px;
+    color: #F1F1F1;
+}
 
-        .footer a {
-            color: #F1F1F1;
-            margin-left: 15px;
-            text-decoration: none;
-            font-size: 14px;
-        }
+.footer::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
+    url('forest.png');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
 
-    </style>
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-center img {
+    width: 80px;
+    filter: invert(1);
+}
+
+.footer a {
+    color: #F1F1F1;
+    margin-left: 15px;
+    text-decoration: none;
+    font-size: 14px;
+}
+</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
 <div class="header">
-
     <div class="header-overlay"></div>
 
     <div class="header-inner">
-
         <img src="logo.png" class="header-logo">
 
         <div class="nav">
@@ -221,109 +235,98 @@
         </div>
 
         <h1>Publications</h1>
-
     </div>
-
 </div>
 
 <!-- CONTENT -->
 <div class="section">
 
-    <div class="series-grid">
+<div class="series-grid">
 
-        <!-- ARCHIVE FILES -->
-        <div class="series">
-            <h2>The Archive Files</h2>
+<!-- ARCHIVE -->
+<div class="series">
+<h2>The Archive Files</h2>
 
-            <a href="archive-files.html">
-                <div class="carousel">
-                    <img src="book3.jpg" class="active">
-                    <img src="book4.jpg "class="active">
-                    <img src="book5.jpg" class="active">
-                    <img src="book6.jpg" class="active">
-                </div>
-            </a>
+<a href="archive-files.html">
+<div class="carousel">
+<img src="book3.jpg" class="active">
+<img src="book4.jpg">
+<img src="book5.jpg">
+<img src="book6.jpg">
+</div>
+</a>
 
-            <p>
-                Psychological and atmospheric fiction exploring memory, landscape, and the quiet persistence of buried truths.
-            </p>
-        </div>
+<p>Psychological and atmospheric fiction exploring memory, landscape, and buried truths.</p>
+</div>
 
-        <!-- CURSED BOTHIES -->
-        <div class="series">
-            <h2>The Cursed Bothies</h2>
+<!-- BOTHIES -->
+<div class="series">
+<h2>The Cursed Bothies</h2>
 
-            <a href="cursed-bothies.html">
-                <div class="carousel">
-                    <img src="book2.jpg" class="active">
-                    <img src="book7.png" class="active">
-                    <img src="book8.jpg" class="active">
-                </div>
-            </a>
+<a href="cursed-bothies.html">
+<div class="carousel">
+<img src="book2.jpg" class="active">
+<img src="book7.png">
+<img src="book8.jpg">
+</div>
+</a>
 
-            <p>
-                Remote Highland bothies, isolation, and ancient forces that do not remain dormant.
-            </p>
-        </div>
+<p>Remote Highland bothies, isolation, and ancient forces that do not remain dormant.</p>
+</div>
 
-        <!-- HARD SILENCE -->
-        <div class="series">
-            <h2>Hard Silence</h2>
+<!-- HARD SILENCE -->
+<div class="series">
+<h2>Hard Silence</h2>
 
-            <a href="hard-silence.html">
-                <div class="carousel">
-                    <img src="book9.png" class="active">
-                    <img src="book10.jpg" class="active">
-                </div>
-            </a>
+<a href="hard-silence.html">
+<div class="carousel">
+<img src="book9.png" class="active">
+<img src="book10.jpg">
+</div>
+</a>
 
-            <p>
-                Dark Scottish crime fiction rooted in loyalty, violence, and consequence.
-            </p>
-        </div>
+<p>Dark Scottish crime fiction rooted in loyalty and consequence.</p>
+</div>
 
-        <!-- STANDALONE -->
-        <div class="series">
-            <h2>Standalone Works</h2>
+<!-- STANDALONE -->
+<div class="series">
+<h2>Standalone Works</h2>
 
-            <a href="standalone.html">
-                <div class="carousel">
-                    <img src="book1.jpg" class="active">
-                </div>
-            </a>
+<a href="standalone.html">
+<div class="carousel">
+<img src="book1.jpg" class="active">
+</div>
+</a>
 
-            <p>
-                Independent works focused on atmosphere, place, and psychological tension.
-            </p>
-        </div>
+<p>Independent works focused on atmosphere and psychological tension.</p>
+</div>
 
-    </div>
-
+</div>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-    <div class="footer-content">
+<div class="footer-content">
 
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
-
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
-
-    </div>
+<div>
+<p>Blackwood Publishing</p>
+<p>Independent Literary Imprint</p>
 </div>
 
-<!-- CAROUSEL SCRIPT -->
+<div class="footer-center">
+<img src="seal.png">
+</div>
+
+<div>
+<a href="publications.html">Publications</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</div>
+
+</div>
+</div>
+
+<!-- CAROUSEL -->
 <script>
 document.querySelectorAll('.carousel').forEach(carousel => {
     const images = carousel.querySelectorAll('img');
@@ -335,6 +338,19 @@ document.querySelectorAll('.carousel').forEach(carousel => {
         images[index].classList.add('active');
     }, 3500);
 });
+</script>
+
+<!-- SCROLL FADE -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.series').forEach(el => observer.observe(el));
 </script>
 
 </body>
