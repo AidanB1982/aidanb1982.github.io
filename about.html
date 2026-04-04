@@ -89,43 +89,42 @@
 
     /* MAIL CLEAN — FIXED */
 #mlb2-28459496 form {
-    display: flex;
-    gap: 10px;
+    display: flex !important;
+    gap: 10px !important;
     max-width: 420px;
-    margin: 20px auto;
+    margin: 20px auto !important;
+    justify-content: center;
 }
 
 /* INPUT */
 #mlb2-28459496 input[type="email"] {
-    flex: 1;
-    padding: 12px;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #F1F1F1;
-    font-family: Georgia, serif;
-    font-size: 15px;
+    flex: 1 !important;
+    padding: 12px !important;
+    font-size: 15px !important;
+
+    background: rgba(255,255,255,0.15) !important;
+    border: 1px solid rgba(0,0,0,0.2) !important;
+
+    color: #1C1C1C !important;
+    font-family: Georgia, serif !important;
 }
 
 /* PLACEHOLDER */
 #mlb2-28459496 input::placeholder {
-    color: rgba(255,255,255,0.7);
-}
-
-/* FOCUS */
-#mlb2-28459496 input:focus {
-    outline: none;
-    border-color: #5F7D76;
+    color: rgba(0,0,0,0.5) !important;
 }
 
 /* BUTTON */
 #mlb2-28459496 button {
-    padding: 12px 18px;
+    padding: 12px 18px !important;
+    font-size: 14px !important;
+
     background: #5F7D76 !important;
-    border: none;
-    color: #F1F1F1;
+    color: #F1F1F1 !important;
+
+    border: none !important;
     cursor: pointer;
-    font-family: Georgia, serif;
-    letter-spacing: 1px;
+    font-family: Georgia, serif !important;
 }
 
 /* HOVER */
@@ -133,11 +132,17 @@
     background: #4e6a63 !important;
 }
 
-/* NOTE TEXT */
-#mlb2-28459496 .ml-form-embedPermissionsContent p {
-    font-size: 12px;
+/* REMOVE STACKED LAYOUT */
+#mlb2-28459496 .ml-form-formContent,
+#mlb2-28459496 .ml-form-fieldRow {
+    margin: 0 !important;
+}
+
+/* CENTER DISCLAIMER TEXT */
+#mlb2-28459496 .ml-form-embedPermissionsContent {
+    text-align: center !important;
+    font-size: 12px !important;
     opacity: 0.6;
-    text-align: center;
 }
 
     /* FOOTER */
