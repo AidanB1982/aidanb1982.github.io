@@ -31,7 +31,9 @@ a, a:visited, a:active {
     text-decoration: none;
 }
 
-/* NAV */
+/* =========================
+   NAV (FIXED + ALIGNED)
+========================= */
 .nav {
     position: fixed;
     top: 0;
@@ -39,19 +41,23 @@ a, a:visited, a:active {
     width: 100%;
     z-index: 1000;
 
-    display: flex;
-    justify-content: flex-end;
-
-    padding: 20px 60px;
-
     background: linear-gradient(
         rgba(10,10,12,0.85),
         rgba(10,10,12,0.4),
         transparent
     );
-
-    backdrop-filter: blur(6px);
 }
+
+/* keeps nav aligned with content */
+.nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 25px 20px;
+
+    display: flex;
+    justify-content: flex-end;
+}
+
 .nav a {
     margin-left: 28px;
     font-size: 12px;
@@ -65,8 +71,24 @@ a, a:visited, a:active {
     opacity: 1;
 }
 
+/* underline */
+.nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #aaa;
+    transition: 0.3s;
+}
+
+.nav a:hover::after {
+    width: 100%;
+}
+
 /* =========================
-   NEW HEADER
+   HEADER
 ========================= */
 
 .header {
@@ -232,23 +254,25 @@ a, a:visited, a:active {
 
 <body>
 
-<!-- NAV -->
+<!-- NAV (NOW PROPERLY STRUCTURED) -->
 <div class="nav">
-<a href="index.html">Home</a>
-<a href="publications.html">Publications</a>
-<a href="about.html">About</a>
-<a href="author.html">Author</a>
-<a href="contact.html">Contact</a>
+    <div class="nav-inner">
+        <a href="index.html">Home</a>
+        <a href="publications.html">Publications</a>
+        <a href="about.html">About</a>
+        <a href="author.html">Author</a>
+        <a href="contact.html">Contact</a>
+    </div>
 </div>
 
 <!-- HEADER -->
 <div class="header">
-<div class="header-overlay"></div>
+    <div class="header-overlay"></div>
 
-<div class="header-inner">
-<img src="logo (1).png" class="header-logo">
-<h1>Literary and psychological fiction shaped by place, memory, and unease.</h1>
-</div>
+    <div class="header-inner">
+        <img src="logo (1).png" class="header-logo">
+        <h1>Literary and psychological fiction shaped by place, memory, and unease.</h1>
+    </div>
 </div>
 
 <!-- FEATURED -->
