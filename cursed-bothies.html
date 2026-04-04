@@ -19,7 +19,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* HEADER (MATCHED) */
+/* HEADER */
 .header {
     position: relative;
     height: 35vh;
@@ -87,12 +87,6 @@ body {
     line-height: 1.7;
 }
 
-.intro em {
-    display: block;
-    margin-bottom: 20px;
-    font-style: italic;
-}
-
 /* GRID */
 .book-grid {
     display: grid;
@@ -109,6 +103,15 @@ body {
 /* BOOK */
 .book {
     text-align: center;
+
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s ease;
+}
+
+.book.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .book img {
@@ -123,7 +126,7 @@ body {
     transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* HOVER (MATCH PUBLICATIONS) */
+/* HOVER */
 .book:hover img {
     transform: translateY(-6px) scale(1.03);
     box-shadow:
@@ -138,18 +141,15 @@ body {
     opacity: 0.9;
 }
 
-/* BUTTON (REFINED) */
+/* BUTTON */
 .button {
     display: inline-block;
     margin-top: 6px;
-
     font-size: 13px;
     letter-spacing: 1px;
     text-transform: uppercase;
-
     color: #5F7D76;
     text-decoration: none;
-
     border-bottom: 1px solid rgba(95,125,118,0.4);
     padding-bottom: 3px;
 }
@@ -262,44 +262,28 @@ body {
 <div class="intro">
     <em>“The bothy waits.”</em>
 
-    <p>
-        Deep in the Scottish Highlands stand the bothies, stone shelters built for survival in the wild. Places of refuge. Places of silence.
-    </p>
-
-    <p>
-        But some walls remember too much.
-    </p>
-
-    <p>
-        The Cursed Bothies is a series of interconnected Highland horror novels rooted in isolation, fractured memory, grief, and the quiet dread of the landscape itself.
-    </p>
-
-    <p>
-        The land watches. The weather erases. And what is buried does not stay buried.
-    </p>
-
-    <p>
-        Enter the bothy. Leave altered.
-    </p>
+    <p>Deep in the Scottish Highlands stand the bothies, stone shelters built for survival in the wild.</p>
+    <p>But some walls remember too much.</p>
+    <p>The land watches. The weather erases. And what is buried does not stay buried.</p>
 </div>
 
 <div class="book-grid">
 
 <div class="book">
     <img src="book2.jpg">
-    <p>A storm traps strangers inside a remote Highland shelter. When an ancient object is disturbed, the bothy begins to change.</p>
+    <p>A storm traps strangers inside a remote Highland shelter. Something begins to change.</p>
     <a href="https://mybook.to/Corrour" target="_blank" class="button">Read Now</a>
 </div>
 
 <div class="book">
     <img src="book7.png">
-    <p>A father and his children seek refuge in the Highlands, but grief opens the door to something waiting in the dark.</p>
+    <p>A father and his children seek refuge, but grief opens the door to something waiting.</p>
     <a href="https://mybook.to/Gualachulain" target="_blank" class="button">Preorder</a>
 </div>
 
 <div class="book">
     <img src="book8.jpg">
-    <p>A documentary crew searching for folklore find something real. Their recordings begin to change and so do they.</p>
+    <p>A documentary crew searching for folklore find something real.</p>
     <a href="https://mybook.to/Camban" target="_blank" class="button">Preorder</a>
 </div>
 
@@ -328,6 +312,19 @@ body {
 
     </div>
 </div>
+
+<!-- FADE-IN SCRIPT -->
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.book').forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
