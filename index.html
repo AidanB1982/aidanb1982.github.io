@@ -32,7 +32,7 @@ a, a:visited, a:active {
 }
 
 /* NAV */
- .nav {
+.nav {
     position: fixed;
     top: 20px;
     right: 40px;
@@ -43,8 +43,9 @@ a, a:visited, a:active {
     border-radius: 4px;
 }
 
- a {
-    margin-left: 24px;
+/* ONLY nav links */
+.nav a {
+    margin-left: 18px;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -52,10 +53,12 @@ a, a:visited, a:active {
     position: relative;
 }
 
+/* hover */
 .nav a:hover {
     opacity: 1;
 }
 
+/* underline */
 .nav a::after {
     content: "";
     position: absolute;
@@ -67,7 +70,7 @@ a, a:visited, a:active {
     transition: 0.3s;
 }
 
- a:hover::after {
+.nav a:hover::after {
     width: 100%;
 }
 
