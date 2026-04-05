@@ -316,8 +316,8 @@ body {
 }
 
 .featured-image img {
-    max-width: 220px;
-    width: 100%;
+    width: 220px;   
+    max-width: 100%;
     height: auto;
 
     display: block;
