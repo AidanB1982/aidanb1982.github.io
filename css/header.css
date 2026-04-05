@@ -6,6 +6,7 @@ body {
     background: #0f0f11;
     font-family: Georgia, serif;
     color: #e6e6e6;
+    overflow-x: hidden;
 }
 
 /* =========================
@@ -19,6 +20,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+    letter-spacing: 0.3px;
 }
 
 /* BACKGROUND */
@@ -32,25 +34,17 @@ body {
         url('/assets/forest.png') center/cover no-repeat,
         linear-gradient(
             120deg,
-            rgba(255,255,255,0.05) 0%,
-            transparent 40%,
-            transparent 60%,
-            rgba(255,255,255,0.04) 100%
+            rgba(255,255,255,0.05),
+            transparent
         );
 
-    transform:
-        translateX(var(--driftX, 0))
-        translateY(var(--driftY, 0))
-        scale(1.05);
-
+    transform: scale(1.05);
     filter: contrast(110%) brightness(0.9);
 
     animation:
+        slowZoom 60s ease-in-out infinite alternate,
         dayNightCycle 40s ease-in-out infinite alternate,
         treeShift 20s ease-in-out infinite alternate;
-   animation:
-    slowZoom 60s ease-in-out infinite alternate,
-    dayNightCycle 40s ease-in-out infinite alternate;
 }
 
 /* VIGNETTE */
@@ -66,7 +60,8 @@ body {
     mix-blend-mode: multiply;
     animation: colorShift 40s ease-in-out infinite alternate;
 }
-  /* =========================
+
+/* =========================
    FOG
 ========================= */
 .fog-back,
@@ -74,17 +69,9 @@ body {
 .fog-front {
     position: absolute;
     inset: 0;
-    background: url('/assets/fog1.png');
-    background-repeat: repeat-x;
-    background-size: cover;
-
-    mask-image: 
-    linear-gradient(to right, transparent, black 20%, black 80%, transparent),
-    linear-gradient(to bottom, transparent, black 30%, black 100%);
-
+    background: url('/assets/fog1.png') repeat-x;
     pointer-events: none;
     will-change: transform;
-    filter: blur(2px);
 }
 
 .fog-back {
@@ -100,8 +87,8 @@ body {
 }
 
 .fog-front {
-    opacity: 0.18;
-    filter: blur(3px);
+    opacity: 0.12;
+    filter: blur(2px);
 }
 
 /* =========================
@@ -170,9 +157,18 @@ body {
     text-shadow: 0 0 8px rgba(255,255,255,0.08);
 }
 
-/* NAV */
+/* =========================
+   NAV (HERO)
+========================= */
 .nav-inline {
     margin: 20px 0;
+}
+
+.hero .nav-inline {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .nav-inline a {
@@ -183,6 +179,7 @@ body {
     color: #e6e6e6;
     text-decoration: none;
     opacity: 0.7;
+    transition: all 0.3s ease;
 }
 
 .nav-inline a:hover {
@@ -190,7 +187,9 @@ body {
     text-shadow: 0 0 6px rgba(255,255,255,0.4);
 }
 
-/* BUTTON */
+/* =========================
+   BUTTON
+========================= */
 .button {
     display: inline-block;
     margin-top: 25px;
@@ -204,12 +203,53 @@ body {
 }
 
 /* =========================
+   SIMPLE HEADER (OTHER PAGES)
+========================= */
+.simple-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+
+    background: rgba(15,15,17,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo img {
+    height: 26px;
+    opacity: 0.9;
+    transition: 0.3s;
+}
+
+.logo img:hover {
+    opacity: 1;
+}
+
+.simple-header .nav-inline {
+    margin: 0;
+}
+
+.simple-header .nav-inline a {
+    font-size: 11px;
+}
+
+/* =========================
    ANIMATIONS
 ========================= */
 
 @keyframes fogSlow { from { transform: translateX(0); } to { transform: translateX(-600px); } }
 @keyframes fogMid  { from { transform: translateX(0); } to { transform: translateX(-800px); } }
-@keyframes fogFast { from { transform: translateX(0); } to { transform: translateX(-1200px); } }
 
 @keyframes entityMove {
     0% { transform: translate(10%,40%); }
@@ -237,14 +277,9 @@ body {
     to { transform: scale(1.02) translateX(-10px); }
 }
 
-/* 🔥 REAL FLICKER */
 @keyframes logoFlicker {
     0%,100% { opacity: 1; filter: brightness(1); }
-    48% { opacity: 0.95; filter: brightness(1.05); }
-    50% { opacity: 0.8;  filter: brightness(0.9); }
-    52% { opacity: 1;    filter: brightness(1); }
-    78% { opacity: 0.9;  filter: brightness(0.95); }
-    80% { opacity: 1;    filter: brightness(1.05); }
+    50% { opacity: 0.85; }
 }
 
 @keyframes logoGlow {
@@ -258,9 +293,9 @@ body {
 }
 
 @keyframes dayNightCycle {
-    0% { filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%); }
-    50% { filter: grayscale(15%) brightness(0.95) contrast(100%) saturate(100%); }
-    100% { filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%); }
+    0% { filter: grayscale(40%) brightness(0.65); }
+    50% { filter: grayscale(15%) brightness(0.95); }
+    100% { filter: grayscale(40%) brightness(0.65); }
 }
 
 @keyframes colorShift {
@@ -268,6 +303,7 @@ body {
     50% { opacity: 0.3; }
     100% { opacity: 0.6; }
 }
+
 @keyframes slowZoom {
     0% { transform: scale(1.05); }
     100% { transform: scale(1.1); }
