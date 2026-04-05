@@ -75,20 +75,18 @@ a:active {
     position: absolute;
     inset: 0;
     background: url('fog.png');
-    opacity: 0.30;
-    animation: fogSlow 120s linear infinite;
+    opacity: 0.12;
+
+    animation:
+        fogSlow 120s linear infinite,
+        ambientFlicker 6s ease-in-out infinite;
+
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6); /* 🔥 vignette */
 }
 
 .hero::before,
 .hero::after {
     pointer-events: none;
-}
-
-/* EXTRA FOG LAYERS */
-.hero::before {
-    background:
-        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-        url('forest.png') center/cover;
 }
 
 .hero .fog-layer {
@@ -127,7 +125,11 @@ a:active {
     from { transform: translateX(0); }
     to { transform: translateX(-300px); }
 }
-
+@keyframes ambientFlicker {
+    0%   { opacity: 0.08; }
+    50%  { opacity: 0.12; }
+    100% { opacity: 0.08; }
+}
 .hero-inner {
     position: relative;
     z-index: 2;
@@ -260,16 +262,19 @@ a:active {
     cursor: pointer;
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
 }
-.popular-book img:hover {
-    transform: perspective(800px) rotateY(-6deg) rotateX(3deg) scale(1.05) translateY(-6px);
-    filter: drop-shadow(0 50px 120px rgba(0,0,0,0.9));
-}
-.book img:hover {
-    transform: scale(1.05) translateY(-6px);
-    filter: drop-shadow(0 40px 100px rgba(0,0,0,0.9));
-}
 .popular-book img {
+    width: 160px;
+    flex: 0 0 auto;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    cursor: pointer;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
+
     transform-style: preserve-3d;
+}
+
+.popular-book img:hover {
+    transform: perspective(1000px) rotateY(-12deg) scale(1.06);
+    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.95));
 }
 
 .popular-book img:hover {
