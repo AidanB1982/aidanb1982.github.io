@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="google-site-verification" content="y6l2EwItL3h92JpCwreVdGN0FGKEpl9p83V6WcyaQVI" />
+<title>Blackwood Publishing</title>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blackwood Publishing</title>
 
 <style>
 
@@ -11,71 +13,74 @@
 body {
     margin: 0;
     font-family: Georgia, serif;
-    background: #0e0e10;
+    background: #111;
     color: #e6e6e6;
     overflow-x: hidden;
 }
 
-/* TEXTURE */
+/* STONE TEXTURE */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background: url('stone.png');
     opacity: 0.12;
-    z-index: -1;
+    z-index: -2;
 }
 
-/* ================= HEADER ================= */
-.header {
+/* GRAIN */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.04;
+    pointer-events: none;
+}
+
+/* ================= NAV ================= */
+.nav {
+    position: absolute;
+    top: 30px;
+    right: 60px;
+    z-index: 10;
+}
+
+.nav a {
+    margin-left: 24px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+/* ================= HERO ================= */
+.hero {
     position: relative;
-    height: 55vh;
+    height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
 }
 
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    background: linear-gradient(rgba(10,10,12,0.9), transparent);
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 26px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.75;
-}
-
-/* FOREST */
-.header::before {
+.hero::before {
     content: "";
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(22,22,25,0.75), rgba(22,22,25,0.9)),
-        url('forest.png') center/cover;
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('forest.png');
+    background-size: cover;
 }
 
 /* FOG */
-.header::after {
+.hero::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: fog.png;
-    opacity: 0.25;
+    background: url('https://i.ibb.co/7G8y7hK/fog.png');
+    opacity: 0.12;
     animation: fog 60s linear infinite;
 }
 
@@ -84,88 +89,139 @@ body::before {
     to { transform: translateX(-200px); }
 }
 
-.header-inner {
+.hero-inner {
     position: relative;
-    z-index: 5;
+    z-index: 2;
 }
 
-.header-logo {
-    width: 150px;
+.hero img {
+    width: 220px;
+    margin-bottom: 20px;
+    animation: fadeUp 1.5s forwards;
+}
+
+.hero p {
+    animation: fadeUp 2.2s forwards;
+}
+
+.button {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+
+/* ================= SECTIONS ================= */
+.section {
+    padding: 120px 20px;
+    background: #e8e6e1;
+    color: #1c1c1c;
+}
+
+.section.dark {
+    background: #111;
+    color: #ddd;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 /* ================= FEATURED ================= */
 .featured {
-    padding: 100px 20px;
-    text-align: center;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 80px;
+    align-items: center;
 }
 
 .featured img {
-    width: 360px;
-    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.9));
-    transition: 0.4s;
-}
-
-.featured img:hover {
-    transform: rotateY(-8deg) rotateX(4deg) scale(1.05);
+    width: 260px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
 }
 
 /* ================= BOOK STRIP ================= */
 .books {
-    padding: 60px 0 100px;
     overflow: hidden;
+    margin-top: 60px;
     cursor: grab;
 }
 
 .book-row {
     display: flex;
     gap: 40px;
-    padding: 0 40px;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
+}
+
+.book {
+    flex: 0 0 auto;
 }
 
 .book img {
-    width: 150px;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.85));
+    width: 180px;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
     transition: 0.4s;
 }
 
 .book img:hover {
-    transform: rotateY(-10deg) scale(1.08);
+    transform: scale(1.05) translateY(-8px);
 }
 
-/* CTA */
-.view-all {
-    text-align: center;
-    margin-top: 30px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    opacity: 0.7;
+/* ================= ANIMATION ================= */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* ================= SECTION ================= */
-.section {
-    padding: 80px 20px;
-    background: #E8E6E1;
-    color: #1c1c1c;
-    text-align: center;
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ================= FOOTER ================= */
 .footer {
-    padding: 80px 20px;
-    background: #000;
-    text-align: center;
+    position: relative;
+    padding: 100px 20px;
+    color: #eee;
 }
 
-.socials img {
-    width: 18px;
-    margin: 10px;
+.footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
+        url('forest.png');
+    background-size: cover;
+}
+
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
 }
 
 /* ================= MOBILE ================= */
-@media (max-width: 800px) {
-    .featured img { width: 240px; }
-    .book img { width: 110px; }
+@media (max-width: 900px) {
+    .featured {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .book img {
+        width: 130px;
+    }
 }
 
 </style>
@@ -173,32 +229,53 @@ body::before {
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-
+<!-- NAV -->
 <div class="nav">
-<div class="nav-inner">
 <a href="#">Home</a>
 <a href="#">Publications</a>
 <a href="#">About</a>
-</div>
+<a href="#">Author</a>
+<a href="#">Contact</a>
 </div>
 
-<div class="header-inner">
-<img src="logo (1).png" class="header-logo">
+<!-- HERO -->
+<div class="hero">
+<div class="hero-inner">
+<img src="logo (1).png">
 <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
+<a href="#" class="button">Explore Publications</a>
+</div>
 </div>
 
+<!-- ABOUT -->
+<div class="section reveal">
+<div class="container" style="text-align:center;">
+<p>
+Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
+</p>
+</div>
 </div>
 
 <!-- FEATURED -->
-<div class="featured">
+<div class="section dark reveal">
+<div class="container featured">
+
 <img src="A1.png">
+
+<div>
 <h2>Dour Hill House</h2>
-<p>A place that remembers.</p>
+<p>Some memories return. Others refuse to leave.</p>
 </div>
 
-<!-- BOOK STRIP (CURATED) -->
+</div>
+</div>
+
+<!-- BOOK STRIP -->
+<div class="section reveal">
+<div class="container">
+
+<h2 style="text-align:center;">Current Publications</h2>
+
 <div class="books" id="books">
 <div class="book-row" id="row">
 
@@ -207,63 +284,77 @@ body::before {
 <div class="book"><img src="A4.png"></div>
 <div class="book"><img src="A5.png"></div>
 <div class="book"><img src="A6.png"></div>
+<div class="book"><img src="A7.png"></div>
+<div class="book"><img src="A8.png"></div>
+<div class="book"><img src="A9.png"></div>
+<div class="book"><img src="A10.png"></div>
+<div class="book"><img src="A11.png"></div>
+<div class="book"><img src="A12.png"></div>
 
 </div>
 </div>
 
-<div class="view-all">
-<a href="publications.html">View All Publications →</a>
 </div>
-
-<!-- ABOUT -->
-<div class="section">
-<p>
-Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
-</p>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
+<div class="footer-content">
 
+<div>
 <p>Blackwood Publishing</p>
-
-<div class="socials">
-<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
-<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
+<p>Independent Literary Imprint</p>
 </div>
 
+<div>
+<img src="seal.png" width="70">
+</div>
+
+<div>
+<a href="#">Publications</a><br>
+<a href="#">About</a><br>
+<a href="#">Contact</a>
+</div>
+
+</div>
 </div>
 
 <script>
+
+/* SCROLL REVEAL */
+const observer = new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add('visible');
+}
+});
+});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
 /* DRAG SCROLL */
 const slider = document.getElementById('books');
 const row = document.getElementById('row');
 
-let isDown = false;
-let startX;
-let scrollLeft = 0;
+let isDown=false,startX,offset=0;
 
-slider.addEventListener('mousedown', e => {
-    isDown = true;
-    startX = e.pageX;
+slider.addEventListener('mousedown',e=>{
+isDown=true;
+startX=e.pageX-offset;
 });
 
-slider.addEventListener('mouseleave', () => isDown = false);
-slider.addEventListener('mouseup', () => isDown = false);
+document.addEventListener('mouseup',()=>isDown=false);
 
-slider.addEventListener('mousemove', e => {
-    if(!isDown) return;
-    const walk = (e.pageX - startX);
-    scrollLeft += walk * 0.5;
-    row.style.transform = `translateX(${scrollLeft}px)`;
+document.addEventListener('mousemove',e=>{
+if(!isDown) return;
+offset=e.pageX-startX;
+row.style.transform=`translateX(${offset}px)`;
 });
 
 /* AUTO DRIFT */
-setInterval(() => {
-    scrollLeft -= 0.2;
-    row.style.transform = `translateX(${scrollLeft}px)`;
-}, 16);
+setInterval(()=>{
+offset -= 0.2;
+row.style.transform=`translateX(${offset}px)`;
+},16);
 
 </script>
 
