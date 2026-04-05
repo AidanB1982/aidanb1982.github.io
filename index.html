@@ -316,8 +316,7 @@ a:active {
     width: 230px;
     transition: transform 0.4s ease, filter 0.4s ease;
     cursor: pointer;
-    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
-}
+   }
 
 .book img:hover {
     transform: perspective(1000px) rotateY(-4deg) rotateX(2deg) scale(1.06) translateY(-8px);
@@ -439,7 +438,7 @@ a:active {
 
 <div class="hero-inner">
 
-<img src="logo.png" class="hero-logo">
+<img src="logo (1).png" class="hero-logo">
 
 <p>
 Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
@@ -658,7 +657,16 @@ modalLink.href=d.link;
 };
 });
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
-/* 🔥 ADD THIS BELOW */
+
+/* 🔥 PARALLAX DRIFT */
+window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+
+    document.querySelectorAll('.popular-book img, .book img').forEach((el, i) => {
+        const speed = (i % 2 === 0) ? 0.03 : 0.06;
+        el.style.transform = `translateY(${scrollY * speed}px);
+    });
+});
 
 </script>
 
