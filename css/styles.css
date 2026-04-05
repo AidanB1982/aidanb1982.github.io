@@ -28,7 +28,9 @@
     justify-content: center;
     transition-delay: 0.1s;
 }
-
+.featured-content {
+    transition-delay: 0.3s;
+}
 .featured-image img {
     width: 360px; 
     height: auto;
