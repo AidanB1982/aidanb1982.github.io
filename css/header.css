@@ -1,4 +1,9 @@
-/* =========================
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #0b0b0d !important;
+    color: #e6e6e6;
+}/* =========================
    GLOBAL LINK RESET
 ========================= */
 a,
