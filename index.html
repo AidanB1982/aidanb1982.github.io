@@ -67,6 +67,7 @@ fetch('header.html')
     .catch(err => console.error("Header load error:", err));
 </script>
 <script>
+<script>
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -74,7 +75,8 @@ const observer = new IntersectionObserver((entries) => {
         }
     });
 }, {
-    threshold: 0.2
+    threshold: 0.6,       
+    rootMargin: "0px 0px -100px 0px"
 });
 
 document.querySelectorAll('.fade-in').forEach(el => {
