@@ -3,16 +3,24 @@
 ========================= */
 .featured {
     position: relative;
+    margin-top: -180px;
+    padding: 180px 20px 120px;
+    background: none;
+    z-index: 5;
+}
+
+.featured::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
     background: linear-gradient(
-         to bottom,
-    rgba(11,11,13,0) 0%,
-    rgba(11,11,13,0.6) 40%,
-    #0b0b0d 70%
+        to bottom,
+        rgba(0,0,0,0.2),
+        rgba(0,0,0,0.75)
     );
 
-    margin-top: -120px;
-    padding: 160px 20px 100px;
-    z-index: 5;
+    z-index: -1;
 }
 
 /* LAYOUT */
@@ -21,8 +29,8 @@
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: 220px 1fr; 
-    gap: 40px; 
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
     align-items: center;
 }
 
@@ -30,20 +38,21 @@
 .featured-image {
     display: flex;
     justify-content: center;
+    transition-delay: 0.1s;
 }
 
 .featured-image img {
-    width: 360px; 
+    width: 200px; /* 🔥 FIX: was 360px (too big again) */
     height: auto;
     display: block;
 
-    transform: translateX(-5px); /* subtle visual centering */
+    transform: translateX(-5px);
     transition: transform 0.5s ease, filter 0.5s ease;
 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
 }
 
-/* Hover effect (premium feel) */
+/* Hover */
 .featured-image img:hover {
     transform: translateY(-6px) scale(1.02);
     filter: drop-shadow(0 30px 60px rgba(0,0,0,0.9));
@@ -52,6 +61,7 @@
 /* TEXT */
 .featured-content {
     max-width: 520px;
+    transition-delay: 0.3s; /* ✅ moved here correctly */
 }
 
 /* LABEL */
@@ -60,7 +70,7 @@
     letter-spacing: 2px;
     text-transform: uppercase;
     opacity: 0.5;
-    margin-bottom: 8px; /* tighter */
+    margin-bottom: 8px;
 }
 
 /* TITLE */
@@ -68,17 +78,17 @@
     font-size: 34px;
     line-height: 1.2;
     font-weight: normal;
-    margin-bottom: 16px; /* tighter */
+    margin-bottom: 16px;
 }
 
 /* TEXT */
 .featured-content p {
     line-height: 1.7;
     opacity: 0.8;
-    margin-bottom: 20px; /* tighter */
+    margin-bottom: 20px;
 }
 
-/* BUTTON ALIGNMENT */
+/* BUTTON */
 .featured .button {
     font-size: 11px;
     letter-spacing: 2px;
@@ -89,6 +99,10 @@
 .featured .button:hover {
     opacity: 1;
 }
+
+/* =========================
+   FADE-IN
+========================= */
 .fade-in {
     opacity: 0;
     transform: translateY(40px);
