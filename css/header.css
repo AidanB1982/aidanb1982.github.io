@@ -316,8 +316,11 @@ body {
 }
 
 .featured-image img {
-    max-width: 260px;
+    max-width: 220px;
     width: 100%;
+    height: auto;
+
+    display: block;
 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
 }
