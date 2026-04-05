@@ -42,7 +42,7 @@
 }
 
 .featured-image img {
-    width: 200px; /* 🔥 FIX: was 360px (too big again) */
+    width: 360px; 
     height: auto;
     display: block;
 
