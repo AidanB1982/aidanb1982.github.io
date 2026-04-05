@@ -1,13 +1,12 @@
 html, body {
     margin: 0;
     padding: 0;
-    background: #000000 !important;
-    color: #e6e6e6;
-    .page {
     background: #000000;
-    min-height: 100vh;
+    color: #e6e6e6;
 }
-    .page {
+
+/* move OUTSIDE */
+.page {
     background: #000000;
     min-height: 100vh;
 }
@@ -37,7 +36,7 @@ body {
 ========================= */
 .hero {
     position: relative;
-    height: 1000vh;
+    height: 100vh;
     overflow: hidden;
 
     display: flex;
@@ -58,19 +57,15 @@ body {
     inset: 0;
 
     background:
-    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
-    url('/assets/forest.png') center 30% / cover no-repeat,
-    linear-gradient(120deg, rgba(255,255,255,0.05), transparent);
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
+        url('/assets/forest.png') center 40% / cover no-repeat;
 
-    transform:
-    translateY(var(--scrollY, 0))
-    scale(1.01);
+    transform: translateY(var(--scrollY, 0)); /* ❗ removed scale */
+    
     filter: contrast(110%) brightness(0.9);
 
     animation:
-        slowZoom 60s ease-in-out infinite alternate,
-        dayNightCycle 40s ease-in-out infinite alternate,
-        treeShift 20s ease-in-out infinite alternate;
+        dayNightCycle 40s ease-in-out infinite alternate;
 }
 
 /* VIGNETTE */
@@ -167,7 +162,6 @@ body {
     z-index: 10;
     max-width: 600px;
     margin: 0 auto;
-    animation: fadeIn 2s ease forwards;
 }
 
 .hero-logo {
@@ -175,9 +169,7 @@ body {
     max-width: 80%;
 
     display: block;             
-    margin-left: auto;           
-    margin-right: auto; 
-    margin-bottom: 10px;
+    margin: 0 auto 10px auto;
 
     animation:
         logoFlicker 7s infinite,
