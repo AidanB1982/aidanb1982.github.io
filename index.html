@@ -19,11 +19,13 @@
 <section class="featured">
     <div class="featured-inner">
 
-        <div class="featured-image fade-in">
+        <!-- BOOK -->
+        <div class="featured-image fade-in" data-speed="0.3">
             <img src="./assets/A1.png" alt="Corrour Bothy">
         </div>
 
-        <div class="featured-content fade-in">
+        <!-- TEXT -->
+        <div class="featured-content fade-in" data-speed="0.6">
             <div class="featured-label">Featured Work</div>
 
             <h2>Corrour Bothy: The First Summoning</h2>
@@ -42,7 +44,9 @@
     </div>
 </section>
 
-<!-- LOAD HEADER -->
+<!-- =========================
+     LOAD HEADER
+========================= -->
 <script>
 fetch('header.html')
     .then(res => {
@@ -69,7 +73,9 @@ fetch('header.html')
     .catch(err => console.error("Header load error:", err));
 </script>
 
-<!-- SCROLL REVEAL -->
+<!-- =========================
+     SCROLL REVEAL + PARALLAX (MERGED)
+========================= -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -88,6 +94,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     elements.forEach(el => observer.observe(el));
+
+});
+
+
+window.addEventListener('scroll', () => {
+
+    const elements = document.querySelectorAll('[data-speed]');
+    const scrollY = window.scrollY;
+
+    elements.forEach(el => {
+
+        const speed = parseFloat(el.getAttribute('data-speed'));
+        const offset = scrollY * speed * -0.1;
+
+        const isVisible = el.classList.contains('visible');
+
+        // Only apply parallax AFTER reveal
+        if (isVisible) {
+            el.style.transform = `translateY(${offset}px)`;
+        }
+
+    });
 
 });
 </script>
