@@ -1,284 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blackwood Publishing</title>
-
-<style>
-
-/* =========================
-   BASE
-========================= */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0f0f11;
-    color: #e6e6e6;
-    overflow-x: hidden;
-    scroll-behavior: smooth;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-}
-
-/* =========================
-   HEADER
-========================= */
-.nav {
-    position: absolute;
-    top: 30px;
-    right: 60px;
-    z-index: 10;
-    padding: 10px 18px;
-    border-radius: 6px;
-    backdrop-filter: blur(8px);
-    background: rgba(0,0,0,0.35);
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.75;
-    transition: 0.3s;
-}
-
-.nav a:hover {
-    opacity: 1;
-}
-
-/* =========================
-   HERO
-========================= */
-.hero {
-    position: relative;
-    height: 55vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    overflow: hidden;
-}
-
-.hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)),
-        url('forest.png') center/cover no-repeat;
-}
-
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        url('fog.png'),
-        radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.12), transparent 40%);
-    opacity: 0.18;
-    animation: fogSlow 120s linear infinite;
-    mix-blend-mode: screen;
-    pointer-events: none;
-}
-
-.hero-inner {
-    position: relative;
-    z-index: 2;
-    max-width: 600px;
-}
-
-.hero-logo {
-    width: 320px;
-    max-width: 80%;
-}
-
-.hero p {
-    opacity: 0.8;
-    line-height: 1.7;
-}
-
-.button {
-    display: inline-block;
-    margin-top: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-    padding-bottom: 4px;
-}
-
-/* =========================
-   FEATURED
-========================= */
-.featured {
-    padding: 80px 20px;
-}
-
-.featured-inner {
-    max-width: 1000px;
-    margin: auto;
-    display: grid;
-    grid-template-columns: 360px 1fr;
-    gap: 40px;
-    align-items: center;
-}
-
-/* =========================
-   POPULAR
-========================= */
-.popular {
-    padding: 120px 20px;
-    text-align: center;
-}
-
-.popular-row {
-    display: flex;
-    gap: 40px;
-    justify-content: center;
-}
-
-.popular-book img {
-    width: 180px;
-    cursor: pointer;
-}
-
-/* =========================
-   MODAL
-========================= */
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.4s;
-}
-
-.modal.active {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-content {
-    background: #111;
-    padding: 40px;
-    text-align: center;
-}
-
-/* =========================
-   ANIMATION
-========================= */
-@keyframes fogSlow {
-    from { transform: translateX(0); }
-    to { transform: translateX(-600px); }
-}
-
-</style>
-</head>
-
-<body>
-
-<!-- HEADER LOAD -->
-<div id="header"></div>
+<!-- NAV -->
+<div class="nav">
+    <a href="index.html">Home</a>
+    <a href="publications.html">Publications</a>
+    <a href="about.html">About</a>
+    <a href="author.html">Author</a>
+    <a href="contact.html">Contact</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
 
-<div class="hero-inner">
-<img src="logo (1).png" class="hero-logo">
+    <!-- Fog layers -->
+    <div class="fog-layer"></div>
+    <div class="fog-layer2"></div>
 
-<p>
-Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
-</p>
+    <!-- Content -->
+    <div class="hero-inner">
+        <img src="logo (1).png" class="hero-logo">
 
-<a href="publications.html" class="button">
-Explore Publications
-</a>
-</div>
+        <p>
+        Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
+        </p>
 
-</section>
-
-<!-- FEATURED -->
-<section class="featured">
-
-<div class="featured-inner">
-<img src="A1.png">
-
-<div>
-<h2>Featured Work</h2>
-<h3>Corrour Bothy</h3>
-<p>Highland isolation and unease.</p>
-</div>
-</div>
+        <a href="publications.html" class="button">
+            Explore Publications
+        </a>
+    </div>
 
 </section>
-
-<!-- POPULAR -->
-<section class="popular">
-
-<h2>Popular Reads</h2>
-
-<div class="popular-row">
-<div class="popular-book"><img src="A3.png" data-id="A3"></div>
-<div class="popular-book"><img src="A6.png" data-id="A6"></div>
-</div>
-
-</section>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-<div class="modal-content">
-<img id="modalImg" width="150">
-<h2 id="modalTitle"></h2>
-<p id="modalDesc"></p>
-</div>
-</div>
-
-<!-- =========================
-     SCRIPTS
-========================= -->
-
-<script>
-/* LOAD HEADER */
-fetch('/header.html')
-.then(res => res.text())
-.then(data => {
-    document.getElementById('header').innerHTML = data;
-});
-
-/* DATA */
-const data = {
-    A3:{ title:"Camban Bothy", desc:"The Third Calling" },
-    A6:{ title:"The Erased Archivist", desc:"Rewrite the future" }
-};
-
-/* MODAL */
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImg");
-const modalTitle = document.getElementById("modalTitle");
-const modalDesc = document.getElementById("modalDesc");
-
-document.querySelectorAll(".popular-book img").forEach(img => {
-    img.addEventListener("click", () => {
-        const d = data[img.dataset.id];
-        if (!d) return;
-
-        modal.classList.add("active");
-        modalImg.src = img.src;
-        modalTitle.textContent = d.title;
-        modalDesc.textContent = d.desc;
-    });
-});
-
-modal.addEventListener("click", e => {
-    if (e.target === modal) modal.classList.remove("active");
-});
-</script>
-
-</body>
-</html>
