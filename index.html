@@ -34,6 +34,29 @@ a {
 }
 a:hover { color: #ffffff; }
 
+/* NAV */
+.nav {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 20;
+}
+.nav-inner {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+.nav a {
+    margin-left: 26px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    opacity: 0.7;
+    position: relative;
+}
+.nav a:hover { opacity: 1; }
+
 /* HERO */
 .header {
     position: relative;
@@ -81,7 +104,6 @@ a:hover { color: #ffffff; }
     position: relative;
     z-index: 5;
 }
-
 .header-logo {
     width: 240px;
 }
@@ -90,18 +112,16 @@ a:hover { color: #ffffff; }
 .section {
     padding: 120px 20px;
 }
-
 .container {
     max-width: 1100px;
     margin: auto;
 }
 
-/* FEATURED LAYOUT */
+/* FEATURED */
 .featured-main {
     display: grid;
     grid-template-columns: 420px 1fr;
     gap: 100px;
-    align-items: start;
 }
 
 /* BOOK IMAGE */
@@ -110,14 +130,9 @@ a:hover { color: #ffffff; }
     box-shadow:
         0 40px 90px rgba(0,0,0,0.7),
         0 15px 30px rgba(0,0,0,0.5);
-    transition: 0.4s;
 }
 
-.featured-image img:hover {
-    transform: translateY(-6px);
-}
-
-/* TEXT BLOCK */
+/* TEXT */
 .featured-text {
     max-width: 520px;
 }
@@ -127,7 +142,6 @@ a:hover { color: #ffffff; }
     margin-bottom: 25px;
 }
 
-/* PARAGRAPH RHYTHM */
 .featured-text p {
     margin-bottom: 22px;
     line-height: 1.7;
@@ -155,10 +169,6 @@ a:hover { color: #ffffff; }
     box-shadow:
         0 30px 60px rgba(0,0,0,0.7),
         0 10px 20px rgba(0,0,0,0.5);
-}
-
-.book-feature p {
-    margin-top: 12px;
 }
 
 /* PUBLICATIONS */
@@ -191,20 +201,27 @@ a:hover { color: #ffffff; }
 
 .book p {
     color: #111;
-    line-height: 1.6;
 }
 
-/* REVEAL SYSTEM */
+/* STAGGER ANIMATION */
 .reveal {
     opacity: 0;
     transform: translateY(60px);
-    transition: 1.3s ease;
 }
 
 .reveal.visible {
     opacity: 1;
     transform: translateY(0);
+    transition: 1.2s ease;
 }
+
+/* STAGGER DELAYS */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.25s; }
+.delay-3 { transition-delay: 0.4s; }
+.delay-4 { transition-delay: 0.55s; }
+.delay-5 { transition-delay: 0.7s; }
+.delay-6 { transition-delay: 0.85s; }
 
 /* MOBILE */
 @media (max-width: 900px) {
@@ -219,6 +236,17 @@ a:hover { color: #ffffff; }
 </head>
 
 <body>
+
+<!-- NAV -->
+<div class="nav">
+    <div class="nav-inner">
+        <a href="index.html">Home</a>
+        <a href="publications.html">Publications</a>
+        <a href="about.html">About</a>
+        <a href="author.html">Author</a>
+        <a href="contact.html">Contact</a>
+    </div>
+</div>
 
 <!-- HERO -->
 <div class="header">
@@ -235,32 +263,28 @@ a:hover { color: #ffffff; }
 <div class="section">
 <div class="container featured-main">
 
-    <div class="featured-image reveal">
+    <div class="featured-image reveal delay-1">
         <img src="book2.jpg">
     </div>
 
     <div class="featured-text">
-        <h2 class="reveal">Corrour Bothy: The First Summoning</h2>
+        <h2 class="reveal delay-2">Corrour Bothy: The First Summoning</h2>
 
-        <p class="reveal"><strong>Some shelters protect. Others keep you.</strong></p>
+        <p class="reveal delay-3"><strong>Some shelters protect. Others keep you.</strong></p>
 
-        <p class="reveal">
-        Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks. To some, it is a refuge. To others, something less easily named.
+        <p class="reveal delay-4">
+        Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks...
         </p>
 
-        <p class="reveal">
-        Isobel and Thomas arrive carrying the strain of a fractured relationship. Jude and Emily come chasing folklore and half-remembered stories. Declan walks alone, untethered from the life he left behind.
+        <p class="reveal delay-5">
+        Isobel and Thomas arrive carrying the strain of a fractured relationship...
         </p>
 
-        <p class="reveal">
-        Their paths converge at Corrour Bothy, where smoke rises from a chimney that should be cold, and footsteps echo where no one walks. The bothy does not ask who they are. It already knows.
+        <p class="reveal delay-6">
+        Their paths converge at Corrour Bothy...
         </p>
 
-        <p class="reveal">
-        Corrour Bothy is the first instalment in The Cursed Bothies, an interconnected series of Highland novels in which each remote shelter holds a fragment of something older and far less patient than the storm.
-        </p>
-
-        <a href="https://mybook.to/Corrour" class="link reveal">Purchase</a>
+        <a href="https://mybook.to/Corrour" class="link reveal delay-6">Purchase</a>
     </div>
 
 </div>
@@ -271,15 +295,13 @@ a:hover { color: #ffffff; }
     <div class="book-feature reveal">
         <img src="book6.jpg">
         <h3>Holdfast</h3>
-        <p>Some memories return. Others refuse to leave.</p>
         <a href="https://mybook.to/Holdfast" class="link">Preorder</a>
     </div>
 
     <div class="book-feature reveal">
         <img src="book13.jpg">
         <h3>Corrour Bothy (Limited)</h3>
-        <p>Founder’s Foil Edition — limited to fifty copies.</p>
-        <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" class="link">Purchase</a>
+        <a href="#" class="link">Purchase</a>
     </div>
 
 </div>
@@ -296,18 +318,14 @@ a:hover { color: #ffffff; }
 <div class="book reveal">
 <img src="book3.jpg">
 <h3>The Black Bothy</h3>
-<p>
-When her sister disappears, Clara follows her into a remote bothy where paths shift, the landscape distorts, and something in the place refuses to let her leave.
-</p>
+<p>When her sister disappears, Clara follows her into a remote bothy...</p>
 <a href="https://mybook.to/BlackBothy" class="link">Purchase</a>
 </div>
 
 <div class="book reveal">
 <img src="book1.jpg">
 <h3>Dour Hill House</h3>
-<p>
-Inheriting a remote house, Clara becomes increasingly confined within it as rooms shift, the interior resists logic, and a mirror begins to distort both memory and identity.
-</p>
+<p>Inheriting a remote house, Clara becomes increasingly confined...</p>
 <a href="https://mybook.to/DourHillHouse" class="link">Purchase</a>
 </div>
 
