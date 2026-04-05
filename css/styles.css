@@ -2,8 +2,16 @@
    FEATURED SECTION
 ========================= */
 .featured {
-    background: #0b0b0d;
-    padding: 120px 20px; /* slightly tighter top/bottom */
+    position: relative;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        #0b0b0d 30%
+    );
+
+    margin-top: -120px;
+    padding: 160px 20px 100px;
+    z-index: 5;
 }
 
 /* LAYOUT */
