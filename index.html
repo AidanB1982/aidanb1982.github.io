@@ -26,10 +26,7 @@ body::before {
     z-index: -1;
 }
 
-/* LINKS */
-a { color: inherit; text-decoration: none; }
-
-/* NAV */
+/* NAV (unchanged) */
 .nav {
     position: absolute;
     top: 0;
@@ -55,19 +52,6 @@ a { color: inherit; text-decoration: none; }
 
 .nav a:hover { opacity: 1; }
 
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-
-.nav a:hover::after { width: 100%; }
-
 /* HERO */
 .header {
     position: relative;
@@ -89,13 +73,16 @@ a { color: inherit; text-decoration: none; }
     background-attachment: fixed;
 }
 
-/* FOG */
+/* FIXED FOG EDGE (fade mask) */
 .header-fog {
     position: absolute;
     inset: 0;
     background: url('fog.png') repeat-x;
     background-size: 130%;
     pointer-events: none;
+
+    mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
 }
 
 .fog-back { opacity: 0.25; animation: fogSlow 160s linear infinite; }
@@ -124,7 +111,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .header h1 {
-    font-size: 42px; /* increased */
+    font-size: 42px;
     margin-bottom: 18px;
 }
 
@@ -133,9 +120,9 @@ a { color: inherit; text-decoration: none; }
     opacity: 0.85;
 }
 
-/* SECTION SPACING */
+/* SECTION */
 .section {
-    padding: 100px 20px;
+    padding: 110px 20px;
 }
 
 .container {
@@ -143,61 +130,85 @@ a { color: inherit; text-decoration: none; }
     margin: auto;
 }
 
-/* FEATURED MAIN */
+/* FEATURED (LEFT IMAGE / RIGHT TEXT) */
 .featured-main {
-    text-align: left;
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 80px;
+    align-items: center;
 }
 
 .featured-main img {
-    width: 360px;
-    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
-    margin-bottom: 40px;
-    transition: 0.4s;
+    width: 100%;
+    transform: perspective(900px) rotateY(-6deg);
+    box-shadow:
+        0 60px 120px rgba(0,0,0,0.8),
+        0 0 0 1px rgba(255,255,255,0.05);
+    transition: 0.5s;
 }
 
 .featured-main img:hover {
-    transform: scale(1.04);
-}
-
-/* SECONDARY FEATURED (Holdfast + Limited) */
-.featured-secondary {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin-top: 80px;
-}
-
-.book-feature img {
-    width: 180px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-    transition: 0.4s;
-}
-
-.book-feature:hover img {
-    transform: translateY(-6px) scale(1.03);
+    transform: perspective(900px) rotateY(-2deg) scale(1.03);
 }
 
 /* TEXT */
-.eyebrow {
-    font-size: 11px;
-    letter-spacing: 2px;
-    opacity: 0.5;
+.featured-main h2 {
+    font-size: 30px;
 }
 
+.featured-main p {
+    margin-bottom: 18px;
+}
+
+/* LINK */
 .link {
     display: inline-block;
-    margin-top: 12px;
+    margin-top: 15px;
     font-size: 12px;
     letter-spacing: 2px;
     border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 
-/* GRID */
+/* SECONDARY FEATURED */
+.featured-secondary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-top: 100px;
+}
+
+.book-feature img {
+    width: 180px;
+    transform: perspective(800px) rotateY(-4deg);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.7);
+    transition: 0.4s;
+}
+
+.book-feature:hover img {
+    transform: perspective(800px) rotateY(-2deg) scale(1.05);
+}
+
+/* PUBLICATIONS (TEXTURED) */
 .section.texture {
+    position: relative;
     background: #E8E6E1;
     color: #1c1c1c;
 }
 
+.section.texture::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.2;
+}
+
+.section.texture .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -207,12 +218,13 @@ a { color: inherit; text-decoration: none; }
 
 .book img {
     width: 220px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    transform: perspective(800px) rotateY(-3deg);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
     transition: 0.4s;
 }
 
 .book:hover img {
-    transform: translateY(-12px) scale(1.05);
+    transform: perspective(800px) rotateY(0deg) scale(1.06);
 }
 
 /* AUTHOR */
@@ -239,8 +251,6 @@ a { color: inherit; text-decoration: none; }
     opacity: 0.7;
 }
 
-.social img:hover { opacity: 1; }
-
 /* REVEAL */
 .reveal {
     opacity: 0;
@@ -255,6 +265,7 @@ a { color: inherit; text-decoration: none; }
 
 /* MOBILE */
 @media (max-width: 900px) {
+    .featured-main,
     .featured-secondary,
     .grid {
         grid-template-columns: 1fr;
@@ -298,11 +309,21 @@ a { color: inherit; text-decoration: none; }
 
     <img src="book2.jpg">
 
-    <h2>Corrour Bothy: The First Summoning</h2>
+    <div>
+        <h2>Corrour Bothy: The First Summoning</h2>
 
-    <p>
-        A remote refuge where isolation fractures perception and something unseen takes hold.
-    </p>
+        <p><strong>Some shelters protect. Others keep you.</strong></p>
+
+        <p>
+        Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks...
+        </p>
+
+        <p>
+        Corrour Bothy is the first instalment in The Cursed Bothies...
+        </p>
+
+        <a href="https://mybook.to/Corrour" target="_blank" class="link">Purchase</a>
+    </div>
 
 </div>
 
@@ -314,7 +335,6 @@ a { color: inherit; text-decoration: none; }
         <div>
             <p class="eyebrow">Coming Soon</p>
             <h3>Holdfast</h3>
-            <p>Some memories return. Others refuse to leave.</p>
             <a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
         </div>
     </div>
@@ -324,7 +344,6 @@ a { color: inherit; text-decoration: none; }
         <div>
             <p class="eyebrow">Limited Edition</p>
             <h3>Corrour Bothy</h3>
-            <p>Founder’s Foil Edition — limited to fifty copies.</p>
             <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
         </div>
     </div>
@@ -336,20 +355,18 @@ a { color: inherit; text-decoration: none; }
 <div class="section texture">
 <div class="container">
 
-<h2>Publications</h2>
+<h2>Popular Reads</h2>
 
 <div class="grid">
 
 <a href="https://mybook.to/BlackBothy" class="book reveal">
 <img src="book3.jpg">
 <h3>The Black Bothy</h3>
-<p>When her sister disappears, she follows her into a remote bothy where the landscape shifts, voices echo without source, and something old in the place begins to take hold.</p>
 </a>
 
 <a href="https://mybook.to/DourHillHouse" class="book reveal">
 <img src="book1.jpg">
 <h3>Dour Hill House</h3>
-<p>Inheriting a remote house, Clara becomes increasingly confined within it as rooms shift, the interior resists logic, and a mirror begins to distort both memory and identity.</p>
 </a>
 
 </div>
@@ -361,7 +378,7 @@ a { color: inherit; text-decoration: none; }
 <div class="section">
 <div class="container author">
 <p>
-Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain...
 </p>
 </div>
 </div>
@@ -373,12 +390,8 @@ Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological
 <div>© Blackwood Publishing</div>
 
 <div class="social">
-<a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
-<img src="tiktok.png">
-</a>
-<a href="https://www.instagram.com/aidan.blackwood" target="_blank">
-<img src="instagram.png">
-</a>
+<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
+<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
 </div>
 
 </div>
@@ -387,23 +400,10 @@ Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological
 <script>
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('visible');
     });
 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-window.addEventListener("scroll", () => {
-    const scrollY = window.scrollY;
-    const fogFront = document.querySelector(".fog-front");
-    const fogBack = document.querySelector(".fog-back");
-
-    if (fogFront && fogBack) {
-        fogFront.style.transform = `translateY(${scrollY * 0.02}px)`;
-        fogBack.style.transform = `translateY(${scrollY * 0.01}px)`;
-    }
-});
 </script>
 
 </body>
