@@ -129,205 +129,6 @@ a {
     width: 180px;
     cursor: pointer;
 }
-
-</style>
-</head>
-
-<body>
-
-<!-- NAV -->
-<div class="nav">
-    <a href="index.html">Home</a>
-    <a href="publications.html">Publications</a>
-    <a href="about.html">About</a>
-    <a href="author.html">Author</a>
-    <a href="contact.html">Contact</a>
-</div>
-
-<!-- HERO -->
-<section class="hero">
-    <div class="hero-inner">
-        <img src="logo.png" class="hero-logo">
-        <p>Independent publisher of literary fiction.</p>
-    </div>
-</section>
-
-<!-- FEATURED -->
-<section class="featured">
-    <div class="featured-inner">
-        <img src="A1.png">
-        <div>
-            <h2>Featured Work</h2>
-            <h3>Corrour Bothy</h3>
-            <p>A remote Highland bothy story.</p>
-        </div>
-    </div>
-</section>
-
-<!-- POPULAR -->
-<section class="popular">
-    <h2>Popular Reads</h2>
-
-    <div class="popular-row">
-        <div class="popular-book">
-            <img src="A3.png" data-id="A3">
-        </div>
-        <div class="popular-book">
-            <img src="A6.png" data-id="A6">
-        </div>
-    </div>
-</section>
-
-<!-- MODAL -->
-<div class="modal" id="modal" style="display:none;">
-    <div style="background:#111;padding:20px;">
-        <img id="modalImg" width="150">
-        <h2 id="modalTitle"></h2>
-        <p id="modalDesc"></p>
-    </div>
-</div>
-
-<!-- ✅ JAVASCRIPT (THIS WAS YOUR MISSING PIECE) -->
-<script>
-
-const data = {
-    A3:{ title:"Camban Bothy", desc:"The Third Calling" },
-    A6:{ title:"The Erased Archivist", desc:"Rewrite the future" }
-};
-
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImg");
-const modalTitle = document.getElementById("modalTitle");
-const modalDesc = document.getElementById("modalDesc");
-
-document.querySelectorAll(".popular-book img").forEach(img => {
-    img.addEventListener("click", () => {
-        const d = data[img.dataset.id];
-        if (!d) return;
-
-        modal.style.display = "flex";
-        modalImg.src = img.src;
-        modalTitle.textContent = d.title;
-        modalDesc.textContent = d.desc;
-    });
-});
-
-modal.addEventListener("click", () => {
-    modal.style.display = "none";
-});
-
-</script>
-<script>
-
-/* =========================
-   BOOK DATA
-========================= */
-const data = {
-    A3:{ title:"Camban Bothy", desc:"The Third Calling (PREORDER)", link:"https://mybook.to/Camban" },
-    A6:{ title:"The Erased Archivist", desc:"They control the past.", link:"https://mybook.to/ErasedArchivist" },
-    A7:{ title:"The Drowned Fjord", desc:"Ancient folklore.", link:"https://mybook.to/DrownedFjord" },
-    A5:{ title:"Holdfast", desc:"A haunting novel.", link:"https://mybook.to/Holdfast" },
-    A11:{ title:"Red Streets", desc:"Scottish crime thriller.", link:"https://mybook.to/RedStreets" }
-};
-
-/* =========================
-   MODAL
-========================= */
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modalImg");
-const modalTitle = document.getElementById("modalTitle");
-const modalDesc = document.getElementById("modalDesc");
-const modalLink = document.getElementById("modalLink");
-
-document.querySelectorAll(".popular-book img").forEach(img => {
-    img.addEventListener("click", () => {
-        const d = data[img.dataset.id];
-        if (!d) return;
-
-        modal.classList.add("active");
-        modalImg.src = img.src;
-        modalTitle.textContent = d.title;
-        modalDesc.textContent = d.desc;
-        modalLink.href = d.link;
-    });
-});
-
-modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.classList.remove("active");
-});
-
-/* =========================
-   REVEAL
-========================= */
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add("visible");
-    });
-});
-
-document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-
-</script>
-<script>
-
-/* =========================
-   HERO LIGHT + PARALLAX (SAFE VERSION)
-========================= */
-
-const hero = document.querySelector('.hero');
-
-if (hero) {
-
-    let targetX = 50, targetY = 50;
-    let currentX = 50, currentY = 50;
-
-    /* LIGHT FOLLOW */
-    hero.addEventListener('mousemove', e => {
-        const rect = hero.getBoundingClientRect();
-
-        targetX = ((e.clientX - rect.left) / rect.width) * 100;
-        targetY = ((e.clientY - rect.top) / rect.height) * 100;
-    });
-
-    /* SMOOTH LIGHT ANIMATION */
-    function animateHero() {
-        currentX += (targetX - currentX) * 0.05;
-        currentY += (targetY - currentY) * 0.05;
-
-        hero.style.setProperty('--mx', currentX + '%');
-        hero.style.setProperty('--my', currentY + '%');
-
-        requestAnimationFrame(animateHero);
-    }
-
-    animateHero();
-
-    /* CONTENT DRIFT */
-    const inner = hero.querySelector('.hero-inner');
-
-    if (inner) {
-
-        hero.addEventListener('mousemove', e => {
-            const rect = hero.getBoundingClientRect();
-
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-            inner.style.transform = `
-                translate(${x * 12}px, ${y * 12}px)
-                scale(1.02)
-            `;
-        });
-
-        hero.addEventListener('mouseleave', () => {
-            inner.style.transform = `translate(0,0) scale(1)`;
-        });
-    }
-}
-
-</script>   
-</body>
-</html>
 /* =========================
    BOOK TITLE
 ========================= */
@@ -485,4 +286,202 @@ if (hero) {
     opacity: 1;
     transform: translateY(0);
 }
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<div class="nav">
+    <a href="index.html">Home</a>
+    <a href="publications.html">Publications</a>
+    <a href="about.html">About</a>
+    <a href="author.html">Author</a>
+    <a href="contact.html">Contact</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <img src="logo.png" class="hero-logo">
+        <p>Independent publisher of literary fiction.</p>
+    </div>
+</section>
+
+<!-- FEATURED -->
+<section class="featured">
+    <div class="featured-inner">
+        <img src="A1.png">
+        <div>
+            <h2>Featured Work</h2>
+            <h3>Corrour Bothy</h3>
+            <p>A remote Highland bothy story.</p>
+        </div>
+    </div>
+</section>
+
+<!-- POPULAR -->
+<section class="popular">
+    <h2>Popular Reads</h2>
+
+    <div class="popular-row">
+        <div class="popular-book">
+            <img src="A3.png" data-id="A3">
+        </div>
+        <div class="popular-book">
+            <img src="A6.png" data-id="A6">
+        </div>
+    </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal" id="modal" style="display:none;">
+    <div style="background:#111;padding:20px;">
+        <img id="modalImg" width="150">
+        <h2 id="modalTitle"></h2>
+        <p id="modalDesc"></p>
+    </div>
+</div>
+
+<!-- ✅ JAVASCRIPT (THIS WAS YOUR MISSING PIECE) -->
+<script>
+
+const data = {
+    A3:{ title:"Camban Bothy", desc:"The Third Calling" },
+    A6:{ title:"The Erased Archivist", desc:"Rewrite the future" }
+};
+
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+
+document.querySelectorAll(".popular-book img").forEach(img => {
+    img.addEventListener("click", () => {
+        const d = data[img.dataset.id];
+        if (!d) return;
+
+        modalImg.src = img.src;
+        modalTitle.textContent = d.title;
+        modalDesc.textContent = d.desc;
+    });
+});
+
+modal.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+</script>
+<script>
+
+/* =========================
+   BOOK DATA
+========================= */
+const data = {
+    A3:{ title:"Camban Bothy", desc:"The Third Calling (PREORDER)", link:"https://mybook.to/Camban" },
+    A6:{ title:"The Erased Archivist", desc:"They control the past.", link:"https://mybook.to/ErasedArchivist" },
+    A7:{ title:"The Drowned Fjord", desc:"Ancient folklore.", link:"https://mybook.to/DrownedFjord" },
+    A5:{ title:"Holdfast", desc:"A haunting novel.", link:"https://mybook.to/Holdfast" },
+    A11:{ title:"Red Streets", desc:"Scottish crime thriller.", link:"https://mybook.to/RedStreets" }
+};
+
+/* =========================
+   MODAL
+========================= */
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+const modalTitle = document.getElementById("modalTitle");
+const modalDesc = document.getElementById("modalDesc");
+const modalLink = document.getElementById("modalLink");
+
+document.querySelectorAll(".popular-book img").forEach(img => {
+    img.addEventListener("click", () => {
+        const d = data[img.dataset.id];
+        if (!d) return;
+
+        modal.classList.add("active");
+        modalImg.src = img.src;
+        modalTitle.textContent = d.title;
+        modalDesc.textContent = d.desc;
+        modalLink.href = d.link;
+    });
+});
+
+modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.remove("active");
+});
+
+/* =========================
+   REVEAL
+========================= */
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add("visible");
+    });
+});
+
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+</script>
+<script>
+
+/* =========================
+   HERO LIGHT + PARALLAX (SAFE VERSION)
+========================= */
+
+const hero = document.querySelector('.hero');
+
+if (hero) {
+
+    let targetX = 50, targetY = 50;
+    let currentX = 50, currentY = 50;
+
+    /* LIGHT FOLLOW */
+    hero.addEventListener('mousemove', e => {
+        const rect = hero.getBoundingClientRect();
+
+        targetX = ((e.clientX - rect.left) / rect.width) * 100;
+        targetY = ((e.clientY - rect.top) / rect.height) * 100;
+    });
+
+    /* SMOOTH LIGHT ANIMATION */
+    function animateHero() {
+        currentX += (targetX - currentX) * 0.05;
+        currentY += (targetY - currentY) * 0.05;
+
+        hero.style.setProperty('--mx', currentX + '%');
+        hero.style.setProperty('--my', currentY + '%');
+
+        requestAnimationFrame(animateHero);
+    }
+
+    animateHero();
+
+    /* CONTENT DRIFT */
+    const inner = hero.querySelector('.hero-inner');
+
+    if (inner) {
+
+        hero.addEventListener('mousemove', e => {
+            const rect = hero.getBoundingClientRect();
+
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+            inner.style.transform = `
+                translate(${x * 12}px, ${y * 12}px)
+                scale(1.02)
+            `;
+        });
+
+        hero.addEventListener('mouseleave', () => {
+            inner.style.transform = `translate(0,0) scale(1)`;
+        });
+    }
+}
+
+</script>   
+</body>
+</html>
+
 
