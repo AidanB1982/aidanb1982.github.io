@@ -58,13 +58,13 @@ body {
     inset: 0;
 
     background:
-        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
-        url('/assets/forest.png') center/cover no-repeat,
-        linear-gradient(120deg, rgba(255,255,255,0.05), transparent);
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
+    url('/assets/forest.png') center 30% / cover no-repeat,
+    linear-gradient(120deg, rgba(255,255,255,0.05), transparent);
 
     transform:
     translateY(var(--scrollY, 0))
-    scale(1.05);
+    scale(1.01);
     filter: contrast(110%) brightness(0.9);
 
     animation:
