@@ -29,7 +29,7 @@ body {
     text-align: center;
 }
 
-/* BACKGROUND */
+/* BACKGROUND + DAY/NIGHT + TREE SHIFT */
 .hero::before {
     content: "";
     position: absolute;
@@ -39,21 +39,20 @@ body {
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
         url('forest.png') center/cover no-repeat;
 
-    animation: dayNightCycle 40s ease-in-out infinite alternate;
+    animation:
+        dayNightCycle 40s ease-in-out infinite alternate,
+        treeShift 20s ease-in-out infinite alternate;
 }
 
-/* VIGNETTE */
+/* VIGNETTE + COLOR SHIFT */
 .hero::after {
     content: "";
     position: absolute;
     inset: 0;
 
-    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.7)),
-                linear-gradient(
-                    to bottom,
-                    rgba(20,30,60,0.2),   /* cold blue night */
-                    rgba(0,0,0,0.4)
-                );
+    background:
+        radial-gradient(circle, transparent 40%, rgba(0,0,0,0.7)),
+        linear-gradient(to bottom, rgba(20,30,60,0.2), rgba(0,0,0,0.4));
 
     mix-blend-mode: multiply;
 
@@ -61,7 +60,7 @@ body {
 }
 
 /* =========================
-   FOG (MULTI DEPTH)
+   FOG (DEPTH)
 ========================= */
 .fog-back,
 .fog-mid,
@@ -74,32 +73,33 @@ body {
 
     mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
     pointer-events: none;
+
+    will-change: transform;
+    filter: blur(2px);
 }
 
-/* DEPTH */
-.fog-back { opacity: 0.05; animation: fogSlow 180s linear infinite; }
-.fog-mid  { opacity: 0.08; animation: fogMid 120s linear infinite; }
+.fog-back { opacity: 0.04; animation: fogSlow 180s linear infinite; }
+.fog-mid  { opacity: 0.07; animation: fogMid 120s linear infinite; }
 .fog-front{ opacity: 0.12; animation: fogFast 60s linear infinite; }
 
 /* =========================
-   MOVING SHADOW (👁 PRESENCE)
+   ENTITY (👁 PRESENCE)
 ========================= */
 .shadow-entity {
     position: absolute;
     width: 300px;
     height: 300px;
+
     background: radial-gradient(circle, rgba(0,0,0,0.6), transparent 70%);
     filter: blur(40px);
-    opacity: 0.4;
-    animation: entityMove 18s ease-in-out infinite;
-    pointer-events: none;
-}
 
-/* =========================
-   TREE SHIFT (🌲 FAKE LIFE)
-========================= */
-.hero::before {
-    animation: treeShift 20s ease-in-out infinite alternate;
+    mix-blend-mode: multiply;
+
+    animation:
+        entityMove 18s ease-in-out infinite,
+        entityFade 40s ease-in-out infinite;
+
+    pointer-events: none;
 }
 
 /* =========================
@@ -116,6 +116,7 @@ body {
     width: 320px;
     max-width: 80%;
     margin-bottom: 20px;
+
     animation: logoFlicker 6s infinite;
 }
 
@@ -126,7 +127,7 @@ body {
     text-shadow: 0 0 8px rgba(255,255,255,0.08);
 }
 
-/* NAV INLINE */
+/* NAV */
 .nav-inline {
     margin: 20px 0;
 }
@@ -164,26 +165,31 @@ body {
    ANIMATIONS
 ========================= */
 
+/* FOG */
 @keyframes fogSlow {
     from { transform: translateX(0); }
     to { transform: translateX(-600px); }
 }
-
 @keyframes fogMid {
     from { transform: translateX(0); }
     to { transform: translateX(-800px); }
 }
-
 @keyframes fogFast {
     from { transform: translateX(0); }
     to { transform: translateX(-1200px); }
 }
 
-/* ENTITY MOVEMENT */
+/* ENTITY */
 @keyframes entityMove {
-    0%   { transform: translate(10%, 40%); opacity: 0.2; }
-    50%  { transform: translate(70%, 50%); opacity: 0.5; }
-    100% { transform: translate(20%, 60%); opacity: 0.2; }
+    0%   { transform: translate(10%, 40%); }
+    50%  { transform: translate(70%, 50%); }
+    100% { transform: translate(20%, 60%); }
+}
+
+@keyframes entityFade {
+    0%   { opacity: 0.35; }
+    50%  { opacity: 0.1; }
+    100% { opacity: 0.35; }
 }
 
 /* TREE SHIFT */
@@ -192,7 +198,7 @@ body {
     100% { transform: scale(1.02) translateX(-10px); }
 }
 
-/* LOGO FLICKER */
+/* LOGO */
 @keyframes logoFlicker {
     0%,100%{opacity:1;}
     50%{opacity:0.85;}
@@ -203,69 +209,27 @@ body {
     from { opacity: 0; transform: translateY(20px);}
     to { opacity: 1; transform: translateY(0);}
 }
+
+/* DAY/NIGHT */
 @keyframes dayNightCycle {
-
-    /* 🌙 NIGHT (start) */
     0% {
-        filter:
-            grayscale(40%)
-            brightness(0.65)
-            contrast(120%)
-            saturate(80%);
+        filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%);
     }
-
-    /* 🌒 EARLY LIGHT */
-    25% {
-        filter:
-            grayscale(25%)
-            brightness(0.8)
-            contrast(110%)
-            saturate(90%);
-    }
-
-    /* 🌫 MID (neutral eerie) */
     50% {
-        filter:
-            grayscale(15%)
-            brightness(0.95)
-            contrast(100%)
-            saturate(100%);
+        filter: grayscale(15%) brightness(0.95) contrast(100%) saturate(100%);
     }
-
-    /* 🌤 DAY (washed, still bleak) */
-    75% {
-        filter:
-            grayscale(10%)
-            brightness(1.1)
-            contrast(95%)
-            saturate(110%);
-    }
-
-    /* 🌙 BACK TO DARK */
     100% {
-        filter:
-            grayscale(40%)
-            brightness(0.65)
-            contrast(120%)
-            saturate(80%);
-    }
-   @keyframes colorShift {
-    0% {
-        opacity: 0.6;
-        background-color: rgba(10,20,40,0.3); /* cold blue */
-    }
-
-    50% {
-        opacity: 0.3;
-        background-color: rgba(80,60,40,0.15); /* warm dusk */
-    }
-
-    100% {
-        opacity: 0.6;
-        background-color: rgba(10,20,40,0.3);
+        filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%);
     }
 }
+
+/* COLOR SHIFT */
+@keyframes colorShift {
+    0%   { opacity: 0.6; }
+    50%  { opacity: 0.3; }
+    100% { opacity: 0.6; }
 }
+
 </style>
 </head>
 
@@ -273,15 +237,12 @@ body {
 
 <section class="hero">
 
-    <!-- FOG DEPTH -->
     <div class="fog-back"></div>
     <div class="fog-mid"></div>
     <div class="fog-front"></div>
 
-    <!-- ENTITY -->
     <div class="shadow-entity"></div>
 
-    <!-- CONTENT -->
     <div class="hero-inner">
 
         <img src="logo (1).png" class="hero-logo">
@@ -307,7 +268,7 @@ body {
 
 <script>
 
-/* PARALLAX + LIGHT */
+/* PARALLAX LIGHT */
 const hero = document.querySelector('.hero');
 
 let targetX = 50, targetY = 50;
