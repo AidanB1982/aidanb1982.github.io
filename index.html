@@ -26,7 +26,18 @@ body::before {
     z-index: -1;
 }
 
-/* NAV (unchanged) */
+/* GLOBAL LINK SYSTEM */
+a {
+    color: #cfcfcf;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: #ffffff;
+}
+
+/* NAV */
 .nav {
     position: absolute;
     top: 0;
@@ -52,6 +63,19 @@ body::before {
 
 .nav a:hover { opacity: 1; }
 
+.nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #cfcfcf;
+    transition: 0.3s;
+}
+
+.nav a:hover::after { width: 100%; }
+
 /* HERO */
 .header {
     position: relative;
@@ -73,7 +97,7 @@ body::before {
     background-attachment: fixed;
 }
 
-/* FIXED FOG EDGE (fade mask) */
+/* FOG FIX */
 .header-fog {
     position: absolute;
     inset: 0;
@@ -130,7 +154,7 @@ body::before {
     margin: auto;
 }
 
-/* FEATURED (LEFT IMAGE / RIGHT TEXT) */
+/* FEATURED */
 .featured-main {
     display: grid;
     grid-template-columns: 420px 1fr;
@@ -141,9 +165,7 @@ body::before {
 .featured-main img {
     width: 100%;
     transform: perspective(900px) rotateY(-6deg);
-    box-shadow:
-        0 60px 120px rgba(0,0,0,0.8),
-        0 0 0 1px rgba(255,255,255,0.05);
+    box-shadow: 0 60px 120px rgba(0,0,0,0.8);
     transition: 0.5s;
 }
 
@@ -151,16 +173,15 @@ body::before {
     transform: perspective(900px) rotateY(-2deg) scale(1.03);
 }
 
-/* TEXT */
 .featured-main h2 {
     font-size: 30px;
 }
 
 .featured-main p {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 
-/* LINK */
+/* CTA LINK STYLE */
 .link {
     display: inline-block;
     margin-top: 15px;
@@ -169,7 +190,7 @@ body::before {
     border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 
-/* SECONDARY FEATURED */
+/* SECONDARY */
 .featured-secondary {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -181,14 +202,9 @@ body::before {
     width: 180px;
     transform: perspective(800px) rotateY(-4deg);
     box-shadow: 0 30px 70px rgba(0,0,0,0.7);
-    transition: 0.4s;
 }
 
-.book-feature:hover img {
-    transform: perspective(800px) rotateY(-2deg) scale(1.05);
-}
-
-/* PUBLICATIONS (TEXTURED) */
+/* PUBLICATIONS */
 .section.texture {
     position: relative;
     background: #E8E6E1;
@@ -208,7 +224,6 @@ body::before {
     z-index: 2;
 }
 
-/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -225,6 +240,12 @@ body::before {
 
 .book:hover img {
     transform: perspective(800px) rotateY(0deg) scale(1.06);
+}
+
+.book p {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.8;
 }
 
 /* AUTHOR */
@@ -303,7 +324,7 @@ body::before {
     </div>
 </div>
 
-<!-- FEATURED MAIN -->
+<!-- FEATURED -->
 <div class="section">
 <div class="container featured-main reveal">
 
@@ -315,11 +336,15 @@ body::before {
         <p><strong>Some shelters protect. Others keep you.</strong></p>
 
         <p>
-        Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks...
+        Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks. To some, it is a refuge. To others, something less easily named.
         </p>
 
         <p>
-        Corrour Bothy is the first instalment in The Cursed Bothies...
+        Their paths converge at Corrour Bothy, where smoke rises from a chimney that should be cold, and footsteps echo where no one walks.
+        </p>
+
+        <p>
+        The first instalment in The Cursed Bothies, where each shelter holds something older and far less patient than the storm.
         </p>
 
         <a href="https://mybook.to/Corrour" target="_blank" class="link">Purchase</a>
@@ -327,7 +352,7 @@ body::before {
 
 </div>
 
-<!-- SECONDARY FEATURED -->
+<!-- SECONDARY -->
 <div class="container featured-secondary">
 
     <div class="book-feature reveal">
@@ -335,6 +360,7 @@ body::before {
         <div>
             <p class="eyebrow">Coming Soon</p>
             <h3>Holdfast</h3>
+            <p>Some memories return. Others refuse to leave.</p>
             <a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
         </div>
     </div>
@@ -344,6 +370,7 @@ body::before {
         <div>
             <p class="eyebrow">Limited Edition</p>
             <h3>Corrour Bothy</h3>
+            <p>Founder’s Foil Edition — limited to fifty copies.</p>
             <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
         </div>
     </div>
@@ -362,11 +389,13 @@ body::before {
 <a href="https://mybook.to/BlackBothy" class="book reveal">
 <img src="book3.jpg">
 <h3>The Black Bothy</h3>
+<p>An investigative record of disappearances tied to a place that refuses to remain fixed.</p>
 </a>
 
 <a href="https://mybook.to/DourHillHouse" class="book reveal">
 <img src="book1.jpg">
 <h3>Dour Hill House</h3>
+<p>Inheritance becomes confinement as a house distorts space, memory, and identity.</p>
 </a>
 
 </div>
@@ -378,7 +407,7 @@ body::before {
 <div class="section">
 <div class="container author">
 <p>
-Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain...
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
 </p>
 </div>
 </div>
