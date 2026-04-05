@@ -290,68 +290,7 @@ body {
 .simple-header .nav-inline a {
     font-size: 11px;
 }
-/* =========================
-   FEATURED SECTION
-========================= */
-.featured {
-    background: #0b0b0d;
-    padding: 140px 20px;
-}
 
-/* LAYOUT */
-.featured-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 80px;
-    align-items: center;
-}
-
-/* IMAGE */
-.featured-image {
-    display: flex;
-    justify-content: center;
-}
-
-.featured-image img {
-    width: 200px;   
-    max-width: 100%;
-    height: auto;
-    transform: translateX(-10px);
-    display: block;
-
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-}
-
-/* TEXT */
-.featured-content {
-    max-width: 520px;
-}
-
-/* LABEL */
-.featured-label {
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.5;
-    margin-bottom: 10px;
-}
-
-/* TITLE */
-.featured-content h2 {
-    font-size: 32px;
-    font-weight: normal;
-    margin-bottom: 20px;
-}
-
-/* TEXT */
-.featured-content p {
-    line-height: 1.7;
-    opacity: 0.8;
-    margin-bottom: 25px;
-}
 /* =========================
    ANIMATIONS
 ========================= */
