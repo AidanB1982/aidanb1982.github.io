@@ -165,7 +165,7 @@ a {
 }
 
 /* =========================
-   BOOK WALL (LN STYLE)
+   BOOK WALL
 ========================= */
 .book-wall {
     display: grid;
@@ -180,12 +180,10 @@ a {
     gap: 40px;
 }
 
-/* OFFSETS */
 .offset-1 { transform: translateY(40px); }
 .offset-2 { transform: translateY(80px); }
 .offset-3 { transform: translateY(120px); }
 
-/* BOOK ITEMS */
 .book-item {
     width: 100%;
     opacity: 0;
@@ -239,10 +237,29 @@ a {
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .footer-center img {
     width: 60px;
+}
+
+/* SOCIAL ICONS */
+.socials {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.socials img {
+    width: 22px;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.socials img:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 
 /* =========================
@@ -342,7 +359,6 @@ a {
 <!-- BOOK WALL -->
 <div class="section reveal">
     <div class="container">
-
         <h2 style="text-align:center;">Current Publications</h2>
 
         <div class="book-wall">
@@ -373,7 +389,6 @@ a {
             </div>
 
         </div>
-
     </div>
 </div>
 
@@ -384,6 +399,15 @@ a {
         <div>
             <p>Blackwood Publishing</p>
             <p>Independent Literary Imprint</p>
+
+            <div class="socials">
+                <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+                    <img src="instagram.png">
+                </a>
+                <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+                    <img src="tiktok.png">
+                </a>
+            </div>
         </div>
 
         <div class="footer-center">
@@ -391,8 +415,8 @@ a {
         </div>
 
         <div>
-            <a href="#">Publications</a>
-            <a href="#">About</a>
+            <a href="#">Publications</a><br>
+            <a href="#">About</a><br>
             <a href="#">Contact</a>
         </div>
 
@@ -401,7 +425,6 @@ a {
 
 <!-- JS -->
 <script>
-/* REVEAL + STAGGER */
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -425,7 +448,7 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 document.querySelectorAll('.column').forEach(col => observer.observe(col));
 
-/* OPTIONAL PARALLAX */
+/* PARALLAX */
 window.addEventListener("scroll", () => {
     const scrollY = window.scrollY;
 
