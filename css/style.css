@@ -12,7 +12,7 @@
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: 240px 1fr;
     gap: 80px;
     align-items: center;
 }
