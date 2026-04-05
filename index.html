@@ -71,11 +71,11 @@ a {
 }
 
 /* =========================
-   HERO (FIXED HEIGHT)
+   HERO
 ========================= */
 .hero {
     position: relative;
-    height: 45vh; /* 🔥 FIXED */
+    height: 45vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,10 +119,10 @@ a {
 }
 
 /* =========================
-   SECTIONS (REDUCED HEIGHT)
+   SECTIONS
 ========================= */
 .section {
-    padding: 70px 20px; /* 🔥 REDUCED */
+    padding: 70px 20px;
     background: rgba(232,230,225,0.88);
     color: #1c1c1c;
 }
@@ -133,12 +133,12 @@ a {
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
 /* =========================
-   INTRO BOX (TIGHTER)
+   INTRO
 ========================= */
 .intro {
     max-width: 650px;
@@ -149,12 +149,12 @@ a {
 }
 
 /* =========================
-   FEATURED (FIXED SPACING)
+   FEATURED
 ========================= */
 .featured {
     display: grid;
     grid-template-columns: 260px 1fr;
-    gap: 60px; /* 🔥 reduced */
+    gap: 60px;
     align-items: center;
 }
 
@@ -165,31 +165,42 @@ a {
 }
 
 /* =========================
-   BOOK GRID
+   BOOK WALL (LN STYLE)
 ========================= */
-.grid {
+.book-wall {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 50px;
-    margin-top: 40px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-top: 60px;
 }
 
-.book {
-    text-align: center;
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
-.book img {
-    width: 190px;
-    margin: 0 auto;
-    transition: 0.4s;
+/* OFFSETS */
+.offset-1 { transform: translateY(40px); }
+.offset-2 { transform: translateY(80px); }
+.offset-3 { transform: translateY(120px); }
+
+/* BOOK ITEMS */
+.book-item {
+    width: 100%;
+    opacity: 0;
+    transform: translateY(60px) scale(0.95);
+    transition: all 1s ease;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
 }
 
-.book:hover img {
-    transform: translateY(-8px) scale(1.04);
+.book-item.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
-.book p {
-    margin-top: 10px;
+.book-item:hover {
+    transform: translateY(-6px) scale(1.03);
 }
 
 /* =========================
@@ -249,22 +260,22 @@ a {
 }
 
 @keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================
    MOBILE
 ========================= */
 @media (max-width: 900px) {
-    .grid {
+    .book-wall {
         grid-template-columns: 1fr;
+    }
+
+    .offset-1,
+    .offset-2,
+    .offset-3 {
+        transform: none;
     }
 
     .featured {
@@ -317,7 +328,6 @@ a {
 <div class="section dark reveal">
     <div class="container featured">
         <img src="book6.jpg">
-
         <div>
             <h2>Holdfast</h2>
             <p>Some memories return. Others refuse to leave.</p>
@@ -329,27 +339,37 @@ a {
 
 <div class="divider"></div>
 
-<!-- BOOKS -->
+<!-- BOOK WALL -->
 <div class="section reveal">
     <div class="container">
 
         <h2 style="text-align:center;">Current Publications</h2>
 
-        <div class="grid">
+        <div class="book-wall">
 
-            <div class="book reveal">
-                <img src="book1.jpg">
-                <p>Dour Hill House</p>
+            <div class="column">
+                <img src="book1.jpg" class="book-item">
+                <img src="book5.jpg" class="book-item">
+                <img src="book9.png" class="book-item">
             </div>
 
-            <div class="book reveal">
-                <img src="book2.jpg">
-                <p>Corrour</p>
+            <div class="column offset-1">
+                <img src="book2.jpg" class="book-item">
+                <img src="book6.jpg" class="book-item">
+                <img src="book10.jpg" class="book-item">
             </div>
 
-            <div class="book reveal">
-                <img src="book3.jpg">
-                <p>The Black Bothy</p>
+            <div class="column offset-2">
+                <img src="book3.jpg" class="book-item">
+                <img src="book7.png" class="book-item">
+                <img src="book11.png" class="book-item">
+            </div>
+
+            <div class="column offset-3">
+                <img src="book4.jpg" class="book-item">
+                <img src="book8.jpg" class="book-item">
+                <img src="book12.jpg" class="book-item">
+                <img src="book13.jpg" class="book-item">
             </div>
 
         </div>
@@ -379,17 +399,48 @@ a {
     </div>
 </div>
 
-<!-- SCROLL ANIMATION -->
+<!-- JS -->
 <script>
-const observer = new IntersectionObserver(entries => {
+/* REVEAL + STAGGER */
+const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
+
+            if (entry.target.classList.contains('column')) {
+                const items = entry.target.querySelectorAll('.book-item');
+
+                items.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('visible');
+                    }, index * 120);
+                });
+
+            } else {
+                entry.target.classList.add('visible');
+            }
         }
     });
-});
+}, { threshold: 0.2 });
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.querySelectorAll('.column').forEach(col => observer.observe(col));
+
+/* OPTIONAL PARALLAX */
+window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+
+    document.querySelectorAll(".offset-1").forEach(el => {
+        el.style.transform = `translateY(${40 + scrollY * 0.05}px)`;
+    });
+
+    document.querySelectorAll(".offset-2").forEach(el => {
+        el.style.transform = `translateY(${80 + scrollY * 0.08}px)`;
+    });
+
+    document.querySelectorAll(".offset-3").forEach(el => {
+        el.style.transform = `translateY(${120 + scrollY * 0.12}px)`;
+    });
+});
 </script>
 
 </body>
