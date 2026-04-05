@@ -74,14 +74,20 @@ a:active {
     content: "";
     position: absolute;
     inset: 0;
-    background: url('fog.png');
-    opacity: 0.12;
+    background:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.06), transparent 50%);
+
+    opacity: 0.18;
 
     animation:
         fogSlow 120s linear infinite,
         ambientFlicker 6s ease-in-out infinite;
 
-    box-shadow: inset 0 0 200px rgba(0,0,0,0.6); /* 🔥 vignette */
+    mix-blend-mode: screen;
+
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
 }
 
 .hero::before,
@@ -93,7 +99,8 @@ a:active {
     position: absolute;
     inset: 0;
     background: url('fog.png');
-    opacity: 0.04;
+    opacity: 0.06;
+    filter: blur(1px)
     animation: fogFast 60s linear infinite;
 }
 
@@ -101,7 +108,8 @@ a:active {
     position: absolute;
     inset: 0;
     background: url('fog.png');
-    opacity: 0.03;
+    opacity: 0.05;
+    filter: blur(2px)
     animation: fogReverse 180s linear infinite;
 }
 
@@ -156,19 +164,6 @@ a:active {
 }
 .popular-book {
     animation: bookFloat 6s ease-in-out infinite;
-}
-.popular::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('fog.png');
-    opacity: 0.25;
-    box-shadow: inset 0 0 300px rgba(0,0,0,0.7);
-    animation:
-        fogDrift 140s linear infinite,
-        fogFloat 20s ease-in-out infinite;
-
-    z-index: 0;
 }
 .hero-inner {
     position: relative;
@@ -273,38 +268,14 @@ a:active {
 
     background:
         url('stone.png'),
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 40%),
-        radial-gradient(circle at 80% 40%, rgba(255,255,255,0.06), transparent 50%),
-        radial-gradient(circle at 50% 10%, rgba(255,255,255,0.04), transparent 60%);
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.08), transparent 50%),
+        radial-gradient(circle at calc(var(--mx, 50%) - 20%) calc(var(--my, 50%) - 10%), rgba(255,255,255,0.05), transparent 60%);
 
     background-blend-mode: overlay;
-    opacity: 0.25;
+    opacity: 0.35;
 
-    animation: lightDrift 20s ease-in-out infinite;
-}
-.popular::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('fog.png');
-    opacity: 0.25;
-    z-index: 0;
-
-    animation:
-        fogDrift 140s linear infinite,
-        fogFloat 20s ease-in-out infinite;
-
-    box-shadow: inset 0 0 300px rgba(0,0,0,0.7);
-}
-
-.popular .fog-layer {
-    position: absolute;
-    inset: 0;
-    background: url('fog.png');
-    opacity: 0.18;
-    filter: blur(2px);
-    animation: fogDriftFast 80s linear infinite;
-    z-index: 0;
+    transition: background-position 0.1s linear;
 }
 .popular h2 {
     text-align: center;
@@ -481,9 +452,6 @@ a:active {
 
 <section class="hero">
 
-<div class="fog-layer"></div>
-<div class="fog-layer2"></div>
-
 <div class="hero-inner">
 
 <img src="logo (1).png" class="hero-logo">
@@ -528,7 +496,6 @@ Explore Publications
    
 <!-- POPULAR READS -->
 <section class="popular reveal">
-<div class="fog-layer"></div> <!-- 🔥 ADD THIS -->
 
 <div class="container">
 
@@ -737,9 +704,8 @@ books.forEach((el, i) => {
     moveX = distX * pullStrength;
     moveY = distY * pullStrength;
 
-updateTransform();
+    updateTransform();
 
-    /* GLOW */
     glow.style.background = `
         radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent 60%)
     `;
@@ -764,6 +730,31 @@ updateTransform();
     animate();
 
 });
+ const hero = document.querySelector('.hero');
+
+let targetX = 50;
+let targetY = 50;
+let currentX = 50;
+let currentY = 50;
+
+hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+
+    targetX = ((e.clientX - rect.left) / rect.width) * 100;
+    targetY = ((e.clientY - rect.top) / rect.height) * 100;
+});
+
+function animateHeroLight() {
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
+
+    hero.style.setProperty('--mx', currentX + '%');
+    hero.style.setProperty('--my', currentY + '%');
+
+    requestAnimationFrame(animateHeroLight);
+}
+
+animateHeroLight();
 </script>
 
 </body>
