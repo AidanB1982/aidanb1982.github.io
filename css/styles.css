@@ -1,4 +1,23 @@
 /* =========================
+   GLOBAL RESET
+========================= */
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #0b0b0d;
+    color: #e6e6e6;
+    font-family: Georgia, serif;
+    overflow-x: hidden;
+}
+
+/* Prevent massive images */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* =========================
    FEATURED SECTION
 ========================= */
 .featured {
@@ -7,51 +26,57 @@
     margin-top: -350px;
     padding: 350px 20px 120px;
 
-    background: transparent
+    background: transparent;
     z-index: 5;
 }
 
-/* LAYOUT */
+/* =========================
+   LAYOUT
+========================= */
 .featured-inner {
     max-width: 1100px;
     margin: 0 auto;
-    transform: translateY(-60px);
+
+    transform: translateY(-40px);
+
     display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 40px;
+    grid-template-columns: 320px 1fr;
+    gap: 50px;
+
     align-items: center;
 }
 
-/* IMAGE */
+/* =========================
+   IMAGE
+========================= */
 .featured-image {
     display: flex;
     justify-content: center;
     transition-delay: 0.1s;
 }
-.featured-content {
-    transition-delay: 0.3s;
-}
-.featured-image img {
-    width: 360px; 
-    height: auto;
-    display: block;
 
-    transform: translateX(-5px);
+.featured-image img {
+    width: 320px;
+    height: auto;
+
+    transform: translateX(-10px);
     transition: transform 0.5s ease, filter 0.5s ease;
 
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+    filter: drop-shadow(0 25px 60px rgba(0,0,0,0.7));
 }
 
-/* Hover */
+/* Hover effect */
 .featured-image img:hover {
-    transform: translateY(-6px) scale(1.02);
-    filter: drop-shadow(0 30px 60px rgba(0,0,0,0.9));
+    transform: translateY(-4px) scale(1.015);
+    filter: drop-shadow(0 35px 80px rgba(0,0,0,0.9));
 }
 
-/* TEXT */
+/* =========================
+   TEXT
+========================= */
 .featured-content {
     max-width: 520px;
-    transition-delay: 0.3s; /* ✅ moved here correctly */
+    transition-delay: 0.3s;
 }
 
 /* LABEL */
@@ -65,13 +90,13 @@
 
 /* TITLE */
 .featured-content h2 {
-    font-size: 34px;
+    font-size: 36px;
     line-height: 1.2;
     font-weight: normal;
     margin-bottom: 16px;
 }
 
-/* TEXT */
+/* PARAGRAPH */
 .featured-content p {
     line-height: 1.7;
     opacity: 0.8;
@@ -91,21 +116,21 @@
 }
 
 /* =========================
-   FADE-IN
+   FADE-IN ANIMATION
 ========================= */
 .fade-in {
     opacity: 0;
-    transform: translateY(60px) scale(0.98);
+    transform: translateY(60px);
     filter: blur(6px);
 
     transition:
-        opacity 1.4s ease,
-        transform 1.4s ease,
-        filter 1.4s ease;
+        opacity 1.2s ease,
+        transform 1.2s ease,
+        filter 1.2s ease;
 }
 
 .fade-in.visible {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     filter: blur(0);
 }
