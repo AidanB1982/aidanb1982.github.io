@@ -29,7 +29,7 @@ body {
 
     background:
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
-        url('../assets/forest.png') center/cover no-repeat;
+        url('/assets/forest.png') center/cover no-repeat;
 
     animation:
         dayNightCycle 40s ease-in-out infinite alternate,
@@ -62,7 +62,7 @@ body {
 .fog-front {
     position: absolute;
     inset: 0;
-    background: url('../assets/fog1.png');
+    background: url('/assets/fog1.png');
     background-repeat: repeat-x;
     background-size: cover;
 
