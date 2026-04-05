@@ -3,7 +3,7 @@
 ========================= */
 .featured {
     background: #0b0b0d;
-    padding: 140px 20px;
+    padding: 120px 20px; /* slightly tighter top/bottom */
 }
 
 /* LAYOUT */
@@ -12,8 +12,8 @@
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 80px;
+    grid-template-columns: 220px 1fr; /* slightly narrower image column */
+    gap: 40px; /* 🔥 reduced from 80px → tighter spacing */
     align-items: center;
 }
 
@@ -24,15 +24,20 @@
 }
 
 .featured-image img {
-    width: 200px !important;
-    height: auto !important;
-    max-width: none !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 180px; /* slightly smaller + cleaner */
+    height: auto;
     display: block;
 
+    transform: translateX(-5px); /* subtle visual centering */
+    transition: transform 0.5s ease, filter 0.5s ease;
+
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+}
+
+/* Hover effect (premium feel) */
+.featured-image img:hover {
+    transform: translateY(-6px) scale(1.02);
+    filter: drop-shadow(0 30px 60px rgba(0,0,0,0.9));
 }
 
 /* TEXT */
@@ -46,19 +51,32 @@
     letter-spacing: 2px;
     text-transform: uppercase;
     opacity: 0.5;
-    margin-bottom: 10px;
+    margin-bottom: 8px; /* tighter */
 }
 
 /* TITLE */
 .featured-content h2 {
-    font-size: 32px;
+    font-size: 34px;
+    line-height: 1.2;
     font-weight: normal;
-    margin-bottom: 20px;
+    margin-bottom: 16px; /* tighter */
 }
 
 /* TEXT */
 .featured-content p {
     line-height: 1.7;
     opacity: 0.8;
-    margin-bottom: 25px;
+    margin-bottom: 20px; /* tighter */
+}
+
+/* BUTTON ALIGNMENT */
+.featured .button {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.featured .button:hover {
+    opacity: 1;
 }
