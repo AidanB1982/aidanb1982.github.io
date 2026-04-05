@@ -108,36 +108,36 @@ a:active {
 /* ANIMATIONS */
 @keyframes fogSlow {
     from { transform: translateX(0); }
-    to { transform: translateX(-400px); }
+    to { transform: translateX(-40px); }
 }
 
 @keyframes fogFast {
     from { transform: translateX(0); }
-    to { transform: translateX(-200px); }
+    to { transform: translateX(-20px); }
 }
 
 @keyframes fogReverse {
     from { transform: translateX(0); }
-    to { transform: translateX(300px); }
+    to { transform: translateX(30px); }
 }
 
 @keyframes fog {
     from { transform: translateX(0); }
-    to { transform: translateX(-300px); }
+    to { transform: translateX(-30px); }
 }
 @keyframes ambientFlicker {
     0%   { opacity: 0.08; }
     50%  { opacity: 0.12; }
-    100% { opacity: 0.08; }
+    100% { opacity: 0.25; }
 }
 @keyframes fogDrift {
     from { transform: translateX(0); }
-    to { transform: translateX(-500px); }
+    to { transform: translateX(-50px); }
 }
 
 @keyframes fogDriftFast {
     from { transform: translateX(0); }
-    to { transform: translateX(-250px); }
+    to { transform: translateX(-20px); }
 }
  @keyframes fogFloat {
     0% { transform: translateY(0); }
@@ -149,7 +149,11 @@ a:active {
     50% { transform: translateY(-6px); }
     100% { transform: translateY(0); }
 }
-
+@keyframes lightDrift {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); }
+}
 .popular-book {
     animation: bookFloat 6s ease-in-out infinite;
 }
@@ -264,9 +268,19 @@ a:active {
     content: "";
     position: absolute;
     inset: 0;
-    background: url('stone.png');
-    opacity: 0.15;
-    z-index: -1;
+    z-index: 1;
+    pointer-events: none;
+
+    background:
+        url('stone.png'),
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 40%),
+        radial-gradient(circle at 80% 40%, rgba(255,255,255,0.06), transparent 50%),
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,0.04), transparent 60%);
+
+    background-blend-mode: overlay;
+    opacity: 0.25;
+
+    animation: lightDrift 20s ease-in-out infinite;
 }
 .popular::after {
     content: "";
@@ -293,13 +307,7 @@ a:active {
 .popular-row {
     display: flex;
     gap: 60px;
-    padding-bottom: 10px;
-    cursor: grab;
-
-    overflow-x: auto;
-    scroll-behavior: smooth;
-
-    justify-content: flex-start;
+    justify-content: center;
 }
  .popular-row {
     margin-top: 40px;
@@ -360,6 +368,7 @@ a:active {
         rgba(0,0,0,0.6) 100%
     );
 }
+ 
 /* =========================
    AUTHOR
 ========================= */
@@ -674,6 +683,8 @@ books.forEach((el, i) => {
 
     let tiltX = 0;
     let tiltY = 0;
+    let moveX = 0;
+    let moveY = 0;
 
     /* CREATE GLOW ELEMENT */
     const glow = document.createElement('div');
@@ -687,25 +698,20 @@ books.forEach((el, i) => {
     el.parentElement.appendChild(glow);
 
     function updateTransform() {
-        const speed = (i % 2 === 0) ? 0.03 : 0.06;
-        const translateY = scrollY * speed;
+    const openAngle = -8;
 
-        const openAngle = -8; // subtle "book opening"
+    el.style.transform = `
+        perspective(800px)
+        rotateY(${tiltY + openAngle}deg)
+        rotateX(${tiltX}deg)
+        translate(${moveX}px, ${moveY}px)
+        scale(1.07)
+    `;
 
-el.style.transform = `
-    perspective(800px)
-    rotateY(${tiltY + openAngle}deg)
-    rotateX(${tiltX}deg)
-    translate(${moveX}px, ${moveY}px)
-    scale(1.07)
-`;
-
-        /* SHADOW DEPTH */
-        el.style.filter = `
-            drop-shadow(${tiltY * 2}px ${tiltX * -2}px 80px rgba(0,0,0,0.9))
-        `;
-    }
-
+    el.style.filter = `
+        drop-shadow(${tiltY * 2}px ${tiltX * -2}px 80px rgba(0,0,0,0.9))
+    `;
+}
     /* MOUSE MOVE */
     el.addEventListener('mousemove', (e) => {
     const rect = el.getBoundingClientRect();
@@ -721,18 +727,14 @@ el.style.transform = `
     tiltY = distX * 12;
     tiltX = distY * -12;
 
-    /* 🔥 MAGNETIC PULL */
     const pullStrength = 8;
     const moveX = distX * pullStrength;
     const moveY = distY * pullStrength;
 
-    el.style.transform = `
-        perspective(800px)
-        rotateY(${tiltY}deg)
-        rotateX(${tiltX}deg)
-        translate(${moveX}px, ${moveY}px)
-        scale(1.07)
-    `;
+    moveX = distX * pullStrength;
+moveY = distY * pullStrength;
+
+updateTransform();
 
     /* GLOW */
     glow.style.background = `
@@ -743,12 +745,13 @@ el.style.transform = `
 
     /* LEAVE */
     el.addEventListener('mouseleave', () => {
-        tiltX = 0;
-        tiltY = 0;
-        glow.style.opacity = '0';
-        updateTransform();
-    });
-
+    tiltX = 0;
+    tiltY = 0;
+    moveX = 0;
+    moveY = 0;
+    glow.style.opacity = '0';
+    updateTransform();
+});
     /* CONTINUOUS PARALLAX LOOP */
     function animate() {
         updateTransform();
@@ -758,20 +761,6 @@ el.style.transform = `
     animate();
 
 });
-const row = document.querySelector('.popular-row');
-
-let autoScroll = 0;
-
-function autoMove() {
-    if (!row) return;
-
-    autoScroll += 0.2; // speed (lower = slower)
-    row.scrollLeft = autoScroll;
-
-    requestAnimationFrame(autoMove);
-}
-
-autoMove();
 </script>
 
 </body>
