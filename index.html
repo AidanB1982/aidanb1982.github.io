@@ -5,16 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackwood Publishing</title>
 
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<!-- LENIS -->
+<script src="https://unpkg.com/@studio-freight/lenis"></script>
+
 <style>
 
-/* =========================
-   BASE
-========================= */
+/* ================= BASE ================= */
 body {
     margin: 0;
     font-family: Georgia, serif;
     background: #0e0e10;
     color: #e6e6e6;
+    overflow-x: hidden;
+    cursor: none;
+}
+
+/* CUSTOM CURSOR */
+.cursor {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, opacity 0.3s;
+}
+
+.cursor-grow {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0.6;
 }
 
 /* TEXTURE */
@@ -27,29 +52,7 @@ body::before {
     z-index: -1;
 }
 
-/* GRAIN */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('https://grainy-gradients.vercel.app/noise.svg');
-    opacity: 0.04;
-    pointer-events: none;
-}
-
-img {
-    max-width: 100%;
-    display: block;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
-/* =========================
-   NAV
-========================= */
+/* ================= NAV ================= */
 .nav {
     position: absolute;
     top: 25px;
@@ -58,28 +61,20 @@ a {
 }
 
 .nav a {
-    margin-left: 22px;
+    margin-left: 20px;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    opacity: 0.75;
-    transition: 0.3s;
 }
 
-.nav a:hover {
-    opacity: 1;
-}
-
-/* =========================
-   HERO
-========================= */
+/* ================= HERO ================= */
 .hero {
-    position: relative;
-    height: 45vh;
+    height: 50vh;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    position: relative;
 }
 
 .hero::before {
@@ -87,91 +82,39 @@ a {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)),
+        linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.9)),
         url('forest.png');
     background-size: cover;
-    background-position: center;
 }
 
 .hero-inner {
     position: relative;
     z-index: 2;
+    opacity: 0;
 }
 
-.hero img {
-    width: 180px;
-    margin: 0 auto 15px;
-    animation: fadeUp 1.2s ease forwards;
-}
-
-.hero p {
-    font-size: 14px;
-    opacity: 0.9;
-}
-
-/* BUTTON */
-.button {
-    display: inline-block;
-    margin-top: 12px;
-    font-size: 11px;
-    letter-spacing: 2px;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-}
-
-/* =========================
-   SECTIONS
-========================= */
+/* ================= SECTION ================= */
 .section {
-    padding: 70px 20px;
-    background: rgba(232,230,225,0.88);
+    padding: 90px 20px;
+    background: rgba(232,230,225,0.9);
     color: #1c1c1c;
 }
 
 .section.dark {
-    background: rgba(10,10,12,0.9);
+    background: #0b0b0c;
     color: #ddd;
 }
 
 .container {
     max-width: 1100px;
-    margin: 0 auto;
+    margin: auto;
 }
 
-/* =========================
-   INTRO
-========================= */
-.intro {
-    max-width: 650px;
-    margin: 0 auto;
-    text-align: center;
-    font-size: 15px;
-    line-height: 1.7;
-}
-
-/* =========================
-   FEATURED
-========================= */
-.featured {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    gap: 60px;
-    align-items: center;
-}
-
-.featured img {
-    width: 240px;
-    margin: 0 auto;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-}
-
-/* =========================
-   BOOK WALL
-========================= */
+/* ================= BOOK WALL ================= */
 .book-wall {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
-    margin-top: 60px;
 }
 
 .column {
@@ -185,66 +128,31 @@ a {
 .offset-3 { transform: translateY(120px); }
 
 .book-item {
-    width: 100%;
     opacity: 0;
-    transform: translateY(60px) scale(0.95);
-    transition: all 1s ease;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    transform: translateY(80px) scale(0.95);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    transition: transform 0.4s ease;
 }
 
-.book-item.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
+/* HOVER GLOW */
 .book-item:hover {
-    transform: translateY(-6px) scale(1.03);
+    transform: translateY(-8px) scale(1.04);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.9);
 }
 
-/* =========================
-   DIVIDER
-========================= */
-.divider {
-    width: 40px;
-    height: 1px;
-    background: rgba(0,0,0,0.25);
-    margin: 50px auto;
-}
-
-/* =========================
-   FOOTER
-========================= */
+/* ================= FOOTER ================= */
 .footer {
-    position: relative;
-    padding: 70px 20px;
-    color: #eee;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.9)),
-        url('forest.png');
-    background-size: cover;
+    padding: 80px 20px;
+    background: #000;
 }
 
 .footer-content {
-    position: relative;
-    z-index: 1;
     max-width: 1000px;
-    margin: 0 auto;
+    margin: auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
-.footer-center img {
-    width: 60px;
-}
-
-/* SOCIAL ICONS */
 .socials {
     display: flex;
     gap: 15px;
@@ -262,49 +170,11 @@ a {
     transform: scale(1.1);
 }
 
-/* =========================
-   ANIMATION
-========================= */
-.reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s ease;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================
-   MOBILE
-========================= */
+/* ================= MOBILE ================= */
 @media (max-width: 900px) {
-    .book-wall {
-        grid-template-columns: 1fr;
-    }
-
-    .offset-1,
-    .offset-2,
-    .offset-3 {
-        transform: none;
-    }
-
-    .featured {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        gap: 25px;
-        text-align: center;
-    }
+    .book-wall { grid-template-columns: 1fr; }
+    body { cursor: default; }
+    .cursor { display: none; }
 }
 
 </style>
@@ -312,158 +182,159 @@ a {
 
 <body>
 
+<div class="cursor"></div>
+
 <!-- NAV -->
 <div class="nav">
-    <a href="#">Home</a>
-    <a href="#">Publications</a>
-    <a href="#">About</a>
-    <a href="#">Author</a>
-    <a href="#">Contact</a>
+<a href="#">Home</a>
+<a href="#">Publications</a>
+<a href="#">About</a>
 </div>
 
 <!-- HERO -->
 <div class="hero">
-    <div class="hero-inner">
-        <img src="logo (1).png">
-        <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
-        <a href="#" class="button">Explore Publications</a>
-    </div>
+<div class="hero-inner">
+<img src="logo (1).png" width="170">
+<p>Literary and psychological fiction shaped by place, memory, and unease.</p>
 </div>
-
-<!-- ABOUT -->
-<div class="section reveal">
-    <div class="container intro">
-        <p>
-            Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
-        </p>
-    </div>
 </div>
-
-<div class="divider"></div>
-
-<!-- FEATURED -->
-<div class="section dark reveal">
-    <div class="container featured">
-        <img src="book6.jpg">
-        <div>
-            <h2>Holdfast</h2>
-            <p>Some memories return. Others refuse to leave.</p>
-            <p>The recursion spreads. Voices rise.</p>
-            <a href="#" class="button">Preorder</a>
-        </div>
-    </div>
-</div>
-
-<div class="divider"></div>
 
 <!-- BOOK WALL -->
-<div class="section reveal">
-    <div class="container">
-        <h2 style="text-align:center;">Current Publications</h2>
+<div class="section dark">
+<div class="container">
 
-        <div class="book-wall">
+<h2 style="text-align:center;">Current Publications</h2>
 
-            <div class="column">
-                <img src="book1.jpg" class="book-item">
-                <img src="book5.jpg" class="book-item">
-                <img src="book9.png" class="book-item">
-            </div>
+<div class="book-wall">
 
-            <div class="column offset-1">
-                <img src="book2.jpg" class="book-item">
-                <img src="book6.jpg" class="book-item">
-                <img src="book10.jpg" class="book-item">
-            </div>
+<div class="column">
+<img src="book1.jpg" class="book-item">
+<img src="book5.jpg" class="book-item">
+<img src="book9.png" class="book-item">
+</div>
 
-            <div class="column offset-2">
-                <img src="book3.jpg" class="book-item">
-                <img src="book7.png" class="book-item">
-                <img src="book11.png" class="book-item">
-            </div>
+<div class="column offset-1">
+<img src="book2.jpg" class="book-item">
+<img src="book6.jpg" class="book-item">
+<img src="book10.jpg" class="book-item">
+</div>
 
-            <div class="column offset-3">
-                <img src="book4.jpg" class="book-item">
-                <img src="book8.jpg" class="book-item">
-                <img src="book12.jpg" class="book-item">
-                <img src="book13.jpg" class="book-item">
-            </div>
+<div class="column offset-2">
+<img src="book3.jpg" class="book-item">
+<img src="book7.png" class="book-item">
+<img src="book11.png" class="book-item">
+</div>
 
-        </div>
-    </div>
+<div class="column offset-3">
+<img src="book4.jpg" class="book-item">
+<img src="book8.jpg" class="book-item">
+<img src="book13.jpg" class="book-item">
+</div>
+
+</div>
+</div>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-    <div class="footer-content">
+<div class="footer-content">
 
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-
-            <div class="socials">
-                <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
-                    <img src="instagram.png">
-                </a>
-                <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
-                    <img src="tiktok.png">
-                </a>
-            </div>
-        </div>
-
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="#">Publications</a><br>
-            <a href="#">About</a><br>
-            <a href="#">Contact</a>
-        </div>
-
-    </div>
+<div>
+<p>Blackwood Publishing</p>
+<div class="socials">
+<a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+<img src="instagram.png">
+</a>
+<a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+<img src="tiktok.png">
+</a>
+</div>
 </div>
 
-<!-- JS -->
+<div>
+<img src="seal.png" width="60">
+</div>
+
+<div>
+<a href="#">Publications</a><br>
+<a href="#">About</a>
+</div>
+
+</div>
+</div>
+
 <script>
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
 
-            if (entry.target.classList.contains('column')) {
-                const items = entry.target.querySelectorAll('.book-item');
+/* ================= LENIS ================= */
+const lenis = new Lenis({ lerp: 0.08 });
 
-                items.forEach((el, index) => {
-                    setTimeout(() => {
-                        el.classList.add('visible');
-                    }, index * 120);
-                });
+function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
 
-            } else {
-                entry.target.classList.add('visible');
-            }
-        }
-    });
-}, { threshold: 0.2 });
+/* ================= GSAP ================= */
+gsap.registerPlugin(ScrollTrigger);
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-document.querySelectorAll('.column').forEach(col => observer.observe(col));
+/* HERO INTRO */
+gsap.to(".hero-inner", {
+    opacity: 1,
+    y: 0,
+    duration: 1.5,
+    ease: "power3.out"
+});
 
-/* PARALLAX */
-window.addEventListener("scroll", () => {
-    const scrollY = window.scrollY;
-
-    document.querySelectorAll(".offset-1").forEach(el => {
-        el.style.transform = `translateY(${40 + scrollY * 0.05}px)`;
-    });
-
-    document.querySelectorAll(".offset-2").forEach(el => {
-        el.style.transform = `translateY(${80 + scrollY * 0.08}px)`;
-    });
-
-    document.querySelectorAll(".offset-3").forEach(el => {
-        el.style.transform = `translateY(${120 + scrollY * 0.12}px)`;
+/* BOOK STAGGER */
+document.querySelectorAll(".column").forEach(col => {
+    gsap.to(col.querySelectorAll(".book-item"), {
+        scrollTrigger: {
+            trigger: col,
+            start: "top 85%"
+        },
+        opacity: 1,
+        y: 0,
+        stagger: 0.15,
+        duration: 1.2,
+        ease: "power3.out"
     });
 });
+
+/* PARALLAX */
+gsap.utils.toArray(".offset-1").forEach(el => {
+    gsap.to(el, {
+        y: 140,
+        scrollTrigger: { scrub: true }
+    });
+});
+
+gsap.utils.toArray(".offset-2").forEach(el => {
+    gsap.to(el, {
+        y: 200,
+        scrollTrigger: { scrub: true }
+    });
+});
+
+gsap.utils.toArray(".offset-3").forEach(el => {
+    gsap.to(el, {
+        y: 260,
+        scrollTrigger: { scrub: true }
+    });
+});
+
+/* ================= CUSTOM CURSOR ================= */
+const cursor = document.querySelector(".cursor");
+
+window.addEventListener("mousemove", e => {
+    cursor.style.left = e.clientX + "px";
+    cursor.style.top = e.clientY + "px";
+});
+
+document.querySelectorAll("a, .book-item").forEach(el => {
+    el.addEventListener("mouseenter", () => cursor.classList.add("cursor-grow"));
+    el.addEventListener("mouseleave", () => cursor.classList.remove("cursor-grow"));
+});
+
 </script>
 
 </body>
