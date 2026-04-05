@@ -36,15 +36,15 @@ body {
     height: 100vh;
     overflow: hidden;
 
-    display: flex;
+    display: block;
     justify-content: center;   
-    align-items: flex-start;   
+    align-items: center;   
     text-align: center;
     letter-spacing: 0.3px;
     padding-top: 20px;        
 }
 .hero-inner {
-    margin-top: 40px;
+    margin-top: 60px;
     margin-bottom: -60px;
 }
 /* BACKGROUND */
