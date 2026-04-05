@@ -230,6 +230,7 @@ body {
 ========================= */
 .button {
     position: relative;
+    opacity: 0.8;
 }
 
 /* animated underline */
