@@ -7,28 +7,122 @@
 
 <style>
 
-/* BASE */
+/* ================= BASE ================= */
 body {
     margin: 0;
     font-family: Georgia, serif;
     background: #111;
     color: #e6e6e6;
+    overflow-x: hidden;
 }
 
-/* HERO */
+/* STONE TEXTURE */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.12;
+    z-index: -2;
+}
+
+/* GRAIN */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.04;
+    pointer-events: none;
+}
+
+/* ================= NAV ================= */
+.nav {
+    position: absolute;
+    top: 30px;
+    right: 60px;
+    z-index: 10;
+}
+
+/* 🔥 FIX: FORCE WHITE LINKS */
+.nav a,
+.nav a:visited,
+.nav a:active {
+    color: #f1f1f1;
+    text-decoration: none;
+    margin-left: 24px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.75;
+    transition: 0.3s;
+}
+
+.nav a:hover {
+    opacity: 1;
+}
+
+/* ================= HERO ================= */
 .hero {
+    position: relative;
     height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-        url('forest.png') center/cover;
+    text-align: center;
 }
 
-.hero img { width: 200px; }
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('forest.png');
+    background-size: cover;
+}
 
-/* BOOK STRIP */
+/* 🔥 FIX: USE YOUR LOCAL fog.png */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    background-size: cover;
+    opacity: 0.08;
+    animation: fog 90s linear infinite; /* slower = premium */
+}
+
+/* FOG ANIMATION */
+@keyframes fog {
+    from { transform: translateX(0); }
+    to { transform: translateX(-300px); }
+}
+
+.hero-inner {
+    position: relative;
+    z-index: 2;
+}
+
+.hero img {
+    width: 220px;
+    margin-bottom: 20px;
+    animation: fadeUp 1.5s forwards;
+}
+
+.hero p {
+    animation: fadeUp 2.2s forwards;
+}
+
+.button {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+
+/* ================= BOOK STRIP ================= */
 .books {
     padding: 80px 0;
     overflow: hidden;
@@ -43,13 +137,14 @@ body {
     width: 160px;
     cursor: pointer;
     transition: 0.3s;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
 }
 
 .book img:hover {
-    transform: scale(1.05);
+    transform: scale(1.05) translateY(-6px);
 }
 
-/* MODAL */
+/* ================= MODAL ================= */
 .modal {
     position: fixed;
     inset: 0;
@@ -94,14 +189,33 @@ body {
     cursor: pointer;
 }
 
+/* ================= ANIMATION ================= */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- NAV -->
+<div class="nav">
+<a href="#">Home</a>
+<a href="#">Publications</a>
+<a href="#">About</a>
+<a href="#">Author</a>
+<a href="#">Contact</a>
+</div>
+
 <!-- HERO -->
 <div class="hero">
+<div class="hero-inner">
 <img src="logo (1).png">
+<p>Literary and psychological fiction shaped by place, memory, and unease.</p>
+<a href="#" class="button">Explore Publications</a>
+</div>
 </div>
 
 <!-- BOOK STRIP -->
@@ -138,87 +252,35 @@ body {
 
 /* BOOK DATA */
 const books = {
-A3: {
-title: "Camban Bothy",
-desc: "The Third Calling (The Cursed Bothies Book 3) PREORDER",
-link: "https://mybook.to/Camban"
-},
-A12: {
-title: "Dour Hill House",
-desc: "A Psychological Gothic Horror Set in the Scottish Highlands",
-link: "https://mybook.to/DourHillHouse"
-},
-A6: {
-title: "The Erased Archivist",
-desc: "They control the past. He's about to rewrite the future.",
-link: "https://mybook.to/ErasedArchivist"
-},
-A7: {
-title: "The Drowned Fjord",
-desc: "Ancient sea myths and haunted science.",
-link: "https://mybook.to/DrownedFjord"
-},
-A4: {
-title: "Gualachulain Bothy",
-desc: "A Highland Horror of grief and survival.",
-link: "https://mybook.to/Gualachulain"
-},
-A9: {
-title: "Corrour Bothy",
-desc: "A haunted bothy horror novel.",
-link: "https://mybook.to/Corrour"
-},
-A5: {
-title: "Holdfast",
-desc: "A haunting novel of memory and voices. PREORDER",
-link: "https://mybook.to/Holdfast"
-},
-A11: {
-title: "Red Streets",
-desc: "A gritty Scottish crime thriller.",
-link: "https://mybook.to/RedStreets"
-},
-A2: {
-title: "Echoes of Vengeance",
-desc: "A dark psychological revenge thriller.",
-link: "https://mybook.to/echoesofvengeance"
-},
-A8: {
-title: "The Black Bothy",
-desc: "A chilling folk horror novel.",
-link: "https://mybook.to/BlackBothy"
-},
-A1: {
-title: "Corrour Bothy Limited Edition",
-desc: "Founders print edition.",
-link: "https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing"
-}
+A3:{title:"Camban Bothy",desc:"The Third Calling PREORDER",link:"https://mybook.to/Camban"},
+A12:{title:"Dour Hill House",desc:"Psychological Gothic Horror",link:"https://mybook.to/DourHillHouse"},
+A6:{title:"The Erased Archivist",desc:"They control the past.",link:"https://mybook.to/ErasedArchivist"},
+A7:{title:"The Drowned Fjord",desc:"Ancient sea myths.",link:"https://mybook.to/DrownedFjord"},
+A4:{title:"Gualachulain Bothy",desc:"Highland horror.",link:"https://mybook.to/Gualachulain"},
+A9:{title:"Corrour Bothy",desc:"Haunted bothy novel.",link:"https://mybook.to/Corrour"},
+A5:{title:"Holdfast",desc:"Memory and voices PREORDER",link:"https://mybook.to/Holdfast"},
+A11:{title:"Red Streets",desc:"Scottish crime thriller.",link:"https://mybook.to/RedStreets"},
+A2:{title:"Echoes of Vengeance",desc:"Psychological revenge thriller.",link:"https://mybook.to/echoesofvengeance"},
+A8:{title:"The Black Bothy",desc:"Folk horror novel.",link:"https://mybook.to/BlackBothy"},
+A1:{title:"Corrour Limited Edition",desc:"Founders print.",link:"https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing"}
 };
 
-/* MODAL LOGIC */
+/* MODAL */
 const modal = document.getElementById("modal");
 
-document.querySelectorAll(".book img").forEach(img => {
-img.addEventListener("click", () => {
-const id = img.dataset.id;
-const data = books[id];
-
-document.getElementById("modalImg").src = img.src;
-document.getElementById("modalTitle").innerText = data.title;
-document.getElementById("modalDesc").innerText = data.desc;
-document.getElementById("modalLink").href = data.link;
-
+document.querySelectorAll(".book img").forEach(img=>{
+img.onclick=()=>{
+const d=books[img.dataset.id];
 modal.classList.add("active");
-});
+modalImg.src=img.src;
+modalTitle.innerText=d.title;
+modalDesc.innerText=d.desc;
+modalLink.href=d.link;
+};
 });
 
-document.getElementById("close").onclick = () => {
-modal.classList.remove("active");
-};
-
-modal.onclick = (e) => {
-if(e.target === modal) modal.classList.remove("active");
-};
+close.onclick=()=>modal.classList.remove("active");
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active");};
 
 </script>
 
