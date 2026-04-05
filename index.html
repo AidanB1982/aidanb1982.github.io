@@ -349,13 +349,27 @@ body::before {
 ========================= */
 .reveal {
     opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
+    transform: translateY(60px);
+    transition: all 1s ease;
 }
 
 .reveal.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* 🔥 STAGGER SYSTEM */
+.book,
+.popular-book {
+    opacity: 0;
+    transform: translateY(60px) scale(0.98);
+    transition: all 0.8s ease;
+}
+
+.book.visible,
+.popular-book.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 </style>
@@ -382,7 +396,7 @@ Independent publisher of literary and psychological fiction shaped by place, mem
 </p>
 
 <a href="publications.html" class="button">
-Explore Publications →
+Explore Publications 
 </a>
 
 </div>
@@ -406,7 +420,7 @@ Explore Publications →
         A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
         </p>
 
-        <a href="#" class="button">View Details →</a>
+        <a href="#" class="button">View Details </a>
 
     </div>
 
@@ -452,7 +466,7 @@ Explore Publications →
 </div>
 <div style="text-align:center; margin-top:40px;">
     <a href="publications.html" class="button">
-        View All Publications →
+        View All Publications
     </a>
 </div>
 </div>
@@ -510,7 +524,7 @@ Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological
 <img id="modalImg">
 <h2 id="modalTitle"></h2>
 <p id="modalDesc"></p>
-<a id="modalLink" class="button" target="_blank">View Book →</a>
+<a id="modalLink" class="button" target="_blank">View Book </a>
 </div>
 </div>
 
@@ -520,7 +534,27 @@ Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological
 const observer=new IntersectionObserver(entries=>{
 entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})
 });
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const bookObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+
+            const items = entry.target.querySelectorAll('.book, .popular-book');
+
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, index * 120); // 👈 controls stagger timing
+            });
+
+        }
+    });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.section, .popular').forEach(section => {
+    bookObserver.observe(section);
+});
 
 /* BOOK DATA */
 const data = {
