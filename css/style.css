@@ -24,10 +24,10 @@
 }
 
 .featured-image img {
-    width: 200px;   
-    max-width: 100%;
-    height: auto;
-    transform: translateX(-10px);
+    width: 200px !important;
+    height: auto !important;
+    max-width: none !important;
+
     display: block;
 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
