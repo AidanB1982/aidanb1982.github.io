@@ -11,29 +11,19 @@
 body {
     margin: 0;
     font-family: Georgia, serif;
-    background: #111;
+    background: #0f0f11;
     color: #e6e6e6;
     overflow-x: hidden;
 }
 
-/* STONE TEXTURE */
+/* TEXTURE */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background: url('stone.png');
-    opacity: 0.12;
+    opacity: 0.1;
     z-index: -2;
-}
-
-/* GRAIN */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('https://grainy-gradients.vercel.app/noise.svg');
-    opacity: 0.04;
-    pointer-events: none;
 }
 
 /* ================= NAV ================= */
@@ -44,28 +34,19 @@ body::after {
     z-index: 10;
 }
 
-/* 🔥 FIX: FORCE WHITE LINKS */
-.nav a,
-.nav a:visited,
-.nav a:active {
+.nav a {
     color: #f1f1f1;
-    text-decoration: none;
     margin-left: 24px;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
     opacity: 0.75;
-    transition: 0.3s;
-}
-
-.nav a:hover {
-    opacity: 1;
 }
 
 /* ================= HERO ================= */
 .hero {
     position: relative;
-    height: 90vh;
+    height: 95vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -78,22 +59,18 @@ body::after {
     inset: 0;
     background:
         linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-        url('forest.png');
-    background-size: cover;
+        url('forest.png') center/cover;
 }
 
-/* 🔥 FIX: USE YOUR LOCAL fog.png */
 .hero::after {
     content: "";
     position: absolute;
     inset: 0;
     background: url('fog.png');
-    background-size: cover;
     opacity: 0.08;
-    animation: fog 90s linear infinite; /* slower = premium */
+    animation: fog 90s linear infinite;
 }
 
-/* FOG ANIMATION */
 @keyframes fog {
     from { transform: translateX(0); }
     to { transform: translateX(-300px); }
@@ -102,97 +79,110 @@ body::after {
 .hero-inner {
     position: relative;
     z-index: 2;
+    max-width: 600px;
 }
 
-.hero img {
-    width: 220px;
-    margin-bottom: 20px;
-    animation: fadeUp 1.5s forwards;
+.hero h1 {
+    font-size: 56px; /* 🔥 increased */
+    letter-spacing: 3px;
 }
 
 .hero p {
-    animation: fadeUp 2.2s forwards;
+    margin-top: 20px;
+    line-height: 1.6;
+    opacity: 0.85;
 }
 
-.button {
-    display: inline-block;
-    margin-top: 15px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
+/* ================= FEATURED ================= */
+.featured {
+    padding: 140px 20px;
+    text-align: center;
 }
 
-/* ================= BOOK STRIP ================= */
-.books {
-    padding: 80px 0;
-    overflow: hidden;
+.featured img {
+    width: 380px;
+    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.9));
+    margin-bottom: 30px;
 }
 
-.book-row {
-    display: flex;
-    gap: 40px;
+.featured h2 {
+    font-size: 28px;
+}
+
+.featured p {
+    max-width: 600px;
+    margin: 20px auto;
+    line-height: 1.7;
+}
+
+/* ================= PUBLICATIONS ================= */
+.section {
+    padding: 120px 20px;
+    background: #e8e6e1;
+    color: #1c1c1c;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 100px 60px;
+    margin-top: 60px;
+}
+
+.book {
+    text-align: left;
 }
 
 .book img {
-    width: 160px;
-    cursor: pointer;
-    transition: 0.3s;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
+    width: 220px;
+    transition: 0.4s;
 }
 
 .book img:hover {
     transform: scale(1.05) translateY(-6px);
 }
 
-/* ================= MODAL ================= */
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.4s;
+.book h3 {
+    margin-top: 20px;
+    font-size: 18px;
 }
 
-.modal.active {
-    opacity: 1;
-    pointer-events: all;
+.book p {
+    margin-top: 10px;
+    line-height: 1.6;
+    opacity: 0.85;
 }
 
-.modal-content {
-    background: #111;
-    padding: 40px;
-    max-width: 500px;
+/* ================= AUTHOR ================= */
+.author {
+    padding: 120px 20px;
     text-align: center;
-    border: 1px solid rgba(255,255,255,0.1);
+    max-width: 700px;
+    margin: auto;
+    line-height: 1.7;
 }
 
-.modal img {
-    width: 180px;
-    margin-bottom: 20px;
+/* ================= FOOTER ================= */
+.footer {
+    padding: 100px 20px;
+    background: #000;
+    text-align: center;
 }
 
-.modal a {
-    display: inline-block;
-    margin-top: 15px;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
+.socials img {
+    width: 18px;
+    margin: 10px;
 }
 
-.close {
-    position: absolute;
-    top: 30px;
-    right: 40px;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-/* ================= ANIMATION ================= */
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(25px); }
-    to { opacity: 1; transform: translateY(0); }
+/* ================= MOBILE ================= */
+@media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .featured img { width: 260px; }
 }
 
 </style>
@@ -212,77 +202,73 @@ body::after {
 <!-- HERO -->
 <div class="hero">
 <div class="hero-inner">
-<img src="logo (1).png">
-<p>Literary and psychological fiction shaped by place, memory, and unease.</p>
-<a href="#" class="button">Explore Publications</a>
+<h1>Blackwood Publishing</h1>
+<p>
+Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
+</p>
 </div>
 </div>
 
-<!-- BOOK STRIP -->
-<div class="books">
-<div class="book-row">
+<!-- FEATURED -->
+<div class="featured">
 
-<div class="book"><img src="A3.png" data-id="A3"></div>
-<div class="book"><img src="A12.png" data-id="A12"></div>
-<div class="book"><img src="A6.png" data-id="A6"></div>
-<div class="book"><img src="A7.png" data-id="A7"></div>
-<div class="book"><img src="A4.png" data-id="A4"></div>
-<div class="book"><img src="A9.png" data-id="A9"></div>
-<div class="book"><img src="A5.png" data-id="A5"></div>
-<div class="book"><img src="A11.png" data-id="A11"></div>
-<div class="book"><img src="A2.png" data-id="A2"></div>
-<div class="book"><img src="A8.png" data-id="A8"></div>
-<div class="book"><img src="A1.png" data-id="A1"></div>
+<img src="A1.png">
+
+<h2>Corrour Bothy: The First Summoning</h2>
+
+<p>
+A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
+</p>
+
+</div>
+
+<!-- PUBLICATIONS -->
+<div class="section">
+<div class="container">
+
+<h2>Publications</h2>
+
+<div class="grid">
+
+<div class="book">
+<img src="A8.png">
+<h3>The Black Bothy</h3>
+<p>
+An investigative record of disappearances tied to a place that refuses to remain fixed.
+</p>
+</div>
+
+<div class="book">
+<img src="A12.png">
+<h3>Dour Hill House</h3>
+<p>
+Inheritance becomes confinement as a house distorts space, memory, and identity.
+</p>
+</div>
+
+</div>
 
 </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-<div class="close" id="close">✕</div>
-<div class="modal-content">
-<img id="modalImg">
-<h2 id="modalTitle"></h2>
-<p id="modalDesc"></p>
-<a id="modalLink" target="_blank">View / Buy →</a>
-</div>
+<!-- AUTHOR -->
+<div class="author">
+<p>
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+</p>
 </div>
 
-<script>
+<!-- FOOTER -->
+<div class="footer">
 
-/* BOOK DATA */
-const books = {
-A3:{title:"Camban Bothy",desc:"The Third Calling PREORDER",link:"https://mybook.to/Camban"},
-A12:{title:"Dour Hill House",desc:"Psychological Gothic Horror",link:"https://mybook.to/DourHillHouse"},
-A6:{title:"The Erased Archivist",desc:"They control the past.",link:"https://mybook.to/ErasedArchivist"},
-A7:{title:"The Drowned Fjord",desc:"Ancient sea myths.",link:"https://mybook.to/DrownedFjord"},
-A4:{title:"Gualachulain Bothy",desc:"Highland horror.",link:"https://mybook.to/Gualachulain"},
-A9:{title:"Corrour Bothy",desc:"Haunted bothy novel.",link:"https://mybook.to/Corrour"},
-A5:{title:"Holdfast",desc:"Memory and voices PREORDER",link:"https://mybook.to/Holdfast"},
-A11:{title:"Red Streets",desc:"Scottish crime thriller.",link:"https://mybook.to/RedStreets"},
-A2:{title:"Echoes of Vengeance",desc:"Psychological revenge thriller.",link:"https://mybook.to/echoesofvengeance"},
-A8:{title:"The Black Bothy",desc:"Folk horror novel.",link:"https://mybook.to/BlackBothy"},
-A1:{title:"Corrour Limited Edition",desc:"Founders print.",link:"https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing"}
-};
+<p>Blackwood Publishing</p>
 
-/* MODAL */
-const modal = document.getElementById("modal");
+<div class="socials">
+<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
+<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
+</div>
 
-document.querySelectorAll(".book img").forEach(img=>{
-img.onclick=()=>{
-const d=books[img.dataset.id];
-modal.classList.add("active");
-modalImg.src=img.src;
-modalTitle.innerText=d.title;
-modalDesc.innerText=d.desc;
-modalLink.href=d.link;
-};
-});
-
-close.onclick=()=>modal.classList.remove("active");
-modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active");};
-
-</script>
+</div>
 
 </body>
 </html>
