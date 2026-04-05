@@ -29,7 +29,7 @@ body {
     text-align: center;
 }
 
-/* BACKGROUND + DAY/NIGHT + TREE SHIFT */
+/* BACKGROUND */
 .hero::before {
     content: "";
     position: absolute;
@@ -44,7 +44,7 @@ body {
         treeShift 20s ease-in-out infinite alternate;
 }
 
-/* VIGNETTE + COLOR SHIFT */
+/* VIGNETTE */
 .hero::after {
     content: "";
     position: absolute;
@@ -55,12 +55,11 @@ body {
         linear-gradient(to bottom, rgba(20,30,60,0.2), rgba(0,0,0,0.4));
 
     mix-blend-mode: multiply;
-
     animation: colorShift 40s ease-in-out infinite alternate;
 }
 
 /* =========================
-   FOG (DEPTH)
+   FOG
 ========================= */
 .fog-back,
 .fog-mid,
@@ -72,8 +71,8 @@ body {
     background-size: cover;
 
     mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-    pointer-events: none;
 
+    pointer-events: none;
     will-change: transform;
     filter: blur(2px);
 }
@@ -83,7 +82,36 @@ body {
 .fog-front{ opacity: 0.12; animation: fogFast 60s linear infinite; }
 
 /* =========================
-   ENTITY (👁 PRESENCE)
+   👁 SILHOUETTE (NEW)
+========================= */
+.silhouette {
+    position: absolute;
+    bottom: 10%;
+    left: 30%;
+    width: 120px;
+    height: 260px;
+
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0,0,0,0.6) 0%,
+        rgba(0,0,0,0.3) 40%,
+        transparent 70%
+    );
+
+    filter: blur(6px);
+    opacity: 0;
+
+    mix-blend-mode: multiply;
+
+    animation:
+        silhouetteAppear 25s ease-in-out infinite,
+        silhouetteDrift 30s ease-in-out infinite;
+
+    pointer-events: none;
+}
+
+/* =========================
+   ENTITY (SHADOW MASS)
 ========================= */
 .shadow-entity {
     position: absolute;
@@ -116,7 +144,6 @@ body {
     width: 320px;
     max-width: 80%;
     margin-bottom: 20px;
-
     animation: logoFlicker 6s infinite;
 }
 
@@ -166,35 +193,37 @@ body {
 ========================= */
 
 /* FOG */
-@keyframes fogSlow {
-    from { transform: translateX(0); }
-    to { transform: translateX(-600px); }
-}
-@keyframes fogMid {
-    from { transform: translateX(0); }
-    to { transform: translateX(-800px); }
-}
-@keyframes fogFast {
-    from { transform: translateX(0); }
-    to { transform: translateX(-1200px); }
-}
+@keyframes fogSlow { from { transform: translateX(0); } to { transform: translateX(-600px); } }
+@keyframes fogMid  { from { transform: translateX(0); } to { transform: translateX(-800px); } }
+@keyframes fogFast { from { transform: translateX(0); } to { transform: translateX(-1200px); } }
 
 /* ENTITY */
 @keyframes entityMove {
-    0%   { transform: translate(10%, 40%); }
-    50%  { transform: translate(70%, 50%); }
-    100% { transform: translate(20%, 60%); }
+    0% { transform: translate(10%,40%); }
+    50% { transform: translate(70%,50%); }
+    100% { transform: translate(20%,60%); }
 }
-
 @keyframes entityFade {
-    0%   { opacity: 0.35; }
-    50%  { opacity: 0.1; }
+    0% { opacity: 0.35; }
+    50% { opacity: 0.1; }
     100% { opacity: 0.35; }
 }
 
-/* TREE SHIFT */
+/* 👁 SILHOUETTE */
+@keyframes silhouetteAppear {
+    0%, 85%, 100% { opacity: 0; }
+    90% { opacity: 0.25; }
+    95% { opacity: 0.1; }
+}
+
+@keyframes silhouetteDrift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(40px); }
+}
+
+/* TREE */
 @keyframes treeShift {
-    0%   { transform: scale(1) translateX(0); }
+    0% { transform: scale(1) translateX(0); }
     100% { transform: scale(1.02) translateX(-10px); }
 }
 
@@ -212,21 +241,15 @@ body {
 
 /* DAY/NIGHT */
 @keyframes dayNightCycle {
-    0% {
-        filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%);
-    }
-    50% {
-        filter: grayscale(15%) brightness(0.95) contrast(100%) saturate(100%);
-    }
-    100% {
-        filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%);
-    }
+    0% { filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%); }
+    50% { filter: grayscale(15%) brightness(0.95) contrast(100%) saturate(100%); }
+    100% { filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%); }
 }
 
-/* COLOR SHIFT */
+/* COLOR */
 @keyframes colorShift {
-    0%   { opacity: 0.6; }
-    50%  { opacity: 0.3; }
+    0% { opacity: 0.6; }
+    50% { opacity: 0.3; }
     100% { opacity: 0.6; }
 }
 
@@ -237,12 +260,18 @@ body {
 
 <section class="hero">
 
+    <!-- FOG -->
     <div class="fog-back"></div>
     <div class="fog-mid"></div>
     <div class="fog-front"></div>
 
+    <!-- 👁 SILHOUETTE -->
+    <div class="silhouette"></div>
+
+    <!-- SHADOW ENTITY -->
     <div class="shadow-entity"></div>
 
+    <!-- CONTENT -->
     <div class="hero-inner">
 
         <img src="logo (1).png" class="hero-logo">
@@ -267,8 +296,6 @@ body {
 </section>
 
 <script>
-
-/* PARALLAX LIGHT */
 const hero = document.querySelector('.hero');
 
 let targetX = 50, targetY = 50;
@@ -290,7 +317,6 @@ function animate() {
     requestAnimationFrame(animate);
 }
 animate();
-
 </script>
 
 </body>
