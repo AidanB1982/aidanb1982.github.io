@@ -1,14 +1,962 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blackwood Publishing</title>
+
+<style>
+ 
+/* =========================
+   BASE
+========================= */
+body { scroll-behavior: smooth;
+    margin: 0;
+    font-family: Georgia, serif;
+    background: #0f0f11;
+    color: #e6e6e6;
+    overflow-x: hidden;
+}
+
+/* TEXTURE */
+/* =========================
+   NAV
+========================= */
+.nav {
+    position: absolute;
+    top: 30px;
+    right: 60px;
+    z-index: 10;
+}
+
+.nav a {
+    color: #f1f1f1;
+    margin-left: 24px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:visited {
+    color: inherit;
+}
+
+a:active {
+    color: inherit;
+}
+/* =========================
+   HERO
+========================= */
+.hero {
+    position: relative;
+    height: 55vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
+        url('forest.png') center/cover;
+
+    pointer-events: none;
+}
+
+/* FOG + LIGHT */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.06), transparent 50%),
+        url('https://grainy-gradients.vercel.app/noise.svg');
+
+    opacity: 0.18;
+
+    animation:
+        fogSlow 120s linear infinite,
+        ambientFlicker 6s ease-in-out infinite;
+
+    mix-blend-mode: screen;
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
+
+    pointer-events: none;
+}
+
+/* PERFORMANCE */
+.hero::before,
+.hero::after {
+    will-change: transform;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.06), transparent 50%);
+
+    opacity: 0.18;
+
+    animation:
+        fogSlow 120s linear infinite,
+        ambientFlicker 6s ease-in-out infinite;
+
+    mix-blend-mode: screen;
+
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
+}
+
+    mix-blend-mode: screen;
+    opacity: 0.4;
+
+     pointer-events: none;
+}
+.hero::after,
+.hero::before {
+    will-change: transform;
+}
+
+.hero {
+    position: relative;
+    height: 55vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* BACKGROUND + LIGHT BEAMS */
+    background:
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
+        url('forest.png') center/cover,
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,0.06) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(255,255,255,0.04) 100%
+        ),
+        linear-gradient(
+            100deg,
+            rgba(255,255,255,0.04) 0%,
+            transparent 40%
+        );
+
+    mix-blend-mode: screen;
+
+    transform: translateX(calc((var(--mx,50%) - 50%) * 0.3))
+               translateY(calc((var(--my,50%) - 50%) * 0.3));
+
+    pointer-events: none;
+}
+    background:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.06), transparent 50%),
+        url('https://grainy-gradients.vercel.app/noise.svg');
+
+    opacity: 0.18;
+
+    animation:
+        fogSlow 120s linear infinite,
+        ambientFlicker 6s ease-in-out infinite;
+
+    mix-blend-mode: screen;
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
+}
+
+/* FOG LAYERS */
+.hero .fog-layer {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.06;
+    filter: blur(1px);
+    animation: fogFast 60s linear infinite;
+}
+
+.hero .fog-layer2 {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.05;
+    filter: blur(2px);
+    animation: fogReverse 180s linear infinite;
+}
+
+/* HERO CONTENT */
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    transition: transform 0.2s ease-out;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.06), transparent 50%),
+        url('https://grainy-gradients.vercel.app/noise.svg');
+
+    opacity: 0.18;
+
+    animation:
+        fogSlow 120s linear infinite,
+        ambientFlicker 6s ease-in-out infinite;
+
+    mix-blend-mode: screen;
+
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
+    pointer-events: none;
+}
+.hero-inner {
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+}
+.hero .fog-layer {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.06;
+    filter: blur(1px);
+    animation: fogFast 60s linear infinite;
+}
+
+.hero .fog-layer2 {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.05;
+    filter: blur(1px);
+    animation: fogFast 60s linear infinite;
+}
+
+/* ANIMATIONS */
+@keyframes fogSlow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-600px); }
+}
+
+@keyframes fogFast {
+    from { transform: translateX(0); }
+    to { transform: translateX(-800px); }
+}
+
+@keyframes fogReverse {
+    from { transform: translateX(0); }
+    to { transform: translateX(300px); }
+}
+
+@keyframes fog {
+    from { transform: translateX(0); }
+    to { transform: translateX(-300px); }
+}
+@keyframes ambientFlicker {
+    0%   { opacity: 0.08; }
+    50%  { opacity: 0.12; }
+    100% { opacity: 0.25; }
+}
+@keyframes fogDrift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-500px); }
+}
+
+@keyframes fogDriftFast {
+    from { transform: translateX(0); }
+    to { transform: translateX(-200px); }
+}
+ @keyframes fogFloat {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-200px); }
+    100% { transform: translateY(0); }
+}
+@keyframes bookFloat {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-60px); }
+    100% { transform: translateY(0); }
+}
+@keyframes lightDrift {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); }
+}
+.popular-book {
+    animation: bookFloat 6s ease-in-out infinite;
+}
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    margin-top: 0px;
+}
+
+.hero-logo {
+    width: 320px;
+    max-width: 80%;
+    margin-bottom: 20px;
+    opacity: 0.95;
+}
+.hero p {
+   margin-top: 15px;
+   line-height: 1.7;
+   opacity: 0.8;
+   max-width: 520px;
+   margin-left: auto;
+   margin-right: auto;  
+}
+.button {
+    display: inline-block;
+    margin-top: 25px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+    padding-bottom: 4px;
+    opacity: 0.85;
+    transition: 0.3s;
+}
+
+.button:hover {
+    opacity: 1;
+    border-color: rgba(255,255,255,0.8);
+} 
+.divider {
+    width: 50px;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+    margin: 80px auto;
+}   
+
+/* =========================
+   FEATURED
+========================= */
+.featured {
+    padding: 60px 20px;
+}
+
+.featured-inner {
+    max-width: 1000px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.featured img {
+    width: 360px;
+    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.9));
+}
+
+.featured-text h2 {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+.featured-text h3 {
+    font-size: 30px;
+    margin: 10px 0;
+}
+
+.featured-text p {
+    line-height: 1.7;
+    max-width: 500px;
+}
+.container {
+    position: relative;
+    z-index: 2;
+}
+/* =========================
+   POPULAR READS
+========================= */
+.popular {
+    padding: 260px 20px 240px;
+    position: relative;
+    overflow: hidden;
+}
+
+.popular::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+
+    background:
+        url('stone.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.08), transparent 50%),
+        radial-gradient(circle at calc(var(--mx, 50%) - 20%) calc(var(--my, 50%) - 10%), rgba(255,255,255,0.05), transparent 60%);
+
+    background-blend-mode: overlay;
+    opacity: 0.35;
+
+    transition: background-position 0.1s linear;
+}
+.popular h2 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+.popular-row {
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+}
+ .popular-row {
+    margin-top: 40px;
+}
+ .popular-row::-webkit-scrollbar {
+    display: none;
+}
+
+.popular-row {
+    scrollbar-width: none;
+}
+.popular-row:active {
+    cursor: grabbing;
+}
+
+.popular-book img {
+    width: 190px;
+    flex: 0 0 auto;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    cursor: pointer;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
+}
+.popular-book img:hover {
+    transform: perspective(1000px) rotateY(-12deg) scale(1.06);
+    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.95));
+}
+
+.popular-book {
+    position: relative;
+}
+
+.popular-book span {
+    position: absolute;
+    bottom: -25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.popular-book:hover span {
+    opacity: 0.8;
+}
+.popular-book:nth-child(odd) {
+    transform: translateY(-10px);
+}
+
+.popular-book:nth-child(even) {
+    transform: translateY(10px);
+}
+.popular {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255,255,255,0.03) 0%,
+        rgba(0,0,0,0.6) 100%
+    );
+}
+ 
+/* =========================
+   AUTHOR
+========================= */
+.author {
+    padding: 120px 20px;
+    text-align: center;
+    max-width: 700px;
+    margin: auto;
+}
+.author-text {
+    font-size: 18px;
+    line-height: 1.8;
+    opacity: 0.9;
+}
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    padding: 60px 20px;
+    background: #000;
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* ICON CONTAINER */
+.footer-links {
+    margin-top: 15px;
+}
+
+/* ICONS */
+.footer-links img {
+    width: 22px;
+    margin: 0 10px;
+    opacity: 0.7;
+    transition: 0.3s ease;
+}
+
+/* HOVER EFFECT */
+.footer-links img:hover {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
+}
+
+/* =========================
+   MODAL
+========================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.4s;
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: #111;
+    padding: 50px;
+    max-width: 500px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    transform: scale(0.95);
+    transition: 0.3s;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+.modal img {
+    width: 180px;
+}
+
+/* =========================
+   REVEAL
+========================= */
+.reveal {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: all 1s ease;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 🔥 STAGGER SYSTEM */
+.book,
+.popular-book {
+    opacity: 0;
+    transform: translateY(60px) scale(0.98);
+    transition: all 0.8s ease;
+}
+
+.book.visible,
+.popular-book.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
 <div class="nav">
-    <a href="index.html">Home</a>
-    <a href="publications.html">Publications</a>
-    <a href="about.html">About</a>
-    <a href="author.html">Author</a>
-    <a href="contact.html">Contact</a>
+<a href="#">Home</a>
+<a href="#">Publications</a>
+<a href="#">About</a>
+<a href="#">Author</a>
+<a href="#">Contact</a>
 </div>
+
+<section class="hero">
+
+<div class="fog-layer"></div>
+<div class="fog-layer2"></div>
+
+<div class="hero-inner">
+
+<img src="logo (1).png" class="hero-logo">
+
+<p>
+Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
+</p>
+
+<a href="publications.html" class="button">
+Explore Publications 
+</a>
+
+</div>
+</section>
+<div class="divider"></div>
+   
+<!-- FEATURED -->
+<section class="featured reveal">
+
+<div class="featured-inner">
+
+    <img src="A1.png">
+
+    <div class="featured-text">
+
+        <h2>Featured Work</h2>
+
+        <h3>Corrour Bothy: The First Summoning</h3>
+
+        <p>
+        A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
+        </p>
+
+        <a href="#" class="button">View Details </a>
+
+    </div>
+
+</div>
+
+</section>
+<div class="divider"></div>
+   
+<!-- POPULAR READS -->
+<section class="popular reveal">
+
+<div class="container">
+
+<h2>Popular Reads</h2>
+
+<div class="popular-row">
+
+<div class="popular-book">
+   <img src="A3.png" data-id="A3">
+   <span>Camban Bothy</span>
+</div>
+
+<div class="popular-book">
+   <img src="A6.png" data-id="A6">
+   <span>The Erased Archivist</span>
+</div>
+
+<div class="popular-book">
+   <img src="A7.png" data-id="A7">
+   <span>The Drowned Fjord</span>
+</div>
+
+<div class="popular-book">
+   <img src="A5.png" data-id="A5">
+   <span>Holdfast</span>
+</div>
+
+<div class="popular-book">
+   <img src="A11.png" data-id="A11">
+   <span>Redstreets</span>
+</div>
+
+</div>
+<div style="text-align:center; margin-top:40px;">
+    <a href="publications.html" class="button">
+        View All Publications
+    </a>
+</div>
+</div>
+
+</section>
+
+<div class="divider"></div>
+<!-- AUTHOR -->
+<section class="author reveal">
+
+<p class="author-text">
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+</p>
+
+</section>
+<div class="divider"></div>
+<!-- FOOTER -->
+<footer class="footer">
+
+    <p>Blackwood Publishing</p>
+
+    <div class="footer-links">
+
+        <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+            <img src="instagram.png" alt="Instagram">
+        </a>
+
+        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+            <img src="tiktok.png" alt="TikTok">
+        </a>
+
+    </div>
+
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-content">
+<img id="modalImg">
+<h2 id="modalTitle"></h2>
+<p id="modalDesc"></p>
+<a id="modalLink" class="button" target="_blank">View Book </a>
+</div>
+</div>
+
 <script>
-fetch('header.html')
-    .then(res => res.text())
-    .then(data => {
-        document.getElementById('header').innerHTML = data;
+
+/* REVEAL */
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})
+});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+const bookObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+
+            const items = entry.target.querySelectorAll('.book, .popular-book');
+
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, index * 120); // 👈 controls stagger timing
+            });
+
+        }
     });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.popular').forEach(section => {
+    bookObserver.observe(section);
+});
+
+/* BOOK DATA */
+const data = {
+A3:{
+title:"Camban Bothy",
+desc:"The Third Calling (PREORDER)",
+link:"https://mybook.to/Camban"
+},
+A6:{
+title:"The Erased Archivist",
+desc:"They control the past. He's about to rewrite the future.",
+link:"https://mybook.to/ErasedArchivist"
+},
+A7:{
+title:"The Drowned Fjord",
+desc:"Ancient sea folk lore and haunted science.",
+link:"https://mybook.to/DrownedFjord"
+},
+A5:{
+title:"Holdfast",
+desc:"A haunting novel of memory and voices (PREORDER)",
+link:"https://mybook.to/Holdfast"
+},
+A11:{
+title:"Red Streets",
+desc:"A gritty Scottish crime thriller.",
+link:"https://mybook.to/RedStreets"
+},
+A8:{
+title:"The Black Bothy",
+desc:"Folk horror novel.",
+link:"https://mybook.to/BlackBothy"
+},
+A12:{
+title:"Dour Hill House",
+desc:"Psychological gothic horror.",
+link:"https://mybook.to/DourHillHouse"
+}
+};
+
+/* MODAL */
+const modal=document.getElementById("modal");
+document.querySelectorAll(".book img, .popular-book img").forEach(img=>{
+img.onclick=()=>{
+const d=data[img.dataset.id];
+modal.classList.add("active");
+modalImg.src=img.src;
+modalTitle.innerText=d.title;
+modalDesc.innerText=d.desc;
+modalLink.href=d.link;
+};
+});
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
+const books = document.querySelectorAll('.popular-book img, .book img');
+
+let scrollY = 0;
+
+window.addEventListener('scroll', () => {
+    scrollY = window.scrollY;
+});
+
+/* LOOP FOR EACH BOOK */
+books.forEach((el, i) => {
+
+    let tiltX = 0;
+    let tiltY = 0;
+    let moveX = 0;
+    let moveY = 0;
+
+    /* CREATE GLOW ELEMENT */
+    const glow = document.createElement('div');
+    glow.style.position = 'absolute';
+    glow.style.inset = '0';
+    glow.style.pointerEvents = 'none';
+    glow.style.background = 'radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 60%)';
+    glow.style.opacity = '0';
+    glow.style.transition = 'opacity 0.3s';
+
+    el.parentElement.appendChild(glow);
+
+    function updateTransform() {
+    const openAngle = -8;
+
+    el.style.transform = `
+        perspective(800px)
+        rotateY(${tiltY + openAngle}deg)
+        rotateX(${tiltX}deg)
+        translate(${moveX}px, ${moveY}px)
+        scale(1.07)
+    `;
+
+    el.style.filter = `
+        drop-shadow(${tiltY * 2}px ${tiltX * -2}px 80px rgba(0,0,0,0.9))
+    `;
+}
+    /* MOUSE MOVE */
+    el.addEventListener('mousemove', (e) => {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const distX = (x - centerX) / centerX;
+    const distY = (y - centerY) / centerY;
+
+    tiltY = distX * 12;
+    tiltX = distY * -12;
+
+    const pullStrength = 8;
+    moveX = distX * pullStrength;
+    moveY = distY * pullStrength;
+
+    updateTransform();
+
+    glow.style.background = `
+        radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent 60%)
+    `;
+    glow.style.opacity = '1';
+});
+    /* LEAVE */
+    el.addEventListener('mouseleave', () => {
+    tiltX = 0;
+    tiltY = 0;
+    moveX = 0;
+    moveY = 0;
+    glow.style.opacity = '0';
+    updateTransform();
+});
+    /* CONTINUOUS PARALLAX LOOP */
+    function animate() {
+        updateTransform();
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+
+});
+
+const hero = document.querySelector('.hero');
+
+let targetX = 50;
+let targetY = 50;
+let currentX = 50;
+let currentY = 50;
+
+/* LIGHT FOLLOW (mouse position → target) */
+hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+
+    targetX = ((e.clientX - rect.left) / rect.width) * 100;
+    targetY = ((e.clientY - rect.top) / rect.height) * 100;
+});
+
+/* SMOOTH INTERPOLATION (this makes it cinematic) */
+function animateHeroLight() {
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
+
+    hero.style.setProperty('--mx', currentX + '%');
+    hero.style.setProperty('--my', currentY + '%');
+
+    requestAnimationFrame(animateHeroLight);
+}
+
+animateHeroLight();
+
+/* CAMERA DRIFT (subtle movement of content) */
+hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    const inner = hero.querySelector('.hero-inner');
+
+    inner.style.transform = `
+        translate(${x * 12}px, ${y * 12}px)
+        scale(1.02)
+    `;
+});
+
+/* RESET WHEN LEAVING HERO */
+hero.addEventListener('mouseleave', () => {
+    const inner = hero.querySelector('.hero-inner');
+    inner.style.transform = `translate(0px, 0px) scale(1)`;
+});
 </script>
+
+</body>
+</html>
