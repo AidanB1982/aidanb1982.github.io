@@ -7,7 +7,9 @@
 
 <style>
 
-/* ================= BASE ================= */
+/* =========================
+   BASE
+========================= */
 body {
     margin: 0;
     font-family: Georgia, serif;
@@ -26,7 +28,9 @@ body::before {
     z-index: -2;
 }
 
-/* ================= NAV ================= */
+/* =========================
+   NAV
+========================= */
 .nav {
     position: absolute;
     top: 30px;
@@ -43,7 +47,9 @@ body::before {
     opacity: 0.75;
 }
 
-/* ================= HERO ================= */
+/* =========================
+   HERO
+========================= */
 .hero {
     position: relative;
     height: 95vh;
@@ -79,11 +85,11 @@ body::before {
 .hero-inner {
     position: relative;
     z-index: 2;
-    max-width: 600px;
+    max-width: 650px;
 }
 
 .hero h1 {
-    font-size: 56px; /* 🔥 increased */
+    font-size: 58px;
     letter-spacing: 3px;
 }
 
@@ -93,19 +99,21 @@ body::before {
     opacity: 0.85;
 }
 
-/* ================= FEATURED ================= */
+/* =========================
+   FEATURED
+========================= */
 .featured {
     padding: 140px 20px;
     text-align: center;
 }
 
 .featured img {
-    width: 380px;
+    width: 400px;
     filter: drop-shadow(0 60px 140px rgba(0,0,0,0.9));
-    margin-bottom: 30px;
 }
 
 .featured h2 {
+    margin-top: 30px;
     font-size: 28px;
 }
 
@@ -115,7 +123,9 @@ body::before {
     line-height: 1.7;
 }
 
-/* ================= PUBLICATIONS ================= */
+/* =========================
+   PUBLICATIONS
+========================= */
 .section {
     padding: 120px 20px;
     background: #e8e6e1;
@@ -131,16 +141,12 @@ body::before {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 100px 60px;
-    margin-top: 60px;
-}
-
-.book {
-    text-align: left;
 }
 
 .book img {
-    width: 220px;
+    width: 230px;
     transition: 0.4s;
+    cursor: pointer;
 }
 
 .book img:hover {
@@ -149,40 +155,70 @@ body::before {
 
 .book h3 {
     margin-top: 20px;
-    font-size: 18px;
 }
 
-.book p {
-    margin-top: 10px;
-    line-height: 1.6;
-    opacity: 0.85;
-}
-
-/* ================= AUTHOR ================= */
+/* =========================
+   AUTHOR
+========================= */
 .author {
     padding: 120px 20px;
     text-align: center;
     max-width: 700px;
     margin: auto;
-    line-height: 1.7;
 }
 
-/* ================= FOOTER ================= */
+/* =========================
+   FOOTER
+========================= */
 .footer {
     padding: 100px 20px;
     background: #000;
     text-align: center;
 }
 
-.socials img {
-    width: 18px;
-    margin: 10px;
+/* =========================
+   MODAL
+========================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.4s;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 900px) {
-    .grid { grid-template-columns: 1fr; }
-    .featured img { width: 260px; }
+.modal.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    background: #111;
+    padding: 40px;
+    max-width: 500px;
+    text-align: center;
+}
+
+.modal img {
+    width: 180px;
+}
+
+/* =========================
+   REVEAL
+========================= */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 </style>
@@ -200,30 +236,22 @@ body::before {
 </div>
 
 <!-- HERO -->
-<div class="hero">
+<section class="hero">
 <div class="hero-inner">
 <h1>Blackwood Publishing</h1>
-<p>
-Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
-</p>
+<p>Independent publisher of literary and psychological fiction shaped by place, memory, and unease.</p>
 </div>
-</div>
+</section>
 
 <!-- FEATURED -->
-<div class="featured">
-
+<section class="featured reveal">
 <img src="A1.png">
-
 <h2>Corrour Bothy: The First Summoning</h2>
-
-<p>
-A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
-</p>
-
-</div>
+<p>A remote Highland bothy draws in those already carrying quiet fractures...</p>
+</section>
 
 <!-- PUBLICATIONS -->
-<div class="section">
+<section class="section reveal">
 <div class="container">
 
 <h2>Publications</h2>
@@ -231,44 +259,71 @@ A remote Highland bothy draws in those already carrying quiet fractures. What be
 <div class="grid">
 
 <div class="book">
-<img src="A8.png">
+<img src="A8.png" data-id="A8">
 <h3>The Black Bothy</h3>
-<p>
-An investigative record of disappearances tied to a place that refuses to remain fixed.
-</p>
 </div>
 
 <div class="book">
-<img src="A12.png">
+<img src="A12.png" data-id="A12">
 <h3>Dour Hill House</h3>
-<p>
-Inheritance becomes confinement as a house distorts space, memory, and identity.
-</p>
 </div>
 
 </div>
 
 </div>
-</div>
+</section>
 
 <!-- AUTHOR -->
-<div class="author">
+<section class="author reveal">
 <p>
-Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain...
 </p>
-</div>
+</section>
 
 <!-- FOOTER -->
-<div class="footer">
-
+<footer class="footer">
 <p>Blackwood Publishing</p>
+</footer>
 
-<div class="socials">
-<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
-<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-content">
+<img id="modalImg">
+<h2 id="modalTitle"></h2>
+<p id="modalDesc"></p>
+<a id="modalLink">View</a>
+</div>
 </div>
 
-</div>
+<script>
+
+/* REVEAL */
+const observer=new IntersectionObserver(entries=>{
+entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})
+});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* BOOK DATA */
+const data={
+A8:{title:"Black Bothy",desc:"Folk horror",link:"#"},
+A12:{title:"Dour Hill House",desc:"Psychological horror",link:"#"}
+};
+
+/* MODAL */
+const modal=document.getElementById("modal");
+document.querySelectorAll(".book img").forEach(img=>{
+img.onclick=()=>{
+const d=data[img.dataset.id];
+modal.classList.add("active");
+modalImg.src=img.src;
+modalTitle.innerText=d.title;
+modalDesc.innerText=d.desc;
+modalLink.href=d.link;
+};
+});
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
+
+</script>
 
 </body>
 </html>
