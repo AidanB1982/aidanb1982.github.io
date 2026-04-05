@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackwood Publishing</title>
 
-<!-- HEADER CSS -->
-<link rel="stylesheet" href="header.css">
+<!-- MAIN CSS -->
+<link rel="stylesheet" href="css/style.css">
 
 <style>
-/* Optional page styling */
 body {
     margin: 0;
     background: #0f0f11;
@@ -32,14 +31,22 @@ body {
 ========================= -->
 <script>
 fetch('header.html')
-    .then(res => res.text())
+    .then(res => {
+        if (!res.ok) {
+            throw new Error("Header failed to load");
+        }
+        return res.text();
+    })
     .then(data => {
         document.getElementById('header-placeholder').innerHTML = data;
 
         // Load header JS AFTER HTML is injected
         const script = document.createElement('script');
-        script.src = 'header.js';
+        script.src = 'js/header.js';   // ✅ FIXED PATH
         document.body.appendChild(script);
+    })
+    .catch(err => {
+        console.error(err);
     });
 </script>
 
