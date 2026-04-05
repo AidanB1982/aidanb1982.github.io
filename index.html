@@ -121,10 +121,93 @@ a:active {
     will-change: transform;
 }
 
-.hero::marker {}
+.hero {
+    position: relative;
+    height: 55vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* BACKGROUND + LIGHT BEAMS */
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.65)),
+        url('forest.png') center/cover,
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,0.06) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(255,255,255,0.04) 100%
+        ),
+        linear-gradient(
+            100deg,
+            rgba(255,255,255,0.04) 0%,
+            transparent 40%
+        );
+
+    mix-blend-mode: screen;
+
+    transform: translateX(calc((var(--mx,50%) - 50%) * 0.3))
+               translateY(calc((var(--my,50%) - 50%) * 0.3));
+
     pointer-events: none;
 }
-.hero::selection {} /* ignore */
+
+/* FOG + LIGHT + GRAIN */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        radial-gradient(circle at calc(var(--mx, 50%) + 20%) calc(var(--my, 50%) + 10%), rgba(255,255,255,0.06), transparent 50%),
+        url('https://grainy-gradients.vercel.app/noise.svg');
+
+    opacity: 0.18;
+
+    animation:
+        fogSlow 120s linear infinite,
+        ambientFlicker 6s ease-in-out infinite;
+
+    mix-blend-mode: screen;
+    box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
+}
+
+/* FOG LAYERS */
+.hero .fog-layer {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.06;
+    filter: blur(1px);
+    animation: fogFast 60s linear infinite;
+}
+
+.hero .fog-layer2 {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.05;
+    filter: blur(2px);
+    animation: fogReverse 180s linear infinite;
+}
+
+/* HERO CONTENT */
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    transition: transform 0.2s ease-out;
+}
 
 .hero::after {
     background-image:
@@ -493,6 +576,9 @@ a:active {
 
 <section class="hero">
 
+<div class="fog-layer"></div>
+<div class="fog-layer2"></div>
+
 <div class="hero-inner">
 
 <img src="logo (1).png" class="hero-logo">
@@ -752,27 +838,6 @@ books.forEach((el, i) => {
     `;
     glow.style.opacity = '1';
 });
-// 🎥 CAMERA DRIFT
-hero.addEventListener('mousemove', (e) => {
-    const rect = hero.getBoundingClientRect();
-
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-    const strength = 12;
-
-    const inner = hero.querySelector('.hero-inner');
-
-    inner.style.transform = `
-        translate(${x * strength}px, ${y * strength}px)
-        scale(1.02)
-    `;
-});
-
-hero.addEventListener('mouseleave', () => {
-    const inner = hero.querySelector('.hero-inner');
-    inner.style.transform = `translate(0px, 0px) scale(1)`;
-});
     /* LEAVE */
     el.addEventListener('mouseleave', () => {
     tiltX = 0;
@@ -816,6 +881,55 @@ function animateHeroLight() {
 }
 
 animateHeroLight();
+
+const hero = document.querySelector('.hero');
+
+let targetX = 50;
+let targetY = 50;
+let currentX = 50;
+let currentY = 50;
+
+/* LIGHT FOLLOW (mouse position → target) */
+hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+
+    targetX = ((e.clientX - rect.left) / rect.width) * 100;
+    targetY = ((e.clientY - rect.top) / rect.height) * 100;
+});
+
+/* SMOOTH INTERPOLATION (this makes it cinematic) */
+function animateHeroLight() {
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
+
+    hero.style.setProperty('--mx', currentX + '%');
+    hero.style.setProperty('--my', currentY + '%');
+
+    requestAnimationFrame(animateHeroLight);
+}
+
+animateHeroLight();
+
+/* CAMERA DRIFT (subtle movement of content) */
+hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    const inner = hero.querySelector('.hero-inner');
+
+    inner.style.transform = `
+        translate(${x * 12}px, ${y * 12}px)
+        scale(1.02)
+    `;
+});
+
+/* RESET WHEN LEAVING HERO */
+hero.addEventListener('mouseleave', () => {
+    const inner = hero.querySelector('.hero-inner');
+    inner.style.transform = `translate(0px, 0px) scale(1)`;
+});
 </script>
 
 </body>
