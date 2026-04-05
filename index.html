@@ -130,6 +130,26 @@ a:active {
     50%  { opacity: 0.12; }
     100% { opacity: 0.08; }
 }
+@keyframes fogDrift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-500px); }
+}
+
+@keyframes fogDriftFast {
+    from { transform: translateX(0); }
+    to { transform: translateX(-250px); }
+}
+ @keyframes fogFloat {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+}
+
+.popular::after {
+    animation:
+        fogDrift 140s linear infinite,
+        fogFloat 20s ease-in-out infinite;
+}
 .hero-inner {
     position: relative;
     z-index: 2;
@@ -211,13 +231,17 @@ a:active {
     line-height: 1.7;
     max-width: 500px;
 }
-
+.container {
+    position: relative;
+    z-index: 2;
+}
 /* =========================
    POPULAR READS
 ========================= */
 .popular {
-    padding: 180px 20px;
+    padding: 260px 20px 240px;
     position: relative;
+    overflow: hidden;
 }
 
 .popular::before {
@@ -228,7 +252,24 @@ a:active {
     opacity: 0.15;
     z-index: -1;
 }
+.popular::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.14;
+    animation: fogDrift 140s linear infinite;
+    z-index: 0;
+}
 
+.popular .fog-layer {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.15;
+    animation: fogDriftFast 80s linear infinite;
+    z-index: 0;
+}
 .popular h2 {
     text-align: center;
     margin-bottom: 50px;
@@ -244,6 +285,9 @@ a:active {
 
     justify-content: flex-start;
 }
+ .popular-row {
+    margin-top: 40px;
+}
  .popular-row::-webkit-scrollbar {
     display: none;
 }
@@ -256,22 +300,12 @@ a:active {
 }
 
 .popular-book img {
-    width: 160px;
+    width: 190px;
     flex: 0 0 auto;
     transition: transform 0.4s ease, filter 0.4s ease;
     cursor: pointer;
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
 }
-.popular-book img {
-    width: 160px;
-    flex: 0 0 auto;
-    transition: transform 0.4s ease, filter 0.4s ease;
-    cursor: pointer;
-    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
-
-    transform-style: preserve-3d;
-}
-
 .popular-book img:hover {
     transform: perspective(1000px) rotateY(-12deg) scale(1.06);
     filter: drop-shadow(0 60px 140px rgba(0,0,0,0.95));
@@ -299,7 +333,20 @@ a:active {
 .popular-book:hover span {
     opacity: 0.8;
 }
+.popular-book:nth-child(odd) {
+    transform: translateY(-10px);
+}
 
+.popular-book:nth-child(even) {
+    transform: translateY(10px);
+}
+.popular {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255,255,255,0.03) 0%,
+        rgba(0,0,0,0.6) 100%
+    );
+}
 /* =========================
    AUTHOR
 ========================= */
@@ -453,6 +500,7 @@ Explore Publications
    
 <!-- POPULAR READS -->
 <section class="popular reveal">
+<div class="fog-layer"></div> <!-- 🔥 ADD THIS -->
 
 <div class="container">
 
