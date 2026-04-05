@@ -10,7 +10,7 @@
 /* =========================
    BASE
 ========================= */
-body {
+body { scroll-behavior: smooth;
     margin: 0;
     font-family: Georgia, serif;
     background: #0f0f11;
@@ -85,42 +85,149 @@ body::before {
 .hero-inner {
     position: relative;
     z-index: 2;
-    max-width: 650px;
+    max-width: 600px;
+    margin-top: 40px;
 }
 
 .hero h1 {
-    font-size: 58px;
-    letter-spacing: 3px;
+    font-size: 64px;
+    letter-spacing: 4px;
+    margin-bottom: 10px;
 }
 
 .hero p {
-    margin-top: 20px;
-    line-height: 1.6;
-    opacity: 0.85;
+   margin-top: 15px;
+   line-height: 1.7;
+   opacity: 0.8;
+   max-width: 520px;
+   margin-left: auto;
+   margin-right: auto;  
 }
+.button {
+    display: inline-block;
+    margin-top: 25px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
+    padding-bottom: 4px;
+    opacity: 0.85;
+    transition: 0.3s;
+}
+
+.button:hover {
+    opacity: 1;
+    border-color: rgba(255,255,255,0.8);
+} 
+.divider {
+    width: 50px;
+    height: 1px;
+    background: rgba(255,255,255,0.2);
+    margin: 80px auto;
+}   
 
 /* =========================
    FEATURED
 ========================= */
 .featured {
-    padding: 140px 20px;
-    text-align: center;
+    padding: 160px 20px;
+}
+
+.featured-inner {
+    max-width: 1000px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 100px;
+    align-items: center;
 }
 
 .featured img {
-    width: 400px;
+    width: 360px;
     filter: drop-shadow(0 60px 140px rgba(0,0,0,0.9));
 }
 
-.featured h2 {
-    margin-top: 30px;
-    font-size: 28px;
+.featured-text h2 {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
 }
 
-.featured p {
-    max-width: 600px;
-    margin: 20px auto;
+.featured-text h3 {
+    font-size: 30px;
+    margin: 10px 0;
+}
+
+.featured-text p {
     line-height: 1.7;
+    max-width: 500px;
+}
+
+/* =========================
+   POPULAR READS
+========================= */
+.popular {
+    padding: 120px 20px;
+}
+
+.popular h2 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+.popular-row {
+    display: flex;
+    gap: 40px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    cursor: grab;
+}
+.popular-row:active {
+    cursor: grabbing;
+}
+
+.popular-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.popular-row::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+}
+
+.popular-book img {
+    width: 160px;
+    flex: 0 0 auto;
+    transition: transform 0.4s ease, filter 0.4s ease;
+    cursor: pointer;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
+    transform: perspective(800px) rotateY(0deg) rotateX(0deg);
+}
+.popular-book img:hover {
+    transform: perspective(800px) rotateY(-6deg) rotateX(3deg) scale(1.05) translateY(-6px);
+    filter: drop-shadow(0 50px 120px rgba(0,0,0,0.9));
+}
+.book img:hover {
+    transform: scale(1.05) translateY(-6px);
+    filter: drop-shadow(0 40px 100px rgba(0,0,0,0.9));
+}
+.popular-book {
+    position: relative;
+}
+
+.popular-book span {
+    position: absolute;
+    bottom: -25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.popular-book:hover span {
+    opacity: 0.8;
 }
 
 /* =========================
@@ -140,17 +247,35 @@ body::before {
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 100px 60px;
+    gap: 120px 80px;
+    margin-top: 60px;
+}
+
+.book {
+    max-width: 300px;
+}
+
+.book h3 {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.book p {
+    margin-top: 10px;
+    line-height: 1.6;
+    opacity: 0.85;
 }
 
 .book img {
     width: 230px;
-    transition: 0.4s;
+    transition: transform 0.4s ease, filter 0.4s ease;
     cursor: pointer;
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
 }
 
 .book img:hover {
-    transform: scale(1.05) translateY(-6px);
+    transform: perspective(1000px) rotateY(-4deg) rotateX(2deg) scale(1.06) translateY(-8px);
+    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.95));
 }
 
 .book h3 {
@@ -166,7 +291,11 @@ body::before {
     max-width: 700px;
     margin: auto;
 }
-
+.author-text {
+    font-size: 18px;
+    line-height: 1.8;
+    opacity: 0.9;
+}
 /* =========================
    FOOTER
 ========================= */
@@ -182,7 +311,8 @@ body::before {
 .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -198,9 +328,16 @@ body::before {
 
 .modal-content {
     background: #111;
-    padding: 40px;
+    padding: 50px;
     max-width: 500px;
     text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    transform: scale(0.95);
+    transition: 0.3s;
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
 }
 
 .modal img {
@@ -235,21 +372,94 @@ body::before {
 <a href="#">Contact</a>
 </div>
 
-<!-- HERO -->
 <section class="hero">
 <div class="hero-inner">
+
 <h1>Blackwood Publishing</h1>
-<p>Independent publisher of literary and psychological fiction shaped by place, memory, and unease.</p>
+
+<p>
+Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
+</p>
+
+<a href="publications.html" class="button">
+Explore Publications →
+</a>
+
 </div>
 </section>
-
+<div class="divider"></div>
+   
 <!-- FEATURED -->
 <section class="featured reveal">
-<img src="A1.png">
-<h2>Corrour Bothy: The First Summoning</h2>
-<p>A remote Highland bothy draws in those already carrying quiet fractures...</p>
+
+<div class="featured-inner">
+
+    <img src="A1.png">
+
+    <div class="featured-text">
+
+        <h2>Featured Work</h2>
+
+        <h3>Corrour Bothy: The First Summoning</h3>
+
+        <p>
+        A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
+        </p>
+
+        <a href="#" class="button">View Details →</a>
+
+    </div>
+
+</div>
+
+</section>
+<div class="divider"></div>
+   
+<!-- POPULAR READS -->
+<section class="popular reveal">
+
+<div class="container">
+
+<h2>Popular Reads</h2>
+
+<div class="popular-row">
+
+<div class="popular-book">
+   <img src="A3.png" data-id="A3">
+   <span>Camban Bothy</span>
+</div>
+
+<div class="popular-book">
+   <img src="A6.png" data-id="A6">
+   <span>The Erased Archivist</span>
+</div>
+
+<div class="popular-book">
+   <img src="A7.png" data-id="A7">
+   <span>The Drowned Fjord</span>
+</div>
+
+<div class="popular-book">
+   <img src="A5.png" data-id="A5">
+   <span>Holdfast</span>
+</div>
+
+<div class="popular-book">
+   <img src="A11.png" data-id="A11">
+   <span>Redstreets</span>
+</div>
+
+</div>
+<div style="text-align:center; margin-top:40px;">
+    <a href="publications.html" class="button">
+        View All Publications →
+    </a>
+</div>
+</div>
+
 </section>
 
+<div class="divider"></div>
 <!-- PUBLICATIONS -->
 <section class="section reveal">
 <div class="container">
@@ -259,8 +469,15 @@ body::before {
 <div class="grid">
 
 <div class="book">
+
 <img src="A8.png" data-id="A8">
+
 <h3>The Black Bothy</h3>
+
+<p>
+An investigative record of disappearances tied to a place that refuses to remain fixed.
+</p>
+
 </div>
 
 <div class="book">
@@ -272,14 +489,16 @@ body::before {
 
 </div>
 </section>
-
+<div class="divider"></div>
 <!-- AUTHOR -->
 <section class="author reveal">
-<p>
-Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain...
-</p>
-</section>
 
+<p class="author-text">
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+</p>
+
+</section>
+<div class="divider"></div>
 <!-- FOOTER -->
 <footer class="footer">
 <p>Blackwood Publishing</p>
@@ -291,7 +510,7 @@ Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological
 <img id="modalImg">
 <h2 id="modalTitle"></h2>
 <p id="modalDesc"></p>
-<a id="modalLink">View</a>
+<a id="modalLink" class="button" target="_blank">View Book →</a>
 </div>
 </div>
 
@@ -304,14 +523,47 @@ entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
 /* BOOK DATA */
-const data={
-A8:{title:"Black Bothy",desc:"Folk horror",link:"#"},
-A12:{title:"Dour Hill House",desc:"Psychological horror",link:"#"}
+const data = {
+A3:{
+title:"Camban Bothy",
+desc:"The Third Calling (PREORDER)",
+link:"https://mybook.to/Camban"
+},
+A6:{
+title:"The Erased Archivist",
+desc:"They control the past. He's about to rewrite the future.",
+link:"https://mybook.to/ErasedArchivist"
+},
+A7:{
+title:"The Drowned Fjord",
+desc:"Ancient sea folk lore and haunted science.",
+link:"https://mybook.to/DrownedFjord"
+},
+A5:{
+title:"Holdfast",
+desc:"A haunting novel of memory and voices (PREORDER)",
+link:"https://mybook.to/Holdfast"
+},
+A11:{
+title:"Red Streets",
+desc:"A gritty Scottish crime thriller.",
+link:"https://mybook.to/RedStreets"
+},
+A8:{
+title:"The Black Bothy",
+desc:"Folk horror novel.",
+link:"https://mybook.to/BlackBothy"
+},
+A12:{
+title:"Dour Hill House",
+desc:"Psychological gothic horror.",
+link:"https://mybook.to/DourHillHouse"
+}
 };
 
 /* MODAL */
 const modal=document.getElementById("modal");
-document.querySelectorAll(".book img").forEach(img=>{
+document.querySelectorAll(".book img, .popular-book img").forEach(img=>{
 img.onclick=()=>{
 const d=data[img.dataset.id];
 modal.classList.add("active");
@@ -322,6 +574,31 @@ modalLink.href=d.link;
 };
 });
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
+/* 🔥 ADD THIS BELOW */
+const slider = document.querySelector('.popular-row');
+
+if (slider) {
+let isDown = false;
+let startX;
+let scrollLeft;
+
+slider.addEventListener('mousedown', e => {
+    isDown = true;
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+});
+
+slider.addEventListener('mouseleave', () => isDown = false);
+slider.addEventListener('mouseup', () => isDown = false);
+
+slider.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    slider.scrollLeft = scrollLeft - walk;
+});
+}
 
 </script>
 
