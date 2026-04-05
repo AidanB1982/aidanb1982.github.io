@@ -29,16 +29,28 @@ body {
 
     background:
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
-        url('/assets/forest.png') center/cover no-repeat;
-
-    animation:
-        dayNightCycle 40s ease-in-out infinite alternate,
-        treeShift 20s ease-in-out infinite alternate;
+        url('/assets/forest.png') center/cover no-repeat,
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,0.05) 0%,
+            transparent 40%,
+            transparent 60%,
+            rgba(255,255,255,0.04) 100%
+        );
 
     transform:
         translateX(var(--driftX, 0))
         translateY(var(--driftY, 0))
-        scale(1.02);
+        scale(1.05);
+
+    filter: contrast(110%) brightness(0.9);
+
+    animation:
+        dayNightCycle 40s ease-in-out infinite alternate,
+        treeShift 20s ease-in-out infinite alternate;
+   animation:
+    slowZoom 60s ease-in-out infinite alternate,
+    dayNightCycle 40s ease-in-out infinite alternate;
 }
 
 /* VIGNETTE */
@@ -88,9 +100,8 @@ body {
 }
 
 .fog-front {
-    opacity: 0.12;
-    animation: fogFast 60s linear infinite;
-    filter: blur(1px);
+    opacity: 0.18;
+    filter: blur(3px);
 }
 
 /* =========================
@@ -256,4 +267,8 @@ body {
     0% { opacity: 0.6; }
     50% { opacity: 0.3; }
     100% { opacity: 0.6; }
+}
+@keyframes slowZoom {
+    0% { transform: scale(1.05); }
+    100% { transform: scale(1.1); }
 }
