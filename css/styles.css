@@ -4,9 +4,10 @@
 .featured {
     position: relative;
     background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        #0b0b0d 30%
+         to bottom,
+    rgba(11,11,13,0) 0%,
+    rgba(11,11,13,0.6) 40%,
+    #0b0b0d 70%
     );
 
     margin-top: -120px;
