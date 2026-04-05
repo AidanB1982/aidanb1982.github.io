@@ -32,54 +32,62 @@ body {
     letter-spacing: 2px;
 }
 
-/* ================= SECTION ================= */
-.section {
-    padding: 80px 20px;
-}
-
-.container {
-    max-width: 900px;
-    margin: auto;
-}
-
 /* ================= FEATURED ================= */
 .featured {
+    padding: 100px 20px;
     text-align: center;
 }
 
 .featured img {
-    width: 240px;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-    margin-bottom: 20px;
+    width: 340px;
+    filter: drop-shadow(0 50px 120px rgba(0,0,0,0.9));
+    transition: transform 0.4s ease;
+}
+
+.featured img:hover {
+    transform: rotateY(-8deg) rotateX(3deg) scale(1.05);
 }
 
 .featured h2 {
+    margin-top: 25px;
     font-size: 28px;
 }
 
-/* ================= BOOK ROW ================= */
+/* ================= BOOK STRIP ================= */
+.books {
+    padding: 80px 0;
+    overflow-x: auto;
+}
+
 .book-row {
     display: flex;
-    justify-content: center;
     gap: 40px;
-    margin-top: 40px;
+    padding: 0 40px;
 }
 
 .book {
-    text-align: center;
+    flex: 0 0 auto;
+    perspective: 800px;
 }
 
 .book img {
     width: 140px;
-    transition: 0.4s;
+    filter: drop-shadow(0 25px 60px rgba(0,0,0,0.8));
+    transition: transform 0.4s ease;
 }
 
 .book img:hover {
-    transform: translateY(-6px) scale(1.05);
+    transform: rotateY(-10deg) scale(1.08);
+}
+
+/* hide scrollbar (clean look) */
+.books::-webkit-scrollbar {
+    display: none;
 }
 
 /* ================= ABOUT ================= */
 .about {
+    padding: 80px 20px;
     text-align: center;
     max-width: 600px;
     margin: auto;
@@ -101,10 +109,8 @@ body {
 
 /* ================= MOBILE ================= */
 @media (max-width: 700px) {
-    .book-row {
-        flex-direction: column;
-        align-items: center;
-    }
+    .featured img { width: 240px; }
+    .book img { width: 110px; }
 }
 
 </style>
@@ -121,54 +127,41 @@ body {
 </div>
 
 <!-- FEATURED BOOK -->
-<div class="section">
-<div class="container featured">
+<div class="featured">
 
-<img src="book6.jpg">
+<img src="A1.png">
 
-<h2>Holdfast</h2>
-<p>Some memories return. Others refuse to leave.</p>
+<h2>Dour Hill House</h2>
+<p>A place that remembers.</p>
 
 </div>
-</div>
 
-<!-- OTHER BOOKS -->
-<div class="section">
-<div class="container">
-
-<h2 style="text-align:center;">Selected Works</h2>
+<!-- BOOK STRIP -->
+<div class="books">
 
 <div class="book-row">
 
-<div class="book">
-<img src="book1.jpg">
-<p>Dour Hill House</p>
-</div>
-
-<div class="book">
-<img src="book2.jpg">
-<p>Corrour</p>
-</div>
-
-<div class="book">
-<img src="book3.jpg">
-<p>The Black Bothy</p>
-</div>
+<div class="book"><img src="A2.png"></div>
+<div class="book"><img src="A3.png"></div>
+<div class="book"><img src="A4.png"></div>
+<div class="book"><img src="A5.png"></div>
+<div class="book"><img src="A6.png"></div>
+<div class="book"><img src="A7.png"></div>
+<div class="book"><img src="A8.png"></div>
+<div class="book"><img src="A9.png"></div>
+<div class="book"><img src="A10.png"></div>
+<div class="book"><img src="A11.png"></div>
+<div class="book"><img src="A12.png"></div>
 
 </div>
 
-</div>
 </div>
 
 <!-- ABOUT -->
-<div class="section">
-<div class="container about">
-
+<div class="about">
 <p>
 Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
 </p>
-
-</div>
 </div>
 
 <!-- FOOTER -->
