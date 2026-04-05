@@ -34,6 +34,11 @@ body {
     animation:
         dayNightCycle 40s ease-in-out infinite alternate,
         treeShift 20s ease-in-out infinite alternate;
+
+    transform:
+        translateX(var(--driftX, 0))
+        translateY(var(--driftY, 0))
+        scale(1.02);
 }
 
 /* VIGNETTE */
@@ -49,11 +54,7 @@ body {
     mix-blend-mode: multiply;
     animation: colorShift 40s ease-in-out infinite alternate;
 }
-   transform:
-       translateX(var(--driftX, 0))
-       translateY(var(--driftY, 0))
-       scale(1.02);
-/* =========================
+  /* =========================
    FOG
 ========================= */
 .fog-back,
@@ -65,16 +66,32 @@ body {
     background-repeat: repeat-x;
     background-size: cover;
 
-    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+    mask-image: 
+    linear-gradient(to right, transparent, black 20%, black 80%, transparent),
+    linear-gradient(to bottom, transparent, black 30%, black 100%);
 
     pointer-events: none;
     will-change: transform;
     filter: blur(2px);
 }
 
-.fog-back { opacity: 0.04; animation: fogSlow 180s linear infinite; }
-.fog-mid  { opacity: 0.07; animation: fogMid 120s linear infinite; }
-.fog-front{ opacity: 0.12; animation: fogFast 60s linear infinite; }
+.fog-back {
+    opacity: 0.03;
+    animation: fogSlow 180s linear infinite;
+    filter: blur(3px);
+}
+
+.fog-mid {
+    opacity: 0.06;
+    animation: fogMid 120s linear infinite;
+    filter: blur(2px);
+}
+
+.fog-front {
+    opacity: 0.12;
+    animation: fogFast 60s linear infinite;
+    filter: blur(1px);
+}
 
 /* =========================
    SILHOUETTE
