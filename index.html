@@ -5,23 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackwood Publishing</title>
 
-<!-- =========================
-     CSS
-========================= -->
 <style>
 
-/* BASE */
+/* =========================
+   BASE
+========================= */
 body {
     margin: 0;
     font-family: Georgia, serif;
     background: #0f0f11;
     color: #e6e6e6;
+    overflow: hidden;
 }
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 .hero {
     position: relative;
-    height: 65vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -29,63 +31,91 @@ body {
     overflow: hidden;
 }
 
-/* BACKGROUND */
+/* BACKGROUND + ZOOM */
 .hero::before {
     content: "";
     position: absolute;
     inset: 0;
+
     background:
-        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)),
+        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.8)),
         url('forest.png') center/cover no-repeat;
+
+    animation: zoomIn 20s ease-out forwards;
+
     z-index: 0;
 }
 
-/* LIGHT + FOG */
+/* FOG (FIXED SEAM + FADE EDGES) */
 .hero::after {
     content: "";
     position: absolute;
-    inset: 0;
+    inset: -200px;
 
     background:
-        url('fog.png'),
-        radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.12), transparent 40%);
+        radial-gradient(circle at center, rgba(0,0,0,0) 60%, rgba(0,0,0,0.8) 100%),
+        url('fog.png') repeat;
 
-    opacity: 0.2;
+    opacity: 0.18;
 
-    animation: fogMove 120s linear infinite;
+    animation: fogDrift 90s linear infinite;
+
+    mask-image: radial-gradient(circle, black 60%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle, black 60%, transparent 100%);
 
     mix-blend-mode: screen;
     pointer-events: none;
     z-index: 1;
 }
 
-/* EXTRA FOG */
-.fog-layer {
+/* LIGHT RAYS */
+.light-rays {
     position: absolute;
     inset: 0;
-    background: url('fog.png');
-    opacity: 0.05;
-    animation: fogFast 60s linear infinite;
+
+    background:
+        radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.15), transparent 50%),
+        linear-gradient(120deg, rgba(255,255,255,0.05) 0%, transparent 40%);
+
+    mix-blend-mode: screen;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* GRAIN OVERLAY */
+.grain {
+    position: absolute;
+    inset: 0;
+    background: url('https://grainy-gradients.vercel.app/noise.svg');
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 3;
 }
 
 /* CONTENT */
 .hero-inner {
     position: relative;
-    z-index: 2;
+    z-index: 4;
     max-width: 600px;
-    transition: transform 0.2s ease-out;
+
+    animation: fadeInUp 2s ease forwards;
 }
 
 /* LOGO */
 .hero-logo {
     width: 320px;
     max-width: 80%;
-    margin-bottom: 10px;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
 }
 
-/* NAV INLINE */
+/* NAV */
 .nav-inline {
-    margin: 15px 0;
+    margin: 20px 0;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+    animation-delay: 1s;
 }
 
 .nav-inline a {
@@ -103,8 +133,9 @@ body {
 
 /* TEXT */
 .hero p {
-    opacity: 0.85;
-    line-height: 1.7;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+    animation-delay: 1.5s;
 }
 
 /* BUTTON */
@@ -113,21 +144,40 @@ body {
     margin-top: 20px;
     font-size: 12px;
     letter-spacing: 2px;
-    text-transform: uppercase;
     border-bottom: 1px solid rgba(255,255,255,0.4);
     padding-bottom: 4px;
-    opacity: 0.85;
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+    animation-delay: 2s;
 }
 
-/* ANIMATIONS */
-@keyframes fogMove {
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fogDrift {
     from { transform: translateX(0); }
-    to { transform: translateX(-600px); }
+    to { transform: translateX(-1000px); }
 }
 
-@keyframes fogFast {
-    from { transform: translateX(0); }
-    to { transform: translateX(-800px); }
+@keyframes zoomIn {
+    from { transform: scale(1.1); }
+    to { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 </style>
@@ -135,12 +185,10 @@ body {
 
 <body>
 
-<!-- =========================
-     HEADER HTML
-========================= -->
 <section class="hero">
 
-    <div class="fog-layer"></div>
+    <div class="light-rays"></div>
+    <div class="grain"></div>
 
     <div class="hero-inner">
 
@@ -164,17 +212,14 @@ body {
 
 </section>
 
-<!-- =========================
-     JAVASCRIPT
-========================= -->
 <script>
 
+/* LIGHT FOLLOW */
 const hero = document.querySelector('.hero');
 
 let targetX = 50, targetY = 50;
 let currentX = 50, currentY = 50;
 
-/* LIGHT FOLLOW */
 hero.addEventListener('mousemove', e => {
     const rect = hero.getBoundingClientRect();
 
@@ -182,36 +227,16 @@ hero.addEventListener('mousemove', e => {
     targetY = ((e.clientY - rect.top) / rect.height) * 100;
 });
 
-/* SMOOTH LIGHT */
-function animateHero() {
+function animateLight() {
     currentX += (targetX - currentX) * 0.05;
     currentY += (targetY - currentY) * 0.05;
 
     hero.style.setProperty('--mx', currentX + '%');
     hero.style.setProperty('--my', currentY + '%');
 
-    requestAnimationFrame(animateHero);
+    requestAnimationFrame(animateLight);
 }
-animateHero();
-
-/* PARALLAX */
-const inner = document.querySelector('.hero-inner');
-
-hero.addEventListener('mousemove', e => {
-    const rect = hero.getBoundingClientRect();
-
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-    inner.style.transform = `
-        translate(${x * 10}px, ${y * 10}px)
-        scale(1.02)
-    `;
-});
-
-hero.addEventListener('mouseleave', () => {
-    inner.style.transform = `translate(0,0) scale(1)`;
-});
+animateLight();
 
 </script>
 
