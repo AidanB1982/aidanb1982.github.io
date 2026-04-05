@@ -36,14 +36,18 @@ img {
 .featured-inner {
     max-width: 1100px;
     margin: 0 auto;
-
-    transform: translateY(-40px);
+    transform: translateY(-60px);
 
     display: grid;
     grid-template-columns: 320px 1fr;
-    gap: 50px;
-
+    gap: 60px;
     align-items: center;
+}
+
+/* stack text properly */
+.featured-content {
+    display: flex;
+    flex-direction: column;
 }
 
 /* =========================
