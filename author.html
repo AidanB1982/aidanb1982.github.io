@@ -9,17 +9,30 @@
 
 <style>
 
+/* BASE */
 body {
     margin: 0;
     font-family: Georgia, serif;
-    background-image: url('stone.png');
-    background-size: cover;
-    background-attachment: fixed;
+    background: #0e0e10;
     color: #1C1C1C;
-    -webkit-font-smoothing: antialiased;
 }
 
-/* HEADER (MATCHED TO SITE) */
+/* GLOBAL TEXTURE */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.25;
+    z-index: -1;
+}
+
+/* LINKS */
+a { text-decoration: none; color: inherit; }
+
+/* =========================
+   HEADER (SYSTEM)
+========================= */
 .header {
     position: relative;
     height: 35vh;
@@ -29,11 +42,62 @@ body {
     text-align: center;
 }
 
+/* NAV */
+.nav {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+
+    background: linear-gradient(
+        rgba(10,10,12,0.9),
+        rgba(10,10,12,0.5),
+        transparent
+    );
+}
+
+.nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav a {
+    margin-left: 24px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #F1F1F1;
+    opacity: 0.75;
+    position: relative;
+}
+
+.nav a:hover { opacity: 1; }
+
+.nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #aaa;
+    transition: 0.3s;
+}
+
+.nav a:hover::after {
+    width: 100%;
+}
+
+/* HEADER BG */
 .header-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
-    url('forest.png');
+    background:
+        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
+        url('forest.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -41,7 +105,8 @@ body {
 
 .header-inner {
     position: relative;
-    z-index: 1;
+    z-index: 5;
+    margin-top: 40px;
 }
 
 .header-logo {
@@ -51,32 +116,47 @@ body {
 
 .header h1 {
     color: #F1F1F1;
-    font-weight: 500;
     letter-spacing: 2px;
 }
 
-/* NAV (CONSISTENT STYLE) */
-.nav a {
-    margin: 0 16px;
-    text-decoration: none;
-    color: #F1F1F1;
-    font-size: 13px;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    opacity: 0.9;
-}
-
-.nav a:hover {
-    opacity: 1;
-}
-
-/* SECTION */
+/* =========================
+   SECTION (TEXTURED)
+========================= */
 .section {
+    position: relative;
     padding: 70px 20px;
-    background-color: rgba(232, 228, 220, 0.6);
+    background: #E8E6E1;
     margin: -40px auto 0;
     width: 90%;
     max-width: 1000px;
+    overflow: hidden;
+}
+
+/* TEXTURE */
+.section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('stone.png');
+    background-size: cover;
+    opacity: 0.18;
+}
+
+/* DEPTH */
+.section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at center,
+        transparent 40%,
+        rgba(0,0,0,0.12) 100%
+    );
+}
+
+.section > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* AUTHOR LAYOUT */
@@ -93,8 +173,8 @@ body {
     height: 320px;
     object-fit: cover;
     box-shadow:
-        0 18px 40px rgba(0,0,0,0.35),
-        0 4px 10px rgba(0,0,0,0.2);
+        0 20px 50px rgba(0,0,0,0.35),
+        0 6px 16px rgba(0,0,0,0.2);
 }
 
 /* TEXT */
@@ -147,45 +227,28 @@ body {
     text-align: center;
 }
 
-.connect h3 {
-    font-weight: normal;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-}
-
-.connect p {
-    font-size: 14px;
-    opacity: 0.85;
-}
-
 .connect-links a {
-    color: #1C1C1C;
-    text-decoration: none;
     margin: 0 6px;
 }
 
-.connect-links a:hover {
-    opacity: 0.6;
-}
-
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 .footer {
     position: relative;
-    width: 100%;
-    padding: 90px 20px 70px;
+    padding: 90px 20px;
     margin-top: 80px;
     color: #F1F1F1;
-    overflow: hidden;
 }
 
 .footer::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
-    url('forest.png');
+    background:
+        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
+        url('forest.png');
     background-size: cover;
-    background-position: center;
 }
 
 .footer-content {
@@ -193,35 +256,15 @@ body {
     z-index: 1;
     max-width: 1100px;
     margin: 0 auto;
+
     display: flex;
     justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
-}
-
-.footer-left p {
-    margin: 4px 0;
-    font-size: 14px;
-    opacity: 0.85;
 }
 
 .footer-center img {
     width: 70px;
     filter: invert(1);
-    opacity: 0.9;
-}
-
-.footer-right a {
-    margin-left: 18px;
-    text-decoration: none;
-    color: #F1F1F1;
-    font-size: 13px;
-    letter-spacing: 1px;
-    opacity: 0.85;
-}
-
-.footer-right a:hover {
-    opacity: 1;
 }
 
 /* MOBILE */
@@ -248,21 +291,24 @@ body {
 
 <!-- HEADER -->
 <div class="header">
-    <div class="header-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
-
-        <div class="nav">
+    <div class="nav">
+        <div class="nav-inner">
             <a href="index.html">Home</a>
             <a href="publications.html">Publications</a>
             <a href="about.html">About</a>
             <a href="author.html">Author</a>
             <a href="contact.html">Contact</a>
         </div>
+    </div>
 
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+        <img src="logo (1).png" class="header-logo">
         <h1>Aidan Blackwood</h1>
     </div>
+
 </div>
 
 <!-- CONTENT -->
@@ -273,7 +319,6 @@ body {
     <img src="profile.jpg" class="author-image">
 
     <div class="author-text">
-
         <p>
             The work published under Aidan Blackwood is concerned with place, memory, and the slow accumulation of unease. 
             Landscapes are not passive settings but active presences, shaping the lives that move through them.
@@ -289,7 +334,6 @@ body {
             Influenced by the geography and atmosphere of the Scottish Highlands, the work explores isolation, 
             recurrence, and the uneasy relationship between people and the places they inhabit.
         </p>
-
     </div>
 
 </div>
@@ -297,14 +341,13 @@ body {
 <div class="divider"></div>
 
 <p class="closing">
-    These stories are not designed to resolve cleanly. They remain, in some form, after they end.
+These stories are not designed to resolve cleanly. They remain, in some form, after they end.
 </p>
 
 <div class="divider"></div>
 
 <div class="works">
     <h2>Selected Works</h2>
-
     <div class="work-item">Dour Hill House <span>(2025)</span></div>
     <div class="work-item">Corrour <span>(2026)</span></div>
     <div class="work-item">The Black Bothy <span>(2021)</span></div>
@@ -315,11 +358,7 @@ body {
 
 <div class="connect">
     <h3>Connect with Aidan</h3>
-
-    <p>
-        Further work, fragments, and updates can be found here:
-    </p>
-
+    <p>Further work, fragments, and updates can be found here:</p>
     <p class="connect-links">
         <a href="https://www.instagram.com/aidan.blackwood" target="_blank">Instagram</a> /
         <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">TikTok</a>
@@ -332,7 +371,7 @@ body {
 <div class="footer">
     <div class="footer-content">
 
-        <div class="footer-left">
+        <div>
             <p>Blackwood Publishing</p>
             <p>Independent Literary Imprint</p>
         </div>
@@ -341,7 +380,7 @@ body {
             <img src="seal.png">
         </div>
 
-        <div class="footer-right">
+        <div>
             <a href="publications.html">Publications</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
