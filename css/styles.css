@@ -93,11 +93,17 @@
 ========================= */
 .fade-in {
     opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 1.4s ease, transform 1.4s ease;
+    transform: translateY(60px) scale(0.98);
+    filter: blur(6px);
+
+    transition:
+        opacity 1.4s ease,
+        transform 1.4s ease,
+        filter 1.4s ease;
 }
 
 .fade-in.visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
 }
