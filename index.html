@@ -11,7 +11,35 @@
 </head>
 
 <body>
+<script>
+fetch('header.html')
+    .then(res => {
+        if (!res.ok) {
+            throw new Error("Header failed to load");
+        }
+        return res.text();
+    })
+    .then(data => {
+        const container = document.getElementById('header-placeholder');
+        container.innerHTML = data;
 
+        container.classList.add('loaded');
+
+        const script = document.createElement('script');
+        script.src = 'js/header.js';
+
+        script.onload = () => {
+            if (window.initHeader) {
+                window.initHeader();
+            }
+        };
+
+        document.body.appendChild(script);
+    })
+    .catch(err => {
+        console.error("Header load error:", err);
+    });
+</script>
 <div id="header-placeholder"></div>
 
 <!-- FEATURED SECTION -->
