@@ -13,9 +13,10 @@ body {
     font-family: Georgia, serif;
     background: #0e0e10;
     color: #e6e6e6;
+    overflow-x: hidden;
 }
 
-/* GLOBAL TEXTURE */
+/* TEXTURE */
 body::before {
     content: "";
     position: fixed;
@@ -24,9 +25,6 @@ body::before {
     opacity: 0.12;
     z-index: -1;
 }
-
-/* LINKS */
-a { text-decoration: none; color: inherit; }
 
 /* ================= HEADER ================= */
 .header {
@@ -38,13 +36,11 @@ a { text-decoration: none; color: inherit; }
     text-align: center;
 }
 
-/* NAV */
 .nav {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 10;
-    background: linear-gradient(rgba(10,10,12,0.9), rgba(10,10,12,0.4), transparent);
+    background: linear-gradient(rgba(10,10,12,0.9), transparent);
 }
 
 .nav-inner {
@@ -63,19 +59,14 @@ a { text-decoration: none; color: inherit; }
     opacity: 0.75;
 }
 
-.nav a:hover { opacity: 1; }
-
-/* FOREST BACKGROUND */
+/* FOREST */
 .header::before {
     content: "";
     position: absolute;
     inset: 0;
     background:
         linear-gradient(rgba(22,22,25,0.75), rgba(22,22,25,0.9)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+        url('forest.png') center/cover;
 }
 
 /* FOG */
@@ -100,7 +91,6 @@ a { text-decoration: none; color: inherit; }
 
 .header-logo {
     width: 150px;
-    margin-bottom: 10px;
 }
 
 /* ================= FEATURED ================= */
@@ -122,18 +112,15 @@ a { text-decoration: none; color: inherit; }
 /* ================= BOOK STRIP ================= */
 .books {
     padding: 60px 0 100px;
-    overflow-x: auto;
+    overflow: hidden;
+    cursor: grab;
 }
 
 .book-row {
     display: flex;
     gap: 40px;
     padding: 0 40px;
-}
-
-.book {
-    flex: 0 0 auto;
-    perspective: 800px;
+    transition: transform 0.3s ease;
 }
 
 .book img {
@@ -146,75 +133,39 @@ a { text-decoration: none; color: inherit; }
     transform: rotateY(-10deg) scale(1.08);
 }
 
-/* hide scrollbar */
-.books::-webkit-scrollbar { display: none; }
+/* CTA */
+.view-all {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    opacity: 0.7;
+}
 
-/* ================= SECTION TEXTURE ================= */
+/* ================= SECTION ================= */
 .section {
-    position: relative;
     padding: 80px 20px;
     background: #E8E6E1;
     color: #1c1c1c;
-}
-
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.15;
-}
-
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.08));
+    text-align: center;
 }
 
 /* ================= FOOTER ================= */
 .footer {
-    position: relative;
     padding: 80px 20px;
-    color: #eee;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1000px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
+    background: #000;
+    text-align: center;
 }
 
 .socials img {
     width: 18px;
-    margin-right: 10px;
-    opacity: 0.7;
+    margin: 10px;
 }
 
 /* ================= MOBILE ================= */
 @media (max-width: 800px) {
-    .book img { width: 110px; }
     .featured img { width: 240px; }
-    .footer-content { flex-direction: column; gap: 20px; text-align: center; }
+    .book img { width: 110px; }
 }
 
 </style>
@@ -227,11 +178,9 @@ a { text-decoration: none; color: inherit; }
 
 <div class="nav">
 <div class="nav-inner">
-<a href="index.html">Home</a>
-<a href="publications.html">Publications</a>
-<a href="about.html">About</a>
-<a href="author.html">Author</a>
-<a href="contact.html">Contact</a>
+<a href="#">Home</a>
+<a href="#">Publications</a>
+<a href="#">About</a>
 </div>
 </div>
 
@@ -249,63 +198,74 @@ a { text-decoration: none; color: inherit; }
 <p>A place that remembers.</p>
 </div>
 
-<!-- BOOK STRIP -->
-<div class="books">
-<div class="book-row">
+<!-- BOOK STRIP (CURATED) -->
+<div class="books" id="books">
+<div class="book-row" id="row">
 
-<img src="A2.png">
-<img src="A3.png">
-<img src="A4.png">
-<img src="A5.png">
-<img src="A6.png">
-<img src="A7.png">
-<img src="A8.png">
-<img src="A9.png">
-<img src="A10.png">
-<img src="A11.png">
-<img src="A12.png">
+<div class="book"><img src="A2.png"></div>
+<div class="book"><img src="A3.png"></div>
+<div class="book"><img src="A4.png"></div>
+<div class="book"><img src="A5.png"></div>
+<div class="book"><img src="A6.png"></div>
 
 </div>
+</div>
+
+<div class="view-all">
+<a href="publications.html">View All Publications →</a>
 </div>
 
 <!-- ABOUT -->
 <div class="section">
-<div style="max-width:600px;margin:auto;text-align:center;position:relative;z-index:1;">
 <p>
 Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
 </p>
 </div>
-</div>
 
 <!-- FOOTER -->
 <div class="footer">
-<div class="footer-content">
 
-<div>
 <p>Blackwood Publishing</p>
-<p>Independent Literary Imprint</p>
+
 <div class="socials">
-<a href="https://www.instagram.com/aidan.blackwood" target="_blank">
-<img src="instagram.png">
-</a>
-<a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
-<img src="tiktok.png">
-</a>
-</div>
-</div>
-
-<div class="footer-center">
-<img src="seal.png">
-</div>
-
-<div>
-<a href="publications.html">Publications</a><br>
-<a href="about.html">About</a><br>
-<a href="contact.html">Contact</a>
+<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
+<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
 </div>
 
 </div>
-</div>
+
+<script>
+
+/* DRAG SCROLL */
+const slider = document.getElementById('books');
+const row = document.getElementById('row');
+
+let isDown = false;
+let startX;
+let scrollLeft = 0;
+
+slider.addEventListener('mousedown', e => {
+    isDown = true;
+    startX = e.pageX;
+});
+
+slider.addEventListener('mouseleave', () => isDown = false);
+slider.addEventListener('mouseup', () => isDown = false);
+
+slider.addEventListener('mousemove', e => {
+    if(!isDown) return;
+    const walk = (e.pageX - startX);
+    scrollLeft += walk * 0.5;
+    row.style.transform = `translateX(${scrollLeft}px)`;
+});
+
+/* AUTO DRIFT */
+setInterval(() => {
+    scrollLeft -= 0.2;
+    row.style.transform = `translateX(${scrollLeft}px)`;
+}, 16);
+
+</script>
 
 </body>
 </html>
