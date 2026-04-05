@@ -6,7 +6,7 @@
 <title>Blackwood Publishing</title>
 
 <style>
-
+ 
 /* =========================
    BASE
 ========================= */
@@ -19,15 +19,6 @@ body { scroll-behavior: smooth;
 }
 
 /* TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.1;
-    z-index: -2;
-}
-
 /* =========================
    NAV
 ========================= */
@@ -224,6 +215,16 @@ a:active {
 ========================= */
 .popular {
     padding: 120px 20px;
+    position: relative;
+}
+
+.popular::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.15;
+    z-index: -1;
 }
 
 .popular h2 {
@@ -235,6 +236,7 @@ a:active {
     gap: 40px;
     padding-bottom: 10px;
     cursor: grab;
+    justify-content: center;
 }
 .popular-row:active {
     cursor: grabbing;
@@ -274,57 +276,6 @@ a:active {
 
 .popular-book:hover span {
     opacity: 0.8;
-}
-
-/* =========================
-   PUBLICATIONS
-========================= */
-.section {
-    padding: 120px 20px;
-    background: #e8e6e1;
-    color: #1c1c1c;
-}
-
-.container {
-    max-width: 1000px;
-    margin: auto;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 120px 80px;
-    margin-top: 60px;
-}
-
-.book {
-    max-width: 300px;
-}
-
-.book h3 {
-    margin-top: 20px;
-    font-size: 18px;
-}
-
-.book p {
-    margin-top: 10px;
-    line-height: 1.6;
-    opacity: 0.85;
-}
-
-.book img {
-    width: 230px;
-    transition: transform 0.4s ease, filter 0.4s ease;
-    cursor: pointer;
-   }
-
-.book img:hover {
-    transform: perspective(1000px) rotateY(-4deg) rotateX(2deg) scale(1.06) translateY(-8px);
-    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.95));
-}
-
-.book h3 {
-    margin-top: 20px;
 }
 
 /* =========================
@@ -523,36 +474,6 @@ Explore Publications
 </section>
 
 <div class="divider"></div>
-<!-- PUBLICATIONS -->
-<section class="section reveal">
-<div class="container">
-
-<h2>Publications</h2>
-
-<div class="grid">
-
-<div class="book">
-
-<img src="A8.png" data-id="A8">
-
-<h3>The Black Bothy</h3>
-
-<p>
-An investigative record of disappearances tied to a place that refuses to remain fixed.
-</p>
-
-</div>
-
-<div class="book">
-<img src="A12.png" data-id="A12">
-<h3>Dour Hill House</h3>
-</div>
-
-</div>
-
-</div>
-</section>
-<div class="divider"></div>
 <!-- AUTHOR -->
 <section class="author reveal">
 
@@ -601,7 +522,7 @@ const bookObserver = new IntersectionObserver(entries => {
     });
 }, { threshold: 0.2 });
 
-document.querySelectorAll('.section, .popular').forEach(section => {
+document.querySelectorAll('.popular').forEach(section => {
     bookObserver.observe(section);
 });
 
@@ -657,14 +578,37 @@ modalLink.href=d.link;
 };
 });
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
+/* 🔥 MOUSE TILT */
+document.querySelectorAll('.popular-book img, .book img').forEach(el => {
 
+    el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const rotateY = ((x / rect.width) - 0.5) * 10;
+        const rotateX = ((y / rect.height) - 0.5) * -10;
+
+        el.style.transform = `
+            perspective(800px)
+            rotateY(${rotateY}deg)
+            rotateX(${rotateX}deg)
+            scale(1.05)
+        `;
+    });
+
+    el.addEventListener('mouseleave', () => {
+        el.style.transform = '';
+    });
+
+});
 /* 🔥 PARALLAX DRIFT */
 window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
 
     document.querySelectorAll('.popular-book img, .book img').forEach((el, i) => {
         const speed = (i % 2 === 0) ? 0.03 : 0.06;
-        el.style.transform = `translateY(${scrollY * speed}px);
+        el.style.transform = `translateY(${scrollY * speed}px)`;
     });
 });
 
