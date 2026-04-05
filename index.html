@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blackwood Publishing</title>
 
 <style>
 
@@ -13,7 +12,6 @@
 body {
     margin: 0;
     background: #0f0f11;
-    overflow: hidden;
     font-family: Georgia, serif;
     color: #e6e6e6;
 }
@@ -25,86 +23,74 @@ body {
     position: relative;
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
-/* =========================
-   BACKGROUND (PARALLAX LAYERS)
-========================= */
-
-/* FAR TREES */
+/* BACKGROUND */
 .hero::before {
     content: "";
     position: absolute;
     inset: 0;
-
     background:
-        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.85)),
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
         url('forest.png') center/cover no-repeat;
-
-    transform: scale(1.1);
-    animation: slowZoom 30s ease-out forwards;
-
+    filter: grayscale(30%) contrast(110%) brightness(0.85);
     z-index: 0;
 }
 
-/* MID DEPTH FOG */
-.fog-mid {
+/* VIGNETTE */
+.hero::after {
+    content: "";
     position: absolute;
-    inset: -200px;
-    background: url('fog.png') repeat;
-    opacity: 0.12;
-
-    animation: fogMid 120s linear infinite;
-    filter: blur(2px);
-
-    mask-image: radial-gradient(circle, black 60%, transparent 100%);
-    z-index: 1;
+    inset: 0;
+    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.7));
+    z-index: 6;
+    pointer-events: none;
 }
 
-/* FRONT FOG */
+/* =========================
+   FOG (MULTI DEPTH)
+========================= */
+.fog-back,
+.fog-mid,
 .fog-front {
     position: absolute;
-    inset: -200px;
-    background: url('fog.png') repeat;
-    opacity: 0.18;
+    inset: 0;
+    background: url('fog.png');
+    background-repeat: repeat-x;
+    background-size: cover;
 
-    animation: fogFront 70s linear infinite;
-    filter: blur(4px);
-
-    mask-image: radial-gradient(circle, black 60%, transparent 100%);
-    z-index: 2;
+    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+    pointer-events: none;
 }
 
-/* LIGHT RAYS */
-.light-rays {
+/* DEPTH */
+.fog-back { opacity: 0.05; animation: fogSlow 180s linear infinite; }
+.fog-mid  { opacity: 0.08; animation: fogMid 120s linear infinite; }
+.fog-front{ opacity: 0.12; animation: fogFast 60s linear infinite; }
+
+/* =========================
+   MOVING SHADOW (👁 PRESENCE)
+========================= */
+.shadow-entity {
     position: absolute;
-    inset: 0;
-
-    background:
-        radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.15), transparent 50%),
-        linear-gradient(120deg, rgba(255,255,255,0.05) 0%, transparent 40%);
-
-    mix-blend-mode: screen;
-    opacity: 0.25;
-    z-index: 3;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0,0,0,0.6), transparent 70%);
+    filter: blur(40px);
+    opacity: 0.4;
+    animation: entityMove 18s ease-in-out infinite;
+    pointer-events: none;
 }
 
-/* DAY/NIGHT COLOR SHIFT */
-.color-shift {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(255,180,120,0.05), rgba(0,0,50,0.4));
-    animation: dayNight 40s ease-in-out infinite;
-    z-index: 3;
-}
-
-/* GRAIN */
-.grain {
-    position: absolute;
-    inset: 0;
-    background: url('https://grainy-gradients.vercel.app/noise.svg');
-    opacity: 0.08;
-    z-index: 4;
+/* =========================
+   TREE SHIFT (🌲 FAKE LIFE)
+========================= */
+.hero::before {
+    animation: treeShift 20s ease-in-out infinite alternate;
 }
 
 /* =========================
@@ -112,84 +98,101 @@ body {
 ========================= */
 .hero-inner {
     position: relative;
-    z-index: 5;
-    text-align: center;
-    top: 50%;
-    transform: translateY(-50%);
+    z-index: 10;
+    max-width: 600px;
+    animation: fadeIn 2s ease forwards;
 }
 
-/* LOGO */
 .hero-logo {
     width: 320px;
-    opacity: 0;
-    animation: fadeIn 2s forwards;
+    max-width: 80%;
+    margin-bottom: 20px;
+    animation: logoFlicker 6s infinite;
 }
 
-/* NAV */
+.hero p {
+    opacity: 0.85;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 8px rgba(255,255,255,0.08);
+}
+
+/* NAV INLINE */
 .nav-inline {
     margin: 20px 0;
-    opacity: 0;
-    animation: fadeIn 2s forwards;
-    animation-delay: 1s;
 }
 
 .nav-inline a {
-    margin: 0 12px;
-    font-size: 11px;
+    margin: 0 15px;
+    font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
+    color: #e6e6e6;
+    text-decoration: none;
     opacity: 0.7;
+    transition: 0.3s;
 }
 
 .nav-inline a:hover {
     opacity: 1;
-}
-
-/* TEXT */
-.hero p {
-    opacity: 0;
-    animation: fadeIn 2s forwards;
-    animation-delay: 1.5s;
+    text-shadow: 0 0 6px rgba(255,255,255,0.4);
 }
 
 /* BUTTON */
 .button {
     display: inline-block;
-    margin-top: 20px;
+    margin-top: 25px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     border-bottom: 1px solid rgba(255,255,255,0.4);
     padding-bottom: 4px;
-    opacity: 0;
-    animation: fadeIn 2s forwards;
-    animation-delay: 2s;
+    color: #e6e6e6;
+    text-decoration: none;
 }
 
 /* =========================
    ANIMATIONS
 ========================= */
 
+@keyframes fogSlow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-600px); }
+}
+
 @keyframes fogMid {
     from { transform: translateX(0); }
     to { transform: translateX(-800px); }
 }
 
-@keyframes fogFront {
+@keyframes fogFast {
     from { transform: translateX(0); }
     to { transform: translateX(-1200px); }
 }
 
-@keyframes slowZoom {
-    from { transform: scale(1.15); }
-    to { transform: scale(1); }
+/* ENTITY MOVEMENT */
+@keyframes entityMove {
+    0%   { transform: translate(10%, 40%); opacity: 0.2; }
+    50%  { transform: translate(70%, 50%); opacity: 0.5; }
+    100% { transform: translate(20%, 60%); opacity: 0.2; }
 }
 
+/* TREE SHIFT */
+@keyframes treeShift {
+    0%   { transform: scale(1) translateX(0); }
+    100% { transform: scale(1.02) translateX(-10px); }
+}
+
+/* LOGO FLICKER */
+@keyframes logoFlicker {
+    0%,100%{opacity:1;}
+    50%{opacity:0.85;}
+}
+
+/* FADE */
 @keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-@keyframes dayNight {
-    0%   { opacity: 0.3; }
-    50%  { opacity: 0.6; }
-    100% { opacity: 0.3; }
+    from { opacity: 0; transform: translateY(20px);}
+    to { opacity: 1; transform: translateY(0);}
 }
 
 </style>
@@ -199,16 +202,18 @@ body {
 
 <section class="hero">
 
+    <!-- FOG DEPTH -->
+    <div class="fog-back"></div>
     <div class="fog-mid"></div>
     <div class="fog-front"></div>
 
-    <div class="light-rays"></div>
-    <div class="color-shift"></div>
-    <div class="grain"></div>
+    <!-- ENTITY -->
+    <div class="shadow-entity"></div>
 
+    <!-- CONTENT -->
     <div class="hero-inner">
 
-        <img src="logo (1).png" class="hero-logo">
+        <img src="logo.png" class="hero-logo">
 
         <div class="nav-inline">
             <a href="#">Home</a>
@@ -219,7 +224,8 @@ body {
         </div>
 
         <p>
-        Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
+        Independent publisher of literary and psychological fiction shaped by place,
+        memory, and unease.
         </p>
 
         <a href="#" class="button">Explore Publications</a>
@@ -230,42 +236,27 @@ body {
 
 <script>
 
-/* =========================
-   LIGHT FOLLOW + CAMERA DRIFT
-========================= */
-
+/* PARALLAX + LIGHT */
 const hero = document.querySelector('.hero');
 
 let targetX = 50, targetY = 50;
 let currentX = 50, currentY = 50;
 
-/* mouse influence */
 hero.addEventListener('mousemove', e => {
     const rect = hero.getBoundingClientRect();
-
     targetX = ((e.clientX - rect.left) / rect.width) * 100;
     targetY = ((e.clientY - rect.top) / rect.height) * 100;
 });
 
-/* idle cinematic drift */
-let t = 0;
-
 function animate() {
-
-    t += 0.002;
-
-    const driftX = Math.sin(t) * 5;
-    const driftY = Math.cos(t) * 5;
-
-    currentX += ((targetX + driftX) - currentX) * 0.05;
-    currentY += ((targetY + driftY) - currentY) * 0.05;
+    currentX += (targetX - currentX) * 0.05;
+    currentY += (targetY - currentY) * 0.05;
 
     hero.style.setProperty('--mx', currentX + '%');
     hero.style.setProperty('--my', currentY + '%');
 
     requestAnimationFrame(animate);
 }
-
 animate();
 
 </script>
