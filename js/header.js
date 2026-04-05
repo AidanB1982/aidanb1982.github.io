@@ -5,7 +5,7 @@
 function initHeader() {
 
     const hero = document.querySelector('.hero');
-    if (!hero) return; // safety (important for multi-page use)
+    if (!hero) return; // safety for other pages
 
     let targetX = 50, targetY = 50;
     let currentX = 50, currentY = 50;
@@ -21,7 +21,7 @@ function initHeader() {
     });
 
     // =========================
-    // SMOOTH INTERPOLATION (CINEMATIC)
+    // SMOOTH LIGHT
     // =========================
     function animateLight() {
         currentX += (targetX - currentX) * 0.05;
@@ -36,7 +36,7 @@ function initHeader() {
     animateLight();
 
     // =========================
-    // SUBTLE CAMERA DRIFT (AUTO)
+    // CAMERA DRIFT (AUTO)
     // =========================
     let driftTime = 0;
 
@@ -55,7 +55,7 @@ function initHeader() {
     cameraDrift();
 
     // =========================
-    // PARALLAX CONTENT (LOGO + TEXT)
+    // PARALLAX CONTENT
     // =========================
     const inner = hero.querySelector('.hero-inner');
 
@@ -77,10 +77,9 @@ function initHeader() {
             inner.style.transform = `translate(0,0) scale(1)`;
         });
     }
-
 }
 
 // =========================
-// INIT (IMPORTANT FOR FETCH LOAD)
+// EXPORT FOR MANUAL CALL
 // =========================
-document.addEventListener('DOMContentLoaded', initHeader);
+window.initHeader = initHeader;
