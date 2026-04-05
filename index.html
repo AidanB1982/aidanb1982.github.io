@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackwood Publishing</title>
 
-<!-- MAIN CSS -->
+<!-- HEADER CSS -->
 <link rel="stylesheet" href="css/header.css">
 
 <style>
@@ -14,6 +14,15 @@ body {
     background: #0f0f11;
     font-family: Georgia, serif;
     color: #e6e6e6;
+}
+
+/* Smooth fade-in */
+#header-placeholder {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+#header-placeholder.loaded {
+    opacity: 1;
 }
 </style>
 
@@ -32,15 +41,26 @@ fetch('header.html')
         return res.text();
     })
     .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
+        const container = document.getElementById('header-placeholder');
+        container.innerHTML = data;
 
-        // Load header JS AFTER HTML is injected
+        // Fade in header
+        container.classList.add('loaded');
+
+        // Load JS AFTER HTML is injected
         const script = document.createElement('script');
-        script.src = 'js/header.js';   // ✅ FIXED PATH
+        script.src = 'js/header.js';
+
+        script.onload = () => {
+            if (window.initHeader) {
+                window.initHeader();
+            }
+        };
+
         document.body.appendChild(script);
     })
     .catch(err => {
-        console.error(err);
+        console.error("Header load error:", err);
     });
 </script>
 
