@@ -11,68 +11,63 @@
 body {
     margin: 0;
     font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #e6e6e6;
-    overflow-x: hidden;
+    background: #f4f3ef; /* off-white */
+    color: #1a1a1a;
+    line-height: 1.6;
 }
 
-/* TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.35;
-    z-index: -1;
+/* GLOBAL TYPOGRAPHY */
+h1 {
+    font-size: 42px;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+p {
+    font-size: 15px;
+    max-width: 600px;
 }
 
 /* LINKS */
-a, a:visited, a:active {
-    color: inherit;
+a {
     text-decoration: none;
-}
-
-/* HEADER */
-.header {
-    position: relative;
-    height: 40vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    color: inherit;
 }
 
 /* NAV */
 .nav {
-    position: absolute;
-    top: 0;
     width: 100%;
-    z-index: 10;
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
+    padding: 20px;
 }
 
 .nav-inner {
     max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
+    margin: auto;
     display: flex;
     justify-content: flex-end;
 }
 
 .nav a {
-    margin-left: 26px;
+    margin-left: 25px;
     font-size: 12px;
     letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.75;
+    opacity: 0.7;
     position: relative;
 }
 
-.nav a:hover { opacity: 1; }
+.nav a:hover {
+    opacity: 1;
+}
 
 .nav a::after {
     content: "";
@@ -81,7 +76,7 @@ a, a:visited, a:active {
     left: 0;
     width: 0;
     height: 1px;
-    background: #aaa;
+    background: #000;
     transition: 0.3s;
 }
 
@@ -89,211 +84,128 @@ a, a:visited, a:active {
     width: 100%;
 }
 
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 140px 20px 120px;
 }
 
-/* FOG */
-.header-fog {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-
-    background: url('fog.png') repeat-x;
-    background-size: 130%;
-
-    mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        black 25%,
-        black 75%,
-        transparent 100%
-    );
-
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        black 25%,
-        black 75%,
-        transparent 100%
-    );
+.hero h1 {
+    font-size: 56px; /* increased */
+    margin-bottom: 20px;
 }
 
-.fog-back {
-    opacity: 0.25;
-    z-index: 2;
-    animation: fogSlow 160s linear infinite;
-}
-
-.fog-front {
-    opacity: 0.35;
-    z-index: 3;
-    animation: fogFast 100s linear infinite;
-}
-
-@keyframes fogFast {
-    from { background-position: 0 0px; }
-    to { background-position: 2000px 0px; }
-}
-
-@keyframes fogSlow {
-    from { background-position: 0 0px; }
-    to { background-position: 1500px 0px; }
-}
-
-/* HEADER CONTENT */
-.header-inner {
-    position: relative;
-    z-index: 5;
-}
-
-.header-logo {
-    width: 150px;
-}
-
-.header h1 {
+.hero p {
+    margin: auto;
     font-size: 18px;
-    letter-spacing: 2px;
+    max-width: 520px;
 }
 
 /* SECTION */
 .section {
-    padding: 80px 20px;
+    padding: 100px 20px;
 }
 
 .container {
     max-width: 1100px;
-    margin: 0 auto;
+    margin: auto;
 }
 
-/* FEATURED */
+/* FEATURED (dominant focal point) */
 .featured {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
+    text-align: left;
 }
 
-.book-feature {
-    display: grid;
-    grid-template-columns: 180px 1fr;
-    gap: 25px;
-    align-items: center;
-}
-
-.book-feature img {
-    width: 180px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+.featured img {
+    width: 320px;
+    display: block;
+    margin-bottom: 40px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2);
     transition: 0.4s;
 }
 
-.book-feature:hover img {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 40px 100px rgba(0,0,0,0.85);
+.featured img:hover {
+    transform: scale(1.03);
 }
 
-/* TEXT */
-.book-text h2 { font-size: 28px; }
-.book-text p { font-size: 14px; opacity: 0.8; }
-
-.eyebrow {
-    font-size: 11px;
-    letter-spacing: 2px;
-    opacity: 0.5;
-}
-
-/* LINK */
-.link {
-    display: inline-block;
-    margin-top: 12px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-    transition: 0.3s;
-}
-
-/* BOOK GRID */
-.section.texture {
-    position: relative;
-    background: #E8E6E1;
-    color: #1c1c1c;
-}
-
-.section.texture::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    background-position: center;
-    opacity: 0.25;
-    z-index: 0;
-}
-
-.section.texture::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to right,
-        rgba(232,230,225,0.95),
-        rgba(232,230,225,0.88),
-        rgba(232,230,225,0.95)
-    );
-    z-index: 0;
-}
-
-/* ensure content sits above overlays */
-.section.texture .container {
-    position: relative;
-    z-index: 1;
+.featured h2 {
+    font-size: 26px;
 }
 
 /* GRID */
 .grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
-    justify-items: center;
-    margin-top: 50px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 80px;
+    margin-top: 40px;
+}
+
+.book {
+    text-align: left;
 }
 
 .book img {
-    width: 200px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    width: 220px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
     transition: 0.4s;
 }
 
 .book:hover img {
-    transform: translateY(-12px) scale(1.05);
-    box-shadow: 0 45px 100px rgba(0,0,0,0.35);
+    transform: translateY(-8px) scale(1.04);
 }
 
-.book p { margin-top: 14px; }
-
-/* ANIMATION */
-.reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
+.book h3 {
+    margin-top: 15px;
 }
 
-.reveal.visible {
+/* AUTHOR */
+.author {
+    max-width: 700px;
+}
+
+/* FOOTER */
+.footer {
+    padding: 60px 20px;
+    border-top: 1px solid #ddd;
+}
+
+.footer-inner {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.social a {
+    margin-left: 15px;
+}
+
+.social img {
+    width: 20px;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.social img:hover {
     opacity: 1;
-    transform: translateY(0);
 }
 
 /* MOBILE */
-@media (max-width: 900px) {
-    .featured { grid-template-columns: 1fr; }
-    .grid { grid-template-columns: 1fr; }
+@media (max-width: 800px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+    }
+
+    .featured img {
+        width: 100%;
+        max-width: 300px;
+    }
 }
 
 </style>
@@ -301,107 +213,101 @@ a, a:visited, a:active {
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
+<!-- NAV -->
+<div class="nav">
+    <div class="nav-inner">
+        <a href="#">Home</a>
+        <a href="#">Publications</a>
+        <a href="#">About</a>
+        <a href="#">Author</a>
+        <a href="#">Contact</a>
     </div>
-
-    <div class="header-overlay"></div>
-    <div class="header-fog fog-back"></div>
-    <div class="header-fog fog-front"></div>
-
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
-        <h1>Literary and psychological fiction shaped by place, memory, and unease.</h1>
-    </div>
-
 </div>
 
-<!-- FEATURED -->
+<!-- HERO -->
+<div class="hero">
+    <h1>Blackwood Publishing</h1>
+    <p>
+        Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
+    </p>
+</div>
+
+<!-- FEATURED BOOK -->
 <div class="section">
 <div class="container featured">
 
-<div class="book-feature reveal">
-<img src="book6.jpg">
-<div class="book-text">
-<p class="eyebrow">Featured Title</p>
-<h2>Holdfast</h2>
-<p>Some memories return. Others refuse to leave.</p>
-<a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
-</div>
-</div>
+    <img src="book-featured.jpg">
 
-<div class="book-feature reveal">
-<img src="book13.jpg">
-<div class="book-text">
-<p class="eyebrow">Limited Edition</p>
-<h2>Corrour Bothy</h2>
-<p><strong>Founder’s Foil Edition</strong></p>
-<p>Limited to fifty hand-numbered copies.</p>
-<a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
-</div>
-</div>
+    <h2>Corrour Bothy: The First Summoning</h2>
+
+    <p>
+        A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
+    </p>
+
+    <p>
+        Memory, isolation, and environment tighten together until the boundary between internal and external strain begins to dissolve.
+    </p>
 
 </div>
 </div>
 
-<!-- BOOK GRID -->
-<div class="section texture">
+<!-- PUBLICATIONS -->
+<div class="section">
 <div class="container">
 
-<h2 style="text-align:center;">Current Publications</h2>
+    <h2>Publications</h2>
 
-<div class="grid">
+    <div class="grid">
 
-<a href="https://mybook.to/DourHillHouse" class="book reveal">
-<img src="book1.jpg">
-<p>Dour Hill House</p>
-</a>
+        <div class="book">
+            <img src="book-black-bothy.jpg">
+            <h3>The Black Bothy</h3>
+            <p>
+                An investigative record of disappearances tied to a place that refuses to remain fixed.
+            </p>
+        </div>
 
-<a href="https://mybook.to/Corrour" class="book reveal">
-<img src="book2.jpg">
-<p>Corrour</p>
-</a>
+        <div class="book">
+            <img src="book-dour-hill.jpg">
+            <h3>Dour Hill House</h3>
+            <p>
+                Inheritance becomes confinement as a house distorts space, memory, and identity.
+            </p>
+        </div>
 
-<a href="https://mybook.to/BlackBothy" class="book reveal">
-<img src="book3.jpg">
-<p>The Black Bothy</p>
-</a>
+    </div>
 
 </div>
+</div>
+
+<!-- AUTHOR -->
+<div class="section">
+<div class="container author">
+
+    <p>
+        Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+    </p>
 
 </div>
 </div>
 
-<script>
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-});
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+<!-- FOOTER -->
+<div class="footer">
+<div class="footer-inner">
 
-window.addEventListener("scroll", () => {
-    const scrollY = window.scrollY;
-    const fogFront = document.querySelector(".fog-front");
-    const fogBack = document.querySelector(".fog-back");
+    <div>© Blackwood Publishing</div>
 
-    if (fogFront && fogBack) {
-        fogFront.style.transform = `translateY(${scrollY * 0.02}px)`;
-        fogBack.style.transform = `translateY(${scrollY * 0.01}px)`;
-    }
-});
-</script>
+    <div class="social">
+        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+            <img src="tiktok.png">
+        </a>
+        <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+            <img src="instagram.png">
+        </a>
+    </div>
+
+</div>
+</div>
 
 </body>
 </html>
