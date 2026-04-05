@@ -34,21 +34,6 @@ a {
 }
 a:hover { color: #ffffff; }
 
-/* NAV */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-}
-.nav-inner {
-    max-width: 1100px;
-    margin: auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
 /* HERO */
 .header {
     position: relative;
@@ -70,7 +55,7 @@ a:hover { color: #ffffff; }
     background-attachment: fixed;
 }
 
-/* FOG (NO EDGE LINE FIXED) */
+/* FOG */
 .header-fog {
     position: absolute;
     inset: 0;
@@ -95,57 +80,63 @@ a:hover { color: #ffffff; }
 .header-inner {
     position: relative;
     z-index: 5;
-    max-width: 600px;
 }
 
 .header-logo {
     width: 240px;
-    margin-bottom: 20px;
-}
-
-.header p {
-    font-size: 16px;
-    opacity: 0.85;
 }
 
 /* SECTION */
 .section {
-    padding: 110px 20px;
+    padding: 120px 20px;
 }
+
 .container {
     max-width: 1100px;
     margin: auto;
 }
 
-/* FEATURED */
+/* FEATURED LAYOUT */
 .featured-main {
     display: grid;
     grid-template-columns: 420px 1fr;
-    gap: 80px;
-    align-items: center;
+    gap: 100px;
+    align-items: start;
 }
 
-.featured-main img {
+/* BOOK IMAGE */
+.featured-image img {
     width: 100%;
     box-shadow:
-        0 40px 80px rgba(0,0,0,0.7),
+        0 40px 90px rgba(0,0,0,0.7),
         0 15px 30px rgba(0,0,0,0.5);
     transition: 0.4s;
 }
 
-.featured-main img:hover {
+.featured-image img:hover {
     transform: translateY(-6px);
 }
 
-/* TEXT */
-.featured-main h2 {
-    font-size: 30px;
+/* TEXT BLOCK */
+.featured-text {
+    max-width: 520px;
 }
 
-/* LINK */
+.featured-text h2 {
+    font-size: 30px;
+    margin-bottom: 25px;
+}
+
+/* PARAGRAPH RHYTHM */
+.featured-text p {
+    margin-bottom: 22px;
+    line-height: 1.7;
+}
+
+/* CTA */
 .link {
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 20px;
     font-size: 12px;
     letter-spacing: 2px;
     border-bottom: 1px solid rgba(255,255,255,0.4);
@@ -153,10 +144,10 @@ a:hover { color: #ffffff; }
 
 /* SECONDARY */
 .featured-secondary {
+    margin-top: 120px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin-top: 100px;
+    gap: 80px;
 }
 
 .book-feature img {
@@ -164,18 +155,17 @@ a:hover { color: #ffffff; }
     box-shadow:
         0 30px 60px rgba(0,0,0,0.7),
         0 10px 20px rgba(0,0,0,0.5);
-    transition: 0.4s;
 }
 
-.book-feature:hover img {
-    transform: translateY(-6px);
+.book-feature p {
+    margin-top: 12px;
 }
 
 /* PUBLICATIONS */
 .section.texture {
-    position: relative;
     background: #E8E6E1;
     color: #1c1c1c;
+    position: relative;
 }
 
 .section.texture::before {
@@ -186,16 +176,10 @@ a:hover { color: #ffffff; }
     opacity: 0.2;
 }
 
-.section.texture .container {
-    position: relative;
-    z-index: 2;
-}
-
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 80px;
-    margin-top: 50px;
+    gap: 100px;
 }
 
 .book img {
@@ -203,25 +187,20 @@ a:hover { color: #ffffff; }
     box-shadow:
         0 30px 70px rgba(0,0,0,0.35),
         0 10px 20px rgba(0,0,0,0.25);
-    transition: 0.4s;
-}
-
-.book:hover img {
-    transform: translateY(-8px);
 }
 
 .book p {
-    margin-top: 10px;
-    font-size: 14px;
     color: #111;
+    line-height: 1.6;
 }
 
-/* REVEAL ANIMATION */
+/* REVEAL SYSTEM */
 .reveal {
     opacity: 0;
-    transform: translateY(50px);
-    transition: 1.2s ease;
+    transform: translateY(60px);
+    transition: 1.3s ease;
 }
+
 .reveal.visible {
     opacity: 1;
     transform: translateY(0);
@@ -249,40 +228,39 @@ a:hover { color: #ffffff; }
 
     <div class="header-inner reveal">
         <img src="logo (1).png" class="header-logo">
-        <p>
-            Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
-        </p>
     </div>
 </div>
 
 <!-- FEATURED -->
 <div class="section">
-<div class="container featured-main reveal">
+<div class="container featured-main">
 
-    <img src="book2.jpg">
+    <div class="featured-image reveal">
+        <img src="book2.jpg">
+    </div>
 
-    <div>
-        <h2>Corrour Bothy: The First Summoning</h2>
+    <div class="featured-text">
+        <h2 class="reveal">Corrour Bothy: The First Summoning</h2>
 
-        <p><strong>Some shelters protect. Others keep you.</strong></p>
+        <p class="reveal"><strong>Some shelters protect. Others keep you.</strong></p>
 
-        <p>
+        <p class="reveal">
         Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks. To some, it is a refuge. To others, something less easily named.
         </p>
 
-        <p>
+        <p class="reveal">
         Isobel and Thomas arrive carrying the strain of a fractured relationship. Jude and Emily come chasing folklore and half-remembered stories. Declan walks alone, untethered from the life he left behind.
         </p>
 
-        <p>
+        <p class="reveal">
         Their paths converge at Corrour Bothy, where smoke rises from a chimney that should be cold, and footsteps echo where no one walks. The bothy does not ask who they are. It already knows.
         </p>
 
-        <p>
+        <p class="reveal">
         Corrour Bothy is the first instalment in The Cursed Bothies, an interconnected series of Highland novels in which each remote shelter holds a fragment of something older and far less patient than the storm.
         </p>
 
-        <a href="https://mybook.to/Corrour" target="_blank" class="link">Purchase</a>
+        <a href="https://mybook.to/Corrour" class="link reveal">Purchase</a>
     </div>
 
 </div>
@@ -315,45 +293,24 @@ a:hover { color: #ffffff; }
 
 <div class="grid">
 
-<a href="https://mybook.to/BlackBothy" class="book reveal">
+<div class="book reveal">
 <img src="book3.jpg">
 <h3>The Black Bothy</h3>
 <p>
 When her sister disappears, Clara follows her into a remote bothy where paths shift, the landscape distorts, and something in the place refuses to let her leave.
 </p>
-</a>
+<a href="https://mybook.to/BlackBothy" class="link">Purchase</a>
+</div>
 
-<a href="https://mybook.to/DourHillHouse" class="book reveal">
+<div class="book reveal">
 <img src="book1.jpg">
 <h3>Dour Hill House</h3>
 <p>
 Inheriting a remote house, Clara becomes increasingly confined within it as rooms shift, the interior resists logic, and a mirror begins to distort both memory and identity.
 </p>
-</a>
-
+<a href="https://mybook.to/DourHillHouse" class="link">Purchase</a>
 </div>
 
-</div>
-</div>
-
-<!-- AUTHOR -->
-<div class="section">
-<div class="container">
-<p>
-Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
-</p>
-</div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-<div class="footer-inner">
-
-<div>© Blackwood Publishing</div>
-
-<div class="social">
-<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
-<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
 </div>
 
 </div>
