@@ -82,7 +82,7 @@ body {
 .fog-front{ opacity: 0.12; animation: fogFast 60s linear infinite; }
 
 /* =========================
-   👁 SILHOUETTE (NEW)
+   👁 SILHOUETTE
 ========================= */
 .silhouette {
     position: absolute;
@@ -91,13 +91,7 @@ body {
     width: 120px;
     height: 260px;
 
-    background: radial-gradient(
-        ellipse at center,
-        rgba(0,0,0,0.6) 0%,
-        rgba(0,0,0,0.3) 40%,
-        transparent 70%
-    );
-
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.6), transparent 70%);
     filter: blur(6px);
     opacity: 0;
 
@@ -106,12 +100,10 @@ body {
     animation:
         silhouetteAppear 25s ease-in-out infinite,
         silhouetteDrift 30s ease-in-out infinite;
-
-    pointer-events: none;
 }
 
 /* =========================
-   ENTITY (SHADOW MASS)
+   SHADOW ENTITY
 ========================= */
 .shadow-entity {
     position: absolute;
@@ -126,8 +118,6 @@ body {
     animation:
         entityMove 18s ease-in-out infinite,
         entityFade 40s ease-in-out infinite;
-
-    pointer-events: none;
 }
 
 /* =========================
@@ -144,7 +134,10 @@ body {
     width: 320px;
     max-width: 80%;
     margin-bottom: 20px;
-    animation: logoFlicker 6s infinite;
+
+    animation:
+        logoFlicker 7s infinite,
+        logoGlow 10s ease-in-out infinite;
 }
 
 .hero p {
@@ -167,7 +160,6 @@ body {
     color: #e6e6e6;
     text-decoration: none;
     opacity: 0.7;
-    transition: 0.3s;
 }
 
 .nav-inline a:hover {
@@ -211,26 +203,38 @@ body {
 
 /* 👁 SILHOUETTE */
 @keyframes silhouetteAppear {
-    0%, 85%, 100% { opacity: 0; }
+    0%,85%,100% { opacity: 0; }
     90% { opacity: 0.25; }
     95% { opacity: 0.1; }
 }
-
 @keyframes silhouetteDrift {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(40px); }
+    from { transform: translateX(0); }
+    to { transform: translateX(40px); }
 }
 
 /* TREE */
 @keyframes treeShift {
-    0% { transform: scale(1) translateX(0); }
-    100% { transform: scale(1.02) translateX(-10px); }
+    from { transform: scale(1) translateX(0); }
+    to { transform: scale(1.02) translateX(-10px); }
 }
 
-/* LOGO */
+/* 🔥 REAL LOGO FLICKER */
 @keyframes logoFlicker {
-    0%,100%{opacity:1;}
-    50%{opacity:0.85;}
+
+    0%,100% { opacity: 1; filter: brightness(1); }
+
+    48% { opacity: 0.95; filter: brightness(1.05); }
+    50% { opacity: 0.8;  filter: brightness(0.9); }
+    52% { opacity: 1;    filter: brightness(1); }
+
+    78% { opacity: 0.9;  filter: brightness(0.95); }
+    80% { opacity: 1;    filter: brightness(1.05); }
+}
+
+/* GLOW */
+@keyframes logoGlow {
+    0%,100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.1)); }
+    50% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
 }
 
 /* FADE */
@@ -260,18 +264,13 @@ body {
 
 <section class="hero">
 
-    <!-- FOG -->
     <div class="fog-back"></div>
     <div class="fog-mid"></div>
     <div class="fog-front"></div>
 
-    <!-- 👁 SILHOUETTE -->
     <div class="silhouette"></div>
-
-    <!-- SHADOW ENTITY -->
     <div class="shadow-entity"></div>
 
-    <!-- CONTENT -->
     <div class="hero-inner">
 
         <img src="logo (1).png" class="hero-logo">
@@ -281,7 +280,7 @@ body {
             <a href="publications.html">Publications</a>
             <a href="about.html">About</a>
             <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
+            <a href="contacts.html">Contact</a>
         </div>
 
         <p>
@@ -294,30 +293,6 @@ body {
     </div>
 
 </section>
-
-<script>
-const hero = document.querySelector('.hero');
-
-let targetX = 50, targetY = 50;
-let currentX = 50, currentY = 50;
-
-hero.addEventListener('mousemove', e => {
-    const rect = hero.getBoundingClientRect();
-    targetX = ((e.clientX - rect.left) / rect.width) * 100;
-    targetY = ((e.clientY - rect.top) / rect.height) * 100;
-});
-
-function animate() {
-    currentX += (targetX - currentX) * 0.05;
-    currentY += (targetY - currentY) * 0.05;
-
-    hero.style.setProperty('--mx', currentX + '%');
-    hero.style.setProperty('--my', currentY + '%');
-
-    requestAnimationFrame(animate);
-}
-animate();
-</script>
 
 </body>
 </html>
