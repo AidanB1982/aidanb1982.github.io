@@ -49,7 +49,10 @@ body {
     mix-blend-mode: multiply;
     animation: colorShift 40s ease-in-out infinite alternate;
 }
-
+   transform:
+       translateX(var(--driftX, 0))
+       translateY(var(--driftY, 0))
+       scale(1.02);
 /* =========================
    FOG
 ========================= */
