@@ -13,12 +13,16 @@ body {
    HERO
 ========================= */
 .hero {
-    align-items: flex-start;
-    padding-top: 120px;
-}
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
 
-.hero-inner {
-    margin-top: 20px;
+    display: flex;
+    justify-content: center;   
+    align-items: flex-start;   
+    text-align: center;
+    letter-spacing: 0.3px;
+    padding-top: 80px;        
 }
 /* BACKGROUND */
 .hero::before {
