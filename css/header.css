@@ -32,11 +32,7 @@ body {
     background:
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
         url('/assets/forest.png') center/cover no-repeat,
-        linear-gradient(
-            120deg,
-            rgba(255,255,255,0.05),
-            transparent
-        );
+        linear-gradient(120deg, rgba(255,255,255,0.05), transparent);
 
     transform: scale(1.05);
     filter: contrast(110%) brightness(0.9);
@@ -169,10 +165,13 @@ body {
     top: 30px;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    gap: 28px;
+    z-index: 20;
 }
 
 .nav-inline a {
-    margin: 0 15px;
+    position: relative;
     font-size: 12px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -182,9 +181,25 @@ body {
     transition: all 0.3s ease;
 }
 
+/* 🔥 UNDERLINE ANIMATION */
+.nav-inline a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.6);
+    transition: 0.3s;
+    transform: translateX(-50%);
+}
+
 .nav-inline a:hover {
     opacity: 1;
-    text-shadow: 0 0 6px rgba(255,255,255,0.4);
+}
+
+.nav-inline a:hover::after {
+    width: 100%;
 }
 
 /* =========================
