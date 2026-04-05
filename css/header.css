@@ -143,7 +143,7 @@ body {
 .hero-logo {
     width: 280px;
     max-width: 80%;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 
     animation:
         logoFlicker 7s infinite,
@@ -178,7 +178,7 @@ body {
     justify-content: center;
     gap: 26px;
 
-    margin: 10px 0 25px 0;
+    margin: 5px 0 30px 0;
 }
 
 .nav-inline a {
@@ -216,15 +216,23 @@ body {
    BUTTON
 ========================= */
 .button {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
-    padding-bottom: 4px;
-    color: #e6e6e6;
-    text-decoration: none;
+    position: relative;
+}
+
+/* animated underline */
+.button::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.9);
+    transition: width 0.3s ease;
+}
+
+.button:hover::after {
+    width: 100%;
 }
 
 /* =========================
