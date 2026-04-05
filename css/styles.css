@@ -49,7 +49,9 @@ img {
 /* =========================
    IMAGE
 ========================= */
-.featured-image {
+.featured-image, 
+.featured-content {
+    will change: transform;
     display: flex;
     justify-content: center;
     transition-delay: 0.1s;
