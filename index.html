@@ -26,118 +26,154 @@ body::before {
     position: fixed;
     inset: 0;
     background: url('stone.png');
-    opacity: 0.2;
+    opacity: 0.25;
     z-index: -1;
 }
 
+/* LINKS */
+a { color: #cfcfcf; text-decoration: none; transition: 0.3s; }
+a:hover { color: #ffffff; }
+
 /* NAV */
 .nav {
-    position: fixed;
-    width: 100%;
+    position: absolute;
     top: 0;
-    z-index: 20;
-    backdrop-filter: blur(10px);
-    background: rgba(10,10,12,0.3);
+    width: 100%;
+    z-index: 10;
 }
-
 .nav-inner {
     max-width: 1100px;
     margin: auto;
-    padding: 20px;
+    padding: 18px 20px;
     display: flex;
     justify-content: flex-end;
 }
-
 .nav a {
     margin-left: 26px;
     font-size: 12px;
     letter-spacing: 2px;
-    opacity: 0.7;
+    opacity: 0.75;
 }
-.nav a:hover { opacity: 1; }
 
 /* HERO */
 .header {
-    height: 100vh;
+    position: relative;
+    height: 55vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+    text-align: center;
 }
-
 .header-overlay {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(10,10,12,0.85), rgba(10,10,12,0.95)),
+        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
         url('forest.png');
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
 }
 
+/* FOG */
+.header-fog {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png') repeat-x;
+    background-size: 130%;
+    pointer-events: none;
+}
+.fog-back { opacity: 0.25; animation: fogSlow 160s linear infinite; }
+.fog-front { opacity: 0.35; animation: fogFast 100s linear infinite; }
+
+@keyframes fogFast {
+    from { background-position: 0 0; }
+    to { background-position: 2000px 0; }
+}
+@keyframes fogSlow {
+    from { background-position: 0 0; }
+    to { background-position: 1500px 0; }
+}
+
+/* HERO CONTENT */
 .header-inner {
-    z-index: 2;
-    text-align: center;
+    position: relative;
+    z-index: 5;
+    max-width: 520px;
 }
-
-.header h1 {
-    font-size: clamp(50px, 8vw, 110px);
+.header-logo {
+    width: 150px;
     margin-bottom: 20px;
 }
 
-.header p {
-    opacity: 0.7;
-}
+/* SECTION */
+.section { padding: 120px 20px; }
+.container { max-width: 1100px; margin: auto; }
 
 /* FEATURED */
-.section {
-    padding: 160px 20px;
-}
-
-.container {
-    max-width: 1100px;
-    margin: auto;
-}
-
 .featured-main {
     display: grid;
     grid-template-columns: 420px 1fr;
-    gap: 100px;
+    gap: 80px;
     align-items: center;
 }
 
 .featured-main img {
     width: 100%;
-    box-shadow: 0 80px 160px rgba(0,0,0,0.9);
+    box-shadow: 0 40px 90px rgba(0,0,0,0.7);
 }
 
-/* LN BOOK STACK */
-.book-scroll {
-    height: 400vh;
-    position: relative;
+/* CHAOS GRID */
+.chaos-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 60px;
 }
 
-.book-stack {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.stack-img {
-    position: absolute;
-    width: 280px;
+.chaos-item {
+    width: 100%;
     opacity: 0;
-    transform: scale(0.9) translateY(80px);
-    box-shadow: 0 60px 120px rgba(0,0,0,0.6);
+    transform: translateY(60px) scale(0.95);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+}
+
+.chaos-item:nth-child(odd) {
+    transform: rotate(-3deg) translateY(60px) scale(0.95);
+}
+.chaos-item:nth-child(even) {
+    transform: rotate(3deg) translateY(60px) scale(0.95);
+}
+
+.chaos-item:hover {
+    transform: rotate(0deg) scale(1.05);
+}
+
+/* CLEAN GRID */
+.section.texture {
+    background: #E8E6E1;
+    color: #1c1c1c;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 80px;
+}
+
+.book img {
+    width: 220px;
 }
 
 /* FOOTER */
 .footer {
     padding: 60px;
     border-top: 1px solid #333;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+    .chaos-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured-main { grid-template-columns: 1fr; }
 }
 
 </style>
@@ -159,9 +195,13 @@ body::before {
 <!-- HERO -->
 <div class="header">
     <div class="header-overlay"></div>
+    <div class="header-fog fog-back"></div>
+    <div class="header-fog fog-front"></div>
+
     <div class="header-inner">
+        <img src="logo (1).png" class="header-logo">
         <h1>Blackwood Publishing</h1>
-        <p>Literary and psychological fiction shaped by place and memory.</p>
+        <p>Independent publisher of literary and psychological fiction.</p>
     </div>
 </div>
 
@@ -169,7 +209,7 @@ body::before {
 <div class="section">
 <div class="container featured-main">
 
-    <img src="book2.jpg" class="parallax">
+    <img src="book2.jpg">
 
     <div>
         <h2>Corrour Bothy</h2>
@@ -179,17 +219,54 @@ body::before {
 </div>
 </div>
 
-<!-- LN STYLE SCROLL -->
-<div class="book-scroll">
+<!-- CHAOS GRID -->
+<div class="section">
+<div class="container">
 
-    <div class="book-stack">
-        <img src="book3.jpg" class="stack-img">
-        <img src="book1.jpg" class="stack-img">
-        <img src="book4.jpg" class="stack-img">
-        <img src="book5.jpg" class="stack-img">
-        <img src="book6.jpg" class="stack-img">
-    </div>
+<h2>Archive</h2>
 
+<div class="chaos-grid">
+<img src="book1.jpg" class="chaos-item">
+<img src="book2.jpg" class="chaos-item">
+<img src="book3.jpg" class="chaos-item">
+<img src="book4.jpg" class="chaos-item">
+<img src="book5.jpg" class="chaos-item">
+<img src="book6.jpg" class="chaos-item">
+<img src="book7.png" class="chaos-item">
+<img src="book8.jpg" class="chaos-item">
+<img src="book9.png" class="chaos-item">
+<img src="book10.jpg" class="chaos-item">
+<img src="book11.png" class="chaos-item">
+<img src="book12.jpg" class="chaos-item">
+<img src="book13.jpg" class="chaos-item">
+</div>
+
+</div>
+</div>
+
+<!-- CLEAN POPULAR -->
+<div class="section texture">
+<div class="container">
+
+<h2>Popular Reads</h2>
+
+<div class="grid">
+
+<div class="book">
+<img src="book3.jpg">
+<h3>The Black Bothy</h3>
+<p>An investigative record of disappearances.</p>
+</div>
+
+<div class="book">
+<img src="book1.jpg">
+<h3>Dour Hill House</h3>
+<p>Inheritance becomes confinement.</p>
+</div>
+
+</div>
+
+</div>
 </div>
 
 <!-- FOOTER -->
@@ -201,60 +278,30 @@ body::before {
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* STACKED REVEAL */
-const images = gsap.utils.toArray(".stack-img");
-
-images.forEach((img, i) => {
-
-    gsap.to(img, {
+/* CHAOS REVEAL */
+gsap.utils.toArray(".chaos-item").forEach(item => {
+    gsap.to(item, {
         opacity: 1,
-        scale: 1,
         y: 0,
+        scale: 1,
+        duration: 1,
         scrollTrigger: {
-            trigger: ".book-scroll",
-            start: () => "top -" + (window.innerHeight * i),
-            end: () => "top -" + (window.innerHeight * (i + 1)),
-            scrub: true
+            trigger: item,
+            start: "top 85%"
         }
     });
-
-    if (i !== images.length - 1) {
-        gsap.to(img, {
-            opacity: 0,
-            scale: 0.95,
-            scrollTrigger: {
-                trigger: ".book-scroll",
-                start: () => "top -" + (window.innerHeight * (i + 0.5)),
-                end: () => "top -" + (window.innerHeight * (i + 1)),
-                scrub: true
-            }
-        });
-    }
-
 });
 
-/* MOUSE FLOAT EFFECT */
+/* FLOAT */
 document.addEventListener("mousemove", e => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 10;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
 
-    const x = (e.clientX / window.innerWidth - 0.5) * 40;
-    const y = (e.clientY / window.innerHeight - 0.5) * 40;
-
-    gsap.to(".stack-img", {
+    gsap.to(".chaos-item", {
         x: x,
         y: y,
-        duration: 0.6,
-        ease: "power2.out"
+        duration: 0.6
     });
-
-});
-
-/* PARALLAX FEATURED IMAGE */
-gsap.to(".parallax", {
-    y: -80,
-    scrollTrigger: {
-        trigger: ".parallax",
-        scrub: true
-    }
 });
 
 </script>
