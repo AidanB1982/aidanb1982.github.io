@@ -856,31 +856,6 @@ books.forEach((el, i) => {
     animate();
 
 });
- const hero = document.querySelector('.hero');
-
-let targetX = 50;
-let targetY = 50;
-let currentX = 50;
-let currentY = 50;
-
-hero.addEventListener('mousemove', (e) => {
-    const rect = hero.getBoundingClientRect();
-
-    targetX = ((e.clientX - rect.left) / rect.width) * 100;
-    targetY = ((e.clientY - rect.top) / rect.height) * 100;
-});
-
-function animateHeroLight() {
-    currentX += (targetX - currentX) * 0.05;
-    currentY += (targetY - currentY) * 0.05;
-
-    hero.style.setProperty('--mx', currentX + '%');
-    hero.style.setProperty('--my', currentY + '%');
-
-    requestAnimationFrame(animateHeroLight);
-}
-
-animateHeroLight();
 
 const hero = document.querySelector('.hero');
 
