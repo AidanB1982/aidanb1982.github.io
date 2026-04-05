@@ -22,27 +22,27 @@ body::before {
     position: fixed;
     inset: 0;
     background: url('stone.png');
-    opacity: 0.25;
+    opacity: 0.2;
     z-index: -1;
 }
 
-/* GLOBAL LINK SYSTEM */
+/* LINKS */
 a {
     color: #cfcfcf;
     text-decoration: none;
     transition: 0.3s;
 }
 
-a:hover {
-    color: #ffffff;
-}
+a:hover { color: #ffffff; }
 
-/* NAV */
+/* NAV (FLOATING GLASS STYLE) */
 .nav {
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
-    z-index: 10;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    background: rgba(10,10,12,0.3);
 }
 
 .nav-inner {
@@ -57,60 +57,44 @@ a:hover {
     margin-left: 26px;
     font-size: 12px;
     letter-spacing: 2px;
-    opacity: 0.75;
-    position: relative;
+    opacity: 0.7;
 }
 
 .nav a:hover { opacity: 1; }
 
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #cfcfcf;
-    transition: 0.3s;
-}
-
-.nav a:hover::after { width: 100%; }
-
 /* HERO */
 .header {
     position: relative;
-    height: 55vh;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    padding: 0 20px;
 }
 
 .header-overlay {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
+        linear-gradient(rgba(10,10,12,0.85), rgba(10,10,12,0.9)),
         url('forest.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* FOG FIX */
+/* FOG */
 .header-fog {
     position: absolute;
     inset: 0;
     background: url('fog.png') repeat-x;
     background-size: 130%;
     pointer-events: none;
-
-    mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
 }
 
-.fog-back { opacity: 0.25; animation: fogSlow 160s linear infinite; }
-.fog-front { opacity: 0.35; animation: fogFast 100s linear infinite; }
+.fog-back { opacity: 0.2; animation: fogSlow 160s linear infinite; }
+.fog-front { opacity: 0.3; animation: fogFast 100s linear infinite; }
 
 @keyframes fogFast {
     from { background-position: 0 0; }
@@ -126,27 +110,34 @@ a:hover {
 .header-inner {
     position: relative;
     z-index: 5;
-    max-width: 520px;
+    max-width: 700px;
+    animation: fadeUp 1.4s ease forwards;
+    opacity: 0;
 }
 
 .header-logo {
-    width: 150px;
-    margin-bottom: 20px;
+    width: 140px;
+    margin-bottom: 30px;
 }
 
 .header h1 {
-    font-size: 42px;
-    margin-bottom: 18px;
+    font-size: clamp(48px, 8vw, 110px);
+    letter-spacing: -2px;
+    line-height: 0.95;
+    font-weight: 500;
+    margin-bottom: 20px;
 }
 
 .header p {
-    font-size: 16px;
-    opacity: 0.85;
+    font-size: 18px;
+    max-width: 500px;
+    margin: auto;
+    opacity: 0.7;
 }
 
-/* SECTION */
+/* SECTIONS */
 .section {
-    padding: 110px 20px;
+    padding: 160px 20px;
 }
 
 .container {
@@ -158,99 +149,94 @@ a:hover {
 .featured-main {
     display: grid;
     grid-template-columns: 420px 1fr;
-    gap: 80px;
+    gap: 100px;
     align-items: center;
 }
 
 .featured-main img {
     width: 100%;
-    transform: perspective(900px) rotateY(-6deg);
-    box-shadow: 0 60px 120px rgba(0,0,0,0.8);
-    transition: 0.5s;
+    transform: perspective(1200px) rotateY(-8deg);
+    box-shadow: 0 80px 160px rgba(0,0,0,0.9);
+    transition: 0.6s ease;
 }
 
 .featured-main img:hover {
-    transform: perspective(900px) rotateY(-2deg) scale(1.03);
+    transform: perspective(1200px) rotateY(-2deg) scale(1.05);
 }
 
-.featured-main h2 {
-    font-size: 30px;
+h2 {
+    font-size: clamp(28px, 4vw, 52px);
+    line-height: 1.1;
+    font-weight: 500;
 }
 
-.featured-main p {
-    margin-bottom: 16px;
-}
-
-/* CTA LINK STYLE */
+/* LINKS */
 .link {
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 20px;
     font-size: 12px;
     letter-spacing: 2px;
-    border-bottom: 1px solid rgba(255,255,255,0.4);
+    position: relative;
+}
+
+.link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 100%;
+    height: 1px;
+    background: white;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: 0.4s;
+}
+
+.link:hover::after {
+    transform: scaleX(1);
 }
 
 /* SECONDARY */
 .featured-secondary {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin-top: 100px;
+    gap: 80px;
+    margin-top: 120px;
 }
 
 .book-feature img {
-    width: 180px;
+    width: 200px;
     transform: perspective(800px) rotateY(-4deg);
-    box-shadow: 0 30px 70px rgba(0,0,0,0.7);
+    box-shadow: 0 40px 90px rgba(0,0,0,0.7);
 }
 
-/* PUBLICATIONS */
+/* LIGHT SECTION */
 .section.texture {
-    position: relative;
     background: #E8E6E1;
     color: #1c1c1c;
-}
-
-.section.texture::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.2;
-}
-
-.section.texture .container {
-    position: relative;
-    z-index: 2;
 }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 80px;
-    margin-top: 50px;
+    gap: 100px;
+    margin-top: 60px;
 }
 
 .book img {
-    width: 220px;
-    transform: perspective(800px) rotateY(-3deg);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+    width: 240px;
     transition: 0.4s;
 }
 
 .book:hover img {
-    transform: perspective(800px) rotateY(0deg) scale(1.06);
-}
-
-.book p {
-    margin-top: 10px;
-    font-size: 14px;
-    opacity: 0.8;
+    transform: scale(1.08);
 }
 
 /* AUTHOR */
 .author {
     max-width: 700px;
+    font-size: 18px;
+    line-height: 1.7;
 }
 
 /* FOOTER */
@@ -266,22 +252,21 @@ a:hover {
     justify-content: space-between;
 }
 
-.social img {
-    width: 20px;
-    margin-left: 15px;
-    opacity: 0.7;
-}
-
-/* REVEAL */
+/* ANIMATION */
 .reveal {
     opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
+    transform: translateY(60px);
+    transition: 1.2s ease;
 }
 
 .reveal.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* MOBILE */
@@ -301,11 +286,11 @@ a:hover {
 <!-- NAV -->
 <div class="nav">
     <div class="nav-inner">
-        <a href="index.html">Home</a>
-        <a href="publications.html">Publications</a>
-        <a href="about.html">About</a>
-        <a href="author.html">Author</a>
-        <a href="contact.html">Contact</a>
+        <a href="#">Home</a>
+        <a href="#">Publications</a>
+        <a href="#">About</a>
+        <a href="#">Author</a>
+        <a href="#">Contact</a>
     </div>
 </div>
 
@@ -331,23 +316,10 @@ a:hover {
     <img src="book2.jpg">
 
     <div>
-        <h2>Corrour Bothy: The First Summoning</h2>
-
+        <h2>Corrour Bothy</h2>
         <p><strong>Some shelters protect. Others keep you.</strong></p>
-
-        <p>
-        Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks. To some, it is a refuge. To others, something less easily named.
-        </p>
-
-        <p>
-        Their paths converge at Corrour Bothy, where smoke rises from a chimney that should be cold, and footsteps echo where no one walks.
-        </p>
-
-        <p>
-        The first instalment in The Cursed Bothies, where each shelter holds something older and far less patient than the storm.
-        </p>
-
-        <a href="https://mybook.to/Corrour" target="_blank" class="link">Purchase</a>
+        <p>Deep in the Cairngorms, a stone bothy waits beneath snow-laden peaks.</p>
+        <a href="#" class="link">Purchase</a>
     </div>
 
 </div>
@@ -357,57 +329,24 @@ a:hover {
 
     <div class="book-feature reveal">
         <img src="book6.jpg">
-        <div>
-            <p class="eyebrow">Coming Soon</p>
-            <h3>Holdfast</h3>
-            <p>Some memories return. Others refuse to leave.</p>
-            <a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
-        </div>
+        <h3>Holdfast</h3>
+        <p>Some memories return. Others refuse to leave.</p>
     </div>
 
     <div class="book-feature reveal">
         <img src="book13.jpg">
-        <div>
-            <p class="eyebrow">Limited Edition</p>
-            <h3>Corrour Bothy</h3>
-            <p>Founder’s Foil Edition — limited to fifty copies.</p>
-            <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
-        </div>
+        <h3>Corrour Bothy</h3>
+        <p>Limited foil edition.</p>
     </div>
-
-</div>
-</div>
-
-<!-- PUBLICATIONS -->
-<div class="section texture">
-<div class="container">
-
-<h2>Popular Reads</h2>
-
-<div class="grid">
-
-<a href="https://mybook.to/BlackBothy" class="book reveal">
-<img src="book3.jpg">
-<h3>The Black Bothy</h3>
-<p>An investigative record of disappearances tied to a place that refuses to remain fixed.</p>
-</a>
-
-<a href="https://mybook.to/DourHillHouse" class="book reveal">
-<img src="book1.jpg">
-<h3>Dour Hill House</h3>
-<p>Inheritance becomes confinement as a house distorts space, memory, and identity.</p>
-</a>
-
-</div>
 
 </div>
 </div>
 
 <!-- AUTHOR -->
 <div class="section">
-<div class="container author">
+<div class="container author reveal">
 <p>
-Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain.
 </p>
 </div>
 </div>
@@ -415,17 +354,11 @@ Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological
 <!-- FOOTER -->
 <div class="footer">
 <div class="footer-inner">
-
 <div>© Blackwood Publishing</div>
-
-<div class="social">
-<a href="https://www.tiktok.com/@aidanblackwood"><img src="tiktok.png"></a>
-<a href="https://www.instagram.com/aidan.blackwood"><img src="instagram.png"></a>
-</div>
-
 </div>
 </div>
 
+<!-- REVEAL SCRIPT -->
 <script>
 const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -433,6 +366,17 @@ const observer = new IntersectionObserver(entries => {
     });
 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+<!-- SMOOTH SCROLL -->
+<script src="https://unpkg.com/lenis@1.0.0/dist/lenis.min.js"></script>
+<script>
+const lenis = new Lenis({ lerp: 0.08 });
+function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
 </script>
 
 </body>
