@@ -115,8 +115,12 @@ function initHeader() {
 
         // HERO content subtle lift
         if (inner) {
-            inner.style.transform += ` translateY(${scrollY * 0.02}px)`;
-        }
+    const current = inner.style.transform || "";
+    inner.style.transform = `
+        ${current}
+        translateY(${scrollY * 0.02}px)
+    `;
+}
 
         // FEATURED section movement
         const featured = document.querySelector('.featured-inner');
