@@ -11,20 +11,23 @@
 body {
     margin: 0;
     font-family: Georgia, serif;
-    background: #e8e6e1;
-    color: #1c1c1c;
-    line-height: 1.6;
+    background: #0e0e10;
+    color: #e6e6e6;
+    overflow-x: hidden;
 }
 
-/* SUBTLE TEXTURE */
+/* TEXTURE */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background: url('stone.png');
-    opacity: 0.15;
+    opacity: 0.25;
     z-index: -1;
 }
+
+/* LINKS */
+a { color: inherit; text-decoration: none; }
 
 /* NAV */
 .nav {
@@ -37,16 +40,16 @@ body::before {
 .nav-inner {
     max-width: 1100px;
     margin: auto;
-    padding: 20px;
+    padding: 18px 20px;
     display: flex;
     justify-content: flex-end;
 }
 
 .nav a {
-    margin-left: 25px;
+    margin-left: 26px;
     font-size: 12px;
     letter-spacing: 2px;
-    opacity: 0.7;
+    opacity: 0.75;
     position: relative;
 }
 
@@ -59,18 +62,16 @@ body::before {
     left: 0;
     width: 0;
     height: 1px;
-    background: #333;
+    background: #aaa;
     transition: 0.3s;
 }
 
-.nav a:hover::after {
-    width: 100%;
-}
+.nav a:hover::after { width: 100%; }
 
 /* HERO */
 .header {
     position: relative;
-    height: 60vh;
+    height: 55vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,13 +82,14 @@ body::before {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(22,22,25,0.75), rgba(22,22,25,0.75)),
+        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
         url('forest.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
+/* FOG */
 .header-fog {
     position: absolute;
     inset: 0;
@@ -96,14 +98,24 @@ body::before {
     pointer-events: none;
 }
 
-.fog-back { opacity: 0.2; }
-.fog-front { opacity: 0.3; }
+.fog-back { opacity: 0.25; animation: fogSlow 160s linear infinite; }
+.fog-front { opacity: 0.35; animation: fogFast 100s linear infinite; }
 
+@keyframes fogFast {
+    from { background-position: 0 0; }
+    to { background-position: 2000px 0; }
+}
+
+@keyframes fogSlow {
+    from { background-position: 0 0; }
+    to { background-position: 1500px 0; }
+}
+
+/* HERO CONTENT */
 .header-inner {
     position: relative;
     z-index: 5;
-    color: #e6e6e6;
-    max-width: 600px;
+    max-width: 520px;
 }
 
 .header-logo {
@@ -112,17 +124,18 @@ body::before {
 }
 
 .header h1 {
-    font-size: 52px;
-    margin-bottom: 20px;
+    font-size: 42px; /* increased */
+    margin-bottom: 18px;
 }
 
 .header p {
-    font-size: 18px;
+    font-size: 16px;
+    opacity: 0.85;
 }
 
 /* SECTION SPACING */
 .section {
-    padding: 110px 20px;
+    padding: 100px 20px;
 }
 
 .container {
@@ -130,24 +143,61 @@ body::before {
     margin: auto;
 }
 
-/* FEATURED (DOMINANT) */
-.featured img {
-    width: 340px;
-    box-shadow: 0 30px 90px rgba(0,0,0,0.25);
-    margin-bottom: 50px;
+/* FEATURED MAIN */
+.featured-main {
+    text-align: left;
+}
+
+.featured-main img {
+    width: 360px;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+    margin-bottom: 40px;
     transition: 0.4s;
 }
 
-.featured img:hover {
-    transform: scale(1.03);
+.featured-main img:hover {
+    transform: scale(1.04);
 }
 
-.featured h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
+/* SECONDARY FEATURED (Holdfast + Limited) */
+.featured-secondary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-top: 80px;
+}
+
+.book-feature img {
+    width: 180px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    transition: 0.4s;
+}
+
+.book-feature:hover img {
+    transform: translateY(-6px) scale(1.03);
+}
+
+/* TEXT */
+.eyebrow {
+    font-size: 11px;
+    letter-spacing: 2px;
+    opacity: 0.5;
+}
+
+.link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 
 /* GRID */
+.section.texture {
+    background: #E8E6E1;
+    color: #1c1c1c;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -157,16 +207,12 @@ body::before {
 
 .book img {
     width: 220px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     transition: 0.4s;
 }
 
 .book:hover img {
-    transform: translateY(-10px) scale(1.05);
-}
-
-.book h3 {
-    margin-top: 15px;
+    transform: translateY(-12px) scale(1.05);
 }
 
 /* AUTHOR */
@@ -177,7 +223,7 @@ body::before {
 /* FOOTER */
 .footer {
     padding: 60px 20px;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #333;
 }
 
 .footer-inner {
@@ -185,28 +231,33 @@ body::before {
     margin: auto;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .social img {
     width: 20px;
     margin-left: 15px;
     opacity: 0.7;
-    transition: 0.3s;
 }
 
-.social img:hover {
+.social img:hover { opacity: 1; }
+
+/* REVEAL */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+
+.reveal.visible {
     opacity: 1;
+    transform: translateY(0);
 }
 
 /* MOBILE */
-@media (max-width: 800px) {
+@media (max-width: 900px) {
+    .featured-secondary,
     .grid {
         grid-template-columns: 1fr;
-    }
-
-    .header h1 {
-        font-size: 40px;
     }
 }
 
@@ -228,67 +279,80 @@ body::before {
 
 <!-- HERO -->
 <div class="header">
-
     <div class="header-overlay"></div>
     <div class="header-fog fog-back"></div>
     <div class="header-fog fog-front"></div>
 
     <div class="header-inner">
         <img src="logo (1).png" class="header-logo">
-
         <h1>Blackwood Publishing</h1>
-
         <p>
             Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
         </p>
     </div>
-
 </div>
 
-<!-- FEATURED -->
+<!-- FEATURED MAIN -->
 <div class="section">
-<div class="container featured">
+<div class="container featured-main reveal">
 
     <img src="book2.jpg">
 
     <h2>Corrour Bothy: The First Summoning</h2>
 
     <p>
-        A remote Highland bothy draws in those already carrying quiet fractures. What begins as refuge shifts into something less certain, as the surrounding landscape unsettles perception and an unseen presence begins to exert influence.
+        A remote refuge where isolation fractures perception and something unseen takes hold.
     </p>
 
-    <p>
-        Memory, isolation, and environment tighten together until the boundary between internal and external strain begins to dissolve.
-    </p>
+</div>
+
+<!-- SECONDARY FEATURED -->
+<div class="container featured-secondary">
+
+    <div class="book-feature reveal">
+        <img src="book6.jpg">
+        <div>
+            <p class="eyebrow">Coming Soon</p>
+            <h3>Holdfast</h3>
+            <p>Some memories return. Others refuse to leave.</p>
+            <a href="https://mybook.to/Holdfast" target="_blank" class="link">Preorder</a>
+        </div>
+    </div>
+
+    <div class="book-feature reveal">
+        <img src="book13.jpg">
+        <div>
+            <p class="eyebrow">Limited Edition</p>
+            <h3>Corrour Bothy</h3>
+            <p>Founder’s Foil Edition — limited to fifty copies.</p>
+            <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing" target="_blank" class="link">Purchase</a>
+        </div>
+    </div>
 
 </div>
 </div>
 
 <!-- PUBLICATIONS -->
-<div class="section">
+<div class="section texture">
 <div class="container">
 
-    <h2>Publications</h2>
+<h2>Publications</h2>
 
-    <div class="grid">
+<div class="grid">
 
-        <div class="book">
-            <img src="book3.jpg">
-            <h3>The Black Bothy</h3>
-            <p>
-                An investigative record of disappearances tied to a place that refuses to remain fixed.
-            </p>
-        </div>
+<a href="https://mybook.to/BlackBothy" class="book reveal">
+<img src="book3.jpg">
+<h3>The Black Bothy</h3>
+<p>An investigative record of disappearances tied to a place that refuses to remain fixed.</p>
+</a>
 
-        <div class="book">
-            <img src="book1.jpg">
-            <h3>Dour Hill House</h3>
-            <p>
-                Inheritance becomes confinement as a house distorts space, memory, and identity.
-            </p>
-        </div>
+<a href="https://mybook.to/DourHillHouse" class="book reveal">
+<img src="book1.jpg">
+<h3>Dour Hill House</h3>
+<p>Inheritance becomes confinement as a house distorts space, memory, and identity.</p>
+</a>
 
-    </div>
+</div>
 
 </div>
 </div>
@@ -296,11 +360,9 @@ body::before {
 <!-- AUTHOR -->
 <div class="section">
 <div class="container author">
-
-    <p>
-        Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
-    </p>
-
+<p>
+Aidan Blackwood writes fiction rooted in isolation, landscape, and psychological strain, where environment and memory converge to unsettle perception and erode certainty.
+</p>
 </div>
 </div>
 
@@ -308,19 +370,41 @@ body::before {
 <div class="footer">
 <div class="footer-inner">
 
-    <div>© Blackwood Publishing</div>
+<div>© Blackwood Publishing</div>
 
-    <div class="social">
-        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
-            <img src="tiktok.png">
-        </a>
-        <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
-            <img src="instagram.png">
-        </a>
-    </div>
+<div class="social">
+<a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+<img src="tiktok.png">
+</a>
+<a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+<img src="instagram.png">
+</a>
+</div>
 
 </div>
 </div>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY;
+    const fogFront = document.querySelector(".fog-front");
+    const fogBack = document.querySelector(".fog-back");
+
+    if (fogFront && fogBack) {
+        fogFront.style.transform = `translateY(${scrollY * 0.02}px)`;
+        fogBack.style.transform = `translateY(${scrollY * 0.01}px)`;
+    }
+});
+</script>
 
 </body>
 </html>
