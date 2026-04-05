@@ -1,29 +1,84 @@
 // =========================
-// HEADER INTERACTIONS
+// HEADER + HERO SYSTEM
+// =========================
+
+async function loadHeader(type = "hero") {
+
+    let file = "/header.html";
+    if (type === "simple") file = "/header-simple.html";
+
+    try {
+        const res = await fetch(file);
+        const html = await res.text();
+
+        const container = document.getElementById("header-placeholder");
+        container.innerHTML = html;
+
+        // Fade-in effect
+        requestAnimationFrame(() => {
+            container.classList.add("loaded");
+        });
+
+        initHeader();
+
+    } catch (err) {
+        console.error("Header load failed:", err);
+    }
+}
+
+// =========================
+// HERO INTERACTIONS
 // =========================
 
 function initHeader() {
 
     const hero = document.querySelector('.hero');
-    if (!hero) return; // safety for other pages
+    if (!hero) return;
+
+    const inner = hero.querySelector('.hero-inner');
 
     let targetX = 50, targetY = 50;
     let currentX = 50, currentY = 50;
 
+    let driftTime = 0;
+
     // =========================
-    // LIGHT FOLLOW (MOUSE)
+    // PERFORMANCE: REDUCE MOTION
+    // =========================
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // =========================
+    // MOUSE + PARALLAX COMBINED
     // =========================
     hero.addEventListener('mousemove', (e) => {
+
         const rect = hero.getBoundingClientRect();
 
-        targetX = ((e.clientX - rect.left) / rect.width) * 100;
-        targetY = ((e.clientY - rect.top) / rect.height) * 100;
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+
+        targetX = x * 100;
+        targetY = y * 100;
+
+        if (inner) {
+            inner.style.transform = `
+                translate(${(x - 0.5) * 12}px, ${(y - 0.5) * 12}px)
+                scale(1.02)
+            `;
+        }
+    });
+
+    hero.addEventListener('mouseleave', () => {
+        if (inner) {
+            inner.style.transform = `translate(0,0) scale(1)`;
+        }
     });
 
     // =========================
-    // SMOOTH LIGHT
+    // SMOOTH LIGHT FOLLOW
     // =========================
     function animateLight() {
+
         currentX += (targetX - currentX) * 0.05;
         currentY += (targetY - currentY) * 0.05;
 
@@ -33,14 +88,11 @@ function initHeader() {
         requestAnimationFrame(animateLight);
     }
 
-    animateLight();
-
     // =========================
-    // CAMERA DRIFT (AUTO)
+    // CAMERA DRIFT (SUBTLE AUTO MOTION)
     // =========================
-    let driftTime = 0;
-
     function cameraDrift() {
+
         driftTime += 0.002;
 
         const driftX = Math.sin(driftTime) * 0.5;
@@ -52,34 +104,22 @@ function initHeader() {
         requestAnimationFrame(cameraDrift);
     }
 
-    cameraDrift();
-
     // =========================
-    // PARALLAX CONTENT
+    // START ANIMATIONS
     // =========================
-    const inner = hero.querySelector('.hero-inner');
-
-    if (inner) {
-
-        hero.addEventListener('mousemove', (e) => {
-            const rect = hero.getBoundingClientRect();
-
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-            inner.style.transform = `
-                translate(${x * 12}px, ${y * 12}px)
-                scale(1.02)
-            `;
-        });
-
-        hero.addEventListener('mouseleave', () => {
-            inner.style.transform = `translate(0,0) scale(1)`;
-        });
+    if (!reduceMotion) {
+        animateLight();
+        cameraDrift();
     }
 }
 
 // =========================
-// EXPORT FOR MANUAL CALL
+// AUTO INIT (SAFETY)
 // =========================
-window.initHeader = initHeader;
+document.addEventListener("DOMContentLoaded", () => {
+
+    // If header isn't dynamically loaded, still run
+    if (!document.getElementById("header-placeholder")) {
+        initHeader();
+    }
+});
