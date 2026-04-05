@@ -181,7 +181,7 @@ body {
     margin: 5px 0 30px 0;
 }
 
-.nav-inline a
+.nav-inline a,
 .nav-inline a:visited,
 .nav-inline a:active {
     position: relative;
