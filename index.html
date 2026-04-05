@@ -12,7 +12,7 @@
 
 <body>
 
-<!-- HEADER PLACEHOLDER -->
+<!-- HEADER -->
 <div id="header-placeholder"></div>
 
 <!-- FEATURED SECTION -->
@@ -42,6 +42,7 @@
     </div>
 </section>
 
+<!-- LOAD HEADER -->
 <script>
 fetch('header.html')
     .then(res => {
@@ -67,22 +68,29 @@ fetch('header.html')
     })
     .catch(err => console.error("Header load error:", err));
 </script>
-<script>
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target); // run once only
-        }
-    });
-}, {
-    threshold: 0.6,
-    rootMargin: "0px 0px -100px 0px"
-});
 
-document.querySelectorAll('.fade-in').forEach(el => {
-    observer.observe(el);
+<!-- SCROLL REVEAL -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const elements = document.querySelectorAll('.fade-in');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+
+        });
+    }, {
+        threshold: 0.25
+    });
+
+    elements.forEach(el => observer.observe(el));
+
 });
 </script>
+
 </body>
 </html>
