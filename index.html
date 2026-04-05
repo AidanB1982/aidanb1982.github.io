@@ -75,7 +75,7 @@ a:active {
     position: absolute;
     inset: 0;
     background: url('fog.png');
-    opacity: 0.06;
+    opacity: 0.30;
     animation: fogSlow 120s linear infinite;
 }
 
@@ -236,12 +236,22 @@ a:active {
     gap: 40px;
     padding-bottom: 10px;
     cursor: grab;
-    justify-content: center;
+
+    overflow-x: auto;
+    scroll-behavior: smooth;
+
+    justify-content: flex-start;
+}
+ .popular-row::-webkit-scrollbar {
+    display: none;
+}
+
+.popular-row {
+    scrollbar-width: none;
 }
 .popular-row:active {
     cursor: grabbing;
 }
-
 
 .popular-book img {
     width: 160px;
@@ -578,40 +588,98 @@ modalLink.href=d.link;
 };
 });
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
-/* 🔥 MOUSE TILT */
-document.querySelectorAll('.popular-book img, .book img').forEach(el => {
+const books = document.querySelectorAll('.popular-book img, .book img');
 
+let scrollY = 0;
+
+window.addEventListener('scroll', () => {
+    scrollY = window.scrollY;
+});
+
+/* LOOP FOR EACH BOOK */
+books.forEach((el, i) => {
+
+    let tiltX = 0;
+    let tiltY = 0;
+
+    /* CREATE GLOW ELEMENT */
+    const glow = document.createElement('div');
+    glow.style.position = 'absolute';
+    glow.style.inset = '0';
+    glow.style.pointerEvents = 'none';
+    glow.style.background = 'radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 60%)';
+    glow.style.opacity = '0';
+    glow.style.transition = 'opacity 0.3s';
+
+    el.parentElement.appendChild(glow);
+
+    function updateTransform() {
+        const speed = (i % 2 === 0) ? 0.03 : 0.06;
+        const translateY = scrollY * speed;
+
+        el.style.transform = `
+            perspective(800px)
+            rotateY(${tiltY}deg)
+            rotateX(${tiltX}deg)
+            translateY(${translateY}px)
+            scale(1.05)
+        `;
+
+        /* SHADOW DEPTH */
+        el.style.filter = `
+            drop-shadow(${tiltY * 2}px ${tiltX * -2}px 80px rgba(0,0,0,0.9))
+        `;
+    }
+
+    /* MOUSE MOVE */
     el.addEventListener('mousemove', (e) => {
         const rect = el.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        const rotateY = ((x / rect.width) - 0.5) * 10;
-        const rotateX = ((y / rect.height) - 0.5) * -10;
+        tiltY = ((x / rect.width) - 0.5) * 12;
+        tiltX = ((y / rect.height) - 0.5) * -12;
 
-        el.style.transform = `
-            perspective(800px)
-            rotateY(${rotateY}deg)
-            rotateX(${rotateX}deg)
-            scale(1.05)
+        /* MOVE GLOW */
+        glow.style.background = `
+            radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.18), transparent 60%)
         `;
+        glow.style.opacity = '1';
+
+        updateTransform();
     });
 
+    /* LEAVE */
     el.addEventListener('mouseleave', () => {
-        el.style.transform = '';
+        tiltX = 0;
+        tiltY = 0;
+        glow.style.opacity = '0';
+        updateTransform();
     });
 
-});
-/* 🔥 PARALLAX DRIFT */
-window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
+    /* CONTINUOUS PARALLAX LOOP */
+    function animate() {
+        updateTransform();
+        requestAnimationFrame(animate);
+    }
 
-    document.querySelectorAll('.popular-book img, .book img').forEach((el, i) => {
-        const speed = (i % 2 === 0) ? 0.03 : 0.06;
-        el.style.transform = `translateY(${scrollY * speed}px)`;
-    });
-});
+    animate();
 
+});
+const row = document.querySelector('.popular-row');
+
+let autoScroll = 0;
+
+function autoMove() {
+    if (!row) return;
+
+    autoScroll += 0.2; // speed (lower = slower)
+    row.scrollLeft = autoScroll;
+
+    requestAnimationFrame(autoMove);
+}
+
+autoMove();
 </script>
 
 </body>
