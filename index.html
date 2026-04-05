@@ -15,21 +15,92 @@ body {
     color: #e6e6e6;
 }
 
-/* ================= HERO ================= */
-.hero {
-    height: 60vh;
+/* GLOBAL TEXTURE */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.12;
+    z-index: -1;
+}
+
+/* LINKS */
+a { text-decoration: none; color: inherit; }
+
+/* ================= HEADER ================= */
+.header {
+    position: relative;
+    height: 55vh;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    background:
-        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-        url('forest.png') center/cover;
 }
 
-.hero h1 {
-    font-size: 42px;
+/* NAV */
+.nav {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    background: linear-gradient(rgba(10,10,12,0.9), rgba(10,10,12,0.4), transparent);
+}
+
+.nav-inner {
+    max-width: 1100px;
+    margin: auto;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav a {
+    margin-left: 26px;
+    font-size: 12px;
     letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.nav a:hover { opacity: 1; }
+
+/* FOREST BACKGROUND */
+.header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(22,22,25,0.75), rgba(22,22,25,0.9)),
+        url('forest.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* FOG */
+.header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('https://i.ibb.co/7G8y7hK/fog.png');
+    opacity: 0.12;
+    animation: fog 60s linear infinite;
+}
+
+@keyframes fog {
+    from { transform: translateX(0); }
+    to { transform: translateX(-200px); }
+}
+
+.header-inner {
+    position: relative;
+    z-index: 5;
+}
+
+.header-logo {
+    width: 150px;
+    margin-bottom: 10px;
 }
 
 /* ================= FEATURED ================= */
@@ -39,23 +110,18 @@ body {
 }
 
 .featured img {
-    width: 340px;
-    filter: drop-shadow(0 50px 120px rgba(0,0,0,0.9));
-    transition: transform 0.4s ease;
+    width: 360px;
+    filter: drop-shadow(0 60px 140px rgba(0,0,0,0.9));
+    transition: 0.4s;
 }
 
 .featured img:hover {
-    transform: rotateY(-8deg) rotateX(3deg) scale(1.05);
-}
-
-.featured h2 {
-    margin-top: 25px;
-    font-size: 28px;
+    transform: rotateY(-8deg) rotateX(4deg) scale(1.05);
 }
 
 /* ================= BOOK STRIP ================= */
 .books {
-    padding: 80px 0;
+    padding: 60px 0 100px;
     overflow-x: auto;
 }
 
@@ -71,46 +137,84 @@ body {
 }
 
 .book img {
-    width: 140px;
-    filter: drop-shadow(0 25px 60px rgba(0,0,0,0.8));
-    transition: transform 0.4s ease;
+    width: 150px;
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.85));
+    transition: 0.4s;
 }
 
 .book img:hover {
     transform: rotateY(-10deg) scale(1.08);
 }
 
-/* hide scrollbar (clean look) */
-.books::-webkit-scrollbar {
-    display: none;
+/* hide scrollbar */
+.books::-webkit-scrollbar { display: none; }
+
+/* ================= SECTION TEXTURE ================= */
+.section {
+    position: relative;
+    padding: 80px 20px;
+    background: #E8E6E1;
+    color: #1c1c1c;
 }
 
-/* ================= ABOUT ================= */
-.about {
-    padding: 80px 20px;
-    text-align: center;
-    max-width: 600px;
-    margin: auto;
-    line-height: 1.7;
+.section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.15;
+}
+
+.section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.08));
 }
 
 /* ================= FOOTER ================= */
 .footer {
-    padding: 60px 20px;
-    background: #000;
-    text-align: center;
+    position: relative;
+    padding: 80px 20px;
+    color: #eee;
+}
+
+.footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.9)),
+        url('forest.png');
+    background-size: cover;
+}
+
+.footer-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.footer-center img {
+    width: 70px;
+    filter: invert(1);
 }
 
 .socials img {
     width: 18px;
-    margin: 10px;
+    margin-right: 10px;
     opacity: 0.7;
 }
 
 /* ================= MOBILE ================= */
-@media (max-width: 700px) {
-    .featured img { width: 240px; }
+@media (max-width: 800px) {
     .book img { width: 110px; }
+    .featured img { width: 240px; }
+    .footer-content { flex-direction: column; gap: 20px; text-align: center; }
 }
 
 </style>
@@ -118,57 +222,68 @@ body {
 
 <body>
 
-<!-- HERO -->
-<div class="hero">
-<div>
-<h1>BLACKWOOD</h1>
+<!-- HEADER -->
+<div class="header">
+
+<div class="nav">
+<div class="nav-inner">
+<a href="index.html">Home</a>
+<a href="publications.html">Publications</a>
+<a href="about.html">About</a>
+<a href="author.html">Author</a>
+<a href="contact.html">Contact</a>
+</div>
+</div>
+
+<div class="header-inner">
+<img src="logo (1).png" class="header-logo">
 <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
 </div>
+
 </div>
 
-<!-- FEATURED BOOK -->
+<!-- FEATURED -->
 <div class="featured">
-
 <img src="A1.png">
-
 <h2>Dour Hill House</h2>
 <p>A place that remembers.</p>
-
 </div>
 
 <!-- BOOK STRIP -->
 <div class="books">
-
 <div class="book-row">
 
-<div class="book"><img src="A2.png"></div>
-<div class="book"><img src="A3.png"></div>
-<div class="book"><img src="A4.png"></div>
-<div class="book"><img src="A5.png"></div>
-<div class="book"><img src="A6.png"></div>
-<div class="book"><img src="A7.png"></div>
-<div class="book"><img src="A8.png"></div>
-<div class="book"><img src="A9.png"></div>
-<div class="book"><img src="A10.png"></div>
-<div class="book"><img src="A11.png"></div>
-<div class="book"><img src="A12.png"></div>
+<img src="A2.png">
+<img src="A3.png">
+<img src="A4.png">
+<img src="A5.png">
+<img src="A6.png">
+<img src="A7.png">
+<img src="A8.png">
+<img src="A9.png">
+<img src="A10.png">
+<img src="A11.png">
+<img src="A12.png">
 
 </div>
-
 </div>
 
 <!-- ABOUT -->
-<div class="about">
+<div class="section">
+<div style="max-width:600px;margin:auto;text-align:center;position:relative;z-index:1;">
 <p>
 Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
 </p>
 </div>
+</div>
 
 <!-- FOOTER -->
 <div class="footer">
+<div class="footer-content">
 
+<div>
 <p>Blackwood Publishing</p>
-
+<p>Independent Literary Imprint</p>
 <div class="socials">
 <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
 <img src="instagram.png">
@@ -177,7 +292,19 @@ Blackwood Publishing explores atmosphere, landscape, and the quiet persistence o
 <img src="tiktok.png">
 </a>
 </div>
+</div>
 
+<div class="footer-center">
+<img src="seal.png">
+</div>
+
+<div>
+<a href="publications.html">Publications</a><br>
+<a href="about.html">About</a><br>
+<a href="contact.html">Contact</a>
+</div>
+
+</div>
 </div>
 
 </body>
