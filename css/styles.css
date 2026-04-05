@@ -21,8 +21,8 @@
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: 220px 1fr; /* slightly narrower image column */
-    gap: 40px; /* 🔥 reduced from 80px → tighter spacing */
+    grid-template-columns: 220px 1fr; 
+    gap: 40px; 
     align-items: center;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .featured-image img {
-    width: 260px; 
+    width: 360px; 
     height: auto;
     display: block;
 
