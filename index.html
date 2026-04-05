@@ -46,7 +46,18 @@ body::before {
     text-transform: uppercase;
     opacity: 0.75;
 }
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
+a:visited {
+    color: inherit;
+}
+
+a:active {
+    color: inherit;
+}
 /* =========================
    HERO
 ========================= */
@@ -73,8 +84,52 @@ body::before {
     position: absolute;
     inset: 0;
     background: url('fog.png');
-    opacity: 0.08;
-    animation: fog 90s linear infinite;
+    opacity: 0.06;
+    animation: fogSlow 120s linear infinite;
+}
+
+.hero::before,
+.hero::after {
+    pointer-events: none;
+}
+
+/* EXTRA FOG LAYERS */
+.hero::before {
+    background:
+        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        url('forest.png') center/cover;
+}
+
+.hero .fog-layer {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.04;
+    animation: fogFast 60s linear infinite;
+}
+
+.hero .fog-layer2 {
+    position: absolute;
+    inset: 0;
+    background: url('fog.png');
+    opacity: 0.03;
+    animation: fogReverse 180s linear infinite;
+}
+
+/* ANIMATIONS */
+@keyframes fogSlow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-400px); }
+}
+
+@keyframes fogFast {
+    from { transform: translateX(0); }
+    to { transform: translateX(-200px); }
+}
+
+@keyframes fogReverse {
+    from { transform: translateX(0); }
+    to { transform: translateX(300px); }
 }
 
 @keyframes fog {
@@ -86,15 +141,15 @@ body::before {
     position: relative;
     z-index: 2;
     max-width: 600px;
-    margin-top: 40px;
+    margin-top: 0px;
 }
 
-.hero h1 {
-    font-size: 64px;
-    letter-spacing: 4px;
-    margin-bottom: 10px;
+.hero-logo {
+    width: 320px;
+    max-width: 80%;
+    margin-bottom: 20px;
+    opacity: 0.95;
 }
-
 .hero p {
    margin-top: 15px;
    line-height: 1.7;
@@ -178,7 +233,6 @@ body::before {
 .popular-row {
     display: flex;
     gap: 40px;
-    overflow-x: auto;
     padding-bottom: 10px;
     cursor: grab;
 }
@@ -186,13 +240,6 @@ body::before {
     cursor: grabbing;
 }
 
-.popular-row::-webkit-scrollbar {
-    height: 6px;
-}
-
-.popular-row::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.2);
-}
 
 .popular-book img {
     width: 160px;
@@ -200,7 +247,6 @@ body::before {
     transition: transform 0.4s ease, filter 0.4s ease;
     cursor: pointer;
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.8));
-    transform: perspective(800px) rotateY(0deg) rotateX(0deg);
 }
 .popular-book img:hover {
     transform: perspective(800px) rotateY(-6deg) rotateX(3deg) scale(1.05) translateY(-6px);
@@ -387,9 +433,13 @@ body::before {
 </div>
 
 <section class="hero">
+
+<div class="fog-layer"></div>
+<div class="fog-layer2"></div>
+
 <div class="hero-inner">
 
-<h1>Blackwood Publishing</h1>
+<img src="logo.png" class="hero-logo">
 
 <p>
 Independent publisher of literary and psychological fiction shaped by place, memory, and unease.
@@ -609,30 +659,6 @@ modalLink.href=d.link;
 });
 modal.onclick=e=>{if(e.target===modal)modal.classList.remove("active")};
 /* 🔥 ADD THIS BELOW */
-const slider = document.querySelector('.popular-row');
-
-if (slider) {
-let isDown = false;
-let startX;
-let scrollLeft;
-
-slider.addEventListener('mousedown', e => {
-    isDown = true;
-    startX = e.pageX - slider.offsetLeft;
-    scrollLeft = slider.scrollLeft;
-});
-
-slider.addEventListener('mouseleave', () => isDown = false);
-slider.addEventListener('mouseup', () => isDown = false);
-
-slider.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - slider.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    slider.scrollLeft = scrollLeft - walk;
-});
-}
 
 </script>
 
