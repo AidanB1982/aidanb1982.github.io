@@ -183,7 +183,8 @@ body {
 
 .nav-inline a,
 .nav-inline a:visited,
-.nav-inline a:active {
+.nav-inline a:active,
+.nav-inline a:link {
     position: relative;
     font-size: 12px;
     letter-spacing: 2px;
