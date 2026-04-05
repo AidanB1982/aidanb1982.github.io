@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-
 /* =========================
    BASE
 ========================= */
@@ -37,7 +29,7 @@ body {
 
     background:
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
-        url('forest.png') center/cover no-repeat;
+        url('../assets/forest.png') center/cover no-repeat;
 
     animation:
         dayNightCycle 40s ease-in-out infinite alternate,
@@ -66,7 +58,7 @@ body {
 .fog-front {
     position: absolute;
     inset: 0;
-    background: url('fog.png');
+    background: url('../assets/fog1.png');
     background-repeat: repeat-x;
     background-size: cover;
 
@@ -82,7 +74,7 @@ body {
 .fog-front{ opacity: 0.12; animation: fogFast 60s linear infinite; }
 
 /* =========================
-   👁 SILHOUETTE
+   SILHOUETTE
 ========================= */
 .silhouette {
     position: absolute;
@@ -184,12 +176,10 @@ body {
    ANIMATIONS
 ========================= */
 
-/* FOG */
 @keyframes fogSlow { from { transform: translateX(0); } to { transform: translateX(-600px); } }
 @keyframes fogMid  { from { transform: translateX(0); } to { transform: translateX(-800px); } }
 @keyframes fogFast { from { transform: translateX(0); } to { transform: translateX(-1200px); } }
 
-/* ENTITY */
 @keyframes entityMove {
     0% { transform: translate(10%,40%); }
     50% { transform: translate(70%,50%); }
@@ -201,7 +191,6 @@ body {
     100% { opacity: 0.35; }
 }
 
-/* 👁 SILHOUETTE */
 @keyframes silhouetteAppear {
     0%,85%,100% { opacity: 0; }
     90% { opacity: 0.25; }
@@ -212,87 +201,39 @@ body {
     to { transform: translateX(40px); }
 }
 
-/* TREE */
 @keyframes treeShift {
     from { transform: scale(1) translateX(0); }
     to { transform: scale(1.02) translateX(-10px); }
 }
 
-/* 🔥 REAL LOGO FLICKER */
+/* 🔥 REAL FLICKER */
 @keyframes logoFlicker {
-
     0%,100% { opacity: 1; filter: brightness(1); }
-
     48% { opacity: 0.95; filter: brightness(1.05); }
     50% { opacity: 0.8;  filter: brightness(0.9); }
     52% { opacity: 1;    filter: brightness(1); }
-
     78% { opacity: 0.9;  filter: brightness(0.95); }
     80% { opacity: 1;    filter: brightness(1.05); }
 }
 
-/* GLOW */
 @keyframes logoGlow {
     0%,100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.1)); }
     50% { filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)); }
 }
 
-/* FADE */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px);}
     to { opacity: 1; transform: translateY(0);}
 }
 
-/* DAY/NIGHT */
 @keyframes dayNightCycle {
     0% { filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%); }
     50% { filter: grayscale(15%) brightness(0.95) contrast(100%) saturate(100%); }
     100% { filter: grayscale(40%) brightness(0.65) contrast(120%) saturate(80%); }
 }
 
-/* COLOR */
 @keyframes colorShift {
     0% { opacity: 0.6; }
     50% { opacity: 0.3; }
     100% { opacity: 0.6; }
 }
-
-</style>
-</head>
-
-<body>
-
-<section class="hero">
-
-    <div class="fog-back"></div>
-    <div class="fog-mid"></div>
-    <div class="fog-front"></div>
-
-    <div class="silhouette"></div>
-    <div class="shadow-entity"></div>
-
-    <div class="hero-inner">
-
-        <img src="logo (1).png" class="hero-logo">
-
-        <div class="nav-inline">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contacts.html">Contact</a>
-        </div>
-
-        <p>
-        Independent publisher of literary and psychological fiction shaped by place,
-        memory, and unease.
-        </p>
-
-        <a href="#" class="button">Explore Publications</a>
-
-    </div>
-
-</section>
-
-</body>
-</html>
