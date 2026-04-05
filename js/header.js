@@ -103,7 +103,28 @@ function initHeader() {
 
         requestAnimationFrame(cameraDrift);
     }
+     // =========================
+    // SCROLL PARALLAX
+    // =========================
+    window.addEventListener('scroll', () => {
 
+        const scrollY = window.scrollY;
+
+        // HERO background drift
+        hero.style.setProperty('--scrollY', scrollY * 0.05 + 'px');
+
+        // HERO content subtle lift
+        if (inner) {
+            inner.style.transform += ` translateY(${scrollY * 0.02}px)`;
+        }
+
+        // FEATURED section movement
+        const featured = document.querySelector('.featured-inner');
+        if (featured) {
+            featured.style.transform = `translateY(${scrollY * -0.03}px)`;
+        }
+
+    });
     // =========================
     // START ANIMATIONS
     // =========================
