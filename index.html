@@ -89,18 +89,59 @@ a:active {
 
     box-shadow: inset 0 0 200px rgba(0,0,0,0.6);
 }
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
 
-.hero::before,
-.hero::after {
+    background:
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,0.06) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(255,255,255,0.04) 100%
+        ),
+        linear-gradient(
+            100deg,
+            rgba(255,255,255,0.04) 0%,
+            transparent 40%
+        );
+
+    mix-blend-mode: screen;
+    opacity: 0.4;
+
+    transform: translateX(calc((var(--mx,50%) - 50%) * 0.3))
+               translateY(calc((var(--my,50%) - 50%) * 0.3));
+
     pointer-events: none;
 }
+.hero::after,
+.hero::before {
+    will-change: transform;
+}
 
+.hero::marker {}
+    pointer-events: none;
+}
+.hero::selection {} /* ignore */
+
+.hero::after {
+    background-image:
+        url('fog.png'),
+        radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.12), transparent 40%),
+        url('https://grainy-gradients.vercel.app/noise.svg');
+}
+.hero-inner {
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+}
 .hero .fog-layer {
     position: absolute;
     inset: 0;
     background: url('fog.png');
     opacity: 0.06;
-    filter: blur(1px)
+    filter: blur(1px);
     animation: fogFast 60s linear infinite;
 }
 
@@ -109,8 +150,8 @@ a:active {
     inset: 0;
     background: url('fog.png');
     opacity: 0.05;
-    filter: blur(2px)
-    animation: fogReverse 180s linear infinite;
+    filter: blur(1px);
+    animation: fogFast 60s linear infinite;
 }
 
 /* ANIMATIONS */
@@ -711,7 +752,27 @@ books.forEach((el, i) => {
     `;
     glow.style.opacity = '1';
 });
+// 🎥 CAMERA DRIFT
+hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
 
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    const strength = 12;
+
+    const inner = hero.querySelector('.hero-inner');
+
+    inner.style.transform = `
+        translate(${x * strength}px, ${y * strength}px)
+        scale(1.02)
+    `;
+});
+
+hero.addEventListener('mouseleave', () => {
+    const inner = hero.querySelector('.hero-inner');
+    inner.style.transform = `translate(0px, 0px) scale(1)`;
+});
     /* LEAVE */
     el.addEventListener('mouseleave', () => {
     tiltX = 0;
