@@ -27,7 +27,9 @@
     width: 200px !important;
     height: auto !important;
     max-width: none !important;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
     display: block;
 
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
