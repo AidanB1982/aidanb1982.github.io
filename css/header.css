@@ -22,7 +22,10 @@ body {
     align-items: flex-start;   
     text-align: center;
     letter-spacing: 0.3px;
-    padding-top: 80px;        
+    padding-top: 20px;        
+}
+.hero-inner {
+    margin-top: 50px;
 }
 /* BACKGROUND */
 .hero::before {
