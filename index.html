@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blackwood Publishing</title>
 
-<!-- GSAP -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-
 <style>
 
 /* ================= BASE ================= */
@@ -19,33 +15,9 @@ body {
     color: #e6e6e6;
 }
 
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.12;
-    z-index: -1;
-}
-
-/* ================= NAV ================= */
-.nav {
-    position: absolute;
-    top: 25px;
-    right: 50px;
-}
-
-.nav a {
-    margin-left: 20px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.7;
-}
-
 /* ================= HERO ================= */
 .hero {
-    height: 45vh;
+    height: 60vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,99 +27,84 @@ body::before {
         url('forest.png') center/cover;
 }
 
-.hero img {
-    width: 160px;
+.hero h1 {
+    font-size: 42px;
+    letter-spacing: 2px;
 }
 
-/* ================= SECTIONS ================= */
+/* ================= SECTION ================= */
 .section {
-    padding: 70px 20px;
-    background: rgba(232,230,225,0.9);
-    color: #1c1c1c;
-}
-
-.section.dark {
-    background: #0b0b0c;
-    color: #ddd;
+    padding: 80px 20px;
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 900px;
     margin: auto;
 }
 
 /* ================= FEATURED ================= */
 .featured {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 60px;
-    align-items: center;
+    text-align: center;
 }
 
 .featured img {
-    width: 200px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    width: 240px;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+    margin-bottom: 20px;
 }
 
-/* ================= BOOK WALL ================= */
-.book-wall {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+.featured h2 {
+    font-size: 28px;
+}
+
+/* ================= BOOK ROW ================= */
+.book-row {
+    display: flex;
+    justify-content: center;
     gap: 40px;
     margin-top: 40px;
 }
 
-.column {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+.book {
+    text-align: center;
 }
 
-.offset-1 { transform: translateY(20px); }
-.offset-2 { transform: translateY(40px); }
-.offset-3 { transform: translateY(60px); }
-
-.book-item {
-    width: 150px;
-    margin: 0 auto;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 0.5s ease;
+.book img {
+    width: 140px;
+    transition: 0.4s;
 }
 
-.book-item:hover {
-    transform: translateY(-6px) scale(1.03);
+.book img:hover {
+    transform: translateY(-6px) scale(1.05);
+}
+
+/* ================= ABOUT ================= */
+.about {
+    text-align: center;
+    max-width: 600px;
+    margin: auto;
+    line-height: 1.7;
 }
 
 /* ================= FOOTER ================= */
 .footer {
     padding: 60px 20px;
     background: #000;
-}
-
-.footer-content {
-    max-width: 1000px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-}
-
-.socials {
-    display: flex;
-    gap: 12px;
-    margin-top: 10px;
+    text-align: center;
 }
 
 .socials img {
     width: 18px;
+    margin: 10px;
     opacity: 0.7;
 }
 
 /* ================= MOBILE ================= */
-@media (max-width: 900px) {
-    .book-wall { grid-template-columns: 1fr; }
-    .featured { grid-template-columns: 1fr; text-align: center; }
-    .footer-content { flex-direction: column; gap: 20px; }
+@media (max-width: 700px) {
+    .book-row {
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 </style>
@@ -155,84 +112,70 @@ body::before {
 
 <body>
 
-<!-- NAV -->
-<div class="nav">
-<a href="#">Home</a>
-<a href="#">Publications</a>
-<a href="#">About</a>
-</div>
-
 <!-- HERO -->
 <div class="hero">
 <div>
-<img src="logo (1).png">
+<h1>BLACKWOOD</h1>
 <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
 </div>
 </div>
 
-<!-- INTRO -->
+<!-- FEATURED BOOK -->
 <div class="section">
-<div class="container">
-<p style="text-align:center; max-width:600px; margin:auto;">
-Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
-</p>
-</div>
-</div>
-
-<!-- FEATURED -->
-<div class="section dark">
 <div class="container featured">
+
 <img src="book6.jpg">
-<div>
+
 <h2>Holdfast</h2>
 <p>Some memories return. Others refuse to leave.</p>
-</div>
+
 </div>
 </div>
 
-<!-- BOOKS -->
+<!-- OTHER BOOKS -->
 <div class="section">
 <div class="container">
 
-<h2 style="text-align:center;">Current Publications</h2>
+<h2 style="text-align:center;">Selected Works</h2>
 
-<div class="book-wall" id="wall">
+<div class="book-row">
 
-<div class="column">
-<img src="book1.jpg" class="book-item">
-<img src="book5.jpg" class="book-item">
-<img src="book9.png" class="book-item">
+<div class="book">
+<img src="book1.jpg">
+<p>Dour Hill House</p>
 </div>
 
-<div class="column offset-1">
-<img src="book2.jpg" class="book-item">
-<img src="book6.jpg" class="book-item">
-<img src="book10.jpg" class="book-item">
+<div class="book">
+<img src="book2.jpg">
+<p>Corrour</p>
 </div>
 
-<div class="column offset-2">
-<img src="book3.jpg" class="book-item">
-<img src="book7.png" class="book-item">
-<img src="book11.png" class="book-item">
-</div>
-
-<div class="column offset-3">
-<img src="book4.jpg" class="book-item">
-<img src="book8.jpg" class="book-item">
-<img src="book13.jpg" class="book-item">
+<div class="book">
+<img src="book3.jpg">
+<p>The Black Bothy</p>
 </div>
 
 </div>
+
+</div>
+</div>
+
+<!-- ABOUT -->
+<div class="section">
+<div class="container about">
+
+<p>
+Blackwood Publishing explores atmosphere, landscape, and the quiet persistence of what remains.
+</p>
 
 </div>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-<div class="footer-content">
 
-<div>
 <p>Blackwood Publishing</p>
+
 <div class="socials">
 <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
 <img src="instagram.png">
@@ -241,52 +184,8 @@ Blackwood Publishing explores atmosphere, landscape, and the quiet persistence o
 <img src="tiktok.png">
 </a>
 </div>
-</div>
-
-<div>
-<img src="seal.png" width="60">
-</div>
-
-<div>
-<a href="#">Publications</a><br>
-<a href="#">About</a>
-</div>
 
 </div>
-</div>
-
-<script>
-
-/* SAFE GSAP INIT */
-if (typeof gsap !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-
-    document.querySelectorAll(".column").forEach(col => {
-        gsap.to(col.children, {
-            scrollTrigger: {
-                trigger: col,
-                start: "top 85%"
-            },
-            opacity: 1,
-            y: 0,
-            stagger: 0.12,
-            duration: 1,
-            ease: "power2.out"
-        });
-    });
-}
-
-/* OPTIONAL SHUFFLE (NON-DESTRUCTIVE) */
-const wall = document.getElementById("wall");
-const columns = [...wall.children];
-
-columns.forEach(col => {
-    const items = [...col.children];
-    items.sort(() => Math.random() - 0.5);
-    items.forEach(el => col.appendChild(el));
-});
-
-</script>
 
 </body>
 </html>
