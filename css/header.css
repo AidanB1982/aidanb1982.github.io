@@ -37,7 +37,7 @@ body {
 ========================= */
 .hero {
     position: relative;
-    height: 80vh;
+    height: 1000vh;
     overflow: hidden;
 
     display: flex;
