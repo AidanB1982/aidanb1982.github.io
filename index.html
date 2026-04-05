@@ -21,50 +21,6 @@ body {
     background: #0e0e10;
     color: #e6e6e6;
     overflow-x: hidden;
-    cursor: none;
-}
-
-/* CUSTOM CURSOR */
-.cursor {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #fff;
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.15s ease, opacity 0.3s;
-}
-
-.cursor-grow {
-    transform: translate(-50%, -50%) scale(2.5);
-    opacity: 0.6;
-}
-
-/* TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.12;
-    z-index: -1;
-}
-
-/* ================= NAV ================= */
-.nav {
-    position: absolute;
-    top: 25px;
-    right: 50px;
-    z-index: 10;
-}
-
-.nav a {
-    margin-left: 20px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
 }
 
 /* ================= HERO ================= */
@@ -74,35 +30,13 @@ body::before {
     align-items: center;
     justify-content: center;
     text-align: center;
-    position: relative;
-}
-
-.hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.hero-inner {
-    position: relative;
-    z-index: 2;
-    opacity: 0;
+    background: url('forest.png') center/cover;
 }
 
 /* ================= SECTION ================= */
-.section {
-    padding: 90px 20px;
-    background: rgba(232,230,225,0.9);
-    color: #1c1c1c;
-}
-
 .section.dark {
     background: #0b0b0c;
-    color: #ddd;
+    padding: 100px 20px;
 }
 
 .container {
@@ -127,6 +61,26 @@ body::before {
 .offset-2 { transform: translateY(80px); }
 .offset-3 { transform: translateY(120px); }
 
+/* BOOK WRAPPER (for glow) */
+.book-wrap {
+    position: relative;
+}
+
+/* GLOW */
+.book-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.book-wrap:hover::before {
+    opacity: 1;
+}
+
+/* BOOK */
 .book-item {
     opacity: 0;
     transform: translateY(80px) scale(0.95);
@@ -134,47 +88,13 @@ body::before {
     transition: transform 0.4s ease;
 }
 
-/* HOVER GLOW */
 .book-item:hover {
-    transform: translateY(-8px) scale(1.04);
-    box-shadow: 0 40px 120px rgba(0,0,0,0.9);
-}
-
-/* ================= FOOTER ================= */
-.footer {
-    padding: 80px 20px;
-    background: #000;
-}
-
-.footer-content {
-    max-width: 1000px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-}
-
-.socials {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.socials img {
-    width: 22px;
-    opacity: 0.7;
-    transition: 0.3s;
-}
-
-.socials img:hover {
-    opacity: 1;
-    transform: scale(1.1);
+    transform: translateY(-10px) scale(1.05);
 }
 
 /* ================= MOBILE ================= */
 @media (max-width: 900px) {
     .book-wall { grid-template-columns: 1fr; }
-    body { cursor: default; }
-    .cursor { display: none; }
 }
 
 </style>
@@ -182,82 +102,25 @@ body::before {
 
 <body>
 
-<div class="cursor"></div>
-
-<!-- NAV -->
-<div class="nav">
-<a href="#">Home</a>
-<a href="#">Publications</a>
-<a href="#">About</a>
-</div>
-
-<!-- HERO -->
 <div class="hero">
-<div class="hero-inner">
-<img src="logo (1).png" width="170">
-<p>Literary and psychological fiction shaped by place, memory, and unease.</p>
-</div>
+    <div>
+        <img src="logo (1).png" width="160">
+        <p>Literary and psychological fiction shaped by place, memory, and unease.</p>
+    </div>
 </div>
 
-<!-- BOOK WALL -->
 <div class="section dark">
 <div class="container">
 
 <h2 style="text-align:center;">Current Publications</h2>
 
-<div class="book-wall">
+<div class="book-wall" id="bookWall">
 
-<div class="column">
-<img src="book1.jpg" class="book-item">
-<img src="book5.jpg" class="book-item">
-<img src="book9.png" class="book-item">
-</div>
+    <div class="column"></div>
+    <div class="column offset-1"></div>
+    <div class="column offset-2"></div>
+    <div class="column offset-3"></div>
 
-<div class="column offset-1">
-<img src="book2.jpg" class="book-item">
-<img src="book6.jpg" class="book-item">
-<img src="book10.jpg" class="book-item">
-</div>
-
-<div class="column offset-2">
-<img src="book3.jpg" class="book-item">
-<img src="book7.png" class="book-item">
-<img src="book11.png" class="book-item">
-</div>
-
-<div class="column offset-3">
-<img src="book4.jpg" class="book-item">
-<img src="book8.jpg" class="book-item">
-<img src="book13.jpg" class="book-item">
-</div>
-
-</div>
-</div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-<div class="footer-content">
-
-<div>
-<p>Blackwood Publishing</p>
-<div class="socials">
-<a href="https://www.instagram.com/aidan.blackwood" target="_blank">
-<img src="instagram.png">
-</a>
-<a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
-<img src="tiktok.png">
-</a>
-</div>
-</div>
-
-<div>
-<img src="seal.png" width="60">
-</div>
-
-<div>
-<a href="#">Publications</a><br>
-<a href="#">About</a>
 </div>
 
 </div>
@@ -267,7 +130,6 @@ body::before {
 
 /* ================= LENIS ================= */
 const lenis = new Lenis({ lerp: 0.08 });
-
 function raf(time) {
     lenis.raf(time);
     requestAnimationFrame(raf);
@@ -277,15 +139,37 @@ requestAnimationFrame(raf);
 /* ================= GSAP ================= */
 gsap.registerPlugin(ScrollTrigger);
 
-/* HERO INTRO */
-gsap.to(".hero-inner", {
-    opacity: 1,
-    y: 0,
-    duration: 1.5,
-    ease: "power3.out"
+/* ================= BOOK DATA ================= */
+const books = [
+    "book1.jpg","book2.jpg","book3.jpg","book4.jpg",
+    "book5.jpg","book6.jpg","book7.png","book8.jpg",
+    "book9.png","book10.jpg","book11.png","book13.jpg"
+];
+
+/* SHUFFLE */
+function shuffle(array) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+const shuffled = shuffle([...books]);
+
+/* DISTRIBUTE INTO COLUMNS */
+const columns = document.querySelectorAll(".column");
+
+shuffled.forEach((src, i) => {
+    const wrap = document.createElement("div");
+    wrap.classList.add("book-wrap");
+
+    const img = document.createElement("img");
+    img.src = src;
+    img.classList.add("book-item");
+
+    wrap.appendChild(img);
+
+    columns[i % 4].appendChild(wrap);
 });
 
-/* BOOK STAGGER */
+/* STAGGER REVEAL */
 document.querySelectorAll(".column").forEach(col => {
     gsap.to(col.querySelectorAll(".book-item"), {
         scrollTrigger: {
@@ -294,45 +178,33 @@ document.querySelectorAll(".column").forEach(col => {
         },
         opacity: 1,
         y: 0,
-        stagger: 0.15,
+        stagger: 0.12,
         duration: 1.2,
         ease: "power3.out"
     });
 });
 
+/* FLOATING MOTION */
+document.querySelectorAll(".book-wrap").forEach((el, i) => {
+    gsap.to(el, {
+        y: "random(-10, 10)",
+        duration: "random(2,4)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: i * 0.1
+    });
+});
+
 /* PARALLAX */
 gsap.utils.toArray(".offset-1").forEach(el => {
-    gsap.to(el, {
-        y: 140,
-        scrollTrigger: { scrub: true }
-    });
+    gsap.to(el, { y: 140, scrollTrigger: { scrub: true } });
 });
-
 gsap.utils.toArray(".offset-2").forEach(el => {
-    gsap.to(el, {
-        y: 200,
-        scrollTrigger: { scrub: true }
-    });
+    gsap.to(el, { y: 200, scrollTrigger: { scrub: true } });
 });
-
 gsap.utils.toArray(".offset-3").forEach(el => {
-    gsap.to(el, {
-        y: 260,
-        scrollTrigger: { scrub: true }
-    });
-});
-
-/* ================= CUSTOM CURSOR ================= */
-const cursor = document.querySelector(".cursor");
-
-window.addEventListener("mousemove", e => {
-    cursor.style.left = e.clientX + "px";
-    cursor.style.top = e.clientY + "px";
-});
-
-document.querySelectorAll("a, .book-item").forEach(el => {
-    el.addEventListener("mouseenter", () => cursor.classList.add("cursor-grow"));
-    el.addEventListener("mouseleave", () => cursor.classList.remove("cursor-grow"));
+    gsap.to(el, { y: 260, scrollTrigger: { scrub: true } });
 });
 
 </script>
