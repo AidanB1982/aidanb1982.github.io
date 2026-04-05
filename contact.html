@@ -9,17 +9,30 @@
 
 <style>
 
+/* BASE */
 body {
     margin: 0;
     font-family: Georgia, serif;
-    background-image: url('stone.png');
-    background-size: cover;
-    background-attachment: fixed;
+    background: #0e0e10;
     color: #1C1C1C;
-    -webkit-font-smoothing: antialiased;
 }
 
-/* HEADER (CONSISTENT) */
+/* GLOBAL TEXTURE */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: url('stone.png');
+    opacity: 0.25;
+    z-index: -1;
+}
+
+/* LINKS */
+a { text-decoration: none; color: inherit; }
+
+/* =========================
+   HEADER (SYSTEM)
+========================= */
 .header {
     position: relative;
     height: 35vh;
@@ -29,11 +42,62 @@ body {
     text-align: center;
 }
 
+/* NAV */
+.nav {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+
+    background: linear-gradient(
+        rgba(10,10,12,0.9),
+        rgba(10,10,12,0.5),
+        transparent
+    );
+}
+
+.nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav a {
+    margin-left: 24px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #F1F1F1;
+    opacity: 0.75;
+    position: relative;
+}
+
+.nav a:hover { opacity: 1; }
+
+.nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #aaa;
+    transition: 0.3s;
+}
+
+.nav a:hover::after {
+    width: 100%;
+}
+
+/* HEADER BG */
 .header-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(22,22,25,0.8), rgba(22,22,25,0.8)),
-    url('forest.png');
+    background:
+        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
+        url('forest.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -41,7 +105,8 @@ body {
 
 .header-inner {
     position: relative;
-    z-index: 1;
+    z-index: 5;
+    margin-top: 40px;
 }
 
 .header-logo {
@@ -51,35 +116,51 @@ body {
 
 .header h1 {
     color: #F1F1F1;
-    font-weight: 500;
     letter-spacing: 2px;
 }
 
-/* NAV */
-.nav a {
-    margin: 0 16px;
-    text-decoration: none;
-    color: #F1F1F1;
-    font-size: 13px;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
-    opacity: 0.9;
-}
-
-.nav a:hover {
-    opacity: 1;
-}
-
-/* SECTION */
+/* =========================
+   SECTION (TEXTURED)
+========================= */
 .section {
+    position: relative;
     padding: 70px 20px;
     text-align: center;
-    background-color: rgba(232, 228, 220, 0.6);
+    background: #E8E6E1;
     margin: -40px auto 0;
     width: 90%;
     max-width: 700px;
+    overflow: hidden;
 }
 
+/* TEXTURE */
+.section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('stone.png');
+    background-size: cover;
+    opacity: 0.18;
+}
+
+/* DEPTH */
+.section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at center,
+        transparent 40%,
+        rgba(0,0,0,0.12) 100%
+    );
+}
+
+.section > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* TEXT */
 .section p {
     max-width: 520px;
     margin: 15px auto;
@@ -94,7 +175,7 @@ body {
     margin: 40px auto;
 }
 
-/* FORM (REFINED STYLE) */
+/* FORM */
 .contact-form {
     margin-top: 30px;
     display: flex;
@@ -102,87 +183,58 @@ body {
     gap: 25px;
 }
 
-/* INPUTS */
 .contact-form input,
 .contact-form textarea {
     border: none;
     border-bottom: 1px solid rgba(0,0,0,0.25);
     background: transparent;
     padding: 10px 0;
-
     font-family: Georgia, serif;
     font-size: 15px;
-    color: #1C1C1C;
 }
 
-/* PLACEHOLDER */
-.contact-form input::placeholder,
-.contact-form textarea::placeholder {
-    color: rgba(0,0,0,0.45);
-    letter-spacing: 0.5px;
-}
-
-/* FOCUS */
 .contact-form input:focus,
 .contact-form textarea:focus {
     outline: none;
     border-bottom: 1px solid #5F7D76;
 }
 
-/* TEXTAREA */
 .contact-form textarea {
     resize: vertical;
     min-height: 120px;
 }
 
-/* BUTTON */
 .contact-form button {
-    margin-top: 10px;
     background: none;
     border: none;
-
-    font-family: Georgia, serif;
     font-size: 14px;
     letter-spacing: 1px;
-
     color: #5F7D76;
     cursor: pointer;
 }
 
-/* BUTTON HOVER */
 .contact-form button:hover {
     opacity: 0.6;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 .footer {
     position: relative;
-    width: 100%;
-    padding: 90px 20px 70px;
+    padding: 90px 20px;
     margin-top: 80px;
     color: #F1F1F1;
-    overflow: hidden;
 }
 
 .footer::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
-    url('forest.png');
+    background:
+        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
+        url('forest.png');
     background-size: cover;
-    background-position: center;
-}
-
-.footer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%;
-    height: 1px;
-    background: rgba(255,255,255,0.08);
 }
 
 .footer-content {
@@ -193,33 +245,12 @@ body {
 
     display: flex;
     justify-content: space-between;
-    align-items: center;
     flex-wrap: wrap;
-}
-
-.footer-left p {
-    margin: 4px 0;
-    font-size: 14px;
-    opacity: 0.85;
 }
 
 .footer-center img {
     width: 70px;
     filter: invert(1);
-    opacity: 0.9;
-}
-
-.footer-right a {
-    margin-left: 18px;
-    text-decoration: none;
-    color: #F1F1F1;
-    font-size: 13px;
-    letter-spacing: 1px;
-    opacity: 0.85;
-}
-
-.footer-right a:hover {
-    opacity: 1;
 }
 
 /* MOBILE */
@@ -237,28 +268,31 @@ body {
 
 <!-- HEADER -->
 <div class="header">
-    <div class="header-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
-
-        <div class="nav">
+    <div class="nav">
+        <div class="nav-inner">
             <a href="index.html">Home</a>
             <a href="publications.html">Publications</a>
             <a href="about.html">About</a>
             <a href="author.html">Author</a>
             <a href="contact.html">Contact</a>
         </div>
+    </div>
 
+    <div class="header-overlay"></div>
+
+    <div class="header-inner">
+        <img src="logo (1).png" class="header-logo">
         <h1>Contact</h1>
     </div>
+
 </div>
 
 <!-- CONTENT -->
 <div class="section">
 
 <p>
-    For enquiries, collaborations, or general correspondence, use the form below.
+For enquiries, collaborations, or general correspondence, use the form below.
 </p>
 
 <div class="divider"></div>
@@ -281,7 +315,7 @@ body {
 <div class="footer">
     <div class="footer-content">
 
-        <div class="footer-left">
+        <div>
             <p>Blackwood Publishing</p>
             <p>Independent Literary Imprint</p>
         </div>
@@ -290,7 +324,7 @@ body {
             <img src="seal.png">
         </div>
 
-        <div class="footer-right">
+        <div>
             <a href="publications.html">Publications</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
