@@ -34,11 +34,12 @@ body {
     content: "";
     position: absolute;
     inset: 0;
+
     background:
-        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+        linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
         url('forest.png') center/cover no-repeat;
-    filter: grayscale(30%) contrast(110%) brightness(0.85);
-    z-index: 0;
+
+    animation: dayNightCycle 40s ease-in-out infinite alternate;
 }
 
 /* VIGNETTE */
@@ -46,9 +47,17 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.7));
-    z-index: 6;
-    pointer-events: none;
+
+    background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.7)),
+                linear-gradient(
+                    to bottom,
+                    rgba(20,30,60,0.2),   /* cold blue night */
+                    rgba(0,0,0,0.4)
+                );
+
+    mix-blend-mode: multiply;
+
+    animation: colorShift 40s ease-in-out infinite alternate;
 }
 
 /* =========================
@@ -194,7 +203,69 @@ body {
     from { opacity: 0; transform: translateY(20px);}
     to { opacity: 1; transform: translateY(0);}
 }
+@keyframes dayNightCycle {
 
+    /* 🌙 NIGHT (start) */
+    0% {
+        filter:
+            grayscale(40%)
+            brightness(0.65)
+            contrast(120%)
+            saturate(80%);
+    }
+
+    /* 🌒 EARLY LIGHT */
+    25% {
+        filter:
+            grayscale(25%)
+            brightness(0.8)
+            contrast(110%)
+            saturate(90%);
+    }
+
+    /* 🌫 MID (neutral eerie) */
+    50% {
+        filter:
+            grayscale(15%)
+            brightness(0.95)
+            contrast(100%)
+            saturate(100%);
+    }
+
+    /* 🌤 DAY (washed, still bleak) */
+    75% {
+        filter:
+            grayscale(10%)
+            brightness(1.1)
+            contrast(95%)
+            saturate(110%);
+    }
+
+    /* 🌙 BACK TO DARK */
+    100% {
+        filter:
+            grayscale(40%)
+            brightness(0.65)
+            contrast(120%)
+            saturate(80%);
+    }
+   @keyframes colorShift {
+    0% {
+        opacity: 0.6;
+        background-color: rgba(10,20,40,0.3); /* cold blue */
+    }
+
+    50% {
+        opacity: 0.3;
+        background-color: rgba(80,60,40,0.15); /* warm dusk */
+    }
+
+    100% {
+        opacity: 0.6;
+        background-color: rgba(10,20,40,0.3);
+    }
+}
+}
 </style>
 </head>
 
