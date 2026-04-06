@@ -4,10 +4,12 @@
 .hero {
     position: relative;
     height: 100vh;
+
+    /* ❗ FIX 1: missing semicolon */
+    min-height: 100svh;
+
     overflow: hidden;
 
-    min-height: 100svh
-   
     display: flex;
     justify-content: center;
     align-items: center;
@@ -54,7 +56,6 @@
 
     will-change: transform;
 
-    /* ✔️ blur stays ONLY on background */
     filter:
         blur(calc(var(--fadeOut, 0) * 6px))
         contrast(calc(1.1 - var(--fadeOut, 0) * 0.2))
@@ -76,6 +77,14 @@
     background: url('/assets/fog1.png') repeat-x;
     pointer-events: none;
     will-change: transform;
+}
+
+/* ❗ FIX 2: ensure fog renders ABOVE background */
+.fog-back,
+.fog-mid,
+.fog-front,
+.entity {
+    z-index: 2;
 }
 
 .fog-back {
@@ -109,7 +118,9 @@
     opacity: var(--entityOpacity, 0);
 
     pointer-events: none;
-    z-index: 6;
+
+    /* ❗ ensure above fog slightly */
+    z-index: 3;
 
     filter: blur(1px) brightness(0.5) contrast(1.2);
 
