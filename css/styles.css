@@ -23,8 +23,8 @@ img {
 .featured {
     position: relative;
 
-    margin-top: -350px;
-    padding: 350px 20px 120px;
+    margin-top: 0px;
+    padding: 120px 20px;
 
     background: transparent;
     z-index: 5;
