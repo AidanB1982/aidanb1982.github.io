@@ -115,27 +115,24 @@ function initHeader() {
 
                 let progress = 0;
 
-                if (featuredSection) {
-                    const rect = featuredSection.getBoundingClientRect(); 
-
-                    const start = window.innerHeight * 0.8;
-                    const end = window.innerHeight * 0.2;
-
-                    progress = (start - rect.top) / (start - end);
-                    progress = Math.max(0, Math.min(1, progress));
-
-                    if (progress > 0.95) progress = 1;
-
-                    featuredSection.style.setProperty('--fadeIn', progress);
-                }
+                iif (featuredSection) {
+                const rect = featuredSection.getBoundingClientRect();
+            
+                const start = window.innerHeight * 0.85;
+                const end = window.innerHeight * 0.25;
+            
+                progress = (start - rect.top) / (start - end);
+                progress = Math.max(0, Math.min(1, progress));
+            
+                featuredSection.style.setProperty('--fadeIn', progress);
+            }
 
                 // HERO fade (reduced intensity)
                 hero.style.setProperty('--fadeOut', progress * 0.8);
 
                 // BACKGROUND
-                hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
-                hero.style.setProperty('--zoom', scrollY * 0.0002);
-                hero.style.setProperty('--depth', scrollY * 0.02 + 'px');
+                hero.style.setProperty('--scrollY', scrollY * 0.08 + 'px');
+                hero.style.setProperty('--zoom', scrollY * 0.0001);
 
                 // FEATURED PARALLAX
                 const featured = document.querySelector('.featured-inner');
