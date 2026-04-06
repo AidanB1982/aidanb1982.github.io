@@ -3,10 +3,7 @@
 ========================= */
 .hero {
     position: relative;
-    height: 100vh;
-
-    /* ❗ FIX 1: missing semicolon */
-    min-height: 100svh;
+    height: 100svh;
 
     overflow: hidden;
 
