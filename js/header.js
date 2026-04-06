@@ -130,23 +130,17 @@ function initHeader() {
                     featuredSection.style.setProperty('--fadeIn', progress);
                 }
 
-                // HERO fade
-                hero.style.setProperty('--fadeOut', progress);
+                // HERO fade (reduced intensity)
+                hero.style.setProperty('--fadeOut', progress * 0.8);
 
                 // BACKGROUND
                 hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
                 hero.style.setProperty('--zoom', scrollY * 0.0002);
                 hero.style.setProperty('--depth', scrollY * 0.02 + 'px');
 
-                // HERO CONTENT
+                // HERO CONTENT (RESTORED CENTERING)
                 if (inner) {
-                    const mouseX = (targetX - 50) * 0.24;
-                    const mouseY = (targetY - 50) * 0.24;
-
-                    inner.style.transform = `
-                    translate3d(${mouseX}px, ${mouseY + scrollY * 0.02}px, 0)
-                    scale(1.02)
-                `;
+                    inner.style.transform = `translate(0,0) scale(1)`;
                 }
 
                 // FEATURED PARALLAX
@@ -183,6 +177,3 @@ document.addEventListener("DOMContentLoaded", () => {
         initHeader();
     }
 });
-
-
-any issues here can you post the full header.js with fixes
