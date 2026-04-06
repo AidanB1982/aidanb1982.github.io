@@ -157,7 +157,8 @@ window.addEventListener('scroll', () => {
             }
 
             if (book) {
-                book.style.transform = `translateY(${scrollY * -0.06}px)`;
+                const offset = Math.min(scrollY * 0.02, 40);
+                book.style.transform = `translateY(-${offset}px)`;
             }
 
             // FOG LAYERS
