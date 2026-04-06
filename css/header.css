@@ -61,20 +61,32 @@ html, body {
 
 .nav-inline a {
     font-size: 12px;
-    letter-spacing: 2px;
+    letter-spacing: 3px; /* tighter premium feel */
     text-transform: uppercase;
 
     color: #e6e6e6;
     text-decoration: none;
 
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
+    opacity: 0.6;
+    transition: all 0.3s ease;
 }
 
 .nav-inline a:hover {
     opacity: 1;
 }
+.nav-inline a::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 1px;
+    background: #e6e6e6;
+    margin: 4px auto 0;
+    transition: width 0.3s ease;
+}
 
+.nav-inline a:hover::after {
+    width: 100%;
+}
 /* =========================
    TEXT
 ========================= */
