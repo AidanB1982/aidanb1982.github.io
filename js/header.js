@@ -14,7 +14,6 @@ async function loadHeader(type = "hero") {
         const container = document.getElementById("header-placeholder");
         container.innerHTML = html;
 
-        // Fade-in effect
         requestAnimationFrame(() => {
             container.classList.add("loaded");
         });
@@ -42,13 +41,10 @@ function initHeader() {
 
     let driftTime = 0;
 
-    // =========================
-    // PERFORMANCE: REDUCE MOTION
-    // =========================
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // =========================
-    // MOUSE + PARALLAX COMBINED
+    // MOUSE PARALLAX
     // =========================
     hero.addEventListener('mousemove', (e) => {
 
@@ -75,10 +71,9 @@ function initHeader() {
     });
 
     // =========================
-    // SMOOTH LIGHT FOLLOW
+    // LIGHT FOLLOW
     // =========================
     function animateLight() {
-
         currentX += (targetX - currentX) * 0.05;
         currentY += (targetY - currentY) * 0.05;
 
@@ -89,10 +84,9 @@ function initHeader() {
     }
 
     // =========================
-    // CAMERA DRIFT (SUBTLE AUTO MOTION)
+    // CAMERA DRIFT
     // =========================
     function cameraDrift() {
-
         driftTime += 0.002;
 
         const driftX = Math.sin(driftTime) * 0.5;
@@ -103,89 +97,96 @@ function initHeader() {
 
         requestAnimationFrame(cameraDrift);
     }
-     // =========================
-    // SCROLL PARALLAX
+
+    // =========================
+    // SCROLL SYSTEM (FIXED)
     // =========================
     let ticking = false;
 
-window.addEventListener('scroll', () => {
+    window.addEventListener('scroll', () => {
 
-    if (!ticking) {
+        if (!ticking) {
 
-        window.requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
 
-            const scrollY = window.scrollY;
-            // =========================
-            // CINEMATIC TRANSITION
-            // =========================
-            
-            const fadeStart = window.innerHeight * 0.2;
-            const fadeEnd = window.innerHeight * 0.9;
-            
-            let progress = (scrollY - fadeStart) / (fadeEnd - fadeStart);
-            progress = Math.max(0, Math.min(1, progress));
-            
-            // HERO fades OUT
-            hero.style.setProperty('--fadeOut', progress);
-            
-            // FEATURED fades IN
-            const featuredSection = document.querySelector('.featured');
-            if (featuredSection) {
-                featuredSection.style.setProperty('--fadeIn', 0.01);
-            }
-            // BACKGROUND
-            hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
-            hero.style.setProperty('--zoom', scrollY * 0.0002);
+                const scrollY = window.scrollY;
 
-            // HERO CONTENT
-            if (inner) {
-                const mouseX = (targetX - 50) * 0.24;
-                const mouseY = (targetY - 50) * 0.24;
-                
-                inner.style.transform = `
-                    translate(${mouseX}px, ${mouseY + scrollY * 0.02}px)
-                    scale(1.02)
-                `;
-            }
+                const featuredSection = document.querySelector('.featured');
 
-            // FEATURED + BOOK DEPTH
-            const featured = document.querySelector('.featured-inner');
-            const book = document.querySelector('.featured-image');
-            
-            if (featured) {
-                featured.style.setProperty('--featuredY', scrollY * -0.03 + 'px');
-            }
-            
-            if (book) {
-                const offset = Math.min(scrollY * 0.02, 40);
-                book.style.setProperty('--bookY', -offset + 'px');
-            }
+                let progress = 0;
 
-            // FOG LAYERS
-            const fogBack = document.querySelector('.fog-back');
-            const fogMid = document.querySelector('.fog-mid');
-            const fogFront = document.querySelector('.fog-front');
+                if (featuredSection) {
+                    const rect = featuredSection.getBoundingClientRect();
 
-            if (fogBack) fogBack.style.transform = `translateX(${scrollY * -0.02}px)`;
-            if (fogMid) fogMid.style.transform = `translateX(${scrollY * -0.05}px)`;
-            if (fogFront) fogFront.style.transform = `translateX(${scrollY * -0.08}px)`;
+                    const start = window.innerHeight * 0.8;
+                    const end = window.innerHeight * 0.2;
 
-            ticking = false;
+                    progress = (start - rect.top) / (start - end);
+                    progress = Math.max(0, Math.min(1, progress));
 
-        });
+                    // snap clean at end
+                    if (progress > 0.95) progress = 1;
 
-        ticking = true;
-    }
+                    featuredSection.style.setProperty('--fadeIn', progress);
+                }
 
-});
-    
+                // HERO fade
+                hero.style.setProperty('--fadeOut', progress);
+
+                // BACKGROUND
+                hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
+                hero.style.setProperty('--zoom', scrollY * 0.0002);
+
+                // HERO CONTENT
+                if (inner) {
+                    const mouseX = (targetX - 50) * 0.24;
+                    const mouseY = (targetY - 50) * 0.24;
+
+                    inner.style.transform = `
+                        translate(${mouseX}px, ${mouseY + scrollY * 0.02}px)
+                        scale(1.02)
+                    `;
+                }
+
+                // FEATURED PARALLAX
+                const featured = document.querySelector('.featured-inner');
+                const book = document.querySelector('.featured-image');
+
+                if (featured) {
+                    featured.style.setProperty('--featuredY', scrollY * -0.03 + 'px');
+                }
+
+                if (book) {
+                    const offset = Math.min(scrollY * 0.02, 40);
+                    book.style.setProperty('--bookY', -offset + 'px');
+                }
+
+                // FOG
+                const fogBack = document.querySelector('.fog-back');
+                const fogMid = document.querySelector('.fog-mid');
+                const fogFront = document.querySelector('.fog-front');
+
+                if (fogBack) fogBack.style.transform = `translateX(${scrollY * -0.02}px)`;
+                if (fogMid) fogMid.style.transform = `translateX(${scrollY * -0.05}px)`;
+                if (fogFront) fogFront.style.transform = `translateX(${scrollY * -0.08}px)`;
+
+                ticking = false;
+
+            });
+
+            ticking = true;
+        }
+
+    });
+
+    animateLight();
+    cameraDrift();
+}
 
 // =========================
-// AUTO INIT (SAFETY)
+// AUTO INIT
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
-
-    // If header isn't dynamically loaded, still run
     if (!document.getElementById("header-placeholder")) {
         initHeader();
     }
