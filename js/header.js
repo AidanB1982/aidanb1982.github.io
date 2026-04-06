@@ -35,15 +35,13 @@ function initHeader() {
     if (!hero) return;
 
     const inner = hero.querySelector('.hero-inner');
-    const featuredSection = document.querySelector('.featured');
-    const featuredInner = document.querySelector('.featured-inner');
-    const book = document.querySelector('.featured-image');
-    const entity = document.querySelector('.entity');
 
     let targetX = 50, targetY = 50;
     let currentX = 50, currentY = 50;
 
     let driftTime = 0;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // =========================
     // MOUSE PARALLAX
@@ -101,7 +99,7 @@ function initHeader() {
     }
 
     // =========================
-    // SCROLL SYSTEM
+    // SCROLL SYSTEM (FIXED)
     // =========================
     let ticking = false;
 
@@ -113,79 +111,55 @@ function initHeader() {
 
                 const scrollY = window.scrollY;
 
-                let fadeProgress = 0;
+                const featuredSection = document.querySelector('.featured');
 
-                // =========================
-                // FEATURED FADE
-                // =========================
+                let progress = 0;
+
                 if (featuredSection) {
-                    const rect = featuredSection.getBoundingClientRect();
+                    const rect = featuredSection.getBoundingClientRect(); 
 
                     const start = window.innerHeight * 0.8;
                     const end = window.innerHeight * 0.2;
 
-                    fadeProgress = (start - rect.top) / (start - end);
-                    fadeProgress = Math.max(0, Math.min(1, fadeProgress));
+                    progress = (start - rect.top) / (start - end);
+                    progress = Math.max(0, Math.min(1, progress));
 
-                    if (fadeProgress > 0.95) fadeProgress = 1;
+                    // snap clean at end
+                    if (progress > 0.95) progress = 1;
 
-                    featuredSection.style.setProperty('--fadeIn', fadeProgress);
+                    featuredSection.style.setProperty('--fadeIn', progress);
                 }
 
                 // HERO fade
-                hero.style.setProperty('--fadeOut', fadeProgress);
+                hero.style.setProperty('--fadeOut', progress);
 
-                // =========================
-                // BACKGROUND PARALLAX
-                // =========================
+                // BACKGROUND
                 hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
                 hero.style.setProperty('--zoom', scrollY * 0.0002);
                 hero.style.setProperty('--depth', scrollY * 0.02 + 'px');
 
-                // =========================
                 // HERO CONTENT
-                // =========================
                 if (inner) {
                     const mouseX = (targetX - 50) * 0.24;
                     const mouseY = (targetY - 50) * 0.24;
 
                     inner.style.transform = `
-                        translate3d(${mouseX}px, ${mouseY + scrollY * 0.02}px, 0)
-                        scale(1.02)
-                    `;
+                    translate3d(${mouseX}px, ${mouseY + scrollY * 0.02}px, 0)
+                    scale(1.02)
+                `;
                 }
 
-                // =========================
                 // FEATURED PARALLAX
-                // =========================
-                if (featuredInner) {
-                    featuredInner.style.setProperty('--featuredY', scrollY * -0.03 + 'px');
+                const featured = document.querySelector('.featured-inner');
+                const book = document.querySelector('.featured-image');
+
+                if (featured) {
+                    featured.style.setProperty('--featuredY', scrollY * -0.03 + 'px');
                 }
 
                 if (book) {
                     const offset = Math.min(scrollY * 0.02, 40);
                     book.style.setProperty('--bookY', -offset + 'px');
-                }
-
-                // =========================
-                // ENTITY (SCROLL CONTROLLED 😈)
-                // =========================
-                if (entity) {
-                    const triggerStart = window.innerHeight * 0.3;
-                    const triggerEnd = window.innerHeight * 0.9;
-
-                    let progress = (scrollY - triggerStart) / (triggerEnd - triggerStart);
-                    progress = Math.max(0, Math.min(1, progress));
-
-                    // fade in/out curve
-                    const opacity = progress < 0.5
-                        ? progress * 2
-                        : (1 - progress) * 2;
-
-                    entity.style.setProperty('--entityOpacity', opacity);
-
-                    // subtle float upward
-                    entity.style.setProperty('--entityY', `${-progress * 40}px`);
                 }
 
                 ticking = false;
@@ -209,3 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
         initHeader();
     }
 });
+
+
+any issues here can you post the full header.js with fixes
