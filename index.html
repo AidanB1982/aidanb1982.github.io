@@ -20,12 +20,12 @@
         <div class="featured-inner">
 
             <!-- IMAGE -->
-            <div class="featured-image">
+            <div class="featured-image fade-in" data-speed="0.2">
                 <img src="assets/A1.png" alt="Corrour Bothy">
             </div>
 
             <!-- TEXT -->
-            <div class="featured-content">
+            <div class="featured-content fade-in">
 
                 <div class="featured-label">Featured Work</div>
 
@@ -53,6 +53,38 @@
             loadHeader("hero");
         });
     </script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
 
+    const elements = document.querySelectorAll('.fade-in');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.2 });
+
+    elements.forEach(el => observer.observe(el));
+
+});
+
+window.addEventListener('scroll', () => {
+
+    const elements = document.querySelectorAll('[data-speed]');
+    const scrollY = window.scrollY;
+
+    elements.forEach(el => {
+        const speed = parseFloat(el.getAttribute('data-speed'));
+        const offset = scrollY * speed * -0.1;
+
+        if (el.classList.contains('visible')) {
+            el.style.transform = `translateY(${offset}px)`;
+        }
+    });
+
+});
+</script>
 </body>
 </html>
