@@ -119,8 +119,8 @@ window.addEventListener('scroll', () => {
             // CINEMATIC TRANSITION
             // =========================
             
-            const fadeStart = 80;   // when fade begins
-            const fadeEnd = 650;     // when fully transitioned
+            const fadeStart = window.innerHeight * 0.2;
+            const fadeEnd = window.innerHeight * 0.9;
             
             let progress = (scrollY - fadeStart) / (fadeEnd - fadeStart);
             progress = Math.max(0, Math.min(1, progress));
