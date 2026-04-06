@@ -58,8 +58,7 @@ function initHeader() {
 
         if (inner) {
             inner.style.transform = `
-                translate(${(x - 0.5) * 12}px, ${(y - 0.5) * 12}px)
-                scale(1.02)
+                translate(${(x - 0.5) * 6}px, ${(y - 0.5) * 6}px)
             `;
         }
     });
@@ -103,8 +102,8 @@ function initHeader() {
         const driftX = Math.sin(driftTime) * 0.5;
         const driftY = Math.cos(driftTime * 0.8) * 0.5;
 
-        hero.style.setProperty('--driftX', driftX + '%');
-        hero.style.setProperty('--driftY', driftY + '%');
+        hero.style.setProperty('--mx', '50%');
+        hero.style.setProperty('--my', '50%');
 
         requestAnimationFrame(cameraDrift);
     }
@@ -142,7 +141,7 @@ function initHeader() {
                 hero.style.setProperty('--fadeOut', progress * 0.8);
 
                 // BACKGROUND
-                hero.style.setProperty('--scrollY', scrollY * 0.08 + 'px');
+                hero.style.setProperty('--scrollY', scrollY * 0.02 + 'px');
                 hero.style.setProperty('--zoom', scrollY * 0.0001);
 
                 // FEATURED PARALLAX
