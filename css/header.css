@@ -3,6 +3,8 @@ html, body {
     padding: 0;
     background: #000000;
     color: #e6e6e6;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* move OUTSIDE */
@@ -36,7 +38,7 @@ body {
 ========================= */
 .hero {
     position: relative;
-    min-height: 100vh; /* instead of fixed height */
+    height: 100vh; /* instead of fixed height */
     overflow: hidden;
 
     display: flex;
