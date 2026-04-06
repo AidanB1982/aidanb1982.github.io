@@ -12,6 +12,7 @@ html, body {
 .hero {
     position: relative;
     height: 100vh;
+    min-height: 100svh;
 
     display: flex;
     justify-content: center;
@@ -41,6 +42,25 @@ html, body {
        rgba(0,0,0,0.3) 85%,
        rgba(0,0,0,0) 100%
    );
+}
+
+/* =========================
+   SUBTLE LIGHT ATMOSPHERE
+   (NEW - sits above background)
+========================= */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: radial-gradient(
+        circle at 50% 30%,
+        rgba(255,255,255,0.04),
+        transparent 60%
+    );
+
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* =========================
@@ -82,7 +102,7 @@ html, body {
 
 .nav-inline a {
     font-size: 12px;
-    letter-spacing: 3px; /* tighter premium feel */
+    letter-spacing: 3px;
     text-transform: uppercase;
 
     color: #e6e6e6;
@@ -95,12 +115,13 @@ html, body {
 .nav-inline a:hover {
     opacity: 1;
 }
+
 .nav-inline a::after {
     content: "";
     display: block;
     width: 0;
     height: 1px;
-    background: #000000;
+    background: rgba(255,255,255,0.6);
     margin: 4px auto 0;
     transition: width 0.3s ease;
 }
@@ -108,6 +129,7 @@ html, body {
 .nav-inline a:hover::after {
     width: 100%;
 }
+
 /* =========================
    TEXT
 ========================= */
@@ -138,13 +160,18 @@ html, body {
 .button:hover {
     opacity: 1;
 }
+
 /* =========================
    FOG ATMOSPHERE
 ========================= */
 .fog {
     position: absolute;
     inset: 0;
+
     background: url("/assets/fog1.png") repeat-x;
+    background-size: 1200px auto;
+    background-position: -50px 0;
+
     pointer-events: none;
     z-index: 2;
 }
@@ -168,6 +195,18 @@ html, body {
     opacity: 0.30;
     animation: fogFast 80s linear infinite;
     filter: blur(2px);
+}
+
+/* EDGE FADE FIX */
+.fog::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 200px;
+    height: 100%;
+
+    background: linear-gradient(to right, transparent, rgba(0,0,0,0.9));
 }
 
 /* =========================
