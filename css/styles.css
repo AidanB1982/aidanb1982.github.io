@@ -58,6 +58,16 @@ body {
 .featured-image img {
     width: 360px;
     height: auto;
+
+    transition: transform 0.4s ease, filter 0.4s ease;
+
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+}
+
+/* ✨ hover lift */
+.featured-image img:hover {
+    transform: translateY(-6px) scale(1.02);
+    filter: drop-shadow(0 30px 60px rgba(0,0,0,0.85));
 }
 
 /* =========================
