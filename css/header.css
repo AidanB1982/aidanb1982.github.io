@@ -49,6 +49,10 @@
         translateY(var(--scrollY, 0))
         scale(calc(1 + var(--zoom, 0)));
 
+    transform-origin: center; /* ✅ FIX ADDED */
+
+    will-change: transform;   /* ✅ PERFORMANCE FIX */
+
     filter:
         contrast(calc(1.1 - var(--fadeOut, 0) * 0.2))
         brightness(calc(0.9 - var(--fadeOut, 0) * 0.2));
@@ -68,6 +72,7 @@
     inset: 0;
     background: url('/assets/fog1.png') repeat-x;
     pointer-events: none;
+    will-change: transform; /* ✅ FIX ADDED */
 }
 
 .fog-back {
@@ -106,6 +111,8 @@
     filter: blur(1px) brightness(0.5) contrast(1.2);
 
     transform: translateY(var(--entityY, 0));
+
+    transition: opacity 0.4s ease, transform 0.4s ease; /* ✅ SMOOTHING FIX */
 }
 
 /* =========================
