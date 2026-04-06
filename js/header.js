@@ -84,25 +84,28 @@ function initEntity() {
     const entity = document.querySelector('.entity');
     if (!entity) return;
 
-    let triggered = false;
+    function triggerEntity() {
 
-    window.addEventListener('scroll', () => {
+        // random delay (3s → 12s)
+        const delay = Math.random() * 9000 + 3000;
 
-        const scrollY = window.scrollY;
-
-        // trigger once after slight scroll
-        if (scrollY > 100 && !triggered) {
-            triggered = true;
+        setTimeout(() => {
 
             entity.classList.add('active');
 
-            // fade out again after a few seconds
+            // visible duration (2–5s)
+            const visibleTime = Math.random() * 3000 + 2000;
+
             setTimeout(() => {
                 entity.classList.remove('active');
-                triggered = false;
-            }, 4000);
-        }
 
-    });
+                // trigger again
+                triggerEntity();
 
+            }, visibleTime);
+
+        }, delay);
+    }
+
+    triggerEntity();
 }
