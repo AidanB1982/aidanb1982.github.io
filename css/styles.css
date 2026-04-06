@@ -2,14 +2,18 @@
    GLOBAL RESET
 ========================= */
 html, body {
-    height: auto;
-    min-height: 100%; 
     margin: 0;
     padding: 0;
+
+    /* ❗ FIX: remove height forcing */
+    /* height: auto; */
+    /* min-height: 100%; */
+
     background: #0b0b0d;
     color: #e6e6e6;
     font-family: Georgia, serif;
-    overflow-x: hidden;
+
+    overflow-x: hidden; /* keep this */
 }
 
 /* Prevent massive images */
@@ -28,7 +32,8 @@ img {
     margin-top: 0px;
     padding: 120px 20px;
 
-    min-height: 100vh; /* ❗ FIX prevents scroll stacking */
+    /* ❗ FIX: REMOVE this — causes scroll stacking */
+    /* min-height: 100vh; */
 
     background: transparent;
     z-index: 5;
@@ -85,7 +90,7 @@ img {
 }
 
 .featured-content {
-    will-change: transform; /* ❗ FIX: typo corrected */
+    will-change: transform;
     display: flex;
     justify-content: center;
     transition-delay: 0.1s;
