@@ -151,14 +151,14 @@ window.addEventListener('scroll', () => {
             // FEATURED + BOOK DEPTH
             const featured = document.querySelector('.featured-inner');
             const book = document.querySelector('.featured-image');
-
+            
             if (featured) {
                 featured.style.setProperty('--featuredY', scrollY * -0.03 + 'px');
             }
-
+            
             if (book) {
                 const offset = Math.min(scrollY * 0.02, 40);
-                book.style.transform = `translateY(-${offset}px)`;
+                book.style.setProperty('--bookY', -offset + 'px');
             }
 
             // FOG LAYERS
