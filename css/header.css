@@ -11,9 +11,7 @@ html, body {
 ========================= */
 .hero {
     position: relative;
-
-    min-height: 100vh; /* full screen height */
-    width: 100%;
+    height: 100vh;
 
     display: flex;
     justify-content: center;
@@ -21,7 +19,12 @@ html, body {
 
     text-align: center;
 
-    background: #0b0b0d; /* fallback colour */
+    /* 🌲 FOREST BACKGROUND */
+    background:
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+        url("../assets/forest.png") center 40% / cover no-repeat;
+
+    color: #e6e6e6;
 }
 
 /* =========================
