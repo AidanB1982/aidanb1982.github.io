@@ -72,6 +72,12 @@ img {
 .featured-image {
     position: relative;
     z-index: 2;
+
+    display: flex;
+    justify-content: center;
+
+    transform: translateY(var(--bookY, 0));
+    will-change: transform;
 }
 .featured-content {
     will change: transform;
