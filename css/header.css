@@ -21,24 +21,26 @@ html, body {
 
     /* 🌲 FOREST BACKGROUND */
     background:
-        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
+        linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)),
         url("/assets/forest.png") center 40% / cover no-repeat;
 
     color: #e6e6e6;
     opacity: calc(1 - var(--fadeOut, 0));
     transition: opacity 0.2s linear;
 
-        mask-image: linear-gradient(
-        to bottom,
-        rgba(0,0,0,1) 70%,
-        rgba(0,0,0,0) 100%
-    );
+    mask-image: linear-gradient(
+       to bottom,
+       rgba(0,0,0,1) 60%,
+       rgba(0,0,0,0.3) 85%,
+       rgba(0,0,0,0) 100%
+   );
 
-    -webkit-mask-image: linear-gradient(
-        to bottom,
-        rgba(0,0,0,1) 70%,
-        rgba(0,0,0,0) 100%
-    );
+   -webkit-mask-image: linear-gradient(
+       to bottom,
+       rgba(0,0,0,1) 60%,
+       rgba(0,0,0,0.3) 85%,
+       rgba(0,0,0,0) 100%
+   );
 }
 
 /* =========================
