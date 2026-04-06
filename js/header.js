@@ -154,28 +154,7 @@ window.addEventListener('scroll', () => {
     }
 
 });
-    // FOG PARALLAX
-const fogBack = document.querySelector('.fog-back');
-const fogMid = document.querySelector('.fog-mid');
-const fogFront = document.querySelector('.fog-front');
-
-if (fogBack) {
-    fogBack.style.transform = `translateX(${scrollY * -0.02}px)`;
-}
-if (fogMid) {
-    fogMid.style.transform = `translateX(${scrollY * -0.05}px)`;
-}
-if (fogFront) {
-    fogFront.style.transform = `translateX(${scrollY * -0.08}px)`;
-}
-    // =========================
-    // START ANIMATIONS
-    // =========================
-    if (!reduceMotion) {
-        animateLight();
-        cameraDrift();
-    }
-}
+    
 
 // =========================
 // AUTO INIT (SAFETY)
