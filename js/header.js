@@ -4,8 +4,8 @@
 
 async function loadHeader(type = "hero") {
 
-    let file = "/header.html";
-    if (type === "simple") file = "/header-simple.html";
+    let file = "header.html"; // ❗ FIX: removed leading slash
+    if (type === "simple") file = "header-simple.html";
 
     try {
         const res = await fetch(file);
@@ -137,8 +137,6 @@ function initHeader() {
                 hero.style.setProperty('--zoom', scrollY * 0.0002);
                 hero.style.setProperty('--depth', scrollY * 0.02 + 'px');
 
-                // ❗ FIX: REMOVE transform override here (no code)
-
                 // FEATURED PARALLAX
                 const featured = document.querySelector('.featured-inner');
                 const book = document.querySelector('.featured-image');
@@ -169,5 +167,5 @@ function initHeader() {
 // AUTO INIT
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
-    loadHeader("hero"); // ❗ FIX: always load header properly
+    loadHeader("hero");
 });
