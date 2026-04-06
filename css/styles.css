@@ -1,1 +1,87 @@
+/* =========================
+   BASE
+========================= */
+body {
+    margin: 0;
+    background: #0b0b0d;
+    color: #e6e6e6;
+    font-family: Georgia, serif;
+}
 
+/* =========================
+   FEATURED SECTION
+========================= */
+.featured {
+    padding: 100px 20px;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+.featured-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+/* =========================
+   IMAGE
+========================= */
+.featured-image {
+    display: flex;
+    justify-content: center;
+}
+
+.featured-image img {
+    width: 320px;
+    height: auto;
+}
+
+/* =========================
+   TEXT
+========================= */
+.featured-content {
+    max-width: 520px;
+}
+
+.featured-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: 10px;
+}
+
+.featured-content h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    font-weight: normal;
+}
+
+.featured-content p {
+    line-height: 1.7;
+    opacity: 0.85;
+    margin-bottom: 20px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.button {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    color: #e6e6e6;
+    text-decoration: none;
+
+    opacity: 0.8;
+}
+
+.button:hover {
+    opacity: 1;
+}
