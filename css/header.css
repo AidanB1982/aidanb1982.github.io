@@ -25,6 +25,8 @@ html, body {
         url("../assets/forest.png") center 40% / cover no-repeat;
 
     color: #e6e6e6;
+    opacity: calc(1 - var(--fadeOut, 0));
+    transition: opacity 0.2s linear;
 }
 
 /* =========================
