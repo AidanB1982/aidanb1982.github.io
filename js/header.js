@@ -131,7 +131,7 @@ window.addEventListener('scroll', () => {
             // FEATURED fades IN
             const featuredSection = document.querySelector('.featured');
             if (featuredSection) {
-                featuredSection.style.setProperty('--fadeIn', progress);
+                featuredSection.style.setProperty('--fadeIn', 0.01);
             }
             // BACKGROUND
             hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
