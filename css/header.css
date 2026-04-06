@@ -226,3 +226,36 @@ html, body {
     from { transform: translateX(0); }
     to { transform: translateX(-1200px); }
 }
+/* =========================
+   ENTITY (SHADOW FIGURE)
+========================= */
+.entity {
+    position: absolute;
+
+    bottom: 6%;
+    left: 30%;
+
+    width: 140px;
+
+    opacity: 0; /* hidden by default */
+
+    pointer-events: none;
+    z-index: 3;
+
+    filter:
+        blur(1px)
+        brightness(0.4)
+        contrast(1.2);
+
+    transform: translateY(20px);
+
+    transition:
+        opacity 1.2s ease,
+        transform 1.2s ease;
+}
+
+/* 👁️ subtle breathing motion */
+.entity.active {
+    opacity: 0.35;
+    transform: translateY(0);
+}
