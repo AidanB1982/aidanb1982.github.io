@@ -50,11 +50,14 @@ img {
 .featured-inner {
     max-width: 1100px;
     margin: 0 auto;
-    
+
     display: grid;
     grid-template-columns: 320px 1fr;
     gap: 60px;
     align-items: center;
+
+    transform: translateY(var(--featuredY, 0));
+    will-change: transform;
 }
 
 /* stack text properly */
