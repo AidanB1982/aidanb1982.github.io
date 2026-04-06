@@ -150,7 +150,7 @@ html, body {
 .fog {
     position: absolute;
     inset: 0;
-    transform: scale(1.2)
+
     background: url("/assets/fog1.png") center 88% / cover no-repeat;
 
     pointer-events: none;
@@ -159,8 +159,8 @@ html, body {
     /* EDGE SOFTENING */
     mask-image: radial-gradient(
         ellipse at center,
-        rgba(0,0,0,1) 60%,
-        rgba(0,0,0,0.6) 80%,
+        rgba(0,0,0,1) 55%,
+        rgba(0,0,0,0.5) 75%,
         transparent 100%
     );
 
@@ -171,7 +171,7 @@ html, body {
         transparent 100%
     );
 }
-
+   
 /* LAYERS */
 .fog-back {
     z-index: 1;
@@ -196,18 +196,18 @@ html, body {
 
 /* ANIMATION */
 @keyframes fogSlow {
-    0%   { transform: translateX(0) translateY(0) scale(1.1); }
-    100% { transform: translateX(-80px) translateY(25px) scale(1.15); }
+    0%   { transform: translateX(0) translateY(0) scale(1.2); }
+    100% { transform: translateX(-80px) translateY(25px) scale(1.25); }
 }
 
 @keyframes fogMid {
-    0%   { transform: translateX(0) translateY(0) scale(1.05); }
-    100% { transform: translateX(-120px) translateY(35px) scale(1.1); }
+    0%   { transform: translateX(0) translateY(0) scale(1.15); }
+    100% { transform: translateX(-120px) translateY(35px) scale(1.2); }
 }
 
 @keyframes fogFast {
-    0%   { transform: translateX(0) translateY(0); }
-    100% { transform: translateX(-160px) translateY(45px); }
+    0%   { transform: translateX(0) translateY(0) scale(1.1); }
+    100% { transform: translateX(-160px) translateY(45px) scale(1.15); }
 }
 
 /* =========================
@@ -220,7 +220,7 @@ html, body {
 
     width: 220px;
 
-    opacity: 0;
+    opacity: 100;
     
     z-index: 3;
 
