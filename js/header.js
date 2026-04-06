@@ -106,29 +106,38 @@ function initHeader() {
      // =========================
     // SCROLL PARALLAX
     // =========================
-    window.addEventListener('scroll', () => {
+    let ticking = false;
 
-        const scrollY = window.scrollY;
+window.addEventListener('scroll', () => {
 
-        // HERO background drift
-        hero.style.setProperty('--scrollY', scrollY * 0.05 + 'px');
+    if (!ticking) {
 
-        // HERO content subtle lift
-        if (inner) {
-    const current = inner.style.transform || "";
-    inner.style.transform = `
-        ${current}
-        translateY(${scrollY * 0.02}px)
-    `;
-}
+        window.requestAnimationFrame(() => {
 
-        // FEATURED section movement
-        const featured = document.querySelector('.featured-inner');
-        if (featured) {
-            featured.style.transform = `translateY(${scrollY * -0.03}px)`;
-        }
+            const scrollY = window.scrollY;
 
-    });
+            // Background movement
+            hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
+
+            // Hero content
+            if (inner) {
+                inner.style.transform = `translateY(${scrollY * 0.02}px)`;
+            }
+
+            // Featured section
+            const featured = document.querySelector('.featured-inner');
+            if (featured) {
+                featured.style.transform = `translateY(${scrollY * -0.03}px)`;
+            }
+
+            ticking = false;
+
+        });
+
+        ticking = true;
+    }
+
+});
     // =========================
     // START ANIMATIONS
     // =========================
