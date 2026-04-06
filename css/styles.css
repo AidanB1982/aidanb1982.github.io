@@ -28,6 +28,7 @@ img {
 
     background: transparent;
     z-index: 5;
+
     opacity: var(--fadeIn, 0);
     transform: translateY(calc(40px * (1 - var(--fadeIn, 0))));
     transition: opacity 0.6s ease, transform 0.6s ease;
