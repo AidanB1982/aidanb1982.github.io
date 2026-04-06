@@ -35,8 +35,9 @@ img {
         translateY(calc(40px * (1 - var(--fadeIn, 1))))
         scale(calc(0.98 + var(--fadeIn, 1) * 0.02));
 
+    /* ❗ FIX: reduce + stabilise blur */
     filter:
-        blur(calc((1 - var(--fadeIn, 1)) * 6px));
+        blur(calc((1 - var(--fadeIn, 1)) * 4px));
 
     transition:
         opacity 0.6s ease,
@@ -79,8 +80,9 @@ img {
     transform: translateY(var(--bookY, 0));
     will-change: transform;
 }
+
 .featured-content {
-    will change: transform;
+    will-change: transform; /* ❗ FIX: typo corrected */
     display: flex;
     justify-content: center;
     transition-delay: 0.1s;
