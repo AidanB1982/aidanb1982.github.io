@@ -20,7 +20,58 @@ async function loadHeader(type = "hero") {
             container.innerHTML = html;
         }
 
+        // ✅ AFTER HEADER LOAD → INIT SCROLL
+        initScrollFade();
+
     } catch (err) {
         console.error("Header load failed:", err);
     }
+}
+
+// =========================
+// SCROLL FADE SYSTEM
+// =========================
+
+function initScrollFade() {
+
+    let ticking = false;
+
+    window.addEventListener('scroll', () => {
+
+        if (!ticking) {
+
+            requestAnimationFrame(() => {
+
+                const scrollY = window.scrollY;
+
+                const featured = document.querySelector('.featured');
+                const hero = document.querySelector('.hero');
+
+                let progress = 0;
+
+                if (featured) {
+                    const rect = featured.getBoundingClientRect();
+
+                    const start = window.innerHeight * 0.9;
+                    const end = window.innerHeight * 0.3;
+
+                    progress = (start - rect.top) / (start - end);
+                    progress = Math.max(0, Math.min(1, progress));
+
+                    featured.style.setProperty('--fadeIn', progress);
+                }
+
+                if (hero) {
+                    hero.style.setProperty('--fadeOut', progress * 0.8);
+                }
+
+                ticking = false;
+
+            });
+
+            ticking = true;
+        }
+
+    });
+
 }
