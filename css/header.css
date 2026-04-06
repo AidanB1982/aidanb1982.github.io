@@ -22,7 +22,7 @@ html, body {
     /* 🌲 FOREST BACKGROUND */
     background:
         linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)),
-        url("../assets/forest.png") center 40% / cover no-repeat;
+        url("/assets/forest.png") center 40% / cover no-repeat;
 
     color: #e6e6e6;
     opacity: calc(1 - var(--fadeOut, 0));
@@ -142,28 +142,28 @@ html, body {
 .fog {
     position: absolute;
     inset: 0;
-    background: url("../assets/fog1.png") repeat-x;
+    background: url("/assets/fog1.png") repeat-x;
     pointer-events: none;
     z-index: 2;
 }
 
 /* BACK LAYER */
 .fog-back {
-    opacity: 0.12;
+    opacity: 0.20;
     animation: fogSlow 180s linear infinite;
     filter: blur(6px);
 }
 
 /* MID LAYER */
 .fog-mid {
-    opacity: 0.18;
+    opacity: 0.25;
     animation: fogMid 120s linear infinite;
     filter: blur(4px);
 }
 
 /* FRONT LAYER */
 .fog-front {
-    opacity: 0.25;
+    opacity: 0.30;
     animation: fogFast 80s linear infinite;
     filter: blur(2px);
 }
