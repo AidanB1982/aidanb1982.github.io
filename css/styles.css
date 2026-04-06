@@ -1,4 +1,14 @@
 /* =========================
+   GLOBAL LINK FIX
+========================= */
+a,
+a:visited,
+a:active,
+a:link {
+    color: #e6e6e6;
+    text-decoration: none;
+}
+/* =========================
    GLOBAL RESET
 ========================= */
 html, body {
