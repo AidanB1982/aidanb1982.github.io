@@ -115,7 +115,24 @@ window.addEventListener('scroll', () => {
         window.requestAnimationFrame(() => {
 
             const scrollY = window.scrollY;
-
+            // =========================
+            // CINEMATIC TRANSITION
+            // =========================
+            
+            const fadeStart = 100;   // when fade begins
+            const fadeEnd = 500;     // when fully transitioned
+            
+            let progress = (scrollY - fadeStart) / (fadeEnd - fadeStart);
+            progress = Math.max(0, Math.min(1, progress));
+            
+            // HERO fades OUT
+            hero.style.setProperty('--fadeOut', progress);
+            
+            // FEATURED fades IN
+            const featuredSection = document.querySelector('.featured');
+            if (featuredSection) {
+                featuredSection.style.setProperty('--fadeIn', progress);
+            }
             // BACKGROUND
             hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
             hero.style.setProperty('--zoom', scrollY * 0.0002);
