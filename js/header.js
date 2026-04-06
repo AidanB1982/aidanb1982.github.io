@@ -124,7 +124,6 @@ function initHeader() {
                     progress = (start - rect.top) / (start - end);
                     progress = Math.max(0, Math.min(1, progress));
 
-                    // snap clean at end
                     if (progress > 0.95) progress = 1;
 
                     featuredSection.style.setProperty('--fadeIn', progress);
@@ -138,10 +137,7 @@ function initHeader() {
                 hero.style.setProperty('--zoom', scrollY * 0.0002);
                 hero.style.setProperty('--depth', scrollY * 0.02 + 'px');
 
-                // HERO CONTENT (RESTORED CENTERING)
-                if (inner) {
-                    inner.style.transform = `translate(0,0) scale(1)`;
-                }
+                // ❗ FIX: REMOVE transform override here (no code)
 
                 // FEATURED PARALLAX
                 const featured = document.querySelector('.featured-inner');
@@ -173,7 +169,5 @@ function initHeader() {
 // AUTO INIT
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
-    if (!document.getElementById("header-placeholder")) {
-        initHeader();
-    }
+    loadHeader("hero"); // ❗ FIX: always load header properly
 });
