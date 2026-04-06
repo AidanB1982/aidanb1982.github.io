@@ -1,1 +1,107 @@
+/* =========================
+   RESET (SAFE BASE)
+========================= */
+html, body {
+    margin: 0;
+    padding: 0;
+}
 
+/* =========================
+   HERO
+========================= */
+.hero {
+    position: relative;
+
+    min-height: 100vh; /* full screen height */
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    background: #0b0b0d; /* fallback colour */
+}
+
+/* =========================
+   INNER CONTENT
+========================= */
+.hero-inner {
+    max-width: 700px;
+    width: 100%;
+
+    padding: 0 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* =========================
+   LOGO
+========================= */
+.hero-logo {
+    width: 260px;
+    max-width: 80%;
+
+    margin-bottom: 20px;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+.nav-inline {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+
+    margin-bottom: 25px;
+}
+
+.nav-inline a {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    color: #e6e6e6;
+    text-decoration: none;
+
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.nav-inline a:hover {
+    opacity: 1;
+}
+
+/* =========================
+   TEXT
+========================= */
+.hero-text {
+    font-size: 15px;
+    line-height: 1.7;
+
+    opacity: 0.85;
+
+    margin-bottom: 25px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.button {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    color: #e6e6e6;
+    text-decoration: none;
+
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.button:hover {
+    opacity: 1;
+}
