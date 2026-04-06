@@ -39,7 +39,7 @@ body {
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 60px;
     align-items: center;
 }
@@ -53,7 +53,7 @@ body {
 }
 
 .featured-image img {
-    width: 320px;
+    width: 240px;
     height: auto;
 }
 
