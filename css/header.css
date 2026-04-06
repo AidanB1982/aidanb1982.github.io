@@ -168,35 +168,55 @@ html, body {
     position: absolute;
     inset: 0;
 
-    background: url("/assets/fog1.png") center / cover no-repeat;
-    background-size: 1200px auto;
-    background-position: -50px 0;
+    background: url("/assets/fog1.png") center 80% / cover no-repeat;
 
     pointer-events: none;
-    z-index: 2;
 }
 
 /* BACK LAYER */
 .fog-back {
-    opacity: 0.20;
-    animation: fogSlow 180s linear infinite;
-    filter: blur(6px);
+    z-index: 1;
+    opacity: 0.18;
+
+    transform: scale(1.1);
+
+    animation: fogSlow 120s ease-in-out infinite alternate;
+    filter: blur(8px);
 }
 
 /* MID LAYER */
 .fog-mid {
-    opacity: 0.25;
-    animation: fogMid 120s linear infinite;
-    filter: blur(4px);
+    z-index: 2;
+    opacity: 0.22;
+
+    transform: scale(1.05);
+
+    animation: fogMid 90s ease-in-out infinite alternate;
+    filter: blur(5px);
 }
 
 /* FRONT LAYER */
 .fog-front {
+    z-index: 3;
     opacity: 0.30;
-    animation: fogFast 80s linear infinite;
+
+    animation: fogFast 60s ease-in-out infinite alternate;
     filter: blur(2px);
 }
+.fog::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
 
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.6),
+        transparent
+    );
+}
 /* EDGE FADE FIX */
 .fog::after {
     content: "";
@@ -213,18 +233,18 @@ html, body {
    FOG ANIMATION
 ========================= */
 @keyframes fogSlow {
-    from { transform: translateX(0); }
-    to { transform: translateX(-600px); }
+    0%   { transform: translateX(0) translateY(0) scale(1.1); }
+    100% { transform: translateX(-20px) translateY(15px) scale(1.15); }
 }
 
 @keyframes fogMid {
-    from { transform: translateX(0); }
-    to { transform: translateX(-900px); }
+    0%   { transform: translateX(0) translateY(0) scale(1.05); }
+    100% { transform: translateX(-30px) translateY(20px) scale(1.1); }
 }
 
 @keyframes fogFast {
-    from { transform: translateX(0); }
-    to { transform: translateX(-1200px); }
+    0%   { transform: translateX(0) translateY(0); }
+    100% { transform: translateX(-40px) translateY(25px); }
 }
 /* =========================
    ENTITY (SHADOW FIGURE)
@@ -254,7 +274,6 @@ html, body {
         transform 1.2s ease;
 }
 
-/* 👁️ subtle breathing motion */
 .entity.active {
     opacity: 0.35;
     transform: translateY(0);
