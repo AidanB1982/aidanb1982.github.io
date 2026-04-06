@@ -84,7 +84,7 @@ html, body {
     display: block;
     width: 0;
     height: 1px;
-    background: #e6e6e6;
+    background: #000000;
     margin: 4px auto 0;
     transition: width 0.3s ease;
 }
