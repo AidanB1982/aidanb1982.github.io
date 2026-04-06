@@ -252,12 +252,13 @@ html, body {
 .entity {
     position: absolute;
     mix-blend-mode: lighten;
+
     bottom: 4%;
     left: 28%;
 
     width: 220px;
 
-    opacity: 0; /* hidden by default */
+    opacity: 0;
 
     pointer-events: none;
     z-index: 3;
@@ -272,19 +273,35 @@ html, body {
     transition:
         opacity 1.5s ease,
         transform 1.5s ease;
-   .entity.active {
+
+    /* 👁️ fade into fog */
+    mask-image: linear-gradient(
+        to top,
+        transparent 0%,
+        rgba(0,0,0,0.8) 40%,
+        rgba(0,0,0,1) 100%
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to top,
+        transparent 0%,
+        rgba(0,0,0,0.8) 40%,
+        rgba(0,0,0,1) 100%
+    );
+}
+
+/* ACTIVE STATE */
+.entity.active {
     opacity: 0.12;
     transform: translateY(0);
 
     animation: entityDrift 6s ease-in-out infinite alternate;
 }
+
+/* DRIFT ANIMATION */
 @keyframes entityDrift {
     0%   { transform: translateY(0) translateX(0); }
     100% { transform: translateY(-6px) translateX(4px); }
-}
-.entity.active {
-    opacity: 0.11;
-    transform: translateY(0);
 }
 .entity {
     mask-image: linear-gradient(
