@@ -67,20 +67,37 @@ body {
 
     background:
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
-        url('/assets/forest.png') center 40% / cover no-repeat;
+        url('/assets/forest.png') center 40% / cover no-repeat,
+
+        /* 🔥 LIGHT BEAMS */
+        linear-gradient(
+            120deg,
+            rgba(255,255,255,0.08) 0%,
+            transparent 30%,
+            transparent 70%,
+            rgba(255,255,255,0.05) 100%
+        ),
+        linear-gradient(
+            100deg,
+            rgba(255,255,255,0.04) 0%,
+            transparent 40%
+        );
+
+    background-blend-mode: overlay;
 
     transform:
         translateY(var(--scrollY, 0))
         scale(calc(1 + var(--zoom, 0)));
 
     transform-origin: center;
-    
+
     filter:
-         contrast(calc(1.1 - var(--fadeOut, 0) * 0.2))
-         brightness(calc(0.9 - var(--fadeOut, 0) * 0.2));
+        contrast(calc(1.1 - var(--fadeOut, 0) * 0.2))
+        brightness(calc(0.9 - var(--fadeOut, 0) * 0.2));
 
     animation:
-        dayNightCycle 40s ease-in-out infinite alternate;
+        dayNightCycle 40s ease-in-out infinite alternate,
+        lightShift 20s ease-in-out infinite alternate;
 }
 
 /* VIGNETTE */
@@ -101,7 +118,7 @@ body {
 }
 
 /* =========================
-   FOG
+   FOG (ENHANCED + VISIBLE)
 ========================= */
 .fog-back,
 .fog-mid,
@@ -113,60 +130,56 @@ body {
     will-change: transform;
 }
 
+/* DEPTH LAYERS */
 .fog-back {
-    opacity: 0.03;
+    opacity: 0.08;
     animation: fogSlow 180s linear infinite;
-    filter: blur(3px);
+    filter: blur(4px);
 }
 
 .fog-mid {
-    opacity: 0.06;
+    opacity: 0.14;
     animation: fogMid 120s linear infinite;
     filter: blur(2px);
 }
 
 .fog-front {
-    opacity: 0.12;
-    filter: blur(2px);
+    opacity: 0.2;
+    animation: fogMid 90s linear infinite;
+    filter: blur(1px);
 }
 
 /* =========================
-   SILHOUETTE
+   ENTITY (PNG VERSION)
 ========================= */
-.silhouette {
+.entity {
     position: absolute;
-    bottom: 10%;
-    left: 30%;
-    width: 120px;
-    height: 260px;
+    bottom: 8%;
+    left: 28%;
 
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0.6), transparent 70%);
-    filter: blur(6px);
+    width: 140px;
     opacity: 0;
 
-    mix-blend-mode: multiply;
+    pointer-events: none;
+
+    filter: blur(1px) brightness(0.5) contrast(1.2);
 
     animation:
-        silhouetteAppear 25s ease-in-out infinite,
-        silhouetteDrift 30s ease-in-out infinite;
+        entityFade 18s ease-in-out infinite,
+        entityDrift 25s ease-in-out infinite;
 }
 
-/* =========================
-   SHADOW ENTITY
-========================= */
-.shadow-entity {
-    position: absolute;
-    width: 300px;
-    height: 300px;
+/* FADE IN / OUT */
+@keyframes entityFade {
+    0%, 85%, 100% { opacity: 0; }
+    90% { opacity: 0.35; }
+}
 
-    background: radial-gradient(circle, rgba(0,0,0,0.6), transparent 70%);
-    filter: blur(40px);
-
-    mix-blend-mode: multiply;
-
-    animation:
-        entityMove 18s ease-in-out infinite,
-        entityFade 40s ease-in-out infinite;
+/* FLOAT */
+@keyframes entityDrift {
+    0%   { transform: translateX(0px) translateY(0px); }
+    50%  { transform: translateX(20px) translateY(-6px); }
+    100% { transform: translateX(0px) translateY(0px); }
 }
 
 /* =========================
@@ -390,4 +403,8 @@ body {
 @keyframes slowZoom {
     0% { transform: scale(1.05); }
     100% { transform: scale(1.1); }
+}
+@keyframes lightShift {
+    0%   { background-position: center 40%, center 40%, 0% 0%, 0% 0%; }
+    100% { background-position: center 40%, center 40%, 10% 5%, -10% 0%; }
 }
