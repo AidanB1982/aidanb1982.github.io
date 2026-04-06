@@ -6,6 +6,8 @@
     height: 100vh;
     overflow: hidden;
 
+    min-height: 100svh
+   
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,7 +15,6 @@
 
     opacity: calc(1 - var(--fadeOut, 0));
 
-    /* ❗ FIX: remove blur from container */
     filter:
         brightness(calc(1 - var(--fadeOut, 0) * 0.3));
 
