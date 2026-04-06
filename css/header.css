@@ -168,7 +168,7 @@ html, body {
     position: absolute;
     inset: 0;
 
-    background: url("/assets/fog1.png") center 80% / cover no-repeat;
+    background: url("/assets/fog1.png") center 88% / cover no-repeat;
 
     pointer-events: none;
 }
@@ -176,7 +176,7 @@ html, body {
 /* BACK LAYER */
 .fog-back {
     z-index: 1;
-    opacity: 0.18;
+    opacity: 0.22;
 
     transform: scale(1.1);
 
@@ -187,7 +187,7 @@ html, body {
 /* MID LAYER */
 .fog-mid {
     z-index: 2;
-    opacity: 0.22;
+    opacity: 0.28;
 
     transform: scale(1.05);
 
@@ -198,7 +198,7 @@ html, body {
 /* FRONT LAYER */
 .fog-front {
     z-index: 3;
-    opacity: 0.30;
+    opacity: 0.36;
 
     animation: fogFast 60s ease-in-out infinite alternate;
     filter: blur(2px);
@@ -275,6 +275,21 @@ html, body {
 }
 
 .entity.active {
-    opacity: 0.35;
+    opacity: 0.18;
     transform: translateY(0);
+}
+.entity {
+    mask-image: linear-gradient(
+        to top,
+        transparent 0%,
+        rgba(0,0,0,0.8) 40%,
+        rgba(0,0,0,1) 100%
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to top,
+        transparent 0%,
+        rgba(0,0,0,0.8) 40%,
+        rgba(0,0,0,1) 100%
+    );
 }
