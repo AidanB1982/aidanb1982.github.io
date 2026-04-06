@@ -38,13 +38,14 @@ body {
     position: relative;
     height: 100vh;
     overflow: hidden;
-
     display: flex;
     justify-content: center;   
     align-items: center;   
     text-align: center;
     letter-spacing: 0.3px;
-    padding-top: 20px;        
+    padding-top: 20px;  
+    opacity: calc(1 - var(--fadeOut, 0));
+    transition: opacity 0.2s linear;
 }
 .hero-inner {
     margin-top: 60px;
