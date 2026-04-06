@@ -126,9 +126,15 @@ window.addEventListener('scroll', () => {
 
             // Featured section
             const featured = document.querySelector('.featured-inner');
-            if (featured) {
-                featured.style.transform = `translateY(${scrollY * -0.03}px)`;
-            }
+const book = document.querySelector('.featured-image');
+
+if (featured) {
+    featured.style.transform = `translateY(${scrollY * -0.03}px)`;
+}
+
+if (book) {
+    book.style.transform = `translateY(${scrollY * -0.06}px)`; // faster = closer
+}
 
             ticking = false;
 
@@ -138,6 +144,20 @@ window.addEventListener('scroll', () => {
     }
 
 });
+    // FOG PARALLAX
+const fogBack = document.querySelector('.fog-back');
+const fogMid = document.querySelector('.fog-mid');
+const fogFront = document.querySelector('.fog-front');
+
+if (fogBack) {
+    fogBack.style.transform = `translateX(${scrollY * -0.02}px)`;
+}
+if (fogMid) {
+    fogMid.style.transform = `translateX(${scrollY * -0.05}px)`;
+}
+if (fogFront) {
+    fogFront.style.transform = `translateX(${scrollY * -0.08}px)`;
+}
     // =========================
     // START ANIMATIONS
     // =========================
