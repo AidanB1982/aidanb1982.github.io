@@ -253,7 +253,7 @@ html, body {
 }
 
 .entity.active {
-    opacity: 0.18;
+    opacity: 0.12;
     transform: translateY(0);
 
     animation: entityDrift 6s ease-in-out infinite alternate;
