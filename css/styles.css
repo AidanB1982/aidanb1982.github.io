@@ -27,6 +27,8 @@ body {
     to bottom,
     #0b0b0d 0%,
     #050505 100%
+    opacity: var(--fadeIn, 1);
+    transition: opacity 0.6s ease;   
 }
 
 /* =========================
