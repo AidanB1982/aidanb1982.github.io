@@ -181,7 +181,14 @@ body {
     50%  { transform: translateX(20px) translateY(-6px); }
     100% { transform: translateX(0px) translateY(0px); }
 }
-
+@keyframes entityFlicker {
+    0%,100% { opacity: inherit; }
+    50% { opacity: calc(inherit * 0.7); }
+}
+animation:
+    entityFade 12s ease-in-out infinite,
+    entityDrift 20s ease-in-out infinite,
+    entityFlicker 3s ease-in-out infinite;
 /* =========================
    CONTENT
 ========================= */
