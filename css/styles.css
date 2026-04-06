@@ -52,8 +52,8 @@ img {
         translateY(calc(40px * (1 - var(--fadeIn, 1))))
         scale(calc(0.98 + var(--fadeIn, 1) * 0.02));
 
-    filter:
-        blur(calc((1 - var(--fadeIn, 1)) * 4px));
+    filter: none;
+       
 
     transition:
         opacity 0.6s ease,
