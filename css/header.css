@@ -36,15 +36,16 @@ body {
 ========================= */
 .hero {
     position: relative;
-    height: 100vh;
+    min-height: 100vh; /* instead of fixed height */
     overflow: hidden;
+
     display: flex;
-    justify-content: center;   
-    align-items: center;   
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    letter-spacing: 0.3px;
-    padding-top: 20px;  
+
     opacity: calc(1 - var(--fadeOut, 0));
+
     filter:
         blur(calc(var(--fadeOut, 0) * 6px))
         brightness(calc(1 - var(--fadeOut, 0) * 0.3));
