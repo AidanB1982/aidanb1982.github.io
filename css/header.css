@@ -60,7 +60,11 @@ body {
         linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.75)),
         url('/assets/forest.png') center 40% / cover no-repeat;
 
-    transform: translateY(var(--scrollY, 0)); /* ❗ removed scale */
+    transform:
+        translateY(var(--scrollY, 0))
+        scale(calc(1 + var(--zoom, 0)));
+
+    transform-origin: center;
     
     filter: contrast(110%) brightness(0.9);
 
