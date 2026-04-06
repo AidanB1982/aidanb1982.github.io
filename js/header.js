@@ -22,6 +22,7 @@ async function loadHeader(type = "hero") {
 
         // ✅ AFTER HEADER LOAD → INIT SCROLL
         initScrollFade();
+        initEntity(); 
 
     } catch (err) {
         console.error("Header load failed:", err);
@@ -70,6 +71,36 @@ function initScrollFade() {
             });
 
             ticking = true;
+        }
+
+    });
+
+}
+// =========================
+// ENTITY REVEAL
+// =========================
+function initEntity() {
+
+    const entity = document.querySelector('.entity');
+    if (!entity) return;
+
+    let triggered = false;
+
+    window.addEventListener('scroll', () => {
+
+        const scrollY = window.scrollY;
+
+        // trigger once after slight scroll
+        if (scrollY > 100 && !triggered) {
+            triggered = true;
+
+            entity.classList.add('active');
+
+            // fade out again after a few seconds
+            setTimeout(() => {
+                entity.classList.remove('active');
+                triggered = false;
+            }, 4000);
         }
 
     });
