@@ -150,7 +150,7 @@ html, body {
 .fog {
     position: absolute;
     inset: 0;
-
+    transform: scale(1.2)
     background: url("/assets/fog1.png") center 88% / cover no-repeat;
 
     pointer-events: none;
@@ -166,8 +166,8 @@ html, body {
 
     -webkit-mask-image: radial-gradient(
         ellipse at center,
-        rgba(0,0,0,1) 60%,
-        rgba(0,0,0,0.6) 80%,
+        rgba(0,0,0,1) 55%,
+        rgba(0,0,0,0.5) 75%,
         transparent 100%
     );
 }
@@ -176,21 +176,21 @@ html, body {
 .fog-back {
     z-index: 1;
     opacity: 0.22;
-    animation: fogSlow 70s ease-in-out infinite alternate;
+    animation: fogSlow 45s ease-in-out infinite alternate;
     filter: blur(8px);
 }
 
 .fog-mid {
     z-index: 2;
     opacity: 0.28;
-    animation: fogMid 50s ease-in-out infinite alternate;
+    animation: fogMid 30s ease-in-out infinite alternate;
     filter: blur(5px);
 }
 
 .fog-front {
     z-index: 3;
     opacity: 0.36;
-    animation: fogFast 35s ease-in-out infinite alternate;
+    animation: fogFast 20s ease-in-out infinite alternate;
     filter: blur(2px);
 }
 
@@ -215,14 +215,13 @@ html, body {
 ========================= */
 .entity {
     position: absolute;
-    bottom: 4%;
-    left: 28%;
+    bottom: 6%;
+    left: 30%;
 
     width: 220px;
 
     opacity: 0;
-
-    pointer-events: none;
+    
     z-index: 3;
 
     mix-blend-mode: lighten;
