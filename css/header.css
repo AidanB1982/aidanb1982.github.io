@@ -125,7 +125,54 @@
 
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
+/* =========================
+   NAVIGATION (HERO)
+========================= */
+.nav-inline {
+    display: flex;
+    justify-content: center;
+    gap: 34px; /* spacing between links */
 
+    margin: 10px 0 25px 0;
+}
+
+.nav-inline a {
+    position: relative;
+
+    font-size: 12px;
+    letter-spacing: 3px; /* ❗ spacing fix */
+    text-transform: uppercase;
+
+    color: #e6e6e6;
+    text-decoration: none;
+
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.nav-inline a:hover {
+    opacity: 1;
+}
+
+/* subtle underline animation */
+.nav-inline a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+
+    width: 0;
+    height: 1px;
+
+    background: rgba(255,255,255,0.6);
+
+    transition: 0.3s;
+    transform: translateX(-50%);
+}
+
+.nav-inline a:hover::after {
+    width: 100%;
+}
 /* =========================
    ANIMATIONS
 ========================= */
