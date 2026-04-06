@@ -1,5 +1,5 @@
 /* =========================
-   RESET (SAFE BASE)
+   RESET
 ========================= */
 html, body {
     margin: 0;
@@ -17,37 +17,33 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-
     text-align: center;
 
-    /* 🌲 FOREST BACKGROUND */
     background:
         linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)),
         url("/assets/forest.png") center 40% / cover no-repeat;
 
     color: #e6e6e6;
+
     opacity: calc(1 - var(--fadeOut, 0));
     transition: opacity 0.2s linear;
 
     mask-image: linear-gradient(
-       to bottom,
-       rgba(0,0,0,1) 60%,
-       rgba(0,0,0,0.3) 85%,
-       rgba(0,0,0,0) 100%
-   );
+        to bottom,
+        rgba(0,0,0,1) 60%,
+        rgba(0,0,0,0.3) 85%,
+        rgba(0,0,0,0) 100%
+    );
 
-   -webkit-mask-image: linear-gradient(
-       to bottom,
-       rgba(0,0,0,1) 60%,
-       rgba(0,0,0,0.3) 85%,
-       rgba(0,0,0,0) 100%
-   );
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,1) 60%,
+        rgba(0,0,0,0.3) 85%,
+        rgba(0,0,0,0) 100%
+    );
 }
 
-/* =========================
-   SUBTLE LIGHT ATMOSPHERE
-   (NEW - sits above background)
-========================= */
+/* LIGHT ATMOSPHERE */
 .hero::after {
     content: "";
     position: absolute;
@@ -64,11 +60,12 @@ html, body {
 }
 
 /* =========================
-   INNER CONTENT
+   CONTENT
 ========================= */
 .hero-inner {
-    position: relative;   
-    z-index: 10;          
+    position: relative;
+    z-index: 10;
+
     max-width: 700px;
     width: 100%;
 
@@ -79,24 +76,16 @@ html, body {
     align-items: center;
 }
 
-/* =========================
-   LOGO
-========================= */
 .hero-logo {
     width: 260px;
     max-width: 80%;
-
     margin-bottom: 20px;
 }
 
-/* =========================
-   NAVIGATION
-========================= */
+/* NAV */
 .nav-inline {
     display: flex;
-    justify-content: center;
     gap: 28px;
-
     margin-bottom: 25px;
 }
 
@@ -130,21 +119,15 @@ html, body {
     width: 100%;
 }
 
-/* =========================
-   TEXT
-========================= */
+/* TEXT */
 .hero-text {
     font-size: 15px;
     line-height: 1.7;
-
     opacity: 0.85;
-
     margin-bottom: 25px;
 }
 
-/* =========================
-   BUTTON
-========================= */
+/* BUTTON */
 .button {
     font-size: 12px;
     letter-spacing: 2px;
@@ -162,76 +145,56 @@ html, body {
 }
 
 /* =========================
-   FOG ATMOSPHERE
+   FOG
 ========================= */
 .fog {
     position: absolute;
     inset: 0;
-    will-change: transform;
+
     background: url("/assets/fog1.png") center 88% / cover no-repeat;
 
     pointer-events: none;
+    will-change: transform;
+
+    /* EDGE SOFTENING */
+    mask-image: radial-gradient(
+        ellipse at center,
+        rgba(0,0,0,1) 60%,
+        rgba(0,0,0,0.6) 80%,
+        transparent 100%
+    );
+
+    -webkit-mask-image: radial-gradient(
+        ellipse at center,
+        rgba(0,0,0,1) 60%,
+        rgba(0,0,0,0.6) 80%,
+        transparent 100%
+    );
 }
 
-/* BACK LAYER */
+/* LAYERS */
 .fog-back {
     z-index: 1;
     opacity: 0.22;
-
-    transform: scale(1.1);
-
-    animation: fogSlow 120s ease-in-out infinite alternate;
+    animation: fogSlow 70s ease-in-out infinite alternate;
     filter: blur(8px);
 }
 
-/* MID LAYER */
 .fog-mid {
     z-index: 2;
     opacity: 0.28;
-
-    transform: scale(1.05);
-
-    animation: fogMid 90s ease-in-out infinite alternate;
+    animation: fogMid 50s ease-in-out infinite alternate;
     filter: blur(5px);
 }
 
-/* FRONT LAYER */
 .fog-front {
     z-index: 3;
     opacity: 0.36;
-
-    animation: fogFast 60s ease-in-out infinite alternate;
+    animation: fogFast 35s ease-in-out infinite alternate;
     filter: blur(2px);
 }
-.fog::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40%;
 
-    background: linear-gradient(
-        to top,
-        rgba(0,0,0,0.6),
-        transparent
-    );
-}
-/* EDGE FADE FIX */
-.fog::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 200px;
-    height: 100%;
-
-    background: linear-gradient(to right, transparent, rgba(0,0,0,0.9));
-}
-
-/* =========================
-   FOG ANIMATION
-========================= */
+/* ANIMATION */
 @keyframes fogSlow {
     0%   { transform: translateX(0) translateY(0) scale(1.1); }
     100% { transform: translateX(-80px) translateY(25px) scale(1.15); }
@@ -246,13 +209,12 @@ html, body {
     0%   { transform: translateX(0) translateY(0); }
     100% { transform: translateX(-160px) translateY(45px); }
 }
+
 /* =========================
-   ENTITY (SHADOW FIGURE)
+   ENTITY
 ========================= */
 .entity {
     position: absolute;
-    mix-blend-mode: lighten;
-
     bottom: 4%;
     left: 28%;
 
@@ -263,10 +225,12 @@ html, body {
     pointer-events: none;
     z-index: 3;
 
+    mix-blend-mode: lighten;
+
     filter:
-        blur(4px)
-        brightness(0.35)
-        contrast(1.2);
+        blur(2px)
+        brightness(0.45)
+        contrast(1.3);
 
     transform: translateY(30px);
 
@@ -274,7 +238,6 @@ html, body {
         opacity 1.5s ease,
         transform 1.5s ease;
 
-    /* 👁️ fade into fog */
     mask-image: linear-gradient(
         to top,
         transparent 0%,
@@ -290,31 +253,14 @@ html, body {
     );
 }
 
-/* ACTIVE STATE */
 .entity.active {
-    opacity: 0.12;
+    opacity: 0.18;
     transform: translateY(0);
 
     animation: entityDrift 6s ease-in-out infinite alternate;
 }
 
-/* DRIFT ANIMATION */
 @keyframes entityDrift {
     0%   { transform: translateY(0) translateX(0); }
     100% { transform: translateY(-6px) translateX(4px); }
-}
-.entity {
-    mask-image: linear-gradient(
-        to top,
-        transparent 0%,
-        rgba(0,0,0,0.8) 40%,
-        rgba(0,0,0,1) 100%
-    );
-
-    -webkit-mask-image: linear-gradient(
-        to top,
-        transparent 0%,
-        rgba(0,0,0,0.8) 40%,
-        rgba(0,0,0,1) 100%
-    );
 }
