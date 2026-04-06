@@ -122,7 +122,13 @@ window.addEventListener('scroll', () => {
 
             // HERO CONTENT
             if (inner) {
-                inner.style.transform = `translateY(${scrollY * 0.02}px)`;
+                const mouseX = (targetX - 50) * 0.24;
+                const mouseY = (targetY - 50) * 0.24;
+                
+                inner.style.transform = `
+                    translate(${mouseX}px, ${mouseY + scrollY * 0.02}px)
+                    scale(1.02)
+                `;
             }
 
             // FEATURED + BOOK DEPTH
