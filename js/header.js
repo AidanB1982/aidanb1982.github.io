@@ -81,6 +81,17 @@ function initHeader() {
         hero.style.setProperty('--my', currentY + '%');
 
         requestAnimationFrame(animateLight);
+
+        if (window.location.pathname === "/" || window.location.pathname.includes("index")) {
+
+    const links = document.querySelectorAll('.nav-inline a');
+
+    links.forEach(link => {
+        if (link.textContent.trim() === "Publications") {
+            link.remove();
+        }
+    });
+}
     }
 
     // =========================
@@ -115,7 +126,7 @@ function initHeader() {
 
                 let progress = 0;
 
-                iif (featuredSection) {
+                if (featuredSection) {
                 const rect = featuredSection.getBoundingClientRect();
             
                 const start = window.innerHeight * 0.85;
