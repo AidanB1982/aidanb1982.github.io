@@ -29,7 +29,7 @@ img {
     background: transparent;
     z-index: 5;
 
-    opacity: var(--fadeIn, 0);
+    opacity: var(--fadeIn, 1);
 
     transform:
         translateY(calc(40px * (1 - var(--fadeIn, 0))))
