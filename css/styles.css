@@ -5,11 +5,11 @@ html, body {
     margin: 0;
     padding: 0;
 
-    /* ❗ FIX: remove height forcing */
+    
     /* height: auto; */
     /* min-height: 100%; */
 
-    background: #0b0b0d;
+    background: #000000;
     color: #e6e6e6;
     font-family: Georgia, serif;
 
@@ -32,9 +32,7 @@ img {
     margin-top: 0px;
     padding: 120px 20px;
 
-    /* ❗ FIX: REMOVE this — causes scroll stacking */
-    /* min-height: 100vh; */
-
+    
     background: transparent;
     z-index: 5;
 
@@ -97,7 +95,7 @@ img {
 }
 
 .featured-image img {
-    width: 320px;
+    width: 400px;
     height: auto;
 
     transform: translateX(-10px);
