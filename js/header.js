@@ -136,6 +136,7 @@ function initHeader() {
                 // BACKGROUND
                 hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
                 hero.style.setProperty('--zoom', scrollY * 0.0002);
+                hero.style.setProperty('--depth', scrollY * 0.02 + 'px');
 
                 // HERO CONTENT
                 if (inner) {
@@ -143,9 +144,9 @@ function initHeader() {
                     const mouseY = (targetY - 50) * 0.24;
 
                     inner.style.transform = `
-                        translate(${mouseX}px, ${mouseY + scrollY * 0.02}px)
-                        scale(1.02)
-                    `;
+                    translate3d(${mouseX}px, ${mouseY + scrollY * 0.02}px, 0)
+                    scale(1.02)
+                `;
                 }
 
                 // FEATURED PARALLAX
@@ -160,15 +161,6 @@ function initHeader() {
                     const offset = Math.min(scrollY * 0.02, 40);
                     book.style.setProperty('--bookY', -offset + 'px');
                 }
-
-                // FOG
-                const fogBack = document.querySelector('.fog-back');
-                const fogMid = document.querySelector('.fog-mid');
-                const fogFront = document.querySelector('.fog-front');
-
-                if (fogBack) fogBack.style.transform = `translateX(${scrollY * -0.02}px)`;
-                if (fogMid) fogMid.style.transform = `translateX(${scrollY * -0.05}px)`;
-                if (fogFront) fogFront.style.transform = `translateX(${scrollY * -0.08}px)`;
 
                 ticking = false;
 
