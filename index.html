@@ -45,6 +45,13 @@
 <!-- HEADER SCRIPT -->
 <script src="js/header.js"></script>
 
+<!-- ❗ FIX: FORCE HEADER LOAD RELIABLY -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("hero");
+});
+</script>
+
 <!-- SCROLL REVEAL + PARALLAX -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
