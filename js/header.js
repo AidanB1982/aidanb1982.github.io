@@ -153,7 +153,7 @@ window.addEventListener('scroll', () => {
             const book = document.querySelector('.featured-image');
 
             if (featured) {
-                featured.style.transform = `translateY(${scrollY * -0.03}px)`;
+                featured.style.setProperty('--featuredY', scrollY * -0.03 + 'px');
             }
 
             if (book) {
