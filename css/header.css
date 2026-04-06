@@ -244,9 +244,14 @@ body {
 /* =========================
    BUTTON
 ========================= */
-.button {
+.button,
+.button:visited,
+.button:active,
+.button:link {
     position: relative;
     opacity: 0.8;
+    color: #e6e6e6;
+    text-decoration: none;
 }
 
 /* animated underline */
