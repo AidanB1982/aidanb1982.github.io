@@ -2,6 +2,8 @@
    GLOBAL RESET
 ========================= */
 html, body {
+    height: auto;
+    min-height: 100%; 
     margin: 0;
     padding: 0;
     background: #0b0b0d;
@@ -26,6 +28,8 @@ img {
     margin-top: 0px;
     padding: 120px 20px;
 
+    min-height: 100vh; /* ❗ FIX prevents scroll stacking */
+
     background: transparent;
     z-index: 5;
 
@@ -35,7 +39,6 @@ img {
         translateY(calc(40px * (1 - var(--fadeIn, 1))))
         scale(calc(0.98 + var(--fadeIn, 1) * 0.02));
 
-    /* ❗ FIX: reduce + stabilise blur */
     filter:
         blur(calc((1 - var(--fadeIn, 1)) * 4px));
 
