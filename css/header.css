@@ -46,6 +46,7 @@ body {
     padding-top: 20px;  
     opacity: calc(1 - var(--fadeOut, 0));
     transition: opacity 0.2s linear;
+    filter: blur(calc(var(--fadeOut, 0) * 6px));
 }
 .hero-inner {
     margin-top: 60px;
