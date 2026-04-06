@@ -45,6 +45,8 @@ html, body {
    INNER CONTENT
 ========================= */
 .hero-inner {
+    position: relative;   
+    z-index: 10;          
     max-width: 700px;
     width: 100%;
 
@@ -133,4 +135,53 @@ html, body {
 
 .button:hover {
     opacity: 1;
+}
+/* =========================
+   FOG ATMOSPHERE
+========================= */
+.fog {
+    position: absolute;
+    inset: 0;
+    background: url("../assets/fog1.png") repeat-x;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* BACK LAYER */
+.fog-back {
+    opacity: 0.12;
+    animation: fogSlow 180s linear infinite;
+    filter: blur(6px);
+}
+
+/* MID LAYER */
+.fog-mid {
+    opacity: 0.18;
+    animation: fogMid 120s linear infinite;
+    filter: blur(4px);
+}
+
+/* FRONT LAYER */
+.fog-front {
+    opacity: 0.25;
+    animation: fogFast 80s linear infinite;
+    filter: blur(2px);
+}
+
+/* =========================
+   FOG ANIMATION
+========================= */
+@keyframes fogSlow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-600px); }
+}
+
+@keyframes fogMid {
+    from { transform: translateX(0); }
+    to { transform: translateX(-900px); }
+}
+
+@keyframes fogFast {
+    from { transform: translateX(0); }
+    to { transform: translateX(-1200px); }
 }
