@@ -116,7 +116,7 @@ function initHeader() {
                 let progress = 0;
 
                 if (featuredSection) {
-                    const rect = featuredSection.getBoundingClientRect();
+                    const rect = featuredSection.getBoundingClientRect(); 
 
                     const start = window.innerHeight * 0.8;
                     const end = window.innerHeight * 0.2;
