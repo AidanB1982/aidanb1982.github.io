@@ -116,25 +116,35 @@ window.addEventListener('scroll', () => {
 
             const scrollY = window.scrollY;
 
-            // Background movement
+            // BACKGROUND
             hero.style.setProperty('--scrollY', scrollY * 0.15 + 'px');
+            hero.style.setProperty('--zoom', scrollY * 0.0002);
 
-            // Hero content
+            // HERO CONTENT
             if (inner) {
                 inner.style.transform = `translateY(${scrollY * 0.02}px)`;
             }
 
-            // Featured section
+            // FEATURED + BOOK DEPTH
             const featured = document.querySelector('.featured-inner');
-const book = document.querySelector('.featured-image');
+            const book = document.querySelector('.featured-image');
 
-if (featured) {
-    featured.style.transform = `translateY(${scrollY * -0.03}px)`;
-}
+            if (featured) {
+                featured.style.transform = `translateY(${scrollY * -0.03}px)`;
+            }
 
-if (book) {
-    book.style.transform = `translateY(${scrollY * -0.06}px)`; // faster = closer
-}
+            if (book) {
+                book.style.transform = `translateY(${scrollY * -0.06}px)`;
+            }
+
+            // FOG LAYERS
+            const fogBack = document.querySelector('.fog-back');
+            const fogMid = document.querySelector('.fog-mid');
+            const fogFront = document.querySelector('.fog-front');
+
+            if (fogBack) fogBack.style.transform = `translateX(${scrollY * -0.02}px)`;
+            if (fogMid) fogMid.style.transform = `translateX(${scrollY * -0.05}px)`;
+            if (fogFront) fogFront.style.transform = `translateX(${scrollY * -0.08}px)`;
 
             ticking = false;
 
