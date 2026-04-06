@@ -132,21 +132,22 @@ body {
 
 /* DEPTH LAYERS */
 .fog-back {
-    opacity: 0.08;
-    animation: fogSlow 180s linear infinite;
-    filter: blur(4px);
+    opacity: 0.12;
+    animation: fogSlow 160s linear infinite;
+    filter: blur(5px);
 }
 
 .fog-mid {
-    opacity: 0.14;
-    animation: fogMid 120s linear infinite;
-    filter: blur(2px);
+    opacity: 0.2;
+    animation: fogMid 110s linear infinite;
+    filter: blur(3px);
 }
 
+
 .fog-front {
-    opacity: 0.2;
-    animation: fogMid 90s linear infinite;
-    filter: blur(1px);
+    opacity: 0.28;
+    animation: fogMid 80s linear infinite;
+    filter: blur(1.5px);
 }
 
 /* =========================
@@ -157,7 +158,8 @@ body {
     bottom: 8%;
     left: 28%;
 
-    width: 140px;
+    width: 160px;
+
     opacity: 0;
 
     pointer-events: none;
@@ -165,17 +167,15 @@ body {
     filter: blur(1px) brightness(0.5) contrast(1.2);
 
     animation:
-        entityFade 18s ease-in-out infinite,
-        entityDrift 25s ease-in-out infinite;
+        entityFade 12s ease-in-out infinite,
+        entityDrift 20s ease-in-out infinite;
 }
 
-/* FADE IN / OUT */
 @keyframes entityFade {
-    0%, 85%, 100% { opacity: 0; }
-    90% { opacity: 0.35; }
+    0%, 60%, 100% { opacity: 0; }
+    70%, 90% { opacity: 0.45; }
 }
 
-/* FLOAT */
 @keyframes entityDrift {
     0%   { transform: translateX(0px) translateY(0px); }
     50%  { transform: translateX(20px) translateY(-6px); }
