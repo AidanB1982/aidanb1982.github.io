@@ -215,21 +215,20 @@ html, body {
 ========================= */
 .entity {
     position: absolute;
+
     bottom: 6%;
     left: 30%;
 
-    width: 220px;
+    width: 240px;
 
-    opacity: 100;
-    
-    z-index: 3;
+    opacity: 0;
 
-    mix-blend-mode: lighten;
+    z-index: 4;
 
     filter:
-        blur(2px)
-        brightness(0.45)
-        contrast(1.3);
+        blur(1.5px)
+        brightness(0.6)
+        contrast(1.4);
 
     transform: translateY(30px);
 
@@ -237,23 +236,24 @@ html, body {
         opacity 1.5s ease,
         transform 1.5s ease;
 
+    /* fade into fog */
     mask-image: linear-gradient(
         to top,
         transparent 0%,
-        rgba(0,0,0,0.8) 40%,
+        rgba(0,0,0,0.7) 40%,
         rgba(0,0,0,1) 100%
     );
 
     -webkit-mask-image: linear-gradient(
         to top,
         transparent 0%,
-        rgba(0,0,0,0.8) 40%,
+        rgba(0,0,0,0.7) 40%,
         rgba(0,0,0,1) 100%
     );
 }
 
 .entity.active {
-    opacity: 0.18;
+    opacity: 0.28;
     transform: translateY(0);
 
     animation: entityDrift 6s ease-in-out infinite alternate;
