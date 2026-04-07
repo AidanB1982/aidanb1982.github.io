@@ -218,11 +218,6 @@ body {
 /* =========================
    FADE-IN (REUSABLE)
 ========================= */
-.fade-in {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease;
-}
 
 .fade-in.visible {
     opacity: 1;
