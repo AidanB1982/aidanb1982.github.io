@@ -18,30 +18,12 @@ body {
     font-family: Georgia, serif;
 }
 /* =========================
-   SECTION DIVIDER
-========================= */
-.section-divider {
-    height: 1px;
-    width: 100%;
-    background: linear-gradient(
-        to right,
-        transparent,
-        rgba(255,255,255,0.25),
-        transparent
-    );
-    opacity: 0.5;
-}
-/* =========================
    FEATURED SECTION
 ========================= */
 .featured {
     padding: 100px 20px;
 
-    background: linear-gradient(
-        to bottom,
-        #000000 0%,
-        #0b0b0d 100%
-    );
+    background: #000000;
 
     opacity: var(--fadeIn, 1);
     transition: opacity 0.6s ease;
@@ -118,7 +100,6 @@ body {
     letter-spacing: 2px;
     text-transform: uppercase;
 
-    color: #e6e6e6;
     text-decoration: none;
 
     opacity: 0.8;
@@ -255,6 +236,8 @@ body {
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+
+    display: inline-block;
 }
 .text-image-overlay {
     background: url("../assets/copper-texture.jpg") center / cover no-repeat;
