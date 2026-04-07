@@ -69,7 +69,7 @@ body {
 }
 
 .featured-image img {
-    width: 360px;
+    width: 420px;
     height: auto;
 
     transition: transform 0.4s ease, filter 0.4s ease;
@@ -184,7 +184,7 @@ body {
 /* IMAGE */
 .work img {
     width: 100%;
-    max-width: 220px;
+    max-width: 280px;
     margin: 0 auto;
 
     transition: transform 0.4s ease, filter 0.4s ease;
@@ -235,4 +235,17 @@ body {
 .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
+}
+/* =========================
+   COPPER TEXT EFFECT
+========================= */
+.copper {
+    background: linear-gradient(
+        120deg,
+        #b87333,
+        #d4a373,
+        #8c4a1f
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
