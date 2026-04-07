@@ -115,19 +115,30 @@ function initFadeIn() {
     const elements = document.querySelectorAll('.fade-in');
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
+
+        entries.forEach((entry) => {
+
             if (entry.isIntersecting) {
 
-                setTimeout(() => {
-                    entry.target.classList.add('visible');
-                }, index * 120);
+                const el = entry.target;
 
-                observer.unobserve(entry.target);
+                const delay = el.dataset.delay || 0;
+
+                setTimeout(() => {
+                    el.classList.add('visible');
+                }, delay);
+
+                observer.unobserve(el);
             }
         });
+
     }, {
-        threshold: 0.2
+        threshold: 0.4,
+        rootMargin: "0px 0px -100px 0px"
     });
 
-    elements.forEach(el => observer.observe(el));
+    elements.forEach((el, index) => {
+        el.dataset.delay = index * 150;
+        observer.observe(el);
+    });
 }
