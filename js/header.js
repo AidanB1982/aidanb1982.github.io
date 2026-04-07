@@ -22,7 +22,8 @@ async function loadHeader(type = "hero") {
 
         // ✅ AFTER HEADER LOAD → INIT SCROLL
         initScrollFade();
-        initEntity(); 
+        initEntity();
+        initFadeIn();
 
     } catch (err) {
         console.error("Header load failed:", err);
