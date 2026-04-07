@@ -28,6 +28,8 @@ html, body {
     opacity: calc(1 - var(--fadeOut, 0));
     transition: opacity 0.2s linear;
 
+    overflow: hidden; /* ✅ prevents fog overflow */
+
     mask-image: linear-gradient(
         to bottom,
         rgba(0,0,0,1) 60%,
@@ -156,7 +158,8 @@ html, body {
     pointer-events: none;
     will-change: transform;
 
-    /* EDGE SOFTENING */
+    z-index: 1; /* ✅ base layer */
+
     mask-image: radial-gradient(
         ellipse at center,
         rgba(0,0,0,1) 55%,
@@ -171,24 +174,21 @@ html, body {
         transparent 100%
     );
 }
-   
+
 /* LAYERS */
 .fog-back {
-    z-index: 1;
     opacity: 0.22;
     animation: fogSlow 35s ease-in-out infinite alternate;
     filter: blur(8px);
 }
 
 .fog-mid {
-    z-index: 2;
     opacity: 0.28;
     animation: fogMid 20s ease-in-out infinite alternate;
     filter: blur(5px);
 }
 
 .fog-front {
-    z-index: 3;
     opacity: 0.36;
     animation: fogFast 10s ease-in-out infinite alternate;
     filter: blur(2px);
@@ -222,8 +222,7 @@ html, body {
     width: 200px;
 
     opacity: 0;
-
-    z-index: 4;
+    z-index: 5; /* ✅ above fog */
 
     filter:
         blur(1.5px)
@@ -236,7 +235,6 @@ html, body {
         opacity 1.5s ease,
         transform 1.5s ease;
 
-    /* fade into fog */
     mask-image: linear-gradient(
         to top,
         transparent 0%,
