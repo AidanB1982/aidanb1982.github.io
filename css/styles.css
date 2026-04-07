@@ -249,3 +249,8 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+.text-image-overlay {
+    background: url("../assets/copper-texture.jpg") center / cover no-repeat;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
