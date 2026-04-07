@@ -4,29 +4,46 @@
 
 async function loadHeader(type = "hero") {
 
-    let file = "header.html";
+    // Map header types to files
+    const fileMap = {
+        hero: "./header.html",
+        simple: "./header-simple.html"
+    };
 
-    if (type === "simple") {
-        file = "header-simple.html";
-    }
+    // Fallback to hero if invalid type
+    const file = fileMap[type] || fileMap.hero;
 
     try {
         const res = await fetch(file);
+
+        // ❗ Handle HTTP errors properly
+        if (!res.ok) {
+            throw new Error(`Failed to load ${file} (${res.status})`);
+        }
+
         const html = await res.text();
 
         const container = document.getElementById("header-placeholder");
 
-        if (container) {
-            container.innerHTML = html;
+        if (!container) {
+            console.warn("Header container not found");
+            return;
         }
 
-        // ✅ AFTER HEADER LOAD → INIT SCROLL
+        container.innerHTML = html;
+
         initScrollFade();
         initEntity();
         initFadeIn();
 
     } catch (err) {
         console.error("Header load failed:", err);
+
+
+        const container = document.getElementById("header-placeholder");
+        if (container) {
+            container.innerHTML = "<p style='color:white'>Header failed to load</p>";
+        }
     }
 }
 
