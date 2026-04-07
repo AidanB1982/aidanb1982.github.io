@@ -29,9 +29,6 @@ body {
     transition: opacity 0.6s ease;
 }
 
-/* =========================
-   LAYOUT
-========================= */
 .featured-inner {
     max-width: 1100px;
     margin: 0 auto;
@@ -41,9 +38,7 @@ body {
     align-items: center;
 }
 
-/* =========================
-   IMAGE
-========================= */
+/* IMAGE */
 .featured-image img {
     width: 420px;
     transition: transform 0.6s ease, filter 0.6s ease;
@@ -55,9 +50,7 @@ body {
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.9));
 }
 
-/* =========================
-   TEXT
-========================= */
+/* TEXT */
 .featured-content {
     max-width: 480px;
 }
@@ -82,9 +75,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* =========================
-   BUTTON
-========================= */
+/* BUTTON */
 .button {
     font-size: 14px;
     letter-spacing: 2.5px;
@@ -149,7 +140,7 @@ body {
     --mouse-y: 50%;
 }
 
-/* SCROLL FADE */
+/* TOP FADE */
 .works::before {
     content: "";
     position: absolute;
@@ -204,9 +195,7 @@ body {
     opacity: 0.8;
 }
 
-/* =========================
-   GRID
-========================= */
+/* GRID */
 .works-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -214,17 +203,15 @@ body {
     perspective: 1000px;
 }
 
-/* =========================
-   WORK ITEM
-========================= */
+/* WORK ITEM */
 .work {
+    position: relative;
     text-align: center;
     opacity: 0;
     transform: translateY(40px);
     transition: opacity 0.4s ease;
 }
 
-/* VISIBLE STATE */
 .work.visible {
     opacity: 1;
     transform: translateY(0);
@@ -244,7 +231,7 @@ body {
         drop-shadow(0 5px 10px rgba(184,115,51,0.08));
 }
 
-/* HOVER IMAGE */
+/* HOVER */
 .work:hover img {
     transform: translateY(-12px) scale(1.06) rotateX(3deg);
     filter:
@@ -252,7 +239,7 @@ body {
         drop-shadow(0 10px 25px rgba(184,115,51,0.2));
 }
 
-/* SHADOW UNDER IMAGE */
+/* SHADOW */
 .work::after {
     content: "";
     position: absolute;
@@ -295,9 +282,138 @@ body {
 }
 
 /* =========================
+   ABOUT / AUTHOR / QUOTE
+========================= */
+.about-snippet,
+.author-link,
+.quote {
+    max-width: 700px;
+    margin: 60px auto;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.about-snippet p {
+    font-size: 18px;
+    line-height: 1.8;
+    opacity: 0.75;
+}
+
+.author-link a {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.author-link a:hover {
+    opacity: 1;
+}
+
+.quote p {
+    font-size: 20px;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+/* =========================
+   NEWSLETTER
+========================= */
+.newsletter {
+    position: relative;
+    padding: 80px 20px;
+    margin-top: 100px;
+    text-align: center;
+}
+
+.newsletter::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("../assets/stone.png");
+    opacity: 0.05;
+    z-index: 0;
+}
+
+.newsletter > * {
+    position: relative;
+    z-index: 1;
+}
+
+.newsletter p {
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 25px;
+}
+
+/* FORM */
+.ml-form {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    max-width: 420px;
+    margin: 0 auto;
+
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.ml-form input {
+    flex: 1;
+    padding: 12px 0;
+    background: transparent;
+    border: none;
+    color: #e6e6e6;
+    font-size: 15px;
+}
+
+.ml-form input::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+.ml-form input:focus {
+    outline: none;
+}
+
+.ml-form button {
+    background: none;
+    border: none;
+    color: #b87333;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ml-form button:hover {
+    opacity: 0.7;
+    transform: translateY(-1px);
+}
+
+.ml-note {
+    font-size: 12px;
+    opacity: 0.5;
+    margin-top: 10px;
+}
+
+/* =========================
    RESPONSIVE
 ========================= */
 @media (max-width: 900px) {
+    .featured-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .featured-image img {
+        width: 100%;
+        max-width: 320px;
+    }
+
     .works-grid {
         grid-template-columns: 1fr 1fr;
     }
