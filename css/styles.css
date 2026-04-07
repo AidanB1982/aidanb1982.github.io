@@ -73,11 +73,11 @@ body {
 }
 
 .featured-label {
-    font-size: 15px;
-    letter-spacing: 3px;
+    font-size: 19px;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    opacity: 0.7;
-    margin-bottom: 10px;
+    opacity: 0.85;
+    margin-bottom: 14px;
 }
 
 .featured-content h2 {
@@ -96,17 +96,47 @@ body {
    BUTTON
 ========================= */
 .button {
-    font-size: 12px;
-    letter-spacing: 2px;
+    font-size: 14px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
 
     text-decoration: none;
 
-    opacity: 0.8;
+    opacity: 0.9;
+
+    display: inline-block;
+    margin-top: 12px;
+
+    position: relative;
+
+    transition: 
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        letter-spacing 0.3s ease;
+}
+
+.button::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+
+    width: 0;
+    height: 1px;
+
+    background: currentColor;
+
+    transition: width 0.3s ease;
 }
 
 .button:hover {
     opacity: 1;
+    transform: translateY(-2px);
+    letter-spacing: 3px;
+}
+
+.button:hover::after {
+    width: 100%;
 }
 /* =========================
    FADE-IN ANIMATION
