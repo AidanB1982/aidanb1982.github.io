@@ -148,5 +148,8 @@ function initFadeIn() {
         threshold: 0.2
     });
 
-    elements.forEach(el => observer.observe(el));
+        elements.forEach((el, index) => {
+        el.style.transitionDelay = `${index * 120}ms`;
+        observer.observe(el);
+    });
 }
