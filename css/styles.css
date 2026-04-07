@@ -210,8 +210,15 @@ body {
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.9));
 }
 
-.work:hover span {
-    opacity: 1;
+.work span {
+    display: block;
+    margin-top: 15px;
+
+    font-size: 14px;
+    letter-spacing: 1px;
+
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
 }
 
 /* =========================
