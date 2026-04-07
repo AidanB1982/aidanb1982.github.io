@@ -53,6 +53,7 @@ function initScrollFade() {
 
                 const featured = document.querySelector('.featured');
                 const hero = document.querySelector('.hero');
+                const works = document.querySelector('.works');
 
                 let progress = 0;
 
@@ -68,8 +69,16 @@ function initScrollFade() {
                     featured.style.setProperty('--fadeIn', progress);
                 }
 
-                if (hero) {
-                    hero.style.setProperty('--fadeOut', progress * 0.8);
+                if (works) {
+                    const rect = works.getBoundingClientRect();
+                
+                    const start = window.innerHeight * 1.0;
+                    const end = window.innerHeight * 0.4;
+                
+                    let fade = (start - rect.top) / (start - end);
+                    fade = Math.max(0, Math.min(1, fade));
+                
+                    works.style.setProperty('--sectionFade', fade);
                 }
 
                 ticking = false;
