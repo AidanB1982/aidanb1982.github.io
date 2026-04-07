@@ -68,6 +68,24 @@ function initScrollFade() {
                     featured.style.setProperty('--fadeIn', progress);
                 }
 
+                // HERO FADE
+                if (hero) {
+                    hero.style.setProperty('--fadeOut', progress * 0.8);
+                }
+
+                // WORKS FADE
+                if (works) {
+                    const rect = works.getBoundingClientRect();
+
+                    const start = window.innerHeight * 1.1;
+                    const end = window.innerHeight * 0.5;
+
+                    let fade = (start - rect.top) / (start - end);
+                    fade = Math.max(0, Math.min(1, fade));
+
+                    works.style.setProperty('--sectionFade', fade);
+                }
+
                 ticking = false;
 
             });
@@ -78,26 +96,6 @@ function initScrollFade() {
     });
 }
 
-// HERO FADE
-if (hero) {
-    hero.style.setProperty('--fadeOut', progress * 0.8);
-}
-
-if (works) {
-    const rect = works.getBoundingClientRect();
-
-    const start = window.innerHeight * 1.1;
-    const end = window.innerHeight * 0.5;
-
-    let fade = (start - rect.top) / (start - end);
-    fade = Math.max(0, Math.min(1, fade));
-
-    works.style.setProperty('--sectionFade', fade);
-}
-
-    });
-
-}
 // =========================
 // ENTITY REVEAL
 // =========================
