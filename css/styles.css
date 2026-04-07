@@ -119,7 +119,7 @@ body {
 ========================= */
 .fade-in {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(60px);
     transition: all 1s ease;
 }
 
