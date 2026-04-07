@@ -94,6 +94,7 @@ function initScrollFade() {
         }
 
     });
+    window.dispatchEvent(new Event('scroll'));
 }
 
 // =========================
