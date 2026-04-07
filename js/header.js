@@ -119,26 +119,14 @@ function initFadeIn() {
         entries.forEach((entry) => {
 
             if (entry.isIntersecting) {
-
-                const el = entry.target;
-
-                const delay = el.dataset.delay || 0;
-
-                setTimeout(() => {
-                    el.classList.add('visible');
-                }, delay);
-
-                observer.unobserve(el);
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
             }
         });
 
     }, {
-        threshold: 0.4,
-        rootMargin: "0px 0px -100px 0px"
+        threshold: 0.2
     });
 
-    elements.forEach((el, index) => {
-        el.dataset.delay = index * 150;
-        observer.observe(el);
-    });
+    elements.forEach(el => observer.observe(el));
 }
