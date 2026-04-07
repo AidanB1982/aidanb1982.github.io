@@ -46,7 +46,7 @@
         </div>
     </section>
 <!-- WORKS GRID -->
-<section class="works">
+<section class="works fade-in">
 
     <div class="works-inner">
 
@@ -88,39 +88,6 @@
         document.addEventListener("DOMContentLoaded", () => {
             loadHeader("hero");
         });
-    </script>
-    <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-    const elements = document.querySelectorAll('.fade-in');
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, { threshold: 0.2 });
-
-    elements.forEach(el => observer.observe(el));
-
-});
-
-window.addEventListener('scroll', () => {
-
-    const elements = document.querySelectorAll('[data-speed]');
-    const scrollY = window.scrollY;
-
-    elements.forEach(el => {
-        const speed = parseFloat(el.getAttribute('data-speed'));
-        const offset = scrollY * speed * -0.1;
-
-        if (el.classList.contains('visible')) {
-            el.style.transform = `translateY(${offset}px)`;
-        }
-    });
-
-});
-</script>
+   
 </body>
 </html>
