@@ -29,7 +29,8 @@ async function loadHeader(type = "hero") {
         initScrollFade();
         initEntity();
         initFadeIn();
-
+        initSpotlight();
+        
     } catch (err) {
         console.error("Header load failed:", err);
     }
@@ -151,5 +152,21 @@ function initFadeIn() {
         elements.forEach((el, index) => {
         el.style.transitionDelay = `${index * 120}ms`;
         observer.observe(el);
+    });
+}
+function initSpotlight() {
+
+    const works = document.querySelector('.works');
+    if (!works) return;
+
+    works.addEventListener('mousemove', (e) => {
+
+        const rect = works.getBoundingClientRect();
+
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        works.style.setProperty('--mouse-x', `${x}%`);
+        works.style.setProperty('--mouse-y', `${y}%`);
     });
 }
