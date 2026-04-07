@@ -127,3 +127,91 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+/* =========================
+   WORKS GRID
+========================= */
+.works {
+    padding: 120px 20px;
+    background: #000;
+}
+
+.works-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* HEADER */
+.works-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.works-header p {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+/* GRID */
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+/* ITEM */
+.work {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: #e6e6e6;
+}
+
+/* IMAGE */
+.work img {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+
+    transition: transform 0.4s ease, filter 0.4s ease;
+
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.7));
+}
+
+/* TITLE */
+.work span {
+    display: block;
+    margin-top: 15px;
+
+    font-size: 14px;
+    letter-spacing: 1px;
+
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+/* HOVER */
+.work:hover img {
+    transform: translateY(-8px) scale(1.03);
+    filter: drop-shadow(0 30px 70px rgba(0,0,0,0.9));
+}
+
+.work:hover span {
+    opacity: 1;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 900px) {
+    .works-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .works-grid {
+        grid-template-columns: 1fr;
+    }
+}
