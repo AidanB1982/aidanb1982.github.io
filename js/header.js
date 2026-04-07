@@ -49,14 +49,13 @@ function initScrollFade() {
 
             requestAnimationFrame(() => {
 
-                const scrollY = window.scrollY;
-
                 const featured = document.querySelector('.featured');
                 const hero = document.querySelector('.hero');
                 const works = document.querySelector('.works');
 
                 let progress = 0;
 
+                // FEATURED FADE
                 if (featured) {
                     const rect = featured.getBoundingClientRect();
 
@@ -69,15 +68,20 @@ function initScrollFade() {
                     featured.style.setProperty('--fadeIn', progress);
                 }
 
-                if (works) {
+                // HERO FADE
+                if (hero) {
+                    hero.style.setProperty('--fadeOut', progress * 0.8);
+                }
+
+             if (works) {
                     const rect = works.getBoundingClientRect();
-                
-                    const start = window.innerHeight * 1.0;
-                    const end = window.innerHeight * 0.4;
-                
+
+                    const start = window.innerHeight * 1.1;
+                    const end = window.innerHeight * 0.5;
+
                     let fade = (start - rect.top) / (start - end);
                     fade = Math.max(0, Math.min(1, fade));
-                
+
                     works.style.setProperty('--sectionFade', fade);
                 }
 
@@ -87,6 +91,26 @@ function initScrollFade() {
 
             ticking = true;
         }
+
+    });
+}
+
+// HERO FADE
+if (hero) {
+    hero.style.setProperty('--fadeOut', progress * 0.8);
+}
+
+if (works) {
+    const rect = works.getBoundingClientRect();
+
+    const start = window.innerHeight * 1.1;
+    const end = window.innerHeight * 0.5;
+
+    let fade = (start - rect.top) / (start - end);
+    fade = Math.max(0, Math.min(1, fade));
+
+    works.style.setProperty('--sectionFade', fade);
+}
 
     });
 
