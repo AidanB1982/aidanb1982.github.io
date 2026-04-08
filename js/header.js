@@ -217,3 +217,64 @@ function initSpotlight() {
         works.style.setProperty('--mouse-y', `${y}%`);
     });
 }
+// =========================
+// BACKGROUND QUOTES SYSTEM
+// =========================
+
+function initQuotes() {
+
+    const quotes = [
+        "Some places keep what they take.",
+        "The sea went wrong.",
+        "The mirror watches.",
+        "Do you remember me?",
+        "Sleep meant forgetting.",
+        "He is not alone.",
+        "It looks back.",
+        "That silence after a secret."
+    ];
+
+    const container = document.getElementById("quote-background");
+    if (!container) return;
+
+    let currentIndex = 0;
+    let charIndex = 0;
+
+    const typeSpeed = 35;
+    const pauseTime = 2500;
+
+    function type() {
+
+        if (charIndex < quotes[currentIndex].length) {
+
+            container.textContent += quotes[currentIndex].charAt(charIndex);
+            charIndex++;
+
+            setTimeout(type, typeSpeed);
+
+        } else {
+
+            setTimeout(() => {
+                fadeOut();
+            }, pauseTime);
+        }
+    }
+
+    function fadeOut() {
+
+        container.classList.add("fade");
+
+        setTimeout(() => {
+            container.textContent = "";
+            charIndex = 0;
+            currentIndex = (currentIndex + 1) % quotes.length;
+
+            container.classList.remove("fade");
+
+            setTimeout(type, 400);
+
+        }, 1500);
+    }
+
+    type();
+}
