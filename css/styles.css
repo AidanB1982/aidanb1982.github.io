@@ -13,7 +13,7 @@ a:link {
 }
 
 a, .work, .button, .work-desc, .footer-col a {
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 /* =========================
    BASE + GLOBAL TEXTURE
@@ -300,6 +300,7 @@ body::before {
     letter-spacing: 2.6px;
     opacity: 0.75;
     transition: all 0.45s ease;
+    transform: translateY(4px);
 }
 
 .work:hover span {
@@ -329,7 +330,7 @@ body::before {
     margin-right: auto;
     transition: all 0.3s ease;
     transform: translateY(6px);
-    filter: blur(2px);
+    filter: blur(1.2px);
 }
 
 /* HOVER ENHANCEMENT */
@@ -768,14 +769,19 @@ body::after {
 .closing-line {
     text-align: center;
     padding: 80px 20px 40px;
+    transition: opacity 0.6s ease;
 }
 
 .opening-line p,
 .closing-line p {
     font-size: 22px;
-    letter-spacing: 2px;
+    letter-spacing: 2.2px;
     opacity: 0.75;
     max-width: 700px;
     margin: 0 auto;
     line-height: 1.6;
+}
+.opening-line:hover p,
+.closing-line:hover p {
+    opacity: 1;
 }
