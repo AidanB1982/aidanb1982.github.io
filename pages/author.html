@@ -1,393 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Author | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Author | Blackwood Publishing</title>
+
 <meta name="description" content="Aidan Blackwood writes literary and psychological fiction shaped by place, memory, and atmosphere.">
 
-<style>
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* BASE */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-}
-
-/* GLOBAL TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.25;
-    z-index: -1;
-}
-
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER (SYSTEM)
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-
-.nav a:hover::after {
-    width: 100%;
-}
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURED)
-========================= */
-.section {
-    position: relative;
-    padding: 70px 20px;
-    background: #E8E6E1;
-    margin: -40px auto 0;
-    width: 90%;
-    max-width: 1000px;
-    overflow: hidden;
-}
-
-/* TEXTURE */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.18;
-}
-
-/* DEPTH */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.12) 100%
-    );
-}
-
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* AUTHOR LAYOUT */
-.author-wrapper {
-    display: flex;
-    gap: 50px;
-    align-items: flex-start;
-    flex-wrap: wrap;
-}
-
-/* IMAGE */
-.author-image {
-    width: 240px;
-    height: 320px;
-    object-fit: cover;
-    box-shadow:
-        0 20px 50px rgba(0,0,0,0.35),
-        0 6px 16px rgba(0,0,0,0.2);
-}
-
-/* TEXT */
-.author-text {
-    flex: 1;
-}
-
-.author-text p {
-    margin-bottom: 18px;
-    line-height: 1.75;
-}
-
-/* DIVIDER */
-.divider {
-    width: 80px;
-    height: 1px;
-    background: rgba(0,0,0,0.3);
-    margin: 50px auto;
-}
-
-/* CLOSING */
-.closing {
-    font-style: italic;
-    opacity: 0.85;
-    text-align: center;
-}
-
-/* WORKS */
-.works {
-    text-align: center;
-}
-
-.works h2 {
-    font-weight: normal;
-    margin-bottom: 20px;
-}
-
-.work-item {
-    margin-bottom: 10px;
-    font-size: 15px;
-}
-
-.work-item span {
-    opacity: 0.6;
-}
-
-/* CONNECT */
-.connect {
-    margin-top: 40px;
-    text-align: center;
-}
-
-.connect-links a {
-    margin: 0 6px;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 80px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .author-wrapper {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .author-image {
-        margin: 0 auto;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">The Author</p>
         <h1>Aidan Blackwood</h1>
     </div>
 
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section fade-in">
 
-<div class="author-wrapper">
+    <!-- AUTHOR BLOCK -->
+    <div style="display:flex; gap:50px; align-items:flex-start; flex-wrap:wrap; justify-content:center;">
 
-    <img src="profile.jpg" class="author-image">
+        <!-- IMAGE -->
+        <img 
+            src="/assets/profile.jpg" 
+            style="
+                width:240px;
+                height:320px;
+                object-fit:cover;
+                box-shadow:
+                    0 20px 50px rgba(0,0,0,0.35),
+                    0 6px 16px rgba(0,0,0,0.2);
+            "
+        >
 
-    <div class="author-text">
-        <p>
-            The work published under Aidan Blackwood is concerned with place, memory, and the slow accumulation of unease. 
-            Landscapes are not passive settings but active presences, shaping the lives that move through them.
-        </p>
+        <!-- TEXT -->
+        <div style="max-width:500px; text-align:left;">
 
-        <p>
-            Much of the writing began in 2021, following the death of my mother. 
-            What started as a way of working through absence and grief gradually became something more structured, 
-            though the themes have remained consistent.
-        </p>
+            <p>
+                The work published under Aidan Blackwood is concerned with place, memory, and the slow accumulation of unease. 
+                Landscapes are not passive settings but active presences, shaping the lives that move through them.
+            </p>
 
-        <p>
-            Influenced by the geography and atmosphere of the Scottish Highlands, the work explores isolation, 
-            recurrence, and the uneasy relationship between people and the places they inhabit.
-        </p>
+            <p>
+                Much of the writing began in 2021, following the death of my mother. 
+                What started as a way of working through absence and grief gradually became something more structured, 
+                though the themes have remained consistent.
+            </p>
+
+            <p>
+                Influenced by the geography and atmosphere of the Scottish Highlands, the work explores isolation, 
+                recurrence, and the uneasy relationship between people and the places they inhabit.
+            </p>
+
+        </div>
+
     </div>
 
+</section>
+
+<!-- DIVIDER -->
+<div class="about-fragment fade-in">
+    <p>These stories are not designed to resolve cleanly.</p>
+    <p>They remain, in some form, after they end.</p>
 </div>
 
-<div class="divider"></div>
+<!-- SELECTED WORKS -->
+<section class="about-section fade-in">
 
-<p class="closing">
-These stories are not designed to resolve cleanly. They remain, in some form, after they end.
-</p>
+    <p class="social-title">Selected Works</p>
 
-<div class="divider"></div>
+    <p>Dour Hill House <span style="opacity:0.5;">(2025)</span></p>
+    <p>Corrour <span style="opacity:0.5;">(2026)</span></p>
+    <p>The Black Bothy <span style="opacity:0.5;">(2021)</span></p>
+    <p>Holdfast <span style="opacity:0.5;">(2026)</span></p>
 
-<div class="works">
-    <h2>Selected Works</h2>
-    <div class="work-item">Dour Hill House <span>(2025)</span></div>
-    <div class="work-item">Corrour <span>(2026)</span></div>
-    <div class="work-item">The Black Bothy <span>(2021)</span></div>
-    <div class="work-item">Holdfast <span>(2026)</span></div>
-</div>
+</section>
 
-<div class="divider"></div>
+<!-- SOCIAL -->
+<section class="about-social fade-in">
 
-<div class="connect">
-    <h3>Connect with Aidan</h3>
-    <p>Further work, fragments, and updates can be found here:</p>
-    <p class="connect-links">
-        <a href="https://www.instagram.com/aidan.blackwood" target="_blank">Instagram</a> /
-        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">TikTok</a>
-    </p>
-</div>
+    <p class="social-title">Connect</p>
 
-</div>
+    <div class="social-links">
+
+        <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+            <img src="/assets/instagram.png" alt="Instagram">
+        </a>
+
+        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+            <img src="/assets/tiktok.png" alt="TikTok">
+        </a>
+
+    </div>
+
+</section>
 
 <!-- FOOTER -->
-<div class="footer">
-    <div class="footer-content">
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
 
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
+<!-- JS -->
+<script src="/js/header.js"></script>
 
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
-
-    </div>
-</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
+    initFadeIn();
+});
+</script>
 
 </body>
 </html>
