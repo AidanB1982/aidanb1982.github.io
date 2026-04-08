@@ -12,30 +12,37 @@ async function loadHeader(type = "hero") {
     const file = fileMap[type] || "header.html";
 
     try {
-        // ✅ FIXED: absolute path (works on ALL pages)
-        const res = await fetch(`/${file}`);
+        // LOAD HEADER
+        const headerRes = await fetch(`/${file}`);
+        if (!headerRes.ok) throw new Error(`Failed to load ${file}`);
 
-        if (!res.ok) {
-            throw new Error(`Failed to load ${file}`);
+        const headerHTML = await headerRes.text();
+        const headerContainer = document.getElementById("header-placeholder");
+
+        if (headerContainer) {
+            headerContainer.innerHTML = headerHTML;
         }
 
-        const html = await res.text();
+        // LOAD FOOTER
+        const footerRes = await fetch(`/footer.html`);
+        if (!footerRes.ok) throw new Error("Failed to load footer.html");
 
-        const container = document.getElementById("header-placeholder");
+        const footerHTML = await footerRes.text();
+        const footerContainer = document.getElementById("footer-placeholder");
 
-        if (container) {
-            container.innerHTML = html;
-
-            // ✅ Only run after header is injected
-            initScrollFade();
-            initEntity();
-            initFadeIn();
-            initSpotlight();
-            initGlobalLighting();
+        if (footerContainer) {
+            footerContainer.innerHTML = footerHTML;
         }
+
+        // INIT SYSTEMS
+        initScrollFade();
+        initEntity();
+        initFadeIn();
+        initSpotlight();
+        initGlobalLighting();
 
     } catch (err) {
-        console.error("Header load failed:", err);
+        console.error("Layout load failed:", err);
     }
 }
 
