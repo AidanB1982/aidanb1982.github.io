@@ -939,4 +939,41 @@ body::after {
     transform: translateY(-2px);
     filter: grayscale(0%) brightness(1.1);
 }
+.series-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 120px 80px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
+@media (max-width: 800px) {
+    .series-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.series {
+    text-align: center;
+}
+
+.carousel {
+    position: relative;
+    width: 260px;
+    height: 400px;
+    margin: 30px auto;
+}
+
+.carousel img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+.carousel img.active {
+    opacity: 1;
+}
