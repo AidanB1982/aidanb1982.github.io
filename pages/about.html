@@ -1,344 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>About | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>About | Blackwood Publishing</title>
+
 <meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
 
-<style>
+<!-- GLOBAL CSS -->
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* BASE */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-}
-
-/* GLOBAL TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.25;
-    z-index: -1;
-}
-
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER (FIXED SYSTEM)
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV (PROPER SYSTEM) */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-
-.nav a:hover::after {
-    width: 100%;
-}
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURED)
-========================= */
-.section {
-    position: relative;
-    padding: 70px 20px;
-    text-align: center;
-    background: #E8E6E1;
-    margin: -40px auto 0;
-    width: 90%;
-    max-width: 900px;
-    overflow: hidden;
-}
-
-/* TEXTURE LAYER */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.18;
-}
-
-/* DEPTH */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.12) 100%
-    );
-}
-
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-.section p {
-    max-width: 650px;
-    margin: 15px auto;
-    line-height: 1.7;
-}
-
-/* DIVIDER */
-.divider {
-    width: 600px;
-    height: 1px;
-    background: rgba(0,0,0,0.25);
-    margin: 40px auto;
-}
-
-/* FORM */
-.ml-form {
-    display: flex;
-    max-width: 460px;
-    margin: 25px auto;
-    border-bottom: 1px solid rgba(0,0,0,0.25);
-}
-
-.ml-form input {
-    flex: 1;
-    padding: 10px 0;
-    background: transparent;
-    border: none;
-    font-family: Georgia, serif;
-    font-size: 15px;
-}
-
-.ml-form input:focus { outline: none; }
-
-.ml-form button {
-    background: none;
-    border: none;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #5F7D76;
-    cursor: pointer;
-}
-
-.ml-form button:hover { opacity: 0.6; }
-
-.ml-note {
-    font-size: 12px;
-    opacity: 0.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 80px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-</style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
+<!-- HEADER (DYNAMIC SYSTEM) -->
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">
+            Some places are not found. They are returned to.
+        </p>
+
         <h1>About Blackwood Publishing</h1>
     </div>
 
-</div>
+</section>
 
-<!-- CONTENT -->
-<div class="section">
+<!-- MAIN CONTENT -->
+<section class="about-section fade-in">
 
-<p>
-Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction shaped by atmosphere, place, and memory.
-</p>
+    <p>
+        Blackwood Publishing is an independent imprint dedicated to literary and psychological fiction shaped by atmosphere, place, and memory.
+    </p>
 
-<p>
-Our work explores the quiet forces that shape lives over time. Landscapes that remember, houses that listen, and histories that refuse to remain buried.
-</p>
+    <p>
+        Many of these works began as notes taken while walking in remote parts of the Highlands. Fragments of place, carried forward and altered over time.
+    </p>
 
-<p>
-Rooted in the Scottish Highlands and beyond, our titles focus on isolation, recursion, and the uneasy relationship between people and the places they inhabit.
-</p>
+    <p>
+        Landscapes that remember, houses that listen, and histories that refuse to remain buried.
+    </p>
 
-<div class="divider"></div>
+    <p>
+        Rooted in the Scottish Highlands and beyond, these stories return to isolation, recursion, and the uneasy relationship between people and the places they inhabit.
+    </p>
 
-<p>
-Each story stands on its own. But something connects them.
-</p>
+    <div class="divider"></div>
 
-<div class="divider"></div>
+    <p>
+        Each story stands on its own. But not entirely.
+    </p>
 
-<h2>Enter the Archive</h2>
+    <p style="opacity:0.6;">
+        All works are written under the Blackwood imprint.
+    </p>
 
-<p>
-Receive new releases, early access, and stories that do not remain buried.
-</p>
+</section>
 
-<form class="ml-form" action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" method="post" target="_blank">
-    <input type="email" name="fields[email]" placeholder="Your email address" required>
-    <button type="submit">Subscribe</button>
-</form>
+<!-- FRAGMENT -->
+<section class="about-fragment fade-in">
+    <p>Dour Hill, February.</p>
+    <p>The house was not empty.</p>
+</section>
 
-<p class="ml-note">You can unsubscribe anytime.</p>
+<!-- NEWSLETTER -->
+<section class="newsletter fade-in">
 
-</div>
+    <p>Enter the Archive</p>
+
+    <p style="opacity:0.5; font-size:13px; margin-bottom:20px;">
+        Occasional releases and material not published elsewhere.
+    </p>
+
+    <form 
+        class="ml-form"
+        action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" 
+        method="post" 
+        target="_blank"
+    >
+        <input 
+            type="email" 
+            name="fields[email]" 
+            placeholder="Your email address" 
+            required
+        >
+        <button type="submit">Subscribe</button>
+    </form>
+
+    <p class="ml-note">No noise. Only releases.</p>
+
+</section>
 
 <!-- FOOTER -->
-<div class="footer">
+<footer class="footer">
+
+    <div class="footer-overlay"></div>
+
     <div class="footer-content">
 
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
+        <div class="footer-grid">
+
+            <div class="footer-brand">
+                <img src="/assets/seal.png" class="footer-seal">
+
+                <p class="footer-title">Blackwood Publishing</p>
+                <p class="footer-sub">Independent Literary Imprint</p>
+            </div>
+
+            <div class="footer-col">
+                <p class="footer-heading">Explore</p>
+
+                <a href="/pages/publications.html">Publications</a>
+                <a href="/pages/contact.html">Contact</a>
+            </div>
+
         </div>
 
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
+        <div class="footer-divider"></div>
 
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
+        <div class="footer-bottom">
+            <p>© 2026 Blackwood Publishing — All works protected</p>
+            <p class="footer-legal">All rights reserved</p>
         </div>
 
     </div>
-</div>
+
+</footer>
+
+<!-- JS -->
+<script src="/js/header.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadHeader("simple");
+    });
+</script>
 
 </body>
 </html>
