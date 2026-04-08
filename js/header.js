@@ -30,10 +30,44 @@ async function loadHeader(type = "hero") {
         initEntity();
         initFadeIn();
         initSpotlight();
+        initGlobalLighting(); // ✅ NEW
 
     } catch (err) {
         console.error("Header load failed:", err);
     }
+}
+
+// =========================
+// GLOBAL CURSOR LIGHTING (FINAL BOSS)
+// =========================
+
+function initGlobalLighting() {
+
+    const root = document.documentElement;
+
+    let mouseX = 50;
+    let mouseY = 50;
+
+    let currentX = 50;
+    let currentY = 50;
+
+    function updateMouse(e) {
+        mouseX = (e.clientX / window.innerWidth) * 100;
+        mouseY = (e.clientY / window.innerHeight) * 100;
+    }
+
+    function animate() {
+        currentX += (mouseX - currentX) * 0.08;
+        currentY += (mouseY - currentY) * 0.08;
+
+        root.style.setProperty("--mouse-x", `${currentX}%`);
+        root.style.setProperty("--mouse-y", `${currentY}%`);
+
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("mousemove", updateMouse);
+    animate();
 }
 
 // =========================
@@ -93,7 +127,6 @@ function initScrollFade() {
         }
     });
 
-    // ✅ FORCE RUN ON LOAD
     update();
 }
 
@@ -156,7 +189,7 @@ function initFadeIn() {
 }
 
 // =========================
-// SPOTLIGHT
+// SPOTLIGHT (ENHANCED)
 // =========================
 
 function initSpotlight() {
@@ -171,6 +204,7 @@ function initSpotlight() {
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
 
+        // LOCAL (stronger effect inside works)
         works.style.setProperty('--mouse-x', `${x}%`);
         works.style.setProperty('--mouse-y', `${y}%`);
     });
