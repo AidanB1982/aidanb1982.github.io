@@ -1,422 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>The Archive Files | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+<title>The Archive Files | Blackwood Publishing</title>
 
-/* =========================
-   BASE
-========================= */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-    overflow-x: hidden;
-}
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* GLOBAL TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.12;
-    z-index: -1;
-}
-
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV (FIXED + CLEAN) */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-/* underline animation */
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-.nav a:hover::after { width: 100%; }
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURED)
-========================= */
-.section {
-    position: relative;
-    padding: 90px 20px;
-    background: #E8E6E1;
-    margin-top: -40px;
-    overflow: hidden;
-}
-
-/* stone texture layer */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.18;
-    pointer-events: none;
-}
-
-/* vignette depth */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.08) 100%
-    );
-    pointer-events: none;
-}
-
-/* keep content above texture */
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* =========================
-   INTRO
-========================= */
-.intro {
-    max-width: 680px;
-    margin: 0 auto 60px;
-    line-height: 1.7;
-    text-align: center;
-}
-
-.intro em {
-    display: block;
-    margin-bottom: 20px;
-    font-style: italic;
-}
-
-/* =========================
-   GRID
-========================= */
-.books {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 90px 60px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-@media (max-width: 800px) {
-    .books {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* =========================
-   BOOK
-========================= */
-.book {
-    text-align: center;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease;
-}
-
-.book.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* IMAGE */
-.book img {
-    width: 240px;
-    height: 360px;
-    object-fit: cover;
-
-    box-shadow:
-        0 20px 50px rgba(0,0,0,0.35),
-        0 6px 18px rgba(0,0,0,0.25);
-
-    transition: all 0.5s ease;
-}
-
-/* HOVER EFFECT */
-.book:hover img {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow:
-        0 40px 100px rgba(0,0,0,0.6);
-}
-
-/* TEXT */
-.book h3 {
-    margin-top: 18px;
-    font-size: 18px;
-}
-
-.book p {
-    max-width: 380px;
-    margin: 12px auto;
-    line-height: 1.6;
-    font-size: 15px;
-    opacity: 0.9;
-}
-
-/* BUTTON */
-.button {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    border-bottom: 1px solid rgba(95,125,118,0.4);
-    transition: 0.3s;
-}
-
-.button:hover {
-    opacity: 0.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 100px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Archive Series</p>
         <h1>The Archive Files</h1>
     </div>
 
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section">
 
-<div class="intro reveal">
-    <em>“Memory is not linear. But you are.”</em>
+    <!-- INTRO -->
+    <div class="fade-in" style="max-width:680px; margin:0 auto 60px; text-align:center;">
 
-    <p>
-    A folk-horror and paranormal mystery series exploring the fractures between memory, place, and reality.
-    </p>
+        <p style="font-style:italic; margin-bottom:20px;">
+            “Memory is not linear. But you are.”
+        </p>
 
-    <p>
-    Each work stands alone. But the recursion connects them all.
-    </p>
-</div>
+        <p>
+            A folk-horror and paranormal mystery series exploring the fractures between memory, place, and reality.
+        </p>
 
-<div class="books">
+        <p>
+            Each work stands alone. But the recursion connects them all.
+        </p>
 
-<div class="book reveal">
-    <img src="book3.jpg">
-    <h3>The Black Bothy</h3>
-    <p>Some places keep what they take. A missing sister. A shifting bothy. And something that remembers.</p>
-    <a href="https://mybook.to/BlackBothy" target="_blank" class="button">View Book</a>
-</div>
+    </div>
 
-<div class="book reveal">
-    <img src="book4.jpg">
-    <h3>The Drowned Fjord</h3>
-    <p>The drowned remember. A Norwegian fjord where echoes arrive before sound.</p>
-    <a href="https://mybook.to/DrownedFjord" target="_blank" class="button">View Book</a>
-</div>
+    <!-- BOOK GRID -->
+    <div class="works-grid">
 
-<div class="book reveal">
-    <img src="book5.jpg">
-    <h3>The Erased Archivist</h3>
-    <p>A book that rewrites history and erases those who open it.</p>
-    <a href="https://mybook.to/ErasedArchivist" target="_blank" class="button">View Book</a>
-</div>
+        <!-- BOOK 1 -->
+        <a href="https://mybook.to/BlackBothy" target="_blank" class="work">
+            <img src="/assets/book3.jpg">
+            <span>The Black Bothy</span>
+            <div class="work-desc">
+                Some places keep what they take. A missing sister. A shifting bothy. And something that remembers.
+            </div>
+        </a>
 
-<div class="book reveal">
-    <img src="book6.jpg">
-    <h3>Holdfast</h3>
-    <p>Coming June 2026. The recursion returns.</p>
-    <a href="https://mybook.to/Holdfast" target="_blank" class="button">View Book</a>
-</div>
+        <!-- BOOK 2 -->
+        <a href="https://mybook.to/DrownedFjord" target="_blank" class="work">
+            <img src="/assets/book4.jpg">
+            <span>The Drowned Fjord</span>
+            <div class="work-desc">
+                A Norwegian fjord where echoes arrive before sound.
+            </div>
+        </a>
 
-</div>
-</div>
+        <!-- BOOK 3 -->
+        <a href="https://mybook.to/ErasedArchivist" target="_blank" class="work">
+            <img src="/assets/book5.jpg">
+            <span>The Erased Archivist</span>
+            <div class="work-desc">
+                A book that rewrites history and erases those who open it.
+            </div>
+        </a>
+
+        <!-- BOOK 4 -->
+        <a href="https://mybook.to/Holdfast" target="_blank" class="work">
+            <img src="/assets/book6.jpg">
+            <span>Holdfast</span>
+            <div class="work-desc">
+                Coming June 2026. The recursion returns.
+            </div>
+        </a>
+
+    </div>
+
+</section>
 
 <!-- FOOTER -->
-<div class="footer">
-<div class="footer-content">
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
 
-<div>
-<p>Blackwood Publishing</p>
-<p>Independent Literary Imprint</p>
-</div>
-
-<div class="footer-center">
-<img src="seal.png">
-</div>
-
-<div>
-<a href="publications.html">Publications</a>
-<a href="about.html">About</a>
-<a href="contact.html">Contact</a>
-</div>
-
-</div>
-</div>
+<!-- JS -->
+<script src="/js/header.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
 
-/* SCROLL REVEAL */
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.2 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
+    // reuse your fade system
+    initFadeIn();
+});
 </script>
 
 </body>
