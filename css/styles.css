@@ -977,3 +977,12 @@ body::after {
 .carousel img.active {
     opacity: 1;
 }
+input:focus,
+textarea:focus {
+    outline: none;
+    border-bottom: 1px solid rgba(184,115,51,0.6);
+}
+form:hover input,
+form:hover textarea {
+    opacity: 0.9;
+}
