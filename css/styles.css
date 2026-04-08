@@ -412,53 +412,61 @@ body::before {
     margin-top: 10px;
 }
 
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 100px 20px;
-    margin-top: 120px;
-    color: #e6e6e6;
-    text-align: center;
-}
+<!-- FOOTER -->
+<footer class="footer">
 
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(0,0,0,0.95), rgba(0,0,0,0.95)),
-        url("../assets/forest.png");
-    background-size: cover;
-    background-position: center;
-    opacity: 0.4;
-}
+    <!-- BACKGROUND OVERLAY -->
+    <div class="footer-overlay"></div>
 
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-}
+    <div class="footer-content">
 
-/* SEAL */
-.footer-seal {
-    width: 90px;
-    opacity: 0.18;
-    margin: 30px auto;
+        <!-- GRID -->
+        <div class="footer-grid">
 
-    filter:
-        brightness(0.9)
-        contrast(1.1);
+            <!-- BRAND -->
+            <div class="footer-brand">
+                <img 
+                    src="assets/seal.png" 
+                    alt="Blackwood Publishing Seal" 
+                    class="footer-seal"
+                >
 
-    transition: all 0.4s ease;
-}
+                <p class="footer-title">Blackwood Publishing</p>
+                <p class="footer-sub">Independent Literary Imprint</p>
+            </div>
 
-.footer-seal:hover {
-    opacity: 0.28;
-    transform: scale(1.03);
-}
+            <!-- NAVIGATION -->
+            <div class="footer-col">
+                <p class="footer-heading">Explore</p>
+
+                <a href="pages/publications.html">Publications</a>
+                <a href="pages/about.html">About</a>
+                <a href="pages/contact.html">Contact</a>
+            </div>
+
+            <!-- ARCHIVE / EXTRA -->
+            <div class="footer-col">
+                <p class="footer-heading">Archive</p>
+
+                <a href="#">Newsletter</a>
+                <a href="#">Releases</a>
+                <a href="#">Catalogue</a>
+            </div>
+
+        </div>
+
+        <!-- DIVIDER -->
+        <div class="footer-divider"></div>
+
+        <!-- BOTTOM BAR -->
+        <div class="footer-bottom">
+            <p>© 2026 Blackwood Publishing</p>
+            <p class="footer-legal">All rights reserved</p>
+        </div>
+
+    </div>
+
+</footer>
 
 /* =========================
    RESPONSIVE
