@@ -119,11 +119,16 @@
 </section>
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
-<script src="/js/header.js"></script>
+<script src="/js/header.js" defer></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("load", () => {
+    if (typeof loadHeader === "function") {
         loadHeader("simple");
-    });
+    } else {
+        console.error("Header failed to load");
+    }
+});
 </script>
 </body>
 </html>
