@@ -509,18 +509,20 @@ body::before {
 .footer-content {
     position: relative;
     z-index: 1;
-    max-width: 1200px;
+    max-width: 1400px;
+    padding: 0 40px;
     margin: 0 auto;
 }
 
 /* GRID LAYOUT */
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 40px; /* reduced from 60px */
+    grid-template-columns: 1.5fr 1fr;
+    gap: 60px;
     text-align: left;
+    align-items: start;
     margin: 25px 0;
-    margin-bottom: 40px; /* tighter */
+    margin-bottom: 40px;
 }
 
 /* BRAND COLUMN */
@@ -565,22 +567,24 @@ body::before {
 .footer-col {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 8px;
 }
 
 /* HEADINGS */
 .footer-heading {
-    font-size: 13px;
-    letter-spacing: 2px;
+    font-size: 12px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    opacity: 0.5;
-    margin-bottom: 10px;
+    opacity: 0.6;
+    margin-bottom: 6px;
 }
 
 /* LINKS */
 .footer-col a {
-    font-size: 14px;
-    opacity: 0.6;
+    font-size: 13px;
+    opacity: 0.65;
+    line-height: 1.6;
     transition: all 0.3s ease;
 }
 
@@ -593,7 +597,7 @@ body::before {
 .footer-divider {
     height: 1px;
     width: 100%;
-    margin: 40px 0;
+    margin: 30px 0 20px;
 
     background: linear-gradient(
         to right,
@@ -628,7 +632,9 @@ body::before {
 
     .footer-brand {
         margin: 0 auto;
-        max-width:260px;
+        display: flex;
+       flex-direction: column;
+       gap: 10px;
     }
 
     .footer-seal {
