@@ -863,3 +863,40 @@ body::after {
 .about-fragment p {
     margin: 5px 0;
 }
+/* =========================
+   ABOUT SOCIAL (ELSEWHERE)
+========================= */
+.about-social {
+    text-align: center;
+    margin: 60px auto 20px;
+    opacity: 0.5;
+}
+
+.social-title {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+/* ICON ROW */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+}
+
+/* ICON STYLE */
+.social-links img {
+    width: 22px;
+    opacity: 0.6;
+    filter: grayscale(100%) brightness(0.9);
+    transition: all 0.3s ease;
+}
+
+/* HOVER */
+.social-links img:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    filter: grayscale(0%) brightness(1.1);
+}
