@@ -115,13 +115,20 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
-<!-- JS -->
-<script src="/js/header.js"></script>
+<script src="/js/header.js" defer></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    loadHeader("simple");
-    initFadeIn();
+window.addEventListener("load", () => {
+    if (typeof loadHeader === "function") {
+        loadHeader("simple");
+    } else {
+        console.error("Header failed to load");
+    }
+
+    // SAFE fade-in call
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
 });
 </script>
 
