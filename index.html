@@ -177,12 +177,22 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
-<!-- JS -->
-<script src="/js/header.js"></script>
+<script src="/js/header.js" defer></script>
+
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        loadHeader("hero"); // IMPORTANT: hero version for homepage
-    });
+window.addEventListener("load", () => {
+
+    if (typeof loadHeader === "function") {
+        loadHeader("hero"); // homepage version
+    } else {
+        console.error("Header failed to load");
+    }
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+});
 </script>
 
 </body>
