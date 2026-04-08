@@ -12,7 +12,8 @@ async function loadHeader(type = "hero") {
     const file = fileMap[type] || "header.html";
 
     try {
-        const res = await fetch(`./${file}`);
+        // ✅ FIXED: absolute path (works on ALL pages)
+        const res = await fetch(`/${file}`);
 
         if (!res.ok) {
             throw new Error(`Failed to load ${file}`);
@@ -24,13 +25,14 @@ async function loadHeader(type = "hero") {
 
         if (container) {
             container.innerHTML = html;
-        }
 
-        initScrollFade();
-        initEntity();
-        initFadeIn();
-        initSpotlight();
-        initGlobalLighting(); // ✅ NEW
+            // ✅ Only run after header is injected
+            initScrollFade();
+            initEntity();
+            initFadeIn();
+            initSpotlight();
+            initGlobalLighting();
+        }
 
     } catch (err) {
         console.error("Header load failed:", err);
@@ -38,7 +40,7 @@ async function loadHeader(type = "hero") {
 }
 
 // =========================
-// GLOBAL CURSOR LIGHTING (FINAL BOSS)
+// GLOBAL CURSOR LIGHTING
 // =========================
 
 function initGlobalLighting() {
@@ -161,7 +163,7 @@ function initEntity() {
 }
 
 // =========================
-// FADE-IN (STAGGER FIXED)
+// FADE-IN (INTERSECTION OBSERVER)
 // =========================
 
 function initFadeIn() {
@@ -189,7 +191,7 @@ function initFadeIn() {
 }
 
 // =========================
-// SPOTLIGHT (ENHANCED)
+// SPOTLIGHT (WORKS SECTION)
 // =========================
 
 function initSpotlight() {
@@ -204,7 +206,6 @@ function initSpotlight() {
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-        // LOCAL (stronger effect inside works)
         works.style.setProperty('--mouse-x', `${x}%`);
         works.style.setProperty('--mouse-y', `${y}%`);
     });
