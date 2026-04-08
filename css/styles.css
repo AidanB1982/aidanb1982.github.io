@@ -761,3 +761,21 @@ body::after {
 .author-link a:hover::after {
     width: 100%;
 }
+/* =========================
+   OPENING / CLOSING LINES
+========================= */
+.opening-line,
+.closing-line {
+    text-align: center;
+    padding: 80px 20px 40px;
+}
+
+.opening-line p,
+.closing-line p {
+    font-size: 22px;
+    letter-spacing: 2px;
+    opacity: 0.75;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
