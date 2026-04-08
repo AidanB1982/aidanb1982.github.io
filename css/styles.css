@@ -1004,12 +1004,21 @@ form:hover textarea {
     font-family: "Georgia", serif;
     font-size: clamp(18px, 2vw, 28px);
     line-height: 1.6;
+    letter-spacing: 1px;
 
     color: rgba(255,255,255,0.06);
 
     pointer-events: none;
 
     transition: opacity 1.5s ease;
+
+    /* subtle atmosphere */
+    filter: blur(0.4px);
+    text-shadow: 0 0 30px rgba(255,255,255,0.04);
+}
+
+#quote-text {
+    display: inline-block;
 }
 
 #quote-background .char {
@@ -1017,12 +1026,10 @@ form:hover textarea {
     animation: fadeChar 0.6s forwards;
 }
 
-/* fade out between quotes */
 #quote-background.fade {
     opacity: 0;
 }
 
-/* animation */
 @keyframes fadeChar {
     to {
         opacity: 1;
