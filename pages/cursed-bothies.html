@@ -1,391 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>The Cursed Bothies | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
+<title>The Cursed Bothies | Blackwood Publishing</title>
 
-<style>
+<meta name="description" content="A series of Highland-set works exploring isolation, landscape, and the presence of something older beneath the surface.">
 
-/* =========================
-   BASE
-========================= */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-    overflow-x: hidden;
-}
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* GLOBAL TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.12;
-    z-index: -1;
-}
-
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV (CONSISTENT) */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-.nav a:hover::after { width: 100%; }
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURED)
-========================= */
-.section {
-    position: relative;
-    padding: 90px 20px;
-    background: #E8E6E1;
-    margin-top: -40px;
-    overflow: hidden;
-}
-
-/* stone texture */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.18;
-}
-
-/* vignette */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.08) 100%
-    );
-}
-
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* =========================
-   INTRO
-========================= */
-.intro {
-    max-width: 680px;
-    margin: 0 auto 60px;
-    line-height: 1.7;
-    text-align: center;
-}
-
-/* =========================
-   GRID
-========================= */
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 90px 60px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-@media (max-width: 800px) {
-    .book-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* =========================
-   BOOK
-========================= */
-.book {
-    text-align: center;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease;
-}
-
-.book.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* IMAGE */
-.book img {
-    width: 240px;
-    height: 360px;
-    object-fit: cover;
-
-    box-shadow:
-        0 20px 50px rgba(0,0,0,0.35),
-        0 6px 18px rgba(0,0,0,0.25);
-
-    transition: all 0.5s ease;
-}
-
-/* HOVER */
-.book:hover img {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow:
-        0 40px 100px rgba(0,0,0,0.6);
-}
-
-/* TEXT */
-.book p {
-    max-width: 380px;
-    margin: 18px auto;
-    line-height: 1.6;
-    font-size: 15px;
-    opacity: 0.9;
-}
-
-/* BUTTON */
-.button {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    border-bottom: 1px solid rgba(95,125,118,0.4);
-    transition: 0.3s;
-}
-
-.button:hover { opacity: 0.6; }
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 100px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Series</p>
         <h1>The Cursed Bothies</h1>
     </div>
 
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section">
 
-<div class="intro reveal">
-    <em>“The bothy waits.”</em>
+    <!-- INTRO -->
+    <div class="fade-in" style="max-width:680px; margin:0 auto 60px; text-align:center;">
 
-    <p>Deep in the Scottish Highlands stand the bothies, stone shelters built for survival in the wild.</p>
-    <p>But some walls remember too much.</p>
-    <p>The land watches. The weather erases. And what is buried does not stay buried.</p>
-</div>
+        <p style="font-style:italic; margin-bottom:20px;">
+            “The bothy waits.”
+        </p>
 
-<div class="book-grid">
+        <p>
+            Deep in the Scottish Highlands stand the bothies, stone shelters built for survival in the wild.
+        </p>
 
-<div class="book reveal">
-    <img src="book2.jpg">
-    <p>A storm traps strangers inside a remote Highland shelter. Something begins to change.</p>
-    <a href="https://mybook.to/Corrour" target="_blank" class="button">Read Now</a>
-</div>
+        <p>
+            But some walls remember too much.
+        </p>
 
-<div class="book reveal">
-    <img src="book7.png">
-    <p>A father and his children seek refuge, but grief opens the door to something waiting.</p>
-    <a href="https://mybook.to/Gualachulain" target="_blank" class="button">Preorder</a>
-</div>
-
-<div class="book reveal">
-    <img src="book8.jpg">
-    <p>A documentary crew searching for folklore find something real.</p>
-    <a href="https://mybook.to/Camban" target="_blank" class="button">Preorder</a>
-</div>
-
-</div>
-
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-    <div class="footer-content">
-
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
-
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
+        <p>
+            The land watches. The weather erases. And what is buried does not stay buried.
+        </p>
 
     </div>
-</div>
+
+    <!-- BOOK GRID -->
+    <div class="works-grid">
+
+        <!-- BOOK 1 -->
+        <a href="https://mybook.to/Corrour" target="_blank" class="work">
+            <img src="/assets/book2.jpg">
+            <span>Corrour</span>
+            <div class="work-desc">
+                A storm traps strangers inside a remote Highland shelter. Something begins to change.
+            </div>
+        </a>
+
+        <!-- BOOK 2 -->
+        <a href="https://mybook.to/Gualachulain" target="_blank" class="work">
+            <img src="/assets/book7.png">
+            <span>Gualachulain</span>
+            <div class="work-desc">
+                A father and his children seek refuge, but grief opens the door to something waiting.
+            </div>
+        </a>
+
+        <!-- BOOK 3 -->
+        <a href="https://mybook.to/Camban" target="_blank" class="work">
+            <img src="/assets/book8.jpg">
+            <span>Camban</span>
+            <div class="work-desc">
+                A documentary crew searching for folklore find something real.
+            </div>
+        </a>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js"></script>
 
 <script>
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.2 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
+    initFadeIn();
+});
 </script>
 
 </body>
