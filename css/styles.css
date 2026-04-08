@@ -271,7 +271,7 @@ body::before {
     transform: perspective(800px) rotateX(4deg) scale(1.04);
     filter:
         drop-shadow(0 50px 120px rgba(0,0,0,1))
-        drop-shadow(0 10px 30px rgba(184,115,51,0.25));
+        drop-shadow(0 10px 30px rgba(184,115,51,0.25)); 
 }
 
 /* SHADOW */
