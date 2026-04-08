@@ -568,6 +568,7 @@ body::before {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    text-align: left;
     gap: 8px;
 }
 
@@ -577,7 +578,8 @@ body::before {
     letter-spacing: 3px;
     text-transform: uppercase;
     opacity: 0.6;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
+    transform: translateX(-2px);
 }
 
 /* LINKS */
@@ -586,6 +588,7 @@ body::before {
     opacity: 0.65;
     line-height: 1.6;
     transition: all 0.3s ease;
+    margin-left: 0;
 }
 
 .footer-col a:hover {
@@ -609,16 +612,18 @@ body::before {
 
 /* BOTTOM BAR */
 .footer-bottom {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
     align-items: center;
 
     font-size: 11px;
     opacity: 0.4;
-}
 
+    text-align: left;
+}
 .footer-legal {
     opacity: 0.3;
+    text-align: right;
 }
 
 /* =========================
@@ -628,18 +633,25 @@ body::before {
     .footer-grid {
         grid-template-columns: 1fr;
         text-align: center;
+        margin-bottom: 30px;
     }
 
     .footer-brand {
         margin: 0 auto;
         display: flex;
-       flex-direction: column;
-       gap: 10px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        text-align: center;
     }
 
     .footer-seal {
-        width: 50px;
-        margin: 10px 0;
+    width: 75px;
+    opacity: 0.2;
+
+    margin-bottom: 10px;
+
+    display: block;
 }
 
     .footer-bottom {
