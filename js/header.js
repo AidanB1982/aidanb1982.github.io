@@ -235,44 +235,49 @@ function initQuotes() {
         "That silence after a secret."
     ];
 
-    const container = document.getElementById("quote-background");
-    if (!container) return;
+    const textEl = document.getElementById("quote-text");
+    const bgEl = document.getElementById("quote-background");
+
+    if (!textEl || !bgEl) return;
 
     let currentIndex = 0;
     let charIndex = 0;
 
-    const typeSpeed = 70;
     const pauseTime = 4000;
 
     function type() {
 
         if (charIndex < quotes[currentIndex].length) {
 
-            container.innerHTML += `<span class="char">${quotes[currentIndex].charAt(charIndex)}</span>`;
+            const char = quotes[currentIndex][charIndex];
+
+            const delay = Math.random() * 40 + 40;
+
+            textEl.innerHTML += `<span class="char" style="animation-delay:${Math.random() * 0.3}s">${char}</span>`;
+
             charIndex++;
 
-            setTimeout(type, typeSpeed);
+            setTimeout(type, delay);
 
         } else {
 
-            setTimeout(() => {
-                fadeOut();
-            }, pauseTime);
+            setTimeout(fadeOut, pauseTime);
         }
     }
 
     function fadeOut() {
 
-        container.classList.add("fade");
+        bgEl.classList.add("fade");
 
         setTimeout(() => {
-            container.textContent = "";
+
+            textEl.innerHTML = "";
             charIndex = 0;
             currentIndex = (currentIndex + 1) % quotes.length;
 
-            container.classList.remove("fade");
+            bgEl.classList.remove("fade");
 
-            setTimeout(type, 400);
+            setTimeout(type, 500);
 
         }, 1500);
     }
