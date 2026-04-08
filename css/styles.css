@@ -35,7 +35,7 @@ body::before {
    FEATURED SECTION
 ========================= */
 .featured {
-    padding: 100px 20px;
+    padding: 100px 20px 60px;
     background: transparent;
     opacity: var(--fadeIn, 1);
     transition: opacity 0.6s ease;
@@ -145,8 +145,8 @@ body::before {
 ========================= */
 .works {
     position: relative;
-    margin-top: -60px;
-    padding: 160px 20px 120px;
+    margin-top: 0;
+    padding: 100px 20px 120px;
     background: transparent;
     overflow: hidden;
 
@@ -154,15 +154,21 @@ body::before {
     --mouse-y: 50%;
 }
 
-/* TOP FADE */
 .works::before {
     content: "";
     position: absolute;
-    top: -80px;
+    top: -40px;
     left: 0;
     width: 100%;
-    height: 120px;
-    background: linear-gradient(to bottom, transparent, #000);
+    height: 80px;
+
+    background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0),
+    rgba(0,0,0,0.6),
+    #000
+);
+
     opacity: var(--sectionFade, 0);
     pointer-events: none;
     z-index: 1;
