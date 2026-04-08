@@ -1,402 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Hard Silence | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+<title>Hard Silence | Blackwood Publishing</title>
 
-/* =========================
-   BASE
-========================= */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #dcdcdc;
-    overflow-x: hidden;
-}
+<meta name="description" content="A dark crime series set in Scotland exploring control, silence, and survival.">
 
-/* DARK TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.08; /* subtle for dark theme */
-    z-index: -1;
-}
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV (CONSISTENT SYSTEM) */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.95),
-        rgba(10,10,12,0.6),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #f1f1f1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-.nav a:hover::after { width: 100%; }
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(8,8,10,0.92), rgba(8,8,10,0.92)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #f1f1f1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (DARK TEXTURED)
-========================= */
-.section {
-    position: relative;
-    padding: 90px 20px;
-    background: #121214;
-    margin-top: -40px;
-    overflow: hidden;
-}
-
-/* subtle stone texture */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.06;
-}
-
-/* vignette */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.35) 100%
-    );
-}
-
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* =========================
-   INTRO
-========================= */
-.intro {
-    max-width: 680px;
-    margin: 0 auto 60px;
-    line-height: 1.7;
-    color: #cfcfcf;
-    text-align: center;
-}
-
-.intro em {
-    display: block;
-    margin-bottom: 20px;
-    color: #ffffff;
-}
-
-/* =========================
-   GRID
-========================= */
-.book-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 90px 60px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-@media (max-width: 800px) {
-    .book-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* =========================
-   BOOK
-========================= */
-.book {
-    text-align: center;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease;
-}
-
-.book.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* IMAGE */
-.book img {
-    width: 240px;
-    height: 360px;
-    object-fit: cover;
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,0.9),
-        0 8px 25px rgba(0,0,0,0.7);
-
-    transition: all 0.5s ease;
-}
-
-/* HOVER (STRONGER FOR DARK) */
-.book:hover img {
-    transform: translateY(-12px) scale(1.06);
-    box-shadow:
-        0 50px 120px rgba(0,0,0,1);
-}
-
-/* TEXT */
-.book p {
-    max-width: 400px;
-    margin: 14px auto;
-    line-height: 1.6;
-    color: #bdbdbd;
-}
-
-/* BUTTON */
-.button {
-    display: inline-block;
-    margin-top: 8px;
-
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    color: #8fa7a1;
-    border-bottom: 1px solid rgba(143,167,161,0.4);
-
-    transition: 0.3s;
-}
-
-.button:hover {
-    opacity: 0.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 100px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Series</p>
         <h1>Hard Silence</h1>
     </div>
 
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section">
 
-<div class="intro reveal">
-<p><em>“Silence is power.”</em></p>
+    <!-- INTRO -->
+    <div class="fade-in" style="max-width:680px; margin:0 auto 60px; text-align:center;">
 
-<p>In Dumbarton’s forgotten corners, loyalty is currency, silence decides who survives.</p>
+        <p style="font-style:italic; margin-bottom:20px;">
+            “Silence is power.”
+        </p>
 
-<p>Hard Silence is a dark crime series set in Scotland’s broken housing schemes, where trauma is buried and control is everything.</p>
+        <p>
+            In Dumbarton’s forgotten corners, loyalty is currency, silence decides who survives.
+        </p>
 
-<p>Pain made him. Silence sharpened him. Now, the streets belong to him.</p>
-</div>
+        <p>
+            Hard Silence is a dark crime series set in Scotland’s broken housing schemes, where trauma is buried and control is everything.
+        </p>
 
-<div class="book-grid">
-
-<div class="book reveal">
-<img src="book9.png">
-<p>Left for dead, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.</p>
-<a href="https://mybook.to/echoesofvengeance" target="_blank" class="button">Read Now</a>
-</div>
-
-<div class="book reveal">
-<img src="book10.jpg">
-<p>Jamie is no longer a victim. Feared and silent, he enforces order—until he decides to break it.</p>
-<a href="https://mybook.to/RedStreets" target="_blank" class="button">Read Now</a>
-</div>
-
-<div class="book reveal">
-<img src="book12.jpg">
-<p>A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.</p>
-<a href="#" class="button">Coming 2027</a>
-</div>
-
-</div>
-
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-    <div class="footer-content">
-
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
-
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
+        <p>
+            Pain made him. Silence sharpened him. Now, the streets belong to him.
+        </p>
 
     </div>
-</div>
+
+    <!-- OPTIONAL HEADER -->
+    <div class="works-header fade-in">
+        <p>Hard Silence Records</p>
+    </div>
+
+    <!-- BOOK GRID -->
+    <div class="works-grid">
+
+        <!-- BOOK 1 -->
+        <a href="https://mybook.to/echoesofvengeance" target="_blank" class="work">
+            <img src="/assets/book9.png">
+            <span>Echoes of Vengeance</span>
+            <div class="work-desc">
+                Left for dead, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.
+            </div>
+        </a>
+
+        <!-- BOOK 2 -->
+        <a href="https://mybook.to/RedStreets" target="_blank" class="work">
+            <img src="/assets/book10.jpg">
+            <span>Red Streets</span>
+            <div class="work-desc">
+                Jamie is no longer a victim. Feared and silent, he enforces order—until he decides to break it.
+            </div>
+        </a>
+
+        <!-- BOOK 3 -->
+        <a href="#" class="work">
+            <img src="/assets/book12.jpg">
+            <span>Untitled Work</span>
+            <div class="work-desc">
+                A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
+            </div>
+        </a>
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js"></script>
 
 <script>
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.2 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
+    initFadeIn();
+});
 </script>
 
 </body>
