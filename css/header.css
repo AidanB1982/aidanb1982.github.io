@@ -260,3 +260,70 @@ html, body {
     0%   { transform: translateY(0) translateX(0); }
     100% { transform: translateY(-6px) translateX(4px); }
 }
+/* =========================
+   SIMPLE HEADER (UPGRADED)
+========================= */
+
+.simple-header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+
+    background: linear-gradient(
+        rgba(0,0,0,0.85),
+        rgba(0,0,0,0.4),
+        transparent
+    );
+}
+
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOGO */
+.logo img {
+    width: 120px;
+    opacity: 0.9;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.logo:hover img {
+    opacity: 1;
+    transform: scale(1.03);
+}
+
+/* NAV */
+.nav-inline a {
+    margin-left: 26px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    position: relative;
+}
+
+.nav-inline a:hover {
+    opacity: 1;
+}
+
+/* UNDERLINE EFFECT */
+.nav-inline a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: rgba(184,115,51,0.6);
+    transition: width 0.3s ease;
+}
+
+.nav-inline a:hover::after {
+    width: 100%;
+}
