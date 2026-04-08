@@ -461,13 +461,13 @@ body::before {
 ========================= */
 .footer {
     position: relative;
-    padding: 140px 20px 80px;
-    margin-top: 140px;
+    padding: 60px 20px 40px;
+    margin-top: 100px;
     color: #e6e6e6;
     overflow: hidden;
+    width: 100%;
 }
 
-/* BACKGROUND OVERLAY */
 .footer-overlay {
     position: absolute;
     inset: 0;
@@ -494,10 +494,10 @@ body::before {
 /* GRID LAYOUT */
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1fr 1fr;
-    gap: 60px;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px; /* reduced from 60px */
     text-align: left;
-    margin-bottom: 60px;
+    margin-bottom: 40px; /* tighter */
 }
 
 /* BRAND COLUMN */
@@ -525,16 +525,16 @@ body::before {
 
 /* TITLE */
 .footer-title {
-    font-size: 14px;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
     opacity: 0.8;
-    margin-top: 10px;
+    margin-top: 25px;
 }
 
 /* SUBTEXT */
 .footer-sub {
-    font-size: 12px;
+    font-size: 11px;
     opacity: 0.4;
 }
 
@@ -547,7 +547,7 @@ body::before {
 
 /* HEADINGS */
 .footer-heading {
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 2px;
     text-transform: uppercase;
     opacity: 0.5;
@@ -586,7 +586,7 @@ body::before {
     justify-content: space-between;
     align-items: center;
 
-    font-size: 12px;
+    font-size: 11px;
     opacity: 0.4;
 }
 
@@ -605,11 +605,13 @@ body::before {
 
     .footer-brand {
         margin: 0 auto;
+        max-width:260px;
     }
 
     .footer-seal {
-        margin: 0 auto 20px;
-    }
+        width: 50px;
+        margin: 10px 0;
+}
 
     .footer-bottom {
         flex-direction: column;
