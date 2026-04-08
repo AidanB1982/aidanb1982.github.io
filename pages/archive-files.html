@@ -105,7 +105,11 @@ window.addEventListener("load", () => {
     } else {
         console.error("Header failed to load");
     }
-    initFadeIn();
+
+    // SAFE fade-in call
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
 });
 </script>
 
