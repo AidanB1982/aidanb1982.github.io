@@ -1,337 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Contact | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Contact | Blackwood Publishing</title>
+
 <meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
 
-<style>
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* BASE */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-}
-
-/* GLOBAL TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.25;
-    z-index: -1;
-}
-
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER (SYSTEM)
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-
-.nav a:hover::after {
-    width: 100%;
-}
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURED)
-========================= */
-.section {
-    position: relative;
-    padding: 70px 20px;
-    text-align: center;
-    background: #E8E6E1;
-    margin: -40px auto 0;
-    width: 90%;
-    max-width: 700px;
-    overflow: hidden;
-}
-
-/* TEXTURE */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.18;
-}
-
-/* DEPTH */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.12) 100%
-    );
-}
-
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* TEXT */
-.section p {
-    max-width: 520px;
-    margin: 15px auto;
-    line-height: 1.7;
-}
-
-/* DIVIDER */
-.divider {
-    width: 80px;
-    height: 1px;
-    background: rgba(0,0,0,0.3);
-    margin: 40px auto;
-}
-
-/* FORM */
-.contact-form {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-}
-
-.contact-form input,
-.contact-form textarea {
-    border: none;
-    border-bottom: 1px solid rgba(0,0,0,0.25);
-    background: transparent;
-    padding: 10px 0;
-    font-family: Georgia, serif;
-    font-size: 15px;
-}
-
-.contact-form input:focus,
-.contact-form textarea:focus {
-    outline: none;
-    border-bottom: 1px solid #5F7D76;
-}
-
-.contact-form textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-.contact-form button {
-    background: none;
-    border: none;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: #5F7D76;
-    cursor: pointer;
-}
-
-.contact-form button:hover {
-    opacity: 0.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 80px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Correspondence</p>
         <h1>Contact</h1>
     </div>
 
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section fade-in">
 
-<p>
-For enquiries, collaborations, or general correspondence, use the form below.
-</p>
+    <p>
+        For enquiries, collaborations, or general correspondence, use the form below.
+    </p>
 
-<div class="divider"></div>
+    <div class="divider"></div>
 
-<form action="https://formspree.io/f/mbdpplkw" method="POST" class="contact-form">
+    <!-- FORM -->
+    <form 
+        action="https://formspree.io/f/mbdpplkw" 
+        method="POST" 
+        style="
+            max-width:520px;
+            margin:30px auto 0;
+            display:flex;
+            flex-direction:column;
+            gap:25px;
+        "
+    >
 
-    <input type="text" name="name" placeholder="Name" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <textarea name="message" placeholder="Message" required></textarea>
+        <input 
+            type="text" 
+            name="name" 
+            placeholder="Name" 
+            required
+            style="
+                border:none;
+                border-bottom:1px solid rgba(255,255,255,0.2);
+                background:transparent;
+                padding:10px 0;
+                color:#e6e6e6;
+                font-family:Georgia, serif;
+            "
+        >
 
-    <input type="hidden" name="_redirect" value="https://yourdomain.com/thank-you.html">
+        <input 
+            type="email" 
+            name="email" 
+            placeholder="Email" 
+            required
+            style="
+                border:none;
+                border-bottom:1px solid rgba(255,255,255,0.2);
+                background:transparent;
+                padding:10px 0;
+                color:#e6e6e6;
+                font-family:Georgia, serif;
+            "
+        >
 
-    <button type="submit">Send Message</button>
+        <textarea 
+            name="message" 
+            placeholder="Message" 
+            required
+            style="
+                border:none;
+                border-bottom:1px solid rgba(255,255,255,0.2);
+                background:transparent;
+                padding:10px 0;
+                color:#e6e6e6;
+                min-height:120px;
+                font-family:Georgia, serif;
+                resize:vertical;
+            "
+        ></textarea>
 
-</form>
+        <input 
+            type="hidden" 
+            name="_redirect" 
+            value="https://yourdomain.com/thank-you.html"
+        >
 
-</div>
+        <button 
+            type="submit"
+            class="button copper"
+            style="margin-top:10px;"
+        >
+            Send Message
+        </button>
+
+    </form>
+
+</section>
 
 <!-- FOOTER -->
-<div class="footer">
-    <div class="footer-content">
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
 
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
+<!-- JS -->
+<script src="/js/header.js"></script>
 
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
-
-    </div>
-</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
+    initFadeIn();
+});
+</script>
 
 </body>
 </html>
