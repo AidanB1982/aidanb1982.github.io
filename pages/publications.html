@@ -1,414 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Publications | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+<title>Publications | Blackwood Publishing</title>
 
-/* BASE */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-}
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* GLOBAL TEXTURE (SUBTLE NOW) */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.12; /* 🔥 reduced */
-    z-index: -1;
-}
-
-/* LINKS */
-a, a:visited, a:active {
-    color: inherit;
-    text-decoration: none;
-}
-
-/* =========================
-   HEADER
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 26px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-}
-
-.nav a:hover {
-    opacity: 1;
-}
-
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURE FIXED HERE)
-========================= */
-.section {
-    position: relative;
-    padding: 90px 20px;
-    background: #E8E6E1;
-    overflow: hidden;
-}
-
-/* 🔥 STONE TEXTURE LAYER */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background: url('stone.png');
-    background-size: cover;
-    background-position: center;
-
-    opacity: 0.18; /* 🔥 controlled */
-
-    pointer-events: none;
-}
-
-/* 🔥 SOFT VIGNETTE (blends edges beautifully) */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.08) 100%
-    );
-
-    pointer-events: none;
-}
-
-/* GRID */
-.series-grid {
-    position: relative;
-    z-index: 1;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 120px 80px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-@media (max-width: 800px) {
-    .series-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* SERIES */
-.series {
-    text-align: center;
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease;
-}
-
-.series.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.series h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-}
-
-.series p {
-    max-width: 380px;
-    margin: 18px auto 0;
-    line-height: 1.6;
-    font-size: 15px;
-    opacity: 0.85;
-}
-
-/* CAROUSEL */
-.carousel {
-    position: relative;
-    width: 260px;
-    height: 400px;
-    margin: 30px auto;
-}
-
-.carousel img {
-    position: absolute;
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-
-    opacity: 0;
-
-    transform: scale(1);
-    transition: 
-        opacity 1.5s ease,
-        transform 0.6s ease,
-        filter 0.6s ease;
-
-    filter: drop-shadow(0 25px 60px rgba(0,0,0,0.5));
-}
-
-.carousel img.active {
-    opacity: 1;
-}
-
-.series:hover .carousel img.active {
-    transform: scale(1.08) translateY(-8px);
-    filter: drop-shadow(0 45px 100px rgba(0,0,0,0.75));
-}
-
-/* VIGNETTE */
-.carousel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(
-        ellipse at center,
-        rgba(0,0,0,0) 60%,
-        rgba(0,0,0,0.25) 100%
-    );
-}
-
-/* FOOTER */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(rgba(18,18,20,0.85), rgba(18,18,20,0.85)),
-    url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* ANIMATION */
-.reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-<div class="nav">
-    <div class="nav-inner">
-        <a href="index.html">Home</a>
-        <a href="publications.html">Publications</a>
-        <a href="about.html">About</a>
-        <a href="author.html">Author</a>
-        <a href="contact.html">Contact</a>
+<!-- HERO -->
+<section class="about-hero">
+
+    <div class="about-hero-overlay"></div>
+
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Selected Works</p>
+        <h1>Publications</h1>
     </div>
-</div>
 
-<div class="header-overlay"></div>
-
-<div class="header-inner">
-    <img src="logo (1).png" class="header-logo">
-    <h1>Publications</h1>
-</div>
-
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section">
 
 <div class="series-grid">
 
-<div class="series reveal">
-<h2>The Archive Files</h2>
-<a href="archive-files.html">
-<div class="carousel">
-<img src="book3.jpg" class="active">
-<img src="book4.jpg">
-<img src="book5.jpg">
-<img src="book6.jpg">
-</div>
-</a>
-<p>Psychological and atmospheric fiction exploring memory, landscape, and buried truths.</p>
+    <!-- SERIES 1 -->
+    <div class="series fade-in">
+        <h2>The Archive Files</h2>
+
+        <a href="/pages/archive-files.html">
+            <div class="carousel">
+                <img src="/assets/book3.jpg" class="active">
+                <img src="/assets/book4.jpg">
+                <img src="/assets/book5.jpg">
+                <img src="/assets/book6.jpg">
+            </div>
+        </a>
+
+        <p>
+            Psychological and atmospheric fiction exploring memory, landscape, and buried truths.
+        </p>
+    </div>
+
+    <!-- SERIES 2 -->
+    <div class="series fade-in">
+        <h2>The Cursed Bothies</h2>
+
+        <a href="/pages/cursed-bothies.html">
+            <div class="carousel">
+                <img src="/assets/book2.jpg" class="active">
+                <img src="/assets/book7.png">
+                <img src="/assets/book8.jpg">
+            </div>
+        </a>
+
+        <p>
+            Remote Highland bothies, isolation, and ancient forces that do not remain dormant.
+        </p>
+    </div>
+
+    <!-- SERIES 3 -->
+    <div class="series fade-in">
+        <h2>Hard Silence</h2>
+
+        <a href="/pages/hard-silence.html">
+            <div class="carousel">
+                <img src="/assets/book9.png" class="active">
+                <img src="/assets/book10.jpg">
+            </div>
+        </a>
+
+        <p>
+            Dark Scottish crime fiction rooted in loyalty and consequence.
+        </p>
+    </div>
+
+    <!-- SERIES 4 -->
+    <div class="series fade-in">
+        <h2>Standalone Works</h2>
+
+        <a href="/pages/standalone.html">
+            <div class="carousel">
+                <img src="/assets/book1.jpg" class="active">
+                <img src="/assets/book11.png">
+            </div>
+        </a>
+
+        <p>
+            Independent works exploring atmosphere, memory, and psychological tension.
+        </p>
+    </div>
+
 </div>
 
-<div class="series reveal">
-<h2>The Cursed Bothies</h2>
-<a href="cursed-bothies.html">
-<div class="carousel">
-<img src="book2.jpg" class="active">
-<img src="book7.png">
-<img src="book8.jpg">
-</div>
-</a>
-<p>Remote Highland bothies, isolation, and ancient forces that do not remain dormant.</p>
-</div>
-
-<div class="series reveal">
-<h2>Hard Silence</h2>
-<a href="hard-silence.html">
-<div class="carousel">
-<img src="book9.png" class="active">
-<img src="book10.jpg">
-</div>
-</a>
-<p>Dark Scottish crime fiction rooted in loyalty and consequence.</p>
-</div>
-
-<div class="series reveal">
-<h2>Standalone Works</h2>
-<a href="standalone.html">
-<div class="carousel">
-<img src="book1.jpg" class="active">
-<img src="book11.png">
-</div>
-</a>
-<p>Independent works exploring atmosphere, memory, and psychological tension.</p>
-</div>
-
-</div>
-</div>
+</section>
 
 <!-- FOOTER -->
-<div class="footer">
-<div class="footer-content">
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
 
-<div>
-<p>Blackwood Publishing</p>
-<p>Independent Literary Imprint</p>
-</div>
-
-<div class="footer-center">
-<img src="seal.png">
-</div>
-
-<div>
-<a href="publications.html">Publications</a>
-<a href="about.html">About</a>
-<a href="contact.html">Contact</a>
-</div>
-
-</div>
-</div>
+<!-- JS -->
+<script src="/js/header.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
 
-/* CAROUSEL */
-document.querySelectorAll('.carousel').forEach(carousel => {
-    const images = carousel.querySelectorAll('img');
-    let index = 0;
+    /* CAROUSEL */
+    document.querySelectorAll('.carousel').forEach(carousel => {
+        const images = carousel.querySelectorAll('img');
+        let index = 0;
 
-    setInterval(() => {
-        images[index].classList.remove('active');
-        index = (index + 1) % images.length;
-        images[index].classList.add('active');
-    }, 3500);
-});
-
-/* REVEAL */
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
+        setInterval(() => {
+            images[index].classList.remove('active');
+            index = (index + 1) % images.length;
+            images[index].classList.add('active');
+        }, 3500);
     });
+
 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
 </script>
 
 </body>
