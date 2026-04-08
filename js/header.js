@@ -40,6 +40,7 @@ async function loadHeader(type = "hero") {
         initFadeIn();
         initSpotlight();
         initGlobalLighting();
+        initQuotes();
 
     } catch (err) {
         console.error("Layout load failed:", err);
@@ -247,7 +248,7 @@ function initQuotes() {
 
         if (charIndex < quotes[currentIndex].length) {
 
-            container.textContent += quotes[currentIndex].charAt(charIndex);
+            container.innerHTML += `<span class="char">${quotes[currentIndex].charAt(charIndex)}</span>`;
             charIndex++;
 
             setTimeout(type, typeSpeed);
