@@ -241,8 +241,8 @@ function initQuotes() {
     let currentIndex = 0;
     let charIndex = 0;
 
-    const typeSpeed = 35;
-    const pauseTime = 2500;
+    const typeSpeed = 70;
+    const pauseTime = 4000;
 
     function type() {
 
