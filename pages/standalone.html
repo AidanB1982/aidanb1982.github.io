@@ -1,393 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Standalone Works | Blackwood Publishing</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+<title>Standalone Works | Blackwood Publishing</title>
 
-/* =========================
-   BASE
-========================= */
-body {
-    margin: 0;
-    font-family: Georgia, serif;
-    background: #0e0e10;
-    color: #1C1C1C;
-}
+<meta name="description" content="Standalone works exploring atmosphere, memory, and psychological tension.">
 
-/* GLOBAL TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url('stone.png');
-    opacity: 0.25;
-    z-index: -1;
-}
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-/* LINKS */
-a { text-decoration: none; color: inherit; }
-
-/* =========================
-   HEADER
-========================= */
-.header {
-    position: relative;
-    height: 35vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* NAV (CONSISTENT SYSTEM) */
-.nav {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-
-    background: linear-gradient(
-        rgba(10,10,12,0.9),
-        rgba(10,10,12,0.5),
-        transparent
-    );
-}
-
-.nav-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 18px 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.nav a {
-    margin-left: 24px;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #F1F1F1;
-    opacity: 0.75;
-    position: relative;
-}
-
-.nav a:hover { opacity: 1; }
-
-.nav a::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: #aaa;
-    transition: 0.3s;
-}
-.nav a:hover::after { width: 100%; }
-
-/* HEADER BG */
-.header-overlay {
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(22,22,25,0.85), rgba(22,22,25,0.85)),
-        url('forest.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.header-inner {
-    position: relative;
-    z-index: 5;
-    margin-top: 40px;
-}
-
-.header-logo {
-    width: 150px;
-    margin-bottom: 10px;
-}
-
-.header h1 {
-    color: #F1F1F1;
-    letter-spacing: 2px;
-}
-
-/* =========================
-   SECTION (TEXTURED + DEPTH)
-========================= */
-.section {
-    position: relative;
-    padding: 90px 20px;
-    background: #E8E6E1;
-    margin-top: -40px;
-    overflow: hidden;
-}
-
-/* TEXTURE LAYER */
-.section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('stone.png');
-    background-size: cover;
-    opacity: 0.18;
-}
-
-/* VIGNETTE */
-.section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-        circle at center,
-        transparent 40%,
-        rgba(0,0,0,0.12) 100%
-    );
-}
-
-.section > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* =========================
-   INTRO
-========================= */
-.intro {
-    max-width: 650px;
-    margin: 0 auto 70px;
-    line-height: 1.7;
-    text-align: center;
-}
-
-/* =========================
-   BOOK
-========================= */
-.book {
-    margin: 100px 0;
-    text-align: center;
-
-    opacity: 0;
-    transform: translateY(40px);
-    transition: all 1s ease;
-}
-
-.book.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* IMAGE */
-.book img {
-    width: 240px;
-    height: 360px;
-    object-fit: cover;
-
-    box-shadow:
-        0 25px 60px rgba(0,0,0,0.35),
-        0 8px 20px rgba(0,0,0,0.25);
-
-    transition: all 0.4s ease;
-}
-
-/* HOVER */
-.book:hover img {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow:
-        0 40px 100px rgba(0,0,0,0.45);
-}
-
-/* TITLE */
-.book h2 {
-    margin-top: 22px;
-    letter-spacing: 0.5px;
-}
-
-/* TEXT */
-.book p {
-    max-width: 520px;
-    margin: 12px auto;
-    line-height: 1.6;
-    opacity: 0.9;
-}
-
-/* BUTTON */
-.button {
-    display: inline-block;
-    margin-top: 10px;
-
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    color: #5F7D76;
-    border-bottom: 1px solid rgba(95,125,118,0.4);
-}
-
-.button:hover {
-    opacity: 0.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-    position: relative;
-    padding: 90px 20px;
-    margin-top: 100px;
-    color: #F1F1F1;
-}
-
-.footer::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-        linear-gradient(rgba(18,18,20,0.9), rgba(18,18,20,0.9)),
-        url('forest.png');
-    background-size: cover;
-}
-
-.footer-content {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-}
-
-.footer-center img {
-    width: 70px;
-    filter: invert(1);
-}
-
-/* =========================
-   ANIMATION
-========================= */
-.reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
-}
-
-.reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-</style>
 </head>
 
 <body>
 
 <!-- HEADER -->
-<div class="header">
+<div id="header-placeholder"></div>
 
-    <div class="nav">
-        <div class="nav-inner">
-            <a href="index.html">Home</a>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="author.html">Author</a>
-            <a href="contact.html">Contact</a>
-        </div>
-    </div>
+<!-- HERO -->
+<section class="about-hero">
 
-    <div class="header-overlay"></div>
+    <div class="about-hero-overlay"></div>
 
-    <div class="header-inner">
-        <img src="logo (1).png" class="header-logo">
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Independent Works</p>
         <h1>Standalone Works</h1>
     </div>
 
-</div>
+</section>
 
 <!-- CONTENT -->
-<div class="section">
+<section class="about-section">
 
-<div class="intro reveal">
-<p>
-Independent works exploring atmosphere, memory, and psychological tension. 
-These stories stand alone, shaped by place, unease, and the quiet persistence of what lingers.
-</p>
-</div>
+    <!-- INTRO -->
+    <div class="fade-in" style="max-width:650px; margin:0 auto 70px; text-align:center;">
+        <p>
+            Independent works exploring atmosphere, memory, and psychological tension.
+            These stories stand alone, shaped by place, unease, and the quiet persistence of what lingers.
+        </p>
+    </div>
 
-<!-- BOOK 1 -->
-<div class="book reveal">
-<a href="https://mybook.to/DourHillHouse" target="_blank">
-<img src="book1.jpg">
-</a>
+    <!-- WORKS GRID -->
+    <div class="works-grid">
 
-<h2>Dour Hill House</h2>
+        <!-- BOOK 1 -->
+        <a href="https://mybook.to/DourHillHouse" target="_blank" class="work">
+            <img src="/assets/book1.jpg">
+            <span>Dour Hill House</span>
+            <div class="work-desc">
+                When Clara inherits Dour Hill House, she hopes for a new beginning.
+                Instead, her daughter whispers to the mirror—and something whispers back.
+            </div>
+        </a>
 
-<p>
-When Clara inherits Dour Hill House, she hopes for a new beginning. 
-Instead, her daughter whispers to the mirror—and something whispers back.
-</p>
-
-<a href="https://mybook.to/DourHillHouse" target="_blank" class="button">Read More</a>
-</div>
-
-<!-- BOOK 2 -->
-<div class="book reveal">
-<a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank">
-<img src="book11.png">
-</a>
-
-<h2>The Red-Clad Collector</h2>
-
-<p>
-Every Christmas, a child disappears. No footprints. No explanation. Just one less memory.
-</p>
-
-<p>
-A dark holiday fable of identity, myth, and the things that take us when no one is looking.
-</p>
-
-<a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" class="button">Read More</a>
-</div>
-
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-    <div class="footer-content">
-
-        <div>
-            <p>Blackwood Publishing</p>
-            <p>Independent Literary Imprint</p>
-        </div>
-
-        <div class="footer-center">
-            <img src="seal.png">
-        </div>
-
-        <div>
-            <a href="publications.html">Publications</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
+        <!-- BOOK 2 -->
+        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" class="work">
+            <img src="/assets/book11.png">
+            <span>The Red-Clad Collector</span>
+            <div class="work-desc">
+                Every Christmas, a child disappears. No footprints. No explanation.
+                Just one less memory.
+            </div>
+        </a>
 
     </div>
-</div>
+
+</section>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js"></script>
 
 <script>
-const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.2 });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+document.addEventListener("DOMContentLoaded", () => {
+    loadHeader("simple");
+    initFadeIn();
+});
 </script>
 
 </body>
