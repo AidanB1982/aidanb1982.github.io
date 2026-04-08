@@ -6,8 +6,8 @@
     <title>Blackwood Publishing</title>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body>
@@ -25,7 +25,7 @@
         <div class="featured-inner">
 
             <div class="featured-image fade-in">
-                <img src="assets/A1.png" alt="Corrour Bothy" loading="lazy">
+                <img src="/assets/A1.png" alt="Corrour Bothy" loading="lazy">
             </div>
 
             <div class="featured-content fade-in">
@@ -67,7 +67,7 @@
                 <a href="https://mybook.to/BlackBothy" target="_blank" rel="noopener noreferrer" class="work">
                     
                     <div class="work-inner">
-                        <img src="assets/A8.png" alt="The Black Bothy" loading="lazy">
+                        <img src="/assets/A8.png" alt="The Black Bothy" loading="lazy">
                     </div>
 
                     <span>The Black Bothy</span>
@@ -83,7 +83,7 @@
                 <a href="https://mybook.to/DourHillHouse" target="_blank" rel="noopener noreferrer" class="work">
                     
                     <div class="work-inner">
-                        <img src="assets/A12.png" alt="Dour Hill House" loading="lazy">
+                        <img src="/assets/A12.png" alt="Dour Hill House" loading="lazy">
                     </div>
 
                     <span>Dour Hill House</span>
@@ -99,7 +99,7 @@
                 <a href="https://mybook.to/Holdfast" target="_blank" rel="noopener noreferrer" class="work">
                     
                     <div class="work-inner">
-                        <img src="assets/A5.png" alt="Holdfast" loading="lazy">
+                        <img src="/assets/A5.png" alt="Holdfast" loading="lazy">
                     </div>
 
                     <span>Holdfast</span>
@@ -174,58 +174,16 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="footer">
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
 
-        <div class="footer-overlay"></div>
-
-        <div class="footer-content">
-
-            <div class="footer-grid">
-
-                <div class="footer-brand">
-                    <img 
-                        src="assets/seal.png" 
-                        alt="Blackwood Publishing Seal" 
-                        class="footer-seal"
-                    >
-
-                    <p class="footer-title">Blackwood Publishing</p>
-                    <p class="footer-sub">Independent Literary Imprint</p>
-                </div>
-
-                <div class="footer-col">
-                    <p class="footer-heading">Explore</p>
-
-                    <a href="pages/publications.html">Publications</a>
-                    <a href="pages/about.html">About</a>
-                    <a href="pages/contact.html">Contact</a>
-                </div>
-
-                <div class="footer-col">
-                    <p class="footer-heading">Archive</p>
-                    <a href="#">Enter the Archive</a>
-                </div>
-
-            </div>
-
-            <div class="footer-divider"></div>
-
-            <div class="footer-bottom">
-                <p>© 2026 Blackwood Publishing — All works protected</p>
-                <p class="footer-legal">All rights reserved</p>
-            </div>
-
-        </div>
-
-    </footer>
-
-    <!-- JS -->
-    <script src="js/header.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            loadHeader("hero");
-        });
-    </script>
+<!-- JS -->
+<script src="/js/header.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadHeader("hero"); // IMPORTANT: hero version for homepage
+    });
+</script>
 
 </body>
 </html>
