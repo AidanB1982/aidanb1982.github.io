@@ -1105,25 +1105,10 @@ form:hover textarea {
     animation: floatDrift 20s ease-in-out infinite alternate;
 }
 
-/* LEFT / RIGHT POSITIONS */
-.quote-fragment.left {
-    left: 6%;
-}
-
-.quote-fragment.right {
-    right: 6%;
-}
-
-/* VERTICAL VARIATION */
-#q1 { top: 20%; }
-#q2 { top: 35%; }
-#q3 { top: 55%; }
-#q4 { top: 70%; }
-
 /* FAINT LAYERS */
 .quote-fragment.faint {
-    opacity: 0.25;
-    filter: blur(1.5px);
+    opacity: 0.2;
+    filter: blur(2px);
 }
 
 /* FLOATING MOTION */
