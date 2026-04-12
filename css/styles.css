@@ -990,94 +990,7 @@ form:hover textarea {
    BACKGROUND QUOTE SYSTEM PRO
 ========================= */
 
-#quote-background {
-    position: fixed;
-    top: 22%;
-    left: 6%;
 
-    width: 420px;
-
-    z-index: 1;
-    pointer-events: none;
-
-    transition: opacity 1.5s ease, transform 6s ease;
-}
-#quote-text {
-    font-family: 'Caveat', cursive;
-
-    font-size: 24px;
-    line-height: 1.9;
-    letter-spacing: 1px;
-
-    color: rgba(255,255,255,0.08);
-
-    text-align: left;
-
-    filter: blur(0.25px);
-    text-shadow: 0 0 25px rgba(255,255,255,0.03);
-}
-
-.word {
-    opacity: 0;
-    transform: translateY(10px);
-    animation: wordFade 1s forwards;
-}
-
-.word.emphasis {
-    animation-duration: 2s;
-    color: rgba(255,255,255,0.12);
-}
-
-@keyframes wordFade {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-#quote-background.fade {
-    opacity: 0;
-}
-@media (max-width: 800px) {
-    #quote-background {
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        top: 18%;
-        text-align: center;
-    }
-
-    #quote-text {
-        text-align: center;
-    }
-}
-.quote-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-}
-
-/* MAIN QUOTE */
-.quote-layer.main {
-    z-index: 2;
-    opacity: 1;
-}
-
-/* GHOST LAYERS */
-.quote-layer.ghost {
-    z-index: 1;
-    opacity: 0.25;
-    filter: blur(1px);
-    transform: translateY(20px);
-}
-
-/* SECOND GHOST */
-#quote-ghost-2 {
-    opacity: 0.15;
-    filter: blur(2px);
-    transform: translateY(40px);
-}
 /* =========================
    QUOTE FRAGMENT SYSTEM
 ========================= */
@@ -1085,11 +998,10 @@ form:hover textarea {
 #quote-background {
     position: fixed;
     inset: 0;
-    z-index: 1;
+    z-index: 0;
     pointer-events: none;
 }
 
-/* BASE FRAGMENT */
 .quote-fragment {
     position: absolute;
     width: 320px;
@@ -1101,6 +1013,8 @@ form:hover textarea {
     color: rgba(255,255,255,0.08);
 
     transition: opacity 1.5s ease, transform 2s ease;
+
+    transform: rotate(var(--rot, 0deg));
 
     animation: floatDrift 20s ease-in-out infinite alternate;
 }
