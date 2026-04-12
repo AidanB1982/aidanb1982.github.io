@@ -354,9 +354,15 @@ function initQuotes() {
     updateFragments();
 
     // LOOP FRAGMENTS
-    setInterval(() => {
-        updateFragments();
-    }, 8000);
+    function loopFragments() {
+    updateFragments();
+
+    const next = Math.random() * 4000 + 3000; // 3s–7s
+
+    setTimeout(loopFragments, next);
+}
+
+loopFragments();
 
     // RANDOM WATCHER TRIGGER
     setInterval(() => {
