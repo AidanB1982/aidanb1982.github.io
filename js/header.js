@@ -275,16 +275,23 @@ function initQuotes() {
         });
     }
 
-    function updateSingleFragment() {
+    let lastIndex = -1;
+
+function updateSingleFragment() {
     let index;
 
-do {
-    index = Math.floor(Math.random() * fragments.length);
-} while (index === lastIndex);
+    do {
+        index = Math.floor(Math.random() * fragments.length);
+    } while (index === lastIndex);
 
-lastIndex = index;
+    lastIndex = index;
 
-const el = fragments[index];
+    const el = fragments[index];
+    el.style.animationDelay = `
+        ${Math.random() * 5}s,
+        ${Math.random() * 5}s
+    `;
+
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const side = Math.random() < 0.5 ? "left" : "right";
@@ -306,7 +313,6 @@ const el = fragments[index];
 
     renderText(el, randomQuote);
 }
-
     function triggerWatcher() {
 
         const text = quotes[Math.floor(Math.random() * quotes.length)];
