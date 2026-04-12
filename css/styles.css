@@ -1078,3 +1078,75 @@ form:hover textarea {
     filter: blur(2px);
     transform: translateY(40px);
 }
+/* =========================
+   QUOTE FRAGMENT SYSTEM
+========================= */
+
+#quote-background {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* BASE FRAGMENT */
+.quote-fragment {
+    position: absolute;
+    width: 320px;
+
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    line-height: 1.8;
+
+    color: rgba(255,255,255,0.08);
+
+    transition: opacity 1.5s ease, transform 2s ease;
+
+    animation: floatDrift 20s ease-in-out infinite alternate;
+}
+
+/* LEFT / RIGHT POSITIONS */
+.quote-fragment.left {
+    left: 6%;
+}
+
+.quote-fragment.right {
+    right: 6%;
+}
+
+/* VERTICAL VARIATION */
+#q1 { top: 20%; }
+#q2 { top: 35%; }
+#q3 { top: 55%; }
+#q4 { top: 70%; }
+
+/* FAINT LAYERS */
+.quote-fragment.faint {
+    opacity: 0.25;
+    filter: blur(1.5px);
+}
+
+/* FLOATING MOTION */
+@keyframes floatDrift {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-25px); }
+}
+
+/* WORD ANIMATION */
+.word {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: wordFade 1s forwards;
+}
+
+.word.emphasis {
+    animation-duration: 2s;
+    color: rgba(255,255,255,0.14);
+}
+
+@keyframes wordFade {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
