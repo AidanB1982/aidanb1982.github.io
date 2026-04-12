@@ -45,7 +45,9 @@ try {
     // UPDATE TITLE
     // =========================
     if (title) {
-        title.textContent = formatMonth(latestMonth);
+        title.textContent = latestMonth === "Current Selection"
+    ? latestMonth
+    : formatMonth(latestMonth);
     }
 
     // =========================
