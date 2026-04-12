@@ -1038,3 +1038,16 @@ form:hover textarea {
 #quote-background.fade {
     opacity: 0;
 }
+@media (max-width: 800px) {
+    #quote-background {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        top: 18%;
+        text-align: center;
+    }
+
+    #quote-text {
+        text-align: center;
+    }
+}
