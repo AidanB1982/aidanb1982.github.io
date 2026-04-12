@@ -276,8 +276,15 @@ function initQuotes() {
     }
 
     function updateSingleFragment() {
+    let index;
 
-    const el = fragments[Math.floor(Math.random() * fragments.length)];
+do {
+    index = Math.floor(Math.random() * fragments.length);
+} while (index === lastIndex);
+
+lastIndex = index;
+
+const el = fragments[index];
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
     const side = Math.random() < 0.5 ? "left" : "right";
@@ -346,7 +353,8 @@ function initQuotes() {
     }
 
     // INITIAL
-    updateFragments();
+    updateSingleFragment();
+    updateSingleFragment();
 
     // LOOP FRAGMENTS
     function loopFragments() {
