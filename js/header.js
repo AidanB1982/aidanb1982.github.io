@@ -264,7 +264,7 @@ function initQuotes() {
             ) ? "word emphasis" : "word";
 
             // RANDOM DISTORTION
-            if (Math.random() < 0.1) {
+            if (Math.random() < 0.4) {
                 span.classList.add("distort");
             }
 
