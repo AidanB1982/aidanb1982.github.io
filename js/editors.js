@@ -65,13 +65,17 @@ async function loadEditorPicks() {
         // =========================
         books.forEach((book, index) => {
 
-            const el = createBookCard(book);
+    const el = createBookCard(book);
 
-            el.style.transitionDelay = `${index * 120}ms`;
+    // FIRST BOOK = FEATURED
+    if (index === 0) {
+        el.classList.add("featured-pick");
+    }
 
-            container.appendChild(el);
-        });
+    el.style.transitionDelay = `${index * 120}ms`;
 
+    container.appendChild(el);
+});
         // =========================
         // RE-INIT ANIMATIONS
         // =========================
