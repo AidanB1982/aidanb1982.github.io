@@ -4,139 +4,143 @@
 
 async function loadEditorPicks() {
 
+    const container = document.querySelector('.editor-inner');
+    const title = document.querySelector('.month-title');
 
-const container = document.querySelector('.editor-inner');
-const title = document.querySelector('.month-title');
+    if (!container) return;
 
-if (!container) return;
+    // =========================
+    // LOADING STATE
+    // =========================
+    container.innerHTML = `
+        <div class="editor-loading fade-in visible">
+            <p>Loading selections...</p>
+        </div>
+    `;
 
-// =========================
-// LOADING STATE
-// =========================
-container.innerHTML = `
-    <div class="editor-loading">
-        <p>Loading selections...</p>
-    </div>
-`;
+    try {
+        const res = await fetch('/data/books.json');
 
-try {
-    const res = await fetch('/data/books.json');
+        if (!res.ok) {
+            throw new Error("Failed to load books.json");
+        }
 
-    if (!res.ok) {
-        throw new Error("Failed to load books.json");
+        const data = await res.json();
+
+        const months = Object.keys(data);
+
+        if (!months.length) {
+            renderEmpty(container);
+            return;
+        }
+
+        // =========================
+        // GET LATEST MONTH
+        // =========================
+        const latestMonth = months[months.length - 1];
+        const books = data[latestMonth];
+
+        // =========================
+        // UPDATE TITLE
+        // =========================
+        if (title) {
+            title.textContent = formatMonth(latestMonth);
+        }
+
+        // =========================
+        // CLEAR LOADER
+        // =========================
+        container.innerHTML = "";
+
+        // =========================
+        // EMPTY STATE
+        // =========================
+        if (!books || !books.length) {
+            renderEmpty(container);
+            return;
+        }
+
+        // =========================
+        // RENDER BOOKS
+        // =========================
+        books.forEach((book, index) => {
+
+            const el = createBookCard(book);
+
+            el.style.transitionDelay = `${index * 120}ms`;
+
+            container.appendChild(el);
+        });
+
+        // =========================
+        // RE-INIT ANIMATIONS
+        // =========================
+        if (typeof initFadeIn === "function") {
+            initFadeIn();
+        }
+
+    } catch (err) {
+        console.error("Editor Picks Error:", err);
+        renderError(container);
     }
-
-    const data = await res.json();
-
-    const months = Object.keys(data);
-
-    if (!months.length) {
-        renderEmpty(container);
-        return;
-    }
-
-    // =========================
-    // GET LATEST MONTH
-    // =========================
-    const latestMonth = months[months.length - 1];
-    const books = data[latestMonth];
-
-    // =========================
-    // UPDATE TITLE
-    // =========================
-    if (title) {
-        title.textContent = formatMonth(latestMonth);
-    }
-
-    // =========================
-    // CLEAR LOADER
-    // =========================
-    container.innerHTML = "";
-
-    // =========================
-    // EMPTY STATE
-    // =========================
-    if (!books || !books.length) {
-        renderEmpty(container);
-        return;
-    }
-
-    // =========================
-    // RENDER BOOKS (STAGGERED)
-    // =========================
-    books.forEach((book, index) => {
-
-        const el = createBookCard(book);
-
-        // Staggered animation delay
-        el.style.transitionDelay = `${index * 120}ms`;
-
-        container.appendChild(el);
-    });
-
-    // =========================
-    // RE-INIT ANIMATIONS
-    // =========================
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
-
-} catch (err) {
-    console.error("Editor Picks Error:", err);
-    renderError(container);
-}
-
-
 }
 
 // =========================
-// CREATE BOOK CARD (SAFE)
+// CREATE BOOK CARD
 // =========================
 
 function createBookCard(book) {
 
+    const el = document.createElement("div");
+    el.className = "pick fade-in";
 
-const el = document.createElement("div");
-el.className = "pick fade-in";
+    // IMAGE
+    const img = document.createElement("img");
+    img.src = book.image;
+    img.alt = book.title;
+    img.loading = "lazy";
 
-// IMAGE
-const img = document.createElement("img");
-img.src = book.image;
-img.alt = book.title;
-img.loading = "lazy";
+    img.onerror = () => {
+        img.src = "/assets/placeholder.jpg";
+    };
 
-// TITLE
-const title = document.createElement("h3");
-title.textContent = book.title;
+    // TITLE
+    const title = document.createElement("h3");
+    title.textContent = book.title;
 
-// AUTHOR
-const author = document.createElement("p");
-author.className = "pick-author";
-author.textContent = book.author;
+    // AUTHOR
+    const author = document.createElement("p");
+    author.className = "pick-author";
+    author.textContent = book.author;
 
-// NOTE
-const note = document.createElement("p");
-note.className = "pick-note";
-note.textContent = book.note;
+    // NOTE
+    const note = document.createElement("p");
+    note.className = "pick-note";
+    note.textContent = book.note;
 
-// LINK BUTTON
-const link = document.createElement("a");
-link.href = book.link;
-link.target = "_blank";
-link.rel = "noopener noreferrer";
-link.className = "button copper";
-link.textContent = "View Book";
+    // LINK BUTTON
+    const link = document.createElement("a");
+    link.href = book.link || "#";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.className = "button copper";
 
-// APPEND
-el.appendChild(img);
-el.appendChild(title);
-el.appendChild(author);
-el.appendChild(note);
-el.appendChild(link);
+    if (!book.link) {
+        link.textContent = "Unavailable";
+        link.style.opacity = "0.4";
+        link.style.pointerEvents = "none";
+    } else {
+        link.textContent = "View Book";
+    }
 
-return el;
+    // APPEND
+    el.appendChild(img);
+    el.appendChild(title);
+    el.appendChild(author);
+    el.appendChild(note);
+    el.appendChild(link);
 
-
+    return el;
 }
 
 // =========================
@@ -144,7 +148,10 @@ return el;
 // =========================
 
 function renderEmpty(container) {
-container.innerHTML = `         <div class="editor-empty fade-in">             <p>No selections available yet.</p>         </div>
+    container.innerHTML = `
+        <div class="editor-empty fade-in">
+            <p>No selections available yet.</p>
+        </div>
     `;
 }
 
@@ -153,7 +160,10 @@ container.innerHTML = `         <div class="editor-empty fade-in">             <
 // =========================
 
 function renderError(container) {
-container.innerHTML = `         <div class="editor-error fade-in">             <p>Unable to load selections.</p>         </div>
+    container.innerHTML = `
+        <div class="editor-error fade-in">
+            <p>Unable to load selections.</p>
+        </div>
     `;
 }
 
@@ -163,20 +173,27 @@ container.innerHTML = `         <div class="editor-error fade-in">             <
 
 function formatMonth(key) {
 
+    const [month, year] = key.split("-");
 
-const [month, year] = key.split("-");
-
-return (
-    month.charAt(0).toUpperCase() +
-    month.slice(1) +
-    " " +
-    year
-);
-
-
+    return (
+        month.charAt(0).toUpperCase() +
+        month.slice(1) +
+        " " +
+        year
+    );
 }
 
 // =========================
-// INIT
+// INIT (SAFE FALLBACK)
 // =========================
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    if (!document.body.classList.contains("editors-page")) return;
+
+    if (!window.__editorPicksLoaded) {
+        window.__editorPicksLoaded = true;
+        loadEditorPicks();
+    }
+
+});
