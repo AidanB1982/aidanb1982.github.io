@@ -275,34 +275,29 @@ function initQuotes() {
         });
     }
 
-    function updateFragments() {
+    function updateSingleFragment() {
 
-    fragments.forEach(el => {
+    const el = fragments[Math.floor(Math.random() * fragments.length)];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    const side = Math.random() < 0.5 ? "left" : "right";
+    const top = Math.random() * 70 + 10;
+    const offset = Math.random() * 10 + 5;
 
-        // RANDOM POSITION
-        const side = Math.random() < 0.5 ? "left" : "right";
+    if (side === "left") {
+        el.style.left = `${offset}%`;
+        el.style.right = "auto";
+    } else {
+        el.style.right = `${offset}%`;
+        el.style.left = "auto";
+    }
 
-        const top = Math.random() * 70 + 10;
-        const offset = Math.random() * 10 + 5;
+    el.style.top = `${top}%`;
 
-        if (side === "left") {
-            el.style.left = `${offset}%`;
-            el.style.right = "auto";
-        } else {
-            el.style.right = `${offset}%`;
-            el.style.left = "auto";
-        }
+    const rotation = (Math.random() - 0.5) * 6;
+    el.style.setProperty('--rot', `${rotation}deg`);
 
-        el.style.top = `${top}%`;
-
-        // slight rotation (unsettling)
-        const rotation = (Math.random() - 0.5) * 6;
-        el.style.setProperty('--rot', `${rotation}deg`);
-
-        renderText(el, randomQuote);
-    });
+    renderText(el, randomQuote);
 }
 
     function triggerWatcher() {
@@ -355,9 +350,9 @@ function initQuotes() {
 
     // LOOP FRAGMENTS
     function loopFragments() {
-    updateFragments();
+    updateSingleFragment();
 
-    const next = Math.random() * 4000 + 3000; // 3s–7s
+    const next = Math.random() * 2000 + 1500; // 1.5s–3.5s
 
     setTimeout(loopFragments, next);
 }
