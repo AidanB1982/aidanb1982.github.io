@@ -156,7 +156,10 @@ body::before {
     transform: translateY(0);
     transition: all 0.8s ease;
 }
-
+.no-js .fade-in {
+    opacity: 1;
+    transform: none;
+}
 /* =========================
    WORKS SECTION
 ========================= */
