@@ -68,8 +68,14 @@
 <!-- INIT -->
 <script defer>
 window.addEventListener("DOMContentLoaded", async () => {
+
     await loadHeader("simple");
-    loadEditorPicks(); // 🔥 run AFTER layout is ready
+
+    // small delay ensures DOM is fully stable
+    requestAnimationFrame(() => {
+        loadEditorPicks();
+    });
+
 });
 </script>
 
