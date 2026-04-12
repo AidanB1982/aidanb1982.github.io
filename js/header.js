@@ -243,47 +243,49 @@ function initQuotes() {
         }
     ];
 
-    const textEl = document.getElementById("quote-text");
-    const bgEl = document.getElementById("quote-background");
+    const mainEl = document.getElementById("quote-main");
+    const ghost1 = document.getElementById("quote-ghost-1");
+    const ghost2 = document.getElementById("quote-ghost-2");
 
-    if (!textEl || !bgEl) return;
+    if (!mainEl || !ghost1 || !ghost2) return;
 
-    let currentQuote = "";
+    let currentIndex = -1;
 
-    function renderQuote(text) {
+    function renderLayer(el, text, delayOffset = 0) {
 
-        if (text === currentQuote) return;
-        currentQuote = text;
+        el.innerHTML = "";
 
-        bgEl.classList.add("fade");
+        const words = text.split(" ");
 
-        setTimeout(() => {
+        words.forEach((word, i) => {
 
-            textEl.innerHTML = "";
+            const span = document.createElement("span");
 
-            const words = text.split(" ");
+            const emphasisWords = ["remember", "alone", "wrong", "watches"];
 
-            words.forEach((word, i) => {
+            span.className = emphasisWords.includes(
+                word.toLowerCase().replace(/[.?]/g, "")
+            ) ? "word emphasis" : "word";
 
-                const span = document.createElement("span");
+            span.textContent = word + " ";
+            span.style.animationDelay = `${(i * 0.25) + delayOffset}s`;
 
-                const emphasisWords = ["remember", "alone", "wrong", "watches"];
+            el.appendChild(span);
+        });
+    }
 
-                span.className = emphasisWords.includes(
-                    word.toLowerCase().replace(/[.?]/g, "")
-                ) ? "word emphasis" : "word";
+    function updateQuotes(index) {
 
-                span.textContent = word + " ";
-                span.style.animationDelay = `${i * 0.25}s`;
+        if (index === currentIndex) return;
+        currentIndex = index;
 
-                textEl.appendChild(span);
-            });
+        const current = sections[index].quote;
+        const prev = sections[index - 1]?.quote || "";
+        const next = sections[index + 1]?.quote || "";
 
-            setTimeout(() => {
-                bgEl.classList.remove("fade");
-            }, 400);
-
-        }, 800);
+        renderLayer(mainEl, current, 0);
+        renderLayer(ghost1, prev, 0.1);
+        renderLayer(ghost2, next, 0.2);
     }
 
     const observer = new IntersectionObserver((entries) => {
@@ -291,12 +293,12 @@ function initQuotes() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
 
-                const match = sections.find(s =>
+                const index = sections.findIndex(s =>
                     entry.target.matches(s.trigger)
                 );
 
-                if (match) {
-                    renderQuote(match.quote);
+                if (index !== -1) {
+                    updateQuotes(index);
                 }
             }
         });
@@ -310,7 +312,9 @@ function initQuotes() {
         if (el) observer.observe(el);
     });
 
-    // smooth parallax (fixed)
+    // PARALLAX (same as before)
+    const bgEl = document.getElementById("quote-background");
+
     let currentX = 0;
     let currentY = 0;
     let targetX = 0;
@@ -325,7 +329,7 @@ function initQuotes() {
         currentX += (targetX - currentX) * 0.05;
         currentY += (targetY - currentY) * 0.05;
 
-        bgEl.style.transform += ` rotate(${(Math.random() - 0.5) * 1.5}deg)`;
+        bgEl.style.transform = `translate(${currentX}px, ${currentY}px)`;
 
         requestAnimationFrame(animateQuote);
     }
