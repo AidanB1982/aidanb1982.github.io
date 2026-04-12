@@ -994,31 +994,6 @@ form:hover textarea {
 /* =========================
    QUOTE FRAGMENT SYSTEM
 ========================= */
-
-#quote-background {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-}
-
-.quote-fragment {
-    position: absolute;
-    width: 320px;
-
-    font-family: 'Caveat', cursive;
-    font-size: 22px;
-    line-height: 1.8;
-
-    color: rgba(255,255,255,0.08);
-
-    transition: opacity 1.5s ease, transform 2s ease;
-
-    transform: rotate(var(--rot, 0deg));
-
-    animation: floatDrift 20s ease-in-out infinite alternate;
-}
-
 /* FAINT LAYERS */
 .quote-fragment.faint {
     opacity: 0.2;
@@ -1107,13 +1082,33 @@ form:hover textarea {
     letter-spacing: 4px;
     opacity: 0.3;
 }
-@keyframes breathe {
-    0%, 100% { opacity: 0.06; }
-    50% { opacity: 0.1; }
+#quote-background {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
 }
-
 .quote-fragment {
+    position: absolute;
+    width: 320px;
+
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    line-height: 1.8;
+
+    color: rgba(255,255,255,0.08);
+
+    transition: opacity 1.5s ease, transform 2s ease;
+
+    transform: rotate(var(--rot, 0deg));
+
     animation:
         floatDrift 20s ease-in-out infinite alternate,
         breathe 12s ease-in-out infinite;
+}
+@keyframes breathe {
+    0%, 100% { opacity: 0.06; }
+    45% { opacity: 0.1; }
+    50% { opacity: 0.16; } /* spike */
+    55% { opacity: 0.1; }
 }
