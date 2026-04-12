@@ -986,52 +986,55 @@ form:hover input,
 form:hover textarea {
     opacity: 0.9;
 }
+/* =========================
+   BACKGROUND QUOTE SYSTEM PRO
+========================= */
 
 #quote-background {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 22%;
+    left: 6%;
 
-    width: 100%;
-    max-width: 900px;
+    width: 420px;
 
     z-index: 1;
-
-    text-align: center;
-    padding: 60px;
-
-    font-family: "Georgia", serif;
-    font-size: clamp(18px, 2vw, 28px);
-    line-height: 1.6;
-    letter-spacing: 1px;
-
-    color: rgba(255,255,255,0.06);
-
     pointer-events: none;
 
-    transition: opacity 1.5s ease;
-
-    /* subtle atmosphere */
-    filter: blur(0.4px);
-    text-shadow: 0 0 30px rgba(255,255,255,0.04);
+    transition: opacity 1.5s ease, transform 6s ease;
 }
-
 #quote-text {
-    display: inline-block;
+    font-family: 'Caveat', cursive;
+
+    font-size: 24px;
+    line-height: 1.9;
+    letter-spacing: 1px;
+
+    color: rgba(255,255,255,0.08);
+
+    text-align: left;
+
+    filter: blur(0.25px);
+    text-shadow: 0 0 25px rgba(255,255,255,0.03);
 }
 
-#quote-background .char {
+.word {
     opacity: 0;
-    animation: fadeChar 0.6s forwards;
+    transform: translateY(10px);
+    animation: wordFade 1s forwards;
+}
+
+.word.emphasis {
+    animation-duration: 2s;
+    color: rgba(255,255,255,0.12);
+}
+
+@keyframes wordFade {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #quote-background.fade {
     opacity: 0;
-}
-
-@keyframes fadeChar {
-    to {
-        opacity: 1;
-    }
 }
