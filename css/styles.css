@@ -1107,3 +1107,13 @@ form:hover textarea {
     letter-spacing: 4px;
     opacity: 0.3;
 }
+@keyframes breathe {
+    0%, 100% { opacity: 0.06; }
+    50% { opacity: 0.1; }
+}
+
+.quote-fragment {
+    animation:
+        floatDrift 20s ease-in-out infinite alternate,
+        breathe 12s ease-in-out infinite;
+}
