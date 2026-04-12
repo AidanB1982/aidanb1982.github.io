@@ -1,19 +1,27 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor’s Picks</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/editors.css">
+```
+<!-- CSS -->
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/editors.css">
+```
+
 </head>
 
 <body class="editors-page" data-page="editors">
 
-    <!-- HEADER -->
-    <div id="header-placeholder"></div>
+```
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<main>
 
     <!-- HERO / OPENING -->
     <section class="opening-line fade-in">
@@ -34,10 +42,10 @@
         <h2 class="month-title">Current Selection</h2>
     </section>
 
-    <!-- PICKS (CMS WILL INJECT HERE) -->
+    <!-- PICKS (JS INJECTS HERE) -->
     <section class="editor-picks">
         <div class="editor-inner">
-            <!-- JS WILL POPULATE BOOKS HERE -->
+            <!-- Books will be dynamically injected -->
         </div>
     </section>
 
@@ -48,16 +56,23 @@
         </p>
     </section>
 
-    <!-- FOOTER -->
-    <div id="footer-placeholder"></div>
+</main>
 
-    <!-- JS -->
-    <script src="/js/main.js"></script>
-    <script src="/js/editors.js"></script>
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
 
-    <script>
+<!-- JS -->
+<script src="/js/main.js" defer></script>
+<script src="/js/editors.js" defer></script>
+
+<!-- INIT -->
+<script defer>
+    window.addEventListener("DOMContentLoaded", () => {
         loadHeader("simple");
-    </script>
+    });
+</script>
+```
 
 </body>
+
 </html>
