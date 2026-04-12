@@ -277,17 +277,33 @@ function initQuotes() {
 
     function updateFragments() {
 
-        fragments.forEach(el => {
+    fragments.forEach(el => {
 
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-            const rotation = (Math.random() - 0.5) * 4;
+        // RANDOM POSITION
+        const side = Math.random() < 0.5 ? "left" : "right";
 
-            el.style.transform = `rotate(${rotation}deg)`;
+        const top = Math.random() * 70 + 10; // 10%–80%
+        const offset = Math.random() * 10 + 5; // 5%–15% from edge
 
-            renderText(el, randomQuote);
-        });
-    }
+        if (side === "left") {
+            el.style.left = `${offset}%`;
+            el.style.right = "auto";
+        } else {
+            el.style.right = `${offset}%`;
+            el.style.left = "auto";
+        }
+
+        el.style.top = `${top}%`;
+
+        // slight rotation (unsettling)
+        const rotation = (Math.random() - 0.5) * 6;
+        el.style.transform = `rotate(${rotation}deg)`;
+
+        renderText(el, randomQuote);
+    });
+}
 
     function triggerWatcher() {
 
