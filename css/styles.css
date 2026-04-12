@@ -25,7 +25,13 @@ body {
     font-family: Georgia, serif;
     position: relative;
 }
-
+body.about-page {
+    background: radial-gradient(
+        circle at 50% 20%,
+        #0a0a0a,
+        #000
+    );
+}
 /* GLOBAL STONE TEXTURE */
 body::before {
     content: "";
@@ -845,7 +851,7 @@ body::after {
     inset: 0;
 
     background:
-        linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.75)),
         url("/assets/forest.png");
 
     background-size: cover;
