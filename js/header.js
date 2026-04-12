@@ -224,34 +224,30 @@ function initSpotlight() {
 
 function initQuotes() {
 
-    const sections = [
-        {
-            trigger: ".about-hero",
-            quote: "Some places keep what they take."
-        },
-        {
-            trigger: ".about-section",
-            quote: "The sea went wrong. It looks back."
-        },
-        {
-            trigger: ".about-fragment",
-            quote: "The mirror watches. Do you remember me?"
-        },
-        {
-            trigger: ".newsletter",
-            quote: "Sleep meant forgetting. He is not alone."
-        }
+    const quotes = [
+        "Some places keep what they take.",
+        "The sea went wrong. It looks back.",
+        "The mirror watches.",
+        "Do you remember me?",
+        "Sleep meant forgetting.",
+        "He is not alone.",
+        "It looks back.",
+        "That silence after a secret.",
+        "It was never not empty."
     ];
 
-    const mainEl = document.getElementById("quote-main");
-    const ghost1 = document.getElementById("quote-ghost-1");
-    const ghost2 = document.getElementById("quote-ghost-2");
+    const fragments = [
+        document.getElementById("q1"),
+        document.getElementById("q2"),
+        document.getElementById("q3"),
+        document.getElementById("q4")
+    ];
 
-    if (!mainEl || !ghost1 || !ghost2) return;
+    const watcher = document.getElementById("quote-watcher");
 
-    let currentIndex = -1;
+    if (fragments.some(el => !el) || !watcher) return;
 
-    function renderLayer(el, text, delayOffset = 0) {
+    function renderText(el, text) {
 
         el.innerHTML = "";
 
@@ -261,78 +257,95 @@ function initQuotes() {
 
             const span = document.createElement("span");
 
-            const emphasisWords = ["remember", "alone", "wrong", "watches"];
+            const emphasisWords = ["remember", "alone", "wrong", "watches", "empty", "back"];
 
             span.className = emphasisWords.includes(
                 word.toLowerCase().replace(/[.?]/g, "")
             ) ? "word emphasis" : "word";
 
+            // RANDOM DISTORTION
+            if (Math.random() < 0.1) {
+                span.classList.add("distort");
+            }
+
             span.textContent = word + " ";
-            span.style.animationDelay = `${(i * 0.25) + delayOffset}s`;
+            span.style.animationDelay = `${i * 0.25}s`;
 
             el.appendChild(span);
         });
     }
 
-    function updateQuotes(index) {
+    function updateFragments() {
 
-        if (index === currentIndex) return;
-        currentIndex = index;
+        fragments.forEach(el => {
 
-        const current = sections[index].quote;
-        const prev = sections[index - 1]?.quote || "";
-        const next = sections[index + 1]?.quote || "";
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-        renderLayer(mainEl, current, 0);
-        renderLayer(ghost1, prev, 0.1);
-        renderLayer(ghost2, next, 0.2);
-    }
+            const rotation = (Math.random() - 0.5) * 4;
 
-    const observer = new IntersectionObserver((entries) => {
+            el.style.transform = `rotate(${rotation}deg)`;
 
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-
-                const index = sections.findIndex(s =>
-                    entry.target.matches(s.trigger)
-                );
-
-                if (index !== -1) {
-                    updateQuotes(index);
-                }
-            }
+            renderText(el, randomQuote);
         });
-
-    }, {
-        threshold: 0.4
-    });
-
-    sections.forEach(section => {
-        const el = document.querySelector(section.trigger);
-        if (el) observer.observe(el);
-    });
-
-    // PARALLAX (same as before)
-    const bgEl = document.getElementById("quote-background");
-
-    let currentX = 0;
-    let currentY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    document.addEventListener("mousemove", (e) => {
-        targetX = (e.clientX / window.innerWidth - 0.5) * 20;
-        targetY = (e.clientY / window.innerHeight - 0.5) * 20;
-    });
-
-    function animateQuote() {
-        currentX += (targetX - currentX) * 0.05;
-        currentY += (targetY - currentY) * 0.05;
-
-        bgEl.style.transform = `translate(${currentX}px, ${currentY}px)`;
-
-        requestAnimationFrame(animateQuote);
     }
 
-    animateQuote();
+    function triggerWatcher() {
+
+        const text = quotes[Math.floor(Math.random() * quotes.length)];
+
+        renderText(watcher, text);
+
+        watcher.style.opacity = 1;
+
+        // FOLLOW MOUSE (slow, unsettling)
+        function move(e) {
+            const x = (e.clientX / window.innerWidth - 0.5) * 40;
+            const y = (e.clientY / window.innerHeight - 0.5) * 40;
+
+            watcher.style.transform =
+                `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        }
+
+        document.addEventListener("mousemove", move);
+
+        // RANDOM GLITCH DURING DISPLAY
+        const glitchInterval = setInterval(() => {
+            watcher.classList.add("glitch");
+
+            setTimeout(() => {
+                watcher.classList.remove("glitch");
+            }, 150);
+        }, Math.random() * 2000 + 1000);
+
+        // RANDOM DECAY MOMENT
+        setTimeout(() => {
+            watcher.classList.add("decay");
+
+            setTimeout(() => {
+                watcher.classList.remove("decay");
+            }, 800);
+        }, Math.random() * 3000 + 2000);
+
+        // DISAPPEAR
+        setTimeout(() => {
+            watcher.style.opacity = 0;
+            document.removeEventListener("mousemove", move);
+            clearInterval(glitchInterval);
+        }, 4000);
+    }
+
+    // INITIAL
+    updateFragments();
+
+    // LOOP FRAGMENTS
+    setInterval(() => {
+        updateFragments();
+    }, 8000);
+
+    // RANDOM WATCHER TRIGGER
+    setInterval(() => {
+        if (Math.random() < 0.4) {
+            triggerWatcher();
+        }
+    }, 6000);
 }
