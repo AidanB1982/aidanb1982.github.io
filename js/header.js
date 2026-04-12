@@ -224,15 +224,23 @@ function initSpotlight() {
 
 function initQuotes() {
 
-    const quotes = [
-        "Some places keep what they take.",
-        "The sea went wrong.",
-        "The mirror watches.",
-        "Do you remember me?",
-        "Sleep meant forgetting.",
-        "He is not alone.",
-        "It looks back.",
-        "That silence after a secret."
+    const sections = [
+        {
+            trigger: ".about-hero",
+            quote: "Some places keep what they take."
+        },
+        {
+            trigger: ".about-section",
+            quote: "The sea went wrong. It looks back."
+        },
+        {
+            trigger: ".about-fragment",
+            quote: "The mirror watches. Do you remember me?"
+        },
+        {
+            trigger: ".newsletter",
+            quote: "Sleep meant forgetting. He is not alone."
+        }
     ];
 
     const textEl = document.getElementById("quote-text");
@@ -240,47 +248,87 @@ function initQuotes() {
 
     if (!textEl || !bgEl) return;
 
-    let currentIndex = 0;
-    let charIndex = 0;
+    let currentQuote = "";
 
-    const pauseTime = 4000;
+    function renderQuote(text) {
 
-    function type() {
-
-        if (charIndex < quotes[currentIndex].length) {
-
-            const char = quotes[currentIndex][charIndex];
-
-            const delay = Math.random() * 40 + 40;
-
-            textEl.innerHTML += `<span class="char" style="animation-delay:${Math.random() * 0.3}s">${char}</span>`;
-
-            charIndex++;
-
-            setTimeout(type, delay);
-
-        } else {
-
-            setTimeout(fadeOut, pauseTime);
-        }
-    }
-
-    function fadeOut() {
+        if (text === currentQuote) return;
+        currentQuote = text;
 
         bgEl.classList.add("fade");
 
         setTimeout(() => {
 
             textEl.innerHTML = "";
-            charIndex = 0;
-            currentIndex = (currentIndex + 1) % quotes.length;
 
-            bgEl.classList.remove("fade");
+            const words = text.split(" ");
 
-            setTimeout(type, 500);
+            words.forEach((word, i) => {
 
-        }, 1500);
+                const span = document.createElement("span");
+
+                const emphasisWords = ["remember", "alone", "wrong", "watches"];
+
+                span.className = emphasisWords.includes(
+                    word.toLowerCase().replace(/[.?]/g, "")
+                ) ? "word emphasis" : "word";
+
+                span.textContent = word + " ";
+                span.style.animationDelay = `${i * 0.25}s`;
+
+                textEl.appendChild(span);
+            });
+
+            setTimeout(() => {
+                bgEl.classList.remove("fade");
+            }, 400);
+
+        }, 800);
     }
 
-    type();
+    const observer = new IntersectionObserver((entries) => {
+
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+
+                const match = sections.find(s =>
+                    entry.target.matches(s.trigger)
+                );
+
+                if (match) {
+                    renderQuote(match.quote);
+                }
+            }
+        });
+
+    }, {
+        threshold: 0.4
+    });
+
+    sections.forEach(section => {
+        const el = document.querySelector(section.trigger);
+        if (el) observer.observe(el);
+    });
+
+    // smooth parallax (fixed)
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    document.addEventListener("mousemove", (e) => {
+        targetX = (e.clientX / window.innerWidth - 0.5) * 20;
+        targetY = (e.clientY / window.innerHeight - 0.5) * 20;
+    });
+
+    function animateQuote() {
+        currentX += (targetX - currentX) * 0.05;
+        currentY += (targetY - currentY) * 0.05;
+
+        bgEl.style.transform += ` rotate(${(Math.random() - 0.5) * 1.5}deg)`;
+
+        requestAnimationFrame(animateQuote);
+    }
+
+    animateQuote();
 }
