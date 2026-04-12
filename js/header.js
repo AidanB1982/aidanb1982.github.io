@@ -287,10 +287,9 @@ function updateSingleFragment() {
     lastIndex = index;
 
     const el = fragments[index];
-    el.style.animationDelay = `
-        ${Math.random() * 5}s,
-        ${Math.random() * 5}s
-    `;
+    el.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 5}s`;
+    
+    el.style.animationDuration = `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
 
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
