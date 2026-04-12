@@ -20,7 +20,7 @@ container.innerHTML = `
 `;
 
 try {
-    const res = await fetch('/..data/books.json');
+    const res = await fetch('/data/books.json');
 
     if (!res.ok) {
         throw new Error("Failed to load books.json");
@@ -45,9 +45,7 @@ try {
     // UPDATE TITLE
     // =========================
     if (title) {
-        title.textContent = latestMonth === "Current Selection"
-    ? latestMonth
-    : formatMonth(latestMonth);
+        title.textContent = formatMonth(latestMonth);
     }
 
     // =========================
