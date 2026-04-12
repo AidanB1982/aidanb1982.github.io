@@ -284,8 +284,8 @@ function initQuotes() {
         // RANDOM POSITION
         const side = Math.random() < 0.5 ? "left" : "right";
 
-        const top = Math.random() * 70 + 10; // 10%–80%
-        const offset = Math.random() * 10 + 5; // 5%–15% from edge
+        const top = Math.random() * 70 + 10;
+        const offset = Math.random() * 10 + 5;
 
         if (side === "left") {
             el.style.left = `${offset}%`;
@@ -299,7 +299,7 @@ function initQuotes() {
 
         // slight rotation (unsettling)
         const rotation = (Math.random() - 0.5) * 6;
-        el.style.transform = `rotate(${rotation}deg)`;
+        el.style.setProperty('--rot', `${rotation}deg`);
 
         renderText(el, randomQuote);
     });
