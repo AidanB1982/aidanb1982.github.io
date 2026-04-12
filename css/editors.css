@@ -42,6 +42,7 @@ body.editors-page {
 .pick {
     text-align: center;
     position: relative;
+    transition: transform 0.4s ease;
 }
 
 /* BOOK IMAGE */
@@ -59,6 +60,7 @@ body.editors-page {
 /* HOVER EFFECT */
 .pick:hover img {
     transform: translateY(-8px) scale(1.04);
+    transform: translateY(-4px);
 
     filter:
         drop-shadow(0 40px 100px rgba(0,0,0,1))
