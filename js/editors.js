@@ -4,7 +4,7 @@
 
 async function loadEditorPicks() {
 
-```
+
 const container = document.querySelector('.editor-inner');
 const title = document.querySelector('.month-title');
 
@@ -20,7 +20,7 @@ container.innerHTML = `
 `;
 
 try {
-    const res = await fetch('/data/books.json');
+    const res = await fetch('/..data/books.json');
 
     if (!res.ok) {
         throw new Error("Failed to load books.json");
@@ -87,7 +87,7 @@ try {
     console.error("Editor Picks Error:", err);
     renderError(container);
 }
-```
+
 
 }
 
@@ -97,7 +97,7 @@ try {
 
 function createBookCard(book) {
 
-```
+
 const el = document.createElement("div");
 el.className = "pick fade-in";
 
@@ -137,7 +137,7 @@ el.appendChild(note);
 el.appendChild(link);
 
 return el;
-```
+
 
 }
 
@@ -165,7 +165,7 @@ container.innerHTML = `         <div class="editor-error fade-in">             <
 
 function formatMonth(key) {
 
-```
+
 const [month, year] = key.split("-");
 
 return (
@@ -174,7 +174,7 @@ return (
     " " +
     year
 );
-```
+
 
 }
 
@@ -182,12 +182,3 @@ return (
 // INIT
 // =========================
 
-document.addEventListener("DOMContentLoaded", () => {
-
-```
-if (!document.body.classList.contains("editors-page")) return;
-
-loadEditorPicks();
-```
-
-});
