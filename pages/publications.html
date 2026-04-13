@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Publications | Blackwood Publishing</title>
+<title>The Works | Blackwood Publishing</title>
 
 <!-- CSS -->
 <link rel="stylesheet" href="/css/header.css">
@@ -23,8 +23,15 @@
     <div class="about-hero-overlay"></div>
 
     <div class="about-hero-content fade-in">
-        <p class="about-intro-line">Selected Works</p>
-        <h1>Publications</h1>
+        <h1>The Works</h1>
+
+        <p class="about-intro-line">
+            A collection of distinct works, each shaped by place, memory, and unease.
+        </p>
+
+        <p class="about-intro-line" style="opacity:0.5; font-size:14px;">
+            New readers may wish to begin with Corrour Bothy.
+        </p>
     </div>
 
 </section>
@@ -38,6 +45,10 @@
     <div class="series fade-in">
         <h2>The Archive Files</h2>
 
+        <p>
+            Records of memory, erasure, and what remains.
+        </p>
+
         <a href="/pages/archive-files.html">
             <div class="carousel">
                 <img src="/assets/book3.jpg" class="active" loading="lazy">
@@ -46,15 +57,15 @@
                 <img src="/assets/book6.jpg" loading="lazy">
             </div>
         </a>
-
-        <p>
-            Psychological and atmospheric fiction exploring memory, landscape, and buried truths.
-        </p>
     </div>
 
     <!-- SERIES 2 -->
     <div class="series fade-in">
         <h2>The Cursed Bothies</h2>
+
+        <p>
+            Remote Highland places where something waits.
+        </p>
 
         <a href="/pages/cursed-bothies.html">
             <div class="carousel">
@@ -63,15 +74,15 @@
                 <img src="/assets/book8.jpg" loading="lazy">
             </div>
         </a>
-
-        <p>
-            Remote Highland bothies, isolation, and ancient forces that do not remain dormant.
-        </p>
     </div>
 
     <!-- SERIES 3 -->
     <div class="series fade-in">
         <h2>Hard Silence</h2>
+
+        <p>
+            Crime shaped by loyalty, consequence, and restraint.
+        </p>
 
         <a href="/pages/hard-silence.html">
             <div class="carousel">
@@ -79,15 +90,15 @@
                 <img src="/assets/book10.jpg" loading="lazy">
             </div>
         </a>
-
-        <p>
-            Dark Scottish crime fiction rooted in loyalty and consequence.
-        </p>
     </div>
 
     <!-- SERIES 4 -->
     <div class="series fade-in">
-        <h2>Standalone Works</h2>
+        <h2>Independent Works</h2>
+
+        <p>
+            Independent works rooted in place and psychological tension.
+        </p>
 
         <a href="/pages/standalone.html">
             <div class="carousel">
@@ -95,10 +106,6 @@
                 <img src="/assets/book11.png" loading="lazy">
             </div>
         </a>
-
-        <p>
-            Independent works exploring atmosphere, memory, and psychological tension.
-        </p>
     </div>
 
 </div>
@@ -115,7 +122,7 @@
 <script>
 window.addEventListener("load", async () => {
 
-    // HEADER (awaited properly)
+    // HEADER
     if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
         return;
@@ -123,7 +130,7 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    // FADE-IN (important)
+    // FADE-IN
     if (typeof initFadeIn === "function") {
         initFadeIn();
     }
