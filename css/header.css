@@ -12,9 +12,8 @@ html, body {
 .hero {
     position: relative;
 
-    /* 🔥 KEY CHANGE */
-    height: auto;
-    min-height: 420px;
+    height: 100vh;
+    min-height: 100svh;
 
     display: flex;
     justify-content: center;
@@ -32,7 +31,6 @@ html, body {
 
     overflow: hidden;
 
-    /* soften bottom edge */
     mask-image: linear-gradient(
         to bottom,
         rgba(0,0,0,1) 70%,
@@ -47,7 +45,6 @@ html, body {
         rgba(0,0,0,0) 100%
     );
 }
-
 /* LIGHT ATMOSPHERE */
 .hero::after {
     content: "";
