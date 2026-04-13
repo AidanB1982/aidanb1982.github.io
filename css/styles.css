@@ -1121,3 +1121,42 @@ form:hover textarea {
     50% { opacity: 0.16; } /* spike */
     55% { opacity: 0.1; }
 }
+/* =========================
+   SIMPLE HEADER MODE
+========================= */
+
+body.editors-page .hero,
+body[data-page] .hero {
+    height: auto;
+    min-height: unset;
+    padding: 40px 20px 20px;
+    text-align: center;
+}
+
+/* LOGO SIZE REDUCTION */
+body.editors-page .hero img,
+body[data-page] .hero img {
+    max-width: 220px;
+    margin: 0 auto 10px;
+}
+
+/* TITLE REDUCTION */
+body.editors-page .hero h1,
+body[data-page] .hero h1 {
+    font-size: 28px;
+    letter-spacing: 3px;
+}
+
+/* NAV FIX */
+body.editors-page nav,
+body[data-page] nav {
+    margin-top: 10px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* REMOVE MASSIVE SPACING */
+body.editors-page .hero-content,
+body[data-page] .hero-content {
+    padding: 0;
+}
