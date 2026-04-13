@@ -61,7 +61,9 @@ body.about-page {
 ========================= */
 .featured {
     padding: 100px 20px 60px;
-    background: transparent;
+    background: #000;
+    position: relative;
+    z-index: 2;
     opacity: var(--fadeIn, 1);
     transition: opacity 0.6s ease;
 }
