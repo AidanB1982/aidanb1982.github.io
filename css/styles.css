@@ -25,6 +25,29 @@ body {
     font-family: Georgia, serif;
     position: relative;
 }
+
+/* GLOBAL TEXTURE + FILM GRAIN (MERGED) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    pointer-events: none;
+    z-index: -1;
+
+    background:
+        url("/assets/stone.png"),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+
+    background-size: cover;
+
+    opacity: 0.08;
+
+    mix-blend-mode: overlay;
+
+    animation: grainMove 12s linear infinite;
+}
+
 body.about-page {
     background: radial-gradient(
         circle at 50% 20%,
@@ -32,17 +55,6 @@ body.about-page {
         #000
     );
 }
-/* GLOBAL STONE TEXTURE */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url("/assets/stone.png");
-    opacity: 0.05;
-    z-index: -1;
-    pointer-events: none;
-}
-
 /* =========================
    FEATURED SECTION
 ========================= */
@@ -1102,10 +1114,6 @@ form:hover textarea {
     55% { opacity: 0.1; }
 }
 
-body.editors-page .hero-content,
-body[data-page] .hero-content {
-    padding: 0;
-}
 /* =========================
    SIMPLE HEADER (FINAL)
 ========================= */
@@ -1190,22 +1198,4 @@ body[data-page] .hero-content {
     );
 
     opacity: 0.6;
-}
-/* =========================
-   FILM GRAIN (ULTRA SUBTLE)
-========================= */
-
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-    z-index: -1;
-
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-
-    opacity: 0.06;
-
-    animation: grainMove 12s linear infinite;
 }
