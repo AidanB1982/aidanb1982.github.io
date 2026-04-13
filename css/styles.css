@@ -752,6 +752,7 @@ body.about-page {
 .hero {
     position: relative;
     z-index: 1;
+    background: #000
 }
 
 .hero::after {
@@ -886,7 +887,7 @@ body::after {
     background-size: cover;
     background-position: center;
 
-    opacity: 0.40;
+    opacity: 0.01;
 }
 
 .about-hero-content {
