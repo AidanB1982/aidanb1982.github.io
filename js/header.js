@@ -8,16 +8,22 @@ document.documentElement.classList.remove("no-js");
 // LOAD HEADER
 // =========================
 
-async function loadHeader() {
+async function loadHeader(type = "hero") {
+
+    const fileMap = {
+        hero: "header.html",
+        simple: "header-simple.html"
+    };
+
+    const file = fileMap[type] || "header.html";
 
     try {
-        // detect correct base path
         const isSubPage = window.location.pathname.includes("/pages/");
         const base = isSubPage ? "../" : "/";
 
-        // LOAD HEADER
-        const headerRes = await fetch(`${base}header.html`);
-        if (!headerRes.ok) throw new Error(`Failed to load header`);
+        // HEADER
+        const headerRes = await fetch(`${base}${file}`);
+        if (!headerRes.ok) throw new Error(`Failed to load ${file}`);
 
         const headerHTML = await headerRes.text();
         const headerContainer = document.getElementById("header-placeholder");
@@ -26,7 +32,7 @@ async function loadHeader() {
             headerContainer.innerHTML = headerHTML;
         }
 
-        // LOAD FOOTER
+        // FOOTER
         const footerRes = await fetch(`${base}footer.html`);
         if (!footerRes.ok) throw new Error("Failed to load footer");
 
@@ -37,7 +43,7 @@ async function loadHeader() {
             footerContainer.innerHTML = footerHTML;
         }
 
-        // INIT SYSTEMS
+        // INIT
         initScrollFade();
         initEntity();
         initFadeIn();
