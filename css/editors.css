@@ -49,6 +49,12 @@ GRID
 
     position: relative;
     z-index: 1;
+
+    transition: opacity 0.8s ease;
+}
+
+.editor-inner.fading {
+    opacity: 0;
 }
 
 /* =========================
@@ -58,6 +64,7 @@ BOOK CARD
 .pick {
     text-align: center;
     position: relative;
+    z-index: 1;
 
     transform: translateY(0);
     transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
@@ -81,7 +88,6 @@ IMAGE
     transition: transform 0.6s ease, filter 0.6s ease;
 }
 
-/* IMAGE HOVER */
 .pick:hover img {
     transform: translateY(-8px) scale(1.04);
 
@@ -91,30 +97,20 @@ IMAGE
 }
 
 /* =========================
-TITLE
+TEXT
 ========================= */
 
 .pick h3 {
     font-size: 20px;
     letter-spacing: 2px;
     margin-bottom: 6px;
-
-    transition: opacity 0.3s ease;
 }
-
-/* =========================
-AUTHOR
-========================= */
 
 .pick-author {
     font-size: 13px;
     opacity: 0.6;
     margin-bottom: 14px;
 }
-
-/* =========================
-NOTE
-========================= */
 
 .pick-note {
     font-size: 14px;
@@ -126,8 +122,6 @@ NOTE
 
     max-width: 260px;
     margin: 0 auto 18px;
-
-    transition: opacity 0.3s ease;
 }
 
 /* =========================
@@ -142,6 +136,11 @@ BUTTON
     content: " →";
     opacity: 0.6;
 }
+
+/* =========================
+AFFILIATE SUBTLE
+========================= */
+
 .affiliate-subtle {
     display: block;
     font-size: 10px;
@@ -150,6 +149,7 @@ BUTTON
     letter-spacing: 1.5px;
     text-transform: uppercase;
 }
+
 /* =========================
 HOVER FOCUS MODE
 ========================= */
@@ -163,6 +163,49 @@ HOVER FOCUS MODE
     opacity: 1;
     transform: translateY(-8px) scale(1.02);
     filter: blur(0);
+}
+
+/* =========================
+ACTIVE PICK (AUTO HIGHLIGHT)
+========================= */
+
+.active-pick {
+    transform: scale(1.05);
+    z-index: 2;
+    animation: pickPulse 4s ease-in-out infinite alternate;
+}
+
+.active-pick img {
+    filter:
+        drop-shadow(0 60px 140px rgba(0,0,0,1))
+        drop-shadow(0 0 60px rgba(184,115,51,0.35))
+        drop-shadow(0 0 120px rgba(184,115,51,0.15));
+}
+
+@keyframes pickPulse {
+    0% { transform: scale(1.05); }
+    100% { transform: scale(1.07); }
+}
+
+/* =========================
+FEATURED PICK
+========================= */
+
+.featured-pick {
+    grid-column: span 2;
+}
+
+.featured-pick img {
+    width: 260px;
+}
+
+.featured-pick h3 {
+    font-size: 24px;
+}
+
+.featured-pick .pick-note {
+    max-width: 420px;
+    font-size: 15px;
 }
 
 /* =========================
@@ -226,39 +269,6 @@ ATMOSPHERE LAYERS
 }
 
 /* =========================
-MICRO INTERACTIONS
-========================= */
-
-.pick:hover h3 {
-    opacity: 0.9;
-}
-
-.pick:hover .pick-note {
-    opacity: 0.9;
-}
-
-/* =========================
-FEATURED PICK
-========================= */
-
-.featured-pick {
-    grid-column: span 2;
-}
-
-.featured-pick img {
-    width: 260px;
-}
-
-.featured-pick h3 {
-    font-size: 24px;
-}
-
-.featured-pick .pick-note {
-    max-width: 420px;
-    font-size: 15px;
-}
-
-/* =========================
 RESPONSIVE
 ========================= */
 
@@ -281,25 +291,4 @@ RESPONSIVE
     .pick-note {
         font-size: 13px;
     }
-}
-/* FEATURED PICK GLOW */
-.active-pick {
-    transform: scale(1.05);
-    z-index: 2;
-}
-
-.active-pick img {
-    filter:
-        drop-shadow(0 60px 140px rgba(0,0,0,1))
-        drop-shadow(0 0 40px rgba(184,115,51,0.25));
-}
-
-/* SUBTLE PULSE */
-@keyframes pickPulse {
-    0% { transform: scale(1.05); }
-    100% { transform: scale(1.07); }
-}
-
-.active-pick {
-    animation: pickPulse 4s ease-in-out infinite alternate;
 }
