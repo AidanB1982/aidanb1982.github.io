@@ -7,15 +7,6 @@ a:active,
 a:link {
     color: #e6e6e6;
     text-decoration: none;
-}/* =========================
-   GLOBAL LINK RESET
-========================= */
-a,
-a:visited,
-a:active,
-a:link {
-    color: #e6e6e6;
-    text-decoration: none;
 }
 * {
     transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -785,9 +776,8 @@ body.about-page {
 
     background: linear-gradient(
         to bottom,
-        rgba(0,0,0,0) 55%,
-        rgba(0,0,0,0.5) 75%,
-        rgba(0,0,0,0.85) 90%,
+        rgba(0,0,0,0) 60%,
+        rgba(0,0,0,0.6) 80%,
         #000 100%
     );
 
@@ -806,12 +796,9 @@ body.about-page {
         to bottom,
         rgba(0,0,0,0.95),
         #000
+    );
 }
 
-
-section {
-    position: relative;
-    }
 /* =========================
    AMBIENT LIGHT (SOFT)
 ========================= */
@@ -1215,49 +1202,73 @@ form:hover textarea {
     margin-bottom: 20px;
     opacity: 0.85;
 }
-* {
-    transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
 a, .work, .button, .work-desc, .footer-col a {
     transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 /* =========================
-   BASE + GLOBAL TEXTURE
+   HERO STATEMENT (NEW)
 ========================= */
-body {
-    margin: 0;
-    background: #000;
-    color: #e6e6e6;
-    font-family: Georgia, serif;
+.hero-statement {
+    text-align: center;
+    padding: 120px 20px 80px;
+
+    max-width: 800px;
+    margin: 0 auto;
+
     position: relative;
+    z-index: 3;
 }
 
-/* GLOBAL TEXTURE + FILM GRAIN */
-body::before {
+/* TITLE */
+.hero-statement h1 {
+    font-size: 38px;
+    font-weight: normal;
+    line-height: 1.4;
+
+    margin-bottom: 25px;
+}
+
+/* SUBTEXT */
+.hero-statement .sub {
+    font-size: 18px;
+    opacity: 0.75;
+    line-height: 1.7;
+
+    margin-bottom: 15px;
+}
+
+/* META LINE */
+.hero-statement .meta {
+    font-size: 13px;
+    opacity: 0.5;
+
+    margin-bottom: 30px;
+}
+
+/* BUTTON ROW */
+.hero-statement .cta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* HARD FADE FROM HERO */
+.hero-statement::before {
     content: "";
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    top: -120px;
+    left: 0;
+    width: 100%;
+    height: 120px;
 
-    pointer-events: none;
-
-    z-index: -1;
-
-    background: url("/assets/stone.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-
-    opacity: 0.02;
-}
-body.home-page::before {
-    opacity: 0.02;
-}
-body.about-page {
-    background: radial-gradient(
-        circle at 50% 20%,
-        #0a0a0a,
+    background: linear-gradient(
+        to bottom,
+        transparent,
         #000
     );
+
+    pointer-events: none;
 }
 /* =========================
    FEATURED SECTION
@@ -1272,6 +1283,7 @@ body.about-page {
         to bottom,
         rgba(0,0,0,0.95),
         #000 40%
+    );
 
     opacity: var(--fadeIn, 1);
     transition: opacity 0.6s ease;
@@ -1969,47 +1981,7 @@ body.about-page {
     background-position: right center;
 }
 
-/* =========================
-   CINEMATIC HERO → PAGE FADE
-========================= */
-.hero {
-    position: relative;
-    z-index: 2;
-    isolation: isolate;
-    
-}
 
-.hero::after {
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0) 55%,
-        rgba(0,0,0,0.5) 75%,
-        rgba(0,0,0,0.85) 90%,
-        #000 100%
-    );
-}
-
-    pointer-events: none;
-    z-index: 2;
-
-    opacity: var(--fadeOut, 0);
-    transition: opacity 0.3s ease-out;
-}
-
-.hero + section {
-    position: relative;
-    z-index: 3;
-    margin-top: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.95),
-        #000
-    );
-}
-
-section {
-    position: relative;
-    }
 /* =========================
    AMBIENT LIGHT (SOFT)
 ========================= */
