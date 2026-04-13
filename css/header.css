@@ -350,3 +350,52 @@ body.sub-page .hero-logo {
 body.sub-page .nav-inline {
     margin-bottom: 10px;
 }
+/* =========================
+   SIMPLE HEADER (STABLE)
+========================= */
+
+.simple-header {
+    position: relative;
+    width: 100%;
+    z-index: 20;
+
+    padding: 20px 30px;
+
+    display: flex;
+    justify-content: center;
+
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(6px);
+}
+
+.simple-header .header-inner {
+    width: 100%;
+    max-width: 1100px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOGO */
+.simple-header .logo img {
+    width: 120px;
+}
+
+/* NAV */
+.simple-header .nav-inline {
+    display: flex;
+    gap: 26px;
+}
+
+.simple-header .nav-inline a {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.simple-header .nav-inline a:hover {
+    opacity: 1;
+}
