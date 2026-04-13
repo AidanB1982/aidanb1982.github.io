@@ -42,7 +42,7 @@ body::before {
     background-size: cover, cover;
     background-repeat: no-repeat, repeat;
 
-    opacity: 0.05;
+    opacity: 0.02;
 
     animation: grainMove 12s linear infinite;
 }
@@ -60,17 +60,43 @@ body.about-page {
    FEATURED SECTION
 ========================= */
 .featured {
-    padding: 100px 20px 60px;
-    background: #000;
     position: relative;
     z-index: 2;
+
+    padding: 100px 20px 60px;
+
+    background: #000;
+
     opacity: var(--fadeIn, 1);
     transition: opacity 0.6s ease;
+
+    overflow: hidden;
 }
 
+/* OPTIONAL: controlled subtle texture (cleaner than body::before) */
+.featured::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: url("/assets/stone.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    opacity: 0.04;
+
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* CONTENT WRAPPER */
 .featured-inner {
+    position: relative;
+    z-index: 1;
+
     max-width: 1100px;
     margin: 0 auto;
+
     display: grid;
     grid-template-columns: 420px 1fr;
     gap: 50px;
@@ -80,12 +106,15 @@ body.about-page {
 /* IMAGE */
 .featured-image img {
     width: 420px;
+
     transition: transform 0.6s ease, filter 0.6s ease;
+
     filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
 }
 
 .featured-image img:hover {
     transform: translateY(-8px) scale(1.03);
+
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.9));
 }
 
@@ -98,6 +127,7 @@ body.about-page {
     font-size: 19px;
     letter-spacing: 4px;
     text-transform: uppercase;
+
     opacity: 0.85;
     margin-bottom: 14px;
 }
@@ -753,6 +783,7 @@ body.about-page {
 .hero {
     position: relative;
     z-index: 1;
+    isolation: isolate;
     
 }
 
