@@ -80,7 +80,14 @@ body.about-page {
     display: grid;
     grid-template-columns: 420px 1fr;
     gap: 50px;
+
     align-items: center;
+    justify-content: center;
+}
+
+.featured-content {
+    max-width: 480px;
+    margin: 0 auto;
 }
 
 /* IMAGE */
@@ -96,11 +103,6 @@ body.about-page {
     transform: translateY(-8px) scale(1.03);
 
     filter: drop-shadow(0 30px 70px rgba(0,0,0,0.9));
-}
-
-/* TEXT */
-.featured-content {
-    max-width: 480px;
 }
 
 .featured-label {
