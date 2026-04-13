@@ -34,8 +34,7 @@ body::before {
 
     pointer-events: none;
 
-    /* 🔥 KEY FIX */
-    z-index: 0;
+    z-index: -1;
 
     background: url("/assets/stone.png");
     background-size: cover;
@@ -68,22 +67,6 @@ body.about-page {
     transition: opacity 0.6s ease;
 
     overflow: hidden;
-}
-
-/* OPTIONAL: controlled subtle texture (cleaner than body::before) */
-.featured::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background: url("/assets/stone.png");
-    background-size: cover;
-    background-repeat: no-repeat;
-
-    opacity: 0.04;
-
-    pointer-events: none;
-    z-index: 0;
 }
 
 /* CONTENT WRAPPER */
@@ -808,7 +791,10 @@ body.about-page {
     position: relative;
     z-index: 3;
     margin-top: 0;
-    background: #000;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.95),
+        #000
 }
 
 
