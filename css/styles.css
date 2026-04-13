@@ -744,34 +744,51 @@ body.about-page {
     background-position: right center;
 }
 
-.hero + section {
+/* =========================
+   CINEMATIC HERO → PAGE FADE
+========================= */
+
+
+.hero {
     position: relative;
-    z-index: 2;
-    margin-top: 120px;
-    background: #000;
+    z-index: 1;
+
+    opacity: calc(1 - var(--fadeOut, 0));
+    transition: opacity 0.3s ease-out;
 }
 
-/* GLOBAL SECTION BASE */
-section {
-    position: relative;
-    isolation: isolate;
-}
-.hero + section::before {
+.hero::after {
     content: "";
     position: absolute;
-    top: -80px;
-    left: 0;
-    width: 100%;
-    height: 80px;
+    inset: 0;
 
     background: linear-gradient(
         to bottom,
-        rgba(0,0,0,0),
-        #000
+        rgba(0,0,0,0) 55%,
+        rgba(0,0,0,0.5) 75%,
+        rgba(0,0,0,0.85) 90%,
+        #000 100%
     );
 
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
+
+    opacity: var(--fadeOut, 0);
+    transition: opacity 0.3s ease-out;
+}
+
+/* FIRST SECTION AFTER HERO */
+.hero + section {
+    position: relative;
+    z-index: 3;
+    margin-top: 0;
+    background: #000;
+}
+
+
+section {
+    position: relative;
+    isolation: isolate;
 }
 /* =========================
    AMBIENT LIGHT (SOFT)
