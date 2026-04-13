@@ -760,46 +760,6 @@ body.about-page {
 }
 
 /* =========================
-   CINEMATIC HERO → PAGE FADE
-========================= */
-.hero {
-    position: relative;
-    z-index: 2;
-    isolation: isolate;
-    
-}
-
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0) 60%,
-        rgba(0,0,0,0.6) 80%,
-        #000 100%
-    );
-
-    pointer-events: none;
-    z-index: 2;
-
-    opacity: var(--fadeOut, 0);
-    transition: opacity 0.3s ease-out;
-}
-
-.hero + section {
-    position: relative;
-    z-index: 3;
-    margin-top: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.95),
-        #000
-    );
-}
-
-/* =========================
    AMBIENT LIGHT (SOFT)
 ========================= */
 
