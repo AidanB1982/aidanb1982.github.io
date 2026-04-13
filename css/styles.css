@@ -1138,4 +1138,39 @@ form:hover textarea {
     50% { opacity: 0.16; } /* spike */
     55% { opacity: 0.1; }
 }
+/* CONTACT FORM */
+.contact-form {
+    max-width: 520px;
+    margin: 30px auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
 
+.contact-form input,
+.contact-form textarea {
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    padding: 10px 0;
+    color: #e6e6e6;
+    font-family: Georgia, serif;
+}
+
+.contact-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.contact-form button {
+    margin-top: 10px;
+}
+
+/* ACCESSIBILITY (hidden labels) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+}
