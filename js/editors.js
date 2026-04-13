@@ -1,16 +1,20 @@
 // =========================
-// EDITOR PICKS CMS SYSTEM (CINEMATIC)
+// EDITOR PICKS CMS SYSTEM (CINEMATIC PRO)
 // =========================
 
 let editorData = {};
 let sortedMonths = [];
 let currentMonthIndex = 0;
 let interval = null;
+let isTransitioning = false;
+
+// =========================
+// LOAD DATA
+// =========================
 
 async function loadEditorPicks() {
 
     const container = document.querySelector('.editor-inner');
-    const title = document.querySelector('.month-title');
 
     if (!container) return;
 
@@ -33,19 +37,21 @@ async function loadEditorPicks() {
             return;
         }
 
-        // SORT MONTHS
+        // SORT MONTHS (chronological)
         sortedMonths = months.sort((a, b) => {
             const [mA, yA] = a.split("-");
             const [mB, yB] = b.split("-");
             return new Date(`${mA} 1, ${yA}`) - new Date(`${mB} 1, ${yB}`);
         });
 
+        // start at latest
         currentMonthIndex = sortedMonths.length - 1;
 
-        renderMonth();
+        renderMonth(true);
 
-        // START AUTO ROTATION
         startRotation();
+
+        setupHoverPause();
 
     } catch (err) {
         console.error("Editor Picks Error:", err);
@@ -57,7 +63,10 @@ async function loadEditorPicks() {
 // RENDER MONTH
 // =========================
 
-function renderMonth() {
+function renderMonth(initial = false) {
+
+    if (isTransitioning) return;
+    isTransitioning = true;
 
     const container = document.querySelector('.editor-inner');
     const title = document.querySelector('.month-title');
@@ -65,19 +74,23 @@ function renderMonth() {
     const monthKey = sortedMonths[currentMonthIndex];
     const books = editorData[monthKey];
 
-    // FADE OUT
-    container.style.opacity = "0";
+    // use CSS fade class instead of inline styles
+    if (!initial) {
+        container.classList.add("fading");
+    }
 
     setTimeout(() => {
 
         container.innerHTML = "";
 
+        // update title
         if (title) {
             title.textContent = formatMonth(monthKey);
         }
 
         if (!books || !books.length) {
             renderEmpty(container);
+            isTransitioning = false;
             return;
         }
 
@@ -85,22 +98,29 @@ function renderMonth() {
 
             const el = createBookCard(book);
 
-            // 🔥 AUTO FEATURED PICK
+            // FEATURED + ACTIVE
             if (index === 0) {
                 el.classList.add("featured-pick", "active-pick");
             }
 
             el.style.transitionDelay = `${index * 120}ms`;
+
             container.appendChild(el);
         });
 
-        container.style.opacity = "1";
+        // fade back in
+        container.classList.remove("fading");
 
         if (typeof initFadeIn === "function") {
             initFadeIn();
         }
 
-    }, 400);
+        // allow next transition
+        setTimeout(() => {
+            isTransitioning = false;
+        }, 500);
+
+    }, initial ? 0 : 400);
 }
 
 // =========================
@@ -112,6 +132,9 @@ function startRotation() {
     if (interval) clearInterval(interval);
 
     interval = setInterval(() => {
+
+        if (isTransitioning) return;
+
         currentMonthIndex--;
 
         if (currentMonthIndex < 0) {
@@ -120,7 +143,25 @@ function startRotation() {
 
         renderMonth();
 
-    }, 8000); // ⏱ every 8 seconds
+    }, 8000);
+}
+
+// =========================
+// PAUSE ON HOVER (UX BOOST)
+// =========================
+
+function setupHoverPause() {
+
+    const container = document.querySelector('.editor-inner');
+    if (!container) return;
+
+    container.addEventListener("mouseenter", () => {
+        if (interval) clearInterval(interval);
+    });
+
+    container.addEventListener("mouseleave", () => {
+        startRotation();
+    });
 }
 
 // =========================
@@ -158,7 +199,13 @@ function createBookCard(book) {
     link.rel = "noopener noreferrer";
     link.className = "button copper";
 
-    link.textContent = book.link ? "View Book" : "Unavailable";
+    if (!book.link) {
+        link.textContent = "Unavailable";
+        link.style.opacity = "0.4";
+        link.style.pointerEvents = "none";
+    } else {
+        link.textContent = "View Book";
+    }
 
     const sub = document.createElement("span");
     sub.className = "affiliate-subtle";
