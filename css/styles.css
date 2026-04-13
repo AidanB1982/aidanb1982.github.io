@@ -39,7 +39,8 @@ body::before {
         url("/assets/stone.png"),
         url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 
-    background-size: cover;
+    background-size: cover, cover;
+    background-repeat: no-repeat, repeat;
 
     opacity: 0.05;
 
@@ -874,19 +875,14 @@ body::after {
 }
 
 .about-hero-overlay {
-    position: absolute;
-    inset: 0;
-
     background:
         linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.75)),
         url("/assets/forest.png");
 
     background-size: cover;
     background-position: center;
-
-    opacity: 0.40;
+    background-repeat: no-repeat;
 }
-
 .about-hero-content {
     position: relative;
     z-index: 2;
