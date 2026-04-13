@@ -9,9 +9,6 @@ async function loadEditorPicks() {
 
     if (!container) return;
 
-    // =========================
-    // LOADING STATE
-    // =========================
     container.innerHTML = `
         <div class="editor-loading fade-in visible">
             <p>Loading selections...</p>
@@ -34,51 +31,45 @@ async function loadEditorPicks() {
             return;
         }
 
-        // =========================
-        // GET LATEST MONTH
-        // =========================
-        const latestMonth = months[months.length - 1];
+        
+        const sortedMonths = months.sort((a, b) => {
+            const [monthA, yearA] = a.split("-");
+            const [monthB, yearB] = b.split("-");
+
+            const dateA = new Date(`${monthA} 1, ${yearA}`);
+            const dateB = new Date(`${monthB} 1, ${yearB}`);
+
+            return dateA - dateB;
+        });
+
+        const latestMonth = sortedMonths[sortedMonths.length - 1];
         const books = data[latestMonth];
 
-        // =========================
         // UPDATE TITLE
-        // =========================
         if (title) {
             title.textContent = formatMonth(latestMonth);
         }
 
-        // =========================
-        // CLEAR LOADER
-        // =========================
         container.innerHTML = "";
 
-        // =========================
-        // EMPTY STATE
-        // =========================
         if (!books || !books.length) {
             renderEmpty(container);
             return;
         }
 
-        // =========================
-        // RENDER BOOKS
-        // =========================
         books.forEach((book, index) => {
 
-    const el = createBookCard(book);
+            const el = createBookCard(book);
 
-    // FIRST BOOK = FEATURED
-    if (index === 0) {
-        el.classList.add("featured-pick");
-    }
+            if (index === 0) {
+                el.classList.add("featured-pick");
+            }
 
-    el.style.transitionDelay = `${index * 120}ms`;
+            el.style.transitionDelay = `${index * 120}ms`;
 
-    container.appendChild(el);
-});
-        // =========================
-        // RE-INIT ANIMATIONS
-        // =========================
+            container.appendChild(el);
+        });
+
         if (typeof initFadeIn === "function") {
             initFadeIn();
         }
@@ -98,7 +89,6 @@ function createBookCard(book) {
     const el = document.createElement("div");
     el.className = "pick fade-in";
 
-    // IMAGE
     const img = document.createElement("img");
     img.src = book.image;
     img.alt = book.title;
@@ -108,46 +98,44 @@ function createBookCard(book) {
         img.src = "/assets/placeholder.jpg";
     };
 
-    // TITLE
     const title = document.createElement("h3");
     title.textContent = book.title;
 
-    // AUTHOR
     const author = document.createElement("p");
     author.className = "pick-author";
     author.textContent = book.author;
 
-    // NOTE
     const note = document.createElement("p");
     note.className = "pick-note";
     note.textContent = book.note;
 
-    // LINK BUTTON
-const link = document.createElement("a");
-link.href = book.link || "#";
-link.target = "_blank";
-link.rel = "noopener noreferrer";
-link.className = "button copper";
+    const link = document.createElement("a");
+    link.href = book.link || "#";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.className = "button copper";
 
-if (!book.link) {
-    link.textContent = "Unavailable";
-    link.style.opacity = "0.4";
-    link.style.pointerEvents = "none";
-} else {
-    link.textContent = "View Book";
+    if (!book.link) {
+        link.textContent = "Unavailable";
+        link.style.opacity = "0.4";
+        link.style.pointerEvents = "none";
+    } else {
+        link.textContent = "View Book";
+    }
+
+    const sub = document.createElement("span");
+    sub.className = "affiliate-subtle";
+    sub.textContent = "via Bookshop";
+
+    el.appendChild(img);
+    el.appendChild(title);
+    el.appendChild(author);
+    el.appendChild(note);
+    el.appendChild(link);
+    el.appendChild(sub);
+
+    return el; // ✅ CRITICAL FIX
 }
-
-const sub = document.createElement("span");
-sub.className = "affiliate-subtle";
-sub.textContent = "via Bookshop";
-
-// APPEND
-el.appendChild(img);
-el.appendChild(title);
-el.appendChild(author);
-el.appendChild(note);
-el.appendChild(link);
-el.appendChild(sub);
 
 // =========================
 // EMPTY STATE
@@ -178,19 +166,12 @@ function renderError(container) {
 // =========================
 
 function formatMonth(key) {
-
     const [month, year] = key.split("-");
-
-    return (
-        month.charAt(0).toUpperCase() +
-        month.slice(1) +
-        " " +
-        year
-    );
+    return month.charAt(0).toUpperCase() + month.slice(1) + " " + year;
 }
 
 // =========================
-// INIT (SAFE FALLBACK)
+// INIT
 // =========================
 
 document.addEventListener("DOMContentLoaded", () => {
