@@ -741,7 +741,7 @@ section {
     z-index: 0;
 }
 /* =========================
-   AMBIENT LIGHT + FILM GRAIN
+   AMBIENT LIGHT (SOFT)
 ========================= */
 
 body::after {
@@ -750,54 +750,15 @@ body::after {
     inset: 0;
 
     pointer-events: none;
-    z-index: -1;
+    z-index: -2;
 
-    background:
-        radial-gradient(
-            circle at 30% 20%,
-            rgba(184,115,51,0.04),
-            transparent 60%
-        ),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background: radial-gradient(
+        circle at 30% 20%,
+        rgba(184,115,51,0.04),
+        transparent 60%
+    );
 
-    background-size: cover;
-
-    opacity: 0.25;
-
-    animation:
-        ambientDrift 24s ease-in-out infinite alternate,
-        grainMove 8s linear infinite;
-}
-
-/* =========================
-   AMBIENT DRIFT (KEEP THIS)
-========================= */
-
-@keyframes ambientDrift {
-    0% {
-        transform: translateX(0) translateY(0);
-        opacity: 0.4;
-    }
-    50% {
-        transform: translateX(40px) translateY(-20px);
-        opacity: 0.6;
-    }
-    100% {
-        transform: translateX(-30px) translateY(30px);
-        opacity: 0.5;
-    }
-}
-
-/* =========================
-   FILM GRAIN MOTION
-========================= */
-
-@keyframes grainMove {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-2%, 1%); }
-    50% { transform: translate(1%, -2%); }
-    75% { transform: translate(-1%, 2%); }
-    100% { transform: translate(2%, -1%); }
+    animation: ambientDrift 24s ease-in-out infinite alternate;
 }
 /* =========================
    PREMIUM LINK INTERACTION
@@ -1229,4 +1190,22 @@ body[data-page] .hero-content {
     );
 
     opacity: 0.6;
+}
+/* =========================
+   FILM GRAIN (ULTRA SUBTLE)
+========================= */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: -1;
+
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.45' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+
+    opacity: 0.04;
+
+    animation: grainMove 12s linear infinite;
 }
