@@ -752,7 +752,7 @@ body.about-page {
 .hero {
     position: relative;
     z-index: 1;
-    background: #000
+    
 }
 
 .hero::after {
