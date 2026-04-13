@@ -11,7 +11,7 @@
 
 </head>
 
-<body>
+<body class="sub-page archive-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -31,7 +31,6 @@
 <!-- CONTENT -->
 <section class="about-section">
 
-    <!-- INTRO -->
     <div class="fade-in" style="max-width:680px; margin:0 auto 60px; text-align:center;">
 
         <p style="font-style:italic; margin-bottom:20px;">
@@ -48,39 +47,34 @@
 
     </div>
 
-    <!-- BOOK GRID -->
     <div class="works-grid">
 
-        <!-- BOOK 1 -->
-        <a href="https://mybook.to/BlackBothy" target="_blank" class="work">
-            <img src="/assets/book3.jpg">
+        <a href="https://mybook.to/BlackBothy" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book3.jpg" loading="lazy" alt="The Black Bothy">
             <span>The Black Bothy</span>
             <div class="work-desc">
                 Some places keep what they take. A missing sister. A shifting bothy. And something that remembers.
             </div>
         </a>
 
-        <!-- BOOK 2 -->
-        <a href="https://mybook.to/DrownedFjord" target="_blank" class="work">
-            <img src="/assets/book4.jpg">
+        <a href="https://mybook.to/DrownedFjord" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book4.jpg" loading="lazy" alt="The Drowned Fjord">
             <span>The Drowned Fjord</span>
             <div class="work-desc">
                 A Norwegian fjord where echoes arrive before sound.
             </div>
         </a>
 
-        <!-- BOOK 3 -->
-        <a href="https://mybook.to/ErasedArchivist" target="_blank" class="work">
-            <img src="/assets/book5.jpg">
+        <a href="https://mybook.to/ErasedArchivist" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book5.jpg" loading="lazy" alt="The Erased Archivist">
             <span>The Erased Archivist</span>
             <div class="work-desc">
                 A book that rewrites history and erases those who open it.
             </div>
         </a>
 
-        <!-- BOOK 4 -->
-        <a href="https://mybook.to/Holdfast" target="_blank" class="work">
-            <img src="/assets/book6.jpg">
+        <a href="https://mybook.to/Holdfast" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book6.jpg" loading="lazy" alt="Holdfast">
             <span>Holdfast</span>
             <div class="work-desc">
                 Coming June 2026. The recursion returns.
@@ -95,20 +89,20 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
-<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
+
 <script>
-window.addEventListener("load", () => {
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // SAFE fade-in call
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") initFadeIn();
+
 });
 </script>
 
