@@ -395,7 +395,27 @@ body.about-page {
     font-style: italic;
     opacity: 0.85;
 }
+.author-block {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
+.author-block img {
+    width: 240px;
+    height: 320px;
+    object-fit: cover;
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.35),
+        0 6px 16px rgba(0,0,0,0.2);
+}
+
+.author-block-text {
+    max-width: 500px;
+    text-align: left;
+}
 /* =========================
    NEWSLETTER
 ========================= */
