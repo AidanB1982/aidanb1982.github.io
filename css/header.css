@@ -327,3 +327,26 @@ html, body {
 .nav-inline a:hover::after {
     width: 100%;
 }
+/* =========================
+   SUB PAGE HEADER MODE
+========================= */
+
+body.sub-page .hero {
+    height: 420px;
+    min-height: unset;
+    align-items: flex-end;
+    padding-bottom: 60px;
+}
+
+body.sub-page .hero-inner {
+    padding-top: 20px;
+}
+
+body.sub-page .hero-logo {
+    width: 120px;
+    margin-bottom: 10px;
+}
+
+body.sub-page .nav-inline {
+    margin-bottom: 10px;
+}
