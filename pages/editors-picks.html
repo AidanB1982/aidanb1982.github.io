@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en" class="no-js">
 
 <head>
@@ -7,17 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor’s Picks</title>
 
-
-<!-- CSS -->
-<link rel="stylesheet" href="/css/styles.css">
-<link rel="stylesheet" href="/css/editors.css">
-<link rel="stylesheet" href="/css/header.css">
-
-
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/editors.css">
 </head>
 
 <body class="editors-page sub-page">
-
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -43,14 +38,14 @@
         <h2 class="month-title">Current Selection</h2>
     </section>
 
-    <!-- PICKS (JS INJECTS HERE) -->
+    <!-- PICKS -->
     <section class="editor-picks">
         <div class="editor-inner">
-            <!-- Books will be dynamically injected -->
+            <!-- JS injects books -->
         </div>
     </section>
 
-    <!-- AFFILIATE NOTE -->
+    <!-- NOTE -->
     <section class="fade-in">
         <p class="affiliate-note">
             Some links may be affiliate links.
@@ -63,28 +58,26 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js" defer></script>
+<script src="/js/header.js?v=20260408" defer></script>
 <script src="/js/editors.js" defer></script>
 
 <!-- INIT -->
 <script>
-window.addEventListener("DOMContentLoaded", async () => {
+window.addEventListener("load", async () => {
 
     if (typeof loadHeader !== "function") {
         console.error("loadHeader not found");
         return;
     }
 
-    await loadHeader("hero");
+    await loadHeader("simple");
 
-    requestAnimationFrame(() => {
+    if (typeof loadEditorPicks === "function") {
         loadEditorPicks();
-    });
+    }
 
 });
 </script>
 
-
 </body>
-
 </html>
