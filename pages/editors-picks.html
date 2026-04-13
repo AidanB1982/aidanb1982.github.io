@@ -66,12 +66,16 @@
 <script src="/js/editors.js" defer></script>
 
 <!-- INIT -->
-<script defer>
+<script>
 window.addEventListener("DOMContentLoaded", async () => {
+
+    if (typeof loadHeader !== "function") {
+        console.error("loadHeader not found");
+        return;
+    }
 
     await loadHeader("simple");
 
-    // small delay ensures DOM is fully stable
     requestAnimationFrame(() => {
         loadEditorPicks();
     });
