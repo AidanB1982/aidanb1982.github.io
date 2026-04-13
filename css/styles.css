@@ -773,10 +773,6 @@ body.about-page {
 }
 
 .hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-
     background: linear-gradient(
         to bottom,
         rgba(0,0,0,0) 55%,
@@ -784,6 +780,7 @@ body.about-page {
         rgba(0,0,0,0.85) 90%,
         #000 100%
     );
+}
 
     pointer-events: none;
     z-index: 2;
