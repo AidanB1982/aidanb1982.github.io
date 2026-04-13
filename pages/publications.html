@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Publications | Blackwood Publishing</title>
 
+<!-- CSS -->
 <link rel="stylesheet" href="/css/header.css">
 <link rel="stylesheet" href="/css/styles.css">
 
 </head>
 
-<body>
+<body class="sub-page publications-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -39,10 +40,10 @@
 
         <a href="/pages/archive-files.html">
             <div class="carousel">
-                <img src="/assets/book3.jpg" class="active">
-                <img src="/assets/book4.jpg">
-                <img src="/assets/book5.jpg">
-                <img src="/assets/book6.jpg">
+                <img src="/assets/book3.jpg" class="active" loading="lazy">
+                <img src="/assets/book4.jpg" loading="lazy">
+                <img src="/assets/book5.jpg" loading="lazy">
+                <img src="/assets/book6.jpg" loading="lazy">
             </div>
         </a>
 
@@ -57,9 +58,9 @@
 
         <a href="/pages/cursed-bothies.html">
             <div class="carousel">
-                <img src="/assets/book2.jpg" class="active">
-                <img src="/assets/book7.png">
-                <img src="/assets/book8.jpg">
+                <img src="/assets/book2.jpg" class="active" loading="lazy">
+                <img src="/assets/book7.png" loading="lazy">
+                <img src="/assets/book8.jpg" loading="lazy">
             </div>
         </a>
 
@@ -74,8 +75,8 @@
 
         <a href="/pages/hard-silence.html">
             <div class="carousel">
-                <img src="/assets/book9.png" class="active">
-                <img src="/assets/book10.jpg">
+                <img src="/assets/book9.png" class="active" loading="lazy">
+                <img src="/assets/book10.jpg" loading="lazy">
             </div>
         </a>
 
@@ -90,8 +91,8 @@
 
         <a href="/pages/standalone.html">
             <div class="carousel">
-                <img src="/assets/book1.jpg" class="active">
-                <img src="/assets/book11.png">
+                <img src="/assets/book1.jpg" class="active" loading="lazy">
+                <img src="/assets/book11.png" loading="lazy">
             </div>
         </a>
 
@@ -108,23 +109,30 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
+<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
 
-    // HEADER (safe)
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+    // HEADER (awaited properly)
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // CAROUSEL (safe)
+    await loadHeader("simple");
+
+    // FADE-IN (important)
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+    // CAROUSEL SYSTEM
     document.querySelectorAll('.carousel').forEach(carousel => {
         const images = carousel.querySelectorAll('img');
 
-        if (images.length === 0) return;
+        if (!images.length) return;
 
         let index = 0;
 
