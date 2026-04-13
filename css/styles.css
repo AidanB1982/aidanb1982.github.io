@@ -33,7 +33,7 @@ body::before {
     inset: 0;
 
     pointer-events: none;
-    z-index: -1;
+    z-index: -2;
 
     background:
         url("/assets/stone.png"),
@@ -752,9 +752,6 @@ body.about-page {
 .hero {
     position: relative;
     z-index: 1;
-
-    opacity: calc(1 - var(--fadeOut, 0));
-    transition: opacity 0.3s ease-out;
 }
 
 .hero::after {
@@ -777,7 +774,6 @@ body.about-page {
     transition: opacity 0.3s ease-out;
 }
 
-/* FIRST SECTION AFTER HERO */
 .hero + section {
     position: relative;
     z-index: 3;
