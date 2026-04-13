@@ -120,16 +120,30 @@ html, body {
 ========================= */
 .fog {
     position: absolute;
-    inset: -10%;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 120%;
 
-    background: url("/assets/fog1.png") center center / cover no-repeat;
+    background: url("/assets/fog1.png") center / cover no-repeat;
 
     pointer-events: none;
     z-index: 1;
-    mix-blend-mode: screen;
+
     opacity: 0.12;
 }
+.fog::after {
+    content: "";
+    position: absolute;
+    inset: 0;
 
+    background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(0,0,0,0.4) 80%,
+        #000 100%
+    );
+}
 /* LAYERS */
 .fog-back {
     opacity: 0.10;
