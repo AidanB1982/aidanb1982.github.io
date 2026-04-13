@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
 
 </head>
 
-<body>
+<body class="sub-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -54,40 +54,44 @@
 
     </div>
 
-    <!-- OPTIONAL HEADER -->
+    <!-- HEADER -->
     <div class="works-header fade-in">
         <p>Hard Silence Records</p>
     </div>
 
-    <!-- BOOK GRID -->
-    <div class="works-grid">
+    <!-- GRID WRAPPER (important for consistency) -->
+    <div class="works-inner">
 
-        <!-- BOOK 1 -->
-        <a href="https://mybook.to/echoesofvengeance" target="_blank" class="work">
-            <img src="/assets/book9.png">
-            <span>Echoes of Vengeance</span>
-            <div class="work-desc">
-                Left for dead, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.
-            </div>
-        </a>
+        <div class="works-grid">
 
-        <!-- BOOK 2 -->
-        <a href="https://mybook.to/RedStreets" target="_blank" class="work">
-            <img src="/assets/book10.jpg">
-            <span>Red Streets</span>
-            <div class="work-desc">
-                Jamie is no longer a victim. Feared and silent, he enforces order—until he decides to break it.
-            </div>
-        </a>
+            <!-- BOOK 1 -->
+            <a href="https://mybook.to/echoesofvengeance" target="_blank" rel="noopener noreferrer" class="work">
+                <img src="/assets/book9.png" alt="Echoes of Vengeance">
+                <span>Echoes of Vengeance</span>
+                <div class="work-desc">
+                    Left for dead, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.
+                </div>
+            </a>
 
-        <!-- BOOK 3 -->
-        <a href="#" class="work">
-            <img src="/assets/book12.jpg">
-            <span>Untitled Work</span>
-            <div class="work-desc">
-                A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
-            </div>
-        </a>
+            <!-- BOOK 2 -->
+            <a href="https://mybook.to/RedStreets" target="_blank" rel="noopener noreferrer" class="work">
+                <img src="/assets/book10.jpg" alt="Red Streets">
+                <span>Red Streets</span>
+                <div class="work-desc">
+                    Jamie is no longer a victim. Feared and silent, he enforces order—until he decides to break it.
+                </div>
+            </a>
+
+            <!-- BOOK 3 -->
+            <a href="#" class="work">
+                <img src="/assets/book12.jpg" alt="Upcoming Hard Silence Book">
+                <span>Untitled Work</span>
+                <div class="work-desc">
+                    A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
+                </div>
+            </a>
+
+        </div>
 
     </div>
 
@@ -97,20 +101,24 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
+<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
-window.addEventListener("load", () => {
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // SAFE fade-in call
+    await loadHeader("simple");
+
+    // re-init animations safely
     if (typeof initFadeIn === "function") {
         initFadeIn();
     }
+
 });
 </script>
 
