@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
 
 </head>
 
-<body>
+<body class="sub-page series-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -34,9 +34,9 @@
 <section class="about-section">
 
     <!-- INTRO -->
-    <div class="fade-in" style="max-width:680px; margin:0 auto 60px; text-align:center;">
+    <div class="series-intro fade-in">
 
-        <p style="font-style:italic; margin-bottom:20px;">
+        <p class="series-quote">
             “The bothy waits.”
         </p>
 
@@ -57,27 +57,24 @@
     <!-- BOOK GRID -->
     <div class="works-grid">
 
-        <!-- BOOK 1 -->
-        <a href="https://mybook.to/Corrour" target="_blank" class="work">
-            <img src="/assets/book2.jpg">
+        <a href="https://mybook.to/Corrour" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book2.jpg" loading="lazy" alt="Corrour">
             <span>Corrour</span>
             <div class="work-desc">
                 A storm traps strangers inside a remote Highland shelter. Something begins to change.
             </div>
         </a>
 
-        <!-- BOOK 2 -->
-        <a href="https://mybook.to/Gualachulain" target="_blank" class="work">
-            <img src="/assets/book7.png">
+        <a href="https://mybook.to/Gualachulain" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book7.png" loading="lazy" alt="Gualachulain">
             <span>Gualachulain</span>
             <div class="work-desc">
                 A father and his children seek refuge, but grief opens the door to something waiting.
             </div>
         </a>
 
-        <!-- BOOK 3 -->
-        <a href="https://mybook.to/Camban" target="_blank" class="work">
-            <img src="/assets/book8.jpg">
+        <a href="https://mybook.to/Camban" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book8.jpg" loading="lazy" alt="Camban">
             <span>Camban</span>
             <div class="work-desc">
                 A documentary crew searching for folklore find something real.
@@ -88,20 +85,25 @@
 
 </section>
 
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
-window.addEventListener("load", () => {
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // SAFE fade-in call
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") initFadeIn();
+
 });
 </script>
 
