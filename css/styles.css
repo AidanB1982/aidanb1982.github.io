@@ -1174,3 +1174,14 @@ form:hover textarea {
     overflow: hidden;
     clip: rect(0,0,0,0);
 }
+.series-intro {
+    max-width: 680px;
+    margin: 0 auto 60px;
+    text-align: center;
+}
+
+.series-quote {
+    font-style: italic;
+    margin-bottom: 20px;
+    opacity: 0.85;
+}
