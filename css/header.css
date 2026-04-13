@@ -9,6 +9,9 @@ html, body {
 /* =========================
    HERO
 ========================= */
+how should this look after the delete 
+
+
 .hero {
     position: relative;
 
@@ -30,6 +33,20 @@ html, body {
     transition: opacity 0.2s linear;
 
     overflow: hidden;
+
+    mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) 90%,
+    rgba(0,0,0,0.3) 98%,
+    rgba(0,0,0,0) 100%
+);
+
+-webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) 85%,
+    rgba(0,0,0,0.6) 95%,
+    rgba(0,0,0,0) 100%
+);
 }
 
 /* HERO FADE */
