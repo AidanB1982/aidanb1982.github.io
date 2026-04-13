@@ -282,3 +282,24 @@ RESPONSIVE
         font-size: 13px;
     }
 }
+/* FEATURED PICK GLOW */
+.active-pick {
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+.active-pick img {
+    filter:
+        drop-shadow(0 60px 140px rgba(0,0,0,1))
+        drop-shadow(0 0 40px rgba(184,115,51,0.25));
+}
+
+/* SUBTLE PULSE */
+@keyframes pickPulse {
+    0% { transform: scale(1.05); }
+    100% { transform: scale(1.07); }
+}
+
+.active-pick {
+    animation: pickPulse 4s ease-in-out infinite alternate;
+}
