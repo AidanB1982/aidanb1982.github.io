@@ -1,6 +1,11 @@
 // =========================
-// EDITOR PICKS CMS SYSTEM (PRO)
+// EDITOR PICKS CMS SYSTEM (CINEMATIC)
 // =========================
+
+let editorData = {};
+let sortedMonths = [];
+let currentMonthIndex = 0;
+let interval = null;
 
 async function loadEditorPicks() {
 
@@ -17,40 +22,59 @@ async function loadEditorPicks() {
 
     try {
         const res = await fetch('/data/books.json');
+        if (!res.ok) throw new Error("Failed to load books.json");
 
-        if (!res.ok) {
-            throw new Error("Failed to load books.json");
-        }
+        editorData = await res.json();
 
-        const data = await res.json();
-
-        const months = Object.keys(data);
+        const months = Object.keys(editorData);
 
         if (!months.length) {
             renderEmpty(container);
             return;
         }
 
-        
-        const sortedMonths = months.sort((a, b) => {
-            const [monthA, yearA] = a.split("-");
-            const [monthB, yearB] = b.split("-");
-
-            const dateA = new Date(`${monthA} 1, ${yearA}`);
-            const dateB = new Date(`${monthB} 1, ${yearB}`);
-
-            return dateA - dateB;
+        // SORT MONTHS
+        sortedMonths = months.sort((a, b) => {
+            const [mA, yA] = a.split("-");
+            const [mB, yB] = b.split("-");
+            return new Date(`${mA} 1, ${yA}`) - new Date(`${mB} 1, ${yB}`);
         });
 
-        const latestMonth = sortedMonths[sortedMonths.length - 1];
-        const books = data[latestMonth];
+        currentMonthIndex = sortedMonths.length - 1;
 
-        // UPDATE TITLE
-        if (title) {
-            title.textContent = formatMonth(latestMonth);
-        }
+        renderMonth();
+
+        // START AUTO ROTATION
+        startRotation();
+
+    } catch (err) {
+        console.error("Editor Picks Error:", err);
+        renderError(container);
+    }
+}
+
+// =========================
+// RENDER MONTH
+// =========================
+
+function renderMonth() {
+
+    const container = document.querySelector('.editor-inner');
+    const title = document.querySelector('.month-title');
+
+    const monthKey = sortedMonths[currentMonthIndex];
+    const books = editorData[monthKey];
+
+    // FADE OUT
+    container.style.opacity = "0";
+
+    setTimeout(() => {
 
         container.innerHTML = "";
+
+        if (title) {
+            title.textContent = formatMonth(monthKey);
+        }
 
         if (!books || !books.length) {
             renderEmpty(container);
@@ -61,23 +85,42 @@ async function loadEditorPicks() {
 
             const el = createBookCard(book);
 
+            // 🔥 AUTO FEATURED PICK
             if (index === 0) {
-                el.classList.add("featured-pick");
+                el.classList.add("featured-pick", "active-pick");
             }
 
             el.style.transitionDelay = `${index * 120}ms`;
-
             container.appendChild(el);
         });
+
+        container.style.opacity = "1";
 
         if (typeof initFadeIn === "function") {
             initFadeIn();
         }
 
-    } catch (err) {
-        console.error("Editor Picks Error:", err);
-        renderError(container);
-    }
+    }, 400);
+}
+
+// =========================
+// ROTATION SYSTEM
+// =========================
+
+function startRotation() {
+
+    if (interval) clearInterval(interval);
+
+    interval = setInterval(() => {
+        currentMonthIndex--;
+
+        if (currentMonthIndex < 0) {
+            currentMonthIndex = sortedMonths.length - 1;
+        }
+
+        renderMonth();
+
+    }, 8000); // ⏱ every 8 seconds
 }
 
 // =========================
@@ -115,13 +158,7 @@ function createBookCard(book) {
     link.rel = "noopener noreferrer";
     link.className = "button copper";
 
-    if (!book.link) {
-        link.textContent = "Unavailable";
-        link.style.opacity = "0.4";
-        link.style.pointerEvents = "none";
-    } else {
-        link.textContent = "View Book";
-    }
+    link.textContent = book.link ? "View Book" : "Unavailable";
 
     const sub = document.createElement("span");
     sub.className = "affiliate-subtle";
@@ -134,31 +171,19 @@ function createBookCard(book) {
     el.appendChild(link);
     el.appendChild(sub);
 
-    return el; // ✅ CRITICAL FIX
+    return el;
 }
 
 // =========================
-// EMPTY STATE
+// STATES
 // =========================
 
 function renderEmpty(container) {
-    container.innerHTML = `
-        <div class="editor-empty fade-in">
-            <p>No selections available yet.</p>
-        </div>
-    `;
+    container.innerHTML = `<div class="editor-empty"><p>No selections available.</p></div>`;
 }
 
-// =========================
-// ERROR STATE
-// =========================
-
 function renderError(container) {
-    container.innerHTML = `
-        <div class="editor-error fade-in">
-            <p>Unable to load selections.</p>
-        </div>
-    `;
+    container.innerHTML = `<div class="editor-error"><p>Unable to load selections.</p></div>`;
 }
 
 // =========================
@@ -178,9 +203,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!document.body.classList.contains("editors-page")) return;
 
-    if (!window.__editorPicksLoaded) {
-        window.__editorPicksLoaded = true;
-        loadEditorPicks();
-    }
-
+    loadEditorPicks();
 });
