@@ -32,18 +32,18 @@ html, body {
     overflow: hidden;
 
     mask-image: linear-gradient(
-        to bottom,
-        rgba(0,0,0,1) 70%,
-        rgba(0,0,0,0.2) 90%,
-        rgba(0,0,0,0) 100%
-    );
+    to bottom,
+    rgba(0,0,0,1) 85%,
+    rgba(0,0,0,0.6) 95%,
+    rgba(0,0,0,0) 100%
+);
 
-    -webkit-mask-image: linear-gradient(
-        to bottom,
-        rgba(0,0,0,1) 70%,
-        rgba(0,0,0,0.2) 90%,
-        rgba(0,0,0,0) 100%
-    );
+-webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,1) 85%,
+    rgba(0,0,0,0.6) 95%,
+    rgba(0,0,0,0) 100%
+);
 }
 
 /* HERO FADE */
