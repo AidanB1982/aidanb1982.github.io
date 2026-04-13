@@ -23,7 +23,7 @@ html, body {
     background:
         linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.85)),
         url("/assets/forest.png") center 40% / cover no-repeat;
-
+    background-blend-mode: overlay;
     color: #e6e6e6;
 
     opacity: calc(1 - var(--fadeOut, 0));
@@ -55,8 +55,10 @@ html, body {
 
     background: linear-gradient(
         to bottom,
-        transparent 80%,
-        rgba(0,0,0,0.35) 92%,
+        rgba(0,0,0,0) 60%,
+        rgba(0,0,0,0.3) 75%,
+        rgba(0,0,0,0.6) 88%,
+        rgba(0,0,0,0.85) 96%,
         #000 100%
     );
 
@@ -137,59 +139,62 @@ html, body {
     position: absolute;
     inset: 0;
 
-    background: url("/assets/fog1.png") center 65% / cover no-repeat;
+    background: url("/assets/fog1.png") center 70% / cover no-repeat;
 
     pointer-events: none;
     will-change: transform;
 
     z-index: 1;
 
-    /* 🔥 MATCH HERO FADE */
     mask-image: linear-gradient(
         to bottom,
-        rgba(0,0,0,1) 92%,
-        rgba(0,0,0,1) 96%,
+        rgba(0,0,0,0.9) 0%,
+        rgba(0,0,0,0.9) 60%,
+        rgba(0,0,0,0.6) 75%,
+        rgba(0,0,0,0.2) 90%,
         rgba(0,0,0,0) 100%
     );
 
     -webkit-mask-image: linear-gradient(
         to bottom,
-        rgba(0,0,0,1) 92%,
-        rgba(0,0,0,1) 96%,
+        rgba(0,0,0,0.9) 0%,
+        rgba(0,0,0,0.9) 60%,
+        rgba(0,0,0,0.6) 75%,
+        rgba(0,0,0,0.2) 90%,
         rgba(0,0,0,0) 100%
     );
 }
 
 .fog-back {
-    opacity: 0.22;
+    opacity: 0.12;
     animation: fogSlow 35s ease-in-out infinite alternate;
-    filter: blur(8px);
+    filter: blur(12px);
 }
 
 .fog-mid {
-    opacity: 0.28;
+    opacity: 0.22;
     animation: fogMid 20s ease-in-out infinite alternate;
-    filter: blur(5px);
+    filter: blur(8px);
 }
 
 .fog-front {
-    opacity: 0.36;
+    opacity: 0.22;
     animation: fogFast 10s ease-in-out infinite alternate;
-    filter: blur(2px);
+    filter: blur(4px);
 }
 
 @keyframes fogSlow {
-    0%   { transform: translateX(0) translateY(0) scale(1.2); }
+    0%   { transform: translateX(0) translateY(0) scale(1.4); }
     100% { transform: translateX(-80px) translateY(25px) scale(1.25); }
 }
 
 @keyframes fogMid {
-    0%   { transform: translateX(0) translateY(0) scale(1.15); }
+    0%   { transform: translateX(0) translateY(0) scale(1.35); }
     100% { transform: translateX(-120px) translateY(35px) scale(1.2); }
 }
 
 @keyframes fogFast {
-    0%   { transform: translateX(0) translateY(0) scale(1.1); }
+    0%   { transform: translateX(0) translateY(0) scale(1.30); }
     100% { transform: translateX(-160px) translateY(45px) scale(1.15); }
 }
 
