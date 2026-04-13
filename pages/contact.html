@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
 
 </head>
 
-<body>
+<body class="sub-page contact-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -43,72 +43,48 @@
     <form 
         action="https://formspree.io/f/mbdpplkw" 
         method="POST" 
-        style="
-            max-width:520px;
-            margin:30px auto 0;
-            display:flex;
-            flex-direction:column;
-            gap:25px;
-        "
+        class="contact-form"
     >
 
+        <label for="name" class="sr-only">Name</label>
         <input 
+            id="name"
             type="text" 
             name="name" 
             placeholder="Name" 
             required
-            style="
-                border:none;
-                border-bottom:1px solid rgba(255,255,255,0.2);
-                background:transparent;
-                padding:10px 0;
-                color:#e6e6e6;
-                font-family:Georgia, serif;
-            "
+            autocomplete="name"
         >
 
+        <label for="email" class="sr-only">Email</label>
         <input 
+            id="email"
             type="email" 
             name="email" 
             placeholder="Email" 
             required
-            style="
-                border:none;
-                border-bottom:1px solid rgba(255,255,255,0.2);
-                background:transparent;
-                padding:10px 0;
-                color:#e6e6e6;
-                font-family:Georgia, serif;
-            "
+            autocomplete="email"
         >
 
+        <label for="message" class="sr-only">Message</label>
         <textarea 
+            id="message"
             name="message" 
             placeholder="Message" 
             required
-            style="
-                border:none;
-                border-bottom:1px solid rgba(255,255,255,0.2);
-                background:transparent;
-                padding:10px 0;
-                color:#e6e6e6;
-                min-height:120px;
-                font-family:Georgia, serif;
-                resize:vertical;
-            "
+            rows="5"
         ></textarea>
 
+        <!-- OPTIONAL REDIRECT (replace with real URL or remove) -->
+        <!--
         <input 
             type="hidden" 
             name="_redirect" 
             value="https://yourdomain.com/thank-you.html"
         >
+        -->
 
-        <button 
-            type="submit"
-            class="button copper"
-            style="margin-top:10px;"
-        >
+        <button type="submit" class="button copper">
             Send Message
         </button>
 
@@ -120,20 +96,21 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
+<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
-window.addEventListener("load", () => {
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // SAFE fade-in call
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") initFadeIn();
+
 });
 </script>
 
