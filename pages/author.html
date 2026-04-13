@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
 
 </head>
 
-<body>
+<body class="sub-page author-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -34,23 +34,17 @@
 <section class="about-section fade-in">
 
     <!-- AUTHOR BLOCK -->
-    <div style="display:flex; gap:50px; align-items:flex-start; flex-wrap:wrap; justify-content:center;">
+    <div class="author-block">
 
         <!-- IMAGE -->
         <img 
             src="/assets/profile.jpg" 
-            style="
-                width:240px;
-                height:320px;
-                object-fit:cover;
-                box-shadow:
-                    0 20px 50px rgba(0,0,0,0.35),
-                    0 6px 16px rgba(0,0,0,0.2);
-            "
+            loading="lazy"
+            alt="Author Aidan Blackwood portrait"
         >
 
         <!-- TEXT -->
-        <div style="max-width:500px; text-align:left;">
+        <div class="author-block-text">
 
             <p>
                 The work published under Aidan Blackwood is concerned with place, memory, and the slow accumulation of unease. 
@@ -83,7 +77,7 @@
 <!-- SELECTED WORKS -->
 <section class="about-section fade-in">
 
-    <p class="social-title">Selected Works</p>
+    <h2 class="social-title">Selected Works</h2>
 
     <p>Dour Hill House <span style="opacity:0.5;">(2025)</span></p>
     <p>Corrour <span style="opacity:0.5;">(2026)</span></p>
@@ -95,15 +89,15 @@
 <!-- SOCIAL -->
 <section class="about-social fade-in">
 
-    <p class="social-title">Connect</p>
+    <h2 class="social-title">Connect</h2>
 
     <div class="social-links">
 
-        <a href="https://www.instagram.com/aidan.blackwood" target="_blank">
+        <a href="https://www.instagram.com/aidan.blackwood" target="_blank" rel="noopener noreferrer">
             <img src="/assets/instagram.png" alt="Instagram">
         </a>
 
-        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank">
+        <a href="https://www.tiktok.com/@aidanblackwood" target="_blank" rel="noopener noreferrer">
             <img src="/assets/tiktok.png" alt="TikTok">
         </a>
 
@@ -115,20 +109,21 @@
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
+<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
-window.addEventListener("load", () => {
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // SAFE fade-in call
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") initFadeIn();
+
 });
 </script>
 
