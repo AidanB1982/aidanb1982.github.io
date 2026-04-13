@@ -785,8 +785,7 @@ body.about-page {
 
 section {
     position: relative;
-    isolation: isolate;
-}
+    }
 /* =========================
    AMBIENT LIGHT (SOFT)
 ========================= */
