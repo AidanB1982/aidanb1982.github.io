@@ -245,12 +245,12 @@ html, body {
    HEADER (FIXED)
 ========================= */
 .simple-header {
-    position: absolute; /* 🔥 THIS FIXES YOUR BUG */
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
 
-    z-index: 20;
+    z-index: 9999;
 
     padding: 20px 30px;
 
