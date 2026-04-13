@@ -44,7 +44,9 @@ body::before {
     opacity: 0.05; 
     animation: grainMove 12s linear infinite;
 }
-
+body.home-page::before {
+    opacity: 0.02;
+}
 body.about-page {
     background: radial-gradient(
         circle at 50% 20%,
