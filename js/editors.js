@@ -123,29 +123,31 @@ function createBookCard(book) {
     note.textContent = book.note;
 
     // LINK BUTTON
-    const link = document.createElement("a");
-    link.href = book.link || "#";
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.className = "button copper";
+const link = document.createElement("a");
+link.href = book.link || "#";
+link.target = "_blank";
+link.rel = "noopener noreferrer";
+link.className = "button copper";
 
-    if (!book.link) {
-        link.textContent = "Unavailable";
-        link.style.opacity = "0.4";
-        link.style.pointerEvents = "none";
-    } else {
-        link.textContent = "View Book";
-    }
-
-    // APPEND
-    el.appendChild(img);
-    el.appendChild(title);
-    el.appendChild(author);
-    el.appendChild(note);
-    el.appendChild(link);
-
-    return el;
+if (!book.link) {
+    link.textContent = "Unavailable";
+    link.style.opacity = "0.4";
+    link.style.pointerEvents = "none";
+} else {
+    link.textContent = "View Book";
 }
+
+const sub = document.createElement("span");
+sub.className = "affiliate-subtle";
+sub.textContent = "via Bookshop";
+
+// APPEND
+el.appendChild(img);
+el.appendChild(title);
+el.appendChild(author);
+el.appendChild(note);
+el.appendChild(link);
+el.appendChild(sub);
 
 // =========================
 // EMPTY STATE
