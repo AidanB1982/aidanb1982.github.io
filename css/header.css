@@ -30,31 +30,24 @@ html, body {
     transition: opacity 0.2s linear;
 
     overflow: hidden;
-}
-.hero::after {
-    background: linear-gradient(
+
+    /* 🔥 HARD CLEAN FADE OUT */
+    mask-image: linear-gradient(
         to bottom,
-        transparent 80%,
-        rgba(0,0,0,0.3) 92%,
-        #000 100%
+        rgba(0,0,0,1) 94%,
+        rgba(0,0,0,1) 97%,
+        rgba(0,0,0,0) 100%
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,1) 94%,
+        rgba(0,0,0,1) 97%,
+        rgba(0,0,0,0) 100%
     );
 }
-    mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,1) 90%,
-    rgba(0,0,0,0.3) 98%,
-    rgba(0,0,0,0) 100%
-);
-}
--webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,1) 85%,
-    rgba(0,0,0,0.6) 95%,
-    rgba(0,0,0,0) 100%
-);
-}
 
-/* HERO FADE */
+/* SINGLE HERO OVERLAY (no duplicates) */
 .hero::after {
     content: "";
     position: absolute;
@@ -62,8 +55,8 @@ html, body {
 
     background: linear-gradient(
         to bottom,
-        transparent 75%,
-        rgba(0,0,0,0.4) 90%,
+        transparent 80%,
+        rgba(0,0,0,0.35) 92%,
         #000 100%
     );
 
@@ -109,7 +102,6 @@ html, body {
     font-size: 12px;
     letter-spacing: 3px;
     text-transform: uppercase;
-
     color: #e6e6e6;
 
     opacity: 0.6;
@@ -145,25 +137,26 @@ html, body {
     position: absolute;
     inset: 0;
 
-    background: url("/assets/fog1.png") center 88% / cover no-repeat;
+    background: url("/assets/fog1.png") center 65% / cover no-repeat;
 
     pointer-events: none;
     will-change: transform;
 
     z-index: 1;
 
-    mask-image: radial-gradient(
-        ellipse at center,
-        rgba(0,0,0,1) 55%,
-        rgba(0,0,0,0.5) 75%,
-        transparent 100%
+    /* 🔥 MATCH HERO FADE */
+    mask-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,1) 92%,
+        rgba(0,0,0,1) 96%,
+        rgba(0,0,0,0) 100%
     );
 
-    -webkit-mask-image: radial-gradient(
-        ellipse at center,
-        rgba(0,0,0,1) 55%,
-        rgba(0,0,0,0.5) 75%,
-        transparent 100%
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgba(0,0,0,1) 92%,
+        rgba(0,0,0,1) 96%,
+        rgba(0,0,0,0) 100%
     );
 }
 
@@ -205,7 +198,6 @@ html, body {
 ========================= */
 .entity {
     position: absolute;
-
     bottom: 6%;
     left: 30%;
 
