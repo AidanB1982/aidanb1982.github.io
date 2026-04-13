@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +13,12 @@
 
 </head>
 
-<body>
+<body class="sub-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
+
+<main>
 
 <!-- HERO -->
 <section class="about-hero">
@@ -45,8 +47,8 @@
     <div class="works-grid">
 
         <!-- BOOK 1 -->
-        <a href="https://mybook.to/DourHillHouse" target="_blank" class="work">
-            <img src="/assets/book1.jpg">
+        <a href="https://mybook.to/DourHillHouse" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book1.jpg" alt="Dour Hill House book cover">
             <span>Dour Hill House</span>
             <div class="work-desc">
                 When Clara inherits Dour Hill House, she hopes for a new beginning.
@@ -55,8 +57,8 @@
         </a>
 
         <!-- BOOK 2 -->
-        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" class="work">
-            <img src="/assets/book11.png">
+        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" rel="noopener noreferrer" class="work">
+            <img src="/assets/book11.png" alt="The Red-Clad Collector book cover">
             <span>The Red-Clad Collector</span>
             <div class="work-desc">
                 Every Christmas, a child disappears. No footprints. No explanation.
@@ -68,20 +70,28 @@
 
 </section>
 
+</main>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
-    
+
 <script>
-window.addEventListener("load", () => {
-    if (typeof loadHeader === "function") {
-        loadHeader("simple");
-    } else {
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
         console.error("Header failed to load");
+        return;
     }
 
-    // SAFE fade-in call
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
+    await loadHeader("simple");
+
+    // re-init animations safely
+    if (typeof initFadeIn === "function") initFadeIn();
+
 });
 </script>
 
