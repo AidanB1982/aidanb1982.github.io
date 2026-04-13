@@ -726,6 +726,11 @@ body.about-page {
 /* =========================
    CINEMATIC SECTION FLOW
 ========================= */
+.hero + section {
+    position: relative;
+    z-index: 1;
+    margin-top: 120px;
+}
 
 /* GLOBAL SECTION SMOOTHING */
 section {
