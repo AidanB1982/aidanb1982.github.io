@@ -26,14 +26,14 @@ body {
     position: relative;
 }
 
-/* GLOBAL TEXTURE + FILM GRAIN (MERGED) */
+/* GLOBAL TEXTURE + FILM GRAIN (FIXED) */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
 
     pointer-events: none;
-    z-index: -1;
+    z-index: 0;
 
     background:
         url("/assets/stone.png"),
@@ -41,10 +41,7 @@ body::before {
 
     background-size: cover;
 
-    opacity: 0.08;
-
-    mix-blend-mode: overlay;
-
+    opacity: 0.05; 
     animation: grainMove 12s linear infinite;
 }
 
