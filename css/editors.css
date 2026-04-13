@@ -142,7 +142,13 @@ BUTTON
     content: " →";
     opacity: 0.6;
 }
-
+.affiliate-subtle {
+    display: block;
+    font-size: 11px;
+    opacity: 0.4;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
 /* =========================
 HOVER FOCUS MODE
 ========================= */
