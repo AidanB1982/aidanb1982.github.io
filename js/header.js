@@ -19,7 +19,9 @@ async function loadHeader(type = "hero") {
 
     try {
         const isSubPage = window.location.pathname.includes("/pages/");
-        const base = isSubPage ? "../" : "/";
+        const base = isSubPage ? "../" : "./";
+
+        console.log("Fetching:", `${base}${file}`);
 
         // HEADER
         const headerRes = await fetch(`${base}${file}`);
