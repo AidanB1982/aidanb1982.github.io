@@ -2345,26 +2345,26 @@ form:hover textarea {
     margin-bottom: 20px;
     opacity: 0.85;
 }
-/* LEGAL PAGE STYLING (DARK THEME) */
+/* LEGAL PAGE STYLING (FORCE LIGHT TEXT) */
 
-.legal-page .about-section {
+body.legal-page .about-section {
     max-width: 800px;
     margin: 0 auto;
     line-height: 1.8;
-    color: #eaeaea;
+    color: #eaeaea !important;
 }
 
-.legal-page .about-section p {
-    color: #d6d6d6; /* softer body text */
-    opacity: 1 !important; /* override any faded styles */
+body.legal-page .about-section p {
+    color: #d6d6d6 !important;
+    opacity: 1 !important;
 }
 
-.legal-page .about-section h2 {
-    color: #ffffff; /* crisp headings */
+body.legal-page .about-section h2 {
+    color: #ffffff !important;
     margin-top: 40px;
     letter-spacing: 0.5px;
 }
 
-.legal-page .about-section strong {
-    color: #ffffff;
+body.legal-page .about-section strong {
+    color: #ffffff !important;
 }
