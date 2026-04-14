@@ -140,19 +140,12 @@ word-break: break-word !important;
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
-window.addEventListener("load", async () => {
-
-    if (typeof loadHeader !== "function") {
-        console.error("Header failed to load");
-        return;
-    }
-
-    await loadHeader("simple");
-
-    // re-init your systems
-    if (typeof initFadeIn === "function") initFadeIn();
-    if (typeof initQuotes === "function") initQuotes();
-
+window.addEventListener("load", () => {
+    const s = document.createElement("script");
+    s.src = "https://app.termly.io/embed-policy.min.js";
+    s.async = true;
+    s.setAttribute("data-policy-id", "YOUR_TERMLY_POLICY_ID");
+    document.getElementById("termly-embed").appendChild(s);
 });
 </script>
 
