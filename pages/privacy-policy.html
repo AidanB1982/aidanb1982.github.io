@@ -3,71 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Privacy Policy | Blackwood Publishing</title>
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    color: #111;
-    line-height: 1.8;
-}
+<meta name="description" content="Privacy Policy for Blackwood Publishing. Learn how we collect, use, and protect your information.">
 
-header {
-    background: #000;
-    color: #fff;
-    padding: 20px 40px;
-}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-header h1 {
-    margin: 0;
-}
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&display=swap" rel="stylesheet">
 
-nav {
-    margin-top: 10px;
-}
+<!-- SAME CSS AS ABOUT PAGE -->
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
 
-nav a {
-    color: #fff;
-    margin-right: 20px;
-    text-decoration: none;
-}
-
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: #fff;
-    padding: 40px;
-    border-radius: 8px;
-}
-
-h1, h2 {
-    margin-top: 30px;
-}
-
-footer {
-    background: #000;
-    color: #fff;
-    text-align: center;
-    padding: 30px;
-    margin-top: 50px;
-}
-</style>
 </head>
 
-<body>
+<body class="legal-page">
+<!-- HEADER -->
+<div id="header-placeholder"></div>
 
-<header>
-    <h1>Blackwood Publishing</h1>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about.html">About</a>
-        <a href="/contact.html">Contact</a>
-        <a href="/privacy.html">Privacy Policy</a>
-    </nav>
-</header>
+<!-- HERO -->
+<section class="about-hero">
+    <div class="about-hero-overlay"></div>
 
+    <div class="about-hero-content fade-in">
+        <h1>Privacy Policy</h1>
+        <p class="about-intro-line">
+            How your information is handled, stored, and protected.
+        </p>
+    </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<section class="about-section fade-in">
 <div class="container">
 
 <h1>PRIVACY POLICY</h1>
@@ -367,9 +336,31 @@ United Kingdom
 
 </div>
 
-<footer>
-    <p>&copy; 2026 Blackwood Publishing. All rights reserved.</p>
-</footer>
+</section>
+
+<div style="height:40px;"></div>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- HEADER SCRIPT -->
+<script src="/js/header.js?v=20260408" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
+        console.error("Header failed to load");
+        return;
+    }
+
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") initFadeIn();
+    if (typeof initQuotes === "function") initQuotes();
+
+});
+</script>
 
 </body>
 </html>
