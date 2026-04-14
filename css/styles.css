@@ -575,7 +575,9 @@ body.about-page {
 .footer-links {
     display: flex;
     justify-content: flex-end;
+    align items: flex-start;
     min-width: 180px;
+    flex: 1;
 }
 
 /* BRAND */
@@ -695,6 +697,7 @@ body.about-page {
 
     .footer-top {
         flex-direction: column;
+        width: 100%;
         align-items: center;
         text-align: center;
         gap: 30px;
