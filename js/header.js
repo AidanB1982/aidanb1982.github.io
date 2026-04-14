@@ -406,7 +406,7 @@ function initQuotes() {
 // =========================
 function initReviewRotator() {
 
-    const container = document.querySelector(".review-snippet");
+    const container = document.querySelector(".review-snippet:not(.static-review)");
     if (!container) return;
 
     // =========================
