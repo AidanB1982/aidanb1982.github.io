@@ -59,7 +59,7 @@
         <p>Hard Silence Records</p>
     </div>
 
-    <!-- GRID WRAPPER (important for consistency) -->
+    <!-- GRID WRAPPER -->
     <div class="works-inner">
 
         <div class="works-grid">
@@ -68,8 +68,13 @@
             <a href="https://mybook.to/echoesofvengeance" target="_blank" rel="noopener noreferrer" class="work">
                 <img src="/assets/book9.png" alt="Echoes of Vengeance">
                 <span>Echoes of Vengeance</span>
+
                 <div class="work-desc">
                     Left for dead, Jamie is rebuilt by a ruthless mentor who teaches him one rule: speak less, control more.
+
+                    <div class="mini-review">
+                        “Gripping, raw, and impossible to put down.”
+                    </div>
                 </div>
             </a>
 
@@ -77,8 +82,13 @@
             <a href="https://mybook.to/RedStreets" target="_blank" rel="noopener noreferrer" class="work">
                 <img src="/assets/book10.jpg" alt="Red Streets">
                 <span>Red Streets</span>
+
                 <div class="work-desc">
                     Jamie is no longer a victim. Feared and silent, he enforces order—until he decides to break it.
+
+                    <div class="mini-review">
+                        “Suspense and tension through and through.”
+                    </div>
                 </div>
             </a>
 
@@ -86,6 +96,7 @@
             <a href="#" class="work">
                 <img src="/assets/book12.jpg" alt="Upcoming Hard Silence Book">
                 <span>Untitled Work</span>
+
                 <div class="work-desc">
                     A turf war erupts across West Dumbarton. Loyalties fracture. Silence breaks.
                 </div>
@@ -114,7 +125,6 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    // re-init animations safely
     if (typeof initFadeIn === "function") {
         initFadeIn();
     }
