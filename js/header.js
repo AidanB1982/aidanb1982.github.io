@@ -416,40 +416,51 @@ function initReviewRotator() {
 
     const reviews = {
 
-        "archive-page": [
-            {
-                text: "Creepy, atmospheric read. I finished one and started the next immediately.",
-                source: "Reader Review"
-            },
-            {
-                text: "It gets under your skin. No cheap scares, just a steady unraveling.",
-                source: "Reader Review"
-            }
-        ],
+    "archive-page": [
+        {
+            text: "Creepy, atmospheric read. I finished one and started the next immediately.",
+            source: "Reader Review"
+        },
+        {
+            text: "It gets under your skin. No cheap scares, just a steady unraveling.",
+            source: "Reader Review"
+        }
+    ],
 
-        "series-page": [
-            {
-                text: "I was hooked from the start — so atmospheric, you feel like you're there.",
-                source: "Reader Review"
-            },
-            {
-                text: "The ending is sublime. I absolutely loved it.",
-                source: "Reader Review"
-            }
-        ],
+    "series-page": [
+        {
+            text: "I was hooked from the start — so atmospheric, you feel like you're there.",
+            source: "Reader Review"
+        },
+        {
+            text: "The ending is sublime. I absolutely loved it.",
+            source: "Reader Review"
+        }
+    ],
 
-        "sub-page": [
-            {
-                text: "A gripping thriller — raw, brutal and unflinching.",
-                source: "Reader Review"
-            },
-            {
-                text: "Very dark and menacing, but addictive in its own way.",
-                source: "Reader Review"
-            }
-        ]
+    "publications-page": [   
+        {
+            text: "Atmospheric, unsettling, and beautifully written.",
+            source: "Reader Review"
+        },
+        {
+            text: "Each book feels like a place you shouldn’t have found.",
+            source: "Reader Review"
+        }
+    ],
 
-    };
+    "sub-page": [
+        {
+            text: "A gripping thriller — raw, brutal and unflinching.",
+            source: "Reader Review"
+        },
+        {
+            text: "Very dark and menacing, but addictive in its own way.",
+            source: "Reader Review"
+        }
+    ]
+
+};
 
     // =========================
     // PICK CORRECT SET
@@ -457,12 +468,14 @@ function initReviewRotator() {
     let activeReviews = [];
 
     if (page.includes("archive-page")) {
-        activeReviews = reviews["archive-page"];
-    } else if (page.includes("series-page")) {
-        activeReviews = reviews["series-page"];
-    } else {
-        activeReviews = reviews["sub-page"];
-    }
+    activeReviews = reviews["archive-page"];
+} else if (page.includes("series-page")) {
+    activeReviews = reviews["series-page"];
+} else if (page.includes("publications-page")) {
+    activeReviews = reviews["publications-page"];
+} else {
+    activeReviews = reviews["sub-page"];
+}
 
     // =========================
     // ROTATION LOGIC
