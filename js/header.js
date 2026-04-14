@@ -3,11 +3,6 @@ document.documentElement.classList.remove("no-js");
 // LOAD HEADER
 // =========================
 
-document.documentElement.classList.remove("no-js");
-// =========================
-// LOAD HEADER
-// =========================
-
 async function loadHeader(type = "hero") {
 
     const fileMap = {
@@ -391,39 +386,6 @@ loopFragments();
     }, 6000);
 }
 
-
-// =========================
-// GLOBAL CURSOR LIGHTING
-// =========================
-
-function initGlobalLighting() {
-
-    const root = document.documentElement;
-
-    let mouseX = 50;
-    let mouseY = 50;
-
-    let currentX = 50;
-    let currentY = 50;
-
-    function updateMouse(e) {
-        mouseX = (e.clientX / window.innerWidth) * 100;
-        mouseY = (e.clientY / window.innerHeight) * 100;
-    }
-
-    function animate() {
-        currentX += (mouseX - currentX) * 0.08;
-        currentY += (mouseY - currentY) * 0.08;
-
-        root.style.setProperty("--mouse-x", `${currentX}%`);
-        root.style.setProperty("--mouse-y", `${currentY}%`);
-
-        requestAnimationFrame(animate);
-    }
-
-    window.addEventListener("mousemove", updateMouse);
-    animate();
-}
 
 // =========================
 // SCROLL FADE SYSTEM
