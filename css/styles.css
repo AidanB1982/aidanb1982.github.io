@@ -512,6 +512,9 @@ body.about-page {
     margin-top: 10px;
 }
 
+/* =========================
+   FOOTER
+========================= */
 .footer {
     position: relative;
 
@@ -519,7 +522,7 @@ body.about-page {
     left: 50%;
     transform: translateX(-50%);
 
-    padding: 40px 20px 20px;
+    padding: 60px 20px 30px; /* slightly more breathing room */
     margin-top: 100px;
 
     color: #e6e6e6;
@@ -528,6 +531,8 @@ body.about-page {
     isolation: isolate;
     z-index: 5;
 }
+
+/* TOP GLOW LINE */
 .footer::before {
     content: "";
     position: absolute;
@@ -538,104 +543,103 @@ body.about-page {
 
     background: linear-gradient(
         to bottom,
-        rgba(184,115,51,0.08),
+        rgba(184,115,51,0.06), /* softer */
         transparent
     );
 
     z-index: 1;
     pointer-events: none;
 }
+
+/* OVERLAY (still off) */
 .footer-overlay {
-    position: absolute;
-    inset: 0;
     display: none;
-    background:
-        radial-gradient(circle at 50% 20%, rgba(184,115,51,0.08), transparent 60%),
-        linear-gradient(rgba(0,0,0,0.96), rgba(0,0,0,1)),
-        url("/assets/forest.png");
-
-    background-size: cover;
-    background-position: center;
-
-    opacity: 0.9;
-   z-index: 0;
 }
 
 /* CONTENT WRAPPER */
 .footer-content {
     position: relative;
     z-index: 1;
-    max-width: 1400px;
+
+    max-width: 1100px; /* tighter than 1400 */
     padding: 0 20px;
     margin: 0 auto;
 }
 
-/* GRID LAYOUT */
+/* =========================
+   GRID (TIGHTER + BALANCED)
+========================= */
 .footer-grid {
     display: grid;
-    grid-template-columns: 1fr 200px;
-    gap: 60px;
+    grid-template-columns: 1fr 220px; /* slightly wider nav */
+    gap: 40px; /* reduced from 60 */
     align-items: start;
 }
 
-/* BRAND COLUMN */
+/* BRAND */
 .footer-brand {
-    max-width: 320px;
+    max-width: 260px; /* tighter */
 }
 
-/* SEAL (FIXED SIZE) */
+/* =========================
+   SEAL (UPGRADED)
+========================= */
+.footer-seal-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 50px 0 25px;
+}
+
 .footer-seal {
-    width: 95px;
-    opacity: 0.22;
-    margin: 10px auto;
+    width: 130px; /* bigger */
+    opacity: 0.28;
 
     display: block;
 
     filter:
-        drop-shadow(0 8px 20px rgba(0,0,0,0.7))
-        brightness(0.9);
+        drop-shadow(0 12px 30px rgba(0,0,0,0.9))
+        brightness(0.95);
 
     transition: all 0.4s ease;
 }
 
 .footer-seal:hover {
-    opacity: 0.3;
-    transform: scale(1.04) rotate(-1deg);
+    opacity: 0.42;
+    transform: scale(1.05);
 }
 
-/* TITLE */
+/* =========================
+   TEXT
+========================= */
 .footer-title {
     font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
     opacity: 0.8;
-    margin-top: 25px;
+    margin-top: 10px;
 }
 
-/* SUBTEXT */
 .footer-sub {
     font-size: 11px;
     opacity: 0.4;
 }
 
-/* COLUMNS */
+/* NAV COLUMN */
 .footer-col {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    justify-self: start;
+    justify-self: end; /* pulls it inward slightly */
     text-align: left;
     gap: 8px;
 }
 
-/* HEADINGS */
 .footer-heading {
     font-size: 12px;
     letter-spacing: 3px;
     text-transform: uppercase;
     opacity: 0.6;
     margin-bottom: 8px;
-    transform: translateX(-2px);
 }
 
 /* LINKS */
@@ -644,7 +648,6 @@ body.about-page {
     opacity: 0.65;
     line-height: 1.6;
     transition: all 0.3s ease;
-    margin-left: 0;
 }
 
 .footer-col a:hover {
@@ -652,7 +655,9 @@ body.about-page {
     transform: translateX(4px);
 }
 
-/* DIVIDER */
+/* =========================
+   DIVIDER
+========================= */
 .footer-divider {
     height: 1px;
     width: 100%;
@@ -661,23 +666,25 @@ body.about-page {
     background: linear-gradient(
         to right,
         transparent,
-        rgba(184,115,51,0.4),
+        rgba(184,115,51,0.35),
         transparent
     );
 }
 
-/* BOTTOM BAR */
+/* =========================
+   BOTTOM
+========================= */
 .footer-bottom {
-    display: block;
     text-align: center;
     margin-top: 10px;
 
     font-size: 11px;
-    opacity: 0.4;
+    opacity: 0.35;
 }
+
+/* REMOVE EXTRA LEGAL WEIGHT */
 .footer-legal {
-    opacity: 0.3;
-    text-align: center;
+    display: none;
 }
 
 /* =========================
