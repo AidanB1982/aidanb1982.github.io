@@ -1,8 +1,12 @@
+// =========================
+// NO-JS FIX
+// =========================
 document.documentElement.classList.remove("no-js");
-// =========================
-// LOAD HEADER
-// =========================
 
+
+// =========================
+// LOAD HEADER + FOOTER
+// =========================
 async function loadHeader(type = "hero") {
 
     const fileMap = {
@@ -40,23 +44,24 @@ async function loadHeader(type = "hero") {
             footerContainer.innerHTML = footerHTML;
         }
 
-        // INIT
+        // INIT SYSTEMS
         initScrollFade();
         initEntity();
         initFadeIn();
         initSpotlight();
         initGlobalLighting();
-        initQuotes();
+        initQuotes(); // section 2
+        initReviewRotator(); // section 3
 
     } catch (err) {
         console.error("Layout load failed:", err);
     }
 }
 
+
 // =========================
 // GLOBAL CURSOR LIGHTING
 // =========================
-
 function initGlobalLighting() {
 
     const root = document.documentElement;
@@ -86,10 +91,10 @@ function initGlobalLighting() {
     animate();
 }
 
-// =========================
-// SCROLL FADE SYSTEM
-// =========================
 
+// =========================
+// SCROLL FADE SYSTEM (DEDUPED)
+// =========================
 function initScrollFade() {
 
     let ticking = false;
@@ -146,10 +151,10 @@ function initScrollFade() {
     update();
 }
 
+
 // =========================
 // ENTITY REVEAL
 // =========================
-
 function initEntity() {
 
     const entity = document.querySelector('.entity');
@@ -176,10 +181,10 @@ function initEntity() {
     triggerEntity();
 }
 
-// =========================
-// FADE-IN (INTERSECTION OBSERVER)
-// =========================
 
+// =========================
+// FADE-IN SYSTEM
+// =========================
 function initFadeIn() {
 
     const elements = document.querySelectorAll('.fade-in, .work');
@@ -194,9 +199,7 @@ function initFadeIn() {
             }
         });
 
-    }, {
-        threshold: 0.2
-    });
+    }, { threshold: 0.2 });
 
     elements.forEach((el, index) => {
         el.style.transitionDelay = `${index * 120}ms`;
@@ -204,10 +207,10 @@ function initFadeIn() {
     });
 }
 
-// =========================
-// SPOTLIGHT (WORKS SECTION)
-// =========================
 
+// =========================
+// SPOTLIGHT SYSTEM
+// =========================
 function initSpotlight() {
 
     const works = document.querySelector('.works');
@@ -225,9 +228,8 @@ function initSpotlight() {
     });
 }
 // =========================
-// BACKGROUND QUOTES SYSTEM
+// BACKGROUND QUOTES SYSTEM (CLEAN)
 // =========================
-
 function initQuotes() {
 
     const quotes = [
@@ -251,8 +253,12 @@ function initQuotes() {
 
     const watcher = document.getElementById("quote-watcher");
 
+    // FAIL SAFE
     if (fragments.some(el => !el) || !watcher) return;
 
+    // =========================
+    // TEXT RENDER
+    // =========================
     function renderText(el, text) {
 
         el.innerHTML = "";
@@ -263,70 +269,87 @@ function initQuotes() {
 
             const span = document.createElement("span");
 
+            const clean = word.toLowerCase().replace(/[.?]/g, "");
+
             const emphasisWords = ["remember", "alone", "wrong", "watches", "empty", "back"];
 
-            span.className = emphasisWords.includes(
-                word.toLowerCase().replace(/[.?]/g, "")
-            ) ? "word emphasis" : "word";
+            span.className = emphasisWords.includes(clean)
+                ? "word emphasis"
+                : "word";
 
-            // RANDOM DISTORTION
-            if (Math.random() < 0.4) {
+            // subtle randomness
+            if (Math.random() < 0.35) {
                 span.classList.add("distort");
             }
 
             span.textContent = word + " ";
-            span.style.animationDelay = `${i * 0.25}s`;
+            span.style.animationDelay = `${i * 0.2}s`;
 
             el.appendChild(span);
         });
     }
 
+    // =========================
+    // FLOATING FRAGMENTS
+    // =========================
     let lastIndex = -1;
 
-function updateSingleFragment() {
-    let index;
+    function updateFragment() {
 
-    do {
-        index = Math.floor(Math.random() * fragments.length);
-    } while (index === lastIndex);
+        let index;
 
-    lastIndex = index;
+        do {
+            index = Math.floor(Math.random() * fragments.length);
+        } while (index === lastIndex);
 
-    const el = fragments[index];
-    el.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 5}s`;
-    
-    el.style.animationDuration = `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
+        lastIndex = index;
 
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        const el = fragments[index];
 
-    const side = Math.random() < 0.5 ? "left" : "right";
-    const top = Math.random() * 70 + 10;
-    const offset = Math.random() * 10 + 5;
+        const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    if (side === "left") {
-        el.style.left = `${offset}%`;
-        el.style.right = "auto";
-    } else {
-        el.style.right = `${offset}%`;
-        el.style.left = "auto";
+        // RANDOM POSITION
+        const side = Math.random() < 0.5 ? "left" : "right";
+        const top = Math.random() * 70 + 10;
+        const offset = Math.random() * 10 + 5;
+
+        if (side === "left") {
+            el.style.left = `${offset}%`;
+            el.style.right = "auto";
+        } else {
+            el.style.right = `${offset}%`;
+            el.style.left = "auto";
+        }
+
+        el.style.top = `${top}%`;
+
+        // ROTATION
+        const rotation = (Math.random() - 0.5) * 6;
+        el.style.setProperty('--rot', `${rotation}deg`);
+
+        // ANIMATION VARIATION
+        el.style.animationDuration = `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
+
+        renderText(el, quote);
     }
 
-    el.style.top = `${top}%`;
+    function loopFragments() {
+        updateFragment();
 
-    const rotation = (Math.random() - 0.5) * 6;
-    el.style.setProperty('--rot', `${rotation}deg`);
+        const next = Math.random() * 2000 + 1500;
+        setTimeout(loopFragments, next);
+    }
 
-    renderText(el, randomQuote);
-}
+    // =========================
+    // WATCHER (CREEPY CENTER TEXT)
+    // =========================
     function triggerWatcher() {
 
         const text = quotes[Math.floor(Math.random() * quotes.length)];
-
         renderText(watcher, text);
 
         watcher.style.opacity = 1;
 
-        // FOLLOW MOUSE (slow, unsettling)
         function move(e) {
             const x = (e.clientX / window.innerWidth - 0.5) * 40;
             const y = (e.clientY / window.innerHeight - 0.5) * 40;
@@ -337,23 +360,24 @@ function updateSingleFragment() {
 
         document.addEventListener("mousemove", move);
 
-        // RANDOM GLITCH DURING DISPLAY
+        // GLITCH BURSTS
         const glitchInterval = setInterval(() => {
             watcher.classList.add("glitch");
 
             setTimeout(() => {
                 watcher.classList.remove("glitch");
-            }, 150);
+            }, 120);
+
         }, Math.random() * 2000 + 1000);
 
-        // RANDOM DECAY MOMENT
+        // DECAY FLASH
         setTimeout(() => {
             watcher.classList.add("decay");
 
             setTimeout(() => {
                 watcher.classList.remove("decay");
-            }, 800);
-        }, Math.random() * 3000 + 2000);
+            }, 700);
+        }, Math.random() * 2500 + 1500);
 
         // DISAPPEAR
         setTimeout(() => {
@@ -363,326 +387,114 @@ function updateSingleFragment() {
         }, 4000);
     }
 
-    // INITIAL
-    updateSingleFragment();
-    updateSingleFragment();
+    // =========================
+    // START SYSTEM
+    // =========================
+    updateFragment();
+    updateFragment();
 
-    // LOOP FRAGMENTS
-    function loopFragments() {
-    updateSingleFragment();
+    loopFragments();
 
-    const next = Math.random() * 2000 + 1500; // 1.5s–3.5s
-
-    setTimeout(loopFragments, next);
-}
-
-loopFragments();
-
-    // RANDOM WATCHER TRIGGER
     setInterval(() => {
         if (Math.random() < 0.4) {
             triggerWatcher();
         }
     }, 6000);
 }
-
-
 // =========================
-// SCROLL FADE SYSTEM
+// REVIEW ROTATOR SYSTEM
 // =========================
+function initReviewRotator() {
 
-function initScrollFade() {
+    const container = document.querySelector(".review-snippet");
+    if (!container) return;
 
-    let ticking = false;
+    // =========================
+    // REVIEW DATA (PER PAGE)
+    // =========================
+    const page = document.body.className;
 
-    function update() {
+    const reviews = {
 
-        const featured = document.querySelector('.featured');
-        const hero = document.querySelector('.hero');
-        const works = document.querySelector('.works');
-
-        let progress = 0;
-
-        // FEATURED FADE
-        if (featured) {
-            const rect = featured.getBoundingClientRect();
-
-            const start = window.innerHeight * 0.9;
-            const end = window.innerHeight * 0.3;
-
-            progress = (start - rect.top) / (start - end);
-            progress = Math.max(0, Math.min(1, progress));
-
-            featured.style.setProperty('--fadeIn', progress);
-        }
-
-        // HERO FADE
-        if (hero) {
-            hero.style.setProperty('--fadeOut', progress * 0.8);
-        }
-
-        // WORKS FADE
-        if (works) {
-            const rect = works.getBoundingClientRect();
-
-            const start = window.innerHeight * 1.1;
-            const end = window.innerHeight * 0.5;
-
-            let fade = (start - rect.top) / (start - end);
-            fade = Math.max(0, Math.min(1, fade));
-
-            works.style.setProperty('--sectionFade', fade);
-        }
-
-        ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(update);
-            ticking = true;
-        }
-    });
-
-    update();
-}
-
-// =========================
-// ENTITY REVEAL
-// =========================
-
-function initEntity() {
-
-    const entity = document.querySelector('.entity');
-    if (!entity) return;
-
-    function triggerEntity() {
-
-        const delay = Math.random() * 9000 + 3000;
-
-        setTimeout(() => {
-
-            entity.classList.add('active');
-
-            const visibleTime = Math.random() * 3000 + 2000;
-
-            setTimeout(() => {
-                entity.classList.remove('active');
-                triggerEntity();
-            }, visibleTime);
-
-        }, delay);
-    }
-
-    triggerEntity();
-}
-
-// =========================
-// FADE-IN (INTERSECTION OBSERVER)
-// =========================
-
-function initFadeIn() {
-
-    const elements = document.querySelectorAll('.fade-in, .work');
-
-    const observer = new IntersectionObserver((entries) => {
-
-        entries.forEach((entry) => {
-
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+        "archive-page": [
+            {
+                text: "Creepy, atmospheric read. I finished one and started the next immediately.",
+                source: "Reader Review"
+            },
+            {
+                text: "It gets under your skin. No cheap scares, just a steady unraveling.",
+                source: "Reader Review"
             }
-        });
+        ],
 
-    }, {
-        threshold: 0.2
-    });
-
-    elements.forEach((el, index) => {
-        el.style.transitionDelay = `${index * 120}ms`;
-        observer.observe(el);
-    });
-}
-
-// =========================
-// SPOTLIGHT (WORKS SECTION)
-// =========================
-
-function initSpotlight() {
-
-    const works = document.querySelector('.works');
-    if (!works) return;
-
-    works.addEventListener('mousemove', (e) => {
-
-        const rect = works.getBoundingClientRect();
-
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-        works.style.setProperty('--mouse-x', `${x}%`);
-        works.style.setProperty('--mouse-y', `${y}%`);
-    });
-}
-// =========================
-// BACKGROUND QUOTES SYSTEM
-// =========================
-
-function initQuotes() {
-
-    const quotes = [
-        "Some places keep what they take.",
-        "The sea went wrong. It looks back.",
-        "The mirror watches.",
-        "Do you remember me?",
-        "Sleep meant forgetting.",
-        "He is not alone.",
-        "It looks back.",
-        "That silence after a secret.",
-        "It was never not empty."
-    ];
-
-    const fragments = [
-        document.getElementById("q1"),
-        document.getElementById("q2"),
-        document.getElementById("q3"),
-        document.getElementById("q4")
-    ];
-
-    const watcher = document.getElementById("quote-watcher");
-
-    if (fragments.some(el => !el) || !watcher) return;
-
-    function renderText(el, text) {
-
-        el.innerHTML = "";
-
-        const words = text.split(" ");
-
-        words.forEach((word, i) => {
-
-            const span = document.createElement("span");
-
-            const emphasisWords = ["remember", "alone", "wrong", "watches", "empty", "back"];
-
-            span.className = emphasisWords.includes(
-                word.toLowerCase().replace(/[.?]/g, "")
-            ) ? "word emphasis" : "word";
-
-            // RANDOM DISTORTION
-            if (Math.random() < 0.4) {
-                span.classList.add("distort");
+        "series-page": [
+            {
+                text: "I was hooked from the start — so atmospheric, you feel like you're there.",
+                source: "Reader Review"
+            },
+            {
+                text: "The ending is sublime. I absolutely loved it.",
+                source: "Reader Review"
             }
+        ],
 
-            span.textContent = word + " ";
-            span.style.animationDelay = `${i * 0.25}s`;
+        "sub-page": [
+            {
+                text: "A gripping thriller — raw, brutal and unflinching.",
+                source: "Reader Review"
+            },
+            {
+                text: "Very dark and menacing, but addictive in its own way.",
+                source: "Reader Review"
+            }
+        ]
 
-            el.appendChild(span);
-        });
-    }
+    };
 
-    let lastIndex = -1;
+    // =========================
+    // PICK CORRECT SET
+    // =========================
+    let activeReviews = [];
 
-function updateSingleFragment() {
-    let index;
-
-    do {
-        index = Math.floor(Math.random() * fragments.length);
-    } while (index === lastIndex);
-
-    lastIndex = index;
-
-    const el = fragments[index];
-    el.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 5}s`;
-    
-    el.style.animationDuration = `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
-
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-
-    const side = Math.random() < 0.5 ? "left" : "right";
-    const top = Math.random() * 70 + 10;
-    const offset = Math.random() * 10 + 5;
-
-    if (side === "left") {
-        el.style.left = `${offset}%`;
-        el.style.right = "auto";
+    if (page.includes("archive-page")) {
+        activeReviews = reviews["archive-page"];
+    } else if (page.includes("series-page")) {
+        activeReviews = reviews["series-page"];
     } else {
-        el.style.right = `${offset}%`;
-        el.style.left = "auto";
+        activeReviews = reviews["sub-page"];
     }
 
-    el.style.top = `${top}%`;
+    // =========================
+    // ROTATION LOGIC
+    // =========================
+    let index = 0;
 
-    const rotation = (Math.random() - 0.5) * 6;
-    el.style.setProperty('--rot', `${rotation}deg`);
+    function showReview(i) {
 
-    renderText(el, randomQuote);
-}
-    function triggerWatcher() {
+        const review = activeReviews[i];
 
-        const text = quotes[Math.floor(Math.random() * quotes.length)];
+        container.style.opacity = 0;
 
-        renderText(watcher, text);
-
-        watcher.style.opacity = 1;
-
-        // FOLLOW MOUSE (slow, unsettling)
-        function move(e) {
-            const x = (e.clientX / window.innerWidth - 0.5) * 40;
-            const y = (e.clientY / window.innerHeight - 0.5) * 40;
-
-            watcher.style.transform =
-                `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
-        }
-
-        document.addEventListener("mousemove", move);
-
-        // RANDOM GLITCH DURING DISPLAY
-        const glitchInterval = setInterval(() => {
-            watcher.classList.add("glitch");
-
-            setTimeout(() => {
-                watcher.classList.remove("glitch");
-            }, 150);
-        }, Math.random() * 2000 + 1000);
-
-        // RANDOM DECAY MOMENT
         setTimeout(() => {
-            watcher.classList.add("decay");
 
-            setTimeout(() => {
-                watcher.classList.remove("decay");
-            }, 800);
-        }, Math.random() * 3000 + 2000);
+            container.innerHTML = `
+                <p>"${review.text}"</p>
+                <span class="quote-source">— ${review.source}</span>
+            `;
 
-        // DISAPPEAR
-        setTimeout(() => {
-            watcher.style.opacity = 0;
-            document.removeEventListener("mousemove", move);
-            clearInterval(glitchInterval);
-        }, 4000);
+            container.style.opacity = 1;
+
+        }, 300);
+    }
+
+    function rotate() {
+        index = (index + 1) % activeReviews.length;
+        showReview(index);
     }
 
     // INITIAL
-    updateSingleFragment();
-    updateSingleFragment();
+    showReview(index);
 
-    // LOOP FRAGMENTS
-    function loopFragments() {
-    updateSingleFragment();
-
-    const next = Math.random() * 2000 + 1500; // 1.5s–3.5s
-
-    setTimeout(loopFragments, next);
-}
-
-loopFragments();
-
-    // RANDOM WATCHER TRIGGER
-    setInterval(() => {
-        if (Math.random() < 0.4) {
-            triggerWatcher();
-        }
-    }, 6000);
+    // LOOP
+    setInterval(rotate, 5000);
 }
