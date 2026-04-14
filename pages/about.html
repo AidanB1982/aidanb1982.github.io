@@ -13,7 +13,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- GLOBAL CSS -->
 <link rel="stylesheet" href="/css/header.css">
 <link rel="stylesheet" href="/css/styles.css">
 
@@ -30,10 +29,8 @@
     <div id="quote-watcher"></div>
 </div>
     
-<!-- HEADER (DYNAMIC SYSTEM) -->
 <div id="header-placeholder"></div>
 
-<!-- HERO -->
 <section class="about-hero">
 
     <div class="about-hero-overlay"></div>
@@ -48,7 +45,6 @@
 
 </section>
 
-<!-- MAIN CONTENT -->
 <section class="about-section fade-in">
 
     <p> Blackwood Publishing is an independent imprint for stories that sit with what most people avoid. Grief, memory, silence, and the things that do not stay buried. </p>
@@ -67,6 +63,44 @@
         All works are written under the Blackwood imprint.
     </p>
 
+    <!-- NEW SECTION -->
+
+    <hr style="margin:50px 0; opacity:0.08;">
+
+    <h3 style="margin-bottom:15px;">Approach</h3>
+
+    <p>
+        The work is developed with a focus on atmosphere, restraint, and continuity. 
+        Stories are not isolated pieces, but part of a wider body connected by place, tone, and recurrence.
+    </p>
+
+    <p>
+        Publishing remains independent, with global distribution across digital and print platforms. 
+        The aim is not volume, but consistency over time.
+    </p>
+
+    <h3 style="margin:40px 0 15px;">Values</h3>
+
+    <p>
+        Clarity — Work is presented without excess. What is shown is intentional, and what is withheld is equally important.
+    </p>
+
+    <p>
+        Atmosphere — Place is not a backdrop, but an active presence shaping events, memory, and perception.
+    </p>
+
+    <p>
+        Restraint — Stories do not resolve cleanly. Meaning is not forced, and conclusions are not imposed.
+    </p>
+
+    <p>
+        Independence — Publishing decisions are made without trend, pressure, or external expectation.
+    </p>
+
+    <p>
+        Continuity — Each work forms part of a wider body, connected by tone, place, and recurring themes.
+    </p>
+
 </section>
 
 <section class="about-fragment fade-in">
@@ -75,7 +109,6 @@
     <p>It was never not empty.</p>
 </section>
 
-<!-- NEWSLETTER -->
 <section class="newsletter fade-in">
 
     <p>Enter the Archive</p>
@@ -103,7 +136,6 @@
 
 </section>
 
-<!-- SOCIAL -->
 <section class="about-social fade-in">
 
     <p class="social-title">Elsewhere</p>
@@ -121,8 +153,10 @@
     </div>
 
 </section>
+
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
+
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
@@ -135,11 +169,11 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    // ensure systems re-run safely
     if (typeof initFadeIn === "function") initFadeIn();
     if (typeof initQuotes === "function") initQuotes();
 
 });
 </script>
+
 </body>
 </html>
