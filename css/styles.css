@@ -125,7 +125,24 @@ body.about-page {
     opacity: 0.75;
     margin-bottom: 20px;
 }
+.featured-content .review-snippet {
+    margin: 20px 0 25px;
+    max-width: 420px;
+}
 
+.featured-content .review-snippet p {
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.65;
+    line-height: 1.6;
+}
+
+.featured-content .quote-source {
+    display: block;
+    font-size: 11px;
+    opacity: 0.4;
+    margin-top: 5px;
+}
 /* =========================
    BUTTON
 ========================= */
@@ -1007,10 +1024,6 @@ form:hover input,
 form:hover textarea {
     opacity: 0.9;
 }
-/* =========================
-   BACKGROUND QUOTE SYSTEM PRO
-========================= */
-
 
 /* =========================
    QUOTE FRAGMENT SYSTEM
@@ -2378,4 +2391,21 @@ body.legal-page h1,
 body.legal-page h2,
 body.legal-page h3 {
     color: #ffffff !important;
+}
+.review-snippet {
+    margin: 20px 0 25px;
+    max-width: 420px;
+}
+
+.review-snippet p {
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.65;
+    line-height: 1.6;
+}
+.quote-source {
+    display: block;
+    font-size: 11px;
+    opacity: 0.4;
+    margin-top: 5px;
 }
