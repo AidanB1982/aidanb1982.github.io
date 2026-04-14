@@ -2409,3 +2409,26 @@ body.legal-page h3 {
     opacity: 0.4;
     margin-top: 5px;
 }
+/* =========================
+   REVIEW (CENTERED FOR PUBLICATIONS)
+========================= */
+
+.publications-page .review-snippet {
+    text-align: center;
+    margin: 30px auto;
+    max-width: 520px;
+}
+
+.publications-page .review-snippet p {
+    font-size: 16px;
+    font-style: italic;
+    line-height: 1.7;
+    opacity: 0.75;
+}
+
+.publications-page .quote-source {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.5;
+}
