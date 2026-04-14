@@ -2345,26 +2345,19 @@ form:hover textarea {
     margin-bottom: 20px;
     opacity: 0.85;
 }
-/* LEGAL PAGE STYLING (FORCE LIGHT TEXT) */
+/* =========================
+   LEGAL PAGE – HARD OVERRIDE
+========================= */
 
-body.legal-page .about-section {
-    max-width: 800px;
-    margin: 0 auto;
-    line-height: 1.8;
+body.legal-page .about-section,
+body.legal-page .about-section * {
     color: #eaeaea !important;
-}
-
-body.legal-page .about-section p {
-    color: #d6d6d6 !important;
     opacity: 1 !important;
 }
 
-body.legal-page .about-section h2 {
-    color: #ffffff !important;
-    margin-top: 40px;
-    letter-spacing: 0.5px;
-}
-
-body.legal-page .about-section strong {
+/* Headings slightly brighter */
+body.legal-page h1,
+body.legal-page h2,
+body.legal-page h3 {
     color: #ffffff !important;
 }
