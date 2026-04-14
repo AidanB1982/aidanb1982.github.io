@@ -522,7 +522,7 @@ body.about-page {
     left: 50%;
     transform: translateX(-50%);
 
-    padding: 60px 20px 30px; /* slightly more breathing room */
+    padding: 60px 20px 30px;
     margin-top: 100px;
 
     color: #e6e6e6;
@@ -543,7 +543,7 @@ body.about-page {
 
     background: linear-gradient(
         to bottom,
-        rgba(184,115,51,0.06), /* softer */
+        rgba(184,115,51,0.06),
         transparent
     );
 
@@ -551,61 +551,45 @@ body.about-page {
     pointer-events: none;
 }
 
-/* OVERLAY (still off) */
-.footer-overlay {
-    display: none;
-}
-
 /* CONTENT WRAPPER */
 .footer-content {
     position: relative;
     z-index: 1;
 
-    max-width: 1100px; /* tighter than 1400 */
+    max-width: 1100px;
     padding: 0 20px;
     margin: 0 auto;
 }
 
 /* =========================
-   GRID (TIGHTER + BALANCED)
+   TOP LAYOUT
 ========================= */
-.footer-grid {
-    display: grid;
-    grid-template-columns: 1fr 220px; /* slightly wider nav */
-    gap: 40px; /* reduced from 60 */
-    align-items: start;
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+/* RIGHT SIDE */
+.footer-links {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 180px;
 }
 
 /* BRAND */
 .footer-brand {
-    max-width: 260px; /* tighter */
+    max-width: 260px;
 }
 
-/* =========================
-   SEAL (UPGRADED)
-========================= */
-.footer-seal-wrap {
+/* COLUMN */
+.footer-col {
     display: flex;
-    justify-content: center;
-    margin: 50px 0 25px;
-}
-
-.footer-seal {
-    width: 130px; /* bigger */
-    opacity: 0.28;
-
-    display: block;
-
-    filter:
-        drop-shadow(0 12px 30px rgba(0,0,0,0.9))
-        brightness(0.95);
-
-    transition: all 0.4s ease;
-}
-
-.footer-seal:hover {
-    opacity: 0.42;
-    transform: scale(1.05);
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 8px;
 }
 
 /* =========================
@@ -622,16 +606,6 @@ body.about-page {
 .footer-sub {
     font-size: 11px;
     opacity: 0.4;
-}
-
-/* NAV COLUMN */
-.footer-col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-self: end; /* pulls it inward slightly */
-    text-align: left;
-    gap: 8px;
 }
 
 .footer-heading {
@@ -653,6 +627,33 @@ body.about-page {
 .footer-col a:hover {
     opacity: 1;
     transform: translateX(4px);
+}
+
+/* =========================
+   SEAL
+========================= */
+.footer-seal-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 50px 0 25px;
+}
+
+.footer-seal {
+    width: 130px;
+    opacity: 0.28;
+
+    display: block;
+
+    filter:
+        drop-shadow(0 12px 30px rgba(0,0,0,0.9))
+        brightness(0.95);
+
+    transition: all 0.4s ease;
+}
+
+.footer-seal:hover {
+    opacity: 0.42;
+    transform: scale(1.05);
 }
 
 /* =========================
@@ -682,7 +683,7 @@ body.about-page {
     opacity: 0.35;
 }
 
-/* REMOVE EXTRA LEGAL WEIGHT */
+/* HIDE DUPLICATE LEGAL */
 .footer-legal {
     display: none;
 }
@@ -691,10 +692,20 @@ body.about-page {
    RESPONSIVE
 ========================= */
 @media (max-width: 800px) {
-    .footer-grid {
-        grid-template-columns: 1fr;
+
+    .footer-top {
+        flex-direction: column;
+        align-items: center;
         text-align: center;
-        margin-bottom: 30px;
+        gap: 30px;
+    }
+
+    .footer-links {
+        justify-content: center;
+    }
+
+    .footer-col {
+        align-items: center;
     }
 
     .footer-brand {
@@ -707,13 +718,10 @@ body.about-page {
     }
 
     .footer-seal {
-    width: 75px;
-    opacity: 0.2;
-
-    margin-bottom: 10px;
-
-    display: block;
-}
+        width: 75px;
+        opacity: 0.2;
+        margin-bottom: 10px;
+    }
 
     .footer-bottom {
         flex-direction: column;
