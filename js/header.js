@@ -402,83 +402,88 @@ function initQuotes() {
     }, 6000);
 }
 // =========================
-// REVIEW ROTATOR SYSTEM
+// REVIEW ROTATOR (BOOK-AWARE)
 // =========================
 function initReviewRotator() {
 
-    const container = document.querySelector(".review-snippet:not(.static-review)");
+    const container = document.querySelector(".review-snippet");
     if (!container) return;
 
-    // =========================
-    // REVIEW DATA (PER PAGE)
-    // =========================
-    const page = document.body.className;
+    // ❗ Skip static reviews
+    if (container.classList.contains("static-review")) return;
 
+    const book = container.dataset.book;
+
+    // =========================
+    // REVIEW DATA (BY BOOK)
+    // =========================
     const reviews = {
 
-    "archive-page": [
-        {
-            text: "Creepy, atmospheric read. I finished one and started the next immediately.",
-            source: "Reader Review"
-        },
-        {
-            text: "It gets under your skin. No cheap scares, just a steady unraveling.",
-            source: "Reader Review"
-        }
-    ],
+        corrour: [
+            {
+                text: "This book didn’t just tell a story. It gave me feelings I cannot shake.",
+                source: "JoJo, TikTok"
+            },
+            {
+                text: "Slow, insidious unraveling that never lets you feel safe.",
+                source: "JoJo, TikTok"
+            },
+            {
+                text: "The landscape feels alive. Watching. Waiting.",
+                source: "JoJo, TikTok"
+            },
+            {
+                text: "It gets into your bones like the cold.",
+                source: "JoJo, TikTok"
+            }
+        ],
 
-    "series-page": [
-        {
-            text: "I was hooked from the start — so atmospheric, you feel like you're there.",
-            source: "Reader Review"
-        },
-        {
-            text: "The ending is sublime. I absolutely loved it.",
-            source: "Reader Review"
-        }
-    ],
+        archive: [
+            {
+                text: "Creepy, atmospheric read. I finished one and started the next immediately.",
+                source: "Reader Review"
+            },
+            {
+                text: "It gets under your skin. No cheap scares, just a steady unraveling.",
+                source: "Reader Review"
+            }
+        ],
 
-    "publications-page": [   
-        {
-            text: "Atmospheric, unsettling, and beautifully written.",
-            source: "Reader Review"
-        },
+        "hard-silence": [
+            {
+                text: "A gripping thriller — raw, brutal and unflinching.",
+                source: "Reader Review"
+            },
+            {
+                text: "Very dark and menacing, but addictive in its own way.",
+                source: "Reader Review"
+            }
+        ],
+
+        standalone: [
+            {
+                text: "Quietly unsettling and deeply personal.",
+                source: "Reader Review"
+            },
+            {
+                text: "Lingers long after the final page.",
+                source: "Reader Review"
+            }
+        ]
+    };
+
+    // =========================
+    // FALLBACK
+    // =========================
+    let activeReviews = reviews[book] || [
         {
             text: "Each book feels like a place you shouldn’t have found.",
-            source: "Reader Review"
+            source: "JoJo, TikTok"
         }
-    ],
-
-    "sub-page": [
-        {
-            text: "A gripping thriller — raw, brutal and unflinching.",
-            source: "Reader Review"
-        },
-        {
-            text: "Very dark and menacing, but addictive in its own way.",
-            source: "Reader Review"
-        }
-    ]
-
-};
+    ];
 
     // =========================
-    // PICK CORRECT SET
-    // =========================
-    let activeReviews = [];
-
-    if (page.includes("archive-page")) {
-    activeReviews = reviews["archive-page"];
-} else if (page.includes("series-page")) {
-    activeReviews = reviews["series-page"];
-} else if (page.includes("publications-page")) {
-    activeReviews = reviews["publications-page"];
-} else {
-    activeReviews = reviews["sub-page"];
-}
-
-    // =========================
-    // ROTATION LOGIC
+    // ROTATION
     // =========================
     let index = 0;
 
@@ -489,14 +494,11 @@ function initReviewRotator() {
         container.style.opacity = 0;
 
         setTimeout(() => {
-
             container.innerHTML = `
                 <p>"${review.text}"</p>
                 <span class="quote-source">— ${review.source}</span>
             `;
-
             container.style.opacity = 1;
-
         }, 300);
     }
 
@@ -505,9 +507,11 @@ function initReviewRotator() {
         showReview(index);
     }
 
-    // INITIAL
+    // INIT
     showReview(index);
 
-    // LOOP
-    setInterval(rotate, 5000);
+    // LOOP (only if more than 1 review)
+    if (activeReviews.length > 1) {
+        setInterval(rotate, 5000);
+    }
 }
