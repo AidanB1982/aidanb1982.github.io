@@ -18,7 +18,7 @@ async function loadHeader(type = "hero") {
 
     try {
         const isSubPage = window.location.pathname.includes("/pages/");
-        const base = isSubPage ? "../" : "./";
+        const base = "/";
 
         console.log("Fetching:", `${base}${file}`);
 
@@ -430,7 +430,7 @@ function initReviewRotator() {
             {
                 text: "It gets into your bones like the cold.",
                 source: "Reader Review"
-            }
+            },
             {
                 text: "An eerie, isolated nightmare that unsettles more with what it doesn’t explain.",
                 source: "Reader Review"
@@ -489,7 +489,7 @@ function initReviewRotator() {
             {
                 text: "It gets under your skin. No cheap scares, just a steady unraveling.",
                 source: "Reader Review"
-            }
+            },
             {
                 text: "A gripping, slow-burn descent that’s impossible to put down.",
                 source: "Reader Review"
@@ -556,7 +556,7 @@ function initReviewRotator() {
             {
                 text: "Very dark and menacing, but addictive in its own way.",
                 source: "Reader Review"
-            }
+            },
             {
                 text: "A brutal, tension-filled thriller that grips from the first page to the last.",
                 source: "Reader Review"
@@ -623,7 +623,7 @@ function initReviewRotator() {
             {
                 text: "Lingers long after the final page.",
                 source: "Reader Review"
-            }
+            },
             {
                 text: "A haunting gothic nightmare where the house itself feels alive.",
                 source: "Reader Review"
