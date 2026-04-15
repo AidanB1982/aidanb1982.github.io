@@ -402,17 +402,12 @@ function initQuotes() {
     }, 6000);
 }
 // =========================
-// REVIEW ROTATOR (BOOK-AWARE)
+// REVIEW ROTATOR (BOOK-AWARE, MULTI-CONTAINER)
 // =========================
 function initReviewRotator() {
 
-    const container = document.querySelector(".review-snippet");
-    if (!container) return;
-
-    // ❗ Skip static reviews
-    if (container.classList.contains("static-review")) return;
-
-    const book = container.dataset.book;
+    const containers = document.querySelectorAll(".review-snippet");
+    if (!containers.length) return;
 
     // =========================
     // REVIEW DATA (BY BOOK)
@@ -473,45 +468,62 @@ function initReviewRotator() {
     };
 
     // =========================
-    // FALLBACK
+    // LOOP THROUGH ALL REVIEW BLOCKS
     // =========================
-    let activeReviews = reviews[book] || [
-        {
-            text: "Each book feels like a place you shouldn’t have found.",
-            source: "JoJo, TikTok"
+    containers.forEach(container => {
+
+        // ❗ Skip static (homepage featured)
+        if (container.classList.contains("static-review")) return;
+
+        const book = container.dataset.book;
+
+        // =========================
+        // SELECT REVIEWS
+        // =========================
+        let activeReviews = reviews[book] || [
+            {
+                text: "Each book feels like a place you shouldn’t have found.",
+                source: "JoJo, TikTok"
+            }
+        ];
+
+        let index = 0;
+
+        // =========================
+        // RENDER FUNCTION
+        // =========================
+        function showReview(i) {
+
+            const review = activeReviews[i];
+
+            container.style.opacity = 0;
+
+            setTimeout(() => {
+                container.innerHTML = `
+                    <p>"${review.text}"</p>
+                    <span class="quote-source">— ${review.source}</span>
+                `;
+                container.style.opacity = 1;
+            }, 300);
         }
-    ];
 
-    // =========================
-    // ROTATION
-    // =========================
-    let index = 0;
+        // =========================
+        // ROTATION
+        // =========================
+        function rotate() {
+            index = (index + 1) % activeReviews.length;
+            showReview(index);
+        }
 
-    function showReview(i) {
-
-        const review = activeReviews[i];
-
-        container.style.opacity = 0;
-
-        setTimeout(() => {
-            container.innerHTML = `
-                <p>"${review.text}"</p>
-                <span class="quote-source">— ${review.source}</span>
-            `;
-            container.style.opacity = 1;
-        }, 300);
-    }
-
-    function rotate() {
-        index = (index + 1) % activeReviews.length;
+        // =========================
+        // INIT
+        // =========================
         showReview(index);
-    }
 
-    // INIT
-    showReview(index);
+        // Only rotate if more than 1 review
+        if (activeReviews.length > 1) {
+            setInterval(rotate, 5000);
+        }
 
-    // LOOP (only if more than 1 review)
-    if (activeReviews.length > 1) {
-        setInterval(rotate, 5000);
-    }
+    });
 }
