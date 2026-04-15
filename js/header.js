@@ -417,19 +417,67 @@ function initReviewRotator() {
         corrour: [
             {
                 text: "This book didn’t just tell a story. It gave me feelings I cannot shake.",
-                source: "JoJo, TikTok"
+                source: "Reader Review"
             },
             {
                 text: "Slow, insidious unraveling that never lets you feel safe.",
-                source: "JoJo, TikTok"
+                source: "Reader Review"
             },
             {
                 text: "The landscape feels alive. Watching. Waiting.",
-                source: "JoJo, TikTok"
+                source: "Reader Review"
             },
             {
                 text: "It gets into your bones like the cold.",
-                source: "JoJo, TikTok"
+                source: "Reader Review"
+            }
+            {
+                text: "An eerie, isolated nightmare that unsettles more with what it doesn’t explain.",
+                source: "Reader Review"
+            },
+            {
+                text: "Atmosphere so thick you feel trapped in the bothy with them.",
+                source: "Reader Review"
+            },
+            {
+                text: "Short, clipped tension that builds into something deeply unsettling.",
+                source: "Reader Review"
+            },
+            {
+                text: "A slow-burn horror where the setting becomes something far more sinister.",
+                source: "Reader Review"
+            },
+            {
+                text: "Relentless unease from the first page, never letting you fully relax.",
+                source: "Reader Review"
+            },
+            {
+                text: "Silence, isolation, and dread woven into every page.",
+                source: "Reader Review"
+            },
+            {
+                text: "Creeping terror that lingers long after the final twist.",
+                source: "Reader Review"
+            },
+            {
+                text: "An oppressive, desolate setting that makes escape feel impossible.",
+                source: "Reader Review"
+            },
+            {
+                text: "Disturbing, atmospheric horror that thrives on ambiguity.",
+                source: "Reader Review"
+            },
+            {
+                text: "A chilling premise elevated by tension, restraint, and a haunting finish.",
+                source: "Reader Review"
+            },
+            {
+                text: "Unnerving, immersive, and deeply claustrophobic.",
+                source: "Reader Review"
+            },
+            {
+                text: "A haunting, slow-build story where fear seeps in from every direction.",
+                source: "Reader Review"
             }
         ],
 
@@ -440,6 +488,62 @@ function initReviewRotator() {
             },
             {
                 text: "It gets under your skin. No cheap scares, just a steady unraveling.",
+                source: "Reader Review"
+            }
+            {
+                text: "A gripping, slow-burn descent that’s impossible to put down.",
+                source: "Reader Review"
+            },
+            {
+                text: "Atmosphere so vivid it pulls you straight into the cold, silent landscape.",
+                source: "Reader Review"
+            },
+            {
+                text: "Creeping dread that builds quietly, then refuses to let go.",
+                source: "Reader Review"
+            },
+            {
+                text: "A haunting exploration of memory, loss, and things that shouldn’t be forgotten.",
+                source: "Reader Review"
+            },
+            {
+                text: "Unsettling, disorienting, and deeply immersive.",
+                source: "Reader Review"
+            },
+            {
+                text: "A tense, labyrinthine story that keeps circling back in unexpected ways.",
+                source: "Reader Review"
+            },
+            {
+                text: "Quiet horror that seeps in slowly and lingers long after.",
+                source: "Reader Review"
+            },
+            {
+                text: "An eerie, thought-provoking journey where nothing feels entirely real.",
+                source: "Reader Review"
+            },
+            {
+                text: "Claustrophobic, cold, and filled with a constant sense of being watched.",
+                source: "Reader Review"
+            },
+            {
+                text: "A chilling blend of psychological depth and creeping supernatural dread.",
+                source: "Reader Review"
+            },
+            {
+                text: "Unnerving and atmospheric, with tension that never fully releases.",
+                source: "Reader Review"
+            },
+            {
+                text: "A story that gets under your skin and stays there.",
+                source: "Reader Review"
+            },
+            {
+                text: "Bleak, beautiful, and quietly terrifying.",
+                source: "Reader Review"
+            },
+            {
+                text: "A compulsive read that pulls you deeper with every page.",
                 source: "Reader Review"
             }
         ],
@@ -453,6 +557,62 @@ function initReviewRotator() {
                 text: "Very dark and menacing, but addictive in its own way.",
                 source: "Reader Review"
             }
+            {
+                text: "A brutal, tension-filled thriller that grips from the first page to the last.",
+                source: "Reader Review"
+            },
+            {
+                text: "Dark, violent, and relentlessly suspenseful.",
+                source: "Reader Review"
+            },
+            {
+                text: "A raw and unflinching story of revenge that doesn’t pull its punches.",
+                source: "Reader Review"
+            },
+            {
+                text: "Gritty, intense, and emotionally charged.",
+                source: "Reader Review"
+            },
+            {
+                text: "A slow-burning descent into vengeance and isolation.",
+                source: "Reader Review"
+            },
+            {
+                text: "Uncompromising, menacing, and impossible to ignore.",
+                source: "Reader Review"
+            },
+            {
+                text: "A gripping, hard-hitting read that keeps the tension high throughout.",
+                source: "Reader Review"
+            },
+            {
+                text: "Violent, atmospheric, and deeply unsettling.",
+                source: "Reader Review"
+            },
+            {
+                text: "A bleak, addictive journey driven by pain, rage, and survival.",
+                source: "Reader Review"
+            },
+            {
+                text: "Sharp, unfiltered writing that brings every moment to life.",
+                source: "Reader Review"
+            },
+            {
+                text: "A dark psychological thriller that lingers long after the final page.",
+                source: "Reader Review"
+            },
+            {
+                text: "Relentless, gripping, and full of unexpected turns.",
+                source: "Reader Review"
+            },
+            {
+                text: "A haunting story of justice, control, and the cost of revenge.",
+                source: "Reader Review"
+            },
+            {
+                text: "Compulsive, brutal, and impossible to put down.",
+                source: "Reader Review"
+            }
         ],
 
         standalone: [
@@ -462,6 +622,54 @@ function initReviewRotator() {
             },
             {
                 text: "Lingers long after the final page.",
+                source: "Reader Review"
+            }
+            {
+                text: "A haunting gothic nightmare where the house itself feels alive.",
+                source: "Reader Review"
+            },
+            {
+                text: "Slow-burning dread that builds into something truly disturbing.",
+                source: "Reader Review"
+            },
+            {
+                text: "A sinister, atmospheric tale that keeps you constantly on edge.",
+                source: "Reader Review"
+            },
+            {
+                text: "Classic gothic horror with a modern, brutal edge.",
+                source: "Reader Review"
+            },
+            {
+                text: "An intense, fast-paced descent into supernatural terror.",
+                source: "Reader Review"
+            },
+            {
+                text: "A chilling story where nothing is as simple as it first appears.",
+                source: "Reader Review"
+            },
+            {
+                text: "Creeping tension, eerie detail, and a deeply unsettling presence.",
+                source: "Reader Review"
+            },
+            {
+                text: "A dark, immersive read that lingers long after the final page.",
+                source: "Reader Review"
+            },
+            {
+                text: "A disturbing, claustrophobic horror driven by something watching from within.",
+                source: "Reader Review"
+            },
+            {
+                text: "An unforgettable ending that leaves you reeling.",
+                source: "Reader Review"
+            },
+            {
+                text: "A sinister house, a haunting past, and a relentless sense of dread.",
+                source: "Reader Review"
+            },
+            {
+                text: "Atmospheric, eerie, and packed with unsettling twists.",
                 source: "Reader Review"
             }
         ]
