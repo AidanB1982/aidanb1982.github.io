@@ -12,10 +12,10 @@
 
 <body class="home-page">
 
-<!-- HEADER (loads hero via JS) -->
+<!-- HEADER -->
 <div id="header-placeholder"></div>
 
-
+<!-- HERO STATEMENT -->
 <section class="hero-statement">
 
     <h1>
@@ -51,33 +51,36 @@
         <div class="featured-content fade-in">
 
             <div class="featured-label copper">Featured Work</div>
-        
+
             <h2>Corrour Bothy: The First Summoning</h2>
-        
+
             <p>
                 A remote Highland bothy draws in those already carrying quiet fractures.
                 What begins as refuge begins to shift, as the landscape unsettles perception
                 and something unseen begins to take hold.
             </p>
-            
+
+            <!-- STATIC REVIEW (NO ROTATION) -->
             <div class="review-snippet static-review">
                 <p>
                     “This book didn’t just tell a story. It gave me feelings I cannot shake.”
                 </p>
                 <span class="quote-source">
-                    — JoJo, Review
-                    <a href="https://www.tiktok.com/@magicbookworm71/video/7629013430636285186" target="_blank">watch</a>
+                    — JoJo, TikTok
+                    <a href="https://www.tiktok.com/@magicbookworm71/video/7629013430636285186" target="_blank">
+                        watch
+                    </a>
                 </span>
             </div>
-        
+
             <a href="https://pay.tide.co/products/corrour-bot-5KdqBmDa/landing"
                class="button copper"
                target="_blank"
                rel="noopener noreferrer">
                 Secure a Copy
-    </a>
+            </a>
 
-</div>
+        </div>
 
     </div>
 
@@ -188,7 +191,7 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="./js/header.js" defer></script>
+<script src="/js/header.js?v=20260408" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
@@ -200,7 +203,10 @@ window.addEventListener("load", async () => {
 
     await loadHeader("hero");
 
+    // Safe init
     if (typeof initFadeIn === "function") initFadeIn();
+    if (typeof initReviewRotator === "function") initReviewRotator();
+    if (typeof initQuotes === "function") initQuotes();
 
 });
 </script>
