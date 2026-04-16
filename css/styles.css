@@ -2664,3 +2664,10 @@ body.legal-page h3 {
 .closing-loop a:hover {
     opacity: 0.8;
 }
+.closing-echo {
+    margin-top: 20px;
+    font-size: 12px;
+    opacity: 0.25;
+    letter-spacing: 2px;
+    text-align: center;
+}
