@@ -2604,3 +2604,15 @@ body.legal-page h3 {
     opacity: 0.5;
     line-height: 1.6;
 }
+/* =========================
+   SOFT ENTRY (HOMEPAGE)
+========================= */
+
+.soft-entry {
+    text-align: center;
+    margin: 40px auto 30px;
+    max-width: 520px;
+    font-size: 13px;
+    opacity: 0.55;
+    line-height: 1.6;
+}
