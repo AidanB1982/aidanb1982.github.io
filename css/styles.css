@@ -2592,3 +2592,15 @@ body.legal-page h3 {
     font-size: 11px;
     opacity: 0.45;
 }
+/* =========================
+   ARCHIVE PATH (HOME)
+========================= */
+
+.archive-path {
+    text-align: center;
+    margin: 20px auto 30px;
+    max-width: 420px;
+    font-size: 13px;
+    opacity: 0.5;
+    line-height: 1.6;
+}
