@@ -2605,14 +2605,62 @@ body.legal-page h3 {
     line-height: 1.6;
 }
 /* =========================
-   SOFT ENTRY (HOMEPAGE)
+   SOFT ENTRY
 ========================= */
 
 .soft-entry {
+    margin-top: 30px;
+    font-size: 14px;
+    opacity: 0.6;
     text-align: center;
-    margin: 40px auto 30px;
-    max-width: 520px;
+}
+
+/* =========================
+   CTA SECONDARY
+========================= */
+
+.cta-secondary {
+    display: block;
+    margin-top: 10px;
     font-size: 13px;
-    opacity: 0.55;
-    line-height: 1.6;
+    opacity: 0.5;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   PURCHASE BRIDGE
+========================= */
+
+.purchase-bridge {
+    margin-top: 20px;
+    font-size: 14px;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+/* =========================
+   PURCHASE META
+========================= */
+
+.purchase-meta {
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.45;
+}
+
+/* =========================
+   CLOSING LOOP
+========================= */
+
+.closing-loop a {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 13px;
+    opacity: 0.5;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.closing-loop a:hover {
+    opacity: 0.8;
 }
