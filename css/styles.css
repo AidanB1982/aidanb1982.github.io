@@ -2490,6 +2490,37 @@ body.legal-page h3 {
     opacity: 0.45;
 }
 /* =========================
+   SERIES PAGE REVIEW
+========================= */
+.series-page .review-snippet {
+    text-align: center;
+    margin: 60px auto 70px;
+    max-width: 480px;
+}
+
+.series-page .review-snippet::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: rgba(184,115,51,0.4);
+    margin: 0 auto 16px;
+}
+
+.series-page .review-snippet p {
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+.series-page .quote-source {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    opacity: 0.45;
+}
+/* =========================
    HARD SILENCE REVIEW
 ========================= */
 
@@ -2530,6 +2561,32 @@ body.legal-page h3 {
 }
 
 .sub-page:not(.archive-page):not(.series-page) .review-snippet[data-book="standalone"] .quote-source {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    opacity: 0.45;
+}
+/* =========================
+   CURSED BOTHIES REVIEW (CENTERED)
+========================= */
+
+.series-page .review-snippet[data-book="corrour"],
+.series-page .review-snippet[data-book="cursed-bothies"] {
+    text-align: center;
+    margin: 60px auto 70px;
+    max-width: 480px;
+}
+
+.series-page .review-snippet[data-book="corrour"] p,
+.series-page .review-snippet[data-book="cursed-bothies"] p {
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+.series-page .review-snippet[data-book="corrour"] .quote-source,
+.series-page .review-snippet[data-book="cursed-bothies"] .quote-source {
     display: block;
     margin-top: 8px;
     font-size: 11px;
