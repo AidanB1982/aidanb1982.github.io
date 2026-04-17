@@ -620,7 +620,7 @@ body.about-page {
     letter-spacing: 3px;
     text-transform: uppercase;
     opacity: 0.8;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .footer-sub {
@@ -733,7 +733,7 @@ body.about-page {
         margin: 0 auto;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 4px;
         align-items: center;
         text-align: center;
     }
@@ -1733,16 +1733,14 @@ a, .work, .button, .work-desc, .footer-col a {
     left: 50%;
     transform: translateX(-50%);
 
-    padding: 25px 20px 15px;
-    margin-top: 40px;
+    padding: 20px 20px 10px;
+    margin-top: 20px;
 
     color: #e6e6e6;
     overflow: hidden;
-
+    outline: 5px solid red;
     isolation: isolate;
     z-index: 5;
-
-    /* subtle top separation */
     border-top: 1px solid rgba(184,115,51,0.08);
 }
 
@@ -1795,8 +1793,9 @@ a, .work, .button, .work-desc, .footer-col a {
 .footer-grid {
     display: grid;
     grid-template-columns: 1fr 200px;
-    gap: 35px; /* reduced from 60px */
+    gap: 20px; /* reduced from 60px */
     align-items: start;
+    margin: 5px auto;
 }
 
 /* BRAND COLUMN */
@@ -1806,9 +1805,9 @@ a, .work, .button, .work-desc, .footer-col a {
 
 /* SEAL */
 .footer-seal {
-    width: 85px;
-    opacity: 0.2;
-    margin: 5px auto;
+    width: 70px;
+    opacity: 0.18;
+    margin: 0px auto 5px;
 
     display: block;
 
@@ -1876,7 +1875,7 @@ a, .work, .button, .work-desc, .footer-col a {
 .footer-divider {
     height: 1px;
     width: 100%;
-    margin: 20px 0 10px; /* reduced */
+    margin: 10px 0 6px; /* reduced */
 
     background: linear-gradient(
         to right,
