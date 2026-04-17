@@ -609,6 +609,7 @@ body.about-page {
     align-items: flex-start;
     text-align: left;
     gap: 8px;
+    letter-spacing: 0.5px;
 }
 
 /* =========================
