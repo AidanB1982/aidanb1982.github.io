@@ -23,6 +23,7 @@ body {
     background: #000;
     color: #e6e6e6;
     font-family: Georgia, serif;
+   
     position: relative;
 }
 
@@ -2606,4 +2607,13 @@ body.legal-page h3 {
     opacity: 0.25;
     letter-spacing: 2px;
     text-align: center;
+}
+body.community-page::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+    opacity: 0.08;
+    z-index: 999;
 }
