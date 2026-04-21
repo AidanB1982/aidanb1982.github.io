@@ -1,1 +1,226 @@
-<div class="taggbox" style="width:1080px;height:100%;overflow:auto;" data-widget-id="323222" data-website="1"></div><script src="https://widget.taggbox.com/embed.min.js" type="text/javascript"></script>
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Community Spotlight | Blackwood Publishing</title>
+
+<meta name="description" content="Community Spotlight showcasing readers, creators, and features from Blackwood Publishing.">
+
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
+
+<style>
+
+/* =========================
+   GLOBAL PREMIUM TWEAKS
+========================= */
+
+body.community-page {
+    background: #0b0b0b;
+    color: #eaeaea;
+    letter-spacing: 0.3px;
+}
+
+/* subtle film grain */
+body.community-page::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+    opacity: 0.08;
+    z-index: 999;
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+
+.community-hero {
+    position: relative;
+    height: 65vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* background image */
+.community-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/assets/community-bg.jpg') center/cover no-repeat;
+    filter: brightness(0.45);
+}
+
+/* vignette overlay */
+.community-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+}
+
+.community-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    padding: 20px;
+}
+
+.community-hero h1 {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.community-hero p {
+    font-size: 16px;
+    opacity: 0.75;
+    line-height: 1.6;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+.community-container {
+    max-width: 1200px;
+    margin: 100px auto;
+    padding: 0 20px;
+}
+
+/* subtle divider */
+.community-divider {
+    text-align: center;
+    margin: 80px auto;
+    opacity: 0.5;
+    font-style: italic;
+}
+
+/* =========================
+   TAGGBOX FRAME
+========================= */
+
+.taggbox-wrapper {
+    position: relative;
+    margin-top: 60px;
+    padding: 30px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+}
+
+/* subtle glow edge */
+.taggbox-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+
+/* remove harsh box feel */
+.taggbox {
+    width: 100% !important;
+    min-height: 600px;
+}
+
+/* =========================
+   FADE + LIFT ANIMATION
+========================= */
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1.2s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+</style>
+
+</head>
+
+<body class="sub-page community-page">
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<!-- HERO -->
+<section class="community-hero">
+
+    <div class="community-hero-content fade-in">
+        <h1>Community Spotlight</h1>
+
+        <p>
+            Stories shared beyond the page — fragments of readers, places, and moments 
+            that continue long after the final line.
+        </p>
+    </div>
+
+</section>
+
+<!-- CONTENT -->
+<section class="community-container">
+
+    <div class="community-divider fade-in">
+        <p>What remains, is what is shared.</p>
+    </div>
+
+    <!-- TAGGBOX -->
+    <div class="taggbox-wrapper fade-in">
+        <div 
+            class="taggbox" 
+            data-widget-id="323222" 
+            data-website="1">
+        </div>
+    </div>
+
+</section>
+
+<!-- FOOTER SPACING -->
+<div style="height:60px;"></div>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js?v=20260408" defer></script>
+<script src="https://widget.taggbox.com/embed.min.js"></script>
+
+<script>
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
+        console.error("Header failed to load");
+        return;
+    }
+
+    await loadHeader("simple");
+
+    // Fade-in observer
+    const elements = document.querySelectorAll(".fade-in");
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+            }
+        });
+    }, { threshold: 0.2 });
+
+    elements.forEach(el => observer.observe(el));
+
+});
+</script>
+
+</body>
+</html>
