@@ -2617,3 +2617,12 @@ body.community-page::after {
     opacity: 0.08;
     z-index: 999;
 }
+.taggbox {
+    width: 100% !important;
+    min-height: 600px;
+}
+.taggbox-wrapper {
+    background: rgba(255,255,255,0.02);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
