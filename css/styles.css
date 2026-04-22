@@ -2651,7 +2651,7 @@ body.community-page::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: url('/assets/forest.png') center/cover no-repeat;
+    background: url('/assets/forest1.png') center/cover no-repeat;
     filter: brightness(0.42) contrast(1.08);
     animation: heroDrift 30s ease-in-out infinite alternate;
 }
@@ -2704,7 +2704,6 @@ body.community-page::after {
     padding: 0 20px;
 }
 
-/* divider (now part of flow, not a break) */
 .community-divider {
     margin: 70px auto 40px;
     text-align: center;
@@ -2745,8 +2744,8 @@ body.community-page::after {
     position: relative;
     margin-top: 50px;
     padding: 20px;
-    background: transparent; /* ← key change */
-    border: none; /* ← remove “box” feel */
+    background: transparent;
+    border: none;
 }
 
 /* soft ambient depth instead */
