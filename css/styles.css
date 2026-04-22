@@ -2609,36 +2609,36 @@ body.legal-page h3 {
     text-align: center;
 }
 /* =========================================
-   COMMUNITY PAGE — FINAL SYSTEM
+   COMMUNITY PAGE — CONTINUOUS SYSTEM (FINAL)
 ========================================= */
 
-/* ===== BASE PAGE ===== */
+/* ===== BASE ===== */
 body.community-page {
     background: #0b0b0b;
     color: #eaeaea;
     letter-spacing: 0.3px;
 }
 
-/* Film grain overlay */
+/* Film grain */
 body.community-page::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
     background-image: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
-    opacity: 0.08;
+    opacity: 0.06;
     z-index: 999;
 }
 
 /* =========================================
-   HERO (HOMEPAGE-STYLE FADE)
+   HERO (BLENDED — NO EDGE)
 ========================================= */
 
 .community-hero {
     position: relative;
-    height: 50vh;
-    min-height: 400px;
-    max-height: 600px;
+    height: 48vh;
+    min-height: 380px;
+    max-height: 580px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2646,25 +2646,27 @@ body.community-page::after {
     overflow: hidden;
 }
 
-/* background image */
+/* background (with subtle motion) */
 .community-hero::before {
     content: "";
     position: absolute;
     inset: 0;
     background: url('/assets/forest.png') center/cover no-repeat;
-    filter: brightness(0.45) contrast(1.05);
+    filter: brightness(0.42) contrast(1.08);
+    animation: heroDrift 30s ease-in-out infinite alternate;
 }
 
-/* smooth tonal fade (NO harsh line) */
+/* ultra-smooth tonal blend */
 .community-hero::after {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(
         to bottom,
-        rgba(0,0,0,0.2) 0%,
-        rgba(0,0,0,0.4) 40%,
-        rgba(11,11,11,1) 100%
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.35) 35%,
+        rgba(0,0,0,0.6) 65%,
+        #0b0b0b 100%
     );
 }
 
@@ -2672,92 +2674,91 @@ body.community-page::after {
 .community-hero-content {
     position: relative;
     z-index: 2;
-    max-width: 700px;
+    max-width: 680px;
     padding: 20px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: heroFade 1.6s ease forwards;
+    animation-delay: 0.3s;
 }
 
 .community-hero h1 {
-    font-size: clamp(32px, 4.5vw, 56px);
+    font-size: clamp(30px, 4.5vw, 54px);
     font-weight: 400;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .community-hero p {
     font-size: 15px;
     opacity: 0.7;
     line-height: 1.6;
-    max-width: 600px;
-    margin: 0 auto;
 }
 
 /* =========================================
-   CONTENT AREA (NATURAL FLOW)
+   FLOW CONTENT (NO SEPARATION)
 ========================================= */
 
 .community-container {
-    max-width: 1200px;
-    margin: 40px auto 100px;
+    max-width: 1100px;
+    margin: 20px auto 100px;
     padding: 0 20px;
 }
 
-/* divider */
+/* divider (now part of flow, not a break) */
 .community-divider {
-    margin: 80px auto;
+    margin: 70px auto 40px;
     text-align: center;
-    opacity: 0.5;
+    opacity: 0.45;
     font-style: italic;
 }
 
 /* =========================================
-   CTA (HASHTAG)
+   CTA (SUBTLE INVITE)
 ========================================= */
 
 .community-cta {
     text-align: center;
-    margin: 40px auto 20px;
-    font-size: 14px;
-    opacity: 0.6;
+    margin: 30px auto 10px;
+    font-size: 13px;
+    opacity: 0.55;
     letter-spacing: 1px;
 }
 
 .community-cta span {
     opacity: 1;
     font-style: italic;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
+    border-bottom: 1px solid rgba(255,255,255,0.25);
     padding-bottom: 2px;
     cursor: pointer;
     transition: opacity 0.3s ease;
 }
 
 .community-cta span:hover {
-    opacity: 0.7;
+    opacity: 0.75;
 }
 
 /* =========================================
-   TAGGBOX WRAPPER (GLASS FRAME)
+   TAGGBOX (INTEGRATED — NOT A BOX)
 ========================================= */
 
 .taggbox-wrapper {
     position: relative;
-    margin-top: 60px;
-    padding: 30px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    overflow: hidden;
+    margin-top: 50px;
+    padding: 20px;
+    background: transparent; /* ← key change */
+    border: none; /* ← remove “box” feel */
 }
 
-/* subtle inner edge */
+/* soft ambient depth instead */
 .taggbox-wrapper::before {
     content: "";
     position: absolute;
     inset: 0;
-    border: 1px solid rgba(255,255,255,0.04);
+    background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 70%);
     pointer-events: none;
 }
 
-/* cinematic side fade */
+/* edge fade (very subtle) */
 .taggbox-wrapper::after {
     content: "";
     position: absolute;
@@ -2765,10 +2766,10 @@ body.community-page::after {
     pointer-events: none;
     background: linear-gradient(
         to right,
-        rgba(11,11,11,1) 0%,
-        transparent 10%,
-        transparent 90%,
-        rgba(11,11,11,1) 100%
+        rgba(11,11,11,0.9) 0%,
+        transparent 12%,
+        transparent 88%,
+        rgba(11,11,11,0.9) 100%
     );
 }
 
@@ -2779,38 +2780,37 @@ body.community-page::after {
 .taggbox {
     width: 100% !important;
     min-height: 600px;
-    filter: grayscale(10%) contrast(95%);
+    filter: grayscale(8%) contrast(96%);
 }
 
 /* cards */
 .taggbox .tb-post-card {
-    border-radius: 6px !important;
+    border-radius: 4px !important;
     overflow: hidden;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .taggbox .tb-post-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
 }
 
 /* buttons */
 .taggbox .tb-btn,
 .taggbox .explore-btn {
-    background: rgba(255,255,255,0.08) !important;
+    background: rgba(255,255,255,0.06) !important;
     color: #eaeaea !important;
-    border: 1px solid rgba(255,255,255,0.15) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
     backdrop-filter: blur(4px);
-    transition: all 0.3s ease;
 }
 
 .taggbox .tb-btn:hover {
-    background: rgba(255,255,255,0.15) !important;
+    background: rgba(255,255,255,0.12) !important;
 }
 
-/* watermark */
+/* watermark (softened) */
 .taggbox .tb-powered-by {
-    opacity: 0.2;
+    opacity: 0.15;
     font-size: 10px;
 }
 
@@ -2820,13 +2820,25 @@ body.community-page::after {
 
 .fade-in {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(25px);
     transition: all 1.2s ease;
 }
 
 .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+@keyframes heroFade {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes heroDrift {
+    from { transform: scale(1); }
+    to { transform: scale(1.04); }
 }
 
 /* =========================================
@@ -2836,15 +2848,15 @@ body.community-page::after {
 @media (max-width: 768px) {
 
     .community-hero {
-        height: 45vh;
+        height: 42vh;
     }
 
     .community-container {
-        margin: 60px auto;
+        margin: 30px auto;
     }
 
     .taggbox-wrapper {
-        padding: 15px;
+        padding: 10px;
     }
 
     .taggbox {
