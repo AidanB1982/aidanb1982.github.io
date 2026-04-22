@@ -2626,3 +2626,17 @@ body.community-page::after {
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
 }
+.community-cta {
+    text-align: center;
+    margin: 40px auto 20px;
+    font-size: 14px;
+    opacity: 0.6;
+    letter-spacing: 1px;
+}
+
+.community-cta span {
+    opacity: 1;
+    font-style: italic;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    padding-bottom: 2px;
+}
