@@ -2609,7 +2609,7 @@ body.legal-page h3 {
     text-align: center;
 }
 /* =========================================
-   COMMUNITY PAGE — FULL SYSTEM
+   COMMUNITY PAGE — FINAL SYSTEM
 ========================================= */
 
 /* ===== BASE PAGE ===== */
@@ -2631,7 +2631,7 @@ body.community-page::after {
 }
 
 /* =========================================
-   HERO (REFINED + FADE TO BLACK)
+   HERO (HOMEPAGE-STYLE FADE)
 ========================================= */
 
 .community-hero {
@@ -2646,23 +2646,26 @@ body.community-page::after {
     overflow: hidden;
 }
 
-/* background */
+/* background image */
 .community-hero::before {
     content: "";
     position: absolute;
     inset: 0;
     background: url('/assets/forest.png') center/cover no-repeat;
-    filter: brightness(0.5);
+    filter: brightness(0.45) contrast(1.05);
 }
 
-/* vignette + bottom fade */
+/* smooth tonal fade (NO harsh line) */
 .community-hero::after {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-        radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.9) 100%),
-        linear-gradient(to bottom, transparent 50%, #0b0b0b 100%);
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.2) 0%,
+        rgba(0,0,0,0.4) 40%,
+        rgba(11,11,11,1) 100%
+    );
 }
 
 /* hero content */
@@ -2687,25 +2690,20 @@ body.community-page::after {
     margin: 0 auto;
 }
 
-/* subtle separator */
-.community-hero {
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
 /* =========================================
-   CONTENT AREA
+   CONTENT AREA (NATURAL FLOW)
 ========================================= */
 
 .community-container {
     max-width: 1200px;
-    margin: 100px auto;
+    margin: 40px auto 100px;
     padding: 0 20px;
 }
 
 /* divider */
 .community-divider {
-    text-align: center;
     margin: 80px auto;
+    text-align: center;
     opacity: 0.5;
     font-style: italic;
 }
@@ -2750,7 +2748,7 @@ body.community-page::after {
     overflow: hidden;
 }
 
-/* inner edge */
+/* subtle inner edge */
 .taggbox-wrapper::before {
     content: "";
     position: absolute;
@@ -2759,7 +2757,7 @@ body.community-page::after {
     pointer-events: none;
 }
 
-/* cinematic edge fade */
+/* cinematic side fade */
 .taggbox-wrapper::after {
     content: "";
     position: absolute;
