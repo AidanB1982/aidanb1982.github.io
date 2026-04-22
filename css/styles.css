@@ -2608,9 +2608,18 @@ body.legal-page h3 {
     letter-spacing: 2px;
     text-align: center;
 }
-/* =========================
-   FILM GRAIN OVERLAY
-========================= */
+/* =========================================
+   COMMUNITY PAGE — FULL SYSTEM
+========================================= */
+
+/* ===== BASE PAGE ===== */
+body.community-page {
+    background: #0b0b0b;
+    color: #eaeaea;
+    letter-spacing: 0.3px;
+}
+
+/* Film grain overlay */
 body.community-page::after {
     content: "";
     position: fixed;
@@ -2621,18 +2630,115 @@ body.community-page::after {
     z-index: 999;
 }
 
-/* =========================
-   TAGGBOX BASE
-========================= */
-.taggbox {
-    width: 100% !important;
-    min-height: 600px;
-    filter: grayscale(10%) contrast(95%);
+/* =========================================
+   HERO (REFINED + FADE TO BLACK)
+========================================= */
+
+.community-hero {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    max-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
 }
 
-/* =========================
-   TAGGBOX FRAME (GLASS LOOK)
-========================= */
+/* background */
+.community-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url('/assets/forest.png') center/cover no-repeat;
+    filter: brightness(0.5);
+}
+
+/* vignette + bottom fade */
+.community-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.85) 100%),
+        linear-gradient(to bottom, transparent 60%, #0b0b0b 100%);
+}
+
+/* hero content */
+.community-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    padding: 20px;
+}
+
+.community-hero h1 {
+    font-size: clamp(32px, 4.5vw, 56px);
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.community-hero p {
+    font-size: 15px;
+    opacity: 0.7;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* subtle separator */
+.community-hero {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* =========================================
+   CONTENT AREA
+========================================= */
+
+.community-container {
+    max-width: 1200px;
+    margin: 100px auto;
+    padding: 0 20px;
+}
+
+/* divider */
+.community-divider {
+    text-align: center;
+    margin: 80px auto;
+    opacity: 0.5;
+    font-style: italic;
+}
+
+/* =========================================
+   CTA (HASHTAG)
+========================================= */
+
+.community-cta {
+    text-align: center;
+    margin: 40px auto 20px;
+    font-size: 14px;
+    opacity: 0.6;
+    letter-spacing: 1px;
+}
+
+.community-cta span {
+    opacity: 1;
+    font-style: italic;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    padding-bottom: 2px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.community-cta span:hover {
+    opacity: 0.7;
+}
+
+/* =========================================
+   TAGGBOX WRAPPER (GLASS FRAME)
+========================================= */
+
 .taggbox-wrapper {
     position: relative;
     margin-top: 60px;
@@ -2644,7 +2750,7 @@ body.community-page::after {
     overflow: hidden;
 }
 
-/* subtle inner edge */
+/* inner edge */
 .taggbox-wrapper::before {
     content: "";
     position: absolute;
@@ -2668,9 +2774,17 @@ body.community-page::after {
     );
 }
 
-/* =========================
-   TAGGBOX CARDS (DEPTH)
-========================= */
+/* =========================================
+   TAGGBOX CONTENT
+========================================= */
+
+.taggbox {
+    width: 100% !important;
+    min-height: 600px;
+    filter: grayscale(10%) contrast(95%);
+}
+
+/* cards */
 .taggbox .tb-post-card {
     border-radius: 6px !important;
     overflow: hidden;
@@ -2682,9 +2796,7 @@ body.community-page::after {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* =========================
-   BUTTON STYLING (FIX EXPLORE)
-========================= */
+/* buttons */
 .taggbox .tb-btn,
 .taggbox .explore-btn {
     background: rgba(255,255,255,0.08) !important;
@@ -2698,42 +2810,40 @@ body.community-page::after {
     background: rgba(255,255,255,0.15) !important;
 }
 
-/* =========================
-   WATERMARK CONTROL
-========================= */
+/* watermark */
 .taggbox .tb-powered-by {
     opacity: 0.2;
     font-size: 10px;
 }
 
-/* =========================
-   CTA (HASHTAG SECTION)
-========================= */
-.community-cta {
-    text-align: center;
-    margin: 40px auto 20px;
-    font-size: 14px;
-    opacity: 0.6;
-    letter-spacing: 1px;
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1.2s ease;
 }
 
-.community-cta span {
+.fade-in.visible {
     opacity: 1;
-    font-style: italic;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
-    padding-bottom: 2px;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
+    transform: translateY(0);
 }
 
-.community-cta span:hover {
-    opacity: 0.7;
-}
+/* =========================================
+   MOBILE
+========================================= */
 
-/* =========================
-   MOBILE POLISH
-========================= */
 @media (max-width: 768px) {
+
+    .community-hero {
+        height: 45vh;
+    }
+
+    .community-container {
+        margin: 60px auto;
+    }
 
     .taggbox-wrapper {
         padding: 15px;
