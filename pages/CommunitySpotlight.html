@@ -48,7 +48,6 @@ body.community-page::after {
     overflow: hidden;
 }
 
-/* background image */
 .community-hero::before {
     content: "";
     position: absolute;
@@ -57,7 +56,6 @@ body.community-page::after {
     filter: brightness(0.45);
 }
 
-/* vignette overlay */
 .community-hero::after {
     content: "";
     position: absolute;
@@ -94,19 +92,36 @@ body.community-page::after {
     padding: 0 20px;
 }
 
-/* subtle divider */
+/* divider */
 .community-divider {
     text-align: center;
     margin: 80px auto;
     opacity: 0.5;
     font-style: italic;
 }
-<div class="community-cta fade-in">
-    <p>
-        Share your own fragment using 
-        <span>#aidanblackwood</span>
-    </p>
-</div>
+
+/* CTA */
+.community-cta {
+    text-align: center;
+    margin: 40px auto 20px;
+    font-size: 14px;
+    opacity: 0.6;
+    letter-spacing: 1px;
+}
+
+.community-cta span {
+    opacity: 1;
+    font-style: italic;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    padding-bottom: 2px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.community-cta span:hover {
+    opacity: 0.7;
+}
+
 /* =========================
    TAGGBOX FRAME
 ========================= */
@@ -118,9 +133,9 @@ body.community-page::after {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-/* subtle glow edge */
 .taggbox-wrapper::before {
     content: "";
     position: absolute;
@@ -129,7 +144,6 @@ body.community-page::after {
     pointer-events: none;
 }
 
-/* remove harsh box feel */
 .taggbox {
     width: 100% !important;
     min-height: 600px;
@@ -180,6 +194,14 @@ body.community-page::after {
         <p>What remains, is what is shared.</p>
     </div>
 
+    <!-- CTA -->
+    <div class="community-cta fade-in">
+        <p>
+            Share your own fragment using 
+            <span id="hashtag">#aidanblackwood</span>
+        </p>
+    </div>
+
     <!-- TAGGBOX -->
     <div class="taggbox-wrapper fade-in">
         <div 
@@ -211,7 +233,7 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    // Fade-in observer
+    // Fade-in animation
     const elements = document.querySelectorAll(".fade-in");
 
     const observer = new IntersectionObserver((entries) => {
@@ -223,6 +245,20 @@ window.addEventListener("load", async () => {
     }, { threshold: 0.2 });
 
     elements.forEach(el => observer.observe(el));
+
+    // Click-to-copy hashtag (premium UX touch)
+    const hashtag = document.getElementById("hashtag");
+    if (hashtag) {
+        hashtag.addEventListener("click", () => {
+            navigator.clipboard.writeText("#aidanblackwood");
+
+            hashtag.textContent = "Copied ✓";
+
+            setTimeout(() => {
+                hashtag.textContent = "#aidanblackwood";
+            }, 2000);
+        });
+    }
 
 });
 </script>
