@@ -2638,7 +2638,7 @@ body.community-page::after {
     position: relative;
     height: 48vh;
     min-height: 380px;
-    max-height: 580px;
+    max-height: 680px;
     display: flex;
     align-items: center;
     justify-content: center;
