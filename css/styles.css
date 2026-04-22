@@ -2608,6 +2608,9 @@ body.legal-page h3 {
     letter-spacing: 2px;
     text-align: center;
 }
+/* =========================
+   FILM GRAIN OVERLAY
+========================= */
 body.community-page::after {
     content: "";
     position: fixed;
@@ -2617,15 +2620,95 @@ body.community-page::after {
     opacity: 0.08;
     z-index: 999;
 }
+
+/* =========================
+   TAGGBOX BASE
+========================= */
 .taggbox {
     width: 100% !important;
     min-height: 600px;
+    filter: grayscale(10%) contrast(95%);
 }
+
+/* =========================
+   TAGGBOX FRAME (GLASS LOOK)
+========================= */
 .taggbox-wrapper {
+    position: relative;
+    margin-top: 60px;
+    padding: 30px;
     background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    overflow: hidden;
 }
+
+/* subtle inner edge */
+.taggbox-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+
+/* cinematic edge fade */
+.taggbox-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        to right,
+        rgba(11,11,11,1) 0%,
+        transparent 10%,
+        transparent 90%,
+        rgba(11,11,11,1) 100%
+    );
+}
+
+/* =========================
+   TAGGBOX CARDS (DEPTH)
+========================= */
+.taggbox .tb-post-card {
+    border-radius: 6px !important;
+    overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.taggbox .tb-post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* =========================
+   BUTTON STYLING (FIX EXPLORE)
+========================= */
+.taggbox .tb-btn,
+.taggbox .explore-btn {
+    background: rgba(255,255,255,0.08) !important;
+    color: #eaeaea !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+
+.taggbox .tb-btn:hover {
+    background: rgba(255,255,255,0.15) !important;
+}
+
+/* =========================
+   WATERMARK CONTROL
+========================= */
+.taggbox .tb-powered-by {
+    opacity: 0.2;
+    font-size: 10px;
+}
+
+/* =========================
+   CTA (HASHTAG SECTION)
+========================= */
 .community-cta {
     text-align: center;
     margin: 40px auto 20px;
@@ -2639,4 +2722,25 @@ body.community-page::after {
     font-style: italic;
     border-bottom: 1px solid rgba(255,255,255,0.3);
     padding-bottom: 2px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.community-cta span:hover {
+    opacity: 0.7;
+}
+
+/* =========================
+   MOBILE POLISH
+========================= */
+@media (max-width: 768px) {
+
+    .taggbox-wrapper {
+        padding: 15px;
+    }
+
+    .taggbox {
+        min-height: 500px;
+    }
+
 }
