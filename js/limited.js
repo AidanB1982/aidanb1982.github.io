@@ -1,10 +1,25 @@
 // ===== CONFIG =====
 const SHOP_DOMAIN = 'vmbd0z-c6.myshopify.com';
 const STOREFRONT_TOKEN = 'aeb1f4c8b1902d50200b3f0dc8d8ee9b';
-const PRODUCT_ID = '16164737679705';
 
-const NODE_ID = 'product-component-1777209632096';
-const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
+// ALL PRODUCTS
+const PRODUCTS = [
+  {
+    id: '16164737679705',
+    node: 'product-1',
+    stock: 'stock-1'
+  },
+  {
+    id: '16270731706713',
+    node: 'product-2',
+    stock: 'stock-2'
+  },
+  {
+    id: '16270738620761',
+    node: 'product-3',
+    stock: 'stock-3'
+  }
+];
 
 
 // ===== LOAD SHOPIFY =====
@@ -22,14 +37,6 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
   function initShopify() {
 
-    const node = document.getElementById(NODE_ID);
-
-    // Prevent silent failure
-    if (!node) {
-      console.error("Shopify node not found:", NODE_ID);
-      return;
-    }
-
     const client = ShopifyBuy.buildClient({
       domain: SHOP_DOMAIN,
       storefrontAccessToken: STOREFRONT_TOKEN,
@@ -37,61 +44,61 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
     ShopifyBuy.UI.onReady(client).then(function (ui) {
 
-      ui.createComponent('product', {
-        id: PRODUCT_ID,
-        node: node,
+      PRODUCTS.forEach(p => {
 
-        // £ formatting
-        moneyFormat: '£{{amount}}',
+        const node = document.getElementById(p.node);
+        if (!node) return;
 
-        options: {
-          product: {
+        ui.createComponent('product', {
+          id: p.id,
+          node: node,
 
-            // 🔥 THIS FIXES THE LEFT OFFSET
-            styles: {
-              product: {
-                "max-width": "100%",
-                "margin": "0 auto",
-                "text-align": "center"
-              },
+          moneyFormat: '£{{amount}}',
 
-              button: {
-                "font-family": "Source Serif Pro, Georgia, serif",
-                "font-size": "14px",
-                "padding": "14px 30px",
-                "color": "#F1F1F1",
-                "background-color": "#5F7D76",
-                ":hover": {
-                  "background-color": "#56716a"
+          options: {
+            product: {
+              styles: {
+                product: {
+                  "max-width": "100%",
+                  "margin": "0 auto",
+                  "text-align": "center"
                 },
-                ":focus": {
-                  "background-color": "#56716a"
+                button: {
+                  "font-family": "Source Serif Pro, Georgia, serif",
+                  "font-size": "14px",
+                  "padding": "14px 30px",
+                  "color": "#F1F1F1",
+                  "background-color": "#5F7D76",
+                  ":hover": {
+                    "background-color": "#56716a"
+                  }
+                },
+                price: {
+                  "color": "#E6E6E6",
+                  "opacity": "0.85",
+                  "margin": "6px 0"
                 }
               },
 
-              price: {
-                "color": "#E6E6E6",
-                "opacity": "0.8",
-                "margin": "8px 0"
+              contents: {
+                img: false,
+                title: false,
+                price: true,
+                button: true
+              },
+
+              text: {
+                button: "Secure a copy"
               }
-            },
-
-            contents: {
-              img: false,
-              title: false,
-              price: true,
-              button: true
-            },
-
-            text: {
-              button: "Secure a copy"
             }
           }
-        }
+        });
+
       });
 
-      // Wait for Shopify DOM
-      setTimeout(fetchInventory, 1200);
+      // load stock after UI renders
+      setTimeout(fetchAllInventory, 1200);
+
     });
   }
 
@@ -108,8 +115,19 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 })();
 
 
-// ===== INVENTORY =====
-async function fetchInventory() {
+// ===== INVENTORY (ALL PRODUCTS) =====
+async function fetchAllInventory() {
+
+  for (let p of PRODUCTS) {
+    await fetchInventory(p);
+  }
+
+}
+
+
+async function fetchInventory(product) {
+
+  const PRODUCT_GID = `gid://shopify/Product/${product.id}`;
 
   const query = `
   {
@@ -155,7 +173,7 @@ async function fetchInventory() {
       }
     });
 
-    const el = document.getElementById("stock-count");
+    const el = document.getElementById(product.stock);
     if (!el) return;
 
     // DISPLAY
@@ -165,7 +183,7 @@ async function fetchInventory() {
       el.innerText = "Limited copies remain.";
     } else {
       el.innerText = "No copies remain.";
-      disableButton();
+      disableButton(product.node);
     }
 
   } catch (err) {
@@ -175,10 +193,9 @@ async function fetchInventory() {
 
 
 // ===== DISABLE BUTTON =====
-function disableButton() {
+function disableButton(nodeId) {
 
-  const btn = document.querySelector(`#${NODE_ID} .shopify-buy__btn`);
-
+  const btn = document.querySelector(`#${nodeId} .shopify-buy__btn`);
   if (!btn) return;
 
   btn.innerText = "Unavailable";
@@ -188,4 +205,4 @@ function disableButton() {
 
 
 // ===== AUTO REFRESH =====
-setInterval(fetchInventory, 30000);
+setInterval(fetchAllInventory, 30000);
