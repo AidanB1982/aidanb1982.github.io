@@ -24,7 +24,7 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
     const node = document.getElementById(NODE_ID);
 
-    // 🔴 Prevent silent failure
+    // Prevent silent failure
     if (!node) {
       console.error("Shopify node not found:", NODE_ID);
       return;
@@ -41,16 +41,48 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
         id: PRODUCT_ID,
         node: node,
 
+        // £ formatting
         moneyFormat: '£{{amount}}',
 
         options: {
           product: {
+
+            // 🔥 THIS FIXES THE LEFT OFFSET
+            styles: {
+              product: {
+                "max-width": "100%",
+                "margin": "0 auto",
+                "text-align": "center"
+              },
+
+              button: {
+                "font-family": "Source Serif Pro, Georgia, serif",
+                "font-size": "14px",
+                "padding": "14px 30px",
+                "color": "#F1F1F1",
+                "background-color": "#5F7D76",
+                ":hover": {
+                  "background-color": "#56716a"
+                },
+                ":focus": {
+                  "background-color": "#56716a"
+                }
+              },
+
+              price: {
+                "color": "#E6E6E6",
+                "opacity": "0.8",
+                "margin": "8px 0"
+              }
+            },
+
             contents: {
               img: false,
               title: false,
               price: true,
               button: true
             },
+
             text: {
               button: "Secure a copy"
             }
@@ -58,7 +90,7 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
         }
       });
 
-      // ✅ More reliable delay
+      // Wait for Shopify DOM
       setTimeout(fetchInventory, 1200);
     });
   }
@@ -105,7 +137,6 @@ async function fetchInventory() {
     });
 
     const data = await response.json();
-    console.log("Shopify inventory data:", data);
 
     const variants = data?.data?.product?.variants?.edges || [];
 
@@ -127,7 +158,7 @@ async function fetchInventory() {
     const el = document.getElementById("stock-count");
     if (!el) return;
 
-    // ===== DISPLAY =====
+    // DISPLAY
     if (totalQty > 0) {
       el.innerText = `${totalQty} copies remain.`;
     } else if (available) {
