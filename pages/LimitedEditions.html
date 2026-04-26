@@ -1,178 +1,168 @@
-<!DOCTYPE html>
-<html lang="en" class="no-js">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+// ===== CONFIG =====
+const SHOP_DOMAIN = 'vmbd0z-c6.myshopify.com';
+const STOREFRONT_TOKEN = 'aeb1f4c8b1902d50200b3f0dc8d8ee9b';
+const PRODUCT_ID = '16164737679705';
 
-<title>Objects from the Archive | Blackwood Publishing</title>
+const NODE_ID = 'product-component-1777209632096';
+const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
-<link rel="stylesheet" href="/css/header.css">
-<link rel="stylesheet" href="/css/styles.css">
 
-<style>
 
-/* ===== STRUCTURE ===== */
+// ===== LOAD SHOPIFY =====
+(function () {
 
-.limited-intro,
-.edition-block,
-.limited-note,
-.limited-exit {
-  max-width: 760px;
-  margin: 80px auto;
-  text-align: center;
-  padding: 0 20px;
-}
+  const scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
 
-.limited-intro {
-  margin-top: 120px;
-  margin-bottom: 60px;
-}
+  function loadScript() {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = scriptURL;
+    document.head.appendChild(script);
+    script.onload = initShopify;
+  }
 
-.edition-block {
-  margin-top: 60px;
-  margin-bottom: 80px;
-}
+  function initShopify() {
 
-.limited-intro h1 {
-  font-size: 36px;
-  margin-bottom: 16px;
-}
+    const client = ShopifyBuy.buildClient({
+      domain: SHOP_DOMAIN,
+      storefrontAccessToken: STOREFRONT_TOKEN,
+    });
 
-.edition-block h2 {
-  font-size: 28px;
-  margin-bottom: 16px;
-}
+    ShopifyBuy.UI.onReady(client).then(function (ui) {
 
-.edition-block p {
-  margin: 10px 0;
-}
+      ui.createComponent('product', {
+        id: PRODUCT_ID,
+        node: document.getElementById(NODE_ID),
 
-/* IMAGE */
-.edition-block img {
-  margin: 30px auto 20px;
-  display: block;
-  max-width: 280px;
-}
+        // ✅ FORCE £ CURRENCY
+        moneyFormat: '£{{amount}}',
 
-/* STOCK */
-.stock-line {
-  margin-top: 20px;
-  font-size: 14px;
-  opacity: 0.7;
-}
+        options: {
 
-.final-line {
-  font-size: 13px;
-  opacity: 0.5;
-  margin-top: 6px;
-}
+          // ===== MAIN BUTTON (NO PRICE ON PAGE) =====
+          product: {
+            contents: {
+              img: false,
+              title: false,
+              price: false
+            },
+            styles: {
+              button: {
+                fontFamily: "Garamond, serif",
+                fontSize: "14px",
+                padding: "15px 35px",
+                color: "#e8e6e1",
+                backgroundColor: "#5f7d76"
+              }
+            },
+            text: {
+              button: "Secure a copy"
+            }
+          },
 
-/* NOTE */
-.limited-note {
-  opacity: 0.6;
-  font-style: italic;
-  margin-top: 60px;
-}
+          // ===== MODAL (PRICE SHOWS HERE WITH £) =====
+          modalProduct: {
+            contents: {
+              img: false,
+              imgWithCarousel: true,
+              button: true,
+              buttonWithQuantity: false,
+              price: true   // 👈 shows £ price here only
+            },
+            text: {
+              button: "Secure a copy"
+            }
+          }
 
-/* EXIT */
-.limited-exit {
-  margin-top: 80px;
-  margin-bottom: 120px;
-}
+        }
+      });
 
-.limited-exit a {
-  display: inline-block;
-  margin-top: 20px;
-  color: #e8e6e1;
-  text-decoration: none;
-  border-bottom: 1px solid #e8e6e1;
-}
+      // wait for Shopify DOM
+      setTimeout(fetchInventory, 700);
+    });
+  }
 
-/* REMOVE SHOPIFY UI NOISE */
-.shopify-buy__cart-toggle {
-  display: none !important;
-}
-
-</style>
-
-</head>
-
-<body class="sub-page limited-page">
-
-<!-- HEADER -->
-<div id="header-placeholder"></div>
-
-<!-- INTRO -->
-<section class="limited-intro fade-in">
-
-  <h1>Objects from the Archive</h1>
-
-  <p>
-    Some editions are released in limited form.<br>
-    Signed. Numbered. Not always available.
-  </p>
-
-  <p>Not all copies remain.</p>
-
-</section>
-
-<!-- EDITION -->
-<section class="edition-block fade-in">
-
-  <h2>Corrour Bothy — The First Summoning</h2>
-
-  <p>A small number of copies were marked by hand.</p>
-
-  <p>
-    Each one carries a record of its own.<br>
-    No two are identical.
-  </p>
-
-  <!-- IMAGE -->
-  <img src="/assets/A1.png" alt="Corrour Bothy Signed Edition">
-
-  <!-- STOCK -->
-  <p id="stock-count" class="stock-line">
-    Checking availability...
-  </p>
-
-  <p class="final-line">
-    Once they are gone, they are not replaced.
-  </p>
-
-  <!-- ✅ NEW SHOPIFY BUTTON TARGET -->
-  <div id="product-component-1777209632096"></div>
-
-</section>
-
-<!-- WORLD DETAIL -->
-<section class="limited-note fade-in">
-  <p>Some copies appear where they should not.</p>
-</section>
-
-<!-- EXIT -->
-<section class="limited-exit fade-in">
-  <p>Once they are gone, they are not replaced.</p>
-  <a href="/pages/archive.html">Return to the archive</a>
-</section>
-
-<!-- FOOTER -->
-<div id="footer-placeholder"></div>
-
-<!-- JS -->
-<script src="/js/header.js?v=20260408" defer></script>
-<script src="/js/limited.js" defer></script>
-
-<script>
-window.addEventListener("load", async () => {
-    if (typeof loadHeader !== "function") return;
-    await loadHeader("simple");
-
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
+  if (window.ShopifyBuy) {
+    if (window.ShopifyBuy.UI) {
+      initShopify();
+    } else {
+      loadScript();
     }
-});
-</script>
+  } else {
+    loadScript();
+  }
 
-</body>
-</html>
+})();
+
+
+
+// ===== INVENTORY =====
+async function fetchInventory() {
+
+  const query = `
+  {
+    product(id: "${PRODUCT_GID}") {
+      variants(first: 1) {
+        edges {
+          node {
+            quantityAvailable
+          }
+        }
+      }
+    }
+  }`;
+
+  try {
+
+    const response = await fetch(`https://${SHOP_DOMAIN}/api/2023-10/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': STOREFRONT_TOKEN
+      },
+      body: JSON.stringify({ query })
+    });
+
+    const data = await response.json();
+    const qty = data.data.product.variants.edges[0].node.quantityAvailable;
+
+    const el = document.getElementById("stock-count");
+    if (!el) return;
+
+    if (qty > 0) {
+
+      el.innerText = `${qty} copies remain.`;
+
+      if (qty <= 10) {
+        el.style.opacity = "0.9";
+      }
+
+    } else {
+
+      el.innerText = "No copies remain.";
+      disableButton();
+    }
+
+  } catch (err) {
+    console.error("Inventory fetch failed:", err);
+  }
+}
+
+
+
+// ===== DISABLE BUTTON =====
+function disableButton() {
+
+  const btn = document.querySelector(".shopify-buy__btn");
+
+  if (!btn) return;
+
+  btn.innerText = "Unavailable";
+  btn.style.opacity = "0.5";
+  btn.style.pointerEvents = "none";
+}
+
+
+
+// ===== AUTO REFRESH =====
+setInterval(fetchInventory, 30000);
