@@ -2863,3 +2863,66 @@ body.community-page::after {
     }
 
 }
+/* ===== CENTER SHOPIFY CONTAINER ===== */
+
+#product-component-1777209632096 {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+
+/* ===== FORCE INTERNAL CENTERING ===== */
+
+.shopify-buy__layout-vertical {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+.shopify-buy__product {
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+
+/* ===== REMOVE TITLE (YOU ALREADY HAVE ONE) ===== */
+
+.shopify-buy__product__title {
+  display: none !important;
+}
+
+
+/* ===== TEXT (BRAND CORRECT) ===== */
+
+.shopify-buy__product__actual-price {
+  color: #F1F1F1 !important;
+  opacity: 1 !important;
+  margin: 8px 0 6px !important;
+}
+
+
+/* ===== BUTTON ===== */
+
+.shopify-buy__btn-wrapper {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.shopify-buy__btn {
+  display: inline-block !important;
+  margin: 0 auto !important;
+  padding: 14px 30px !important;
+
+  background-color: #5F7D76 !important;
+  color: #F1F1F1 !important;
+}
+
+
+/* ===== REMOVE SHOPIFY UI NOISE ===== */
+
+.shopify-buy-frame--toggle {
+  display: none !important;
+}
