@@ -1,4 +1,3 @@
-// ===== CONFIG =====
 const SHOP_DOMAIN = 'vmbd0z-c6.myshopify.com';
 const STOREFRONT_TOKEN = 'aeb1f4c8b1902d50200b3f0dc8d8ee9b';
 const PRODUCT_ID = '16164737679705';
@@ -7,7 +6,7 @@ const NODE_ID = 'product-component-1777209632096';
 const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
 
-// ===== LOAD SHOPIFY =====
+// LOAD SHOPIFY
 (function () {
 
   const scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
@@ -33,47 +32,22 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
         id: PRODUCT_ID,
         node: document.getElementById(NODE_ID),
 
-        // ✅ Force £ currency
         moneyFormat: '£{{amount}}',
 
         options: {
-
           product: {
             contents: {
               img: false,
               title: false,
               price: true
             },
-            styles: {
-              button: {
-                fontFamily: "Garamond, serif",
-                fontSize: "14px",
-                padding: "15px 35px",
-                color: "#e8e6e1",
-                backgroundColor: "#5f7d76"
-              }
-            },
-            text: {
-              button: "Secure a copy"
-            }
-          },
-
-          modalProduct: {
-            contents: {
-              img: false,
-              imgWithCarousel: true,
-              button: true,
-              buttonWithQuantity: false
-            },
             text: {
               button: "Secure a copy"
             }
           }
-
         }
       });
 
-      // Wait for DOM to render
       setTimeout(fetchInventory, 600);
     });
   }
@@ -91,13 +65,13 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 })();
 
 
-// ===== INVENTORY =====
+// INVENTORY
 async function fetchInventory() {
 
   const query = `
   {
     product(id: "${PRODUCT_GID}") {
-      variants(first: 1) {
+      variants(first: 10) {
         edges {
           node {
             quantityAvailable
@@ -119,21 +93,20 @@ async function fetchInventory() {
     });
 
     const data = await response.json();
-    const qty = data.data.product.variants.edges[0].node.quantityAvailable;
+
+    const variants = data.data.product.variants.edges;
+
+    let totalQty = 0;
+    variants.forEach(v => {
+      totalQty += v.node.quantityAvailable || 0;
+    });
 
     const el = document.getElementById("stock-count");
     if (!el) return;
 
-    if (qty > 0) {
-
-      el.innerText = `${qty} copies remain.`;
-
-      if (qty <= 10) {
-        el.style.opacity = "0.9";
-      }
-
+    if (totalQty > 0) {
+      el.innerText = `${totalQty} copies remain.`;
     } else {
-
       el.innerText = "No copies remain.";
       disableButton();
     }
@@ -144,11 +117,9 @@ async function fetchInventory() {
 }
 
 
-// ===== DISABLE BUTTON =====
+// DISABLE BUTTON
 function disableButton() {
-
   const btn = document.querySelector(".shopify-buy__btn");
-
   if (!btn) return;
 
   btn.innerText = "Unavailable";
@@ -157,5 +128,5 @@ function disableButton() {
 }
 
 
-// ===== AUTO REFRESH =====
+// REFRESH
 setInterval(fetchInventory, 30000);
