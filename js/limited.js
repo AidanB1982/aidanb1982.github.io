@@ -5,128 +5,147 @@ const PRODUCT_ID = '16164737679705';
 const NODE_ID = 'product-component-1777209632096';
 const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
-
-// LOAD SHOPIFY
+// ===== LOAD SHOPIFY =====
 (function () {
 
-  const scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+const scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
 
-  function loadScript() {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = scriptURL;
-    document.head.appendChild(script);
-    script.onload = initShopify;
-  }
+function loadScript() {
+const script = document.createElement('script');
+script.async = true;
+script.src = scriptURL;
+document.head.appendChild(script);
+script.onload = initShopify;
+}
 
-  function initShopify() {
+function initShopify() {
 
-    const client = ShopifyBuy.buildClient({
-      domain: SHOP_DOMAIN,
-      storefrontAccessToken: STOREFRONT_TOKEN,
-    });
+```
+const client = ShopifyBuy.buildClient({
+  domain: SHOP_DOMAIN,
+  storefrontAccessToken: STOREFRONT_TOKEN,
+});
 
-    ShopifyBuy.UI.onReady(client).then(function (ui) {
+ShopifyBuy.UI.onReady(client).then(function (ui) {
 
-      ui.createComponent('product', {
-        id: PRODUCT_ID,
-        node: document.getElementById(NODE_ID),
+  ui.createComponent('product', {
+    id: PRODUCT_ID,
+    node: document.getElementById(NODE_ID),
 
-        moneyFormat: '£{{amount}}',
+    moneyFormat: '£{{amount}}',
 
-        options: {
-          product: {
-            contents: {
-              img: false,
-              title: false,
-              price: true
-            },
-            text: {
-              button: "Secure a copy"
-            }
-          }
+    options: {
+      product: {
+        contents: {
+          img: false,
+          title: false,
+          price: true
+        },
+        text: {
+          button: "Secure a copy"
         }
-      });
-
-      setTimeout(fetchInventory, 600);
-    });
-  }
-
-  if (window.ShopifyBuy) {
-    if (window.ShopifyBuy.UI) {
-      initShopify();
-    } else {
-      loadScript();
+      }
     }
-  } else {
-    loadScript();
-  }
+  });
+
+  // delay ensures Shopify DOM exists
+  setTimeout(fetchInventory, 800);
+});
+```
+
+}
+
+if (window.ShopifyBuy) {
+if (window.ShopifyBuy.UI) {
+initShopify();
+} else {
+loadScript();
+}
+} else {
+loadScript();
+}
 
 })();
 
-
-// INVENTORY
+// ===== INVENTORY =====
 async function fetchInventory() {
 
-  const query = `
+const query = `
   {
     product(id: "${PRODUCT_GID}") {
       variants(first: 10) {
         edges {
           node {
             quantityAvailable
+            availableForSale
           }
         }
       }
     }
   }`;
 
-  try {
+try {
 
-    const response = await fetch(`https://${SHOP_DOMAIN}/api/2023-10/graphql.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': STOREFRONT_TOKEN
-      },
-      body: JSON.stringify({ query })
-    });
+```
+const response = await fetch(`https://${SHOP_DOMAIN}/api/2023-10/graphql.json`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Shopify-Storefront-Access-Token': STOREFRONT_TOKEN
+  },
+  body: JSON.stringify({ query })
+});
 
-    const data = await response.json();
+const data = await response.json();
 
-    const variants = data.data.product.variants.edges;
+console.log("Shopify inventory data:", data); // 👈 DEBUG
 
-    let totalQty = 0;
-    variants.forEach(v => {
-      totalQty += v.node.quantityAvailable || 0;
-    });
+const variants = data?.data?.product?.variants?.edges || [];
 
-    const el = document.getElementById("stock-count");
-    if (!el) return;
+let totalQty = 0;
+let available = false;
 
-    if (totalQty > 0) {
-      el.innerText = `${totalQty} copies remain.`;
-    } else {
-      el.innerText = "No copies remain.";
-      disableButton();
-    }
+variants.forEach(v => {
+  const qty = v.node.quantityAvailable;
 
-  } catch (err) {
-    console.error("Inventory fetch failed:", err);
+  if (typeof qty === "number") {
+    totalQty += qty;
   }
+
+  if (v.node.availableForSale) {
+    available = true;
+  }
+});
+
+const el = document.getElementById("stock-count");
+if (!el) return;
+
+// ===== DISPLAY LOGIC =====
+if (totalQty > 0) {
+  el.innerText = `${totalQty} copies remain.`;
+} else if (available) {
+  // fallback when Shopify hides quantity
+  el.innerText = "Limited copies remain.";
+} else {
+  el.innerText = "No copies remain.";
+  disableButton();
+}
+```
+
+} catch (err) {
+console.error("Inventory fetch failed:", err);
+}
 }
 
-
-// DISABLE BUTTON
+// ===== DISABLE BUTTON =====
 function disableButton() {
-  const btn = document.querySelector(".shopify-buy__btn");
-  if (!btn) return;
+const btn = document.querySelector(".shopify-buy__btn");
+if (!btn) return;
 
-  btn.innerText = "Unavailable";
-  btn.style.opacity = "0.5";
-  btn.style.pointerEvents = "none";
+btn.innerText = "Unavailable";
+btn.style.opacity = "0.5";
+btn.style.pointerEvents = "none";
 }
 
-
-// REFRESH
+// ===== REFRESH =====
 setInterval(fetchInventory, 30000);
