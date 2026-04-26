@@ -19,8 +19,6 @@ script.onload = initShopify;
 }
 
 function initShopify() {
-
-```
 const client = ShopifyBuy.buildClient({
   domain: SHOP_DOMAIN,
   storefrontAccessToken: STOREFRONT_TOKEN,
@@ -39,7 +37,8 @@ ShopifyBuy.UI.onReady(client).then(function (ui) {
         contents: {
           img: false,
           title: false,
-          price: true
+          price: true,
+          button: true
         },
         text: {
           button: "Secure a copy"
