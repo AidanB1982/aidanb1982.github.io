@@ -2864,17 +2864,18 @@ body.community-page::after {
 
 }
 /* =========================================
-   SHOPIFY (GRID VERSION — CLEAN)
+   SHOPIFY — FINAL GRID VERSION
    ========================================= */
 
-/* TARGET ALL PRODUCT NODES */
+/* ROOT PRODUCT CONTAINERS */
 [id^="product-"] {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-/* REMOVE SHOPIFY LAYOUT CONSTRAINTS */
+
+/* REMOVE SHOPIFY INTERNAL LAYOUT ISSUES */
 .shopify-buy__layout-vertical {
   display: flex !important;
   flex-direction: column !important;
@@ -2882,41 +2883,50 @@ body.community-page::after {
   width: 100% !important;
 }
 
-/* FIX INTERNAL PRODUCT WIDTH */
+
+/* FIX PRODUCT WIDTH + CENTER */
 .shopify-buy__product {
   width: 100% !important;
-  max-width: 280px !important; /* slightly wider for grid balance */
+  max-width: 260px !important;
   margin: 0 auto !important;
   text-align: center !important;
 }
 
-/* REMOVE AUTO TITLE */
+
+/* REMOVE SHOPIFY TITLE (YOU HANDLE IT IN HTML) */
 .shopify-buy__product__title {
   display: none !important;
 }
 
-/* PRICE — CLEAN + BRIGHTER */
+
+/* PRICE */
 .shopify-buy__product__actual-price {
   width: 100% !important;
   text-align: center !important;
+  margin: 6px 0 !important;
+
   color: #F1F1F1 !important;
-  opacity: 0.95 !important;
-  margin: 8px 0 !important;
+  opacity: 1 !important;
+
   font-family: "Source Serif Pro", Georgia, serif;
+  font-size: 14px;
 }
 
-/* BUTTON WRAPPER */
+
+/* BUTTON WRAPPER (FOR TRUE CENTERING) */
 .shopify-buy__btn-wrapper {
   width: 100% !important;
   display: flex !important;
   justify-content: center !important;
+  margin-top: 6px !important;
 }
+
 
 /* BUTTON */
 .shopify-buy__btn {
   display: inline-block !important;
   margin: 0 auto !important;
-  padding: 14px 34px !important;
+  padding: 14px 32px !important;
 
   background-color: #5F7D76 !important;
   color: #F1F1F1 !important;
@@ -2925,15 +2935,19 @@ body.community-page::after {
   font-size: 14px !important;
 
   border: none !important;
+  cursor: pointer;
+
   transition: background-color 0.2s ease;
 }
 
-/* HOVER */
+
+/* BUTTON HOVER */
 .shopify-buy__btn:hover {
   background-color: #56716a !important;
 }
 
-/* REMOVE FLOATING CART */
+
+/* REMOVE FLOATING CART ICON */
 .shopify-buy-frame--toggle {
   display: none !important;
 }
