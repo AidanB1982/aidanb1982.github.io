@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Objects from the Archive | Blackwood Publishing</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
+
+<style>
+/* LIMITED EDITIONS STYLING */
+
+.limited-intro,
+.edition-block,
+.limited-note,
+.limited-exit {
+  max-width: 700px;
+  margin: 120px auto;
+  text-align: center;
+}
+
+.limited-intro h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.edition-block h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.limited-note {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.limited-exit a {
+  display: inline-block;
+  margin-top: 20px;
+  color: #e8e6e1;
+  text-decoration: none;
+  border-bottom: 1px solid #e8e6e1;
+}
+
+/* HIDE SHOPIFY CART ICON */
+.shopify-buy__cart-toggle {
+  display: none !important;
+}
+</style>
+
+</head>
+
+<body class="sub-page limited-page">
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<!-- INTRO -->
+<section class="limited-intro fade-in">
+
+  <h1>Objects from the Archive</h1>
+
+  <p>
+    Some editions are released in limited form.<br>
+    Signed. Numbered. Not always available.
+  </p>
+
+  <p>
+    Not all copies remain.
+  </p>
+
+</section>
+
+<!-- EDITION 1 -->
+<section class="edition-block fade-in">
+
+  <h2>Corrour Bothy — The First Summoning</h2>
+
+  <p>
+    A small number of copies were marked by hand.
+  </p>
+
+  <p>
+    Each one carries a record of its own.<br>
+    No two are identical.
+  </p>
+
+  <!-- SHOPIFY PRODUCT -->
+  <div id='product-component-1777208605383'></div>
+
+</section>
+
+<!-- OPTIONAL SECOND EDITION -->
+<!--
+<section class="edition-block fade-in">
+
+  <h2>Dour Hill House</h2>
+
+  <p>
+    Some editions were signed before release.
+  </p>
+
+  <p>
+    A limited number remain.
+  </p>
+
+  <div id='product-component-SECOND'></div>
+
+</section>
+-->
+
+<!-- WORLD DETAIL -->
+<section class="limited-note fade-in">
+
+  <p>
+    Some copies appear where they should not.
+  </p>
+
+</section>
+
+<!-- EXIT -->
+<section class="limited-exit fade-in">
+
+  <p>
+    Once they are gone, they are not replaced.
+  </p>
+
+  <a href="/pages/archive.html">Return to the archive</a>
+
+</section>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- SHOPIFY SCRIPT -->
+<script type="text/javascript">
+(function () {
+  var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+  if (window.ShopifyBuy) {
+    if (window.ShopifyBuy.UI) {
+      ShopifyBuyInit();
+    } else {
+      loadScript();
+    }
+  } else {
+    loadScript();
+  }
+
+  function loadScript() {
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = scriptURL;
+    document.head.appendChild(script);
+    script.onload = ShopifyBuyInit;
+  }
+
+  function ShopifyBuyInit() {
+    var client = ShopifyBuy.buildClient({
+      domain: 'vmbd0z-c6.myshopify.com',
+      storefrontAccessToken: 'aeb1f4c8b1902d50200b3f0dc8d8ee9b',
+    });
+
+    ShopifyBuy.UI.onReady(client).then(function (ui) {
+      ui.createComponent('product', {
+        id: '16164737679705',
+        node: document.getElementById('product-component-1777208605383'),
+        moneyFormat: '%C2%A3%7B%7Bamount%7D%7D',
+        options: {
+
+          product: {
+            styles: {
+              product: {
+                "max-width": "100%",
+                "margin-left": "0px",
+                "margin-bottom": "40px"
+              },
+              button: {
+                "font-family": "Garamond, serif",
+                "font-size": "14px",
+                "padding-top": "15px",
+                "padding-bottom": "15px",
+                "color": "#e8e6e1",
+                "background-color": "#5f7d76",
+                ":hover": {
+                  "background-color": "#56716a"
+                }
+              }
+            },
+            text: {
+              button: "Secure a copy"
+            }
+          },
+
+          modalProduct: {
+            contents: {
+              img: false,
+              imgWithCarousel: true,
+              button: true,
+              buttonWithQuantity: false
+            },
+            text: {
+              button: "Secure a copy"
+            }
+          },
+
+          cart: {
+            styles: {
+              button: {
+                "font-family": "Garamond, serif",
+                "background-color": "#5f7d76"
+              }
+            },
+            text: {
+              total: "Subtotal",
+              button: "Checkout"
+            }
+          }
+
+        }
+      });
+    });
+  }
+})();
+</script>
+
+<!-- JS -->
+<script src="/js/header.js?v=20260408" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") return;
+
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+});
+</script>
+
+</body>
+</html>
