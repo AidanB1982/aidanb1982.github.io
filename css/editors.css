@@ -303,7 +303,12 @@ RESPONSIVE
         font-size: 13px;
     }
 }
-/* ===== FORCE SHOPIFY ALIGNMENT ===== */
+/* ===== SHOPIFY ALIGNMENT FIX ===== */
+
+.shopify-buy__layout-vertical {
+  margin: 0 auto !important;
+  text-align: center !important;
+}
 
 .shopify-buy__product {
   text-align: center !important;
@@ -314,26 +319,26 @@ RESPONSIVE
   justify-content: center !important;
 }
 
-/* Center price */
+/* Price */
 .shopify-buy__product__actual-price {
   display: block !important;
   text-align: center !important;
-  margin: 10px 0 !important;
+  margin: 10px auto 5px !important;
   color: #e8e6e1;
   opacity: 0.7;
 }
 
-/* Center button */
+/* Button */
 .shopify-buy__btn-wrapper {
   text-align: center !important;
 }
 
 .shopify-buy__btn {
-  margin: 20px auto !important;
+  margin: 10px auto !important;
   display: inline-block !important;
 }
 
-/* REMOVE FLOATING CART ICON */
+/* Remove floating cart */
 .shopify-buy-frame--toggle {
   display: none !important;
 }
