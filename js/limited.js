@@ -129,7 +129,7 @@
   </p>
 
   <!-- IMAGE -->
-  <img src="/assets/corrour-signed.jpg" alt="Corrour Bothy Signed Edition">
+  <img src="/assets/a1.png" alt="Corrour Bothy Signed Edition">
 
   <!-- STOCK (filled by JS) -->
   <p id="stock-count" class="stock-line">
