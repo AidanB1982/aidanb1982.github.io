@@ -47,7 +47,7 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
           product: {
             contents: {
               img: false,
-              title: false,
+              title: true,
               price: true,
               button: true
             },
