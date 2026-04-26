@@ -2864,62 +2864,59 @@ body.community-page::after {
 
 }
 /* =========================================
-   SHOPIFY (LIMITED EDITIONS FIX)
+   SHOPIFY (LIMITED EDITIONS — FINAL FIX)
    ========================================= */
 
+/* ROOT CONTAINER */
 #product-component-1777209632096 {
   display: flex;
   justify-content: center;
-  align-items: center;
   width: 100%;
 }
 
-#product-component-1777209632096 * {
-  text-align: center !important;
-}
-
-
-/* FORCE INTERNAL CENTERING */
+/* REMOVE ALL SHOPIFY WIDTH CONSTRAINTS */
 .shopify-buy__layout-vertical {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  text-align: center !important;
+  width: 100% !important;
 }
 
+/* 🔥 CRITICAL FIX — REMOVE LEFT OFFSET */
 .shopify-buy__product {
+  width: 100% !important;
+  max-width: 240px !important; /* controls layout width */
   margin: 0 auto !important;
   text-align: center !important;
 }
 
-
-/* REMOVE SHOPIFY TITLE (YOU ALREADY HAVE ONE) */
+/* REMOVE SHOPIFY TITLE */
 .shopify-buy__product__title {
   display: none !important;
 }
 
-
-/* PRICE — MATCH BRAND */
+/* PRICE */
 .shopify-buy__product__actual-price {
+  width: 100% !important;
+  text-align: center !important;
   color: #F1F1F1 !important;
   opacity: 1 !important;
-  margin: 6px 0 !important;
+  margin: 8px 0 !important;
   font-family: "Source Serif Pro", Georgia, serif;
 }
 
-
-/* BUTTON — CENTER + STYLE */
+/* BUTTON WRAPPER — TRUE CENTER */
 .shopify-buy__btn-wrapper {
+  width: 100% !important;
   display: flex !important;
   justify-content: center !important;
-  width: 100% !important;
-  margin-top: 10px !important;
 }
 
+/* BUTTON */
 .shopify-buy__btn {
   display: inline-block !important;
   margin: 0 auto !important;
-  padding: 14px 30px !important;
+  padding: 14px 32px !important;
 
   background-color: #5F7D76 !important;
   color: #F1F1F1 !important;
@@ -2929,7 +2926,6 @@ body.community-page::after {
 
   border: none !important;
 }
-
 
 /* REMOVE FLOATING CART */
 .shopify-buy-frame--toggle {
