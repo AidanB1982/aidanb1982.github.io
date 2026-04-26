@@ -2864,10 +2864,67 @@ body.community-page::after {
 
 }
 /* =========================================
-   SHOPIFY — FINAL GRID VERSION
+   LIMITED EDITIONS — FULL LAYOUT
    ========================================= */
 
-/* ROOT PRODUCT CONTAINERS */
+
+/* ===== GRID LAYOUT ===== */
+
+.edition-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+
+  max-width: 1100px;
+  margin: 80px auto;
+  padding: 40px 30px;
+
+  background: rgba(255,255,255,0.02);
+}
+
+
+/* ===== CARD ===== */
+
+.edition-card {
+  text-align: center;
+}
+
+
+/* ===== IMAGE SIZE (FIXES MASSIVE BOOKS) ===== */
+
+.edition-card img {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+
+  display: block;
+  margin: 0 auto 15px;
+}
+
+
+/* ===== TITLE ===== */
+
+.edition-card h3 {
+  font-size: 16px;
+  margin-bottom: 6px;
+  color: #F1F1F1;
+}
+
+
+/* ===== STOCK TEXT ===== */
+
+.stock-line {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+
+/* =========================================
+   SHOPIFY — CLEAN INTEGRATION
+   ========================================= */
+
+/* ROOT PRODUCT CONTAINER */
 [id^="product-"] {
   display: flex;
   justify-content: center;
@@ -2884,7 +2941,7 @@ body.community-page::after {
 }
 
 
-/* FIX PRODUCT WIDTH + CENTER */
+/* PRODUCT WIDTH + CENTER */
 .shopify-buy__product {
   width: 100% !important;
   max-width: 260px !important;
@@ -2893,7 +2950,7 @@ body.community-page::after {
 }
 
 
-/* REMOVE SHOPIFY TITLE (YOU HANDLE IT IN HTML) */
+/* REMOVE AUTO TITLE */
 .shopify-buy__product__title {
   display: none !important;
 }
@@ -2913,7 +2970,7 @@ body.community-page::after {
 }
 
 
-/* BUTTON WRAPPER (FOR TRUE CENTERING) */
+/* BUTTON WRAPPER */
 .shopify-buy__btn-wrapper {
   width: 100% !important;
   display: flex !important;
@@ -2941,13 +2998,13 @@ body.community-page::after {
 }
 
 
-/* BUTTON HOVER */
+/* HOVER */
 .shopify-buy__btn:hover {
   background-color: #56716a !important;
 }
 
 
-/* REMOVE FLOATING CART ICON */
+/* REMOVE FLOATING CART */
 .shopify-buy-frame--toggle {
   display: none !important;
 }
