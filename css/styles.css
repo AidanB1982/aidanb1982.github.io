@@ -3036,3 +3036,19 @@ body.community-page::after {
 .limited-exit p {
   opacity: 0.85;
 }
+/* =========================================
+   BOOK IMAGE CONSISTENCY FIX
+   ========================================= */
+
+
+.edition-card {
+  text-align: center;
+}
+.edition-card img {
+  width: 100%;
+  max-width: 220px; 
+  height: 300px;      
+  object-fit: contain; 
+  display: block;
+  margin: 0 auto 20px;
+}
