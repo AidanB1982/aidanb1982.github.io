@@ -2863,17 +2863,20 @@ body.community-page::after {
     }
 
 }
-/* ===== CENTER SHOPIFY CONTAINER ===== */
+/* =========================================
+   SHOPIFY (LIMITED EDITIONS FIX)
+   ========================================= */
 
+/* CENTER THE WHOLE SHOPIFY BLOCK */
 #product-component-1777209632096 {
   display: flex;
   justify-content: center;
   width: 100%;
+  margin-top: 10px;
 }
 
 
-/* ===== FORCE INTERNAL CENTERING ===== */
-
+/* FORCE INTERNAL CENTERING */
 .shopify-buy__layout-vertical {
   display: flex !important;
   flex-direction: column !important;
@@ -2887,28 +2890,27 @@ body.community-page::after {
 }
 
 
-/* ===== REMOVE TITLE (YOU ALREADY HAVE ONE) ===== */
-
+/* REMOVE SHOPIFY TITLE (YOU ALREADY HAVE ONE) */
 .shopify-buy__product__title {
   display: none !important;
 }
 
 
-/* ===== TEXT (BRAND CORRECT) ===== */
-
+/* PRICE — MATCH BRAND */
 .shopify-buy__product__actual-price {
   color: #F1F1F1 !important;
   opacity: 1 !important;
-  margin: 8px 0 6px !important;
+  margin: 6px 0 !important;
+  font-family: "Source Serif Pro", Georgia, serif;
 }
 
 
-/* ===== BUTTON ===== */
-
+/* BUTTON — CENTER + STYLE */
 .shopify-buy__btn-wrapper {
   display: flex !important;
   justify-content: center !important;
   width: 100% !important;
+  margin-top: 10px !important;
 }
 
 .shopify-buy__btn {
@@ -2918,11 +2920,15 @@ body.community-page::after {
 
   background-color: #5F7D76 !important;
   color: #F1F1F1 !important;
+
+  font-family: "Source Serif Pro", Georgia, serif !important;
+  font-size: 14px !important;
+
+  border: none !important;
 }
 
 
-/* ===== REMOVE SHOPIFY UI NOISE ===== */
-
+/* REMOVE FLOATING CART */
 .shopify-buy-frame--toggle {
   display: none !important;
 }
