@@ -3046,8 +3046,8 @@ body.community-page::after {
 }
 .edition-card img {
   width: 100%;
-  max-width: 220px; 
-  height: 300px;      
+  max-width: 300px; 
+  height: 400px;      
   object-fit: contain; 
   display: block;
   margin: 0 auto 20px;
