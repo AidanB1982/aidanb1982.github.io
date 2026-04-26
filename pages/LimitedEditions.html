@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en" class="no-js">
 <head>
 <meta charset="UTF-8">
@@ -13,20 +12,20 @@
 
 <style>
 
-/* ===== PAGE STRUCTURE ===== */
+/* ===== HERO FIX ===== */
+.about-hero {
+  min-height: auto;
+  padding: 140px 0 60px;
+}
 
+/* ===== PAGE STRUCTURE ===== */
 .edition-block,
 .limited-note,
 .limited-exit {
   max-width: 760px;
-  margin: 80px auto;
+  margin: 60px auto;
   text-align: center;
   padding: 0 20px;
-}
-
-.edition-block {
-  margin-top: 40px;
-  margin-bottom: 80px;
 }
 
 .edition-block h2 {
@@ -39,14 +38,14 @@
 }
 
 .edition-block img {
-  margin: 30px auto 20px;
+  margin: 25px auto 15px;
   display: block;
-  max-width: 280px;
+  max-width: 260px;
 }
 
-/* STOCK TEXT */
+/* STOCK */
 .stock-line {
-  margin-top: 20px;
+  margin-top: 10px;
   font-size: 14px;
   opacity: 0.7;
 }
@@ -54,19 +53,49 @@
 .final-line {
   font-size: 13px;
   opacity: 0.5;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
-/* ATMOSPHERIC TEXT */
+/* SHOPIFY BLOCK FIX */
+#product-component-1777209632096 {
+  margin-top: 10px;
+}
+
+/* REMOVE FLOATING CART */
+.shopify-buy-frame--toggle {
+  display: none !important;
+}
+
+/* FORCE CENTER + TIGHT STACK */
+.shopify-buy__product {
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+.shopify-buy__btn-wrapper {
+  text-align: center !important;
+  margin-top: 10px !important;
+}
+
+.shopify-buy__btn {
+  margin: 0 auto !important;
+  display: inline-block !important;
+}
+
+.shopify-buy__product__actual-price {
+  margin: 5px 0 !important;
+  opacity: 0.7;
+}
+
+/* ATMOSPHERE */
 .limited-note {
   opacity: 0.6;
   font-style: italic;
-  margin-top: 60px;
+  margin-top: 50px;
 }
 
-/* EXIT */
 .limited-exit {
-  margin-top: 80px;
+  margin-top: 70px;
   margin-bottom: 120px;
 }
 
@@ -78,103 +107,71 @@
   border-bottom: 1px solid #e8e6e1;
 }
 
-/* REMOVE FLOATING CART ICON */
-.shopify-buy-frame--toggle {
-  display: none !important;
-}
-.about-hero {
-  min-height: auto;
-  padding: 120px 0 40px;
-}
 </style>
-
 </head>
 
 <body class="sub-page limited-page">
-
-<!-- HEADER -->
 
 <div id="header-placeholder"></div>
 
 <main>
 
-  <!-- HERO (uses your global system — fixes overlap) -->
+<section class="about-hero">
+  <div class="about-hero-overlay"></div>
 
-  <section class="about-hero">
-    <div class="about-hero-overlay"></div>
+  <div class="about-hero-content fade-in">
+    <h1>Objects from the Archive</h1>
 
+    <p class="about-intro-line">
+      Some editions are released in limited form.<br>
+      Signed. Numbered. Not always available.
+    </p>
 
-<div class="about-hero-content fade-in">
-  <h1>Objects from the Archive</h1>
+    <p class="about-intro-line" style="opacity:0.6;">
+      Not all copies remain.
+    </p>
+  </div>
+</section>
 
-  <p class="about-intro-line">
-    Some editions are released in limited form.<br>
-    Signed. Numbered. Not always available.
+<section class="edition-block fade-in">
+
+  <h2>Corrour Bothy — The First Summoning</h2>
+
+  <p>A small number of copies were marked by hand.</p>
+
+  <p>
+    Each one carries a record of its own.<br>
+    No two are identical.
   </p>
 
-  <p class="about-intro-line" style="opacity:0.6;">
-    Not all copies remain.
+  <img src="/assets/A1.png" alt="Corrour Bothy Signed Edition">
+
+  <p id="stock-count" class="stock-line">
+    Checking availability...
   </p>
-</div>
 
+  <p class="final-line">
+    Once they are gone, they are not replaced.
+  </p>
 
-  </section>
+  <div id="product-component-1777209632096"></div>
 
-  <!-- EDITION -->
+</section>
 
-  <section class="edition-block fade-in">
+<section class="limited-note fade-in">
+  <p>Some copies appear where they should not.</p>
+</section>
 
-
-<h2>Corrour Bothy — The First Summoning</h2>
-
-<p>A small number of copies were marked by hand.</p>
-
-<p>
-  Each one carries a record of its own.<br>
-  No two are identical.
-</p>
-
-<!-- IMAGE -->
-<img src="/assets/A1.png" alt="Corrour Bothy Signed Edition">
-
-<!-- STOCK -->
-<p id="stock-count" class="stock-line">
-  Checking availability...
-</p>
-
-<p class="final-line">
-  Once they are gone, they are not replaced.
-</p>
-
-<!-- SHOPIFY BUTTON TARGET -->
-<div id="product-component-1777209632096"></div>
-
-
-  </section>
-
-  <!-- WORLD DETAIL -->
-
-  <section class="limited-note fade-in">
-    <p>Some copies appear where they should not.</p>
-  </section>
-
-  <!-- EXIT -->
-
-  <section class="limited-exit fade-in">
-    <p>Once they are gone, they are not replaced.</p>
-    <a href="/pages/archive.html">Return to the archive</a>
-  </section>
+<section class="limited-exit fade-in">
+  <p>Once they are gone, they are not replaced.</p>
+  <a href="/pages/archive.html">Return to the archive</a>
+</section>
 
 </main>
 
-<!-- FOOTER -->
-
 <div id="footer-placeholder"></div>
 
-<!-- JS -->
-
 <script src="/js/header.js?v=20260408" defer></script>
-
 <script src="/js/limited.js" defer></script>
 
 <script>
