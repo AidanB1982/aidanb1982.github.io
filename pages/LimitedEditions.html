@@ -1,191 +1,81 @@
-<!DOCTYPE html>
-<html lang="en" class="no-js">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Objects from the Archive | Blackwood Publishing</title>
-
-<link rel="stylesheet" href="/css/header.css">
-<link rel="stylesheet" href="/css/styles.css">
-
-<style>
-
-/* ===== HERO FIX ===== */
-.about-hero {
-  min-height: auto;
-  padding: 140px 0 60px;
-}
-
-/* ===== PAGE STRUCTURE ===== */
-.edition-block,
-.limited-note,
-.limited-exit {
-  max-width: 760px;
-  margin: 60px auto;
-  text-align: center;
-  padding: 0 0px;
-}
-
-.edition-block h2 {
-  font-size: 28px;
-  margin-bottom: 16px;
-}
-
-.edition-block p {
-  margin: 10px 0;
-}
-
-.edition-block img {
-  margin: 25px auto 15px;
-  display: block;
-  max-width: 520px;
-}
-
-/* STOCK */
-.stock-line {
-  margin-top: 10px;
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.final-line {
-  font-size: 13px;
-  opacity: 0.5;
-  margin-top: 4px;
-}
-
-/* SHOPIFY BLOCK FIX */
-#product-component-1777209632096 {
-  margin-top: 10px;
-}
-
-/* REMOVE FLOATING CART */
-.shopify-buy-frame--toggle {
-  display: none !important;
-}
-
-/* FORCE CENTER + TIGHT STACK */
-.shopify-buy__product {
-  text-align: center !important;
-  margin: 0 auto !important;
-}
-
-.shopify-buy__btn-wrapper {
-  text-align: center !important;
-  margin-top: 10px !important;
-}
-
-.shopify-buy__btn {
-  margin: 0 auto !important;
-  display: inline-block !important;
-}
-
-.shopify-buy__product__actual-price {
-  margin: 5px 0 !important;
-  opacity: 0.7;
-}
-
-/* ATMOSPHERE */
-.limited-note {
-  opacity: 0.6;
-  font-style: italic;
-  margin-top: 50px;
-}
-
-.limited-exit {
-  margin-top: 70px;
-  margin-bottom: 120px;
-}
-
-.limited-exit a {
-  display: inline-block;
-  margin-top: 20px;
-  color: #e8e6e1;
-  text-decoration: none;
-  border-bottom: 1px solid #e8e6e1;
-}
-
-</style>
-</head>
-
-<body class="sub-page limited-page">
-
-<div id="header-placeholder"></div>
-
 <main>
 
-<section class="about-hero">
-  <div class="about-hero-overlay"></div>
+  <!-- HERO -->
+  <section class="about-hero">
+    <div class="about-hero-overlay"></div>
 
-  <div class="about-hero-content fade-in">
-    <h1>Objects from the Archive</h1>
+    <div class="about-hero-content fade-in">
+      <h1>Objects from the Archive</h1>
 
-    <p class="about-intro-line">
-      Some editions are released in limited form.<br>
-      Signed. Numbered. Not always available.
-    </p>
+      <p class="about-intro-line">
+        Some editions are released in limited form.<br>
+        Signed. Numbered. Not always available.
+      </p>
 
-    <p class="about-intro-line" style="opacity:0.6;">
-      Not all copies remain.
-    </p>
-  </div>
-</section>
+      <p class="about-intro-line" style="opacity:0.6;">
+        Not all copies remain.
+      </p>
+    </div>
+  </section>
 
-<section class="edition-block fade-in">
 
-  <h2>Corrour Bothy — The First Summoning</h2>
+  <!-- GRID -->
+  <section class="edition-grid fade-in">
 
-  <p>A small number of copies marked by hand.</p>
+    <!-- BOOK 1 -->
+    <div class="edition-card">
+      <img src="/assets/A1.png" alt="Corrour Bothy Signed Edition">
 
-  <p>
-    Each one carries a record of its own.<br>
-    No two are identical.
-  </p>
+      <h3>Corrour Bothy — First Summoning</h3>
 
-  <img src="/assets/A1.png" alt="Corrour Bothy Signed Edition">
+      <p class="stock-line" id="stock-1">
+        Checking availability...
+      </p>
 
-  <p id="stock-count" class="stock-line">
-    Checking availability...
-  </p>
+      <div id="product-1"></div>
+    </div>
 
-  <p class="final-line">
-    Once they are gone, they are not replaced.
-  </p>
 
-  <div id="product-component-1777209632096"></div>
+    <!-- BOOK 2 -->
+    <div class="edition-card">
+      <img src="/assets/A8.png" alt="The Black Bothy">
 
-</section>
+      <h3>The Black Bothy</h3>
 
-<section class="limited-note fade-in">
-  <p>Some copies appear where they should not.</p>
-</section>
+      <p class="stock-line" id="stock-2">
+        Checking availability...
+      </p>
 
-<section class="limited-exit fade-in">
-  
-  <a href="/pages/archive.html">Return to the archive</a>
-</section>
+      <div id="product-2"></div>
+    </div>
+
+
+    <!-- BOOK 3 -->
+    <div class="edition-card">
+      <img src="/assets/A9.png" alt="Corrour Paperback">
+
+      <h3>Corrour — Paperback</h3>
+
+      <p class="stock-line" id="stock-3">
+        Checking availability...
+      </p>
+
+      <div id="product-3"></div>
+    </div>
+
+  </section>
+
+
+  <!-- NOTE -->
+  <section class="limited-note fade-in">
+    <p>Some copies appear where they should not.</p>
+  </section>
+
+
+  <!-- EXIT -->
+  <section class="limited-exit fade-in">
+    <p>They do not return.</p>
+    <a href="/pages/archive.html">Return to the archive</a>
+  </section>
 
 </main>
-
-<div id="footer-placeholder"></div>
-
-<script src="/js/header.js?v=20260408" defer></script>
-<script src="/js/limited.js" defer></script>
-
-<script>
-window.addEventListener("load", async () => {
-
-    if (typeof loadHeader === "function") {
-        await loadHeader("simple");
-    }
-
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
-
-});
-</script>
-
-</body>
-</html>
