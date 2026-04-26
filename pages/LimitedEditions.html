@@ -7,7 +7,6 @@ const NODE_ID = 'product-component-1777209632096';
 const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
 
 
-
 // ===== LOAD SHOPIFY =====
 (function () {
 
@@ -34,17 +33,15 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
         id: PRODUCT_ID,
         node: document.getElementById(NODE_ID),
 
-        // ✅ FORCE £ CURRENCY
         moneyFormat: '£{{amount}}',
 
         options: {
 
-          // ===== MAIN BUTTON (NO PRICE ON PAGE) =====
           product: {
             contents: {
               img: false,
               title: false,
-              price: false
+              price: true
             },
             styles: {
               button: {
@@ -60,14 +57,12 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
             }
           },
 
-          // ===== MODAL (PRICE SHOWS HERE WITH £) =====
           modalProduct: {
             contents: {
               img: false,
               imgWithCarousel: true,
               button: true,
-              buttonWithQuantity: false,
-              price: true   // 👈 shows £ price here only
+              buttonWithQuantity: false
             },
             text: {
               button: "Secure a copy"
@@ -77,7 +72,6 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
         }
       });
 
-      // wait for Shopify DOM
       setTimeout(fetchInventory, 700);
     });
   }
@@ -93,7 +87,6 @@ const PRODUCT_GID = `gid://shopify/Product/${PRODUCT_ID}`;
   }
 
 })();
-
 
 
 // ===== INVENTORY =====
@@ -149,7 +142,6 @@ async function fetchInventory() {
 }
 
 
-
 // ===== DISABLE BUTTON =====
 function disableButton() {
 
@@ -161,7 +153,6 @@ function disableButton() {
   btn.style.opacity = "0.5";
   btn.style.pointerEvents = "none";
 }
-
 
 
 // ===== AUTO REFRESH =====
