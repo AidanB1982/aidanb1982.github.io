@@ -306,41 +306,27 @@ RESPONSIVE
 <style>
 
 
-/* ===== SHOPIFY ALIGNMENT FIX ===== */
+/* ===== CONTROL SHOPIFY BLOCK ===== */
 
-.shopify-buy__layout-vertical {
-  margin: 0 auto !important;
-  text-align: center !important;
+#product-component-1777209632096 {
+  margin-top: 15px;
 }
 
-.shopify-buy__product {
-  text-align: center !important;
-  margin: 0 auto !important;
-}
-
-.shopify-buy__product__variant {
-  justify-content: center !important;
-}
-
-/* Price */
+/* tighten spacing between price and button */
 .shopify-buy__product__actual-price {
-  display: block !important;
-  text-align: center !important;
-  margin: 10px auto 5px !important;
-  color: #e8e6e1;
-  opacity: 0.7;
+  margin-bottom: 5px !important;
 }
 
-/* Button */
-.shopify-buy__btn-wrapper {
-  text-align: center !important;
-}
-
+/* tighten button spacing */
 .shopify-buy__btn {
   margin: 10px auto !important;
-  display: inline-block !important;
 }
 
+/* REMOVE hidden vertical padding Shopify adds */
+.shopify-buy__layout-vertical {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
 /* Remove floating cart */
 .shopify-buy-frame--toggle {
   display: none !important;
