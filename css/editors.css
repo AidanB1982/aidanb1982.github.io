@@ -305,33 +305,15 @@ RESPONSIVE
 }
 <style>
 
-/* ===== SHOPIFY BLOCK CONTROL ===== */
-
-#product-component-1777209632096 {
-  margin-top: 12px;
-}
-
-/* ===== CENTER EVERYTHING ===== */
+/* ===== SHOPIFY ALIGNMENT ===== */
 
 .shopify-buy__layout-vertical {
   text-align: center !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
 }
 
 .shopify-buy__product {
-  text-align: center !important;
   margin: 0 auto !important;
-}
-
-/* ===== PRICE ===== */
-
-.shopify-buy__product__actual-price {
-  display: block !important;
   text-align: center !important;
-  margin: 6px 0 4px !important;
-  color: #e8e6e1;
-  opacity: 0.7;
 }
 
 /* ===== BUTTON ===== */
