@@ -4,21 +4,9 @@ const STOREFRONT_TOKEN = 'aeb1f4c8b1902d50200b3f0dc8d8ee9b';
 
 // ALL PRODUCTS
 const PRODUCTS = [
-  {
-    id: '16164737679705',
-    node: 'product-1',
-    stock: 'stock-1'
-  },
-  {
-    id: '16270731706713',
-    node: 'product-2',
-    stock: 'stock-2'
-  },
-  {
-    id: '16270738620761',
-    node: 'product-3',
-    stock: 'stock-3'
-  }
+  { id: '16164737679705', node: 'product-1', stock: 'stock-1' },
+  { id: '16270731706713', node: 'product-2', stock: 'stock-2' },
+  { id: '16270738620761', node: 'product-3', stock: 'stock-3' }
 ];
 
 
@@ -47,7 +35,10 @@ const PRODUCTS = [
       PRODUCTS.forEach(p => {
 
         const node = document.getElementById(p.node);
-        if (!node) return;
+        if (!node) {
+          console.error("Missing node:", p.node);
+          return;
+        }
 
         ui.createComponent('product', {
           id: p.id,
@@ -59,7 +50,8 @@ const PRODUCTS = [
             product: {
               styles: {
                 product: {
-                  "max-width": "100%",
+                  "width": "100%",
+                  "max-width": "260px",
                   "margin": "0 auto",
                   "text-align": "center"
                 },
@@ -69,14 +61,19 @@ const PRODUCTS = [
                   "padding": "14px 30px",
                   "color": "#F1F1F1",
                   "background-color": "#5F7D76",
+                  "border": "none",
                   ":hover": {
+                    "background-color": "#56716a"
+                  },
+                  ":focus": {
                     "background-color": "#56716a"
                   }
                 },
                 price: {
-                  "color": "#E6E6E6",
-                  "opacity": "0.85",
-                  "margin": "6px 0"
+                  "color": "#F1F1F1",
+                  "opacity": "0.9",
+                  "margin": "6px 0",
+                  "font-family": "Source Serif Pro, Georgia, serif"
                 }
               },
 
@@ -96,8 +93,8 @@ const PRODUCTS = [
 
       });
 
-      // load stock after UI renders
-      setTimeout(fetchAllInventory, 1200);
+      // 🔥 Slightly longer delay = more reliable
+      setTimeout(fetchAllInventory, 1500);
 
     });
   }
@@ -117,11 +114,9 @@ const PRODUCTS = [
 
 // ===== INVENTORY (ALL PRODUCTS) =====
 async function fetchAllInventory() {
-
   for (let p of PRODUCTS) {
     await fetchInventory(p);
   }
-
 }
 
 
@@ -162,12 +157,9 @@ async function fetchInventory(product) {
     let available = false;
 
     variants.forEach(v => {
-      const qty = v.node.quantityAvailable;
-
-      if (typeof qty === "number") {
-        totalQty += qty;
+      if (typeof v.node.quantityAvailable === "number") {
+        totalQty += v.node.quantityAvailable;
       }
-
       if (v.node.availableForSale) {
         available = true;
       }
