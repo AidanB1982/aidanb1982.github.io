@@ -3008,3 +3008,31 @@ body.community-page::after {
 .shopify-buy-frame--toggle {
   display: none !important;
 }
+/* =========================================
+   LIMITED EDITIONS — TEXT ALIGNMENT FIX
+   ========================================= */
+
+/* Align note + exit sections with grid */
+.limited-note,
+.limited-exit {
+  max-width: 1100px;       /* match your grid width */
+  margin: 80px auto 0;
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* Atmosphere styling */
+.limited-note {
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Exit spacing */
+.limited-exit {
+  margin-top: 60px;
+}
+
+/* Exit text tone */
+.limited-exit p {
+  opacity: 0.85;
+}
