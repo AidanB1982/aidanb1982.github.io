@@ -303,6 +303,28 @@ RESPONSIVE
         font-size: 13px;
     }
 }
+<style>
+
+/* ===== STRUCTURE ===== */
+
+body.limited-page {
+  padding-top: 140px;
+}
+
+.limited-intro,
+.edition-block,
+.limited-note,
+.limited-exit {
+  max-width: 760px;
+  margin: 80px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.limited-intro {
+  margin-top: 40px; /* reduce this from 120px */
+  margin-bottom: 60px;
+}
 /* ===== SHOPIFY ALIGNMENT FIX ===== */
 
 .shopify-buy__layout-vertical {
