@@ -6,35 +6,82 @@
 
 <title>Objects from the Archive | Blackwood Publishing</title>
 
-<!-- CSS -->
 <link rel="stylesheet" href="/css/header.css">
 <link rel="stylesheet" href="/css/styles.css">
 
 <style>
-/* LIMITED EDITIONS STYLING */
+
+/* ===== STRUCTURE ===== */
 
 .limited-intro,
 .edition-block,
 .limited-note,
 .limited-exit {
-  max-width: 700px;
-  margin: 120px auto;
+  max-width: 760px;
+  margin: 80px auto;
   text-align: center;
+  padding: 0 20px;
+}
+
+/* tighter hero spacing */
+.limited-intro {
+  margin-top: 120px;
+  margin-bottom: 60px;
+}
+
+/* reduce excessive gap before product */
+.edition-block {
+  margin-top: 60px;
+  margin-bottom: 80px;
 }
 
 .limited-intro h1 {
   font-size: 36px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .edition-block h2 {
   font-size: 28px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
+/* better paragraph rhythm */
+.edition-block p {
+  margin: 10px 0;
+}
+
+/* image spacing fix */
+.edition-block img {
+  margin: 30px auto 20px;
+  display: block;
+  max-width: 280px;
+}
+
+/* stock line */
+.stock-line {
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* finality line */
+.final-line {
+  font-size: 13px;
+  opacity: 0.5;
+  margin-top: 6px;
+}
+
+/* subtle world text */
 .limited-note {
   opacity: 0.6;
   font-style: italic;
+  margin-top: 60px;
+}
+
+/* exit */
+.limited-exit {
+  margin-top: 80px;
+  margin-bottom: 120px;
 }
 
 .limited-exit a {
@@ -45,17 +92,17 @@
   border-bottom: 1px solid #e8e6e1;
 }
 
-/* HIDE SHOPIFY CART ICON */
+/* hide Shopify cart icon */
 .shopify-buy__cart-toggle {
   display: none !important;
 }
+
 </style>
 
 </head>
 
 <body class="sub-page limited-page">
 
-<!-- HEADER -->
 <div id="header-placeholder"></div>
 
 <!-- INTRO -->
@@ -68,87 +115,56 @@
     Signed. Numbered. Not always available.
   </p>
 
-  <p>
-    Not all copies remain.
-  </p>
+  <p>Not all copies remain.</p>
 
 </section>
 
-<!-- EDITION 1 -->
+<!-- EDITION -->
 <section class="edition-block fade-in">
 
   <h2>Corrour Bothy — The First Summoning</h2>
 
-  <p>
-    A small number of copies were marked by hand.
-  </p>
+  <p>A small number of copies were marked by hand.</p>
 
   <p>
     Each one carries a record of its own.<br>
     No two are identical.
   </p>
 
-  <!-- SHOPIFY PRODUCT -->
+  <!-- IMAGE -->
+  <img src="/mnt/data/08738052-c44a-471c-9949-dbc2f02fdce5.png" alt="Corrour Bothy Signed Edition">
+
+  <!-- STOCK -->
+  <p id="stock-count" class="stock-line">
+    40 copies remain.
+  </p>
+
+  <p class="final-line">
+    Once they are gone, they are not replaced.
+  </p>
+
+  <!-- SHOPIFY -->
   <div id='product-component-1777208605383'></div>
 
 </section>
 
-<!-- OPTIONAL SECOND EDITION -->
-<!--
-<section class="edition-block fade-in">
-
-  <h2>Dour Hill House</h2>
-
-  <p>
-    Some editions were signed before release.
-  </p>
-
-  <p>
-    A limited number remain.
-  </p>
-
-  <div id='product-component-SECOND'></div>
-
-</section>
--->
-
 <!-- WORLD DETAIL -->
 <section class="limited-note fade-in">
-
-  <p>
-    Some copies appear where they should not.
-  </p>
-
+  <p>Some copies appear where they should not.</p>
 </section>
 
 <!-- EXIT -->
 <section class="limited-exit fade-in">
-
-  <p>
-    Once they are gone, they are not replaced.
-  </p>
-
+  <p>Once they are gone, they are not replaced.</p>
   <a href="/pages/archive.html">Return to the archive</a>
-
 </section>
 
-<!-- FOOTER -->
-<div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
-<!-- SHOPIFY SCRIPT -->
-<script type="text/javascript">
+<!-- SHOPIFY -->
+<script>
 (function () {
   var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
-  if (window.ShopifyBuy) {
-    if (window.ShopifyBuy.UI) {
-      ShopifyBuyInit();
-    } else {
-      loadScript();
-    }
-  } else {
-    loadScript();
-  }
 
   function loadScript() {
     var script = document.createElement('script');
@@ -168,26 +184,20 @@
       ui.createComponent('product', {
         id: '16164737679705',
         node: document.getElementById('product-component-1777208605383'),
-        moneyFormat: '%C2%A3%7B%7Bamount%7D%7D',
         options: {
 
           product: {
             styles: {
               product: {
                 "max-width": "100%",
-                "margin-left": "0px",
-                "margin-bottom": "40px"
+                "margin-bottom": "20px"
               },
               button: {
                 "font-family": "Garamond, serif",
                 "font-size": "14px",
-                "padding-top": "15px",
-                "padding-bottom": "15px",
+                "padding": "15px 35px",
                 "color": "#e8e6e1",
-                "background-color": "#5f7d76",
-                ":hover": {
-                  "background-color": "#56716a"
-                }
+                "background-color": "#5f7d76"
               }
             },
             text: {
@@ -205,42 +215,48 @@
             text: {
               button: "Secure a copy"
             }
-          },
-
-          cart: {
-            styles: {
-              button: {
-                "font-family": "Garamond, serif",
-                "background-color": "#5f7d76"
-              }
-            },
-            text: {
-              total: "Subtotal",
-              button: "Checkout"
-            }
           }
 
         }
       });
     });
   }
+
+  if (window.ShopifyBuy) {
+    if (window.ShopifyBuy.UI) {
+      ShopifyBuyInit();
+    } else {
+      loadScript();
+    }
+  } else {
+    loadScript();
+  }
 })();
 </script>
 
-<!-- JS -->
+<!-- SIMPLE COUNTER (visual only) -->
+<script>
+let stock = 40;
+
+document.addEventListener("click", function(e) {
+  if (e.target.innerText.includes("Secure a copy")) {
+    if (stock > 1) {
+      stock--;
+      document.getElementById("stock-count").innerText = stock + " copies remain.";
+    } else {
+      document.getElementById("stock-count").innerText = "No copies remain.";
+    }
+  }
+});
+</script>
+
 <script src="/js/header.js?v=20260408" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
-
     if (typeof loadHeader !== "function") return;
-
     await loadHeader("simple");
-
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
-
+    if (typeof initFadeIn === "function") initFadeIn();
 });
 </script>
 
