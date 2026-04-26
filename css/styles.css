@@ -2864,17 +2864,17 @@ body.community-page::after {
 
 }
 /* =========================================
-   SHOPIFY (LIMITED EDITIONS — FINAL FIX)
+   SHOPIFY (GRID VERSION — CLEAN)
    ========================================= */
 
-/* ROOT CONTAINER */
-#product-component-1777209632096 {
+/* TARGET ALL PRODUCT NODES */
+[id^="product-"] {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-/* REMOVE ALL SHOPIFY WIDTH CONSTRAINTS */
+/* REMOVE SHOPIFY LAYOUT CONSTRAINTS */
 .shopify-buy__layout-vertical {
   display: flex !important;
   flex-direction: column !important;
@@ -2882,30 +2882,30 @@ body.community-page::after {
   width: 100% !important;
 }
 
-/* 🔥 CRITICAL FIX — REMOVE LEFT OFFSET */
+/* FIX INTERNAL PRODUCT WIDTH */
 .shopify-buy__product {
   width: 100% !important;
-  max-width: 240px !important; /* controls layout width */
+  max-width: 280px !important; /* slightly wider for grid balance */
   margin: 0 auto !important;
   text-align: center !important;
 }
 
-/* REMOVE SHOPIFY TITLE */
+/* REMOVE AUTO TITLE */
 .shopify-buy__product__title {
   display: none !important;
 }
 
-/* PRICE */
+/* PRICE — CLEAN + BRIGHTER */
 .shopify-buy__product__actual-price {
   width: 100% !important;
   text-align: center !important;
   color: #F1F1F1 !important;
-  opacity: 1 !important;
+  opacity: 0.95 !important;
   margin: 8px 0 !important;
   font-family: "Source Serif Pro", Georgia, serif;
 }
 
-/* BUTTON WRAPPER — TRUE CENTER */
+/* BUTTON WRAPPER */
 .shopify-buy__btn-wrapper {
   width: 100% !important;
   display: flex !important;
@@ -2916,7 +2916,7 @@ body.community-page::after {
 .shopify-buy__btn {
   display: inline-block !important;
   margin: 0 auto !important;
-  padding: 14px 32px !important;
+  padding: 14px 34px !important;
 
   background-color: #5F7D76 !important;
   color: #F1F1F1 !important;
@@ -2925,6 +2925,12 @@ body.community-page::after {
   font-size: 14px !important;
 
   border: none !important;
+  transition: background-color 0.2s ease;
+}
+
+/* HOVER */
+.shopify-buy__btn:hover {
+  background-color: #56716a !important;
 }
 
 /* REMOVE FLOATING CART */
