@@ -79,6 +79,13 @@ function renderMonth(initial = false) {
             return;
         }
 
+        // ✅ SINGLE BOOK LAYOUT FIX (THIS WAS MISSING)
+        if (books.length === 1) {
+            container.classList.add("single");
+        } else {
+            container.classList.remove("single");
+        }
+
         books.forEach((book, index) => {
 
             const el = createBookCard(book);
@@ -161,6 +168,7 @@ function createBookCard(book) {
     const link = document.createElement("a");
     link.href = book.link || "#";
     link.target = "_blank";
+    link.rel = "noopener noreferrer";
     link.className = "button copper";
 
     link.textContent = book.link ? "View Book" : "Unavailable";
