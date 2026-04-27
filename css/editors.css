@@ -12,7 +12,7 @@ body.editors-page {
 }
 
 /* =========================
-LAYOUT FIX (HEADER SPACING)
+LAYOUT FIX
 ========================= */
 main {
     padding-top: 40px;
@@ -43,16 +43,21 @@ MAIN SECTION
 }
 
 /* =========================
-GRID
+GRID (FINAL BALANCED VERSION)
 ========================= */
 
 .editor-inner {
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: 1100px;
+    margin: 80px auto;
 
     display: grid;
-    grid-template-columns: 1.3fr 1fr 1fr;
-    gap: 100px 80px;
+    grid-template-columns: 1.4fr 1fr 1fr;
+
+    gap: 60px 50px;
+
+    padding: 50px 40px;
+
+    background: rgba(255,255,255,0.02);
 
     position: relative;
     z-index: 1;
@@ -73,10 +78,17 @@ BOOK CARD
 .pick {
     text-align: center;
     position: relative;
-    z-index: 1;
 
+    opacity: 0;
+    transform: translateY(12px);
+
+    transition: all 0.4s ease;
+}
+
+/* FADE-IN */
+.pick.fade-in.visible {
+    opacity: 1;
     transform: translateY(0);
-    transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
 }
 
 /* =========================
@@ -84,21 +96,22 @@ IMAGE
 ========================= */
 
 .pick img {
-    width: 220px;
+    width: 200px;
+    height: 300px;
+    object-fit: contain;
+
     margin: 0 auto 20px;
     display: block;
-
-    will-change: transform, filter;
 
     filter:
         drop-shadow(0 25px 60px rgba(0,0,0,0.9))
         drop-shadow(0 5px 10px rgba(184,115,51,0.08));
 
-    transition: transform 0.6s ease, filter 0.6s ease;
+    transition: transform 0.5s ease, filter 0.5s ease;
 }
 
 .pick:hover img {
-    transform: translateY(-8px) scale(1.04);
+    transform: translateY(-6px) scale(1.03);
 
     filter:
         drop-shadow(0 50px 120px rgba(0,0,0,1))
@@ -110,26 +123,25 @@ TEXT
 ========================= */
 
 .pick h3 {
-    font-size: 20px;
-    letter-spacing: 2px;
+    font-size: 18px;
+    letter-spacing: 1px;
     margin-bottom: 6px;
 }
 
 .pick-author {
     font-size: 13px;
     opacity: 0.6;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 .pick-note {
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.7;
     opacity: 0.75;
 
     font-style: italic;
-    letter-spacing: 0.3px;
 
-    max-width: 260px;
+    max-width: 300px;
     margin: 0 auto 18px;
 }
 
@@ -147,7 +159,7 @@ BUTTON
 }
 
 /* =========================
-AFFILIATE SUBTLE
+AFFILIATE TEXT
 ========================= */
 
 .affiliate-subtle {
@@ -160,7 +172,7 @@ AFFILIATE SUBTLE
 }
 
 /* =========================
-HOVER FOCUS MODE (SOFTER)
+HOVER FOCUS MODE
 ========================= */
 
 .editor-inner:hover .pick {
@@ -170,7 +182,7 @@ HOVER FOCUS MODE (SOFTER)
 
 .editor-inner .pick:hover {
     opacity: 1;
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-6px) scale(1.02);
     filter: blur(0);
 }
 
@@ -179,7 +191,7 @@ ACTIVE PICK (AUTO HIGHLIGHT)
 ========================= */
 
 .active-pick {
-    transform: scale(1.04);
+    transform: scale(1.03);
     z-index: 2;
 
     animation: pickPulse 4s ease-in-out infinite alternate;
@@ -192,31 +204,35 @@ ACTIVE PICK (AUTO HIGHLIGHT)
         drop-shadow(0 0 120px rgba(184,115,51,0.15));
 }
 
-/* smoother pulse */
 @keyframes pickPulse {
-    0% { transform: scale(1.04); }
+    0% { transform: scale(1.03); }
     100% { transform: scale(1.06); }
 }
 
 /* =========================
-FEATURED PICK
+FEATURED PICK (PRIMARY)
 ========================= */
 
 .featured-pick {
     grid-column: span 2;
 }
 
+/* Bigger image */
 .featured-pick img {
-    width: 260px;
+    width: 280px;
+    height: 360px;
 }
 
+/* Stronger title */
 .featured-pick h3 {
     font-size: 24px;
 }
 
+/* Wider readable text */
 .featured-pick .pick-note {
-    max-width: 420px;
-    font-size: 15px;
+    max-width: 460px;
+    font-size: 14.5px;
+    opacity: 0.9;
 }
 
 /* =========================
@@ -286,15 +302,21 @@ RESPONSIVE
 @media (max-width: 900px) {
     .editor-inner {
         grid-template-columns: 1fr;
-        gap: 80px;
+        gap: 60px;
+        padding: 30px 20px;
     }
 
     .pick img {
         width: 200px;
+        height: auto;
     }
 
     .featured-pick {
         grid-column: span 1;
+    }
+
+    .featured-pick img {
+        width: 240px;
     }
 }
 
@@ -303,4 +325,3 @@ RESPONSIVE
         font-size: 13px;
     }
 }
-
