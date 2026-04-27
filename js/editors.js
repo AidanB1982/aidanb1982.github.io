@@ -1,184 +1,200 @@
-/* =========================================
-   EDITOR PICKS — FULL UPGRADE (ARCHIVE STYLE)
-   ========================================= */
+// =========================
+// EDITOR PICKS CMS SYSTEM
+// =========================
 
+let editorData = {};
+let sortedMonths = [];
+let currentMonthIndex = 0;
+let interval = null;
+let isTransitioning = false;
 
-/* ===== MAIN CONTAINER ===== */
+async function loadEditorPicks() {
 
-.editor-inner {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
-  gap: 50px;
+    const container = document.querySelector('.editor-inner');
+    if (!container) return;
 
-  max-width: 1100px;
-  margin: 80px auto;
-  padding: 50px 40px;
+    container.innerHTML = `
+        <div class="editor-loading fade-in visible">
+            <p>Loading selections...</p>
+        </div>
+    `;
 
-  background: rgba(255,255,255,0.02);
+    try {
+        const res = await fetch('/data/books.json');
+        if (!res.ok) throw new Error("Failed to load books.json");
+
+        editorData = await res.json();
+
+        const months = Object.keys(editorData);
+
+        if (!months.length) {
+            renderEmpty(container);
+            return;
+        }
+
+        sortedMonths = months.sort((a, b) => {
+            const [mA, yA] = a.split("-");
+            const [mB, yB] = b.split("-");
+            return new Date(`${mA} 1, ${yA}`) - new Date(`${mB} 1, ${yB}`);
+        });
+
+        currentMonthIndex = sortedMonths.length - 1;
+
+        renderMonth(true);
+        startRotation();
+        setupHoverPause();
+
+    } catch (err) {
+        console.error("Editor Picks Error:", err);
+        renderError(container);
+    }
 }
 
+function renderMonth(initial = false) {
 
-/* ===== BASE CARD ===== */
+    if (isTransitioning) return;
+    isTransitioning = true;
 
-.pick {
-  text-align: center;
+    const container = document.querySelector('.editor-inner');
+    const title = document.querySelector('.month-title');
 
-  opacity: 0;
-  transform: translateY(12px);
-  transition: all 0.5s ease;
+    const monthKey = sortedMonths[currentMonthIndex];
+    const books = editorData[monthKey];
+
+    if (!initial) {
+        container.classList.add("fading");
+    }
+
+    setTimeout(() => {
+
+        container.innerHTML = "";
+
+        if (title) {
+            title.textContent = formatMonth(monthKey);
+        }
+
+        if (!books || !books.length) {
+            renderEmpty(container);
+            isTransitioning = false;
+            return;
+        }
+
+        books.forEach((book, index) => {
+
+            const el = createBookCard(book);
+
+            if (index === 0) {
+                el.classList.add("featured-pick", "active-pick");
+            }
+
+            el.style.transitionDelay = `${index * 120}ms`;
+
+            container.appendChild(el);
+        });
+
+        container.classList.remove("fading");
+
+        if (typeof initFadeIn === "function") {
+            initFadeIn();
+        }
+
+        setTimeout(() => {
+            isTransitioning = false;
+        }, 500);
+
+    }, initial ? 0 : 400);
 }
 
+function startRotation() {
 
-/* FADE-IN */
-.pick.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
+    if (interval) clearInterval(interval);
+
+    interval = setInterval(() => {
+
+        if (isTransitioning) return;
+
+        currentMonthIndex--;
+
+        if (currentMonthIndex < 0) {
+            currentMonthIndex = sortedMonths.length - 1;
+        }
+
+        renderMonth();
+
+    }, 8000);
 }
 
+function setupHoverPause() {
 
-/* ===== IMAGE ===== */
+    const container = document.querySelector('.editor-inner');
+    if (!container) return;
 
-.pick img {
-  width: 100%;
-  max-width: 210px;
-  height: 300px;
-  object-fit: contain;
+    container.addEventListener("mouseenter", () => {
+        if (interval) clearInterval(interval);
+    });
 
-  display: block;
-  margin: 0 auto 18px;
-
-  transition: transform 0.3s ease, opacity 0.3s ease;
+    container.addEventListener("mouseleave", () => {
+        startRotation();
+    });
 }
 
+function createBookCard(book) {
 
-/* SUBTLE HOVER (ON BRAND — NOT LOUD) */
-.pick:hover img {
-  transform: translateY(-4px);
-  opacity: 0.95;
+    const el = document.createElement("div");
+    el.className = "pick fade-in";
+
+    const img = document.createElement("img");
+    img.src = book.image;
+    img.alt = book.title;
+
+    const title = document.createElement("h3");
+    title.textContent = book.title;
+
+    const author = document.createElement("p");
+    author.className = "pick-author";
+    author.textContent = book.author;
+
+    const note = document.createElement("p");
+    note.className = "pick-note";
+    note.textContent = book.note;
+
+    const link = document.createElement("a");
+    link.href = book.link || "#";
+    link.target = "_blank";
+    link.className = "button copper";
+
+    link.textContent = book.link ? "View Book" : "Unavailable";
+
+    const sub = document.createElement("span");
+    sub.className = "affiliate-subtle";
+    sub.textContent = "via Bookshop";
+
+    el.appendChild(img);
+    el.appendChild(title);
+    el.appendChild(author);
+    el.appendChild(note);
+    el.appendChild(link);
+    el.appendChild(sub);
+
+    return el;
 }
 
-
-/* ===== TITLE ===== */
-
-.pick h3 {
-  font-size: 15px;
-  margin-bottom: 3px;
-  color: #F1F1F1;
-  letter-spacing: 0.2px;
+function renderEmpty(container) {
+    container.innerHTML = `<div class="editor-empty"><p>No selections available.</p></div>`;
 }
 
-
-/* ===== AUTHOR ===== */
-
-.pick-author {
-  font-size: 12px;
-  opacity: 0.6;
-  margin-bottom: 10px;
+function renderError(container) {
+    container.innerHTML = `<div class="editor-error"><p>Unable to load selections.</p></div>`;
 }
 
-
-/* ===== NOTE ===== */
-
-.pick-note {
-  font-size: 13px;
-  line-height: 1.65;
-  opacity: 0.75;
-  margin-bottom: 14px;
-
-  max-width: 320px;
-  margin-left: auto;
-  margin-right: auto;
+function formatMonth(key) {
+    const [month, year] = key.split("-");
+    return month.charAt(0).toUpperCase() + month.slice(1) + " " + year;
 }
 
+document.addEventListener("DOMContentLoaded", () => {
 
-/* ===== BUTTON (UNCHANGED STYLE, JUST SPACING) ===== */
+    if (!document.body.classList.contains("editors-page")) return;
 
-.button.copper {
-  display: inline-block;
-  margin-top: 6px;
-}
-
-
-/* ===== SUBTEXT ===== */
-
-.affiliate-subtle {
-  display: block;
-  margin-top: 6px;
-  font-size: 11px;
-  opacity: 0.35;
-}
-
-
-/* =========================================
-   FEATURED PICK (ANCHOR ELEMENT)
-   ========================================= */
-
-.featured-pick {
-  position: relative;
-}
-
-
-/* FEATURED IMAGE */
-.featured-pick img {
-  max-width: 260px;
-  height: 360px;
-}
-
-
-/* FEATURED TITLE */
-.featured-pick h3 {
-  font-size: 18px;
-}
-
-
-/* FEATURED NOTE */
-.featured-pick .pick-note {
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-
-/* SUBTLE LEFT EMPHASIS LINE */
-.featured-pick::before {
-  content: "";
-  position: absolute;
-  left: -20px;
-  top: 20px;
-  bottom: 20px;
-  width: 1px;
-  background: rgba(255,255,255,0.06);
-}
-
-
-/* =========================================
-   TRANSITION STATE
-   ========================================= */
-
-.editor-inner.fading {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.4s ease;
-}
-
-
-/* =========================================
-   RESPONSIVE
-   ========================================= */
-
-@media (max-width: 900px) {
-
-  .editor-inner {
-    grid-template-columns: 1fr;
-    gap: 60px;
-    padding: 30px 20px;
-  }
-
-  .featured-pick::before {
-    display: none;
-  }
-
-  .featured-pick img {
-    max-width: 240px;
-    height: 330px;
-  }
-}
+    loadEditorPicks();
+});
