@@ -329,7 +329,7 @@ RESPONSIVE
 SINGLE ITEM FIX
 ========================= */
 
-.editor-inner:has(.pick:only-child) {
+.editor-inner.single {
   grid-template-columns: 1fr;
   justify-items: center;
 }
