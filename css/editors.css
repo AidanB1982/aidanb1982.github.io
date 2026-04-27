@@ -325,3 +325,11 @@ RESPONSIVE
         font-size: 13px;
     }
 }
+/* =========================
+SINGLE ITEM FIX
+========================= */
+
+.editor-inner:has(.pick:only-child) {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
