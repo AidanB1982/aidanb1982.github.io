@@ -283,7 +283,8 @@
     }
 
     .access-button,
-    .play-button {
+    .play-button,
+    .seal-button {
         min-height: 56px;
         border: 1px solid rgba(201, 169, 106, 0.55);
         background:
@@ -301,12 +302,29 @@
     .access-button:hover,
     .access-button:focus,
     .play-button:hover,
-    .play-button:focus {
+    .play-button:focus,
+    .seal-button:hover,
+    .seal-button:focus {
         transform: translateY(-1px);
         border-color: rgba(201, 169, 106, 0.92);
         background:
             linear-gradient(135deg, rgba(201, 169, 106, 0.3), rgba(201, 169, 106, 0.1)),
             rgba(0,0,0,0.56);
+    }
+
+    .seal-button {
+        width: 100%;
+        margin-top: 12px;
+        color: rgba(255, 255, 255, 0.68);
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.34);
+    }
+
+    .seal-button:hover,
+    .seal-button:focus {
+        color: #fff;
+        border-color: rgba(201, 169, 106, 0.7);
+        background: rgba(0, 0, 0, 0.56);
     }
 
     .access-message {
@@ -633,6 +651,10 @@
                         Play Transmission
                     </button>
 
+                    <button class="seal-button" type="button" id="seal-button">
+                        Seal Archive
+                    </button>
+
                     <audio id="holdfast-audio" class="audio-hidden" preload="metadata">
                         <source src="/assets/archive-file-04-transmission-1042.mp3" type="audio/mpeg">
                         Your browser does not support the audio element.
@@ -691,6 +713,7 @@ window.addEventListener("load", async () => {
     const status = document.getElementById("access-status");
     const transmissionPanel = document.getElementById("transmission-panel");
     const playButton = document.getElementById("play-button");
+    const sealButton = document.getElementById("seal-button");
     const audio = document.getElementById("holdfast-audio");
     const soundwaveBox = document.getElementById("soundwave-box");
     const transmissionNote = document.getElementById("transmission-note");
@@ -758,6 +781,17 @@ window.addEventListener("load", async () => {
         }
     }
 
+    function sealArchive() {
+        sessionStorage.removeItem(STORAGE_KEY);
+
+        if (audio) {
+            audio.pause();
+            audio.currentTime = 0;
+        }
+
+        location.reload();
+    }
+
     if (sessionStorage.getItem(STORAGE_KEY) === "true") {
         grantAccess();
     }
@@ -819,6 +853,10 @@ window.addEventListener("load", async () => {
         audio.addEventListener("play", function () {
             soundwaveBox.classList.add("is-playing");
         });
+    }
+
+    if (sealButton) {
+        sealButton.addEventListener("click", sealArchive);
     }
 })();
 </script>
