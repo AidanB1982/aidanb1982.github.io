@@ -1,1 +1,827 @@
+<!DOCTYPE html>
+<html lang="en-GB" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Holdfast | Blackwood Publishing</title>
+
+<meta name="description" content="A restricted Blackwood Publishing archive transmission for Holdfast. Enter the access code to unlock the audio file.">
+
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
+
+<style>
+    :root {
+        --gold: #c9a96a;
+        --gold-soft: rgba(201, 169, 106, 0.68);
+        --paper: #e8ddc8;
+        --white: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --red: #8b2419;
+        --black: #050505;
+        --panel: rgba(5, 5, 5, 0.74);
+        --border: rgba(201, 169, 106, 0.28);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body.holdfast-page {
+        margin: 0;
+        min-height: 100vh;
+        background: #050505;
+        color: var(--white);
+        font-family: Georgia, "Times New Roman", serif;
+        overflow-x: hidden;
+    }
+
+    #header-placeholder {
+        position: relative;
+        z-index: 100;
+    }
+
+    .skip-link {
+        position: absolute;
+        top: -100px;
+        left: 1rem;
+        z-index: 9999;
+        padding: 0.75rem 1rem;
+        background: #2b1d12;
+        color: #fff;
+        border-radius: 8px;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .skip-link:focus {
+        top: 1rem;
+    }
+
+    .holdfast-page-wrap {
+        position: relative;
+        min-height: 100vh;
+        padding-top: 92px;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.82) 0%,
+                rgba(0, 0, 0, 0.46) 42%,
+                rgba(0, 0, 0, 0.88) 100%
+            ),
+            url("/assets/HOLDFAST_BG.png") center center / cover no-repeat fixed;
+        isolation: isolate;
+    }
+
+    .holdfast-page-wrap::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+            radial-gradient(circle at center 38%, rgba(201, 169, 106, 0.12), transparent 34%),
+            linear-gradient(90deg, rgba(0,0,0,0.72), transparent 30%, transparent 70%, rgba(0,0,0,0.78));
+    }
+
+    .holdfast-page-wrap::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        opacity: 0.14;
+        pointer-events: none;
+        background-image:
+            linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+        background-size: 48px 48px;
+        mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    }
+
+    .holdfast-hero {
+        min-height: calc(100vh - 92px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 72px 22px 92px;
+    }
+
+    .holdfast-stage {
+        width: min(100%, 1080px);
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 32px;
+        align-items: center;
+    }
+
+    .holdfast-title-area {
+        position: relative;
+        min-height: 560px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: clamp(30px, 5vw, 56px);
+        border: 1px solid rgba(201, 169, 106, 0.14);
+        background:
+            linear-gradient(145deg, rgba(0,0,0,0.18), rgba(0,0,0,0.58));
+        box-shadow: 0 30px 100px rgba(0,0,0,0.48);
+    }
+
+    .holdfast-title-area::before {
+        content: "ARCHIVE FILE / 04";
+        position: absolute;
+        top: 24px;
+        left: 24px;
+        color: rgba(201, 169, 106, 0.72);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+    }
+
+    .holdfast-title-area::after {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 1px solid rgba(201, 169, 106, 0.08);
+        pointer-events: none;
+    }
+
+    .holdfast-kicker {
+        margin: 0 0 16px;
+        color: var(--gold);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.76rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+    }
+
+    .holdfast-title {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(4.4rem, 11vw, 9rem);
+        line-height: 0.9;
+        font-weight: 500;
+        letter-spacing: 0.035em;
+        text-transform: uppercase;
+        text-shadow:
+            0 8px 30px rgba(0,0,0,0.95),
+            0 0 48px rgba(201, 169, 106, 0.12);
+    }
+
+    .holdfast-subtitle {
+        max-width: 620px;
+        margin: 28px 0 0;
+        color: rgba(255,255,255,0.8);
+        font-size: 1.1rem;
+        line-height: 1.85;
+        text-shadow: 0 4px 18px rgba(0,0,0,0.92);
+    }
+
+    .access-panel {
+        position: relative;
+        padding: 34px 30px;
+        border: 1px solid var(--border);
+        background:
+            linear-gradient(145deg, rgba(0,0,0,0.84), rgba(14,12,10,0.76)),
+            var(--panel);
+        box-shadow: 0 30px 100px rgba(0,0,0,0.62);
+        backdrop-filter: blur(6px);
+    }
+
+    .access-panel::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border: 1px solid rgba(201, 169, 106, 0.08);
+        pointer-events: none;
+    }
+
+    .access-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 22px;
+        padding: 8px 11px;
+        border: 1px solid rgba(201,169,106,0.24);
+        color: var(--gold);
+        background: rgba(0,0,0,0.34);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .access-status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 18px rgba(139, 36, 25, 0.95);
+    }
+
+    .access-status.is-granted::before {
+        background: var(--gold);
+        box-shadow: 0 0 18px rgba(201, 169, 106, 0.95);
+    }
+
+    .access-title {
+        margin: 0;
+        color: #fff;
+        font-size: clamp(1.9rem, 4vw, 3.05rem);
+        line-height: 1.08;
+        font-weight: 500;
+    }
+
+    .access-copy {
+        margin: 18px 0 26px;
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 1rem;
+    }
+
+    .access-form {
+        display: grid;
+        gap: 14px;
+    }
+
+    .access-label {
+        color: rgba(255,255,255,0.78);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .access-input {
+        width: 100%;
+        min-height: 56px;
+        padding: 0 16px;
+        border: 1px solid rgba(201, 169, 106, 0.36);
+        border-radius: 0;
+        outline: none;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.08rem;
+        letter-spacing: 0.12em;
+    }
+
+    .access-input::placeholder {
+        color: rgba(255,255,255,0.28);
+    }
+
+    .access-input:focus {
+        border-color: rgba(201, 169, 106, 0.9);
+        box-shadow: 0 0 0 3px rgba(201, 169, 106, 0.12);
+    }
+
+    .access-button,
+    .play-button {
+        min-height: 56px;
+        border: 1px solid rgba(201, 169, 106, 0.55);
+        background:
+            linear-gradient(135deg, rgba(201, 169, 106, 0.2), rgba(201, 169, 106, 0.07)),
+            rgba(0,0,0,0.46);
+        color: #fff;
+        cursor: pointer;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.76rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .access-button:hover,
+    .access-button:focus,
+    .play-button:hover,
+    .play-button:focus {
+        transform: translateY(-1px);
+        border-color: rgba(201, 169, 106, 0.92);
+        background:
+            linear-gradient(135deg, rgba(201, 169, 106, 0.3), rgba(201, 169, 106, 0.1)),
+            rgba(0,0,0,0.56);
+    }
+
+    .access-message {
+        min-height: 26px;
+        margin: 4px 0 0;
+        color: rgba(255,255,255,0.58);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .access-message.is-error {
+        color: #e5a49c;
+    }
+
+    .access-message.is-success {
+        color: #d6b56d;
+    }
+
+    .transmission-panel {
+        display: none;
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid rgba(201, 169, 106, 0.18);
+    }
+
+    .transmission-panel.is-visible {
+        display: block;
+        animation: revealTransmission 700ms ease both;
+    }
+
+    .transmission-heading {
+        margin: 0 0 14px;
+        color: rgba(255,255,255,0.86);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+    }
+
+    .soundwave-box {
+        position: relative;
+        margin: 0 0 18px;
+        padding: 14px;
+        border: 1px solid rgba(201, 169, 106, 0.22);
+        background: rgba(0,0,0,0.38);
+        overflow: hidden;
+    }
+
+    .soundwave-box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, transparent, rgba(201,169,106,0.12), transparent),
+            linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+        transform: translateX(-100%);
+        animation: scanWave 3.8s linear infinite;
+        pointer-events: none;
+    }
+
+    .soundwave-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 160px;
+        object-fit: contain;
+        opacity: 0.86;
+        filter: contrast(1.2) sepia(0.25);
+        animation: soundwaveFlicker 2.4s infinite steps(2, end);
+    }
+
+    .soundwave-box.is-playing .soundwave-image {
+        animation:
+            soundwaveFlicker 1.1s infinite steps(2, end),
+            soundwavePulse 680ms ease-in-out infinite alternate;
+    }
+
+    .audio-hidden {
+        display: none;
+    }
+
+    .transmission-note {
+        margin: 14px 0 0;
+        color: rgba(255,255,255,0.48);
+        font-size: 0.92rem;
+        line-height: 1.7;
+    }
+
+    .archive-footer-note {
+        width: min(100%, 1080px);
+        margin: 0 auto;
+        padding: 0 22px 70px;
+        color: rgba(255,255,255,0.36);
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    @keyframes revealTransmission {
+        from {
+            opacity: 0;
+            transform: translateY(14px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes soundwaveFlicker {
+        0%, 100% {
+            opacity: 0.88;
+            filter: contrast(1.18) sepia(0.25) brightness(1);
+        }
+
+        8% {
+            opacity: 0.54;
+            filter: contrast(1.4) sepia(0.3) brightness(1.35);
+        }
+
+        12% {
+            opacity: 0.96;
+        }
+
+        28% {
+            opacity: 0.68;
+        }
+
+        31% {
+            opacity: 0.92;
+        }
+
+        61% {
+            opacity: 0.5;
+            filter: contrast(1.55) sepia(0.38) brightness(1.2);
+        }
+
+        64% {
+            opacity: 0.9;
+        }
+    }
+
+    @keyframes soundwavePulse {
+        from {
+            transform: scaleY(0.96);
+        }
+
+        to {
+            transform: scaleY(1.05);
+        }
+    }
+
+    @keyframes scanWave {
+        from {
+            transform: translateX(-100%);
+        }
+
+        to {
+            transform: translateX(100%);
+        }
+    }
+
+    @media (max-width: 980px) {
+        .holdfast-stage {
+            grid-template-columns: 1fr;
+        }
+
+        .holdfast-title-area {
+            min-height: 440px;
+        }
+
+        .access-panel {
+            max-width: 620px;
+            margin: 0 auto;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .holdfast-page-wrap {
+            padding-top: 74px;
+            background-attachment: scroll;
+        }
+
+        .holdfast-hero {
+            min-height: auto;
+            padding: 48px 14px 70px;
+        }
+
+        .holdfast-title-area {
+            min-height: 360px;
+            padding: 30px 22px;
+        }
+
+        .holdfast-title-area::before {
+            top: 18px;
+            left: 18px;
+            font-size: 0.66rem;
+        }
+
+        .holdfast-title {
+            font-size: clamp(3.2rem, 18vw, 5rem);
+        }
+
+        .holdfast-subtitle {
+            font-size: 0.98rem;
+            line-height: 1.7;
+        }
+
+        .access-panel {
+            padding: 28px 22px;
+        }
+
+        .access-title {
+            font-size: 2rem;
+        }
+
+        .access-copy {
+            font-size: 0.96rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
+        }
+    }
+</style>
+</head>
+
+<body class="sub-page holdfast-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<main id="main-content" class="holdfast-page-wrap">
+
+    <section class="holdfast-hero" aria-labelledby="holdfast-title">
+
+        <div class="holdfast-stage">
+
+            <div class="holdfast-title-area">
+                <div>
+                    <p class="holdfast-kicker">Blackwood Publishing / Restricted Transmission</p>
+
+                    <h1 id="holdfast-title" class="holdfast-title">
+                        Holdfast
+                    </h1>
+
+                    <p class="holdfast-subtitle">
+                        A sealed record from the Blackwood archive. The background remains visible.
+                        The file waits for the correct code.
+                    </p>
+                </div>
+            </div>
+
+            <aside class="access-panel" aria-labelledby="access-title">
+
+                <div class="access-status" id="access-status">
+                    Access locked
+                </div>
+
+                <h2 id="access-title" class="access-title">
+                    Enter Access Code
+                </h2>
+
+                <p class="access-copy">
+                    The archive is listening. Enter the pass code to unlock the Holdfast transmission.
+                </p>
+
+                <form class="access-form" id="access-form" autocomplete="off">
+                    <label class="access-label" for="access-code">
+                        Access code
+                    </label>
+
+                    <input
+                        class="access-input"
+                        id="access-code"
+                        name="access-code"
+                        type="password"
+                        placeholder="Type code here"
+                        aria-describedby="access-message"
+                        required
+                    >
+
+                    <button class="access-button" type="submit">
+                        Submit Code
+                    </button>
+
+                    <p class="access-message" id="access-message" aria-live="polite">
+                        Awaiting archivist credentials.
+                    </p>
+                </form>
+
+                <div class="transmission-panel" id="transmission-panel">
+
+                    <p class="transmission-heading">
+                        Archive file 04 / Transmission 1042
+                    </p>
+
+                    <div class="soundwave-box" id="soundwave-box">
+                        <img
+                            src="/assets/Soundwave Main.png"
+                            class="soundwave-image"
+                            alt="Flickering soundwave for the Holdfast archive transmission"
+                        >
+                    </div>
+
+                    <button class="play-button" type="button" id="play-button">
+                        Play Transmission
+                    </button>
+
+                    <audio id="holdfast-audio" class="audio-hidden" preload="metadata">
+                        <source src="/assets/archive-file-04-transmission-1042.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+
+                    <p class="transmission-note" id="transmission-note">
+                        Audio file locked to manual playback. Press play to begin.
+                    </p>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </section>
+
+    <p class="archive-footer-note">
+        Blackwood Publishing — Archive access monitored
+    </p>
+
+</main>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js?v=20260408" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+    try {
+        if (typeof loadHeader === "function") {
+            await loadHeader("simple");
+        } else {
+            console.warn("loadHeader function not found");
+        }
+
+        if (typeof initFadeIn === "function") {
+            initFadeIn();
+        }
+    } catch (error) {
+        console.error("Page initialisation error:", error);
+    }
+});
+
+(function () {
+    "use strict";
+
+    const ACCESS_CODE = "Holdfast-04";
+    const STORAGE_KEY = "blackwood_holdfast_access_granted";
+
+    const form = document.getElementById("access-form");
+    const input = document.getElementById("access-code");
+    const message = document.getElementById("access-message");
+    const status = document.getElementById("access-status");
+    const transmissionPanel = document.getElementById("transmission-panel");
+    const playButton = document.getElementById("play-button");
+    const audio = document.getElementById("holdfast-audio");
+    const soundwaveBox = document.getElementById("soundwave-box");
+    const transmissionNote = document.getElementById("transmission-note");
+
+    function normaliseCode(value) {
+        return String(value || "").trim().toLowerCase();
+    }
+
+    function setMessage(text, type) {
+        if (!message) return;
+
+        message.textContent = text;
+        message.classList.remove("is-error", "is-success");
+
+        if (type) {
+            message.classList.add(type);
+        }
+    }
+
+    function grantAccess() {
+        if (status) {
+            status.textContent = "Access granted";
+            status.classList.add("is-granted");
+        }
+
+        setMessage("Archivist has entered the correct pass code. Entry granted.", "is-success");
+
+        if (transmissionPanel) {
+            transmissionPanel.classList.add("is-visible");
+        }
+
+        if (input) {
+            input.setAttribute("disabled", "disabled");
+        }
+
+        if (form) {
+            const submitButton = form.querySelector(".access-button");
+            if (submitButton) {
+                submitButton.setAttribute("disabled", "disabled");
+                submitButton.textContent = "Code Accepted";
+            }
+        }
+
+        sessionStorage.setItem(STORAGE_KEY, "true");
+    }
+
+    function denyAccess() {
+        setMessage("Access denied. The archive does not recognise that code.", "is-error");
+
+        if (input) {
+            input.setAttribute("aria-invalid", "true");
+
+            input.animate(
+                [
+                    { transform: "translateX(0)" },
+                    { transform: "translateX(-7px)" },
+                    { transform: "translateX(7px)" },
+                    { transform: "translateX(0)" }
+                ],
+                {
+                    duration: 240,
+                    easing: "ease-out"
+                }
+            );
+        }
+    }
+
+    if (sessionStorage.getItem(STORAGE_KEY) === "true") {
+        grantAccess();
+    }
+
+    if (form && input) {
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const enteredCode = normaliseCode(input.value);
+            const correctCode = normaliseCode(ACCESS_CODE);
+
+            if (enteredCode === correctCode) {
+                input.removeAttribute("aria-invalid");
+                grantAccess();
+                return;
+            }
+
+            denyAccess();
+        });
+
+        input.addEventListener("input", function () {
+            input.removeAttribute("aria-invalid");
+            setMessage("Awaiting archivist credentials.", "");
+        });
+    }
+
+    if (playButton && audio && soundwaveBox && transmissionNote) {
+        playButton.addEventListener("click", async function () {
+            try {
+                if (audio.paused) {
+                    await audio.play();
+                    playButton.textContent = "Pause Transmission";
+                    soundwaveBox.classList.add("is-playing");
+                    transmissionNote.textContent = "Transmission is playing.";
+                } else {
+                    audio.pause();
+                    playButton.textContent = "Play Transmission";
+                    soundwaveBox.classList.remove("is-playing");
+                    transmissionNote.textContent = "Transmission paused.";
+                }
+            } catch (error) {
+                console.error("Audio playback failed:", error);
+                transmissionNote.textContent = "Playback could not begin. Check browser audio permissions.";
+            }
+        });
+
+        audio.addEventListener("ended", function () {
+            playButton.textContent = "Replay Transmission";
+            soundwaveBox.classList.remove("is-playing");
+            transmissionNote.textContent = "Transmission ended.";
+        });
+
+        audio.addEventListener("pause", function () {
+            if (!audio.ended) {
+                soundwaveBox.classList.remove("is-playing");
+            }
+        });
+
+        audio.addEventListener("play", function () {
+            soundwaveBox.classList.add("is-playing");
+        });
+    }
+})();
+</script>
+
+</body>
+</html>
