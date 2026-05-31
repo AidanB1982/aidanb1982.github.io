@@ -1,12 +1,17 @@
-<style>
-    /*
-        SECURITY POLICY PAGE FIXES
-        - Separates fixed/header area from hero title
-        - Improves text contrast/readability
-        - Moves the seal behind the content with low opacity
-        - Adds stronger mobile spacing
-    */
+<!DOCTYPE html>
+<html lang="en-GB" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Security Policy | Blackwood Publishing</title>
+
+<meta name="description" content="Security Policy for Blackwood Publishing, including responsible disclosure, vulnerability reporting, incident response, and website security practices.">
+
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
+
+<style>
     #header-placeholder {
         position: relative;
         z-index: 50;
@@ -23,10 +28,10 @@
         background:
             linear-gradient(
                 180deg,
-                rgba(0, 0, 0, 0.96) 0%,
-                rgba(8, 8, 8, 0.94) 28%,
-                rgba(12, 12, 12, 0.9) 58%,
-                rgba(15, 15, 15, 0.96) 100%
+                rgba(0, 0, 0, 0.97) 0%,
+                rgba(8, 8, 8, 0.95) 32%,
+                rgba(12, 12, 12, 0.92) 62%,
+                rgba(15, 15, 15, 0.98) 100%
             );
         overflow: hidden;
         border-bottom: 1px solid rgba(201, 169, 106, 0.16);
@@ -37,7 +42,7 @@
         position: absolute;
         inset: 0;
         background: url("/assets/seal.png") center 185px / 300px no-repeat;
-        opacity: 0.16;
+        opacity: 0.14;
         filter: grayscale(1);
         pointer-events: none;
         z-index: 1;
@@ -60,10 +65,10 @@
         max-width: 860px;
         margin: 0 auto;
         padding: 22px 20px 28px;
-        background: rgba(0, 0, 0, 0.28);
-        border: 1px solid rgba(201, 169, 106, 0.16);
+        background: rgba(0, 0, 0, 0.36);
+        border: 1px solid rgba(201, 169, 106, 0.18);
         border-radius: 18px;
-        backdrop-filter: blur(2px);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
     }
 
     .security-intro-line {
@@ -91,7 +96,7 @@
     .security-hero-subtitle {
         max-width: 760px;
         margin: 24px auto 0;
-        color: rgba(255, 255, 255, 0.94);
+        color: rgba(255, 255, 255, 0.95);
         font-size: 1.12rem;
         line-height: 1.75;
         font-weight: 500;
@@ -357,3 +362,318 @@
         }
     }
 </style>
+</head>
+
+<body class="sub-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<!-- HERO -->
+<section class="security-hero">
+
+    <div class="security-hero-content">
+        <p class="security-intro-line">Website Policy</p>
+        <h1>Security Policy</h1>
+        <p class="security-hero-subtitle">
+            How Blackwood Publishing protects its website, handles security concerns,
+            and responds to potential vulnerabilities or incidents.
+        </p>
+    </div>
+
+</section>
+
+<!-- CONTENT -->
+<main id="main-content" class="security-section">
+
+    <div class="security-wrap">
+
+        <div class="security-meta" aria-label="Policy information">
+            <span>Last updated: 31 May 2026</span>
+            <span>Website: Blackwoodpublishing.co.uk</span>
+        </div>
+
+        <article class="security-card">
+
+            <div class="security-notice">
+                <strong>Responsible disclosure:</strong>
+                If you believe you have found a vulnerability affecting this website,
+                please report it responsibly using the contact details below.
+            </div>
+
+            <div class="security-content">
+
+                <section aria-labelledby="scope">
+                    <h2 id="scope">1. Scope</h2>
+                    <p>This policy applies to:</p>
+                    <ul>
+                        <li>Blackwoodpublishing.co.uk</li>
+                        <li>Website forms, newsletter or archive sign-up features</li>
+                        <li>Publishing, author, book, archive, and community pages</li>
+                        <li>Any digital services directly operated by Blackwood Publishing</li>
+                    </ul>
+                    <p>
+                        This policy does not apply to third-party websites, retailers, payment processors,
+                        social media platforms, or external services linked from our website. Those services
+                        are governed by their own security and privacy policies.
+                    </p>
+                </section>
+
+                <section aria-labelledby="commitments">
+                    <h2 id="commitments">2. Our Security Commitments</h2>
+                    <p>
+                        We aim to protect the confidentiality, integrity, and availability of our website and
+                        related systems by using reasonable technical and organisational safeguards.
+                    </p>
+                    <p>These may include:</p>
+                    <ul>
+                        <li>HTTPS encryption for website traffic</li>
+                        <li>Secure administrator access controls</li>
+                        <li>Strong passwords and multi-factor authentication where available</li>
+                        <li>Regular updates to website software, plugins, themes, and dependencies</li>
+                        <li>Limited access to administrative systems</li>
+                        <li>Routine review of website forms and data collection points</li>
+                        <li>Backups of essential website content and configuration</li>
+                        <li>Monitoring for suspicious activity, spam, abuse, or unauthorised access</li>
+                    </ul>
+                </section>
+
+                <section aria-labelledby="data-protection">
+                    <h2 id="data-protection">3. Data Protection and Privacy</h2>
+                    <p>
+                        Where we collect personal information, such as through a contact form, mailing list,
+                        archive sign-up, order-related communication, or reader enquiry, we aim to handle that
+                        information securely and only for legitimate purposes.
+                    </p>
+                    <p>
+                        Personal information should be collected, stored, used, and deleted in accordance with
+                        applicable UK data protection requirements.
+                    </p>
+                    <p>
+                        Where a personal data breach is likely to result in a risk to individuals’ rights and freedoms,
+                        notification may be required to the Information Commissioner’s Office without undue delay and,
+                        where feasible, within 72 hours of becoming aware of it.
+                    </p>
+                </section>
+
+                <section aria-labelledby="responsible-disclosure">
+                    <h2 id="responsible-disclosure">4. Responsible Disclosure</h2>
+                    <p>
+                        We welcome good-faith reports from security researchers, visitors, readers,
+                        and members of the public.
+                    </p>
+                    <p>
+                        If you believe you have found a security vulnerability affecting Blackwoodpublishing.co.uk,
+                        please report it to:
+                    </p>
+
+                    <div class="security-contact-card" aria-label="Security contact details">
+                        <p>
+                            <strong>Security contact:</strong>
+                            <a href="mailto:aidan@blackwoodpublishing.co.uk">aidan@blackwoodpublishing.co.uk</a>
+                        </p>
+                        <p>
+                            <strong>Alternative contact:</strong>
+                            <a href="mailto:contact@blackwoodpublishing.co.uk">contact@blackwoodpublishing.co.uk</a>
+                        </p>
+                    </div>
+
+                    <p>Please include:</p>
+                    <ul>
+                        <li>A clear description of the issue</li>
+                        <li>The affected URL or page</li>
+                        <li>Steps to reproduce the issue</li>
+                        <li>Any relevant screenshots or proof-of-concept details</li>
+                        <li>Your contact details, if you would like a response</li>
+                    </ul>
+                    <p>
+                        Please do not include personal data belonging to other people unless strictly necessary
+                        to demonstrate the issue.
+                    </p>
+                </section>
+
+                <section aria-labelledby="research-rules">
+                    <h2 id="research-rules">5. Good-Faith Research Rules</h2>
+                    <p>When testing or reporting a vulnerability, please:</p>
+                    <ul>
+                        <li>Do not access, modify, delete, or copy data that does not belong to you</li>
+                        <li>Do not disrupt the website or services</li>
+                        <li>Do not perform denial-of-service testing</li>
+                        <li>Do not use automated high-volume scanning without permission</li>
+                        <li>Do not attempt social engineering, phishing, physical attacks, or attacks against staff, readers, authors, or suppliers</li>
+                        <li>Do not publicly disclose the issue before we have had a reasonable opportunity to investigate and resolve it</li>
+                    </ul>
+                    <p>
+                        Reports made in good faith and in line with this policy will be reviewed respectfully.
+                    </p>
+                </section>
+
+                <section aria-labelledby="vulnerability-response">
+                    <h2 id="vulnerability-response">6. Vulnerability Response Process</h2>
+                    <p>When we receive a security report, we aim to:</p>
+                    <ol>
+                        <li>Acknowledge receipt where contact details are provided.</li>
+                        <li>Review and validate the report.</li>
+                        <li>Assess severity and potential impact.</li>
+                        <li>Take appropriate steps to contain, fix, or mitigate the issue.</li>
+                        <li>Confirm resolution where appropriate.</li>
+                        <li>Review whether further action is needed to prevent recurrence.</li>
+                    </ol>
+                    <p>
+                        We may not be able to provide detailed internal information about our systems, hosting,
+                        suppliers, or security controls, but we will aim to communicate clearly where possible.
+                    </p>
+                </section>
+
+                <section aria-labelledby="incidents">
+                    <h2 id="incidents">7. Security Incidents</h2>
+                    <p>A security incident may include:</p>
+                    <ul>
+                        <li>Unauthorised access to website systems</li>
+                        <li>Exposure of personal information</li>
+                        <li>Malware or malicious code</li>
+                        <li>Defacement or unauthorised content changes</li>
+                        <li>Abuse of website forms or mailing systems</li>
+                        <li>Compromise of administrator accounts</li>
+                        <li>Loss of access to critical website systems</li>
+                    </ul>
+                    <p>Where an incident occurs, we will take reasonable steps to:</p>
+                    <ul>
+                        <li>Contain the issue</li>
+                        <li>Preserve relevant evidence</li>
+                        <li>Restore secure operation</li>
+                        <li>Assess whether personal data has been affected</li>
+                        <li>Notify affected individuals, regulators, suppliers, or service providers where required</li>
+                        <li>Improve controls to reduce the risk of recurrence</li>
+                    </ul>
+                </section>
+
+                <section aria-labelledby="access-control">
+                    <h2 id="access-control">8. Access Control</h2>
+                    <p>
+                        Administrative access to Blackwood Publishing systems should be limited to authorised individuals only.
+                    </p>
+                    <p>Users with administrative access are expected to:</p>
+                    <ul>
+                        <li>Use strong, unique passwords</li>
+                        <li>Enable multi-factor authentication where available</li>
+                        <li>Keep login details confidential</li>
+                        <li>Avoid accessing administrative systems from insecure devices or networks</li>
+                        <li>Report suspected compromise immediately</li>
+                    </ul>
+                    <p>
+                        Access should be removed or updated when it is no longer required.
+                    </p>
+                </section>
+
+                <section aria-labelledby="maintenance">
+                    <h2 id="maintenance">9. Website Maintenance</h2>
+                    <p>To reduce security risk, Blackwood Publishing should maintain its website by:</p>
+                    <ul>
+                        <li>Applying security updates promptly</li>
+                        <li>Removing unused plugins, themes, accounts, and integrations</li>
+                        <li>Reviewing form submissions and spam controls</li>
+                        <li>Keeping backups separate from the live website</li>
+                        <li>Testing restoration procedures periodically</li>
+                        <li>Reviewing third-party scripts and embedded services</li>
+                    </ul>
+                </section>
+
+                <section aria-labelledby="third-party-services">
+                    <h2 id="third-party-services">10. Third-Party Services</h2>
+                    <p>
+                        Blackwood Publishing may use third-party services for hosting, analytics, email newsletters,
+                        payments, book distribution, forms, or embedded content.
+                    </p>
+                    <p>
+                        Where third-party services are used, we aim to choose reputable providers and configure them securely.
+                        However, we are not responsible for the independent security practices of external websites or platforms.
+                    </p>
+                </section>
+
+                <section aria-labelledby="prohibited-activity">
+                    <h2 id="prohibited-activity">11. Prohibited Activity</h2>
+                    <p>Visitors must not misuse Blackwoodpublishing.co.uk.</p>
+                    <p>Prohibited activity includes:</p>
+                    <ul>
+                        <li>Attempting unauthorised access</li>
+                        <li>Uploading malicious code</li>
+                        <li>Scraping or harvesting data without permission</li>
+                        <li>Interfering with normal website operation</li>
+                        <li>Attempting to bypass security controls</li>
+                        <li>Sending spam, abusive messages, or malicious submissions through website forms</li>
+                        <li>Impersonating Blackwood Publishing, its authors, or representatives</li>
+                    </ul>
+                </section>
+
+                <section aria-labelledby="no-warranty">
+                    <h2 id="no-warranty">12. No Warranty</h2>
+                    <p>
+                        While we take reasonable steps to secure our website, no online service can be guaranteed to be completely secure.
+                        Visitors use the website at their own risk, subject to any rights they may have under applicable law.
+                    </p>
+                </section>
+
+                <section aria-labelledby="changes">
+                    <h2 id="changes">13. Changes to This Policy</h2>
+                    <p>
+                        We may update this Security Policy from time to time to reflect changes in our website, systems,
+                        legal obligations, or security practices.
+                    </p>
+                    <p>
+                        The latest version will be published on Blackwoodpublishing.co.uk.
+                    </p>
+                </section>
+
+                <section aria-labelledby="security-txt-section">
+                    <h2 id="security-txt-section">Optional security.txt File</h2>
+                    <p>
+                        You can also create a <span class="security-code">security.txt</span> file at:
+                        <span class="security-code">/.well-known/security.txt</span>
+                    </p>
+
+                    <pre class="security-txt">Contact: mailto:aidan@blackwoodpublishing.co.uk
+Contact: mailto:contact@blackwoodpublishing.co.uk
+Preferred-Languages: en
+Canonical: https://blackwoodpublishing.co.uk/.well-known/security.txt
+Policy: https://blackwoodpublishing.co.uk/security-policy.html
+Expires: 2027-05-31T23:59:59Z</pre>
+                </section>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</main>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js?v=20260408" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+    try {
+        if (typeof loadHeader === "function") {
+            await loadHeader("simple");
+        } else {
+            console.warn("loadHeader function not found");
+        }
+
+        if (typeof initFadeIn === "function") {
+            initFadeIn();
+        }
+    } catch (error) {
+        console.error("Page initialisation error:", error);
+    }
+});
+</script>
+
+</body>
+</html>
