@@ -3191,7 +3191,9 @@ body.reading-lists-page {
     border: 1px solid rgba(201, 169, 106, 0.14);
     background: rgba(0,0,0,0.38);
 }
-
+/* =========================================
+   HOLDFAST — UNLOCKED PRE-ORDER PANEL
+   ========================================= */
 .reading-lists-footer-note {
     width: min(100%, 1080px);
     margin: 70px auto 0;
