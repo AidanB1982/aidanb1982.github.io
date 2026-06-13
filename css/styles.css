@@ -3235,3 +3235,57 @@ body.reading-lists-page {
         padding: 10px;
     }
 }
+
+.preorder-panel {
+    margin-top: 24px;
+    padding: 22px 18px;
+    border: 1px solid rgba(201, 169, 106, 0.2);
+    background:
+        linear-gradient(145deg, rgba(201, 169, 106, 0.08), rgba(0,0,0,0.32)),
+        rgba(0,0,0,0.34);
+}
+
+.preorder-heading {
+    margin: 0 0 10px;
+    color: var(--gold);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.preorder-copy {
+    margin: 0 0 18px;
+    color: rgba(255,255,255,0.62);
+    font-size: 0.94rem;
+    line-height: 1.7;
+}
+
+.preorder-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 56px;
+    padding: 0 18px;
+    border: 1px solid rgba(201, 169, 106, 0.55);
+    background:
+        linear-gradient(135deg, rgba(201, 169, 106, 0.22), rgba(201, 169, 106, 0.07)),
+        rgba(0,0,0,0.48);
+    color: #fff;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.76rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.preorder-button:hover,
+.preorder-button:focus {
+    transform: translateY(-1px);
+    border-color: rgba(201, 169, 106, 0.92);
+    background:
+        linear-gradient(135deg, rgba(201, 169, 106, 0.3), rgba(201, 169, 106, 0.1)),
+        rgba(0,0,0,0.58);
+}
