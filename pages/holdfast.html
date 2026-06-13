@@ -633,40 +633,60 @@
                     </p>
                 </form>
 
-                <div class="transmission-panel" id="transmission-panel">
+               <div class="transmission-panel" id="transmission-panel">
 
-                    <p class="transmission-heading">
-                        Archive file 04 / Transmission 1042
-                    </p>
+    <p class="transmission-heading">
+        Archive file 04 / Transmission 1042
+    </p>
 
-                    <div class="soundwave-box" id="soundwave-box">
-                        <img
-                            src="/assets/Soundwave Main.png"
-                            class="soundwave-image"
-                            alt="Flickering soundwave for the Holdfast archive transmission"
-                        >
-                    </div>
+    <div class="soundwave-box" id="soundwave-box">
+        <img
+            src="/assets/Soundwave Main.png"
+            class="soundwave-image"
+            alt="Flickering soundwave for the Holdfast archive transmission"
+        >
+    </div>
 
-                    <button class="play-button" type="button" id="play-button">
-                        Play Transmission
-                    </button>
+    <button class="play-button" type="button" id="play-button">
+        Play Transmission
+    </button>
 
-                    <button class="seal-button" type="button" id="seal-button">
-                        Seal Archive
-                    </button>
+    <audio id="holdfast-audio" class="audio-hidden" preload="metadata">
+        <source src="/assets/archive-file-04-transmission-1042.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
-                    <audio id="holdfast-audio" class="audio-hidden" preload="metadata">
-                        <source src="/assets/archive-file-04-transmission-1042.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
+    <p class="transmission-note" id="transmission-note">
+        Audio file locked to manual playback. Press play to begin.
+    </p>
 
-                    <p class="transmission-note" id="transmission-note">
-                        Audio file locked to manual playback. Press play to begin.
-                    </p>
+    <div class="preorder-panel" aria-labelledby="preorder-heading">
+        <p class="preorder-heading" id="preorder-heading">
+            Archive continuation unlocked
+        </p>
 
-                </div>
+        <p class="preorder-copy">
+            The transmission has opened the next record. Continue to the public archive
+            to pre-order <em>Holdfast</em>.
+        </p>
 
-            </aside>
+        <a
+            class="preorder-button"
+            href="https://www.amazon.co.uk/HoldFast-haunting-archives-memories-forgiven-ebook/dp/B0FPSCY7SW"
+            target="_blank"
+            rel="noopener sponsored"
+        >
+            Continue to the Archive
+        </a>
+    </div>
+
+    <button class="seal-button" type="button" id="seal-button">
+        Seal Archive
+    </button>
+
+</div>
+               
+         </aside>
 
         </div>
 
