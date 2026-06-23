@@ -11,7 +11,7 @@
                 <p class="footer-sub">Independent Literary Imprint</p>
             </div>
 
-            <!-- RIGHT (MERGED COLUMN) -->
+            <!-- RIGHT -->
             <div class="footer-links">
 
                 <div class="footer-col">
@@ -50,7 +50,7 @@
                 class="footer-ml-form"
                 action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" 
                 method="post" 
-                target="_blank"
+                target="footer-mailerlite-frame"
             >
                 <label class="sr-only" for="footer-email">
                     Email address
@@ -64,10 +64,26 @@
                     required
                 >
 
+                <input 
+                    type="hidden" 
+                    name="ml-submit" 
+                    value="1"
+                >
+
                 <button type="submit">
                     Join the Archive
                 </button>
             </form>
+
+            <iframe
+                name="footer-mailerlite-frame"
+                title="Mailing list signup"
+                style="display:none;"
+            ></iframe>
+
+            <p class="footer-archive-note">
+                You can unsubscribe at any time.
+            </p>
 
         </section>
 
@@ -81,6 +97,7 @@
         <!-- BOTTOM -->
         <div class="footer-bottom">
             <p>© 2026 Blackwood Publishing — All works protected</p>
+
             <p class="footer-legal">
                 All rights reserved · 
                 <a href="/pages/privacy-policy.html">Privacy Policy</a>
