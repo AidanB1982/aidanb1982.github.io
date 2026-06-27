@@ -1,4 +1,27 @@
 {
+  "july-2026": [
+    {
+      "title": "Grace",
+      "author": "A.M. Shine",
+      "image": "/assets/grace.jpg",
+      "note": "Shine gives the Gothic its old weather back: salt air, isolation, inheritance and the sense that the land has been waiting longer than any person can bear. Grace moves with a slow, tightening dread, drawing its horror from return, memory and the things a place refuses to let go.",
+      "link": "https://uk.bookshop.org/a/17286/9781804547984"
+    },
+    {
+      "title": "Behind a Mask",
+      "author": "Louisa May Alcott",
+      "image": "/assets/behindamask.jpg",
+      "note": "Small, sharp and quietly venomous, this is Alcott working with a colder hand. Beneath the manners and drawing-room restraint, Behind a Mask becomes a study of performance, power and the danger of underestimating someone who has learned exactly how to be seen.",
+      "link": "https://uk.bookshop.org/a/17286/9781529981360"
+    },
+    {
+      "title": "Dead but Dreaming of Electric Sheep",
+      "author": "Paul Tremblay",
+      "image": "/assets/deadbutdreaming.jpg",
+      "note": "Tremblay brings horror into the near future without losing the human unease at its centre. The result is unsettling not because the technology feels distant, but because it feels close enough to touch, with identity, body and consciousness beginning to slip out of shape.",
+      "link": "https://uk.bookshop.org/a/17286/9781037205798"
+    }
+  ],
   "june-2026": [
     {
       "title": "Land",
