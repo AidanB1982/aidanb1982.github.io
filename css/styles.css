@@ -3685,11 +3685,14 @@ body.reading-lists-page {
    SOLE TRADER RESOURCES PAGE
 ====================================================== */
 
-.sole-trader-resources-page {
+.sole-trader-resources-page,
+.soletrader-page {
     background:
         radial-gradient(circle at 50% 0%, rgba(171, 104, 43, 0.08), transparent 34%),
         #070707;
 }
+
+/* HERO */
 
 .sole-trader-hero {
     position: relative;
@@ -3703,6 +3706,8 @@ body.reading-lists-page {
     letter-spacing: 5px;
     text-transform: uppercase;
 }
+
+/* MAIN SECTION */
 
 .sole-trader-resources-section {
     width: min(1120px, calc(100% - 40px));
@@ -3740,6 +3745,8 @@ body.reading-lists-page {
     line-height: 1.75;
 }
 
+/* DOWNLOAD CARDS */
+
 .resource-download-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3751,6 +3758,7 @@ body.reading-lists-page {
     position: relative;
     min-height: 100%;
     padding: clamp(28px, 4vw, 44px);
+    overflow: hidden;
     background:
         radial-gradient(circle at top left, rgba(171, 104, 43, 0.12), transparent 38%),
         linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008));
@@ -3797,6 +3805,8 @@ body.reading-lists-page {
     line-height: 1.7;
 }
 
+/* FILE META PILLS */
+
 .resource-file-meta {
     position: relative;
     z-index: 1;
@@ -3818,12 +3828,16 @@ body.reading-lists-page {
     background: rgba(0, 0, 0, 0.18);
 }
 
+/* DOWNLOAD BUTTONS */
+
 .resource-download-card .button {
     position: relative;
     z-index: 1;
     width: 100%;
     text-align: center;
 }
+
+/* NOTE SECTION */
 
 .sole-trader-resource-note {
     max-width: 820px;
@@ -3843,6 +3857,8 @@ body.reading-lists-page {
     margin-top: 18px;
 }
 
+/* RESPONSIVE */
+
 @media (max-width: 820px) {
     .sole-trader-resources-section {
         padding-top: 70px;
@@ -3858,6 +3874,17 @@ body.reading-lists-page {
         width: min(100% - 28px, 1120px);
     }
 
+    .sole-trader-kicker {
+        font-size: 12px;
+        letter-spacing: 3.5px;
+    }
+
+    .sole-trader-resources-intro p,
+    .sole-trader-resource-note p {
+        font-size: 16px;
+        line-height: 1.65;
+    }
+
     .resource-download-card {
         padding: 30px 22px;
     }
@@ -3869,5 +3896,9 @@ body.reading-lists-page {
     .resource-file-meta span {
         justify-content: center;
         text-align: center;
+    }
+
+    .resource-download-card .button {
+        width: 100%;
     }
 }
