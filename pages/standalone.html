@@ -11,6 +11,151 @@
 <link rel="stylesheet" href="/css/header.css">
 <link rel="stylesheet" href="/css/styles.css">
 
+<style>
+/* ABOUT BOOK SECTION */
+.book-feature-section {
+    background:
+        radial-gradient(circle at top center, rgba(168, 101, 32, 0.12), transparent 36%),
+        linear-gradient(180deg, #090909 0%, #111 100%);
+    padding: 90px 24px;
+    color: #ddd;
+}
+
+.book-feature-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(240px, 360px) 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.book-feature-cover a {
+    display: block;
+    text-decoration: none;
+}
+
+.book-feature-cover img {
+    width: 100%;
+    max-width: 360px;
+    display: block;
+    border-radius: 6px;
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.book-feature-cover a:hover img {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
+}
+
+.book-feature-content {
+    max-width: 680px;
+}
+
+.book-feature-kicker {
+    display: block;
+    margin-bottom: 14px;
+    color: #c47a2c;
+    font-size: 13px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.book-feature-content h2 {
+    margin: 0 0 14px;
+    color: #f2f2f2;
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.05;
+}
+
+.book-feature-meta {
+    margin: 0 0 28px;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+}
+
+.book-feature-content p {
+    margin: 0 0 18px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+.book-feature-list {
+    margin: 24px 0 34px;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.book-feature-list li {
+    position: relative;
+    padding-left: 26px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 16px;
+    line-height: 1.55;
+}
+
+.book-feature-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #c47a2c;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.book-feature-button {
+    display: inline-block;
+    padding: 14px 28px;
+    border: 1px solid rgba(196, 122, 44, 0.8);
+    color: #f2f2f2;
+    background: rgba(196, 122, 44, 0.12);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 2px;
+    transition: background 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+
+.book-feature-button:hover {
+    background: rgba(196, 122, 44, 0.28);
+    border-color: #c47a2c;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 820px) {
+    .book-feature-section {
+        padding: 70px 22px;
+    }
+
+    .book-feature-inner {
+        grid-template-columns: 1fr;
+        gap: 42px;
+        text-align: center;
+    }
+
+    .book-feature-cover img {
+        margin: 0 auto;
+        max-width: 300px;
+    }
+
+    .book-feature-list {
+        text-align: left;
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+</style>
+
 </head>
 
 <body class="sub-page">
@@ -32,20 +177,88 @@
 
 </section>
 
+<!-- A LITTLE ABOUT THE BOOK -->
+<section class="book-feature-section">
+
+    <div class="book-feature-inner fade-in">
+
+        <div class="book-feature-cover">
+            <a href="https://www.amazon.co.uk/dp/B0H6T9565F" target="_blank" rel="noopener noreferrer">
+                <img src="/assets/A20.png" alt="Accounting for UK Sole Traders book cover">
+            </a>
+        </div>
+
+        <div class="book-feature-content">
+
+            <span class="book-feature-kicker">A Little About the Book</span>
+
+            <h2>Accounting for UK Sole Traders</h2>
+
+            <p class="book-feature-meta">
+                A Practical Guide for Business Owners and Students<br>
+                by Martin Hales | Kindle Edition
+            </p>
+
+            <p>
+                Accounting does not need to feel like a second business you never meant to start.
+            </p>
+
+            <p>
+                <em>Accounting for UK Sole Traders</em> is a practical guide for business owners and students
+                who want to understand the records, routines and figures behind a small UK sole trader business.
+            </p>
+
+            <p>
+                Starting with the basics, this book explains how income, expenses, drawings, VAT, payroll,
+                bank reconciliation, year-end figures, Self Assessment and Making Tax Digital fit together.
+                Each topic is built around clear explanations, worked examples, practice tasks and checklists,
+                so you can see how everyday transactions become reliable accounts.
+            </p>
+
+            <p>
+                Whether you are running a small business, starting self-employment, studying bookkeeping,
+                or trying to make sense of your own records, this guide gives you a steady route through
+                the essentials without unnecessary jargon.
+            </p>
+
+            <ul class="book-feature-list">
+                <li>Keep accurate business records</li>
+                <li>Record income, expenses, cash payments and refunds</li>
+                <li>Understand drawings, profit and taxable profit</li>
+                <li>Deal with VAT, payroll and year-end adjustments</li>
+                <li>Prepare figures for Self Assessment</li>
+                <li>Build better bookkeeping habits throughout the year</li>
+            </ul>
+
+            <p>
+                A clear, practical workbook-style guide for anyone who wants better records, more confidence
+                and a stronger understanding of sole trader accounting in the UK.
+            </p>
+
+            <a class="book-feature-button" href="https://www.amazon.co.uk/dp/B0H6T9565F" target="_blank" rel="noopener noreferrer">
+                View on Amazon
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
 <!-- CONTENT -->
 <section class="about-section">
 
     <!-- INTRO -->
     <div class="fade-in" style="max-width:650px; margin:0 auto 70px; text-align:center;">
 
-    <p>
-        These works stand alone, shaped by atmosphere and the quiet persistence of what remains.
-    </p>
+        <p>
+            These works stand alone, shaped by atmosphere and the quiet persistence of what remains.
+        </p>
 
-    <!-- 🔥 STANDALONE REVIEW -->
-    <div class="review-snippet fade-in" data-book="standalone"></div>
+        <!-- 🔥 STANDALONE REVIEW -->
+        <div class="review-snippet fade-in" data-book="standalone"></div>
 
-</div>
+    </div>
 
     <!-- WORKS GRID -->
     <div class="works-grid">
@@ -80,7 +293,7 @@
             </div>
         </a>
 
-        <!-- BOOK 3 (NO REVIEW ON PURPOSE) -->
+        <!-- BOOK 3 -->
         <a href="https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF" target="_blank" rel="noopener noreferrer" class="work">
             <img src="/assets/book15.jpg" alt="Love, Abused book cover">
             <span><em>Love, Abused</em></span>
