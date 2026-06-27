@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Sole Trader Resources | Blackwood Publishing</title>
+
 <meta 
     name="description" 
     content="Download companion workbook resources for Accounting for UK Sole Traders."
@@ -16,7 +17,7 @@
 
 </head>
 
-<body class="sub-page sole-trader-resources-page">
+<body class="sub-page soletrader-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -149,15 +150,24 @@
 <script>
 window.addEventListener("load", async () => {
 
-    if (typeof loadHeader !== "function") {
-        console.error("Header failed to load");
-        return;
+    try {
+        if (typeof loadHeader === "function") {
+            await loadHeader("simple");
+        } else {
+            console.warn("Header loader not found.");
+        }
+    } catch (error) {
+        console.error("Header failed to load:", error);
     }
-
-    await loadHeader("simple");
 
     if (typeof initFadeIn === "function") {
         initFadeIn();
+    } else {
+        document.querySelectorAll(".fade-in").forEach(element => {
+            element.classList.add("visible");
+            element.style.opacity = "1";
+            element.style.transform = "none";
+        });
     }
 
 });
