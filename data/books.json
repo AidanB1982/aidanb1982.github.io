@@ -1,4 +1,27 @@
 {
+  "june-2026": [
+    {
+      "title": "Land",
+      "author": "Maggie O’Farrell",
+      "image": "/assets/Land.jpg",
+      "note": "A novel of maps, loss and survival, set in post-famine Ireland, where the work of recording a landscape becomes tangled with everything the land has already endured.",
+      "link": "https://uk.bookshop.org/a/17286/9781472289087"
+    },
+    {
+      "title": "The Correspondent",
+      "author": "Virginia Evans",
+      "image": "/assets/correspondent.jpg",
+      "note": "A warm, sharp and quietly moving novel told through letters, following Sybil Van Antwerp as she writes her way through family, friendship, regret and the one truth she has never quite managed to send.",
+      "link": "https://uk.bookshop.org/a/17286/9781405971553"
+    },
+    {
+      "title": "John of John",
+      "author": "Douglas Stuart",
+      "image": "/assets/JohnofJohn.jpg",
+      "note": "A return to the Hebrides, to family pressure, faith, desire and the difficult pull of home. A tender, heavy novel about fathers, sons and the cost of being known.",
+      "link": "https://uk.bookshop.org/a/17286/9781035086955"
+    }
+  ],
   "may-2026": [
     {
       "title": "The Lamb",
