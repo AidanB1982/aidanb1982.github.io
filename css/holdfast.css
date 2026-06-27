@@ -109,7 +109,7 @@ body.holdfast-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 72px 22px 92px;
+    padding: 72px 22px 42px;
 }
 
 .holdfast-stage {
@@ -538,6 +538,137 @@ body.holdfast-page {
 }
 
 /* =========================
+   UNLOCKED PROLOGUE PANEL
+========================= */
+
+.prologue-panel {
+    position: relative;
+    display: block;
+    width: min(calc(100% - 44px), 1080px);
+    margin: 0 auto 76px;
+    padding: clamp(28px, 4vw, 44px);
+    border: 1px solid rgba(201, 169, 106, 0.24);
+    background:
+        linear-gradient(145deg, rgba(201, 169, 106, 0.08), transparent 42%),
+        linear-gradient(180deg, rgba(0,0,0,0.78), rgba(0,0,0,0.58)),
+        rgba(0, 0, 0, 0.52);
+    box-shadow: 0 30px 100px rgba(0,0,0,0.45);
+    overflow: hidden;
+}
+
+.prologue-panel[hidden] {
+    display: none !important;
+}
+
+.prologue-panel.is-visible {
+    display: block;
+    animation: revealTransmission 700ms ease both;
+}
+
+.prologue-panel::before {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    border: 1px solid rgba(201, 169, 106, 0.08);
+    pointer-events: none;
+}
+
+.prologue-kicker {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 10px;
+    color: var(--gold);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+}
+
+.prologue-panel h2,
+.prologue-panel h3 {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 10px;
+    color: #fff;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 500;
+    line-height: 1.16;
+}
+
+.prologue-protection-note {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 24px;
+    color: rgba(255,255,255,0.38);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    line-height: 1.6;
+    text-transform: uppercase;
+}
+
+.prologue-text {
+    position: relative;
+    z-index: 2;
+    max-width: 840px;
+    max-height: 560px;
+    margin: 0 auto;
+    overflow-y: auto;
+    padding: 4px 18px 4px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 169, 106, 0.46) rgba(255,255,255,0.08);
+}
+
+.prologue-text::-webkit-scrollbar {
+    width: 8px;
+}
+
+.prologue-text::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.08);
+}
+
+.prologue-text::-webkit-scrollbar-thumb {
+    background: rgba(201, 169, 106, 0.46);
+}
+
+.prologue-text p {
+    margin: 0 0 20px;
+    color: rgba(255,255,255,0.76);
+    font-size: 1.05rem;
+    line-height: 1.9;
+}
+
+.prologue-watermark {
+    position: absolute;
+    right: -80px;
+    bottom: 96px;
+    z-index: 1;
+    transform: rotate(-18deg);
+    color: rgba(201, 169, 106, 0.05);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(2rem, 5vw, 4.2rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.locked-reading,
+.locked-reading * {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+@media print {
+    .prologue-panel,
+    .locked-reading {
+        display: none !important;
+    }
+}
+
+/* =========================
    ROUTE CARDS
 ========================= */
 
@@ -719,7 +850,7 @@ body.holdfast-page {
 
     .holdfast-hero {
         min-height: auto;
-        padding: 48px 14px 70px;
+        padding: 48px 14px 36px;
     }
 
     .holdfast-title-area {
@@ -759,6 +890,32 @@ body.holdfast-page {
         font-size: 0.66rem;
         letter-spacing: 0.12em;
     }
+
+    .prologue-panel {
+        width: min(calc(100% - 28px), 1080px);
+        margin-bottom: 58px;
+        padding: 24px 16px 26px;
+    }
+
+    .prologue-panel::before {
+        inset: 12px;
+    }
+
+    .prologue-text {
+        max-height: 440px;
+        padding-right: 12px;
+    }
+
+    .prologue-text p {
+        font-size: 0.96rem;
+        line-height: 1.78;
+    }
+
+    .prologue-watermark {
+        right: -120px;
+        bottom: 120px;
+        font-size: 1.8rem;
+    }
 }
 
 /* =========================
@@ -776,126 +933,5 @@ body.holdfast-page {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
-    }
-}
-/* =========================
-   UNLOCKED PROLOGUE PANEL
-========================= */
-
-.prologue-panel {
-    position: relative;
-    margin-top: 26px;
-    padding: 22px 20px 24px;
-    border: 1px solid rgba(201, 169, 106, 0.22);
-    background:
-        linear-gradient(145deg, rgba(201, 169, 106, 0.07), transparent),
-        rgba(0, 0, 0, 0.42);
-    overflow: hidden;
-}
-
-.prologue-kicker {
-    margin: 0 0 10px;
-    color: var(--gold);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.66rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-}
-
-.prologue-panel h3 {
-    margin: 0 0 10px;
-    color: #fff;
-    font-size: 1.55rem;
-    font-weight: 500;
-    line-height: 1.2;
-}
-
-.prologue-protection-note {
-    margin: 0 0 18px;
-    color: rgba(255,255,255,0.38);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    line-height: 1.6;
-    text-transform: uppercase;
-}
-
-.prologue-text {
-    position: relative;
-    z-index: 2;
-    max-height: 430px;
-    overflow-y: auto;
-    padding: 2px 12px 2px 0;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(201, 169, 106, 0.42) rgba(255,255,255,0.08);
-}
-
-.prologue-text::-webkit-scrollbar {
-    width: 8px;
-}
-
-.prologue-text::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.08);
-}
-
-.prologue-text::-webkit-scrollbar-thumb {
-    background: rgba(201, 169, 106, 0.42);
-}
-
-.prologue-text p {
-    margin: 0 0 18px;
-    color: rgba(255,255,255,0.72);
-    font-size: 0.98rem;
-    line-height: 1.82;
-}
-
-.prologue-watermark {
-    position: absolute;
-    right: -70px;
-    bottom: 70px;
-    z-index: 1;
-    transform: rotate(-18deg);
-    color: rgba(201, 169, 106, 0.052);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 2.2rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    pointer-events: none;
-}
-
-.locked-reading,
-.locked-reading * {
-    user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    -webkit-touch-callout: none;
-}
-
-@media print {
-    .prologue-panel,
-    .locked-reading {
-        display: none !important;
-    }
-}
-
-@media (max-width: 700px) {
-    .prologue-panel {
-        padding: 20px 16px 22px;
-    }
-
-    .prologue-text {
-        max-height: 390px;
-    }
-
-    .prologue-text p {
-        font-size: 0.94rem;
-        line-height: 1.74;
-    }
-
-    .prologue-watermark {
-        right: -95px;
-        bottom: 90px;
-        font-size: 1.7rem;
     }
 }
