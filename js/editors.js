@@ -1,208 +1,110 @@
-// =========================
-// EDITOR PICKS CMS SYSTEM
-// =========================
+/* =========================
+   EDITOR PICKS ALIGNMENT FIX
+========================= */
 
-let editorData = {};
-let sortedMonths = [];
-let currentMonthIndex = 0;
-let interval = null;
-let isTransitioning = false;
+.editor-inner.multi {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 56px;
+    align-items: start;
+    justify-items: center;
+}
 
-async function loadEditorPicks() {
+.editor-inner.single {
+    display: flex;
+    justify-content: center;
+}
 
-    const container = document.querySelector('.editor-inner');
-    if (!container) return;
+.editor-inner.multi .pick {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-    container.innerHTML = `
-        <div class="editor-loading fade-in visible">
-            <p>Loading selections...</p>
-        </div>
-    `;
+/* Reset featured styling when there are multiple books */
+.editor-inner.multi .featured-pick,
+.editor-inner.multi .active-pick {
+    transform: none;
+    grid-column: auto;
+    width: 100%;
+    max-width: 320px;
+}
 
-    try {
-        const res = await fetch('/data/books.json');
-        if (!res.ok) throw new Error("Failed to load books.json");
+/* Fixed cover area so all images line up */
+.pick-image-wrap {
+    width: 100%;
+    height: 390px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 28px;
+}
 
-        editorData = await res.json();
+.pick-image-wrap img {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45);
+}
 
-        const months = Object.keys(editorData);
+/* Keep text aligned neatly */
+.pick h3 {
+    margin-top: 0;
+}
 
-        if (!months.length) {
-            renderEmpty(container);
-            return;
-        }
+.pick-author {
+    margin-top: 8px;
+}
 
-        sortedMonths = months.sort((a, b) => {
-            const [mA, yA] = a.split("-");
-            const [mB, yB] = b.split("-");
-            return new Date(`${mA} 1, ${yA}`) - new Date(`${mB} 1, ${yB}`);
-        });
+.pick-note {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
 
-        currentMonthIndex = sortedMonths.length - 1;
+/* Single-book months can stay larger and centred */
+.editor-inner.single .pick {
+    max-width: 520px;
+    text-align: center;
+}
 
-        renderMonth(true);
-        startRotation();
-        setupHoverPause();
+.editor-inner.single .pick-image-wrap {
+    height: 430px;
+}
 
-    } catch (err) {
-        console.error("Editor Picks Error:", err);
-        renderError(container);
+/* Tablet */
+@media (max-width: 980px) {
+    .editor-inner.multi {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+        gap: 50px;
+    }
+
+    .pick-image-wrap {
+        height: 360px;
     }
 }
 
-function renderMonth(initial = false) {
-
-    if (isTransitioning) return;
-    isTransitioning = true;
-
-    const container = document.querySelector('.editor-inner');
-    const title = document.querySelector('.month-title');
-
-    const monthKey = sortedMonths[currentMonthIndex];
-    const books = editorData[monthKey];
-
-    if (!initial) {
-        container.classList.add("fading");
+/* Mobile */
+@media (max-width: 640px) {
+    .editor-inner.multi {
+        grid-template-columns: 1fr;
+        gap: 48px;
     }
 
-    setTimeout(() => {
+    .editor-inner.multi .pick {
+        max-width: 300px;
+    }
 
-        container.innerHTML = "";
+    .pick-image-wrap {
+        height: 340px;
+    }
 
-        if (title) {
-            title.textContent = formatMonth(monthKey);
-        }
-
-        if (!books || !books.length) {
-            renderEmpty(container);
-            isTransitioning = false;
-            return;
-        }
-
-        // ✅ SINGLE BOOK LAYOUT FIX (THIS WAS MISSING)
-        if (books.length === 1) {
-            container.classList.add("single");
-        } else {
-            container.classList.remove("single");
-        }
-
-        books.forEach((book, index) => {
-
-            const el = createBookCard(book);
-
-            if (index === 0) {
-                el.classList.add("featured-pick", "active-pick");
-            }
-
-            el.style.transitionDelay = `${index * 120}ms`;
-
-            container.appendChild(el);
-        });
-
-        container.classList.remove("fading");
-
-        if (typeof initFadeIn === "function") {
-            initFadeIn();
-        }
-
-        setTimeout(() => {
-            isTransitioning = false;
-        }, 500);
-
-    }, initial ? 0 : 400);
+    .editor-inner.single .pick-image-wrap {
+        height: 360px;
+    }
 }
-
-function startRotation() {
-
-    if (interval) clearInterval(interval);
-
-    interval = setInterval(() => {
-
-        if (isTransitioning) return;
-
-        currentMonthIndex--;
-
-        if (currentMonthIndex < 0) {
-            currentMonthIndex = sortedMonths.length - 1;
-        }
-
-        renderMonth();
-
-    }, 8000);
-}
-
-function setupHoverPause() {
-
-    const container = document.querySelector('.editor-inner');
-    if (!container) return;
-
-    container.addEventListener("mouseenter", () => {
-        if (interval) clearInterval(interval);
-    });
-
-    container.addEventListener("mouseleave", () => {
-        startRotation();
-    });
-}
-
-function createBookCard(book) {
-
-    const el = document.createElement("div");
-    el.className = "pick fade-in";
-
-    const img = document.createElement("img");
-    img.src = book.image;
-    img.alt = book.title;
-
-    const title = document.createElement("h3");
-    title.textContent = book.title;
-
-    const author = document.createElement("p");
-    author.className = "pick-author";
-    author.textContent = book.author;
-
-    const note = document.createElement("p");
-    note.className = "pick-note";
-    note.textContent = book.note;
-
-    const link = document.createElement("a");
-    link.href = book.link || "#";
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.className = "button copper";
-
-    link.textContent = book.link ? "View Book" : "Unavailable";
-
-    const sub = document.createElement("span");
-    sub.className = "affiliate-subtle";
-    sub.textContent = "via Bookshop";
-
-    el.appendChild(img);
-    el.appendChild(title);
-    el.appendChild(author);
-    el.appendChild(note);
-    el.appendChild(link);
-    el.appendChild(sub);
-
-    return el;
-}
-
-function renderEmpty(container) {
-    container.innerHTML = `<div class="editor-empty"><p>No selections available.</p></div>`;
-}
-
-function renderError(container) {
-    container.innerHTML = `<div class="editor-error"><p>Unable to load selections.</p></div>`;
-}
-
-function formatMonth(key) {
-    const [month, year] = key.split("-");
-    return month.charAt(0).toUpperCase() + month.slice(1) + " " + year;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    if (!document.body.classList.contains("editors-page")) return;
-
-    loadEditorPicks();
-});
