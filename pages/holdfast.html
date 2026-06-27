@@ -249,10 +249,52 @@
     }
 
     .access-copy {
-        margin: 18px 0 26px;
+        margin: 18px 0 22px;
         color: var(--muted);
         line-height: 1.75;
         font-size: 1rem;
+    }
+
+    .file-designation {
+        margin: 0 0 18px;
+        padding: 11px 13px;
+        border: 1px solid rgba(201, 169, 106, 0.2);
+        background: rgba(0, 0, 0, 0.28);
+        color: rgba(255,255,255,0.58);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .file-designation span {
+        color: rgba(201, 169, 106, 0.86);
+        letter-spacing: 0.12em;
+    }
+
+    .archivist-note {
+        margin: 0 0 24px;
+        padding: 16px 16px 15px;
+        border-left: 2px solid rgba(201, 169, 106, 0.5);
+        background:
+            linear-gradient(90deg, rgba(201, 169, 106, 0.08), transparent),
+            rgba(0,0,0,0.24);
+    }
+
+    .archivist-note-label {
+        margin: 0 0 9px;
+        color: var(--gold);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.66rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+    }
+
+    .archivist-note p:not(.archivist-note-label) {
+        margin: 6px 0 0;
+        color: rgba(255,255,255,0.58);
+        font-size: 0.9rem;
+        line-height: 1.55;
     }
 
     .access-form {
@@ -293,7 +335,9 @@
 
     .access-button,
     .play-button,
-    .seal-button {
+    .seal-button,
+    .preorder-button,
+    .route-button {
         min-height: 56px;
         border: 1px solid rgba(201, 169, 106, 0.55);
         background:
@@ -305,7 +349,17 @@
         font-size: 0.76rem;
         letter-spacing: 0.24em;
         text-transform: uppercase;
+        text-decoration: none;
         transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .preorder-button,
+    .route-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 22px;
+        text-align: center;
     }
 
     .access-button:hover,
@@ -313,12 +367,21 @@
     .play-button:hover,
     .play-button:focus,
     .seal-button:hover,
-    .seal-button:focus {
+    .seal-button:focus,
+    .preorder-button:hover,
+    .preorder-button:focus,
+    .route-button:hover,
+    .route-button:focus {
         transform: translateY(-1px);
         border-color: rgba(201, 169, 106, 0.92);
         background:
             linear-gradient(135deg, rgba(201, 169, 106, 0.3), rgba(201, 169, 106, 0.1)),
             rgba(0,0,0,0.56);
+    }
+
+    .access-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.62;
     }
 
     .seal-button {
@@ -423,6 +486,94 @@
         line-height: 1.7;
     }
 
+    .preorder-panel {
+        margin-top: 24px;
+        padding: 18px 18px 20px;
+        border: 1px solid rgba(201, 169, 106, 0.22);
+        background:
+            linear-gradient(145deg, rgba(201, 169, 106, 0.08), transparent),
+            rgba(0,0,0,0.34);
+    }
+
+    .preorder-heading {
+        margin: 0 0 9px;
+        color: var(--gold);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.7rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+    }
+
+    .preorder-copy {
+        margin: 0 0 16px;
+        color: rgba(255,255,255,0.62);
+        font-size: 0.94rem;
+        line-height: 1.65;
+    }
+
+    .preorder-button {
+        width: 100%;
+    }
+
+    .holdfast-routes {
+        width: min(100%, 1080px);
+        margin: 0 auto;
+        padding: 0 22px 76px;
+    }
+
+    .holdfast-route-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+    .holdfast-route-card {
+        position: relative;
+        padding: 30px 28px;
+        border: 1px solid rgba(201, 169, 106, 0.18);
+        background:
+            linear-gradient(145deg, rgba(0,0,0,0.72), rgba(14,12,10,0.62)),
+            rgba(0,0,0,0.5);
+        box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+    }
+
+    .holdfast-route-card::before {
+        content: "";
+        position: absolute;
+        inset: 13px;
+        border: 1px solid rgba(201, 169, 106, 0.07);
+        pointer-events: none;
+    }
+
+    .route-kicker {
+        margin: 0 0 12px;
+        color: var(--gold);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.68rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+    }
+
+    .holdfast-route-card h2 {
+        margin: 0 0 14px;
+        color: #fff;
+        font-size: clamp(1.55rem, 3vw, 2.2rem);
+        font-weight: 500;
+        line-height: 1.14;
+    }
+
+    .holdfast-route-card p {
+        margin: 0 0 18px;
+        color: rgba(255,255,255,0.64);
+        font-size: 1rem;
+        line-height: 1.72;
+    }
+
+    .route-button {
+        min-height: 50px;
+        margin-top: 4px;
+    }
+
     .archive-footer-note {
         width: min(100%, 1080px);
         margin: 0 auto;
@@ -501,7 +652,8 @@
     }
 
     @media (max-width: 980px) {
-        .holdfast-stage {
+        .holdfast-stage,
+        .holdfast-route-grid {
             grid-template-columns: 1fr;
         }
 
@@ -547,7 +699,8 @@
             line-height: 1.7;
         }
 
-        .access-panel {
+        .access-panel,
+        .holdfast-route-card {
             padding: 28px 22px;
         }
 
@@ -557,6 +710,11 @@
 
         .access-copy {
             font-size: 0.96rem;
+        }
+
+        .file-designation {
+            font-size: 0.66rem;
+            letter-spacing: 0.12em;
         }
     }
 
@@ -611,16 +769,27 @@
                 </div>
 
                 <h2 id="access-title" class="access-title">
-                    Enter Access Code
+                    Enter File Designation
                 </h2>
 
                 <p class="access-copy">
-                    The archive is listening. Enter the pass code to unlock the Holdfast transmission.
+                    The archive is listening. Enter the file designation to unlock the Holdfast transmission.
                 </p>
+
+                <p class="file-designation">
+                    File designation: <span>Holdfast-04</span>
+                </p>
+
+                <div class="archivist-note" id="access-hint">
+                    <p class="archivist-note-label">Archivist Note</p>
+                    <p>The correct key is already present in this record.</p>
+                    <p>Archive files retain their designations.</p>
+                    <p>Enter the designation exactly as recorded.</p>
+                </div>
 
                 <form class="access-form" id="access-form" autocomplete="off">
                     <label class="access-label" for="access-code">
-                        Access code
+                        File designation
                     </label>
 
                     <input
@@ -628,74 +797,120 @@
                         id="access-code"
                         name="access-code"
                         type="password"
-                        placeholder="Type code here"
-                        aria-describedby="access-message"
+                        placeholder="Enter designation"
+                        aria-describedby="access-hint access-message"
                         required
                     >
 
                     <button class="access-button" type="submit">
-                        Submit Code
+                        Submit Designation
                     </button>
 
                     <p class="access-message" id="access-message" aria-live="polite">
-                        Awaiting archivist credentials.
+                        Awaiting file designation.
                     </p>
                 </form>
 
-               <div class="transmission-panel" id="transmission-panel">
+                <div class="transmission-panel" id="transmission-panel">
 
-    <p class="transmission-heading">
-        Archive file 04 / Transmission 1042
-    </p>
+                    <p class="transmission-heading">
+                        Archive file 04 / Transmission 1042
+                    </p>
 
-    <div class="soundwave-box" id="soundwave-box">
-        <img
-            src="/assets/Soundwave Main.png"
-            class="soundwave-image"
-            alt="Flickering soundwave for the Holdfast archive transmission"
-        >
-    </div>
+                    <div class="soundwave-box" id="soundwave-box">
+                        <img
+                            src="/assets/Soundwave Main.png"
+                            class="soundwave-image"
+                            alt="Flickering soundwave for the Holdfast archive transmission"
+                        >
+                    </div>
 
-    <button class="play-button" type="button" id="play-button">
-        Play Transmission
-    </button>
+                    <button class="play-button" type="button" id="play-button">
+                        Play Transmission
+                    </button>
 
-    <audio id="holdfast-audio" class="audio-hidden" preload="metadata">
-        <source src="/assets/archive-file-04-transmission-1042.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+                    <audio id="holdfast-audio" class="audio-hidden" preload="metadata">
+                        <source src="/assets/archive-file-04-transmission-1042.mp3" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
 
-    <p class="transmission-note" id="transmission-note">
-        Audio file locked to manual playback. Press play to begin.
-    </p>
+                    <p class="transmission-note" id="transmission-note">
+                        Audio file locked to manual playback. Press play to begin.
+                    </p>
 
-    <div class="preorder-panel" aria-labelledby="preorder-heading">
-        <p class="preorder-heading" id="preorder-heading">
-            Archive continuation unlocked
-        </p>
+                    <div class="preorder-panel" aria-labelledby="preorder-heading">
+                        <p class="preorder-heading" id="preorder-heading">
+                            Archive continuation unlocked
+                        </p>
 
-        <p class="preorder-copy">
-            The transmission has opened the next record. Continue to the public archive
-            to pre-order <em>Holdfast</em>.
-        </p>
+                        <p class="preorder-copy">
+                            The transmission has opened the next record. Pre-order <em>Holdfast</em>
+                            through the public listing.
+                        </p>
 
-        <a
-            class="preorder-button"
-            href="https://www.amazon.co.uk/HoldFast-haunting-archives-memories-forgiven-ebook/dp/B0FPSCY7SW"
-            target="_blank"
-            rel="noopener sponsored"
-        >
-            Continue to the Archive
-        </a>
-    </div>
+                        <a
+                            class="preorder-button"
+                            href="https://www.amazon.co.uk/HoldFast-haunting-archives-memories-forgiven-ebook/dp/B0FPSCY7SW"
+                            target="_blank"
+                            rel="noopener sponsored"
+                        >
+                            Pre-order Holdfast
+                        </a>
+                    </div>
 
-    <button class="seal-button" type="button" id="seal-button">
-        Seal Archive
-    </button>
+                    <button class="seal-button" type="button" id="seal-button">
+                        Seal Archive
+                    </button>
 
-</div>
-               
-         </aside>
+                </div>
+
+            </aside>
+
+        </div>
+
+    </section>
+
+    <section class="holdfast-routes" aria-label="Further archive routes">
+
+        <div class="holdfast-route-grid">
+
+            <article class="holdfast-route-card">
+                <p class="route-kicker">New to The Archive Files?</p>
+
+                <h2>Begin with The Black Bothy</h2>
+
+                <p>
+                    Begin with <em>The Black Bothy</em>, Book One. <em>Holdfast</em> is Book Four,
+                    opening on 31 July.
+                </p>
+
+                <a
+                    class="route-button"
+                    href="https://mybook.to/BlackBothy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Begin with Book One
+                </a>
+            </article>
+
+            <article class="holdfast-route-card">
+                <p class="route-kicker">Blackwood Archive</p>
+
+                <h2>Join the Archive</h2>
+
+                <p>
+                    Join the Blackwood Archive for records, fragments, release notices,
+                    and quiet updates from Blackwood Publishing.
+                </p>
+
+                <a
+                    class="route-button"
+                    href="/pages/community.html"
+                >
+                    Join the Blackwood Archive
+                </a>
+            </article>
 
         </div>
 
@@ -747,8 +962,8 @@ window.addEventListener("load", async () => {
     const soundwaveBox = document.getElementById("soundwave-box");
     const transmissionNote = document.getElementById("transmission-note");
 
-    function normaliseCode(value) {
-        return String(value || "").trim().toLowerCase();
+    function cleanCode(value) {
+        return String(value || "").trim();
     }
 
     function setMessage(text, type) {
@@ -768,7 +983,7 @@ window.addEventListener("load", async () => {
             status.classList.add("is-granted");
         }
 
-        setMessage("Archivist has entered the correct pass code. Entry granted.", "is-success");
+        setMessage("File designation accepted. Transmission unlocked.", "is-success");
 
         if (transmissionPanel) {
             transmissionPanel.classList.add("is-visible");
@@ -780,9 +995,10 @@ window.addEventListener("load", async () => {
 
         if (form) {
             const submitButton = form.querySelector(".access-button");
+
             if (submitButton) {
                 submitButton.setAttribute("disabled", "disabled");
-                submitButton.textContent = "Code Accepted";
+                submitButton.textContent = "Designation Accepted";
             }
         }
 
@@ -790,7 +1006,7 @@ window.addEventListener("load", async () => {
     }
 
     function denyAccess() {
-        setMessage("Access denied. The archive does not recognise that code.", "is-error");
+        setMessage("Access denied. Check the file designation and enter it exactly as recorded.", "is-error");
 
         if (input) {
             input.setAttribute("aria-invalid", "true");
@@ -829,10 +1045,9 @@ window.addEventListener("load", async () => {
         form.addEventListener("submit", function (event) {
             event.preventDefault();
 
-            const enteredCode = normaliseCode(input.value);
-            const correctCode = normaliseCode(ACCESS_CODE);
+            const enteredCode = cleanCode(input.value);
 
-            if (enteredCode === correctCode) {
+            if (enteredCode === ACCESS_CODE) {
                 input.removeAttribute("aria-invalid");
                 grantAccess();
                 return;
@@ -843,7 +1058,7 @@ window.addEventListener("load", async () => {
 
         input.addEventListener("input", function () {
             input.removeAttribute("aria-invalid");
-            setMessage("Awaiting archivist credentials.", "");
+            setMessage("Awaiting file designation.", "");
         });
     }
 
