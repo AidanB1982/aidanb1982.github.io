@@ -11,6 +11,56 @@
 <link rel="stylesheet" href="/css/header.css">
 <link rel="stylesheet" href="/css/styles.css">
 
+<style>
+/* Make Independent Works grid 4 across */
+.works-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(180px, 1fr));
+    gap: 40px;
+    max-width: 1120px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.work {
+    text-align: center;
+}
+
+.work img {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    display: block;
+    margin: 0 auto 26px;
+}
+
+.work span {
+    display: block;
+}
+
+/* Tablet */
+@media (max-width: 1050px) {
+    .works-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+        max-width: 720px;
+        gap: 50px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .works-grid {
+        grid-template-columns: 1fr;
+        max-width: 320px;
+        gap: 46px;
+    }
+
+    .work img {
+        max-width: 260px;
+    }
+}
+</style>
+
 </head>
 
 <body class="sub-page">
@@ -38,14 +88,14 @@
     <!-- INTRO -->
     <div class="fade-in" style="max-width:650px; margin:0 auto 70px; text-align:center;">
 
-    <p>
-        These works stand alone, shaped by atmosphere and the quiet persistence of what remains.
-    </p>
+        <p>
+            These works stand alone, shaped by atmosphere and the quiet persistence of what remains.
+        </p>
 
-    <!-- 🔥 STANDALONE REVIEW -->
-    <div class="review-snippet fade-in" data-book="standalone"></div>
+        <!-- 🔥 STANDALONE REVIEW -->
+        <div class="review-snippet fade-in" data-book="standalone"></div>
 
-</div>
+    </div>
 
     <!-- WORKS GRID -->
     <div class="works-grid">
@@ -80,7 +130,7 @@
             </div>
         </a>
 
-        <!-- BOOK 3 (NO REVIEW ON PURPOSE) -->
+        <!-- BOOK 3 -->
         <a href="https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF" target="_blank" rel="noopener noreferrer" class="work">
             <img src="/assets/book15.jpg" alt="Love, Abused book cover">
             <span><em>Love, Abused</em></span>
@@ -88,6 +138,21 @@
             <div class="work-desc">
                 A work of narrative nonfiction examining how a child’s life becomes a record.
                 What is observed, documented, and ultimately missed.
+            </div>
+        </a>
+
+        <!-- BOOK 4 -->
+        <a href="https://blackwoodpublishing.co.uk/pages/soletrader.html" class="work">
+            <img src="/assets/book14.jpg" alt="Accountancy for Sole Traders book cover">
+            <span><em>Accountancy for Sole Traders</em></span>
+
+            <div class="work-desc">
+                A practical guide for sole traders, small business owners, students, and anyone
+                wanting a clearer understanding of business records and bookkeeping.
+
+                <div class="mini-review">
+                    “Clear, practical, and built for everyday use.”
+                </div>
             </div>
         </a>
 
