@@ -27,6 +27,7 @@ window.addEventListener("load", async () => {
     const message = document.getElementById("access-message");
     const status = document.getElementById("access-status");
     const transmissionPanel = document.getElementById("transmission-panel");
+    const prologuePanel = document.getElementById("holdfast-prologue");
     const playButton = document.getElementById("play-button");
     const sealButton = document.getElementById("seal-button");
     const audio = document.getElementById("holdfast-audio");
@@ -48,6 +49,16 @@ window.addEventListener("load", async () => {
         }
     }
 
+    function revealPrologue() {
+        if (!prologuePanel) return;
+
+        prologuePanel.hidden = false;
+
+        requestAnimationFrame(() => {
+            prologuePanel.classList.add("is-visible");
+        });
+    }
+
     function grantAccess() {
         if (status) {
             status.textContent = "Access granted";
@@ -59,6 +70,8 @@ window.addEventListener("load", async () => {
         if (transmissionPanel) {
             transmissionPanel.classList.add("is-visible");
         }
+
+        revealPrologue();
 
         if (input) {
             input.setAttribute("disabled", "disabled");
@@ -106,6 +119,11 @@ window.addEventListener("load", async () => {
         if (audio) {
             audio.pause();
             audio.currentTime = 0;
+        }
+
+        if (prologuePanel) {
+            prologuePanel.classList.remove("is-visible");
+            prologuePanel.hidden = true;
         }
 
         location.reload();
@@ -177,6 +195,7 @@ window.addEventListener("load", async () => {
         sealButton.addEventListener("click", sealArchive);
     }
 })();
+
 // =========================
 // LOCKED READING PROTECTION
 // =========================
@@ -226,6 +245,7 @@ window.addEventListener("load", async () => {
             event.preventDefault();
 
             const selection = window.getSelection();
+
             if (selection) {
                 selection.removeAllRanges();
             }
@@ -246,6 +266,7 @@ window.addEventListener("load", async () => {
             event.preventDefault();
 
             const selection = window.getSelection();
+
             if (selection) {
                 selection.removeAllRanges();
             }
