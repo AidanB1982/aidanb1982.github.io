@@ -935,3 +935,38 @@ body.holdfast-page {
         transition-duration: 0.001ms !important;
     }
 }
+/* =========================
+   PROLOGUE UNDER HOLDFAST BOX
+========================= */
+
+.holdfast-title-area {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.access-panel {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: start;
+}
+
+.prologue-panel {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    margin: 32px 0 0;
+}
+
+@media (max-width: 980px) {
+    .holdfast-title-area,
+    .access-panel,
+    .prologue-panel {
+        grid-column: auto;
+        grid-row: auto;
+    }
+
+    .prologue-panel {
+        width: 100%;
+        margin: 34px auto 0;
+    }
+}
