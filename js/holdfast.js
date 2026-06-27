@@ -177,3 +177,88 @@ window.addEventListener("load", async () => {
         sealButton.addEventListener("click", sealArchive);
     }
 })();
+// =========================
+// LOCKED READING PROTECTION
+// =========================
+
+(function () {
+    "use strict";
+
+    function closestLockedReadingFromEvent(event) {
+        if (!event || !event.target || typeof event.target.closest !== "function") {
+            return null;
+        }
+
+        return event.target.closest(".locked-reading");
+    }
+
+    function selectionTouchesLockedReading() {
+        const selection = window.getSelection();
+
+        if (!selection || selection.rangeCount === 0) {
+            return false;
+        }
+
+        const anchorNode = selection.anchorNode;
+        const focusNode = selection.focusNode;
+
+        const anchorElement = anchorNode && anchorNode.nodeType === Node.TEXT_NODE
+            ? anchorNode.parentElement
+            : anchorNode;
+
+        const focusElement = focusNode && focusNode.nodeType === Node.TEXT_NODE
+            ? focusNode.parentElement
+            : focusNode;
+
+        return Boolean(
+            anchorElement &&
+            typeof anchorElement.closest === "function" &&
+            anchorElement.closest(".locked-reading")
+        ) || Boolean(
+            focusElement &&
+            typeof focusElement.closest === "function" &&
+            focusElement.closest(".locked-reading")
+        );
+    }
+
+    function blockLockedReadingAction(event) {
+        if (closestLockedReadingFromEvent(event) || selectionTouchesLockedReading()) {
+            event.preventDefault();
+
+            const selection = window.getSelection();
+            if (selection) {
+                selection.removeAllRanges();
+            }
+        }
+    }
+
+    document.addEventListener("contextmenu", blockLockedReadingAction);
+    document.addEventListener("copy", blockLockedReadingAction);
+    document.addEventListener("cut", blockLockedReadingAction);
+    document.addEventListener("dragstart", blockLockedReadingAction);
+
+    document.addEventListener("keydown", function (event) {
+        const key = event.key.toLowerCase();
+        const isCopy = (event.ctrlKey || event.metaKey) && key === "c";
+        const isPrint = (event.ctrlKey || event.metaKey) && key === "p";
+
+        if ((isCopy || isPrint) && selectionTouchesLockedReading()) {
+            event.preventDefault();
+
+            const selection = window.getSelection();
+            if (selection) {
+                selection.removeAllRanges();
+            }
+        }
+    });
+
+    document.addEventListener("selectionchange", function () {
+        if (selectionTouchesLockedReading()) {
+            const selection = window.getSelection();
+
+            if (selection) {
+                selection.removeAllRanges();
+            }
+        }
+    });
+})();
