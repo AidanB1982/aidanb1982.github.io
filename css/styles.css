@@ -3902,3 +3902,7 @@ body.reading-lists-page {
         width: 100%;
     }
 }
+.holdfast-route-grid:has(.holdfast-route-card:only-child) {
+    grid-template-columns: minmax(0, 620px);
+    justify-content: center;
+}
