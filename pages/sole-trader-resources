@@ -1,1 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Sole Trader Resources | Blackwood Publishing</title>
+<meta 
+    name="description" 
+    content="Download companion workbook resources for Accounting for UK Sole Traders."
+>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/css/header.css">
+<link rel="stylesheet" href="/css/styles.css">
+
+</head>
+
+<body class="sub-page sole-trader-resources-page">
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<!-- HERO -->
+<section class="about-hero sole-trader-hero">
+
+    <div class="about-hero-overlay"></div>
+
+    <div class="about-hero-content fade-in">
+        <p class="sole-trader-kicker">Book Resources</p>
+
+        <h1>Accounting for UK Sole Traders</h1>
+
+        <p class="about-intro-line">
+            Companion workbook downloads for readers working through the book.
+        </p>
+
+        <p class="about-intro-line" style="opacity:0.55; font-size:14px;">
+            Practical templates, workbook exercises, and supporting files.
+        </p>
+    </div>
+
+</section>
+
+<!-- CONTENT -->
+<main>
+
+<section class="sole-trader-resources-section">
+
+    <div class="sole-trader-resources-intro fade-in">
+
+        <p class="resource-label copper">Downloadable Assets</p>
+
+        <h2>Reader Workbooks</h2>
+
+        <p>
+            These files are designed to be used alongside <em>Accounting for UK Sole Traders</em>.
+            Download them to your device, open them in Excel or compatible spreadsheet software,
+            and work through the examples at your own pace.
+        </p>
+
+    </div>
+
+    <div class="resource-download-grid">
+
+        <!-- DOWNLOAD 1 -->
+        <article class="resource-download-card fade-in">
+
+            <p class="resource-card-kicker">Companion Workbook</p>
+
+            <h3>Accounting for UK Sole Traders Companion Workbook</h3>
+
+            <p>
+                A companion spreadsheet for additional exercises, working notes,
+                and practical bookkeeping support.
+            </p>
+
+            <div class="resource-file-meta">
+                <span>XLSX file</span>
+                <span>Spreadsheet download</span>
+            </div>
+
+            <a 
+                href="/assets/accounting_for_uk_sole_traders_companion_workbook.xlsx"
+                class="button copper"
+                download
+            >
+                Download Companion Workbook
+            </a>
+
+        </article>
+
+        <!-- DOWNLOAD 2 -->
+        <article class="resource-download-card fade-in">
+
+            <p class="resource-card-kicker">Main Workbook</p>
+
+            <h3>Accounting for UK Sole Traders Workbook</h3>
+
+            <p>
+                The primary workbook file for following the book’s examples,
+                templates, and guided accounting tasks.
+            </p>
+
+            <div class="resource-file-meta">
+                <span>XLSX file</span>
+                <span>Spreadsheet download</span>
+            </div>
+
+            <a 
+                href="/assets/Accounting_for_UK_Sole_Traders_Workbook.xlsx"
+                class="button copper"
+                download
+            >
+                Download Main Workbook
+            </a>
+
+        </article>
+
+    </div>
+
+    <div class="sole-trader-resource-note fade-in">
+
+        <h2>Before You Begin</h2>
+
+        <p>
+            Save your own copy before making changes. The downloaded files are provided
+            as workbook resources for readers and should be treated as working templates.
+        </p>
+
+        <p>
+            These materials are educational resources and are not a substitute for professional
+            accounting, tax, or legal advice.
+        </p>
+
+    </div>
+
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<div style="height:40px;"></div>
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js?v=20260408" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
+        console.error("Header failed to load");
+        return;
+    }
+
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+});
+</script>
+
+</body>
+</html>
