@@ -6941,3 +6941,306 @@ body.limited-editions-page .limited-editions-hero .about-hero-overlay {
             linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.84));
     }
 }
+/* ======================================================
+   MARKED RECORDS / EDITOR PICKS PAGE
+====================================================== */
+
+body.marked-records-page {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.97)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+body.marked-records-page .marked-records-hero {
+    position: relative;
+}
+
+body.marked-records-page .marked-records-hero .about-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.8));
+}
+
+body.marked-records-page .about-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    padding: 0 22px;
+}
+
+body.marked-records-page .about-hero h1 {
+    font-size: clamp(42px, 7vw, 78px);
+    line-height: 0.95;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.marked-records-hero-subline {
+    max-width: 760px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(16px, 2.4vw, 21px);
+    line-height: 1.6;
+}
+
+.marked-records-warning {
+    margin: 18px auto 0;
+    color: rgba(184, 115, 51, 0.84);
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+}
+
+/* WRAP */
+
+.marked-records-wrap {
+    width: min(100%, 1240px);
+    margin: 0 auto;
+    padding: 72px 22px 84px;
+}
+
+/* INTRO */
+
+.marked-records-intro {
+    max-width: 860px;
+    margin: 0 auto 58px;
+    padding: clamp(34px, 5vw, 58px);
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.34);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.42);
+}
+
+.marked-records-kicker {
+    margin: 0 0 14px;
+    color: #b87333;
+    font-size: 12px;
+    letter-spacing: 4px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.marked-records-intro h2,
+.marked-records-picks h2 {
+    margin: 0 0 20px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.08;
+    font-weight: normal;
+}
+
+.marked-records-quote {
+    margin: 0 auto 22px;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.marked-records-intro p:not(.marked-records-kicker):not(.marked-records-quote) {
+    max-width: 720px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.7);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* PICKS */
+
+.marked-records-picks {
+    text-align: center;
+}
+
+body.marked-records-page .editor-picks {
+    margin-top: 42px;
+}
+
+body.marked-records-page .editor-inner {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    width: min(100%, 1120px);
+    margin: 0 auto;
+}
+
+/* Robust styling for JS-injected cards */
+
+body.marked-records-page .editor-inner > * {
+    position: relative;
+    min-height: 100%;
+    padding: 30px 24px 34px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.075), transparent 42%),
+        linear-gradient(145deg, rgba(255,255,255,0.016), rgba(255,255,255,0.005)),
+        rgba(0, 0, 0, 0.34);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.36);
+}
+
+body.marked-records-page .editor-inner > *::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 115, 51, 0.055);
+    pointer-events: none;
+}
+
+body.marked-records-page .editor-inner > * > * {
+    position: relative;
+    z-index: 1;
+}
+
+body.marked-records-page .editor-inner img {
+    width: min(100%, 210px);
+    height: 315px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 24px;
+    filter:
+        drop-shadow(0 26px 46px rgba(0,0,0,0.82))
+        drop-shadow(0 6px 16px rgba(184,115,51,0.1));
+}
+
+body.marked-records-page .editor-inner h2,
+body.marked-records-page .editor-inner h3,
+body.marked-records-page .editor-inner .pick-title,
+body.marked-records-page .editor-inner .book-title {
+    margin: 0 0 14px;
+    color: #fff;
+    font-size: clamp(22px, 2.5vw, 30px);
+    line-height: 1.15;
+    font-weight: normal;
+}
+
+body.marked-records-page .editor-inner p {
+    margin: 12px auto 0;
+    color: rgba(230, 230, 230, 0.66);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+body.marked-records-page .editor-inner a {
+    color: #e6e6e6;
+}
+
+body.marked-records-page .editor-inner a.button,
+body.marked-records-page .editor-inner .button {
+    margin-top: 22px;
+}
+
+/* NOTE */
+
+.marked-records-note {
+    max-width: 720px;
+    margin: 62px auto 0;
+    padding: 26px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(184, 115, 51, 0.18);
+    border-bottom: 1px solid rgba(184, 115, 51, 0.1);
+    background: rgba(255,255,255,0.012);
+}
+
+.marked-records-note p {
+    margin: 0;
+    color: rgba(230, 230, 230, 0.58);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+/* ROUTES */
+
+.marked-records-routes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 980px;
+    margin: 82px auto 0;
+}
+
+.marked-records-route-card {
+    padding: 24px 22px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background: rgba(255,255,255,0.01);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        background 0.3s ease;
+}
+
+.marked-records-route-card:hover,
+.marked-records-route-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(184, 115, 51, 0.36);
+    background: rgba(184, 115, 51, 0.045);
+    outline: none;
+}
+
+.marked-records-route-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(230,230,230,0.48);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.marked-records-route-card strong {
+    color: #fff;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 980px) {
+    body.marked-records-page .editor-inner {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 760px;
+    }
+}
+
+@media (max-width: 760px) {
+    body.marked-records-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+            linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    .marked-records-wrap {
+        padding: 54px 16px 64px;
+    }
+
+    .marked-records-intro {
+        margin-bottom: 48px;
+        padding: 34px 22px;
+    }
+
+    body.marked-records-page .editor-inner {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+    }
+
+    body.marked-records-page .editor-inner > * {
+        padding: 28px 20px 32px;
+    }
+
+    body.marked-records-page .editor-inner img {
+        width: min(72vw, 210px);
+        height: 315px;
+    }
+
+    .marked-records-routes {
+        grid-template-columns: 1fr;
+        margin-top: 62px;
+    }
+}
