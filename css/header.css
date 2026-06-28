@@ -1,7 +1,8 @@
 /* =========================
    RESET
 ========================= */
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
 }
@@ -29,7 +30,7 @@ html, body {
     overflow: hidden;
 }
 
-/* SMOOTH CINEMATIC FADE (NO MASKS) */
+/* SMOOTH CINEMATIC FADE */
 .hero::after {
     content: "";
     position: absolute;
@@ -54,9 +55,9 @@ html, body {
 ========================= */
 .hero-inner {
     position: relative;
-    z-index: 10;
+    z-index: 20;
 
-    max-width: 700px;
+    max-width: 760px;
     width: 100%;
 
     padding: 60px 20px 0;
@@ -73,32 +74,68 @@ html, body {
 }
 
 /* =========================
-   NAV
+   SHARED NAV
+   Used by hero header and simple header
 ========================= */
-.nav-inline {
+.nav-inline,
+.blackwood-nav {
+    position: relative;
+    z-index: 100;
+
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 28px;
+    flex-wrap: wrap;
+
+    gap: clamp(14px, 2vw, 28px);
     margin-bottom: 25px;
 }
 
-.nav-inline a {
+.blackwood-nav a,
+.blackwood-nav button,
+.nav-inline a,
+.nav-inline button {
+    font: inherit;
+}
+
+.blackwood-nav-link {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    padding: 8px 0;
+
+    border: 0;
+    background: transparent;
+
+    color: #e6e6e6;
+    opacity: 0.68;
+
     font-size: 12px;
     letter-spacing: 3px;
+    line-height: 1.2;
     text-transform: uppercase;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        color 0.25s ease,
+        opacity 0.25s ease;
+}
+
+.blackwood-nav-link:hover,
+.blackwood-nav-link:focus-visible,
+.blackwood-nav-item.is-open > .blackwood-nav-link {
     color: #e6e6e6;
-
-    opacity: 0.65;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.nav-inline a:hover {
     opacity: 1;
+    outline: none;
 }
 
-.nav-inline a::after {
+.blackwood-nav-link::after {
     content: "";
     position: absolute;
     bottom: -4px;
@@ -107,16 +144,112 @@ html, body {
     width: 0;
     height: 1px;
 
-    background: rgba(184,115,51,0.6);
+    background: rgba(184,115,51,0.65);
+
     transition: width 0.3s ease;
 }
 
-.nav-inline a:hover::after {
+.blackwood-nav-link:hover::after,
+.blackwood-nav-link:focus-visible::after,
+.blackwood-nav-item.is-open > .blackwood-nav-link::after {
     width: 100%;
 }
 
+.dropdown-mark {
+    font-size: 10px;
+    line-height: 1;
+    transform: translateY(-1px);
+    opacity: 0.75;
+}
+
 /* =========================
-   FOG (FIXED + VISIBLE)
+   DROPDOWNS
+========================= */
+.blackwood-nav-item {
+    position: relative;
+}
+
+.blackwood-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+
+    width: max-content;
+    min-width: 235px;
+
+    padding: 14px;
+
+    transform: translateX(-50%) translateY(8px);
+
+    border: 1px solid rgba(184, 115, 51, 0.24);
+
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        rgba(7, 7, 7, 0.97);
+
+    box-shadow:
+        0 26px 70px rgba(0, 0, 0, 0.78),
+        inset 0 0 0 1px rgba(255,255,255,0.025);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.22s ease,
+        transform 0.22s ease,
+        visibility 0.22s ease;
+
+    z-index: 99999;
+}
+
+.blackwood-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+.blackwood-dropdown a {
+    display: block;
+
+    padding: 10px 12px;
+
+    color: rgba(245, 245, 245, 0.78);
+
+    font-size: 11px;
+    letter-spacing: 2.2px;
+    line-height: 1.35;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.blackwood-dropdown a:hover,
+.blackwood-dropdown a:focus-visible {
+    color: #b87333;
+    background: rgba(184, 115, 51, 0.07);
+    outline: none;
+}
+
+.blackwood-nav-item:hover .blackwood-dropdown,
+.blackwood-nav-item:focus-within .blackwood-dropdown,
+.blackwood-nav-item.is-open .blackwood-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* =========================
+   FOG
 ========================= */
 .fog {
     position: absolute;
@@ -132,6 +265,7 @@ html, body {
 
     opacity: 0.12;
 }
+
 .fog::after {
     content: "";
     position: absolute;
@@ -144,7 +278,7 @@ html, body {
         #000 100%
     );
 }
-/* LAYERS */
+
 .fog-back {
     opacity: 0.10;
     filter: blur(18px);
@@ -163,20 +297,34 @@ html, body {
     animation: fogFast 15s ease-in-out infinite alternate;
 }
 
-/* MOTION */
 @keyframes fogSlow {
-    0%   { transform: translateX(0) translateY(0) scale(1.25); }
-    100% { transform: translateX(-50px) translateY(20px) scale(1.15); }
+    0% {
+        transform: translateX(0) translateY(0) scale(1.25);
+    }
+
+    100% {
+        transform: translateX(-50px) translateY(20px) scale(1.15);
+    }
 }
 
 @keyframes fogMid {
-    0%   { transform: translateX(0) translateY(0) scale(1.2); }
-    100% { transform: translateX(-90px) translateY(30px) scale(1.1); }
+    0% {
+        transform: translateX(0) translateY(0) scale(1.2);
+    }
+
+    100% {
+        transform: translateX(-90px) translateY(30px) scale(1.1);
+    }
 }
 
 @keyframes fogFast {
-    0%   { transform: translateX(0) translateY(0) scale(1.15); }
-    100% { transform: translateX(-120px) translateY(40px) scale(1.05); }
+    0% {
+        transform: translateX(0) translateY(0) scale(1.15);
+    }
+
+    100% {
+        transform: translateX(-120px) translateY(40px) scale(1.05);
+    }
 }
 
 /* =========================
@@ -218,12 +366,17 @@ html, body {
 }
 
 @keyframes entityDrift {
-    0%   { transform: translateY(0) translateX(0); }
-    100% { transform: translateY(-6px) translateX(4px); }
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    100% {
+        transform: translateY(-6px) translateX(4px);
+    }
 }
 
 /* =========================
-   HEADER (TOP BAR)
+   SIMPLE HEADER / TOP BAR
 ========================= */
 .simple-header {
     position: absolute;
@@ -247,15 +400,36 @@ html, body {
 
 .simple-header .header-inner {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1180px;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 24px;
+}
+
+.simple-header .logo {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
 }
 
 .simple-header .logo img {
     width: 120px;
+    height: auto;
+    display: block;
+}
+
+.simple-header .nav-inline,
+.simple-header .blackwood-nav {
+    margin-bottom: 0;
+    justify-content: flex-end;
+    gap: clamp(12px, 1.7vw, 24px);
+}
+
+.simple-header .blackwood-nav-link {
+    font-size: 11px;
+    letter-spacing: 2.6px;
 }
 
 /* =========================
@@ -277,6 +451,116 @@ body.sub-page .hero-logo {
     margin-bottom: 10px;
 }
 
-body.sub-page .nav-inline {
+body.sub-page .nav-inline,
+body.sub-page .blackwood-nav {
     margin-bottom: 10px;
+}
+
+/* =========================
+   TABLET
+========================= */
+@media (max-width: 980px) {
+    .simple-header {
+        padding: 18px 22px;
+    }
+
+    .simple-header .header-inner {
+        max-width: 100%;
+        gap: 18px;
+    }
+
+    .blackwood-nav-link {
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
+
+    .simple-header .blackwood-nav-link {
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
+
+    .blackwood-dropdown {
+        min-width: 220px;
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 760px) {
+    .hero-inner {
+        padding: 50px 18px 0;
+    }
+
+    .hero-logo {
+        width: 220px;
+    }
+
+    .nav-inline,
+    .blackwood-nav {
+        gap: 8px 15px;
+        margin-bottom: 22px;
+    }
+
+    .blackwood-nav-link {
+        font-size: 10px;
+        letter-spacing: 1.6px;
+    }
+
+    .blackwood-dropdown {
+        left: auto;
+        right: 0;
+
+        min-width: 210px;
+
+        transform: translateY(8px);
+    }
+
+    .blackwood-nav-item:hover .blackwood-dropdown,
+    .blackwood-nav-item:focus-within .blackwood-dropdown,
+    .blackwood-nav-item.is-open .blackwood-dropdown {
+        transform: translateY(0);
+    }
+
+    .simple-header {
+        padding: 16px 18px;
+    }
+
+    .simple-header .header-inner {
+        align-items: flex-start;
+    }
+
+    .simple-header .logo img {
+        width: 96px;
+    }
+
+    .simple-header .nav-inline,
+    .simple-header .blackwood-nav {
+        justify-content: flex-end;
+        gap: 8px 13px;
+    }
+}
+
+@media (max-width: 560px) {
+    .simple-header .header-inner {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .simple-header .nav-inline,
+    .simple-header .blackwood-nav {
+        justify-content: center;
+    }
+
+    .blackwood-dropdown {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) translateY(8px);
+    }
+
+    .blackwood-nav-item:hover .blackwood-dropdown,
+    .blackwood-nav-item:focus-within .blackwood-dropdown,
+    .blackwood-nav-item.is-open .blackwood-dropdown {
+        transform: translateX(-50%) translateY(0);
+    }
 }
