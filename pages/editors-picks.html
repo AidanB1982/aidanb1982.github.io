@@ -3,63 +3,131 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
 
-  gtag('config', 'G-1WN8PBHBW4');
-</script>
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marked Entries</title>
+    <title>Marked Records | Blackwood Publishing</title>
+
+    <meta
+        name="description"
+        content="Marked Records from Blackwood Publishing. A quiet selection of books currently in rotation, noted from the editor's shelf."
+    >
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/editors.css">
+    <link rel="stylesheet" href="/css/header.css?v=20260714">
+    <link rel="stylesheet" href="/css/styles.css?v=20260714">
+    <link rel="stylesheet" href="/css/editors.css?v=20260714">
 </head>
 
-<body class="editors-page sub-page">
+<body class="editors-page marked-records-page sub-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
 
-<main>
+<!-- HERO -->
+<section class="about-hero marked-records-hero">
 
-    <!-- HERO / OPENING -->
-    <section class="opening-line fade-in">
-        <p>
+    <div class="about-hero-overlay"></div>
+
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Editor Picks</p>
+
+        <h1>Marked Records</h1>
+
+        <p class="marked-records-hero-subline">
             A quiet selection of books currently in rotation.
         </p>
-    </section>
 
-    <!-- OPTIONAL SUBTEXT -->
-    <section class="about-snippet fade-in">
-        <p>
+        <p class="marked-records-warning">
             What has been sitting close lately.
         </p>
-    </section>
+    </div>
 
-    <!-- MONTH TITLE -->
-    <section class="fade-in">
-        <h2 class="month-title">Current Selection</h2>
+</section>
+
+<main id="main-content" class="marked-records-wrap">
+
+    <!-- INTRO -->
+    <section class="marked-records-intro fade-in" aria-labelledby="marked-records-title">
+
+        <p class="marked-records-kicker">Marked for Record</p>
+
+        <h2 id="marked-records-title">
+            Current Selection
+        </h2>
+
+        <p class="marked-records-quote">
+            “Some books do not leave the desk when they are finished.”
+        </p>
+
+        <p>
+            These are the books currently marked, returned to, recommended, or left open nearby.
+            A changing shelf rather than a formal canon.
+        </p>
+
+        <p>
+            The selection may shift without notice.
+        </p>
+
     </section>
 
     <!-- PICKS -->
-    <section class="editor-picks">
-        <div class="editor-inner">
-            <!-- JS injects books -->
+    <section class="marked-records-picks fade-in" aria-labelledby="marked-records-picks-title">
+
+        <p class="marked-records-kicker">Current Shelf</p>
+
+        <h2 id="marked-records-picks-title">
+            Editor Picks
+        </h2>
+
+        <div class="editor-picks">
+            <div class="editor-inner">
+                <!-- JS injects books -->
+            </div>
         </div>
+
     </section>
 
     <!-- NOTE -->
-    <section class="fade-in">
-        <p class="affiliate-note">
-            Some links may be affiliated.
+    <section class="marked-records-note fade-in">
+        <p>
+            Some links may be affiliated. These selections are chosen because they belong on the shelf,
+            not because they are convenient.
         </p>
     </section>
+
+    <!-- ROUTES -->
+    <nav class="marked-records-routes fade-in" aria-label="Marked Records related routes">
+
+        <a href="/pages/reading-lists.html" class="marked-records-route-card">
+            <span>More Shelves</span>
+            <strong>Reading Lists</strong>
+        </a>
+
+        <a href="/pages/publications.html" class="marked-records-route-card">
+            <span>Blackwood Works</span>
+            <strong>The Works</strong>
+        </a>
+
+        <a href="/pages/start-here.html" class="marked-records-route-card">
+            <span>New Reader</span>
+            <strong>Start Here</strong>
+        </a>
+
+    </nav>
 
 </main>
 
@@ -67,8 +135,8 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260408" defer></script>
-<script src="/js/editors.js" defer></script>
+<script src="/js/header.js?v=20260714" defer></script>
+<script src="/js/editors.js?v=20260714" defer></script>
 
 <!-- INIT -->
 <script>
@@ -83,6 +151,10 @@ window.addEventListener("load", async () => {
 
     if (typeof loadEditorPicks === "function") {
         loadEditorPicks();
+    }
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
     }
 
 });
