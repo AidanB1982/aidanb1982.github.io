@@ -7772,7 +7772,7 @@ body.editors-page {
     background:
         radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
         linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.97)),
-        url("/assets/forest.png") center top / cover fixed no-repeat,
+        url("/assets/forest1.png") center top / cover fixed no-repeat,
         #000;
     color: #e6e6e6;
 }
