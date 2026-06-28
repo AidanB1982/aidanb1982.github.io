@@ -882,7 +882,7 @@ body.holdfast-page {
     }
 
     .holdfast-title {
-        font-size: clamp(3.2rem, 18vw, 5rem);
+        font-size: clamp(2.8rem, 15vw, 4.4rem);
     }
 
     .holdfast-subtitle {
