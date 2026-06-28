@@ -7244,3 +7244,283 @@ body.marked-records-page .editor-inner .button {
         margin-top: 62px;
     }
 }
+/* ======================================================
+   ABOUT BLACKWOOD PAGE — IMPRINT MAKEOVER
+====================================================== */
+
+body.about-blackwood-page {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.84), rgba(0,0,0,0.97)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+body.about-blackwood-page .about-blackwood-hero {
+    position: relative;
+}
+
+body.about-blackwood-page .about-blackwood-hero .about-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.8));
+}
+
+body.about-blackwood-page .about-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    padding: 0 22px;
+}
+
+body.about-blackwood-page .about-hero h1 {
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 0.95;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.about-blackwood-hero-subline {
+    max-width: 780px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(16px, 2.4vw, 21px);
+    line-height: 1.6;
+}
+
+/* WRAP */
+
+.about-blackwood-wrap {
+    width: min(100%, 1240px);
+    margin: 0 auto;
+    padding: 72px 22px 84px;
+}
+
+/* INTRO */
+
+.about-blackwood-intro,
+.about-blackwood-panel,
+.about-blackwood-fragment,
+.about-blackwood-social {
+    max-width: 860px;
+    margin: 0 auto 58px;
+    padding: clamp(34px, 5vw, 58px);
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.34);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.42);
+}
+
+.about-blackwood-kicker {
+    margin: 0 0 14px;
+    color: #b87333;
+    font-size: 12px;
+    letter-spacing: 4px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.about-blackwood-intro h2,
+.about-blackwood-panel h2,
+.about-blackwood-values h2,
+.about-blackwood-social h2 {
+    margin: 0 0 20px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.08;
+    font-weight: normal;
+}
+
+.about-blackwood-quote {
+    margin: 0 auto 22px;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.about-blackwood-intro p:not(.about-blackwood-kicker):not(.about-blackwood-quote),
+.about-blackwood-panel p,
+.about-blackwood-fragment p:not(.about-blackwood-kicker),
+.about-blackwood-social p:not(.about-blackwood-kicker) {
+    max-width: 760px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.7);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* APPROACH */
+
+.about-blackwood-text-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px;
+    margin-top: 28px;
+}
+
+.about-blackwood-text-columns p {
+    margin-top: 0;
+    padding: 24px 22px;
+    border: 1px solid rgba(184, 115, 51, 0.12);
+    background: rgba(255,255,255,0.012);
+}
+
+/* VALUES */
+
+.about-blackwood-values {
+    margin: 0 auto 58px;
+    text-align: center;
+}
+
+.about-blackwood-value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 36px;
+}
+
+.about-blackwood-value-card {
+    padding: 30px 24px;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.065), transparent 44%),
+        rgba(255, 255, 255, 0.012);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+}
+
+.about-blackwood-value-card h3 {
+    margin: 0 0 14px;
+    color: #fff;
+    font-size: 19px;
+    letter-spacing: 2px;
+    line-height: 1.25;
+    text-transform: uppercase;
+}
+
+.about-blackwood-value-card p {
+    margin: 0;
+    color: rgba(230, 230, 230, 0.64);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+/* FRAGMENT */
+
+.about-blackwood-fragment {
+    max-width: 720px;
+}
+
+.about-blackwood-fragment p:not(.about-blackwood-kicker) {
+    margin-top: 8px;
+    color: rgba(230, 230, 230, 0.52);
+    font-size: 15px;
+    line-height: 1.7;
+    font-style: italic;
+}
+
+/* ROUTES */
+
+.about-blackwood-routes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 980px;
+    margin: 82px auto 58px;
+}
+
+.about-blackwood-route-card {
+    padding: 24px 22px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background: rgba(255,255,255,0.01);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        background 0.3s ease;
+}
+
+.about-blackwood-route-card:hover,
+.about-blackwood-route-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(184, 115, 51, 0.36);
+    background: rgba(184, 115, 51, 0.045);
+    outline: none;
+}
+
+.about-blackwood-route-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(230,230,230,0.48);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.about-blackwood-route-card strong {
+    color: #fff;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+/* SOCIAL */
+
+.about-blackwood-social {
+    max-width: 620px;
+    margin-bottom: 0;
+}
+
+.about-blackwood-social h2 {
+    margin-bottom: 24px;
+    font-size: clamp(26px, 3vw, 38px);
+}
+
+.about-blackwood-social-links img {
+    width: 26px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 980px) {
+    .about-blackwood-text-columns,
+    .about-blackwood-value-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    body.about-blackwood-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+            linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    .about-blackwood-wrap {
+        padding: 54px 16px 64px;
+    }
+
+    .about-blackwood-intro,
+    .about-blackwood-panel,
+    .about-blackwood-fragment,
+    .about-blackwood-social {
+        margin-bottom: 48px;
+        padding: 34px 22px;
+    }
+
+    .about-blackwood-text-columns,
+    .about-blackwood-value-grid,
+    .about-blackwood-routes {
+        grid-template-columns: 1fr;
+    }
+
+    .about-blackwood-routes {
+        margin-top: 62px;
+        margin-bottom: 48px;
+    }
+}
