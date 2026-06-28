@@ -3934,7 +3934,7 @@ body.publications-page .review-snippet {
 
 /* Main section spacing */
 body.publications-page .about-section.works-page-section {
-    max-width: 1120px;
+    max-width: 1240px;
     margin: 58px auto;
     padding: 0 22px;
 }
@@ -3973,7 +3973,7 @@ body.publications-page .series-grid.works-two-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 38px 46px;
-    max-width: 1060px;
+    max-width: 1180px;
     margin: 0 auto;
     align-items: start;
 }
@@ -4127,4 +4127,24 @@ body.publications-page #footer-placeholder {
         width: 100%;
         min-width: 0;
     }
+}
+/* ======================================================
+   THE WORKS PAGE — WIDER ATMOSPHERE BACKGROUND
+====================================================== */
+
+body.publications-page {
+    background:
+        radial-gradient(circle at 50% 12%, rgba(184, 115, 51, 0.08), transparent 34%),
+        linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.96)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+body.publications-page .about-section.works-page-section {
+    max-width: 1240px;
+}
+
+body.publications-page .series-grid,
+body.publications-page .series-grid.works-two-grid {
+    max-width: 1180px;
 }
