@@ -5858,3 +5858,352 @@ body.cursed-bothies-page .review-snippet[data-book="corrour"]::before {
         margin-top: 62px;
     }
 }
+/* ======================================================
+   HARD SILENCE PAGE — BLACKWOOD CRIME MAKEOVER
+====================================================== */
+
+body.hard-silence-page {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.96)),
+        url("/assets/HardSilence.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+body.hard-silence-page .hard-silence-hero {
+    position: relative;
+}
+
+body.hard-silence-page .hard-silence-hero .about-hero-overlay {
+    background:
+        linear-gradient(rgba(0,0,0,0.46), rgba(0,0,0,0.82)),
+        url("/assets/HardSilence.png") center top / cover no-repeat;
+}
+
+body.hard-silence-page .about-hero h1 {
+    font-size: clamp(42px, 7vw, 78px);
+    line-height: 0.95;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.hard-silence-hero-subline {
+    max-width: 760px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.72);
+    font-size: clamp(16px, 2.4vw, 21px);
+    line-height: 1.6;
+}
+
+/* MAIN WRAP */
+
+.hard-silence-wrap {
+    width: min(100%, 1240px);
+    margin: 0 auto;
+    padding: 72px 22px 84px;
+}
+
+/* INTRO */
+
+.hard-silence-intro {
+    max-width: 860px;
+    margin: 0 auto 58px;
+    padding: clamp(34px, 5vw, 58px);
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.36);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.46);
+}
+
+.hard-silence-kicker {
+    margin: 0 0 14px;
+    color: #b87333;
+    font-size: 12px;
+    letter-spacing: 4px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.hard-silence-intro h2,
+.hard-silence-sequence h2 {
+    margin: 0 0 20px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.08;
+    font-weight: normal;
+}
+
+.hard-silence-quote {
+    margin: 0 auto 22px;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.hard-silence-intro p:not(.hard-silence-kicker):not(.hard-silence-quote) {
+    max-width: 720px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.7);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.hard-silence-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+/* REVIEW */
+
+body.hard-silence-page .hard-silence-review {
+    max-width: 520px;
+    margin: 0 auto 30px;
+    text-align: center;
+}
+
+body.hard-silence-page .hard-silence-review::before {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 1px;
+    margin: 0 auto 18px;
+    background: rgba(184, 115, 51, 0.42);
+}
+
+/* SEQUENCE */
+
+.hard-silence-sequence {
+    text-align: center;
+}
+
+.hard-silence-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 42px;
+}
+
+.hard-silence-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+    min-height: 100%;
+    padding: 30px;
+    text-align: left;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background:
+        radial-gradient(circle at 18% 50%, rgba(184, 115, 51, 0.075), transparent 34%),
+        linear-gradient(145deg, rgba(255,255,255,0.016), rgba(255,255,255,0.005)),
+        rgba(0, 0, 0, 0.32);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.38);
+}
+
+.hard-silence-card::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 115, 51, 0.055);
+    pointer-events: none;
+}
+
+.hard-silence-card-featured {
+    border-color: rgba(184, 115, 51, 0.24);
+    background:
+        radial-gradient(circle at 18% 50%, rgba(184, 115, 51, 0.1), transparent 36%),
+        linear-gradient(145deg, rgba(184, 115, 51, 0.03), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.36);
+}
+
+.hard-silence-card-locked {
+    opacity: 0.9;
+}
+
+.hard-silence-card-cover {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.hard-silence-card-cover img {
+    width: min(100%, 210px);
+    height: 315px;
+    object-fit: contain;
+    filter:
+        drop-shadow(0 26px 46px rgba(0,0,0,0.82))
+        drop-shadow(0 6px 16px rgba(184,115,51,0.1));
+}
+
+.hard-silence-card-copy {
+    position: relative;
+    z-index: 1;
+}
+
+.hard-silence-card-number {
+    margin: 0 0 12px;
+    color: #b87333;
+    font-size: 11px;
+    letter-spacing: 3.5px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.hard-silence-card-copy h3 {
+    margin: 0 0 16px;
+    color: #fff;
+    font-size: clamp(24px, 3vw, 36px);
+    line-height: 1.1;
+    font-weight: normal;
+}
+
+.hard-silence-card-copy p:not(.hard-silence-card-number):not(.hard-silence-card-note) {
+    margin: 0;
+    color: rgba(230, 230, 230, 0.66);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.hard-silence-card-note {
+    margin: 16px 0 0;
+    color: rgba(230, 230, 230, 0.48);
+    font-size: 13px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.hard-silence-card .mini-review {
+    margin-top: 16px;
+    color: rgba(230, 230, 230, 0.62);
+    font-size: 14px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.hard-silence-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    margin-top: 24px;
+}
+
+.hard-silence-card-actions .button {
+    margin-top: 0;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.hard-silence-disabled {
+    cursor: default;
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+/* ROUTES */
+
+.hard-silence-routes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 980px;
+    margin: 82px auto 0;
+}
+
+.hard-silence-route-card {
+    padding: 24px 22px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background: rgba(255,255,255,0.01);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        background 0.3s ease;
+}
+
+.hard-silence-route-card:hover,
+.hard-silence-route-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(184, 115, 51, 0.36);
+    background: rgba(184, 115, 51, 0.045);
+    outline: none;
+}
+
+.hard-silence-route-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(230,230,230,0.48);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.hard-silence-route-card strong {
+    color: #fff;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+    body.hard-silence-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 50%),
+            linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.98)),
+            url("/assets/HardSilence.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    .hard-silence-wrap {
+        padding: 54px 16px 64px;
+    }
+
+    .hard-silence-intro {
+        margin-bottom: 48px;
+        padding: 34px 22px;
+    }
+
+    .hard-silence-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hard-silence-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .hard-silence-card {
+        grid-template-columns: 1fr;
+        padding: 28px 20px 32px;
+        text-align: center;
+    }
+
+    .hard-silence-card-cover img {
+        width: min(72vw, 210px);
+        height: 315px;
+    }
+
+    .hard-silence-card-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hard-silence-card-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .hard-silence-routes {
+        grid-template-columns: 1fr;
+        margin-top: 62px;
+    }
+}
