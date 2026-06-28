@@ -3318,49 +3318,6 @@ body.reading-lists-page {
 /* =========================================
    HOLDFAST — UNLOCKED PRE-ORDER PANEL
    ========================================= */
-.reading-lists-footer-note {
-    width: min(100%, 1080px);
-    margin: 70px auto 0;
-    color: rgba(255,255,255,0.34);
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-}
-
-@media (max-width: 700px) {
-    .reading-lists-wrap {
-        padding: 112px 14px 58px;
-    }
-
-    .reading-lists-hero {
-        margin-bottom: 44px;
-        padding: 32px 22px;
-    }
-
-    .reading-lists-title {
-        font-size: clamp(2.8rem, 15vw, 4.4rem);
-    }
-
-    .reading-lists-intro {
-        font-size: 1rem;
-        line-height: 1.72;
-    }
-
-    .bookshop-list-block {
-        padding: 26px 18px;
-        margin-bottom: 34px;
-    }
-
-    .bookshop-list-copy h2 {
-        font-size: 2rem;
-    }
-
-    .bookshop-widget-shell {
-        padding: 10px;
-    }
-}
 
 .preorder-panel {
     margin-top: 24px;
