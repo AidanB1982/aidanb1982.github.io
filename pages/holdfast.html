@@ -18,12 +18,12 @@
 
     <meta
         name="description"
-        content="A restricted Blackwood Publishing archive transmission for Holdfast. Enter the access code to unlock the audio file."
+        content="A restricted Blackwood Publishing archive transmission for Holdfast. Enter the file designation to unlock the audio file and archive fragment."
     >
 
     <link rel="stylesheet" href="/css/header.css">
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/holdfast.css?v=20260631">
+    <link rel="stylesheet" href="/css/holdfast.css?v=20260701">
 </head>
 
 <body class="sub-page holdfast-page">
@@ -50,8 +50,7 @@
                     </h1>
 
                     <p class="holdfast-subtitle">
-                        A sealed record from the Blackwood archive. The background remains visible.
-                        The file waits for the correct code.
+                        A sealed record from the Blackwood archive. The file waits for the correct designation.
                     </p>
                 </div>
             </div>
@@ -131,6 +130,16 @@
                     <p class="transmission-note" id="transmission-note">
                         Audio file locked to manual playback. Press play to begin.
                     </p>
+
+                    <div class="fragment-prompt">
+                        <p>
+                            Archive fragment unlocked. Read the recovered prologue below.
+                        </p>
+
+                        <a class="fragment-jump-button" href="#holdfast-prologue">
+                            Read Unlocked Fragment
+                        </a>
+                    </div>
 
                     <div class="preorder-panel" aria-labelledby="preorder-heading">
                         <p class="preorder-heading" id="preorder-heading">
@@ -312,7 +321,7 @@
 
 <!-- JS -->
 <script src="/js/header.js?v=20260408" defer></script>
-<script src="/js/holdfast.js?v=20260630" defer></script>
+<script src="/js/holdfast.js?v=20260701" defer></script>
 
 </body>
 </html>
