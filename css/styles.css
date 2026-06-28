@@ -6596,3 +6596,333 @@ body.standalone-page .standalone-hero .about-hero-overlay {
         filter: none;
     }
 }
+/* ======================================================
+   LIMITED EDITIONS PAGE — OBJECTS FROM THE ARCHIVE
+====================================================== */
+
+body.limited-editions-page {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.97)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+body.limited-editions-page .limited-editions-hero {
+    position: relative;
+}
+
+body.limited-editions-page .limited-editions-hero .about-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.8)),
+        url("/assets/forest.png") center center / cover no-repeat;
+}
+
+body.limited-editions-page .about-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    padding: 0 22px;
+}
+
+body.limited-editions-page .about-hero h1 {
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 0.95;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.limited-editions-hero-subline {
+    max-width: 760px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(16px, 2.4vw, 21px);
+    line-height: 1.6;
+}
+
+.limited-editions-warning {
+    margin: 18px auto 0;
+    color: rgba(184, 115, 51, 0.84);
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+}
+
+/* WRAP */
+
+.limited-editions-wrap {
+    width: min(100%, 1240px);
+    margin: 0 auto;
+    padding: 72px 22px 84px;
+}
+
+/* INTRO */
+
+.limited-editions-intro {
+    max-width: 860px;
+    margin: 0 auto 58px;
+    padding: clamp(34px, 5vw, 58px);
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.34);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.42);
+}
+
+.limited-editions-kicker {
+    margin: 0 0 14px;
+    color: #b87333;
+    font-size: 12px;
+    letter-spacing: 4px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.limited-editions-intro h2,
+.limited-editions-section h2 {
+    margin: 0 0 20px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.08;
+    font-weight: normal;
+}
+
+.limited-editions-quote {
+    margin: 0 auto 22px;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.limited-editions-intro p:not(.limited-editions-kicker):not(.limited-editions-quote) {
+    max-width: 720px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.7);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* SECTION */
+
+.limited-editions-section {
+    text-align: center;
+}
+
+.limited-editions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+    margin: 42px auto 0;
+}
+
+/* CARDS */
+
+.limited-edition-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 30px 24px 34px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.075), transparent 42%),
+        linear-gradient(145deg, rgba(255,255,255,0.016), rgba(255,255,255,0.005)),
+        rgba(0, 0, 0, 0.34);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.36);
+}
+
+.limited-edition-card::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 115, 51, 0.055);
+    pointer-events: none;
+}
+
+.limited-edition-card-featured {
+    border-color: rgba(184, 115, 51, 0.26);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.12), transparent 44%),
+        linear-gradient(145deg, rgba(184, 115, 51, 0.035), rgba(255,255,255,0.008)),
+        rgba(0, 0, 0, 0.38);
+}
+
+.limited-edition-cover,
+.limited-edition-copy {
+    position: relative;
+    z-index: 1;
+}
+
+.limited-edition-cover {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.limited-edition-cover img {
+    width: min(100%, 230px);
+    height: 345px;
+    object-fit: contain;
+    filter:
+        drop-shadow(0 28px 48px rgba(0,0,0,0.82))
+        drop-shadow(0 6px 16px rgba(184,115,51,0.1));
+}
+
+.limited-edition-label {
+    margin: 0 0 12px;
+    color: #b87333;
+    font-size: 11px;
+    letter-spacing: 3px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.limited-edition-card h3 {
+    margin: 0 0 14px;
+    color: #fff;
+    font-size: clamp(22px, 2.5vw, 31px);
+    line-height: 1.12;
+    font-weight: normal;
+}
+
+.limited-edition-description {
+    max-width: 310px;
+    margin: 0 auto 18px;
+    color: rgba(230,230,230,0.62);
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+/* STOCK */
+
+body.limited-editions-page .stock-line {
+    margin: 16px auto 14px;
+    color: rgba(230,230,230,0.54);
+    font-size: 12px;
+    letter-spacing: 1.4px;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+/* SHOPIFY PRODUCT SLOT */
+
+body.limited-editions-page .product-slot {
+    position: relative;
+    z-index: 2;
+    min-height: 46px;
+    margin-top: 10px;
+}
+
+/* Keep Shopify centred */
+
+body.limited-editions-page [id^="product-"] {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+body.limited-editions-page .shopify-buy__product {
+    width: 100% !important;
+    max-width: 260px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+}
+
+body.limited-editions-page .shopify-buy__btn-wrapper {
+    display: flex !important;
+    justify-content: center !important;
+}
+
+/* NOTE + EXIT */
+
+body.limited-editions-page .limited-note,
+body.limited-editions-page .limited-exit {
+    max-width: 760px;
+    margin: 70px auto 0;
+    padding: 28px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(184, 115, 51, 0.18);
+    border-bottom: 1px solid rgba(184, 115, 51, 0.1);
+    background:
+        radial-gradient(circle at center top, rgba(184,115,51,0.06), transparent 44%),
+        rgba(255,255,255,0.012);
+}
+
+body.limited-editions-page .limited-note p,
+body.limited-editions-page .limited-exit p {
+    margin: 0;
+    color: rgba(230,230,230,0.66);
+    font-size: 16px;
+    line-height: 1.7;
+    font-style: italic;
+}
+
+body.limited-editions-page .limited-exit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 34px;
+}
+
+body.limited-editions-page .limited-exit .button {
+    margin-top: 6px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 980px) {
+    .limited-editions-grid {
+        grid-template-columns: 1fr;
+        max-width: 560px;
+    }
+
+    .limited-edition-cover img {
+        width: min(72vw, 230px);
+        height: 345px;
+    }
+}
+
+@media (max-width: 760px) {
+    body.limited-editions-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+            linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    .limited-editions-wrap {
+        padding: 54px 16px 64px;
+    }
+
+    .limited-editions-intro {
+        margin-bottom: 48px;
+        padding: 34px 22px;
+    }
+
+    .limited-edition-card {
+        padding: 28px 20px 32px;
+    }
+
+    body.limited-editions-page .limited-note,
+    body.limited-editions-page .limited-exit {
+        margin-top: 52px;
+        padding: 26px 20px;
+    }
+
+    body.limited-editions-page .limited-exit {
+        margin-top: 30px;
+    }
+
+    body.limited-editions-page .limited-exit .button {
+        width: 100%;
+        text-align: center;
+    }
+}
