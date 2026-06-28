@@ -6579,3 +6579,20 @@ body.standalone-page .review-snippet[data-book="standalone"]::before {
         margin-top: 62px;
     }
 }
+/* ======================================================
+   STANDALONE PAGE — REMOVE HERO IMAGE REPEAT
+====================================================== */
+
+body.standalone-page .standalone-hero .about-hero-overlay {
+    background:
+        linear-gradient(rgba(0,0,0,0.34), rgba(0,0,0,0.72));
+    filter: none;
+}
+
+@media (max-width: 760px) {
+    body.standalone-page .standalone-hero .about-hero-overlay {
+        background:
+            linear-gradient(rgba(0,0,0,0.44), rgba(0,0,0,0.8));
+        filter: none;
+    }
+}
