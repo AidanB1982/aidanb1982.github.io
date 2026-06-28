@@ -7524,3 +7524,243 @@ body.about-blackwood-page .about-hero h1 {
         margin-bottom: 48px;
     }
 }
+/* ======================================================
+   COMMUNITY SPOTLIGHT PAGE — FOREST ON PAGE, NOT HERO
+====================================================== */
+
+body.community-spotlight-page {
+    background: #050505;
+    color: #eaeaea;
+}
+
+/* remove older community hero image rules */
+body.community-spotlight-page .community-hero::before {
+    display: none;
+}
+
+body.community-spotlight-page .community-hero::after {
+    background:
+        radial-gradient(circle at center, rgba(184, 115, 51, 0.08), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.88));
+}
+
+/* HERO */
+
+body.community-spotlight-page .community-hero {
+    position: relative;
+    min-height: 480px;
+    height: 52vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 20%, rgba(184, 115, 51, 0.08), transparent 34%),
+        linear-gradient(rgba(0,0,0,0.72), rgba(0,0,0,0.96)),
+        #050505;
+}
+
+body.community-spotlight-page .community-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 880px;
+    padding: 0 22px;
+    text-align: center;
+}
+
+body.community-spotlight-page .community-hero h1 {
+    margin: 0 0 22px;
+    color: #fff;
+    font-size: clamp(42px, 7vw, 78px);
+    line-height: 0.95;
+    font-weight: normal;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+body.community-spotlight-page .community-hero p:not(.about-intro-line) {
+    max-width: 760px;
+    margin: 0 auto;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(16px, 2.4vw, 21px);
+    line-height: 1.6;
+}
+
+/* MAIN PAGE BACKGROUND */
+
+.community-spotlight-wrap {
+    position: relative;
+    width: 100%;
+    padding: 72px 22px 90px;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.78), rgba(0,0,0,0.96)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+.community-spotlight-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        linear-gradient(to bottom, rgba(0,0,0,0.68), transparent 18%, transparent 82%, rgba(0,0,0,0.88)),
+        radial-gradient(circle at center, transparent 34%, rgba(0,0,0,0.42) 100%);
+}
+
+.community-spotlight-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 52px 52px;
+    opacity: 0.12;
+}
+
+/* INTRO PANEL */
+
+.community-spotlight-intro {
+    max-width: 860px;
+    margin: 0 auto 54px;
+    padding: clamp(34px, 5vw, 58px);
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.38);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.42);
+}
+
+.community-spotlight-kicker {
+    margin: 0 0 14px;
+    color: #b87333;
+    font-size: 12px;
+    letter-spacing: 4px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.community-spotlight-intro h2 {
+    margin: 0 0 20px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.08;
+    font-weight: normal;
+}
+
+.community-spotlight-quote {
+    margin: 0 auto 22px;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.community-spotlight-intro p:not(.community-spotlight-kicker):not(.community-spotlight-quote) {
+    max-width: 720px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.7);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+/* CTA */
+
+.community-spotlight-cta {
+    max-width: 720px;
+    margin: 0 auto 42px;
+    text-align: center;
+}
+
+.community-spotlight-cta p {
+    margin: 0;
+    color: rgba(230, 230, 230, 0.62);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.community-spotlight-cta button {
+    display: inline;
+    margin: 0;
+    padding: 0 0 2px;
+    border: none;
+    border-bottom: 1px solid rgba(184, 115, 51, 0.5);
+    background: transparent;
+    color: #b87333;
+    font: inherit;
+    font-style: italic;
+    cursor: pointer;
+}
+
+.community-spotlight-cta button:hover,
+.community-spotlight-cta button:focus-visible {
+    color: #e0a46b;
+    outline: none;
+}
+
+/* TAGGBOX */
+
+body.community-spotlight-page .taggbox-wrapper {
+    position: relative;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    padding: clamp(18px, 4vw, 34px);
+    border: 1px solid rgba(184, 115, 51, 0.16);
+    background:
+        radial-gradient(circle at center top, rgba(184,115,51,0.055), transparent 44%),
+        rgba(0, 0, 0, 0.38);
+    box-shadow: 0 28px 90px rgba(0,0,0,0.46);
+}
+
+body.community-spotlight-page .taggbox-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 115, 51, 0.055);
+    pointer-events: none;
+}
+
+body.community-spotlight-page .taggbox {
+    position: relative;
+    z-index: 1;
+    width: 100% !important;
+    min-height: 600px;
+    filter: grayscale(8%) contrast(96%);
+}
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+    body.community-spotlight-page .community-hero {
+        height: auto;
+        min-height: 360px;
+        padding: 112px 18px 70px;
+    }
+
+    .community-spotlight-wrap {
+        padding: 54px 16px 64px;
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+            linear-gradient(rgba(0,0,0,0.86), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    .community-spotlight-intro {
+        margin-bottom: 42px;
+        padding: 34px 22px;
+    }
+
+    body.community-spotlight-page .taggbox {
+        min-height: 500px;
+    }
+}
