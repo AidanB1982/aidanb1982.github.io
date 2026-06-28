@@ -5807,7 +5807,7 @@ body.cursed-bothies-page .review-snippet[data-book="corrour"]::before {
 @media (max-width: 760px) {
     body.cursed-bothies-page {
         background:
-            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 34%),
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 50%),
             linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.98)),
             url("/assets/CursedBothiesBG.png") center top / cover scroll no-repeat,
             #000;
