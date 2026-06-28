@@ -26,8 +26,10 @@ window.addEventListener("load", async () => {
     const input = document.getElementById("access-code");
     const message = document.getElementById("access-message");
     const status = document.getElementById("access-status");
+    const accessTitle = document.getElementById("access-title");
     const transmissionPanel = document.getElementById("transmission-panel");
     const prologuePanel = document.getElementById("holdfast-prologue");
+    const fragmentJumpButton = document.querySelector(".fragment-jump-button");
     const playButton = document.getElementById("play-button");
     const sealButton = document.getElementById("seal-button");
     const audio = document.getElementById("holdfast-audio");
@@ -80,14 +82,21 @@ window.addEventListener("load", async () => {
         }
     }
 
-    function grantAccess() {
+    function updateUnlockedCopy() {
         if (status) {
             status.textContent = "Access granted";
             status.classList.add("is-granted");
         }
 
-        setMessage("File designation accepted. Transmission unlocked.", "is-success");
+        if (accessTitle) {
+            accessTitle.textContent = "Transmission Open";
+        }
 
+        setMessage("File designation accepted. Transmission unlocked.", "is-success");
+    }
+
+    function grantAccess() {
+        updateUnlockedCopy();
         revealTransmission();
         revealPrologue();
         lockFormAfterSuccess();
@@ -135,6 +144,19 @@ window.addEventListener("load", async () => {
         location.reload();
     }
 
+    function scrollToPrologue(event) {
+        if (!prologuePanel) return;
+
+        event.preventDefault();
+
+        revealPrologue();
+
+        prologuePanel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
     if (sessionStorage.getItem(STORAGE_KEY) === "true") {
         grantAccess();
     }
@@ -158,6 +180,10 @@ window.addEventListener("load", async () => {
             input.removeAttribute("aria-invalid");
             setMessage("Awaiting file designation.", "");
         });
+    }
+
+    if (fragmentJumpButton) {
+        fragmentJumpButton.addEventListener("click", scrollToPrologue);
     }
 
     if (playButton && audio && soundwaveBox && transmissionNote) {
