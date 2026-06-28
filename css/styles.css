@@ -7764,3 +7764,44 @@ body.community-spotlight-page .taggbox {
         min-height: 500px;
     }
 }
+/* ======================================================
+   EDITOR PICKS / MARKED RECORDS BACKGROUND
+====================================================== */
+
+body.editors-page {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+        linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.97)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+    color: #e6e6e6;
+}
+
+body.editors-page main {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    padding-top: 120px;
+}
+
+body.editors-page .opening-line,
+body.editors-page .about-snippet,
+body.editors-page .month-title,
+body.editors-page .editor-picks,
+body.editors-page .affiliate-note {
+    position: relative;
+    z-index: 1;
+}
+@media (max-width: 760px) {
+    body.editors-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.1), transparent 38%),
+            linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    body.editors-page main {
+        padding-top: 100px;
+    }
+}
