@@ -3911,6 +3911,16 @@ body.reading-lists-page {
    Scoped to body.publications-page only
 ====================================================== */
 
+body.publications-page {
+    background:
+        radial-gradient(circle at 50% 12%, rgba(184, 115, 51, 0.08), transparent 34%),
+        linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.96)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+/* HERO */
+
 body.publications-page .about-hero {
     height: 46vh;
     min-height: 340px;
@@ -3928,11 +3938,14 @@ body.publications-page .about-intro-line {
     margin-bottom: 12px;
 }
 
+/* REVIEW */
+
 body.publications-page .review-snippet {
     margin: 36px auto 46px;
 }
 
-/* Main section spacing */
+/* MAIN SECTION SPACING */
+
 body.publications-page .about-section.works-page-section {
     max-width: 1240px;
     margin: 58px auto;
@@ -3947,7 +3960,8 @@ body.publications-page .about-section.works-page-section:last-of-type {
     margin-bottom: 80px;
 }
 
-/* Section headers */
+/* SECTION HEADERS */
+
 body.publications-page .works-header {
     margin-bottom: 34px;
 }
@@ -3967,7 +3981,8 @@ body.publications-page .works-header p:last-child {
     line-height: 1.65;
 }
 
-/* Two-card grids */
+/* TWO-CARD GRIDS */
+
 body.publications-page .series-grid,
 body.publications-page .series-grid.works-two-grid {
     display: grid;
@@ -3978,7 +3993,8 @@ body.publications-page .series-grid.works-two-grid {
     align-items: start;
 }
 
-/* Cards */
+/* CARDS */
+
 body.publications-page .series {
     position: relative;
     min-height: 100%;
@@ -4015,12 +4031,13 @@ body.publications-page .series p {
     line-height: 1.65;
 }
 
-/* Book carousel/image sizing */
+/* BOOK COVERS / CAROUSEL */
+
 body.publications-page .carousel {
     position: relative;
     z-index: 1;
-    width: 210px;
-    height: 320px;
+    width: 260px;
+    height: 390px;
     margin: 24px auto 22px;
 }
 
@@ -4031,7 +4048,8 @@ body.publications-page .carousel img {
         drop-shadow(0 4px 12px rgba(184, 115, 51, 0.08));
 }
 
-/* Notes / reading order */
+/* NOTES / READING ORDER */
+
 body.publications-page .series-note {
     max-width: 430px;
     margin: 10px auto 0;
@@ -4044,7 +4062,8 @@ body.publications-page .series-note strong {
     color: rgba(230, 230, 230, 0.92);
 }
 
-/* Buttons */
+/* BUTTONS */
+
 body.publications-page .work-actions {
     position: relative;
     z-index: 1;
@@ -4071,12 +4090,14 @@ body.publications-page .button.ghost {
     border: 1px solid rgba(230, 230, 230, 0.2);
 }
 
-/* Reduce oversized final footer gap on this page */
+/* REDUCE FOOTER GAP */
+
 body.publications-page #footer-placeholder {
     margin-top: 0;
 }
 
-/* Tablet */
+/* TABLET */
+
 @media (max-width: 900px) {
     body.publications-page .series-grid,
     body.publications-page .series-grid.works-two-grid {
@@ -4084,13 +4105,22 @@ body.publications-page #footer-placeholder {
     }
 
     body.publications-page .carousel {
-        width: 190px;
-        height: 290px;
+        width: 230px;
+        height: 345px;
     }
 }
 
-/* Mobile */
+/* MOBILE */
+
 @media (max-width: 760px) {
+    body.publications-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 34%),
+            linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.97)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
     body.publications-page .about-hero {
         height: auto;
         min-height: 320px;
@@ -4113,8 +4143,8 @@ body.publications-page #footer-placeholder {
     }
 
     body.publications-page .carousel {
-        width: 180px;
-        height: 275px;
+        width: 220px;
+        height: 330px;
         margin: 22px auto 20px;
     }
 
@@ -4127,24 +4157,4 @@ body.publications-page #footer-placeholder {
         width: 100%;
         min-width: 0;
     }
-}
-/* ======================================================
-   THE WORKS PAGE — WIDER ATMOSPHERE BACKGROUND
-====================================================== */
-
-body.publications-page {
-    background:
-        radial-gradient(circle at 50% 12%, rgba(184, 115, 51, 0.08), transparent 34%),
-        linear-gradient(rgba(0,0,0,0.88), rgba(0,0,0,0.96)),
-        url("/assets/forest.png") center top / cover fixed no-repeat,
-        #000;
-}
-
-body.publications-page .about-section.works-page-section {
-    max-width: 1240px;
-}
-
-body.publications-page .series-grid,
-body.publications-page .series-grid.works-two-grid {
-    max-width: 1180px;
 }
