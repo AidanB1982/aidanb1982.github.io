@@ -3972,7 +3972,7 @@ body.publications-page .series-grid,
 body.publications-page .series-grid.works-two-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 52px 56px;
+    gap: 38px 46px;
     max-width: 1060px;
     margin: 0 auto;
     align-items: start;
