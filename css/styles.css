@@ -3054,26 +3054,30 @@ body.community-page::after {
 }
 /* =========================================================
    Reading Lists / Blackwood Bookshop
-   ========================================================= */
+========================================================= */
 
 body.reading-lists-page {
     margin: 0;
     min-height: 100vh;
-    background: #050505;
+    background:
+        radial-gradient(circle at 50% 8%, rgba(201, 169, 106, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(0,0,0,0.82), rgba(0,0,0,0.97)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #050505;
     color: rgba(255, 255, 255, 0.92);
     font-family: Georgia, "Times New Roman", serif;
     overflow-x: hidden;
 }
 
+/* MAIN WRAP */
+
 .reading-lists-wrap {
     position: relative;
     min-height: 100vh;
     padding: 150px 22px 80px;
-    background:
-        radial-gradient(circle at center 8%, rgba(201, 169, 106, 0.1), transparent 34%),
-        linear-gradient(180deg, rgba(0,0,0,0.74), rgba(0,0,0,0.96)),
-        #050505;
 }
+
+/* SUBTLE BOOKSHOP GRID / PAPER TEXTURE */
 
 .reading-lists-wrap::before {
     content: "";
@@ -3081,20 +3085,29 @@ body.reading-lists-page {
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.16;
+    opacity: 0.12;
     background-image:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
     background-size: 48px 48px;
-    mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+    mask-image: linear-gradient(
+        to bottom,
+        transparent,
+        #000 16%,
+        #000 84%,
+        transparent
+    );
 }
 
 .reading-lists-hero,
 .bookshop-list-block,
+.bookshop-working-shelf,
 .reading-lists-footer-note {
     position: relative;
     z-index: 1;
 }
+
+/* HERO */
 
 .reading-lists-hero {
     width: min(100%, 980px);
@@ -3102,8 +3115,9 @@ body.reading-lists-page {
     padding: clamp(30px, 5vw, 58px);
     border: 1px solid rgba(201, 169, 106, 0.18);
     background:
-        linear-gradient(145deg, rgba(0,0,0,0.78), rgba(14,12,10,0.62));
-    box-shadow: 0 30px 100px rgba(0,0,0,0.56);
+        radial-gradient(circle at center top, rgba(201, 169, 106, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(0,0,0,0.78), rgba(14,12,10,0.64));
+    box-shadow: 0 30px 100px rgba(0,0,0,0.58);
 }
 
 .reading-lists-hero::before {
@@ -3114,6 +3128,8 @@ body.reading-lists-page {
     pointer-events: none;
 }
 
+/* TEXT */
+
 .reading-lists-kicker,
 .bookshop-list-kicker {
     margin: 0 0 16px;
@@ -3121,24 +3137,25 @@ body.reading-lists-page {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.72rem;
     letter-spacing: 0.26em;
+    line-height: 1.5;
     text-transform: uppercase;
 }
 
 .reading-lists-title {
     margin: 0;
     color: #fff;
-    font-size: clamp(2rem, 6vw, 4.4rem);
+    font-size: clamp(2.4rem, 6vw, 4.7rem);
     line-height: 0.92;
     font-weight: 500;
     letter-spacing: 0.035em;
     text-transform: uppercase;
     text-shadow:
         0 8px 30px rgba(0,0,0,0.95),
-        0 0 48px rgba(201, 169, 106, 0.1);
+        0 0 48px rgba(201, 169, 106, 0.12);
 }
 
 .reading-lists-intro {
-    max-width: 720px;
+    max-width: 760px;
     margin: 28px 0 0;
     color: rgba(255,255,255,0.82);
     font-size: 1.12rem;
@@ -3146,7 +3163,7 @@ body.reading-lists-page {
 }
 
 .reading-lists-disclosure {
-    max-width: 720px;
+    max-width: 760px;
     margin: 22px 0 0;
     color: rgba(255,255,255,0.5);
     font-family: Arial, Helvetica, sans-serif;
@@ -3154,12 +3171,15 @@ body.reading-lists-page {
     line-height: 1.7;
 }
 
+/* MAIN BOOKSHOP SHELVES */
+
 .bookshop-list-block {
     width: min(100%, 1080px);
     margin: 0 auto 54px;
     padding: clamp(24px, 4vw, 42px);
     border: 1px solid rgba(201, 169, 106, 0.16);
     background:
+        radial-gradient(circle at top left, rgba(201, 169, 106, 0.055), transparent 36%),
         linear-gradient(145deg, rgba(0,0,0,0.78), rgba(12,11,10,0.58));
     box-shadow: 0 24px 80px rgba(0,0,0,0.42);
 }
@@ -3185,11 +3205,115 @@ body.reading-lists-page {
     line-height: 1.8;
 }
 
+/* BOOKSHOP WIDGET AREA */
+
 .bookshop-widget-shell {
     overflow: hidden;
     padding: 18px;
     border: 1px solid rgba(201, 169, 106, 0.14);
-    background: rgba(0,0,0,0.38);
+    background:
+        linear-gradient(180deg, rgba(255,255,255,0.012), rgba(0,0,0,0.22)),
+        rgba(0,0,0,0.38);
+}
+
+/* WORKING SHELF — SEPARATE FROM BLACKWOOD FICTION MOOD */
+
+.bookshop-working-shelf {
+    width: min(100%, 1080px);
+    margin: 90px auto 70px;
+    padding: clamp(28px, 4vw, 46px);
+    border: 1px solid rgba(201, 169, 106, 0.13);
+    background:
+        linear-gradient(145deg, rgba(201, 169, 106, 0.035), transparent),
+        rgba(255, 255, 255, 0.01);
+    box-shadow: 0 22px 70px rgba(0,0,0,0.36);
+}
+
+.bookshop-working-intro {
+    max-width: 720px;
+    margin: 0 auto 34px;
+    text-align: center;
+}
+
+.bookshop-working-intro h2 {
+    margin: 0 0 18px;
+    color: #fff;
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1.1;
+    font-weight: normal;
+    letter-spacing: 0.025em;
+}
+
+.bookshop-working-intro p:not(.bookshop-list-kicker) {
+    margin: 0;
+    color: rgba(255,255,255,0.68);
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+/* FOOTER NOTE */
+
+.reading-lists-footer-note {
+    width: min(100%, 1080px);
+    margin: 70px auto 0;
+    color: rgba(255,255,255,0.34);
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+    body.reading-lists-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(201, 169, 106, 0.1), transparent 34%),
+            linear-gradient(180deg, rgba(0,0,0,0.88), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #050505;
+    }
+
+    .reading-lists-wrap {
+        padding: 112px 14px 58px;
+    }
+
+    .reading-lists-hero {
+        margin-bottom: 44px;
+        padding: 32px 22px;
+    }
+
+    .reading-lists-title {
+        font-size: clamp(2.8rem, 15vw, 4.4rem);
+    }
+
+    .reading-lists-intro {
+        font-size: 1rem;
+        line-height: 1.72;
+    }
+
+    .bookshop-list-block {
+        padding: 26px 18px;
+        margin-bottom: 34px;
+    }
+
+    .bookshop-list-copy h2 {
+        font-size: 2rem;
+    }
+
+    .bookshop-widget-shell {
+        padding: 10px;
+    }
+
+    .bookshop-working-shelf {
+        margin: 64px auto 54px;
+        padding: 32px 20px;
+    }
+
+    .bookshop-working-intro h2 {
+        font-size: 2rem;
+    }
 }
 /* =========================================
    HOLDFAST — UNLOCKED PRE-ORDER PANEL
