@@ -6,175 +6,234 @@
 
 <title>Independent Works | Blackwood Publishing</title>
 
-<meta name="description" content="Independent works rooted in place, memory, and psychological tension.">
+<meta name="description" content="Independent works from Blackwood Publishing rooted in place, memory, psychological tension, haunting landscapes, and the quiet persistence of what remains.">
 
-<link rel="stylesheet" href="/css/header.css">
-<link rel="stylesheet" href="/css/styles.css">
-
-<style>
-/* Make Independent Works grid 4 across */
-.works-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(180px, 1fr));
-    gap: 40px;
-    max-width: 1120px;
-    margin: 0 auto;
-    align-items: start;
-}
-
-.work {
-    text-align: center;
-}
-
-.work img {
-    width: 100%;
-    max-width: 240px;
-    height: auto;
-    display: block;
-    margin: 0 auto 26px;
-}
-
-.work span {
-    display: block;
-}
-
-/* Tablet */
-@media (max-width: 1050px) {
-    .works-grid {
-        grid-template-columns: repeat(2, minmax(220px, 1fr));
-        max-width: 720px;
-        gap: 50px;
-    }
-}
-
-/* Mobile */
-@media (max-width: 600px) {
-    .works-grid {
-        grid-template-columns: 1fr;
-        max-width: 320px;
-        gap: 46px;
-    }
-
-    .work img {
-        max-width: 260px;
-    }
-}
-</style>
+<link rel="stylesheet" href="/css/header.css?v=20260712">
+<link rel="stylesheet" href="/css/styles.css?v=20260712">
 
 </head>
 
-<body class="sub-page">
+<body class="sub-page standalone-page">
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
 
-<main>
-
 <!-- HERO -->
-<section class="about-hero">
+<section class="about-hero standalone-hero">
 
     <div class="about-hero-overlay"></div>
 
     <div class="about-hero-content fade-in">
-        <h1>Independent Works</h1>
-        <p class="about-intro-line">Rooted in place, memory, and psychological tension.</p>
+        <p class="about-intro-line">Independent Works</p>
+
+        <h1>Standalone Records</h1>
+
+        <p class="standalone-hero-subline">
+            Rooted in place, memory, psychological tension, and the quiet persistence of what remains.
+        </p>
     </div>
 
 </section>
 
-<!-- CONTENT -->
-<section class="about-section">
+<main class="standalone-wrap">
 
     <!-- INTRO -->
-    <div class="fade-in" style="max-width:650px; margin:0 auto 70px; text-align:center;">
+    <section class="standalone-intro fade-in" aria-labelledby="standalone-intro-title">
 
-        <p>
-            These works stand alone, shaped by atmosphere and the quiet persistence of what remains.
+        <p class="standalone-kicker">Independent Works</p>
+
+        <h2 id="standalone-intro-title">
+            Separate stories. Familiar unease.
+        </h2>
+
+        <p class="standalone-quote">
+            “Some houses remember. Some records refuse to close.”
         </p>
 
-        <!-- 🔥 STANDALONE REVIEW -->
         <div class="review-snippet fade-in" data-book="standalone"></div>
 
-    </div>
+        <p>
+            These works stand outside the main series, but remain shaped by atmosphere,
+            memory, landscape, damage, and the things people try to leave behind.
+        </p>
 
-    <!-- WORKS GRID -->
-    <div class="works-grid">
+        <p>
+            Some are fictional records. One is practical. One is drawn from lived experience.
+            All belong to the wider Blackwood shelf.
+        </p>
 
-        <!-- BOOK 1 -->
-        <a href="https://mybook.to/DourHillHouse" target="_blank" rel="noopener noreferrer" class="work">
-            <img src="/assets/book1.jpg" alt="Dour Hill House book cover">
-            <span><em>Dour Hill House</em></span>
+    </section>
 
-            <div class="work-desc">
-                When Clara inherits Dour Hill House, she hopes for a new beginning.
-                Instead, her daughter whispers to the mirror and something whispers back.
+    <!-- WORKS -->
+    <section class="standalone-sequence fade-in" aria-labelledby="standalone-records-title">
 
-                <div class="mini-review">
-                    “A haunting tale… intense and atmospheric.”
+        <p class="standalone-kicker">The Records</p>
+
+        <h2 id="standalone-records-title">
+            Independent Works
+        </h2>
+
+        <div class="standalone-grid">
+
+            <!-- DOUR HILL HOUSE -->
+            <article class="standalone-card standalone-card-featured">
+
+                <div class="standalone-card-cover">
+                    <img src="/assets/book1.jpg" loading="lazy" alt="Dour Hill House book cover">
                 </div>
-            </div>
-        </a>
 
-        <!-- BOOK 2 -->
-        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" rel="noopener noreferrer" class="work">
-            <img src="/assets/book11.png" alt="The Red-Clad Collector book cover">
-            <span><em>The Red-Clad Collector</em></span>
+                <div class="standalone-card-copy">
+                    <p class="standalone-card-number">Fiction</p>
 
-            <div class="work-desc">
-                Every Christmas, a child disappears. No footprints. No explanation.
-                Just one less memory.
+                    <h3>Dour Hill House</h3>
 
-                <div class="mini-review">
-                    “Creepy, unsettling, and stays with you.”
+                    <p>
+                        When Clara inherits Dour Hill House, she hopes for a new beginning.
+                        Instead, her daughter whispers to the mirror, and something whispers back.
+                    </p>
+
+                    <div class="mini-review">
+                        “A haunting tale… intense and atmospheric.”
+                    </div>
+
+                    <div class="standalone-card-actions">
+                        <a href="https://mybook.to/DourHillHouse" target="_blank" rel="noopener noreferrer" class="button copper">
+                            Read Dour Hill House
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </a>
 
-        <!-- BOOK 3 -->
-        <a href="https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF" target="_blank" rel="noopener noreferrer" class="work">
-            <img src="/assets/book15.jpg" alt="Love, Abused book cover">
-            <span><em>Love, Abused</em></span>
+            </article>
 
-            <div class="work-desc">
-                A work of narrative nonfiction examining how a child’s life becomes a record.
-                What is observed, documented, and ultimately missed.
-            </div>
-        </a>
+            <!-- THE RED-CLAD COLLECTOR -->
+            <article class="standalone-card">
 
-        <!-- BOOK 4 -->
-        <a href="https://blackwoodpublishing.co.uk/pages/soletrader.html" class="work">
-            <img src="/assets/book14.jpg" alt="Accountancy for Sole Traders book cover">
-            <span><em>Accountancy for Sole Traders</em></span>
-
-            <div class="work-desc">
-                A practical guide for sole traders, small business owners, students, and anyone
-                wanting a clearer understanding of business records and bookkeeping.
-
-                <div class="mini-review">
-                    “Clear, practical, and built for everyday use.”
+                <div class="standalone-card-cover">
+                    <img src="/assets/book11.png" loading="lazy" alt="The Red-Clad Collector book cover">
                 </div>
-            </div>
-        </a>
 
-    </div>
+                <div class="standalone-card-copy">
+                    <p class="standalone-card-number">Christmas Horror</p>
+
+                    <h3>The Red-Clad Collector</h3>
+
+                    <p>
+                        Every Christmas, a child disappears. No footprints. No explanation.
+                        Just one less memory.
+                    </p>
+
+                    <div class="mini-review">
+                        “Creepy, unsettling, and stays with you.”
+                    </div>
+
+                    <div class="standalone-card-actions">
+                        <a href="https://www.amazon.co.uk/dp/B0G76MRK8R" target="_blank" rel="noopener noreferrer" class="button copper">
+                            Read The Red-Clad Collector
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+
+            <!-- LOVE, ABUSED -->
+            <article class="standalone-card standalone-card-sensitive">
+
+                <div class="standalone-card-cover">
+                    <img src="/assets/book15.jpg" loading="lazy" alt="Love, Abused book cover">
+                </div>
+
+                <div class="standalone-card-copy">
+                    <p class="standalone-card-number">Narrative Nonfiction</p>
+
+                    <h3>Love, Abused</h3>
+
+                    <p>
+                        A work of narrative nonfiction examining how a child’s life becomes a record:
+                        what is observed, documented, and ultimately missed.
+                    </p>
+
+                    <p class="standalone-card-note">
+                        Contains references to childhood neglect, abuse, and systemic failure.
+                    </p>
+
+                    <div class="standalone-card-actions">
+                        <a href="https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF" target="_blank" rel="noopener noreferrer" class="button copper">
+                            Read Love, Abused
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+
+            <!-- ACCOUNTANCY FOR SOLE TRADERS -->
+            <article class="standalone-card standalone-card-practical">
+
+                <div class="standalone-card-cover">
+                    <img src="/assets/book14.jpg" loading="lazy" alt="Accountancy for Sole Traders book cover">
+                </div>
+
+                <div class="standalone-card-copy">
+                    <p class="standalone-card-number">Practical Guide</p>
+
+                    <h3>Accountancy for Sole Traders</h3>
+
+                    <p>
+                        A practical guide for sole traders, small business owners, students,
+                        and anyone wanting a clearer understanding of business records and bookkeeping.
+                    </p>
+
+                    <div class="mini-review">
+                        “Clear, practical, and built for everyday use.”
+                    </div>
+
+                    <div class="standalone-card-actions">
+                        <a href="/pages/soletrader.html" class="button copper">
+                            View Guide
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
 
     <!-- CONTENT NOTE -->
-    <div class="fade-in" style="max-width:600px; margin:60px auto 0; text-align:center;">
-        <p style="font-size:13px; opacity:0.6;">
-            <em>Love, Abused</em> contains references to childhood neglect, abuse, and systemic failure. It is not graphic but may be emotionally difficult for some readers.
+    <section class="standalone-note fade-in" aria-label="Content note">
+        <p>
+            <em>Love, Abused</em> contains references to childhood neglect, abuse, and systemic failure.
+            It is not graphic, but it may be emotionally difficult for some readers.
         </p>
-    </div>
+    </section>
 
-</section>
+    <!-- ROUTES -->
+    <nav class="standalone-routes fade-in" aria-label="Independent Works related routes">
+
+        <a href="/pages/start-here.html" class="standalone-route-card">
+            <span>New to Blackwood?</span>
+            <strong>Start Here</strong>
+        </a>
+
+        <a href="/pages/publications.html" class="standalone-route-card">
+            <span>All Publications</span>
+            <strong>The Works</strong>
+        </a>
+
+        <a href="/pages/contact.html" class="standalone-route-card">
+            <span>Correspondence</span>
+            <strong>Contact</strong>
+        </a>
+
+    </nav>
 
 </main>
 
 <!-- FOOTER -->
-<div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260408" defer></script>
+<script src="/js/header.js?v=20260712" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
@@ -186,7 +245,9 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    if (typeof initFadeIn === "function") initFadeIn();
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
 
 });
 </script>
