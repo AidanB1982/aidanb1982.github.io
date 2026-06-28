@@ -49,6 +49,12 @@ window.addEventListener("load", async () => {
         }
     }
 
+    function revealTransmission() {
+        if (transmissionPanel) {
+            transmissionPanel.classList.add("is-visible");
+        }
+    }
+
     function revealPrologue() {
         if (!prologuePanel) return;
 
@@ -59,6 +65,21 @@ window.addEventListener("load", async () => {
         });
     }
 
+    function lockFormAfterSuccess() {
+        if (input) {
+            input.setAttribute("disabled", "disabled");
+        }
+
+        if (!form) return;
+
+        const submitButton = form.querySelector(".access-button");
+
+        if (submitButton) {
+            submitButton.setAttribute("disabled", "disabled");
+            submitButton.textContent = "Designation Accepted";
+        }
+    }
+
     function grantAccess() {
         if (status) {
             status.textContent = "Access granted";
@@ -67,24 +88,9 @@ window.addEventListener("load", async () => {
 
         setMessage("File designation accepted. Transmission unlocked.", "is-success");
 
-        if (transmissionPanel) {
-            transmissionPanel.classList.add("is-visible");
-        }
-
+        revealTransmission();
         revealPrologue();
-
-        if (input) {
-            input.setAttribute("disabled", "disabled");
-        }
-
-        if (form) {
-            const submitButton = form.querySelector(".access-button");
-
-            if (submitButton) {
-                submitButton.setAttribute("disabled", "disabled");
-                submitButton.textContent = "Designation Accepted";
-            }
-        }
+        lockFormAfterSuccess();
 
         sessionStorage.setItem(STORAGE_KEY, "true");
     }
@@ -95,22 +101,22 @@ window.addEventListener("load", async () => {
             "is-error"
         );
 
-        if (input) {
-            input.setAttribute("aria-invalid", "true");
+        if (!input) return;
 
-            input.animate(
-                [
-                    { transform: "translateX(0)" },
-                    { transform: "translateX(-7px)" },
-                    { transform: "translateX(7px)" },
-                    { transform: "translateX(0)" }
-                ],
-                {
-                    duration: 240,
-                    easing: "ease-out"
-                }
-            );
-        }
+        input.setAttribute("aria-invalid", "true");
+
+        input.animate(
+            [
+                { transform: "translateX(0)" },
+                { transform: "translateX(-7px)" },
+                { transform: "translateX(7px)" },
+                { transform: "translateX(0)" }
+            ],
+            {
+                duration: 240,
+                easing: "ease-out"
+            }
+        );
     }
 
     function sealArchive() {
@@ -229,26 +235,33 @@ window.addEventListener("load", async () => {
             ? focusNode.parentElement
             : focusNode;
 
-        return Boolean(
+        const anchorIsLocked = Boolean(
             anchorElement &&
             typeof anchorElement.closest === "function" &&
             anchorElement.closest(".locked-reading")
-        ) || Boolean(
+        );
+
+        const focusIsLocked = Boolean(
             focusElement &&
             typeof focusElement.closest === "function" &&
             focusElement.closest(".locked-reading")
         );
+
+        return anchorIsLocked || focusIsLocked;
+    }
+
+    function clearSelection() {
+        const selection = window.getSelection();
+
+        if (selection) {
+            selection.removeAllRanges();
+        }
     }
 
     function blockLockedReadingAction(event) {
         if (closestLockedReadingFromEvent(event) || selectionTouchesLockedReading()) {
             event.preventDefault();
-
-            const selection = window.getSelection();
-
-            if (selection) {
-                selection.removeAllRanges();
-            }
+            clearSelection();
         }
     }
 
@@ -264,22 +277,13 @@ window.addEventListener("load", async () => {
 
         if ((isCopy || isPrint) && selectionTouchesLockedReading()) {
             event.preventDefault();
-
-            const selection = window.getSelection();
-
-            if (selection) {
-                selection.removeAllRanges();
-            }
+            clearSelection();
         }
     });
 
     document.addEventListener("selectionchange", function () {
         if (selectionTouchesLockedReading()) {
-            const selection = window.getSelection();
-
-            if (selection) {
-                selection.removeAllRanges();
-            }
+            clearSelection();
         }
     });
 })();
