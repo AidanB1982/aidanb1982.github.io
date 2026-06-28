@@ -17,7 +17,6 @@ async function loadHeader(type = "hero") {
     const file = fileMap[type] || "header.html";
 
     try {
-        const isSubPage = window.location.pathname.includes("/pages/");
         const base = "/";
 
         console.log("Fetching:", `${base}${file}`);
@@ -31,6 +30,7 @@ async function loadHeader(type = "hero") {
 
         if (headerContainer) {
             headerContainer.innerHTML = headerHTML;
+            initBlackwoodDropdownNav(headerContainer);
         }
 
         // FOOTER
@@ -50,12 +50,179 @@ async function loadHeader(type = "hero") {
         initFadeIn();
         initSpotlight();
         initGlobalLighting();
-        initQuotes(); // section 2
-        initReviewRotator(); // section 3
+        initQuotes();
+        initReviewRotator();
 
     } catch (err) {
         console.error("Layout load failed:", err);
     }
+}
+
+
+// =========================
+// BLACKWOOD DROPDOWN NAV
+// Works for both header.html and header-simple.html
+// =========================
+function initBlackwoodDropdownNav(headerContainer) {
+
+    if (!headerContainer) return;
+
+    const existingNav =
+        headerContainer.querySelector("nav") ||
+        headerContainer.querySelector(".nav") ||
+        headerContainer.querySelector(".main-nav") ||
+        headerContainer.querySelector(".site-nav") ||
+        headerContainer.querySelector(".hero-nav") ||
+        headerContainer.querySelector(".simple-nav") ||
+        headerContainer.querySelector(".header-nav") ||
+        headerContainer.querySelector(".nav-links");
+
+    if (!existingNav) {
+        console.warn("Blackwood nav not found. Dropdown nav was not injected.");
+        return;
+    }
+
+    existingNav.classList.add("blackwood-nav");
+    existingNav.setAttribute("aria-label", "Main navigation");
+
+    existingNav.innerHTML = `
+        <a href="/" class="blackwood-nav-link">Home</a>
+
+        <a href="/pages/start-here.html" class="blackwood-nav-link">Start Here</a>
+
+        <div class="blackwood-nav-item has-dropdown">
+            <button
+                class="blackwood-nav-link blackwood-dropdown-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-haspopup="true"
+            >
+                The Works
+                <span class="dropdown-mark" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="blackwood-dropdown" role="menu">
+                <a href="/pages/publications.html" role="menuitem">All Works</a>
+                <a href="/pages/archive-files.html" role="menuitem">The Archive Files</a>
+                <a href="/pages/cursed-bothies.html" role="menuitem">The Cursed Bothies</a>
+                <a href="/pages/hard-silence.html" role="menuitem">Hard Silence</a>
+                <a href="/pages/standalone.html" role="menuitem">Independent Works</a>
+                <a href="/pages/LimitedEditions.html" role="menuitem">Limited Editions</a>
+            </div>
+        </div>
+
+        <a href="/pages/holdfast.html" class="blackwood-nav-link">Holdfast</a>
+
+        <div class="blackwood-nav-item has-dropdown">
+            <button
+                class="blackwood-nav-link blackwood-dropdown-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-haspopup="true"
+            >
+                Reading
+                <span class="dropdown-mark" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="blackwood-dropdown" role="menu">
+                <a href="/pages/reading-lists.html" role="menuitem">Reading Lists</a>
+                <a href="/pages/editors-picks.html" role="menuitem">Marked for Record</a>
+            </div>
+        </div>
+
+        <div class="blackwood-nav-item has-dropdown">
+            <button
+                class="blackwood-nav-link blackwood-dropdown-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-haspopup="true"
+            >
+                About
+                <span class="dropdown-mark" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="blackwood-dropdown" role="menu">
+                <a href="/pages/author.html" role="menuitem">Author</a>
+                <a href="/pages/about.html" role="menuitem">About Blackwood</a>
+                <a href="/pages/contact.html" role="menuitem">Contact</a>
+            </div>
+        </div>
+
+        <a href="/pages/CommunitySpotlight.html" class="blackwood-nav-link">Community</a>
+    `;
+
+    const dropdownItems = existingNav.querySelectorAll(".has-dropdown");
+
+    function closeAllDropdowns() {
+        dropdownItems.forEach((item) => {
+            const button = item.querySelector(".blackwood-dropdown-toggle");
+
+            item.classList.remove("is-open");
+
+            if (button) {
+                button.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
+
+    dropdownItems.forEach((item) => {
+
+        const button = item.querySelector(".blackwood-dropdown-toggle");
+        const dropdown = item.querySelector(".blackwood-dropdown");
+
+        if (!button || !dropdown) return;
+
+        button.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const isOpen = item.classList.contains("is-open");
+
+            closeAllDropdowns();
+
+            item.classList.toggle("is-open", !isOpen);
+            button.setAttribute("aria-expanded", String(!isOpen));
+        });
+
+        button.addEventListener("keydown", (event) => {
+
+            if (event.key === "Escape") {
+                item.classList.remove("is-open");
+                button.setAttribute("aria-expanded", "false");
+                button.focus();
+            }
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+
+                closeAllDropdowns();
+
+                item.classList.add("is-open");
+                button.setAttribute("aria-expanded", "true");
+
+                const firstDropdownLink = dropdown.querySelector("a");
+
+                if (firstDropdownLink) {
+                    firstDropdownLink.focus();
+                }
+            }
+        });
+
+        dropdown.addEventListener("keydown", (event) => {
+
+            if (event.key === "Escape") {
+                item.classList.remove("is-open");
+                button.setAttribute("aria-expanded", "false");
+                button.focus();
+            }
+        });
+    });
+
+    document.addEventListener("click", closeAllDropdowns);
+
+    existingNav.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
 }
 
 
@@ -93,7 +260,7 @@ function initGlobalLighting() {
 
 
 // =========================
-// SCROLL FADE SYSTEM (DEDUPED)
+// SCROLL FADE SYSTEM
 // =========================
 function initScrollFade() {
 
@@ -101,13 +268,12 @@ function initScrollFade() {
 
     function update() {
 
-        const featured = document.querySelector('.featured');
-        const hero = document.querySelector('.hero');
-        const works = document.querySelector('.works');
+        const featured = document.querySelector(".featured");
+        const hero = document.querySelector(".hero");
+        const works = document.querySelector(".works");
 
         let progress = 0;
 
-        // FEATURED FADE
         if (featured) {
             const rect = featured.getBoundingClientRect();
 
@@ -117,15 +283,13 @@ function initScrollFade() {
             progress = (start - rect.top) / (start - end);
             progress = Math.max(0, Math.min(1, progress));
 
-            featured.style.setProperty('--fadeIn', progress);
+            featured.style.setProperty("--fadeIn", progress);
         }
 
-        // HERO FADE
         if (hero) {
-            hero.style.setProperty('--fadeOut', progress * 0.8);
+            hero.style.setProperty("--fadeOut", progress * 0.8);
         }
 
-        // WORKS FADE
         if (works) {
             const rect = works.getBoundingClientRect();
 
@@ -135,13 +299,13 @@ function initScrollFade() {
             let fade = (start - rect.top) / (start - end);
             fade = Math.max(0, Math.min(1, fade));
 
-            works.style.setProperty('--sectionFade', fade);
+            works.style.setProperty("--sectionFade", fade);
         }
 
         ticking = false;
     }
 
-    window.addEventListener('scroll', () => {
+    window.addEventListener("scroll", () => {
         if (!ticking) {
             requestAnimationFrame(update);
             ticking = true;
@@ -157,7 +321,7 @@ function initScrollFade() {
 // =========================
 function initEntity() {
 
-    const entity = document.querySelector('.entity');
+    const entity = document.querySelector(".entity");
     if (!entity) return;
 
     function triggerEntity() {
@@ -166,12 +330,12 @@ function initEntity() {
 
         setTimeout(() => {
 
-            entity.classList.add('active');
+            entity.classList.add("active");
 
             const visibleTime = Math.random() * 3000 + 2000;
 
             setTimeout(() => {
-                entity.classList.remove('active');
+                entity.classList.remove("active");
                 triggerEntity();
             }, visibleTime);
 
@@ -187,14 +351,16 @@ function initEntity() {
 // =========================
 function initFadeIn() {
 
-    const elements = document.querySelectorAll('.fade-in, .work');
+    const elements = document.querySelectorAll(".fade-in, .work");
+
+    if (!elements.length) return;
 
     const observer = new IntersectionObserver((entries) => {
 
         entries.forEach((entry) => {
 
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+                entry.target.classList.add("visible");
                 observer.unobserve(entry.target);
             }
         });
@@ -213,22 +379,24 @@ function initFadeIn() {
 // =========================
 function initSpotlight() {
 
-    const works = document.querySelector('.works');
+    const works = document.querySelector(".works");
     if (!works) return;
 
-    works.addEventListener('mousemove', (e) => {
+    works.addEventListener("mousemove", (e) => {
 
         const rect = works.getBoundingClientRect();
 
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-        works.style.setProperty('--mouse-x', `${x}%`);
-        works.style.setProperty('--mouse-y', `${y}%`);
+        works.style.setProperty("--mouse-x", `${x}%`);
+        works.style.setProperty("--mouse-y", `${y}%`);
     });
 }
+
+
 // =========================
-// BACKGROUND QUOTES SYSTEM (CLEAN)
+// BACKGROUND QUOTES SYSTEM
 // =========================
 function initQuotes() {
 
@@ -253,12 +421,8 @@ function initQuotes() {
 
     const watcher = document.getElementById("quote-watcher");
 
-    // FAIL SAFE
     if (fragments.some(el => !el) || !watcher) return;
 
-    // =========================
-    // TEXT RENDER
-    // =========================
     function renderText(el, text) {
 
         el.innerHTML = "";
@@ -270,14 +434,12 @@ function initQuotes() {
             const span = document.createElement("span");
 
             const clean = word.toLowerCase().replace(/[.?]/g, "");
-
             const emphasisWords = ["remember", "alone", "wrong", "watches", "empty", "back"];
 
             span.className = emphasisWords.includes(clean)
                 ? "word emphasis"
                 : "word";
 
-            // subtle randomness
             if (Math.random() < 0.35) {
                 span.classList.add("distort");
             }
@@ -289,9 +451,6 @@ function initQuotes() {
         });
     }
 
-    // =========================
-    // FLOATING FRAGMENTS
-    // =========================
     let lastIndex = -1;
 
     function updateFragment() {
@@ -305,10 +464,8 @@ function initQuotes() {
         lastIndex = index;
 
         const el = fragments[index];
-
         const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
-        // RANDOM POSITION
         const side = Math.random() < 0.5 ? "left" : "right";
         const top = Math.random() * 70 + 10;
         const offset = Math.random() * 10 + 5;
@@ -323,12 +480,11 @@ function initQuotes() {
 
         el.style.top = `${top}%`;
 
-        // ROTATION
         const rotation = (Math.random() - 0.5) * 6;
-        el.style.setProperty('--rot', `${rotation}deg`);
+        el.style.setProperty("--rot", `${rotation}deg`);
 
-        // ANIMATION VARIATION
-        el.style.animationDuration = `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
+        el.style.animationDuration =
+            `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
 
         renderText(el, quote);
     }
@@ -340,9 +496,6 @@ function initQuotes() {
         setTimeout(loopFragments, next);
     }
 
-    // =========================
-    // WATCHER (CREEPY CENTER TEXT)
-    // =========================
     function triggerWatcher() {
 
         const text = quotes[Math.floor(Math.random() * quotes.length)];
@@ -360,7 +513,6 @@ function initQuotes() {
 
         document.addEventListener("mousemove", move);
 
-        // GLITCH BURSTS
         const glitchInterval = setInterval(() => {
             watcher.classList.add("glitch");
 
@@ -370,7 +522,6 @@ function initQuotes() {
 
         }, Math.random() * 2000 + 1000);
 
-        // DECAY FLASH
         setTimeout(() => {
             watcher.classList.add("decay");
 
@@ -379,7 +530,6 @@ function initQuotes() {
             }, 700);
         }, Math.random() * 2500 + 1500);
 
-        // DISAPPEAR
         setTimeout(() => {
             watcher.style.opacity = 0;
             document.removeEventListener("mousemove", move);
@@ -387,9 +537,6 @@ function initQuotes() {
         }, 4000);
     }
 
-    // =========================
-    // START SYSTEM
-    // =========================
     updateFragment();
     updateFragment();
 
@@ -401,305 +548,108 @@ function initQuotes() {
         }
     }, 6000);
 }
+
+
 // =========================
-// REVIEW ROTATOR (BOOK-AWARE, MULTI-CONTAINER)
+// REVIEW ROTATOR
 // =========================
 function initReviewRotator() {
 
     const containers = document.querySelectorAll(".review-snippet");
     if (!containers.length) return;
 
-    // =========================
-    // REVIEW DATA (BY BOOK)
-    // =========================
     const reviews = {
 
         corrour: [
-            {
-                text: "This book didn’t just tell a story. It gave me feelings I cannot shake.",
-                source: "Reader Review"
-            },
-            {
-                text: "Slow, insidious unraveling that never lets you feel safe.",
-                source: "Reader Review"
-            },
-            {
-                text: "The landscape feels alive. Watching. Waiting.",
-                source: "Reader Review"
-            },
-            {
-                text: "It gets into your bones like the cold.",
-                source: "Reader Review"
-            },
-            {
-                text: "An eerie, isolated nightmare that unsettles more with what it doesn’t explain.",
-                source: "Reader Review"
-            },
-            {
-                text: "Atmosphere so thick you feel trapped in the bothy with them.",
-                source: "Reader Review"
-            },
-            {
-                text: "Short, clipped tension that builds into something deeply unsettling.",
-                source: "Reader Review"
-            },
-            {
-                text: "A slow-burn horror where the setting becomes something far more sinister.",
-                source: "Reader Review"
-            },
-            {
-                text: "Relentless unease from the first page, never letting you fully relax.",
-                source: "Reader Review"
-            },
-            {
-                text: "Silence, isolation, and dread woven into every page.",
-                source: "Reader Review"
-            },
-            {
-                text: "Creeping terror that lingers long after the final twist.",
-                source: "Reader Review"
-            },
-            {
-                text: "An oppressive, desolate setting that makes escape feel impossible.",
-                source: "Reader Review"
-            },
-            {
-                text: "Disturbing, atmospheric horror that thrives on ambiguity.",
-                source: "Reader Review"
-            },
-            {
-                text: "A chilling premise elevated by tension, restraint, and a haunting finish.",
-                source: "Reader Review"
-            },
-            {
-                text: "Unnerving, immersive, and deeply claustrophobic.",
-                source: "Reader Review"
-            },
-            {
-                text: "A haunting, slow-build story where fear seeps in from every direction.",
-                source: "Reader Review"
-            }
+            { text: "This book didn’t just tell a story. It gave me feelings I cannot shake.", source: "Reader Review" },
+            { text: "Slow, insidious unraveling that never lets you feel safe.", source: "Reader Review" },
+            { text: "The landscape feels alive. Watching. Waiting.", source: "Reader Review" },
+            { text: "It gets into your bones like the cold.", source: "Reader Review" },
+            { text: "An eerie, isolated nightmare that unsettles more with what it doesn’t explain.", source: "Reader Review" },
+            { text: "Atmosphere so thick you feel trapped in the bothy with them.", source: "Reader Review" },
+            { text: "Short, clipped tension that builds into something deeply unsettling.", source: "Reader Review" },
+            { text: "A slow-burn horror where the setting becomes something far more sinister.", source: "Reader Review" },
+            { text: "Relentless unease from the first page, never letting you fully relax.", source: "Reader Review" },
+            { text: "Silence, isolation, and dread woven into every page.", source: "Reader Review" },
+            { text: "Creeping terror that lingers long after the final twist.", source: "Reader Review" },
+            { text: "An oppressive, desolate setting that makes escape feel impossible.", source: "Reader Review" },
+            { text: "Disturbing, atmospheric horror that thrives on ambiguity.", source: "Reader Review" },
+            { text: "A chilling premise elevated by tension, restraint, and a haunting finish.", source: "Reader Review" },
+            { text: "Unnerving, immersive, and deeply claustrophobic.", source: "Reader Review" },
+            { text: "A haunting, slow-build story where fear seeps in from every direction.", source: "Reader Review" }
         ],
 
         archive: [
-            {
-                text: "Creepy, atmospheric read. I finished one and started the next immediately.",
-                source: "Reader Review"
-            },
-            {
-                text: "It gets under your skin. No cheap scares, just a steady unraveling.",
-                source: "Reader Review"
-            },
-            {
-                text: "A gripping, slow-burn descent that’s impossible to put down.",
-                source: "Reader Review"
-            },
-            {
-                text: "Atmosphere so vivid it pulls you straight into the cold, silent landscape.",
-                source: "Reader Review"
-            },
-            {
-                text: "Creeping dread that builds quietly, then refuses to let go.",
-                source: "Reader Review"
-            },
-            {
-                text: "A haunting exploration of memory, loss, and things that shouldn’t be forgotten.",
-                source: "Reader Review"
-            },
-            {
-                text: "Unsettling, disorienting, and deeply immersive.",
-                source: "Reader Review"
-            },
-            {
-                text: "A tense, labyrinthine story that keeps circling back in unexpected ways.",
-                source: "Reader Review"
-            },
-            {
-                text: "Quiet horror that seeps in slowly and lingers long after.",
-                source: "Reader Review"
-            },
-            {
-                text: "An eerie, thought-provoking journey where nothing feels entirely real.",
-                source: "Reader Review"
-            },
-            {
-                text: "Claustrophobic, cold, and filled with a constant sense of being watched.",
-                source: "Reader Review"
-            },
-            {
-                text: "A chilling blend of psychological depth and creeping supernatural dread.",
-                source: "Reader Review"
-            },
-            {
-                text: "Unnerving and atmospheric, with tension that never fully releases.",
-                source: "Reader Review"
-            },
-            {
-                text: "A story that gets under your skin and stays there.",
-                source: "Reader Review"
-            },
-            {
-                text: "Bleak, beautiful, and quietly terrifying.",
-                source: "Reader Review"
-            },
-            {
-                text: "A compulsive read that pulls you deeper with every page.",
-                source: "Reader Review"
-            }
+            { text: "Creepy, atmospheric read. I finished one and started the next immediately.", source: "Reader Review" },
+            { text: "It gets under your skin. No cheap scares, just a steady unraveling.", source: "Reader Review" },
+            { text: "A gripping, slow-burn descent that’s impossible to put down.", source: "Reader Review" },
+            { text: "Atmosphere so vivid it pulls you straight into the cold, silent landscape.", source: "Reader Review" },
+            { text: "Creeping dread that builds quietly, then refuses to let go.", source: "Reader Review" },
+            { text: "A haunting exploration of memory, loss, and things that shouldn’t be forgotten.", source: "Reader Review" },
+            { text: "Unsettling, disorienting, and deeply immersive.", source: "Reader Review" },
+            { text: "A tense, labyrinthine story that keeps circling back in unexpected ways.", source: "Reader Review" },
+            { text: "Quiet horror that seeps in slowly and lingers long after.", source: "Reader Review" },
+            { text: "An eerie, thought-provoking journey where nothing feels entirely real.", source: "Reader Review" },
+            { text: "Claustrophobic, cold, and filled with a constant sense of being watched.", source: "Reader Review" },
+            { text: "A chilling blend of psychological depth and creeping supernatural dread.", source: "Reader Review" },
+            { text: "Unnerving and atmospheric, with tension that never fully releases.", source: "Reader Review" },
+            { text: "A story that gets under your skin and stays there.", source: "Reader Review" },
+            { text: "Bleak, beautiful, and quietly terrifying.", source: "Reader Review" },
+            { text: "A compulsive read that pulls you deeper with every page.", source: "Reader Review" }
         ],
 
         "hard-silence": [
-            {
-                text: "A gripping thriller — raw, brutal and unflinching.",
-                source: "Reader Review"
-            },
-            {
-                text: "Very dark and menacing, but addictive in its own way.",
-                source: "Reader Review"
-            },
-            {
-                text: "A brutal, tension-filled thriller that grips from the first page to the last.",
-                source: "Reader Review"
-            },
-            {
-                text: "Dark, violent, and relentlessly suspenseful.",
-                source: "Reader Review"
-            },
-            {
-                text: "A raw and unflinching story of revenge that doesn’t pull its punches.",
-                source: "Reader Review"
-            },
-            {
-                text: "Gritty, intense, and emotionally charged.",
-                source: "Reader Review"
-            },
-            {
-                text: "A slow-burning descent into vengeance and isolation.",
-                source: "Reader Review"
-            },
-            {
-                text: "Uncompromising, menacing, and impossible to ignore.",
-                source: "Reader Review"
-            },
-            {
-                text: "A gripping, hard-hitting read that keeps the tension high throughout.",
-                source: "Reader Review"
-            },
-            {
-                text: "Violent, atmospheric, and deeply unsettling.",
-                source: "Reader Review"
-            },
-            {
-                text: "A bleak, addictive journey driven by pain, rage, and survival.",
-                source: "Reader Review"
-            },
-            {
-                text: "Sharp, unfiltered writing that brings every moment to life.",
-                source: "Reader Review"
-            },
-            {
-                text: "A dark psychological thriller that lingers long after the final page.",
-                source: "Reader Review"
-            },
-            {
-                text: "Relentless, gripping, and full of unexpected turns.",
-                source: "Reader Review"
-            },
-            {
-                text: "A haunting story of justice, control, and the cost of revenge.",
-                source: "Reader Review"
-            },
-            {
-                text: "Compulsive, brutal, and impossible to put down.",
-                source: "Reader Review"
-            }
+            { text: "A gripping thriller — raw, brutal and unflinching.", source: "Reader Review" },
+            { text: "Very dark and menacing, but addictive in its own way.", source: "Reader Review" },
+            { text: "A brutal, tension-filled thriller that grips from the first page to the last.", source: "Reader Review" },
+            { text: "Dark, violent, and relentlessly suspenseful.", source: "Reader Review" },
+            { text: "A raw and unflinching story of revenge that doesn’t pull its punches.", source: "Reader Review" },
+            { text: "Gritty, intense, and emotionally charged.", source: "Reader Review" },
+            { text: "A slow-burning descent into vengeance and isolation.", source: "Reader Review" },
+            { text: "Uncompromising, menacing, and impossible to ignore.", source: "Reader Review" },
+            { text: "A gripping, hard-hitting read that keeps the tension high throughout.", source: "Reader Review" },
+            { text: "Violent, atmospheric, and deeply unsettling.", source: "Reader Review" },
+            { text: "A bleak, addictive journey driven by pain, rage, and survival.", source: "Reader Review" },
+            { text: "Sharp, unfiltered writing that brings every moment to life.", source: "Reader Review" },
+            { text: "A dark psychological thriller that lingers long after the final page.", source: "Reader Review" },
+            { text: "Relentless, gripping, and full of unexpected turns.", source: "Reader Review" },
+            { text: "A haunting story of justice, control, and the cost of revenge.", source: "Reader Review" },
+            { text: "Compulsive, brutal, and impossible to put down.", source: "Reader Review" }
         ],
 
         standalone: [
-            {
-                text: "Quietly unsettling and deeply personal.",
-                source: "Reader Review"
-            },
-            {
-                text: "Lingers long after the final page.",
-                source: "Reader Review"
-            },
-            {
-                text: "A haunting gothic nightmare where the house itself feels alive.",
-                source: "Reader Review"
-            },
-            {
-                text: "Slow-burning dread that builds into something truly disturbing.",
-                source: "Reader Review"
-            },
-            {
-                text: "A sinister, atmospheric tale that keeps you constantly on edge.",
-                source: "Reader Review"
-            },
-            {
-                text: "Classic gothic horror with a modern, brutal edge.",
-                source: "Reader Review"
-            },
-            {
-                text: "An intense, fast-paced descent into supernatural terror.",
-                source: "Reader Review"
-            },
-            {
-                text: "A chilling story where nothing is as simple as it first appears.",
-                source: "Reader Review"
-            },
-            {
-                text: "Creeping tension, eerie detail, and a deeply unsettling presence.",
-                source: "Reader Review"
-            },
-            {
-                text: "A dark, immersive read that lingers long after the final page.",
-                source: "Reader Review"
-            },
-            {
-                text: "A disturbing, claustrophobic horror driven by something watching from within.",
-                source: "Reader Review"
-            },
-            {
-                text: "An unforgettable ending that leaves you reeling.",
-                source: "Reader Review"
-            },
-            {
-                text: "A sinister house, a haunting past, and a relentless sense of dread.",
-                source: "Reader Review"
-            },
-            {
-                text: "Atmospheric, eerie, and packed with unsettling twists.",
-                source: "Reader Review"
-            }
+            { text: "Quietly unsettling and deeply personal.", source: "Reader Review" },
+            { text: "Lingers long after the final page.", source: "Reader Review" },
+            { text: "A haunting gothic nightmare where the house itself feels alive.", source: "Reader Review" },
+            { text: "Slow-burning dread that builds into something truly disturbing.", source: "Reader Review" },
+            { text: "A sinister, atmospheric tale that keeps you constantly on edge.", source: "Reader Review" },
+            { text: "Classic gothic horror with a modern, brutal edge.", source: "Reader Review" },
+            { text: "An intense, fast-paced descent into supernatural terror.", source: "Reader Review" },
+            { text: "A chilling story where nothing is as simple as it first appears.", source: "Reader Review" },
+            { text: "Creeping tension, eerie detail, and a deeply unsettling presence.", source: "Reader Review" },
+            { text: "A dark, immersive read that lingers long after the final page.", source: "Reader Review" },
+            { text: "A disturbing, claustrophobic horror driven by something watching from within.", source: "Reader Review" },
+            { text: "An unforgettable ending that leaves you reeling.", source: "Reader Review" },
+            { text: "A sinister house, a haunting past, and a relentless sense of dread.", source: "Reader Review" },
+            { text: "Atmospheric, eerie, and packed with unsettling twists.", source: "Reader Review" }
         ]
     };
 
-    // =========================
-    // LOOP THROUGH ALL REVIEW BLOCKS
-    // =========================
     containers.forEach(container => {
 
-        // ❗ Skip static (homepage featured)
         if (container.classList.contains("static-review")) return;
 
         const book = container.dataset.book;
 
-        // =========================
-        // SELECT REVIEWS
-        // =========================
-        let activeReviews = reviews[book] || [
+        const activeReviews = reviews[book] || [
             {
                 text: "Each book feels like a place you shouldn’t have found.",
-                source: "JoJo, TikTok"
+                source: "Reader Review"
             }
         ];
 
         let index = 0;
 
-        // =========================
-        // RENDER FUNCTION
-        // =========================
         function showReview(i) {
 
             const review = activeReviews[i];
@@ -715,23 +665,15 @@ function initReviewRotator() {
             }, 300);
         }
 
-        // =========================
-        // ROTATION
-        // =========================
         function rotate() {
             index = (index + 1) % activeReviews.length;
             showReview(index);
         }
 
-        // =========================
-        // INIT
-        // =========================
         showReview(index);
 
-        // Only rotate if more than 1 review
         if (activeReviews.length > 1) {
             setInterval(rotate, 5000);
         }
-
     });
 }
