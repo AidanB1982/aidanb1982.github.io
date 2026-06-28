@@ -5494,3 +5494,28 @@ body.archive-page .archive-files-wrap {
         padding-top: 42px;
     }
 }
+/* ======================================================
+   ACCESSIBILITY — SKIP LINK
+====================================================== */
+
+.skip-link {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    z-index: 99999;
+    padding: 10px 14px;
+    background: #050505;
+    color: #fff;
+    border: 1px solid rgba(184, 115, 51, 0.45);
+    transform: translateY(-140%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+    outline: none;
+}
