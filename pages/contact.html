@@ -2,27 +2,32 @@
 <html lang="en" class="no-js">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-  gtag('config', 'G-1WN8PBHBW4');
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+      gtag('config', 'G-1WN8PBHBW4');
+    </script>
 
-<title>Contact | Blackwood Publishing</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="description" content="Blackwood Publishing is an independent imprint publishing literary and psychological fiction shaped by place, memory, and atmosphere.">
+    <title>Contact | Blackwood Publishing</title>
 
-<link rel="stylesheet" href="/css/header.css">
-<link rel="stylesheet" href="/css/styles.css">
+    <meta
+        name="description"
+        content="Contact Blackwood Publishing for reader messages, reviews and features, bookshop or stock enquiries, collaborations, events, and general correspondence."
+    >
 
+    <link rel="stylesheet" href="/css/header.css?v=20260708">
+    <link rel="stylesheet" href="/css/styles.css?v=20260708">
 </head>
 
 <body class="sub-page contact-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -39,74 +44,182 @@
 
 </section>
 
-<!-- CONTENT -->
-<section class="about-section fade-in">
+<main id="main-content" class="contact-wrap">
 
-    <p>
-        For enquiries, collaborations, or general correspondence, use the form below.
-    </p>
+    <!-- INTRO -->
+    <section class="contact-intro fade-in" aria-labelledby="contact-intro-title">
 
-    <div class="divider"></div>
+        <p class="contact-kicker">
+            Blackwood Publishing
+        </p>
 
-    <!-- FORM -->
-    <form 
-        action="https://formspree.io/f/mbdpplkw" 
-        method="POST" 
-        class="contact-form"
-    >
+        <h2 id="contact-intro-title">
+            Send a Message
+        </h2>
 
-        <label for="name" class="sr-only">Name</label>
-        <input 
-            id="name"
-            type="text" 
-            name="name" 
-            placeholder="Name" 
-            required
-            autocomplete="name"
+        <p>
+            For reader messages, review enquiries, bookshop questions, collaborations,
+            events, or general correspondence, use the form below.
+        </p>
+
+    </section>
+
+    <!-- CONTACT CATEGORIES -->
+    <section class="contact-categories fade-in" aria-label="Contact categories">
+
+        <article class="contact-category-card">
+            <p class="contact-category-label">
+                Reader Messages
+            </p>
+
+            <p>
+                For notes from readers, responses to the books, questions about the archive,
+                or messages for Blackwood Publishing.
+            </p>
+        </article>
+
+        <article class="contact-category-card">
+            <p class="contact-category-label">
+                Reviews &amp; Features
+            </p>
+
+            <p>
+                For reviewers, bloggers, press, bookstagrammers, TikTok readers, interviews,
+                features, or review-copy enquiries.
+            </p>
+        </article>
+
+        <article class="contact-category-card">
+            <p class="contact-category-label">
+                Bookshops &amp; Stock
+            </p>
+
+            <p>
+                For bookshops, libraries, stock questions, ordering information, or trade-related
+                enquiries about Blackwood titles.
+            </p>
+        </article>
+
+        <article class="contact-category-card">
+            <p class="contact-category-label">
+                Collaborations &amp; Events
+            </p>
+
+            <p>
+                For readings, events, panels, festivals, creative collaborations, or suitable
+                Blackwood-related opportunities.
+            </p>
+        </article>
+
+    </section>
+
+    <!-- FORM SECTION -->
+    <section class="contact-form-section fade-in" aria-labelledby="contact-form-title">
+
+        <div class="contact-form-heading">
+
+            <p class="contact-kicker">
+                Correspondence Form
+            </p>
+
+            <h2 id="contact-form-title">
+                Write to Blackwood
+            </h2>
+
+            <p>
+                Choose the closest enquiry type, then leave your message. If none of the categories
+                fit, select general correspondence.
+            </p>
+
+        </div>
+
+        <form 
+            action="https://formspree.io/f/mbdpplkw" 
+            method="POST" 
+            class="contact-form contact-form-enhanced"
         >
 
-        <label for="email" class="sr-only">Email</label>
-        <input 
-            id="email"
-            type="email" 
-            name="email" 
-            placeholder="Email" 
-            required
-            autocomplete="email"
-        >
+            <input
+                type="hidden"
+                name="_subject"
+                value="New message from Blackwood Publishing contact page"
+            >
 
-        <label for="message" class="sr-only">Message</label>
-        <textarea 
-            id="message"
-            name="message" 
-            placeholder="Message" 
-            required
-            rows="5"
-        ></textarea>
+            <label for="enquiry-type" class="sr-only">
+                Enquiry type
+            </label>
 
-        <!-- OPTIONAL REDIRECT (replace with real URL or remove) -->
-        <!--
-        <input 
-            type="hidden" 
-            name="_redirect" 
-            value="https://yourdomain.com/thank-you.html"
-        >
-        -->
+            <select
+                id="enquiry-type"
+                name="enquiry_type"
+                required
+            >
+                <option value="" selected disabled>Choose enquiry type</option>
+                <option value="Reader message">Reader message</option>
+                <option value="Reviews and features">Reviews and features</option>
+                <option value="Bookshops and stock enquiries">Bookshops and stock enquiries</option>
+                <option value="Collaborations or events">Collaborations or events</option>
+                <option value="General correspondence">General correspondence</option>
+            </select>
 
-        <button type="submit" class="button copper">
-            Send Message
-        </button>
+            <label for="name" class="sr-only">
+                Name
+            </label>
 
-    </form>
+            <input 
+                id="name"
+                type="text" 
+                name="name" 
+                placeholder="Name" 
+                required
+                autocomplete="name"
+            >
 
-</section>
+            <label for="email" class="sr-only">
+                Email
+            </label>
+
+            <input 
+                id="email"
+                type="email" 
+                name="email" 
+                placeholder="Email" 
+                required
+                autocomplete="email"
+            >
+
+            <label for="message" class="sr-only">
+                Message
+            </label>
+
+            <textarea 
+                id="message"
+                name="message" 
+                placeholder="Message" 
+                required
+                rows="6"
+            ></textarea>
+
+            <button type="submit" class="button copper">
+                Send Message
+            </button>
+
+        </form>
+
+        <p class="contact-note">
+            Blackwood Publishing reads all correspondence, though response times may vary.
+        </p>
+
+    </section>
+
+</main>
 
 <!-- FOOTER -->
 <div style="height:40px;"></div>
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260408" defer></script>
+<script src="/js/header.js?v=20260708" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
@@ -118,7 +231,9 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    if (typeof initFadeIn === "function") initFadeIn();
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
 
 });
 </script>
