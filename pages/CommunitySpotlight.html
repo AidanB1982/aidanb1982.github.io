@@ -1,236 +1,101 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
-   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
 
-  gtag('config', 'G-1WN8PBHBW4');
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        function gtag() {
+            dataLayer.push(arguments);
+        }
 
-<title>Community Spotlight | Blackwood Publishing</title>
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+    </script>
 
-<meta name="description" content="Community Spotlight showcasing readers, creators, and features from Blackwood Publishing.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="/css/header.css">
-<link rel="stylesheet" href="/css/styles.css">
+    <title>Community Spotlight | Blackwood Publishing</title>
 
-<style>
+    <meta name="description" content="Community Spotlight showcasing readers, creators, and features from Blackwood Publishing.">
 
-/* =========================
-   GLOBAL PREMIUM TWEAKS
-========================= */
-
-body.community-page {
-    background: #0b0b0b;
-    color: #eaeaea;
-    letter-spacing: 0.3px;
-}
-
-/* subtle film grain */
-body.community-page::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
-    opacity: 0.08;
-    z-index: 999;
-}
-
-/* =========================
-   HERO SECTION
-========================= */
-
-.community-hero {
-    position: relative;
-    height: 65vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    overflow: hidden;
-}
-
-.community-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url('/assets/forest.png') center/cover no-repeat;
-    filter: brightness(0.45);
-}
-
-.community-hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.85) 100%);
-}
-
-.community-hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 700px;
-    padding: 20px;
-}
-
-.community-hero h1 {
-    font-size: clamp(36px, 5vw, 64px);
-    font-weight: 400;
-    margin-bottom: 20px;
-}
-
-.community-hero p {
-    font-size: 16px;
-    opacity: 0.75;
-    line-height: 1.6;
-}
-
-/* =========================
-   MAIN CONTENT
-========================= */
-
-.community-container {
-    max-width: 1200px;
-    margin: 100px auto;
-    padding: 0 20px;
-}
-
-/* divider */
-.community-divider {
-    text-align: center;
-    margin: 80px auto;
-    opacity: 0.5;
-    font-style: italic;
-}
-
-/* CTA */
-.community-cta {
-    text-align: center;
-    margin: 40px auto 20px;
-    font-size: 14px;
-    opacity: 0.6;
-    letter-spacing: 1px;
-}
-
-.community-cta span {
-    opacity: 1;
-    font-style: italic;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
-    padding-bottom: 2px;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-}
-
-.community-cta span:hover {
-    opacity: 0.7;
-}
-
-/* =========================
-   TAGGBOX FRAME
-========================= */
-
-.taggbox-wrapper {
-    position: relative;
-    margin-top: 60px;
-    padding: 30px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-.taggbox-wrapper::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border: 1px solid rgba(255,255,255,0.04);
-    pointer-events: none;
-}
-
-.taggbox {
-    width: 100% !important;
-    min-height: 600px;
-}
-
-/* =========================
-   FADE + LIFT ANIMATION
-========================= */
-
-.fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1.2s ease;
-}
-
-.fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-</style>
-
+    <link rel="stylesheet" href="/css/header.css?v=20260716">
+    <link rel="stylesheet" href="/css/styles.css?v=20260716">
 </head>
 
-<body class="sub-page community-page">
+<body class="sub-page community-page community-spotlight-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
 
 <!-- HERO -->
-<section class="community-hero">
+<section class="community-hero community-spotlight-hero">
 
     <div class="community-hero-content fade-in">
+        <p class="about-intro-line">Community</p>
+
         <h1>Community Spotlight</h1>
 
         <p>
-            Stories shared beyond the page. Fragments of readers, places, and moments 
+            Stories shared beyond the page. Fragments of readers, places, and moments
             that continue long after the final line.
         </p>
     </div>
 
 </section>
 
-<!-- CONTENT -->
-<section class="community-container">
+<main id="main-content" class="community-spotlight-wrap">
 
-    <div class="community-divider fade-in">
-        <p>What remains, is what is shared.</p>
-    </div>
+    <section class="community-spotlight-intro fade-in">
+
+        <p class="community-spotlight-kicker">Shared Fragments</p>
+
+        <h2>What remains is what is shared.</h2>
+
+        <p class="community-spotlight-quote">
+            “The archive does not end at the final page.”
+        </p>
+
+        <p>
+            Reader posts, creator features, fragments, reactions, and moments from the wider
+            Blackwood community appear here as they surface.
+        </p>
+
+    </section>
 
     <!-- CTA -->
-    <div class="community-cta fade-in">
+    <section class="community-spotlight-cta fade-in">
+
         <p>
-            Share your own fragment using 
-            <span id="hashtag">#aidanblackwood</span>
+            Share your own fragment using
+            <button type="button" id="hashtag">#aidanblackwood</button>
         </p>
-    </div>
+
+    </section>
 
     <!-- TAGGBOX -->
-    <div class="taggbox-wrapper fade-in">
-        <div 
-            class="taggbox" 
-            data-widget-id="323222" 
+    <section class="taggbox-wrapper fade-in" aria-label="Community posts">
+
+        <div
+            class="taggbox"
+            data-widget-id="323222"
             data-website="1">
         </div>
-    </div>
 
-</section>
+    </section>
 
-<!-- FOOTER SPACING -->
-<div style="height:60px;"></div>
+</main>
 
 <!-- FOOTER -->
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260408" defer></script>
-<script src="https://widget.taggbox.com/embed.min.js"></script>
+<script src="/js/header.js?v=20260716" defer></script>
+<script src="https://widget.taggbox.com/embed.min.js" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
@@ -242,30 +107,28 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    // Fade-in animation
-    const elements = document.querySelectorAll(".fade-in");
+    if (typeof loadFooter === "function") {
+        await loadFooter();
+    }
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add("visible");
-            }
-        });
-    }, { threshold: 0.2 });
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
 
-    elements.forEach(el => observer.observe(el));
-
-    // Click-to-copy hashtag (premium UX touch)
     const hashtag = document.getElementById("hashtag");
+
     if (hashtag) {
-        hashtag.addEventListener("click", () => {
-            navigator.clipboard.writeText("#aidanblackwood");
+        hashtag.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText("#aidanblackwood");
+                hashtag.textContent = "Copied ✓";
 
-            hashtag.textContent = "Copied ✓";
-
-            setTimeout(() => {
+                setTimeout(() => {
+                    hashtag.textContent = "#aidanblackwood";
+                }, 2000);
+            } catch (error) {
                 hashtag.textContent = "#aidanblackwood";
-            }, 2000);
+            }
         });
     }
 
