@@ -353,7 +353,8 @@ body.holdfast-page {
 .play-button,
 .seal-button,
 .preorder-button,
-.route-button {
+.route-button,
+.fragment-jump-button {
     min-height: 56px;
     border: 1px solid rgba(201, 169, 106, 0.55);
     background:
@@ -370,7 +371,8 @@ body.holdfast-page {
 }
 
 .preorder-button,
-.route-button {
+.route-button,
+.fragment-jump-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -387,7 +389,9 @@ body.holdfast-page {
 .preorder-button:hover,
 .preorder-button:focus,
 .route-button:hover,
-.route-button:focus {
+.route-button:focus,
+.fragment-jump-button:hover,
+.fragment-jump-button:focus {
     transform: translateY(-1px);
     border-color: rgba(201, 169, 106, 0.92);
     background:
@@ -508,6 +512,33 @@ body.holdfast-page {
     color: rgba(255,255,255,0.48);
     font-size: 0.92rem;
     line-height: 1.7;
+}
+
+/* =========================
+   FRAGMENT PROMPT
+========================= */
+
+.fragment-prompt {
+    margin-top: 20px;
+    padding: 17px 17px 19px;
+    border: 1px solid rgba(201, 169, 106, 0.2);
+    background:
+        linear-gradient(145deg, rgba(201, 169, 106, 0.07), transparent),
+        rgba(0,0,0,0.3);
+}
+
+.fragment-prompt p {
+    margin: 0 0 14px;
+    color: rgba(255,255,255,0.62);
+    font-size: 0.94rem;
+    line-height: 1.6;
+}
+
+.fragment-jump-button {
+    width: 100%;
+    min-height: 50px;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
 }
 
 /* =========================
@@ -907,6 +938,12 @@ body.holdfast-page {
     .file-designation {
         font-size: 0.66rem;
         letter-spacing: 0.12em;
+    }
+
+    .fragment-jump-button {
+        min-height: 48px;
+        font-size: 0.66rem;
+        letter-spacing: 0.14em;
     }
 
     .prologue-panel {
