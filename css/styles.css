@@ -3906,3 +3906,225 @@ body.reading-lists-page {
     grid-template-columns: minmax(0, 620px);
     justify-content: center;
 }
+/* ======================================================
+   THE WORKS PAGE — CLEAN INDEX LAYOUT PATCH
+   Scoped to body.publications-page only
+====================================================== */
+
+body.publications-page .about-hero {
+    height: 46vh;
+    min-height: 340px;
+}
+
+body.publications-page .about-hero-content {
+    padding: 0 22px;
+}
+
+body.publications-page .about-hero h1 {
+    margin-bottom: 18px;
+}
+
+body.publications-page .about-intro-line {
+    margin-bottom: 12px;
+}
+
+body.publications-page .review-snippet {
+    margin: 36px auto 46px;
+}
+
+/* Main section spacing */
+body.publications-page .about-section.works-page-section {
+    max-width: 1120px;
+    margin: 58px auto;
+    padding: 0 22px;
+}
+
+body.publications-page .about-section.works-page-section:first-of-type {
+    margin-top: 40px;
+}
+
+body.publications-page .about-section.works-page-section:last-of-type {
+    margin-bottom: 80px;
+}
+
+/* Section headers */
+body.publications-page .works-header {
+    margin-bottom: 34px;
+}
+
+body.publications-page .works-header p:first-child {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 5px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    opacity: 0.82;
+}
+
+body.publications-page .works-header p:last-child {
+    max-width: 620px;
+    margin: 12px auto 0;
+    line-height: 1.65;
+}
+
+/* Two-card grids */
+body.publications-page .series-grid,
+body.publications-page .series-grid.works-two-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 52px 56px;
+    max-width: 1060px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* Cards */
+body.publications-page .series {
+    position: relative;
+    min-height: 100%;
+    padding: 30px 26px 34px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.12);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.055), transparent 42%),
+        rgba(255, 255, 255, 0.012);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+body.publications-page .series::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 115, 51, 0.055);
+    pointer-events: none;
+}
+
+body.publications-page .series h2 {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 16px;
+    font-size: clamp(22px, 2.4vw, 30px);
+    line-height: 1.15;
+}
+
+body.publications-page .series p {
+    position: relative;
+    z-index: 1;
+    max-width: 460px;
+    margin: 14px auto;
+    line-height: 1.65;
+}
+
+/* Book carousel/image sizing */
+body.publications-page .carousel {
+    position: relative;
+    z-index: 1;
+    width: 210px;
+    height: 320px;
+    margin: 24px auto 22px;
+}
+
+body.publications-page .carousel img {
+    object-fit: contain;
+    filter:
+        drop-shadow(0 22px 42px rgba(0, 0, 0, 0.78))
+        drop-shadow(0 4px 12px rgba(184, 115, 51, 0.08));
+}
+
+/* Notes / reading order */
+body.publications-page .series-note {
+    max-width: 430px;
+    margin: 10px auto 0;
+    font-size: 13px;
+    line-height: 1.55;
+    opacity: 0.68;
+}
+
+body.publications-page .series-note strong {
+    color: rgba(230, 230, 230, 0.92);
+}
+
+/* Buttons */
+body.publications-page .work-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 16px;
+    margin-top: 24px;
+}
+
+body.publications-page .work-actions + .work-actions {
+    margin-top: 12px;
+}
+
+body.publications-page .work-actions .button {
+    min-width: 190px;
+    margin-top: 0;
+    text-align: center;
+    line-height: 1.45;
+}
+
+body.publications-page .button.ghost {
+    padding: 8px 12px;
+    border: 1px solid rgba(230, 230, 230, 0.2);
+}
+
+/* Reduce oversized final footer gap on this page */
+body.publications-page #footer-placeholder {
+    margin-top: 0;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    body.publications-page .series-grid,
+    body.publications-page .series-grid.works-two-grid {
+        gap: 42px 30px;
+    }
+
+    body.publications-page .carousel {
+        width: 190px;
+        height: 290px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+    body.publications-page .about-hero {
+        height: auto;
+        min-height: 320px;
+        padding: 110px 18px 70px;
+    }
+
+    body.publications-page .about-section.works-page-section {
+        margin: 48px auto;
+        padding: 0 16px;
+    }
+
+    body.publications-page .series-grid,
+    body.publications-page .series-grid.works-two-grid {
+        grid-template-columns: 1fr;
+        gap: 34px;
+    }
+
+    body.publications-page .series {
+        padding: 28px 20px 32px;
+    }
+
+    body.publications-page .carousel {
+        width: 180px;
+        height: 275px;
+        margin: 22px auto 20px;
+    }
+
+    body.publications-page .work-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    body.publications-page .work-actions .button {
+        width: 100%;
+        min-width: 0;
+    }
+}
