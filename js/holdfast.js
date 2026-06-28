@@ -22,6 +22,8 @@ window.addEventListener("load", async () => {
     const ACCESS_CODE = "Holdfast-04";
     const STORAGE_KEY = "blackwood_holdfast_access_granted";
 
+    const accessPanel = document.querySelector(".access-panel");
+    const accessCopy = document.querySelector(".access-copy");
     const form = document.getElementById("access-form");
     const input = document.getElementById("access-code");
     const message = document.getElementById("access-message");
@@ -83,6 +85,10 @@ window.addEventListener("load", async () => {
     }
 
     function updateUnlockedCopy() {
+        if (accessPanel) {
+            accessPanel.classList.add("is-unlocked");
+        }
+
         if (status) {
             status.textContent = "Access granted";
             status.classList.add("is-granted");
@@ -90,6 +96,10 @@ window.addEventListener("load", async () => {
 
         if (accessTitle) {
             accessTitle.textContent = "Transmission Open";
+        }
+
+        if (accessCopy) {
+            accessCopy.textContent = "The designation has been accepted. Transmission 1042 is now open.";
         }
 
         setMessage("File designation accepted. Transmission unlocked.", "is-success");
@@ -141,6 +151,10 @@ window.addEventListener("load", async () => {
             prologuePanel.hidden = true;
         }
 
+        if (accessPanel) {
+            accessPanel.classList.remove("is-unlocked");
+        }
+
         location.reload();
     }
 
@@ -151,8 +165,10 @@ window.addEventListener("load", async () => {
 
         revealPrologue();
 
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
         prologuePanel.scrollIntoView({
-            behavior: "smooth",
+            behavior: prefersReducedMotion ? "auto" : "smooth",
             block: "start"
         });
     }
