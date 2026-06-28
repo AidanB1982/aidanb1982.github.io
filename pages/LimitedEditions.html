@@ -6,107 +6,191 @@
 
 <title>Objects from the Archive | Blackwood Publishing</title>
 
-<link rel="stylesheet" href="/css/header.css">
-<link rel="stylesheet" href="/css/styles.css">
+<meta
+    name="description"
+    content="Limited editions, signed copies, numbered objects, and archive releases from Blackwood Publishing. Not all copies remain."
+>
+
+<link rel="stylesheet" href="/css/header.css?v=20260713">
+<link rel="stylesheet" href="/css/styles.css?v=20260713">
 
 </head>
 
-<body class="sub-page limited-page">
+<body class="sub-page limited-page limited-editions-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
 
+<!-- HERO -->
+<section class="about-hero limited-editions-hero">
 
-<main>
-
-  <!-- HERO -->
-  <section class="about-hero">
     <div class="about-hero-overlay"></div>
 
     <div class="about-hero-content fade-in">
-      <h1>Objects from the Archive</h1>
+        <p class="about-intro-line">Limited Editions</p>
 
-      <p class="about-intro-line">
-        Some editions are released in limited form.<br>
-        Signed. Numbered. Not always available.
-      </p>
+        <h1>Objects from the Archive</h1>
 
-      <p class="about-intro-line" style="opacity:0.6;">
-        Not all copies remain.
-      </p>
-    </div>
-  </section>
+        <p class="limited-editions-hero-subline">
+            Signed. Numbered. Released in limited form. Not always available.
+        </p>
 
-
-  <!-- GRID -->
-  <section class="edition-grid fade-in">
-
-    <!-- BOOK 1 -->
-    <div class="edition-card">
-      <img src="/assets/A1.png" alt="Corrour Bothy Signed Edition">
-
-      <h3>Corrour Bothy — First Summoning</h3>
-
-      <p class="stock-line" id="stock-1">
-        Checking availability...
-      </p>
-
-      <div id="product-1" class="product-slot"></div>
+        <p class="limited-editions-warning">
+            Not all copies remain.
+        </p>
     </div>
 
+</section>
 
-    <!-- BOOK 2 -->
-    <div class="edition-card">
-      <img src="/assets/A8.png" alt="The Black Bothy">
+<main id="main-content" class="limited-editions-wrap">
 
-      <h3>The Black Bothy</h3>
+    <!-- INTRO -->
+    <section class="limited-editions-intro fade-in" aria-labelledby="limited-editions-title">
 
-      <p class="stock-line" id="stock-2">
-        Checking availability...
-      </p>
+        <p class="limited-editions-kicker">Archive Objects</p>
 
-      <div id="product-2" class="product-slot"></div>
-    </div>
+        <h2 id="limited-editions-title">
+            Some editions appear only briefly.
+        </h2>
 
+        <p class="limited-editions-quote">
+            “A copy is only a copy until the archive marks it.”
+        </p>
 
-    <!-- BOOK 3 -->
-    <div class="edition-card">
-      <img src="/assets/A9.png" alt="Corrour Paperback">
+        <p>
+            These editions are released in limited quantities. Some are signed. Some are numbered.
+            Some are tied to particular records within the wider Blackwood archive.
+        </p>
 
-      <h3>Corrour — Paperback</h3>
+        <p>
+            Availability may change without warning. Once a marked object leaves the archive,
+            it may not return.
+        </p>
 
-      <p class="stock-line" id="stock-3">
-        Checking availability...
-      </p>
+    </section>
 
-      <div id="product-3" class="product-slot"></div>
-    </div>
+    <!-- LIMITED OBJECTS -->
+    <section class="limited-editions-section fade-in" aria-labelledby="limited-objects-title">
 
-  </section>
+        <p class="limited-editions-kicker">Available Objects</p>
 
+        <h2 id="limited-objects-title">
+            Current Archive Stock
+        </h2>
 
-  <!-- NOTE -->
-  <section class="limited-note fade-in">
-    <p>Some copies appear where they should not.</p>
-  </section>
+        <div class="limited-editions-grid">
 
+            <!-- BOOK 1 -->
+            <article class="limited-edition-card">
 
-  <!-- EXIT -->
-  <section class="limited-exit fade-in">
-    <p>They do not return.</p>
-    <a href="/pages/archive.html">Return to the archive</a>
-  </section>
+                <div class="limited-edition-cover">
+                    <img src="/assets/A1.png" loading="lazy" alt="Corrour Bothy Signed Edition">
+                </div>
+
+                <div class="limited-edition-copy">
+                    <p class="limited-edition-label">Signed Edition</p>
+
+                    <h3>Corrour Bothy — First Summoning</h3>
+
+                    <p class="limited-edition-description">
+                        A marked edition from the bothy records. Released in limited form.
+                    </p>
+
+                    <p class="stock-line" id="stock-1">
+                        Checking availability...
+                    </p>
+
+                    <div id="product-1" class="product-slot"></div>
+                </div>
+
+            </article>
+
+            <!-- BOOK 2 -->
+            <article class="limited-edition-card limited-edition-card-featured">
+
+                <div class="limited-edition-cover">
+                    <img src="/assets/A8.png" loading="lazy" alt="The Black Bothy limited edition">
+                </div>
+
+                <div class="limited-edition-copy">
+                    <p class="limited-edition-label">Archive File</p>
+
+                    <h3>The Black Bothy</h3>
+
+                    <p class="limited-edition-description">
+                        Book One of The Archive Files. The first record. The correct place to begin.
+                    </p>
+
+                    <p class="stock-line" id="stock-2">
+                        Checking availability...
+                    </p>
+
+                    <div id="product-2" class="product-slot"></div>
+                </div>
+
+            </article>
+
+            <!-- BOOK 3 -->
+            <article class="limited-edition-card">
+
+                <div class="limited-edition-cover">
+                    <img src="/assets/A9.png" loading="lazy" alt="Corrour paperback">
+                </div>
+
+                <div class="limited-edition-copy">
+                    <p class="limited-edition-label">Paperback</p>
+
+                    <h3>Corrour — Paperback</h3>
+
+                    <p class="limited-edition-description">
+                        A physical edition from The Cursed Bothies sequence.
+                    </p>
+
+                    <p class="stock-line" id="stock-3">
+                        Checking availability...
+                    </p>
+
+                    <div id="product-3" class="product-slot"></div>
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- NOTE -->
+    <section class="limited-note fade-in">
+        <p>
+            Some copies appear where they should not.
+        </p>
+    </section>
+
+    <!-- EXIT -->
+    <nav class="limited-exit fade-in" aria-label="Limited editions exit routes">
+        <p>
+            They do not return.
+        </p>
+
+        <a href="/pages/archive-files.html" class="button copper">
+            Return to The Archive Files
+        </a>
+
+        <a href="/pages/publications.html" class="button ghost">
+            View The Works
+        </a>
+    </nav>
 
 </main>
-
 
 <!-- FOOTER -->
 <div id="footer-placeholder"></div>
 
-
 <!-- JS -->
-<script src="/js/header.js?v=20260408" defer></script>
-<script src="/js/limited.js" defer></script>
+<script src="/js/header.js?v=20260713" defer></script>
+<script src="/js/limited.js?v=20260713" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
