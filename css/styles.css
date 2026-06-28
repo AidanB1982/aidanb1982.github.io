@@ -5192,3 +5192,324 @@ body.author-page .author-hero h1 {
         margin-bottom: 64px;
     }
 }
+/* ======================================================
+   ARCHIVE FILES PAGE — BLACKWOOD MAKEOVER
+====================================================== */
+
+body.archive-page {
+    background:
+        radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 34%),
+        linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.98)),
+        url("/assets/forest.png") center top / cover fixed no-repeat,
+        #000;
+}
+
+body.archive-page .archive-files-hero h1 {
+    font-size: clamp(42px, 7vw, 78px);
+    line-height: 0.95;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.archive-files-wrap {
+    width: min(100%, 1240px);
+    margin: 0 auto;
+    padding: 72px 22px 84px;
+}
+
+/* INTRO */
+
+.archive-files-intro {
+    max-width: 860px;
+    margin: 0 auto 56px;
+    padding: clamp(34px, 5vw, 58px);
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.18);
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.32);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.42);
+}
+
+.archive-files-kicker {
+    margin: 0 0 14px;
+    color: #b87333;
+    font-size: 12px;
+    letter-spacing: 4px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.archive-files-intro h2,
+.archive-sequence h2 {
+    margin: 0 0 20px;
+    color: #fff;
+    font-size: clamp(32px, 5vw, 56px);
+    line-height: 1.05;
+    font-weight: normal;
+}
+
+.archive-files-quote {
+    margin: 0 auto 24px;
+    color: rgba(230, 230, 230, 0.76);
+    font-size: clamp(20px, 3vw, 30px);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+.archive-files-intro p:not(.archive-files-kicker):not(.archive-files-quote) {
+    max-width: 720px;
+    margin: 18px auto 0;
+    color: rgba(230, 230, 230, 0.7);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.archive-files-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+/* REVIEW */
+
+body.archive-page .archive-review {
+    max-width: 560px;
+    margin: 0 auto 74px;
+    text-align: center;
+}
+
+body.archive-page .archive-review::before {
+    content: "";
+    display: block;
+    width: 42px;
+    height: 1px;
+    margin: 0 auto 18px;
+    background: rgba(184, 115, 51, 0.42);
+}
+
+/* SEQUENCE */
+
+.archive-sequence {
+    text-align: center;
+}
+
+.archive-file-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px;
+    margin-top: 42px;
+}
+
+.archive-file-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+    min-height: 100%;
+    padding: 30px;
+    text-align: left;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background:
+        radial-gradient(circle at 18% 50%, rgba(184, 115, 51, 0.075), transparent 34%),
+        linear-gradient(145deg, rgba(255,255,255,0.016), rgba(255,255,255,0.005)),
+        rgba(0, 0, 0, 0.28);
+    box-shadow: 0 24px 70px rgba(0,0,0,0.34);
+}
+
+.archive-file-card::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(184, 115, 51, 0.055);
+    pointer-events: none;
+}
+
+.archive-file-card-current {
+    border-color: rgba(184, 115, 51, 0.26);
+    background:
+        radial-gradient(circle at 18% 50%, rgba(184, 115, 51, 0.11), transparent 36%),
+        linear-gradient(145deg, rgba(184, 115, 51, 0.035), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.32);
+}
+
+.archive-file-cover {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.archive-file-cover img {
+    width: min(100%, 210px);
+    height: 315px;
+    object-fit: contain;
+    filter:
+        drop-shadow(0 26px 46px rgba(0,0,0,0.82))
+        drop-shadow(0 6px 16px rgba(184,115,51,0.1));
+}
+
+.archive-file-copy {
+    position: relative;
+    z-index: 1;
+}
+
+.archive-file-number {
+    margin: 0 0 12px;
+    color: #b87333;
+    font-size: 11px;
+    letter-spacing: 3.5px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.archive-file-copy h3 {
+    margin: 0 0 16px;
+    color: #fff;
+    font-size: clamp(24px, 3vw, 36px);
+    line-height: 1.1;
+    font-weight: normal;
+}
+
+.archive-file-copy p:not(.archive-file-number):not(.archive-file-note) {
+    margin: 0;
+    color: rgba(230, 230, 230, 0.66);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.archive-file-note {
+    margin: 16px 0 0;
+    color: rgba(230, 230, 230, 0.48);
+    font-size: 13px;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.archive-file-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    margin-top: 24px;
+}
+
+.archive-file-actions .button {
+    margin-top: 0;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.archive-file-actions-split .button {
+    min-width: 170px;
+}
+
+/* CLOSING ROUTES */
+
+.archive-closing-routes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 980px;
+    margin: 82px auto 0;
+}
+
+.archive-route-card {
+    padding: 24px 22px;
+    text-align: center;
+    border: 1px solid rgba(184, 115, 51, 0.14);
+    background: rgba(255,255,255,0.01);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        background 0.3s ease;
+}
+
+.archive-route-card:hover,
+.archive-route-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(184, 115, 51, 0.36);
+    background: rgba(184, 115, 51, 0.045);
+    outline: none;
+}
+
+.archive-route-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: rgba(230,230,230,0.48);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.archive-route-card strong {
+    color: #fff;
+    font-size: 20px;
+    font-weight: normal;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1080px) {
+    .archive-file-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    body.archive-page {
+        background:
+            radial-gradient(circle at 50% 8%, rgba(184, 115, 51, 0.08), transparent 34%),
+            linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.98)),
+            url("/assets/forest.png") center top / cover scroll no-repeat,
+            #000;
+    }
+
+    .archive-files-wrap {
+        padding: 54px 16px 64px;
+    }
+
+    .archive-files-intro {
+        margin-bottom: 48px;
+        padding: 34px 22px;
+    }
+
+    .archive-files-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .archive-files-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .archive-file-card {
+        grid-template-columns: 1fr;
+        padding: 28px 20px 32px;
+        text-align: center;
+    }
+
+    .archive-file-cover img {
+        width: min(72vw, 210px);
+        height: 315px;
+    }
+
+    .archive-file-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .archive-file-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .archive-closing-routes {
+        grid-template-columns: 1fr;
+        margin-top: 62px;
+    }
+}
