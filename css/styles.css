@@ -5470,3 +5470,27 @@ body.archive-page .archive-review::before {
         margin-top: 62px;
     }
 }
+/* ======================================================
+   ARCHIVE FILES PAGE — HERO SPACING TWEAK
+====================================================== */
+
+body.archive-page .about-hero {
+    height: 48vh;
+    min-height: 380px;
+}
+
+body.archive-page .archive-files-wrap {
+    padding-top: 46px;
+}
+
+@media (max-width: 760px) {
+    body.archive-page .about-hero {
+        height: auto;
+        min-height: 330px;
+        padding: 110px 18px 64px;
+    }
+
+    body.archive-page .archive-files-wrap {
+        padding-top: 42px;
+    }
+}
