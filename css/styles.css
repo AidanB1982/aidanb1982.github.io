@@ -7835,15 +7835,15 @@ body.editors-page .affiliate-note {
 
 .holdfast-countdown-banner .countdown-label,
 .holdfast-countdown-banner .countdown-action {
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 2.2px;
     text-transform: uppercase;
-    opacity: 0.62;
+    opacity: 0.68;
 }
 
 .holdfast-countdown-banner strong {
     color: #b87333;
-    font-size: 14px;
+    font-size: 16px;
     letter-spacing: 2px;
     font-weight: normal;
     text-transform: uppercase;
