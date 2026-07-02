@@ -8716,3 +8716,31 @@ body.recovered-file-page .about-hero h1 {
         height: 330px;
     }
 }
+/* ======================================================
+   HEADER NAV — KEEP DESKTOP NAV ON ONE LINE
+====================================================== */
+
+@media (min-width: 900px) {
+    .hero .nav-inline,
+    .hero .blackwood-nav,
+    .simple-header .nav-inline,
+    .simple-header .blackwood-nav {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        gap: clamp(18px, 2vw, 30px);
+    }
+
+    .hero .nav-inline a,
+    .hero .blackwood-nav-link,
+    .simple-header .nav-inline a,
+    .simple-header .blackwood-nav-link {
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+
+    .hero-inner {
+        width: min(100%, 1180px);
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
