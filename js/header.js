@@ -127,8 +127,8 @@ function initBlackwoodDropdownNav(headerContainer) {
             <div class="blackwood-dropdown" role="menu">
                 <a href="/pages/reading-lists.html" role="menuitem">Reading Lists</a>
                 <a href="/pages/editors-picks.html" role="menuitem">Marked for Record</a>
+                <a href="/pages/recovered-files.html" role="menuitem">Recovered Files</a>
             </div>
-        </div>
 
         <div class="blackwood-nav-item has-dropdown">
             <button
