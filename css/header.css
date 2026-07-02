@@ -114,7 +114,7 @@ body {
     color: #e6e6e6;
     opacity: 0.68;
 
-    font-size: 12px;
+    font-size: 14px;
     letter-spacing: 3px;
     line-height: 1.2;
     text-transform: uppercase;
@@ -635,8 +635,8 @@ body.sub-page .blackwood-nav {
 
         padding: 6px 0 !important;
 
-        font-size: 12px !important;
-        letter-spacing: 1.75px !important;
+        font-size: 14px !important;
+        letter-spacing: 2px !important;
         line-height: 1.4 !important;
 
         white-space: nowrap !important;
@@ -659,8 +659,8 @@ body.sub-page .blackwood-nav {
     .simple-header .nav-inline > a,
     .simple-header .blackwood-nav-link,
     .simple-header .blackwood-dropdown-toggle {
-        font-size: 10.2px !important;
-        letter-spacing: 1.35px !important;
+        font-size: 12px !important;
+        letter-spacing: 1.75px !important;
     }
 }
 
