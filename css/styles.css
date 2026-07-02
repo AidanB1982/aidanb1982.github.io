@@ -8725,22 +8725,29 @@ body.recovered-file-page .about-hero h1 {
     .hero .blackwood-nav,
     .simple-header .nav-inline,
     .simple-header .blackwood-nav {
-        flex-wrap: nowrap;
+        flex-wrap: nowrap !important;
         white-space: nowrap;
-        gap: clamp(18px, 2vw, 30px);
+        gap: clamp(14px, 1.55vw, 24px);
+        width: 100%;
+        justify-content: center;
     }
 
     .hero .nav-inline a,
     .hero .blackwood-nav-link,
     .simple-header .nav-inline a,
     .simple-header .blackwood-nav-link {
-        font-size: 11px;
-        letter-spacing: 2px;
+        font-size: 10.5px;
+        letter-spacing: 1.8px;
+    }
+
+    .hero .blackwood-nav-item,
+    .simple-header .blackwood-nav-item {
+        flex: 0 0 auto;
     }
 
     .hero-inner {
-        width: min(100%, 1180px);
-        padding-left: 24px;
-        padding-right: 24px;
+        width: min(100%, 1240px);
+        padding-left: 20px;
+        padding-right: 20px;
     }
 }
