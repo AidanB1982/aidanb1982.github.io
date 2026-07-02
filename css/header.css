@@ -564,3 +564,71 @@ body.sub-page .blackwood-nav {
         transform: translateX(-50%) translateY(0);
     }
 }
+/* ======================================================
+   HERO HEADER — FORCE DESKTOP NAV INTO ONE ROW
+====================================================== */
+
+@media (min-width: 900px) {
+    .hero-inner {
+        width: 100% !important;
+        max-width: none !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero .nav-inline,
+    .hero .blackwood-nav,
+    .hero nav[aria-label="Main navigation"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        width: 100% !important;
+        max-width: 1120px !important;
+        margin: 32px auto 0 !important;
+
+        gap: 22px !important;
+        white-space: nowrap !important;
+    }
+
+    .hero .blackwood-nav-item,
+    .hero .blackwood-nav-has-dropdown {
+        display: inline-flex !important;
+        flex: 0 0 auto !important;
+        align-items: center !important;
+        width: auto !important;
+    }
+
+    .hero .nav-inline a,
+    .hero .blackwood-nav-link,
+    .hero .blackwood-dropdown-toggle {
+        display: inline-flex !important;
+        width: auto !important;
+        flex: 0 0 auto !important;
+
+        font-size: 10.5px !important;
+        letter-spacing: 1.7px !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+    }
+}
+
+/* Smaller desktop / laptop tightening */
+@media (min-width: 900px) and (max-width: 1120px) {
+    .hero .nav-inline,
+    .hero .blackwood-nav,
+    .hero nav[aria-label="Main navigation"] {
+        max-width: 980px !important;
+        gap: 16px !important;
+    }
+
+    .hero .nav-inline a,
+    .hero .blackwood-nav-link,
+    .hero .blackwood-dropdown-toggle {
+        font-size: 10px !important;
+        letter-spacing: 1.35px !important;
+    }
+}
