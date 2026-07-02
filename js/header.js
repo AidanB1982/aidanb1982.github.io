@@ -23,7 +23,7 @@ async function loadHeader(type = "hero") {
 
         // HEADER
         const headerRes = await fetch(`${base}${file}`);
-        if (!headerRes.ok) throw new Error(`Failed to load ${file}`);
+        if (!headerRes.ok) throw new Error(`Failed to load ${file}`); 
 
         const headerHTML = await headerRes.text();
         const headerContainer = document.getElementById("header-placeholder");
