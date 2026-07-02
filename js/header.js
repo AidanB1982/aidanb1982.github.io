@@ -8,7 +8,7 @@ document.documentElement.classList.remove("no-js");
 // LOAD HEADER + FOOTER
 // =========================
 async function loadHeader(type = "hero") {
-
+ 
     const fileMap = {
         hero: "header.html",
         simple: "header-simple.html"
