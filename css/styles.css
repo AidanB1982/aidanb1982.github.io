@@ -8644,3 +8644,29 @@ body.recovered-file-page .about-hero h1 {
         display: none;
     }
 }
+/* Recovered Files — give file cards more breathing room */
+
+@media (min-width: 1101px) {
+    .recovered-files-grid {
+        width: min(100%, 1420px);
+        margin-left: auto;
+        margin-right: auto;
+        gap: 42px;
+    }
+
+    .recovered-file-card {
+        grid-template-columns: minmax(210px, 300px) minmax(0, 1fr);
+        gap: 38px;
+        padding: 38px;
+    }
+
+    .recovered-file-cover-button img {
+        width: min(100%, 275px);
+        height: 410px;
+    }
+
+    .recovered-file-actions .button {
+        min-width: 190px;
+        text-align: center;
+    }
+}
