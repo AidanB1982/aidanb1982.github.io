@@ -632,3 +632,127 @@ body.sub-page .blackwood-nav {
         letter-spacing: 1.35px !important;
     }
 }
+/* ======================================================
+   HEADER NAV — CLEAN DESKTOP ROW + DROPDOWN FIX
+====================================================== */
+
+@media (min-width: 900px) {
+    .hero-inner {
+        width: 100% !important;
+        max-width: none !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero .nav-inline,
+    .hero .blackwood-nav,
+    .simple-header .nav-inline,
+    .simple-header .blackwood-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 18px !important;
+        width: 100% !important;
+        max-width: 1180px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        white-space: nowrap !important;
+    }
+
+    .hero .blackwood-nav-item,
+    .simple-header .blackwood-nav-item {
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+    }
+
+    .hero .nav-inline a,
+    .hero .blackwood-nav-link,
+    .hero .blackwood-dropdown-toggle,
+    .simple-header .nav-inline a,
+    .simple-header .blackwood-nav-link,
+    .simple-header .blackwood-dropdown-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        width: auto !important;
+        flex: 0 0 auto !important;
+        padding: 0 !important;
+        font-size: 10px !important;
+        letter-spacing: 1.6px !important;
+        line-height: 1.4 !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+    }
+}
+
+/* ======================================================
+   HEADER DROPDOWNS — ONLY SHOW THE ACTIVE MENU
+====================================================== */
+
+.blackwood-dropdown {
+    display: none !important;
+    position: absolute !important;
+    top: calc(100% + 14px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    min-width: 230px !important;
+    padding: 14px 0 !important;
+    background: rgba(5, 5, 5, 0.97) !important;
+    border: 1px solid rgba(184, 115, 51, 0.25) !important;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75) !important;
+    z-index: 99999 !important;
+    pointer-events: none !important;
+}
+
+.blackwood-nav-item:hover > .blackwood-dropdown,
+.blackwood-nav-item:focus-within > .blackwood-dropdown,
+.blackwood-nav-item.is-open > .blackwood-dropdown {
+    display: block !important;
+    pointer-events: auto !important;
+}
+
+.blackwood-dropdown a {
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 10px 18px !important;
+    color: rgba(230, 230, 230, 0.78) !important;
+    font-size: 10.5px !important;
+    letter-spacing: 1.8px !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+}
+
+.blackwood-dropdown a:hover,
+.blackwood-dropdown a:focus-visible {
+    color: #b87333 !important;
+    background: rgba(184, 115, 51, 0.08) !important;
+    outline: none !important;
+}
+
+/* Smaller desktop tightening */
+@media (min-width: 900px) and (max-width: 1120px) {
+    .hero .nav-inline,
+    .hero .blackwood-nav,
+    .simple-header .nav-inline,
+    .simple-header .blackwood-nav {
+        gap: 14px !important;
+    }
+
+    .hero .nav-inline a,
+    .hero .blackwood-nav-link,
+    .hero .blackwood-dropdown-toggle,
+    .simple-header .nav-inline a,
+    .simple-header .blackwood-nav-link,
+    .simple-header .blackwood-dropdown-toggle {
+        font-size: 9.5px !important;
+        letter-spacing: 1.35px !important;
+    }
+}
