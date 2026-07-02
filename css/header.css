@@ -635,8 +635,8 @@ body.sub-page .blackwood-nav {
 
         padding: 6px 0 !important;
 
-        font-size: 10px !important;
-        letter-spacing: 1.55px !important;
+        font-size: 12px !important;
+        letter-spacing: 1.75px !important;
         line-height: 1.4 !important;
 
         white-space: nowrap !important;
@@ -659,8 +659,8 @@ body.sub-page .blackwood-nav {
     .simple-header .nav-inline > a,
     .simple-header .blackwood-nav-link,
     .simple-header .blackwood-dropdown-toggle {
-        font-size: 9.4px !important;
-        letter-spacing: 1.15px !important;
+        font-size: 10.2px !important;
+        letter-spacing: 1.35px !important;
     }
 }
 
