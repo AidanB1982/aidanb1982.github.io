@@ -565,7 +565,7 @@ body.sub-page .blackwood-nav {
     }
 }
 /* ======================================================
-   HERO HEADER — FORCE DESKTOP NAV INTO ONE ROW
+   HEADER NAV — FINAL DESKTOP ROW + DROPDOWN FIX
 ====================================================== */
 
 @media (min-width: 900px) {
@@ -578,92 +578,43 @@ body.sub-page .blackwood-nav {
     }
 
     .hero .nav-inline,
-    .hero .blackwood-nav,
-    .hero nav[aria-label="Main navigation"] {
+    .hero .blackwood-nav {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
         justify-content: center !important;
 
-        width: 100% !important;
-        max-width: 1120px !important;
-        margin: 32px auto 0 !important;
+        width: min(100%, 1160px) !important;
+        max-width: 1160px !important;
 
-        gap: 22px !important;
+        margin: 28px auto 24px !important;
+        gap: 18px !important;
+
         white-space: nowrap !important;
     }
 
-    .hero .blackwood-nav-item,
-    .hero .blackwood-nav-has-dropdown {
-        display: inline-flex !important;
-        flex: 0 0 auto !important;
-        align-items: center !important;
-        width: auto !important;
-    }
-
-    .hero .nav-inline a,
-    .hero .blackwood-nav-link,
-    .hero .blackwood-dropdown-toggle {
-        display: inline-flex !important;
-        width: auto !important;
-        flex: 0 0 auto !important;
-
-        font-size: 10.5px !important;
-        letter-spacing: 1.7px !important;
-        white-space: nowrap !important;
-        text-align: center !important;
-    }
-}
-
-/* Smaller desktop / laptop tightening */
-@media (min-width: 900px) and (max-width: 1120px) {
-    .hero .nav-inline,
-    .hero .blackwood-nav,
-    .hero nav[aria-label="Main navigation"] {
-        max-width: 980px !important;
-        gap: 16px !important;
-    }
-
-    .hero .nav-inline a,
-    .hero .blackwood-nav-link,
-    .hero .blackwood-dropdown-toggle {
-        font-size: 10px !important;
-        letter-spacing: 1.35px !important;
-    }
-}
-/* ======================================================
-   HEADER NAV — CLEAN DESKTOP ROW + DROPDOWN FIX
-====================================================== */
-
-@media (min-width: 900px) {
-    .hero-inner {
-        width: 100% !important;
-        max-width: none !important;
-        padding-left: 24px !important;
-        padding-right: 24px !important;
-        box-sizing: border-box !important;
-    }
-
-    .hero .nav-inline,
-    .hero .blackwood-nav,
     .simple-header .nav-inline,
     .simple-header .blackwood-nav {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
-        justify-content: center !important;
+        justify-content: flex-end !important;
+
+        width: auto !important;
+        max-width: none !important;
+
+        margin: 0 !important;
         gap: 18px !important;
-        width: 100% !important;
-        max-width: 1180px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
+
         white-space: nowrap !important;
     }
 
     .hero .blackwood-nav-item,
-    .simple-header .blackwood-nav-item {
+    .hero .blackwood-nav-has-dropdown,
+    .simple-header .blackwood-nav-item,
+    .simple-header .blackwood-nav-has-dropdown {
         position: relative !important;
         display: inline-flex !important;
         align-items: center !important;
@@ -671,60 +622,107 @@ body.sub-page .blackwood-nav {
         width: auto !important;
     }
 
-    .hero .nav-inline a,
+    .hero .nav-inline > a,
     .hero .blackwood-nav-link,
     .hero .blackwood-dropdown-toggle,
-    .simple-header .nav-inline a,
+    .simple-header .nav-inline > a,
     .simple-header .blackwood-nav-link,
     .simple-header .blackwood-dropdown-toggle {
         display: inline-flex !important;
         align-items: center !important;
         width: auto !important;
         flex: 0 0 auto !important;
-        padding: 0 !important;
+
+        padding: 6px 0 !important;
+
         font-size: 10px !important;
-        letter-spacing: 1.6px !important;
+        letter-spacing: 1.55px !important;
         line-height: 1.4 !important;
+
         white-space: nowrap !important;
         text-align: center !important;
     }
 }
 
+/* Slightly tighter for smaller desktop widths */
+@media (min-width: 900px) and (max-width: 1120px) {
+    .hero .nav-inline,
+    .hero .blackwood-nav,
+    .simple-header .nav-inline,
+    .simple-header .blackwood-nav {
+        gap: 13px !important;
+    }
+
+    .hero .nav-inline > a,
+    .hero .blackwood-nav-link,
+    .hero .blackwood-dropdown-toggle,
+    .simple-header .nav-inline > a,
+    .simple-header .blackwood-nav-link,
+    .simple-header .blackwood-dropdown-toggle {
+        font-size: 9.4px !important;
+        letter-spacing: 1.15px !important;
+    }
+}
+
 /* ======================================================
-   HEADER DROPDOWNS — ONLY SHOW THE ACTIVE MENU
+   HEADER DROPDOWNS — ONLY ONE ACTIVE MENU
 ====================================================== */
 
 .blackwood-dropdown {
-    display: none !important;
+    display: block !important;
     position: absolute !important;
-    top: calc(100% + 14px) !important;
+
+    top: calc(100% + 12px) !important;
     left: 50% !important;
-    transform: translateX(-50%) !important;
+
     min-width: 230px !important;
-    padding: 14px 0 !important;
-    background: rgba(5, 5, 5, 0.97) !important;
+    width: max-content !important;
+
+    padding: 12px 0 !important;
+
+    transform: translateX(-50%) translateY(8px) !important;
+
     border: 1px solid rgba(184, 115, 51, 0.25) !important;
+    background:
+        radial-gradient(circle at center top, rgba(184, 115, 51, 0.08), transparent 44%),
+        rgba(5, 5, 5, 0.97) !important;
+
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.75) !important;
-    z-index: 99999 !important;
+
+    opacity: 0 !important;
+    visibility: hidden !important;
     pointer-events: none !important;
+
+    transition:
+        opacity 0.22s ease,
+        transform 0.22s ease,
+        visibility 0.22s ease !important;
+
+    z-index: 99999 !important;
 }
 
+/* Important: no focus-within here, otherwise multiple dropdowns can stay open */
 .blackwood-nav-item:hover > .blackwood-dropdown,
-.blackwood-nav-item:focus-within > .blackwood-dropdown,
 .blackwood-nav-item.is-open > .blackwood-dropdown {
-    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) !important;
 }
 
 .blackwood-dropdown a {
     display: block !important;
     width: 100% !important;
     box-sizing: border-box !important;
+
     padding: 10px 18px !important;
+
     color: rgba(230, 230, 230, 0.78) !important;
+
     font-size: 10.5px !important;
     letter-spacing: 1.8px !important;
     line-height: 1.35 !important;
+
     text-align: left !important;
     text-transform: uppercase !important;
     white-space: nowrap !important;
@@ -737,22 +735,16 @@ body.sub-page .blackwood-nav {
     outline: none !important;
 }
 
-/* Smaller desktop tightening */
-@media (min-width: 900px) and (max-width: 1120px) {
-    .hero .nav-inline,
-    .hero .blackwood-nav,
-    .simple-header .nav-inline,
-    .simple-header .blackwood-nav {
-        gap: 14px !important;
+/* Mobile dropdown positioning */
+@media (max-width: 760px) {
+    .blackwood-dropdown {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) translateY(8px) !important;
     }
 
-    .hero .nav-inline a,
-    .hero .blackwood-nav-link,
-    .hero .blackwood-dropdown-toggle,
-    .simple-header .nav-inline a,
-    .simple-header .blackwood-nav-link,
-    .simple-header .blackwood-dropdown-toggle {
-        font-size: 9.5px !important;
-        letter-spacing: 1.35px !important;
+    .blackwood-nav-item:hover > .blackwood-dropdown,
+    .blackwood-nav-item.is-open > .blackwood-dropdown {
+        transform: translateX(-50%) translateY(0) !important;
     }
 }
