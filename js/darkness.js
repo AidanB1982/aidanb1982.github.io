@@ -1,128 +1,117 @@
 /* ======================================================
-   CHOOSE YOUR DARKNESS
-   The Blackwood Mood Map
+   DARKNESS DROPDOWN VERSION
 ====================================================== */
 
-(function () {
-    "use strict";
+.darkness-select-panel {
+    position: relative;
+    z-index: 2;
 
-    function initDarknessMap() {
-        const map = document.querySelector("[data-darkness-map]");
+    max-width: 680px;
+    margin: 0 auto 42px;
+    text-align: center;
+}
 
-        if (!map) return;
+.darkness-select-label {
+    display: block;
 
-        const cards = Array.from(map.querySelectorAll("[data-darkness-choice]"));
+    margin: 0 0 16px;
 
-        const reveal = map.querySelector(".darkness-reveal");
-        const revealImage = map.querySelector("[data-darkness-image]");
-        const revealMood = map.querySelector("[data-darkness-mood]");
-        const revealTitle = map.querySelector("[data-darkness-title]");
-        const revealCopy = map.querySelector("[data-darkness-copy]");
-        const revealPrimaryLink = map.querySelector("[data-darkness-primary-link]");
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    letter-spacing: 2.8px;
+    line-height: 1.6;
+    text-transform: uppercase;
 
-        if (
-            !cards.length ||
-            !reveal ||
-            !revealImage ||
-            !revealMood ||
-            !revealTitle ||
-            !revealCopy ||
-            !revealPrimaryLink
-        ) {
-            return;
-        }
+    color: rgba(184, 115, 51, 0.95);
+}
 
-        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+.darkness-select-wrap {
+    position: relative;
+}
 
-        function getCardData(card) {
-            return {
-                mood: card.dataset.mood || "",
-                title: card.dataset.title || "",
-                image: card.dataset.image || "",
-                link: card.dataset.link || "#",
-                button: card.dataset.button || "Begin Reading",
-                copy: card.dataset.copy || "",
-                external: card.dataset.external === "true"
-            };
-        }
+.darkness-select-wrap::after {
+    content: "⌄";
+    position: absolute;
+    top: 50%;
+    right: 20px;
 
-        function setActiveCard(activeCard) {
-            cards.forEach(card => {
-                const isActive = card === activeCard;
+    transform: translateY(-54%);
 
-                card.classList.toggle("is-active", isActive);
-                card.setAttribute("aria-pressed", isActive ? "true" : "false");
-            });
-        }
+    color: #b87333;
+    font-size: 20px;
+    line-height: 1;
 
-        function updatePrimaryLink(data) {
-            revealPrimaryLink.href = data.link;
-            revealPrimaryLink.textContent = data.button;
+    pointer-events: none;
+}
 
-            if (data.external) {
-                revealPrimaryLink.setAttribute("target", "_blank");
-                revealPrimaryLink.setAttribute("rel", "noopener noreferrer sponsored");
-            } else {
-                revealPrimaryLink.removeAttribute("target");
-                revealPrimaryLink.removeAttribute("rel");
-            }
-        }
+.darkness-select {
+    appearance: none;
+    -webkit-appearance: none;
 
-        function updateReveal(card) {
-            const data = getCardData(card);
+    width: 100%;
 
-            setActiveCard(card);
+    padding: 18px 54px 18px 20px;
 
-            const applyUpdate = () => {
-                revealMood.textContent = data.mood;
-                revealTitle.textContent = data.title;
-                revealCopy.textContent = data.copy;
+    border: 1px solid rgba(184, 115, 51, 0.34);
+    border-radius: 0;
 
-                revealImage.src = data.image;
-                revealImage.alt = `${data.title} cover`;
+    background:
+        linear-gradient(145deg, rgba(18, 18, 18, 0.98), rgba(5, 5, 5, 0.99));
 
-                updatePrimaryLink(data);
+    color: #f1ece4;
 
-                reveal.classList.remove("is-changing");
-            };
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    line-height: 1.4;
 
-            if (prefersReducedMotion) {
-                applyUpdate();
-                return;
-            }
+    cursor: pointer;
 
-            reveal.classList.add("is-changing");
+    box-shadow:
+        0 22px 58px rgba(0, 0, 0, 0.58),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
 
-            window.setTimeout(applyUpdate, 170);
-        }
+.darkness-select:focus {
+    outline: none;
+    border-color: rgba(184, 115, 51, 0.72);
+    box-shadow:
+        0 26px 70px rgba(0, 0, 0, 0.68),
+        0 0 34px rgba(184, 115, 51, 0.12),
+        inset 0 0 0 1px rgba(184, 115, 51, 0.08);
+}
 
-        cards.forEach(card => {
-            card.setAttribute("aria-pressed", card.classList.contains("is-active") ? "true" : "false");
+.darkness-select option {
+    background: #090909;
+    color: #f1ece4;
+}
 
-            card.addEventListener("click", () => {
-                updateReveal(card);
+.darkness-reveal[hidden] {
+    display: none !important;
+}
 
-                if (window.innerWidth <= 760) {
-                    window.setTimeout(() => {
-                        reveal.scrollIntoView({
-                            behavior: prefersReducedMotion ? "auto" : "smooth",
-                            block: "start"
-                        });
-                    }, 220);
-                }
-            });
-        });
+.darkness-reveal.is-visible {
+    animation: darknessRevealIn 0.45s ease both;
+}
 
-        const initialCard = cards.find(card => card.classList.contains("is-active")) || cards[0];
-
-        if (initialCard) {
-            updateReveal(initialCard);
-        }
+@keyframes darknessRevealIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initDarknessMap);
-    } else {
-        initDarknessMap();
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-})();
+}
+
+@media (max-width: 680px) {
+    .darkness-select-panel {
+        margin-bottom: 32px;
+    }
+
+    .darkness-select {
+        font-size: 16px;
+        padding: 16px 48px 16px 16px;
+    }
+}
