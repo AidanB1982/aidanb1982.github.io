@@ -5,7 +5,7 @@
 
 (function () {
     "use strict";
-
+ 
     const darknessMap = {
         "isolated-grief": {
             mood: "Isolated Grief",
