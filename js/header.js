@@ -128,7 +128,9 @@ function initBlackwoodDropdownNav(headerContainer) {
                 <a href="/pages/reading-lists.html" role="menuitem">Reading Lists</a>
                 <a href="/pages/editors-picks.html" role="menuitem">Marked for Record</a>
                 <a href="/pages/recovered-files.html" role="menuitem">Recovered Files</a>
+                <a href="/pages/reader-records.html" role="menuitem">Reader Records</a>
             </div>
+        </div>
 
         <div class="blackwood-nav-item has-dropdown">
             <button
@@ -224,8 +226,6 @@ function initBlackwoodDropdownNav(headerContainer) {
         event.stopPropagation();
     });
 }
-
-
 // =========================
 // GLOBAL CURSOR LIGHTING
 // =========================
