@@ -3,7 +3,7 @@
    Front-end bridge for Google Apps Script
 ====================================================== */
 
-const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbw6MvDsQdd0LTODjmX7Sc0d51qcdpRbo-1-6lh8rXdkBWVyjWi5XzwOOC0O1PPrUFh8vg/exec";
+const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxlvZEvfKy59rT0gp29voxP3pXFHWI4L54GCk2mv49Iqt7xMBGfNEFuQths2OYC2S4k/exec";
 
 (function () {
     "use strict";
