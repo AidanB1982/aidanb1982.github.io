@@ -566,6 +566,7 @@ body.sub-page .blackwood-nav {
 }
 /* ======================================================
    HEADER NAV — FINAL DESKTOP ROW + DROPDOWN FIX
+   Updated for Reader Records nav item
 ====================================================== */
 
 @media (min-width: 900px) {
@@ -577,6 +578,10 @@ body.sub-page .blackwood-nav {
         box-sizing: border-box !important;
     }
 
+    .simple-header .header-inner {
+        max-width: 1280px !important;
+    }
+
     .hero .nav-inline,
     .hero .blackwood-nav {
         display: flex !important;
@@ -585,11 +590,11 @@ body.sub-page .blackwood-nav {
         align-items: center !important;
         justify-content: center !important;
 
-        width: min(100%, 1160px) !important;
-        max-width: 1160px !important;
+        width: min(100%, 1220px) !important;
+        max-width: 1220px !important;
 
         margin: 28px auto 24px !important;
-        gap: 18px !important;
+        gap: 15px !important;
 
         white-space: nowrap !important;
     }
@@ -606,7 +611,7 @@ body.sub-page .blackwood-nav {
         max-width: none !important;
 
         margin: 0 !important;
-        gap: 18px !important;
+        gap: 14px !important;
 
         white-space: nowrap !important;
     }
@@ -635,12 +640,35 @@ body.sub-page .blackwood-nav {
 
         padding: 6px 0 !important;
 
-        font-size: 14px !important;
-        letter-spacing: 2px !important;
+        color: #e6e6e6 !important;
+        opacity: 0.72 !important;
+
+        font-size: 11px !important;
+        letter-spacing: 1.75px !important;
         line-height: 1.4 !important;
 
+        text-transform: uppercase !important;
+        text-decoration: none !important;
         white-space: nowrap !important;
         text-align: center !important;
+
+        transition:
+            color 0.25s ease,
+            opacity 0.25s ease;
+    }
+
+    .hero .nav-inline > a:hover,
+    .hero .nav-inline > a:focus-visible,
+    .hero .blackwood-nav-link:hover,
+    .hero .blackwood-nav-link:focus-visible,
+    .simple-header .nav-inline > a:hover,
+    .simple-header .nav-inline > a:focus-visible,
+    .simple-header .blackwood-nav-link:hover,
+    .simple-header .blackwood-nav-link:focus-visible,
+    .blackwood-nav-item.is-open > .blackwood-nav-link {
+        color: #e6e6e6 !important;
+        opacity: 1 !important;
+        outline: none !important;
     }
 }
 
@@ -650,7 +678,7 @@ body.sub-page .blackwood-nav {
     .hero .blackwood-nav,
     .simple-header .nav-inline,
     .simple-header .blackwood-nav {
-        gap: 13px !important;
+        gap: 10px !important;
     }
 
     .hero .nav-inline > a,
@@ -659,8 +687,12 @@ body.sub-page .blackwood-nav {
     .simple-header .nav-inline > a,
     .simple-header .blackwood-nav-link,
     .simple-header .blackwood-dropdown-toggle {
-        font-size: 12px !important;
-        letter-spacing: 1.75px !important;
+        font-size: 10.2px !important;
+        letter-spacing: 1.35px !important;
+    }
+
+    .simple-header .logo img {
+        width: 104px !important;
     }
 }
 
@@ -725,6 +757,7 @@ body.sub-page .blackwood-nav {
 
     text-align: left !important;
     text-transform: uppercase !important;
+    text-decoration: none !important;
     white-space: nowrap !important;
 }
 
