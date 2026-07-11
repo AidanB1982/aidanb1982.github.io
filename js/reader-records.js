@@ -5,7 +5,7 @@
 
 const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwOWic3DTxR5VkXy0gFythhvDVO6TsOh81jse4LO3YpCyP7SnScUi8p-ccx0SqJPlBb/exec";
 (function () {
-    "use strict";
+    "use strict"; 
 
     const BOOK_META = {
         "The Black Bothy": {
