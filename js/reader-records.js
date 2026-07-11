@@ -157,20 +157,36 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
             const formData = new FormData(form);
 
-            const payload = {
-                book: String(formData.get("book") || "").trim(),
-                mood: String(formData.get("mood") || "").trim(),
-                displayName: String(formData.get("displayName") || "").trim(),
-                email: String(formData.get("email") || "").trim(),
-                readerRecord: String(formData.get("readerRecord") || "").trim(),
-                spoilerWarning: formData.has("spoilerWarning"),
-                permissionToPublish: formData.has("permissionToPublish"),
-                atmosphere: String(formData.get("atmosphere") || "").trim(),
-                story: String(formData.get("story") || "").trim(),
-                characters: String(formData.get("characters") || "").trim(),
-                dread: String(formData.get("dread") || "").trim(),
-                ending: String(formData.get("ending") || "").trim()
-            };
+            const moodMap = {
+    "isolated-grief": "Isolated Grief",
+    "uncanny-obsession": "Uncanny Obsession",
+    "dark-and-twisted": "Dark and Twisted",
+    "bleak-coastal-dread": "Bleak Coastal Dread",
+    "identity-collapse": "Identity Collapse",
+    "haunted-memory": "Haunted Memory",
+    "domestic-haunting": "Domestic Haunting",
+    "urban-pressure": "Urban Pressure",
+    "emotional-damage": "Emotional Damage",
+    "blood-on-the-pavement": "Blood on the Pavement"
+};
+
+const rawMood = String(formData.get("mood") || "").trim();
+const cleanMood = moodMap[rawMood] || rawMood;
+
+const payload = {
+    book: String(formData.get("book") || "").trim(),
+    mood: cleanMood,
+    displayName: String(formData.get("displayName") || "").trim(),
+    email: String(formData.get("email") || "").trim(),
+    readerRecord: String(formData.get("readerRecord") || "").trim(),
+    spoilerWarning: formData.has("spoilerWarning"),
+    permissionToPublish: formData.has("permissionToPublish"),
+    atmosphere: String(formData.get("atmosphere") || "").trim(),
+    story: String(formData.get("story") || "").trim(),
+    characters: String(formData.get("characters") || "").trim(),
+    dread: String(formData.get("dread") || "").trim(),
+    ending: String(formData.get("ending") || "").trim()
+};
 
             await fetch(BLACKWOOD_READER_RECORDS_ENDPOINT, {
                 method: "POST",
