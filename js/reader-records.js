@@ -96,14 +96,19 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
                 .filter(value => Number.isFinite(value) && value >= 1 && value <= 5);
 
             if (ratings.length !== ratingFields.length) {
-                ratingDisplay.textContent = "—";
+                if (ratingDisplay) {
+                    ratingDisplay.textContent = "—";
+                }
+
                 return null;
             }
 
             const total = ratings.reduce((sum, value) => sum + value, 0);
             const average = Math.round((total / ratings.length) * 10) / 10;
 
-            ratingDisplay.textContent = `${average.toFixed(1)} / 5`;
+            if (ratingDisplay) {
+                ratingDisplay.textContent = `${average.toFixed(1)} / 5`;
+            }
 
             return average;
         }
@@ -151,27 +156,29 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             }
 
             const formData = new FormData(form);
-            const payload = new URLSearchParams();
 
-            for (const [key, value] of formData.entries()) {
-                payload.append(key, value);
-            }
-
-            if (!formData.has("spoilerWarning")) {
-                payload.append("spoilerWarning", "false");
-            }
-
-            if (!formData.has("permissionToPublish")) {
-                payload.append("permissionToPublish", "false");
-            }
+            const payload = {
+                book: String(formData.get("book") || "").trim(),
+                mood: String(formData.get("mood") || "").trim(),
+                displayName: String(formData.get("displayName") || "").trim(),
+                email: String(formData.get("email") || "").trim(),
+                readerRecord: String(formData.get("readerRecord") || "").trim(),
+                spoilerWarning: formData.has("spoilerWarning"),
+                permissionToPublish: formData.has("permissionToPublish"),
+                atmosphere: String(formData.get("atmosphere") || "").trim(),
+                story: String(formData.get("story") || "").trim(),
+                characters: String(formData.get("characters") || "").trim(),
+                dread: String(formData.get("dread") || "").trim(),
+                ending: String(formData.get("ending") || "").trim()
+            };
 
             await fetch(BLACKWOOD_READER_RECORDS_ENDPOINT, {
                 method: "POST",
                 mode: "no-cors",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+                    "Content-Type": "text/plain;charset=utf-8"
                 },
-                body: payload.toString()
+                body: JSON.stringify(payload)
             });
         }
 
@@ -192,8 +199,10 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
                 validateForm();
 
-                submitButton.disabled = true;
-                submitButton.textContent = "Filing Record...";
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.textContent = "Filing Record...";
+                }
 
                 await submitRecord();
 
@@ -209,8 +218,10 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             } catch (error) {
                 setStatus(error.message || "Unable to submit your reader record.", "is-error");
             } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = "Submit Reader Record";
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Submit Reader Record";
+                }
             }
         });
     }
@@ -277,12 +288,10 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
             window[callbackName] = data => {
                 resolve(data);
-
                 cleanup();
             };
 
             const script = document.createElement("script");
-
             const separator = url.includes("?") ? "&" : "?";
 
             script.src = `${url}${separator}callback=${callbackName}&cache=${Date.now()}`;
