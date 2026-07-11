@@ -4,7 +4,6 @@
 ====================================================== */
 
 const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxyKTgCB2Ag0qXQi4ZHch_6Hs0oyKDzNOLcFtJob9AuWjZvbCkSs1hrLLReDRguoEvejQ/exec";
-
 (function () {
     "use strict";
 
