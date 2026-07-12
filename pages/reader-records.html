@@ -279,12 +279,27 @@
             </p>
         </div>
 
-        <div class="reader-records-toolbar">
-            <button type="button" class="button ghost" id="reader-records-refresh">
-                Refresh Records
-            </button>
-        </div>
+        <div class="reader-records-toolbar reader-records-toolbar-filtered">
 
+    <label class="reader-record-filter">
+        <span>Filter by Book</span>
+        <select id="reader-records-book-filter">
+            <option value="all">All Books</option>
+        </select>
+    </label>
+
+    <label class="reader-record-filter">
+        <span>Filter by Mood</span>
+        <select id="reader-records-mood-filter">
+            <option value="all">All Moods</option>
+        </select>
+    </label>
+
+    <button type="button" class="button ghost" id="reader-records-refresh">
+        Refresh Records
+    </button>
+
+</div>
         <div class="reader-records-list" id="reader-records-list" aria-live="polite">
             <p class="reader-records-loading">
                 Loading filed records...
