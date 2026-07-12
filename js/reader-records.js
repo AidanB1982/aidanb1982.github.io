@@ -1,6 +1,6 @@
 /* ======================================================
    BLACKWOOD READER RECORDS
-   Front-end bridge for Google Apps Script
+   Front-end bridge for Google Apps Script 
 ====================================================== */
 
 const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwOWic3DTxR5VkXy0gFythhvDVO6TsOh81jse4LO3YpCyP7SnScUi8p-ccx0SqJPlBb/exec";
