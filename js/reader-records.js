@@ -4,8 +4,9 @@
 ====================================================== */
 
 const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwOWic3DTxR5VkXy0gFythhvDVO6TsOh81jse4LO3YpCyP7SnScUi8p-ccx0SqJPlBb/exec";
+
 (function () {
-    "use strict"; 
+    "use strict";
 
     const BOOK_META = {
         "The Black Bothy": {
@@ -36,6 +37,10 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             image: "/assets/book2.jpg",
             link: "https://mybook.to/Corrour"
         },
+        "The Corrour Bothy": {
+            image: "/assets/book2.jpg",
+            link: "https://mybook.to/Corrour"
+        },
         "Love, Abused": {
             image: "/assets/book15.jpg",
             link: "https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF"
@@ -48,6 +53,28 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             image: "/assets/book10.jpg",
             link: "https://mybook.to/RedStreets"
         }
+    };
+
+    const MOOD_MAP = {
+        "isolated-grief": "Isolated Grief",
+        "uncanny-obsession": "Uncanny Obsession",
+        "dark-and-twisted": "Dark and Twisted",
+        "bleak-coastal-dread": "Bleak Coastal Dread",
+        "identity-collapse": "Identity Collapse",
+        "haunted-memory": "Haunted Memory",
+        "domestic-haunting": "Domestic Haunting",
+        "urban-pressure": "Urban Pressure",
+        "emotional-damage": "Emotional Damage",
+        "blood-on-the-pavement": "Blood on the Pavement"
+    };
+
+    const publicRecordsState = {
+        records: [],
+        bookFilter: "all",
+        moodFilter: "all",
+        list: null,
+        bookFilterEl: null,
+        moodFilterEl: null
     };
 
     function endpointConfigured() {
@@ -156,36 +183,23 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
             const formData = new FormData(form);
 
-            const moodMap = {
-    "isolated-grief": "Isolated Grief",
-    "uncanny-obsession": "Uncanny Obsession",
-    "dark-and-twisted": "Dark and Twisted",
-    "bleak-coastal-dread": "Bleak Coastal Dread",
-    "identity-collapse": "Identity Collapse",
-    "haunted-memory": "Haunted Memory",
-    "domestic-haunting": "Domestic Haunting",
-    "urban-pressure": "Urban Pressure",
-    "emotional-damage": "Emotional Damage",
-    "blood-on-the-pavement": "Blood on the Pavement"
-};
+            const rawMood = String(formData.get("mood") || "").trim();
+            const cleanMood = MOOD_MAP[rawMood] || rawMood;
 
-const rawMood = String(formData.get("mood") || "").trim();
-const cleanMood = moodMap[rawMood] || rawMood;
-
-const payload = {
-    book: String(formData.get("book") || "").trim(),
-    mood: cleanMood,
-    displayName: String(formData.get("displayName") || "").trim(),
-    email: String(formData.get("email") || "").trim(),
-    readerRecord: String(formData.get("readerRecord") || "").trim(),
-    spoilerWarning: formData.has("spoilerWarning"),
-    permissionToPublish: formData.has("permissionToPublish"),
-    atmosphere: String(formData.get("atmosphere") || "").trim(),
-    story: String(formData.get("story") || "").trim(),
-    characters: String(formData.get("characters") || "").trim(),
-    dread: String(formData.get("dread") || "").trim(),
-    ending: String(formData.get("ending") || "").trim()
-};
+            const payload = {
+                book: String(formData.get("book") || "").trim(),
+                mood: cleanMood,
+                displayName: String(formData.get("displayName") || "").trim(),
+                email: String(formData.get("email") || "").trim(),
+                readerRecord: String(formData.get("readerRecord") || "").trim(),
+                spoilerWarning: formData.has("spoilerWarning"),
+                permissionToPublish: formData.has("permissionToPublish"),
+                atmosphere: String(formData.get("atmosphere") || "").trim(),
+                story: String(formData.get("story") || "").trim(),
+                characters: String(formData.get("characters") || "").trim(),
+                dread: String(formData.get("dread") || "").trim(),
+                ending: String(formData.get("ending") || "").trim()
+            };
 
             await fetch(BLACKWOOD_READER_RECORDS_ENDPOINT, {
                 method: "POST",
@@ -248,19 +262,43 @@ const payload = {
     function initPublicRecords() {
         const list = document.querySelector("#reader-records-list");
         const refresh = document.querySelector("#reader-records-refresh");
+        const bookFilter = document.querySelector("#reader-records-book-filter");
+        const moodFilter = document.querySelector("#reader-records-mood-filter");
 
         if (!list) return;
 
+        publicRecordsState.list = list;
+        publicRecordsState.bookFilterEl = bookFilter;
+        publicRecordsState.moodFilterEl = moodFilter;
+
         if (refresh) {
             refresh.addEventListener("click", () => {
-                loadApprovedRecords(list);
+                loadApprovedRecords();
             });
         }
 
-        loadApprovedRecords(list);
+        if (bookFilter) {
+            bookFilter.addEventListener("change", () => {
+                publicRecordsState.bookFilter = bookFilter.value;
+                renderRecords();
+            });
+        }
+
+        if (moodFilter) {
+            moodFilter.addEventListener("change", () => {
+                publicRecordsState.moodFilter = moodFilter.value;
+                renderRecords();
+            });
+        }
+
+        loadApprovedRecords();
     }
 
-    function loadApprovedRecords(list) {
+    function loadApprovedRecords() {
+        const list = publicRecordsState.list;
+
+        if (!list) return;
+
         if (!endpointConfigured()) {
             list.innerHTML = "";
 
@@ -284,7 +322,10 @@ const payload = {
             .then(data => {
                 const records = Array.isArray(data.records) ? data.records : [];
 
-                renderRecords(list, records);
+                publicRecordsState.records = normaliseRecords(records);
+
+                populateFilters(publicRecordsState.records);
+                renderRecords();
             })
             .catch(() => {
                 list.innerHTML = "";
@@ -329,29 +370,166 @@ const payload = {
         });
     }
 
-    function renderRecords(list, records) {
-        list.innerHTML = "";
-
-        const filtered = records
+    function normaliseRecords(records) {
+        return records
             .filter(record => record && record.book && record.readerRecord)
+            .map(record => ({
+                ...record,
+                book: String(record.book || "").trim(),
+                mood: String(record.mood || "").trim(),
+                displayName: String(record.displayName || "").trim(),
+                readerRecord: String(record.readerRecord || "").trim(),
+                timestamp: String(record.timestamp || "").trim(),
+                featured: Boolean(record.featured),
+                spoilerWarning: Boolean(record.spoilerWarning),
+                finalRating: Number(record.finalRating || 0),
+                atmosphere: Number(record.atmosphere || 0),
+                story: Number(record.story || 0),
+                characters: Number(record.characters || 0),
+                dreadTension: Number(record.dreadTension || 0),
+                ending: Number(record.ending || 0)
+            }))
             .sort((a, b) => {
                 if (a.featured && !b.featured) return -1;
                 if (!a.featured && b.featured) return 1;
-                return 0;
+
+                return a.book.localeCompare(b.book);
             });
+    }
+
+    function populateFilters(records) {
+        const bookFilter = publicRecordsState.bookFilterEl;
+        const moodFilter = publicRecordsState.moodFilterEl;
+
+        if (bookFilter) {
+            const currentValue = bookFilter.value || "all";
+            const books = uniqueValues(records.map(record => record.book));
+
+            bookFilter.innerHTML = `<option value="all">All Books</option>`;
+
+            books.forEach(book => {
+                const option = document.createElement("option");
+                option.value = book;
+                option.textContent = book;
+                bookFilter.appendChild(option);
+            });
+
+            bookFilter.value = books.includes(currentValue) ? currentValue : "all";
+            publicRecordsState.bookFilter = bookFilter.value;
+        }
+
+        if (moodFilter) {
+            const currentValue = moodFilter.value || "all";
+            const moods = uniqueValues(records.map(record => record.mood));
+
+            moodFilter.innerHTML = `<option value="all">All Moods</option>`;
+
+            moods.forEach(mood => {
+                const option = document.createElement("option");
+                option.value = mood;
+                option.textContent = mood;
+                moodFilter.appendChild(option);
+            });
+
+            moodFilter.value = moods.includes(currentValue) ? currentValue : "all";
+            publicRecordsState.moodFilter = moodFilter.value;
+        }
+    }
+
+    function uniqueValues(values) {
+        return Array.from(
+            new Set(
+                values
+                    .map(value => String(value || "").trim())
+                    .filter(Boolean)
+            )
+        ).sort((a, b) => a.localeCompare(b));
+    }
+
+    function renderRecords() {
+        const list = publicRecordsState.list;
+
+        if (!list) return;
+
+        list.innerHTML = "";
+
+        const filtered = publicRecordsState.records.filter(record => {
+            const bookMatches =
+                publicRecordsState.bookFilter === "all" ||
+                record.book === publicRecordsState.bookFilter;
+
+            const moodMatches =
+                publicRecordsState.moodFilter === "all" ||
+                record.mood === publicRecordsState.moodFilter;
+
+            return bookMatches && moodMatches;
+        });
 
         if (!filtered.length) {
             const empty = document.createElement("p");
             empty.className = "reader-records-empty";
-            empty.textContent = "No approved reader records have been filed yet.";
+            empty.textContent = "No approved reader records match this filter.";
 
             list.appendChild(empty);
             return;
         }
 
-        filtered.forEach(record => {
-            list.appendChild(createRecordCard(record));
+        const grouped = groupRecordsByBook(filtered);
+
+        Object.keys(grouped).forEach(book => {
+            list.appendChild(createBookGroup(book, grouped[book]));
         });
+    }
+
+    function groupRecordsByBook(records) {
+        return records.reduce((groups, record) => {
+            const book = record.book || "Unfiled Record";
+
+            if (!groups[book]) {
+                groups[book] = [];
+            }
+
+            groups[book].push(record);
+
+            groups[book].sort((a, b) => {
+                if (a.featured && !b.featured) return -1;
+                if (!a.featured && b.featured) return 1;
+                return 0;
+            });
+
+            return groups;
+        }, {});
+    }
+
+    function createBookGroup(book, records) {
+        const section = document.createElement("section");
+        section.className = "reader-book-group";
+
+        const heading = document.createElement("div");
+        heading.className = "reader-book-group-heading";
+
+        const title = document.createElement("h3");
+        title.className = "reader-book-group-title";
+        title.textContent = book;
+
+        const count = document.createElement("p");
+        count.className = "reader-book-group-count";
+        count.textContent = `${records.length} ${records.length === 1 ? "record" : "records"}`;
+
+        heading.appendChild(title);
+        heading.appendChild(count);
+
+        const grid = document.createElement("div");
+        grid.className = "reader-book-group-grid";
+
+        records.forEach(record => {
+            grid.appendChild(createRecordCard(record));
+        });
+
+        section.appendChild(heading);
+        section.appendChild(grid);
+
+        return section;
     }
 
     function createRecordCard(record) {
@@ -361,7 +539,7 @@ const payload = {
         };
 
         const card = document.createElement("article");
-        card.className = "reader-public-card";
+        card.className = "reader-public-card is-compact";
 
         const coverWrap = document.createElement("div");
         coverWrap.className = "reader-public-cover";
@@ -398,7 +576,7 @@ const payload = {
             metaRow.appendChild(createPill("Spoilers Hidden"));
         }
 
-        const title = document.createElement("h3");
+        const title = document.createElement("h4");
         title.textContent = record.book;
 
         const finalRating = Number(record.finalRating || 0);
@@ -409,6 +587,10 @@ const payload = {
 
         const review = document.createElement("p");
         review.className = "reader-public-review";
+
+        content.appendChild(metaRow);
+        content.appendChild(title);
+        content.appendChild(rating);
 
         if (record.spoilerWarning) {
             review.hidden = true;
@@ -427,18 +609,10 @@ const payload = {
             });
 
             spoilerWrap.appendChild(spoilerButton);
-
-            content.appendChild(metaRow);
-            content.appendChild(title);
-            content.appendChild(rating);
             content.appendChild(spoilerWrap);
             content.appendChild(review);
         } else {
             review.textContent = record.readerRecord;
-
-            content.appendChild(metaRow);
-            content.appendChild(title);
-            content.appendChild(rating);
             content.appendChild(review);
         }
 
