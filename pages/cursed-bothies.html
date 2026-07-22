@@ -20,11 +20,13 @@
         content="The Cursed Bothies is a Highland-set series exploring isolation, folklore, weather, memory, and the presence of something older beneath the land."
     >
 
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/header.css?v=20260815">
+    <link rel="stylesheet" href="/css/styles.css?v=20260815">
 </head>
 
 <body class="sub-page series-page cursed-bothies-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -36,7 +38,9 @@
 
     <div class="about-hero-content fade-in">
         <p class="about-intro-line">Highland Series</p>
+
         <h1>The Cursed Bothies</h1>
+
         <p class="cursed-bothies-hero-subline">
             Remote shelters. Harsh weather. Old presences that do not stay buried.
         </p>
@@ -45,7 +49,7 @@
 </section>
 
 <!-- MAIN -->
-<main class="cursed-bothies-wrap">
+<main id="main-content" class="cursed-bothies-wrap">
 
     <!-- INTRO PANEL -->
     <section class="cursed-bothies-intro fade-in">
@@ -77,16 +81,14 @@
 
         <div class="cursed-bothies-actions">
             <a
-                href="https://mybook.to/Corrour"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/pages/store.html#corrour-bothy"
                 class="button copper"
             >
-                Start with Corrour
+                Start with Corrour Bothy
             </a>
 
-            <a href="/pages/publications.html" class="button ghost">
-                View The Works
+            <a href="/pages/store.html" class="button ghost">
+                View Direct Editions
             </a>
         </div>
 
@@ -96,19 +98,21 @@
     <section class="cursed-bothies-sequence fade-in">
 
         <p class="cursed-bothies-kicker">The Sequence</p>
+
         <h2>Three bothies. Three records.</h2>
 
         <div class="cursed-bothies-grid">
 
-            <!-- CORROUR -->
+            <!-- CORROUR BOTHY -->
             <article class="cursed-bothies-card cursed-bothies-card-featured">
                 <div class="cursed-bothies-card-cover">
-                    <img src="/assets/book2.jpg" loading="lazy" alt="Corrour cover">
+                    <img src="/assets/book2.jpg" loading="lazy" alt="Corrour Bothy cover">
                 </div>
 
                 <div class="cursed-bothies-card-copy">
                     <p class="cursed-bothies-card-number">Book One</p>
-                    <h3>Corrour</h3>
+
+                    <h3>Corrour Bothy</h3>
 
                     <p>
                         A storm traps strangers inside a remote Highland shelter.
@@ -125,12 +129,10 @@
 
                     <div class="cursed-bothies-card-actions">
                         <a
-                            href="https://mybook.to/Corrour"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="/pages/store.html#corrour-bothy"
                             class="button copper"
                         >
-                            Read Corrour
+                            Read Corrour Bothy
                         </a>
                     </div>
                 </div>
@@ -144,6 +146,7 @@
 
                 <div class="cursed-bothies-card-copy">
                     <p class="cursed-bothies-card-number">Book Two</p>
+
                     <h3>Gualachulain</h3>
 
                     <p>
@@ -157,10 +160,8 @@
 
                     <div class="cursed-bothies-card-actions">
                         <a
-                            href="https://mybook.to/Gualachulain"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="button copper"
+                            href="/pages/store.html"
+                            class="button ghost"
                         >
                             Gualachulain Coming Soon
                         </a>
@@ -176,6 +177,7 @@
 
                 <div class="cursed-bothies-card-copy">
                     <p class="cursed-bothies-card-number">Book Three</p>
+
                     <h3>Camban</h3>
 
                     <p>
@@ -189,10 +191,8 @@
 
                     <div class="cursed-bothies-card-actions">
                         <a
-                            href="https://mybook.to/Camban"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="button copper"
+                            href="/pages/store.html"
+                            class="button ghost"
                         >
                             Camban Coming Soon
                         </a>
@@ -217,9 +217,9 @@
             <strong>The Archive Files</strong>
         </a>
 
-        <a href="/pages/publications.html" class="cursed-bothies-route-card">
-            <span>See Everything</span>
-            <strong>The Works</strong>
+        <a href="/pages/store.html" class="cursed-bothies-route-card">
+            <span>Direct Copies</span>
+            <strong>Direct Editions</strong>
         </a>
 
     </section>
@@ -231,7 +231,7 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260812" defer></script>
+<script src="/js/header.js?v=20260815" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
@@ -243,7 +243,9 @@ window.addEventListener("load", async () => {
 
     await loadHeader("simple");
 
-    if (typeof initFadeIn === "function") initFadeIn();
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
 
 });
 </script>
