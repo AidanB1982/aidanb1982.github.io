@@ -113,7 +113,7 @@
             category: "limited",
             categoryLabel: "Limited Editions",
             badge: "Foil Edition",
-            image: "/assets/book2.jpg",
+            image: "/assets/book13.jpg",
             description: "A limited collector edition from the Cursed Bothies file. Available while stock remains."
         }
     ];
