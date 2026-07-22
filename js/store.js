@@ -18,6 +18,7 @@
     const STORE_PRODUCTS = [
         {
             id: "16270731706713",
+            slug: "the-black-bothy",
             title: "The Black Bothy",
             subtitle: "Book One of The Archive Files",
             category: "archive-files",
@@ -28,6 +29,7 @@
         },
         {
             id: "16446299242841",
+            slug: "the-drowned-fjord",
             title: "The Drowned Fjord",
             subtitle: "Book Two of The Archive Files",
             category: "archive-files",
@@ -38,6 +40,7 @@
         },
         {
             id: "16446301143385",
+            slug: "the-erased-archivist",
             title: "The Erased Archivist",
             subtitle: "Book Three of The Archive Files",
             category: "archive-files",
@@ -48,6 +51,7 @@
         },
         {
             id: "16396256477529",
+            slug: "holdfast",
             title: "Holdfast",
             subtitle: "Book Four of The Archive Files",
             category: "archive-files",
@@ -58,6 +62,7 @@
         },
         {
             id: "16446303732057",
+            slug: "dour-hill-house",
             title: "Dour Hill House",
             subtitle: "Independent Work",
             category: "standalone",
@@ -68,6 +73,7 @@
         },
         {
             id: "16446309794137",
+            slug: "the-scheme",
             title: "The Scheme",
             subtitle: "Hard Silence",
             category: "hard-silence",
@@ -78,6 +84,7 @@
         },
         {
             id: "16446312087897",
+            slug: "red-streets",
             title: "Red Streets",
             subtitle: "Hard Silence",
             category: "hard-silence",
@@ -88,6 +95,7 @@
         },
         {
             id: "16270738620761",
+            slug: "corrour-bothy",
             title: "Corrour Bothy",
             subtitle: "The Cursed Bothies",
             category: "cursed-bothies",
@@ -98,6 +106,7 @@
         },
         {
             id: "16446308811097",
+            slug: "love-abused",
             title: "Love, Abused",
             subtitle: "Independent Work",
             category: "standalone",
@@ -108,6 +117,7 @@
         },
         {
             id: "16164737679705",
+            slug: "corrour-foil-edition",
             title: "Corrour Foil Edition",
             subtitle: "Limited Edition",
             category: "limited",
@@ -162,6 +172,8 @@
         renderProducts(grid);
         updateStoreStatus();
         bindSearch();
+        bindHashNavigation();
+        openProductFromHash();
 
         loadShopifySdk()
             .then(initShopify)
@@ -226,8 +238,12 @@
     function createProductCard(product) {
         const card = document.createElement("article");
 
+        card.id = product.slug;
         card.className = "store-product-card";
+        card.tabIndex = -1;
+
         card.dataset.storeProduct = product.id;
+        card.dataset.storeSlug = product.slug;
         card.dataset.storeCategory = product.category;
         card.dataset.storeTitle = product.title.toLowerCase();
         card.dataset.storeText = `${product.title} ${product.subtitle} ${product.categoryLabel} ${product.description}`.toLowerCase();
@@ -289,6 +305,65 @@
         }
 
         search.addEventListener("input", applyStoreFilters);
+    }
+
+    function bindHashNavigation() {
+        window.addEventListener("hashchange", openProductFromHash);
+    }
+
+    function openProductFromHash() {
+        const slug = getCurrentHashSlug();
+
+        if (!slug) {
+            return;
+        }
+
+        const productExists = STORE_PRODUCTS.some(product => product.slug === slug);
+
+        if (!productExists) {
+            return;
+        }
+
+        state.activeFilter = "all";
+        updateActiveFilterButtons();
+
+        const search = document.querySelector("#blackwood-store-search");
+
+        if (search) {
+            search.value = "";
+        }
+
+        applyStoreFilters();
+
+        window.requestAnimationFrame(() => {
+            const card = document.getElementById(slug);
+
+            if (!card) {
+                return;
+            }
+
+            card.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            card.focus({
+                preventScroll: true
+            });
+
+            card.classList.add("is-targeted");
+
+            window.setTimeout(() => {
+                card.classList.remove("is-targeted");
+            }, 2200);
+        });
+    }
+
+    function getCurrentHashSlug() {
+        return decodeURIComponent(window.location.hash || "")
+            .replace("#", "")
+            .trim()
+            .toLowerCase();
     }
 
     function applyStoreFilters() {
