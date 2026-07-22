@@ -586,3 +586,13 @@
         font-size: 22px;
     }
 }
+/* ======================================================
+   STORE PAGE — FORCE CONTENT VISIBLE
+   Fixes black screen if fade-in animation does not trigger
+====================================================== */
+
+.store-page .fade-in {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+}
