@@ -9,51 +9,51 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
     "use strict";
 
     const BOOK_META = {
-        "The Black Bothy": {
-            image: "/assets/A8.png",
-            link: "https://amzn.eu/d/0iArX1Pv"
-        },
-        "The Drowned Fjord": {
-            image: "/assets/A7.png",
-            link: "https://amzn.eu/d/07uDWvaN"
-        },
-        "The Erased Archivist": {
-            image: "/assets/A6.png",
-            link: "https://amzn.eu/d/06fDEnwB"
-        },
-        "Holdfast": {
-            image: "/assets/A5.png",
-            link: "/pages/holdfast.html"
-        },
-        "Dour Hill House": {
-            image: "/assets/book1.jpg",
-            link: "https://mybook.to/DourHillHouse"
-        },
-        "The Red-Clad Collector": {
-            image: "/assets/book11.png",
-            link: "https://www.amazon.co.uk/dp/B0G76MRK8R"
-        },
-        "Corrour Bothy": {
-            image: "/assets/book2.jpg",
-            link: "https://mybook.to/Corrour"
-        },
-        "The Corrour Bothy": {
-            image: "/assets/book2.jpg",
-            link: "https://mybook.to/Corrour"
-        },
-        "Love, Abused": {
-            image: "/assets/book15.jpg",
-            link: "https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF"
-        },
-        "The Scheme": {
-            image: "/assets/book9.png",
-            link: "https://www.amazon.co.uk/dp/B0H3C64H11"
-        },
-        "Red Streets": {
-            image: "/assets/book10.jpg",
-            link: "https://mybook.to/RedStreets"
-        }
-    };
+    "The Black Bothy": {
+        image: "/assets/A8.png",
+        link: "/pages/store.html#the-black-bothy"
+    },
+    "The Drowned Fjord": {
+        image: "/assets/A7.png",
+        link: "/pages/store.html#the-drowned-fjord"
+    },
+    "The Erased Archivist": {
+        image: "/assets/A6.png",
+        link: "/pages/store.html#the-erased-archivist"
+    },
+    "Holdfast": {
+        image: "/assets/A5.png",
+        link: "/pages/holdfast.html"
+    },
+    "Dour Hill House": {
+        image: "/assets/book1.jpg",
+        link: "/pages/store.html#dour-hill-house"
+    },
+    "The Red-Clad Collector": {
+        image: "/assets/book11.png",
+        link: "https://www.amazon.co.uk/dp/B0G76MRK8R"
+    },
+    "Corrour Bothy": {
+        image: "/assets/book2.jpg",
+        link: "/pages/store.html#corrour-bothy"
+    },
+    "The Corrour Bothy": {
+        image: "/assets/book2.jpg",
+        link: "/pages/store.html#corrour-bothy"
+    },
+    "Love, Abused": {
+        image: "/assets/book15.jpg",
+        link: "/pages/store.html#love-abused"
+    },
+    "The Scheme": {
+        image: "/assets/book9.png",
+        link: "/pages/store.html#the-scheme"
+    },
+    "Red Streets": {
+        image: "/assets/book10.jpg",
+        link: "/pages/store.html#red-streets"
+    }
+};
 
     const MOOD_MAP = {
         "isolated-grief": "Isolated Grief",
