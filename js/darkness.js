@@ -5,7 +5,7 @@
 
 (function () {
     "use strict";
- 
+
     const darknessMap = {
         "isolated-grief": {
             mood: "Isolated Grief",
@@ -16,27 +16,27 @@
                     title: "The Black Bothy",
                     label: "Recommended Door",
                     image: "/assets/A8.png",
-                    link: "https://amzn.eu/d/0iArX1Pv",
+                    link: "/pages/store.html#the-black-bothy",
                     button: "Begin The Black Bothy",
-                    external: true,
+                    external: false,
                     copy: "For readers who want silence, loss, bad weather, final recordings, and the feeling that somewhere empty has been waiting for them."
                 },
                 {
                     title: "The Drowned Fjord",
                     label: "Also Opens",
                     image: "/assets/A7.png",
-                    link: "https://amzn.eu/d/07uDWvaN",
+                    link: "/pages/store.html#the-drowned-fjord",
                     button: "Continue to The Drowned Fjord",
-                    external: true,
+                    external: false,
                     copy: "Cold water, buried history, grief, and the sense that something vast is waiting offshore."
                 },
                 {
                     title: "Dour Hill House",
                     label: "Also Opens",
                     image: "/assets/book1.jpg",
-                    link: "https://mybook.to/DourHillHouse",
+                    link: "/pages/store.html#dour-hill-house",
                     button: "Read Dour Hill House",
-                    external: true,
+                    external: false,
                     copy: "A house full of pressure, old rooms, quiet dread, and something unresolved still moving through the walls."
                 }
             ]
@@ -60,9 +60,9 @@
                     title: "The Erased Archivist",
                     label: "Also Opens",
                     image: "/assets/A6.png",
-                    link: "https://amzn.eu/d/06fDEnwB",
+                    link: "/pages/store.html#the-erased-archivist",
                     button: "Begin The Erased Archivist",
-                    external: true,
+                    external: false,
                     copy: "Missing names, impossible records, fractured identity, and the horror of finding yourself rewritten."
                 },
                 {
@@ -86,27 +86,27 @@
                     title: "Corrour Bothy",
                     label: "Recommended Door",
                     image: "/assets/book2.jpg",
-                    link: "https://mybook.to/Corrour",
+                    link: "/pages/store.html#corrour-bothy",
                     button: "Begin Corrour Bothy",
-                    external: true,
+                    external: false,
                     copy: "For readers who want a bothy story with teeth. Harsher, stranger, and more disturbed."
                 },
                 {
                     title: "Red Streets",
                     label: "Also Opens",
                     image: "/assets/book10.jpg",
-                    link: "https://mybook.to/RedStreets",
+                    link: "/pages/store.html#red-streets",
                     button: "Begin Red Streets",
-                    external: true,
+                    external: false,
                     copy: "Street-level violence, consequence, brutality, and no clean escape."
                 },
                 {
                     title: "The Scheme",
                     label: "Also Opens",
                     image: "/assets/book9.png",
-                    link: "https://www.amazon.co.uk/dp/B0H3C64H11",
+                    link: "/pages/store.html#the-scheme",
                     button: "Begin The Scheme",
-                    external: true,
+                    external: false,
                     copy: "Tension, survival, moral collapse, and lives forced against the wall."
                 }
             ]
@@ -121,18 +121,18 @@
                     title: "The Drowned Fjord",
                     label: "Recommended Door",
                     image: "/assets/A7.png",
-                    link: "https://amzn.eu/d/07uDWvaN",
+                    link: "/pages/store.html#the-drowned-fjord",
                     button: "Begin The Drowned Fjord",
-                    external: true,
+                    external: false,
                     copy: "For readers who want cold water, buried history, grief, and the sense that something vast is waiting offshore."
                 },
                 {
                     title: "The Black Bothy",
                     label: "Also Opens",
                     image: "/assets/A8.png",
-                    link: "https://amzn.eu/d/0iArX1Pv",
+                    link: "/pages/store.html#the-black-bothy",
                     button: "Begin The Black Bothy",
-                    external: true,
+                    external: false,
                     copy: "Remote silence, loss, bad weather, final recordings, and somewhere empty waiting."
                 },
                 {
@@ -156,9 +156,9 @@
                     title: "The Erased Archivist",
                     label: "Recommended Door",
                     image: "/assets/A6.png",
-                    link: "https://amzn.eu/d/06fDEnwB",
+                    link: "/pages/store.html#the-erased-archivist",
                     button: "Begin The Erased Archivist",
-                    external: true,
+                    external: false,
                     copy: "For readers who want missing names, impossible records, fractured identity, and the horror of finding yourself rewritten."
                 },
                 {
@@ -200,18 +200,18 @@
                     title: "The Erased Archivist",
                     label: "Also Opens",
                     image: "/assets/A6.png",
-                    link: "https://amzn.eu/d/06fDEnwB",
+                    link: "/pages/store.html#the-erased-archivist",
                     button: "Begin The Erased Archivist",
-                    external: true,
+                    external: false,
                     copy: "Impossible records, fractured identity, and the horror of finding yourself rewritten."
                 },
                 {
                     title: "The Black Bothy",
                     label: "Also Opens",
                     image: "/assets/A8.png",
-                    link: "https://amzn.eu/d/0iArX1Pv",
+                    link: "/pages/store.html#the-black-bothy",
                     button: "Begin The Black Bothy",
-                    external: true,
+                    external: false,
                     copy: "Final recordings, remote silence, and the feeling that the land remembers."
                 }
             ]
@@ -226,27 +226,27 @@
                     title: "Dour Hill House",
                     label: "Recommended Door",
                     image: "/assets/book1.jpg",
-                    link: "https://mybook.to/DourHillHouse",
+                    link: "/pages/store.html#dour-hill-house",
                     button: "Begin Dour Hill House",
-                    external: true,
+                    external: false,
                     copy: "For readers who want a house full of pressure, old rooms, quiet dread, and something unresolved still moving through the walls."
                 },
                 {
                     title: "The Black Bothy",
                     label: "Also Opens",
                     image: "/assets/A8.png",
-                    link: "https://amzn.eu/d/0iArX1Pv",
+                    link: "/pages/store.html#the-black-bothy",
                     button: "Begin The Black Bothy",
-                    external: true,
+                    external: false,
                     copy: "Remote shelter, bad weather, and somewhere that should have been empty."
                 },
                 {
                     title: "Love, Abused",
                     label: "Also Opens",
                     image: "/assets/book15.jpg",
-                    link: "https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF",
+                    link: "/pages/store.html#love-abused",
                     button: "Begin Love, Abused",
-                    external: true,
+                    external: false,
                     copy: "Trauma, control, survival, and the human cost of being broken by someone else."
                 }
             ]
@@ -261,27 +261,27 @@
                     title: "The Scheme",
                     label: "Recommended Door",
                     image: "/assets/book9.png",
-                    link: "https://www.amazon.co.uk/dp/B0H3C64H11",
+                    link: "/pages/store.html#the-scheme",
                     button: "Begin The Scheme",
-                    external: true,
+                    external: false,
                     copy: "For readers who want something sharper, street-level, tense, and close to real-world violence."
                 },
                 {
                     title: "Red Streets",
                     label: "Also Opens",
                     image: "/assets/book10.jpg",
-                    link: "https://mybook.to/RedStreets",
+                    link: "/pages/store.html#red-streets",
                     button: "Begin Red Streets",
-                    external: true,
+                    external: false,
                     copy: "Violence, consequence, survival, and streets that do not forgive."
                 },
                 {
                     title: "Love, Abused",
                     label: "Also Opens",
                     image: "/assets/book15.jpg",
-                    link: "https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF",
+                    link: "/pages/store.html#love-abused",
                     button: "Begin Love, Abused",
-                    external: true,
+                    external: false,
                     copy: "Pain, control, survival, and the human cost of abuse."
                 }
             ]
@@ -296,27 +296,27 @@
                     title: "Love, Abused",
                     label: "Recommended Door",
                     image: "/assets/book15.jpg",
-                    link: "https://www.amazon.co.uk/Love-Abused-Record-What-Missed-ebook/dp/B0GCLV1WBF",
+                    link: "/pages/store.html#love-abused",
                     button: "Begin Love, Abused",
-                    external: true,
+                    external: false,
                     copy: "For readers who want dark fiction rooted in pain, control, survival, and the human cost of abuse."
                 },
                 {
                     title: "Dour Hill House",
                     label: "Also Opens",
                     image: "/assets/book1.jpg",
-                    link: "https://mybook.to/DourHillHouse",
+                    link: "/pages/store.html#dour-hill-house",
                     button: "Begin Dour Hill House",
-                    external: true,
+                    external: false,
                     copy: "A house full of pressure, family damage, and something unresolved still moving through the walls."
                 },
                 {
                     title: "The Scheme",
                     label: "Also Opens",
                     image: "/assets/book9.png",
-                    link: "https://www.amazon.co.uk/dp/B0H3C64H11",
+                    link: "/pages/store.html#the-scheme",
                     button: "Begin The Scheme",
-                    external: true,
+                    external: false,
                     copy: "Survival, silence, control, and moral lines under pressure."
                 }
             ]
@@ -331,27 +331,27 @@
                     title: "Red Streets",
                     label: "Recommended Door",
                     image: "/assets/book10.jpg",
-                    link: "https://mybook.to/RedStreets",
+                    link: "/pages/store.html#red-streets",
                     button: "Begin Red Streets",
-                    external: true,
+                    external: false,
                     copy: "For readers who want the darker edge of the city: violence, consequence, survival, and streets that do not forgive."
                 },
                 {
                     title: "The Scheme",
                     label: "Also Opens",
                     image: "/assets/book9.png",
-                    link: "https://www.amazon.co.uk/dp/B0H3C64H11",
+                    link: "/pages/store.html#the-scheme",
                     button: "Begin The Scheme",
-                    external: true,
+                    external: false,
                     copy: "Tension, survival, moral collapse, and lives forced against the wall."
                 },
                 {
                     title: "Corrour Bothy",
                     label: "Also Opens",
                     image: "/assets/book2.jpg",
-                    link: "https://mybook.to/Corrour",
+                    link: "/pages/store.html#corrour-bothy",
                     button: "Begin Corrour Bothy",
-                    external: true,
+                    external: false,
                     copy: "A harsher, stranger, more disturbed bothy story with teeth."
                 }
             ]
