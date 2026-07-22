@@ -596,3 +596,10 @@
     visibility: visible !important;
     transform: none !important;
 }
+.store-product-card.is-targeted {
+    border-color: rgba(184, 115, 51, 0.78);
+    box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.68),
+        0 0 48px rgba(184, 115, 51, 0.18),
+        inset 0 0 0 1px rgba(184, 115, 51, 0.18);
+}
