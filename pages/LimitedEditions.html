@@ -11,8 +11,8 @@
     content="Limited editions, signed copies, numbered objects, and archive releases from Blackwood Publishing. Not all copies remain."
 >
 
-<link rel="stylesheet" href="/css/header.css?v=20260713">
-<link rel="stylesheet" href="/css/styles.css?v=20260713">
+<link rel="stylesheet" href="/css/header.css?v=20260815">
+<link rel="stylesheet" href="/css/styles.css?v=20260815">
 
 </head>
 
@@ -82,36 +82,38 @@
 
         <div class="limited-editions-grid">
 
-            <!-- BOOK 1 -->
+            <!-- CORROUR FOIL EDITION -->
             <article class="limited-edition-card">
 
                 <div class="limited-edition-cover">
-                    <img src="/assets/A1.png" loading="lazy" alt="Corrour Bothy Signed Edition">
+                    <img src="/assets/book2.jpg" loading="lazy" alt="Corrour Foil Edition">
                 </div>
 
                 <div class="limited-edition-copy">
-                    <p class="limited-edition-label">Signed Edition</p>
+                    <p class="limited-edition-label">Foil Edition</p>
 
-                    <h3>Corrour Bothy — First Summoning</h3>
+                    <h3>Corrour Foil Edition</h3>
 
                     <p class="limited-edition-description">
-                        A marked edition from the bothy records. Released in limited form.
+                        A marked collector edition from The Cursed Bothies file. Available while stock remains.
                     </p>
 
-                    <p class="stock-line" id="stock-1">
-                        Checking availability...
+                    <p class="stock-line">
+                        Filed at the Direct Editions Desk.
                     </p>
 
-                    <div id="product-1" class="product-slot"></div>
+                    <a href="/pages/store.html#corrour-foil-edition" class="button copper">
+                        View Direct Edition
+                    </a>
                 </div>
 
             </article>
 
-            <!-- BOOK 2 -->
+            <!-- THE BLACK BOTHY -->
             <article class="limited-edition-card limited-edition-card-featured">
 
                 <div class="limited-edition-cover">
-                    <img src="/assets/A8.png" loading="lazy" alt="The Black Bothy limited edition">
+                    <img src="/assets/A8.png" loading="lazy" alt="The Black Bothy direct edition">
                 </div>
 
                 <div class="limited-edition-copy">
@@ -123,36 +125,40 @@
                         Book One of The Archive Files. The first record. The correct place to begin.
                     </p>
 
-                    <p class="stock-line" id="stock-2">
-                        Checking availability...
+                    <p class="stock-line">
+                        Filed at the Direct Editions Desk.
                     </p>
 
-                    <div id="product-2" class="product-slot"></div>
+                    <a href="/pages/store.html#the-black-bothy" class="button copper">
+                        View Direct Edition
+                    </a>
                 </div>
 
             </article>
 
-            <!-- BOOK 3 -->
+            <!-- CORROUR BOTHY -->
             <article class="limited-edition-card">
 
                 <div class="limited-edition-cover">
-                    <img src="/assets/A9.png" loading="lazy" alt="Corrour paperback">
+                    <img src="/assets/book2.jpg" loading="lazy" alt="Corrour Bothy paperback">
                 </div>
 
                 <div class="limited-edition-copy">
                     <p class="limited-edition-label">Paperback</p>
 
-                    <h3>Corrour — Paperback</h3>
+                    <h3>Corrour Bothy</h3>
 
                     <p class="limited-edition-description">
                         A physical edition from The Cursed Bothies sequence.
                     </p>
 
-                    <p class="stock-line" id="stock-3">
-                        Checking availability...
+                    <p class="stock-line">
+                        Filed at the Direct Editions Desk.
                     </p>
 
-                    <div id="product-3" class="product-slot"></div>
+                    <a href="/pages/store.html#corrour-bothy" class="button copper">
+                        View Direct Edition
+                    </a>
                 </div>
 
             </article>
@@ -174,7 +180,11 @@
             They do not return.
         </p>
 
-        <a href="/pages/archive-files.html" class="button copper">
+        <a href="/pages/store.html" class="button copper">
+            Enter the Direct Editions Desk
+        </a>
+
+        <a href="/pages/archive-files.html" class="button ghost">
             Return to The Archive Files
         </a>
 
@@ -189,18 +199,13 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260812" defer></script>
-<script src="/js/limited.js?v=20260713" defer></script>
+<script src="/js/header.js?v=20260815" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
 
     if (typeof loadHeader === "function") {
         await loadHeader("simple");
-    }
-
-    if (typeof loadFooter === "function") {
-        await loadFooter();
     }
 
     if (typeof initFadeIn === "function") {
