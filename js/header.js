@@ -112,6 +112,8 @@ function initBlackwoodDropdownNav(headerContainer) {
         </div>
 
         <a href="/pages/holdfast.html" class="blackwood-nav-link">Holdfast</a>
+        
+        <a href="/pages/store.html" class="blackwood-nav-link">Direct Editions</a>
 
         <div class="blackwood-nav-item has-dropdown">
             <button
