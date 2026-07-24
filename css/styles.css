@@ -8846,3 +8846,10 @@ body.author-page .author-block {
         width: min(72vw, 270px);
     }
 }
+/* ======================================================
+   AIDAN BLACKWOOD PAGE — FORTHCOMING WORK FEATURE
+====================================================== */
+
+.aidan-book-feature {
+    max-width: 1040px;
+}
