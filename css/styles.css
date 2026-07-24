@@ -8716,31 +8716,7 @@ body.recovered-file-page .about-hero h1 {
         height: 330px;
     }
 }
-/* ======================================================
-   MIREN VALE PAGE — HERO GAP FIX
-====================================================== */
 
-.miren-vale-page .about-hero {
-    min-height: 380px;
-    height: auto;
-    padding: 115px 20px 70px;
-}
-
-.miren-vale-page .about-hero-content {
-    max-width: 760px;
-}
-
-.miren-vale-page main {
-    margin-top: 0;
-}
-
-.miren-vale-page .about-section:first-of-type {
-    padding-top: 55px;
-}
-
-.miren-vale-page .author-block {
-    margin-top: 0;
-}
 /* ======================================================
    AUTHOR PAGES — HERO GAP FIX
    Applies to Aidan Blackwood and Miren Vale
