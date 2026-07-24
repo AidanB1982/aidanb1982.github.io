@@ -19,8 +19,6 @@ async function loadHeader(type = "hero") {
     try {
         const base = "/";
 
-        console.log("Fetching:", `${base}${file}`);
-
         // HEADER
         const headerRes = await fetch(`${base}${file}`);
         if (!headerRes.ok) throw new Error(`Failed to load ${file}`); 
@@ -146,11 +144,11 @@ function initBlackwoodDropdownNav(headerContainer) {
             </button>
 
             <div class="blackwood-dropdown" role="menu">
-                <a href="/pages/author.html" role="menuitem">Author</a>
-                <a href="/pages/about.html" role="menuitem">About Blackwood</a>
-                <a href="/pages/contact.html" role="menuitem">Contact</a>
-            </div>
-        </div>
+    <a href="/pages/author.html" role="menuitem">Aidan Blackwood</a>
+    <a href="/pages/miren-vale.html" role="menuitem">Miren Vale</a>
+    <a href="/pages/about.html" role="menuitem">About Blackwood</a>
+    <a href="/pages/contact.html" role="menuitem">Contact</a>
+</div>
 
         <a href="/pages/CommunitySpotlight.html" class="blackwood-nav-link">Community</a>
     `;
