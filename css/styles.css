@@ -8722,25 +8722,25 @@ body.recovered-file-page .about-hero h1 {
    Applies to Aidan Blackwood and Miren Vale
 ====================================================== */
 
-.author-page .about-hero {
-    min-height: 380px;
-    height: auto;
-    padding: 115px 20px 70px;
+body.author-page .about-hero {
+    height: auto !important;
+    min-height: 360px !important;
+    padding: 115px 20px 56px !important;
 }
 
-.author-page .about-hero-content {
+body.author-page .about-hero-content {
     max-width: 760px;
 }
 
-.author-page main,
-.author-page .about-section:first-of-type {
+body.author-page main {
     margin-top: 0;
 }
 
-.author-page .about-section:first-of-type {
-    padding-top: 55px;
+body.author-page main > .about-section:first-child {
+    margin-top: 0;
+    padding-top: 38px;
 }
 
-.author-page .author-block {
+body.author-page .author-block {
     margin-top: 0;
 }
