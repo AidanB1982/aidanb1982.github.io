@@ -147,6 +147,7 @@ function initBlackwoodDropdownNav(headerContainer) {
     <a href="/pages/author.html" role="menuitem">Aidan Blackwood</a>
     <a href="/pages/miren-vale.html" role="menuitem">Miren Vale</a>
     <a href="/pages/about.html" role="menuitem">About Blackwood</a>
+    <a href="/pages/appearances.html" role="menuitem">Appearances</a>
     <a href="/pages/contact.html" role="menuitem">Contact</a>
 </div>
 
