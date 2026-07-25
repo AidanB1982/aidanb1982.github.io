@@ -9341,3 +9341,50 @@ body.appearances-page .about-hero h1 {
         text-align: center;
     }
 }
+/* ======================================================
+   APPEARANCES PAGE — RESTORE SEND DETAILS BUTTON
+====================================================== */
+
+.appearances-actions {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.appearances-modal-open.button.copper {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    margin: 12px 0 0 !important;
+    padding: 8px 14px !important;
+    border: 1px solid rgba(176, 111, 54, 0.55) !important;
+    background: rgba(176, 111, 54, 0.08) !important;
+    color: #d49a61 !important;
+    font-family: Georgia, serif !important;
+    font-size: 14px !important;
+    line-height: 1.45 !important;
+    letter-spacing: 2.5px !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.appearances-modal-open.button.copper:hover,
+.appearances-modal-open.button.copper:focus-visible {
+    color: #fff !important;
+    border-color: rgba(176, 111, 54, 0.8) !important;
+    background: rgba(176, 111, 54, 0.14) !important;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+@media (max-width: 760px) {
+    .appearances-modal-open.button.copper {
+        width: 100% !important;
+        text-align: center !important;
+    }
+}
