@@ -9143,3 +9143,16 @@ body.appearances-page .about-hero h1 {
         min-height: 720px;
     }
 }
+/* ======================================================
+   APPEARANCES PAGE — EMBED OVERFLOW SAFETY
+====================================================== */
+
+.appearances-calendar-section,
+.appearances-calendar-embed,
+.appearances-calendar-embed iframe {
+    box-sizing: border-box;
+}
+
+.appearances-calendar-embed iframe {
+    max-width: 100%;
+}
