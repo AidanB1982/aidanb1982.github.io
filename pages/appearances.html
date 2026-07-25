@@ -20,13 +20,10 @@
         name="description"
         content="Request an appearance, interview, podcast, radio slot, bookshop event, library visit, festival appearance, or livestream with Aidan Blackwood."
     >
-<!-- Google Calendar Appointment Scheduling -->
-    <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
-</head>
-    
+
     <link rel="stylesheet" href="/css/header.css?v=20260824">
-    <link rel="stylesheet" href="/css/styles.css?v=20260827">
-   
+    <link rel="stylesheet" href="/css/styles.css?v=20260828">
+</head>
 
 <body class="sub-page appearances-page">
 
@@ -156,53 +153,21 @@
             <div class="work-actions appearances-actions">
 
                 <button
-    type="button"
-    class="button copper appearances-modal-open"
-    id="open-appearance-modal"
->
-    <span>Send Event Details</span>
-</button>
+                    type="button"
+                    class="appearance-action-button appearance-action-primary"
+                    id="open-appearance-modal"
+                >
+                    Send Event Details
+                </button>
 
-                <div class="google-calendar-button-wrap" aria-label="Request a time with Aidan Blackwood">
-                    <!-- Google Calendar Appointment Scheduling begin -->
-                    <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
-                    <script>
-                    (function() {
-                        var target = document.currentScript;
-
-                        function loadGoogleCalendarButton() {
-                            if (
-                                window.calendar &&
-                                calendar.schedulingButton &&
-                                typeof calendar.schedulingButton.load === "function"
-                            ) {
-                                calendar.schedulingButton.load({
-                                    url: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1i37rs7WKpnomT4AUv4H-27IkDNYXeEDacx8CUxiyqtyMP-ohbQiq0_8uiDxPL8WHVTDtnG8WL?gv=true",
-                                    color: "#ececec",
-                                    label: "Request a Time",
-                                    target: target
-                                });
-                            } else {
-                                window.setTimeout(loadGoogleCalendarButton, 250);
-                            }
-                        }
-
-                        window.addEventListener("load", loadGoogleCalendarButton);
-                    })();
-                    </script>
-                    <!-- end Google Calendar Appointment Scheduling -->
-                </div>
-
-                <noscript>
-                    <a
-                        href="https://calendar.app.google/H9CUaVCrHADdiTGv6"
-                        class="button ghost appearances-calendar-button"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Request a Time
-                    </a>
-                </noscript>
+                <a
+                    href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1i37rs7WKpnomT4AUv4H-27IkDNYXeEDacx8CUxiyqtyMP-ohbQiq0_8uiDxPL8WHVTDtnG8WL?gv=true"
+                    class="appearance-action-button appearance-action-secondary"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Request a Time
+                </a>
 
             </div>
 
