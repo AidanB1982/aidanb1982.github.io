@@ -9201,3 +9201,20 @@ body.appearances-page .appearances-calendar-embed iframe {
         min-height: 760px;
     }
 }
+/* ======================================================
+   APPEARANCES PAGE — BUTTON BOOKING VERSION
+====================================================== */
+
+.appearances-calendar-button {
+    min-width: 190px;
+}
+
+.appearances-calendar-note {
+    max-width: 520px;
+    margin: 28px auto 0 !important;
+    color: rgba(230, 230, 230, 0.42) !important;
+    font-size: 12px !important;
+    line-height: 1.7 !important;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
