@@ -9156,3 +9156,48 @@ body.appearances-page .about-hero h1 {
 .appearances-calendar-embed iframe {
     max-width: 100%;
 }
+/* ======================================================
+   APPEARANCES PAGE — FINAL POLISH
+====================================================== */
+
+body.appearances-page {
+    overflow-x: hidden;
+}
+
+body.appearances-page .about-hero {
+    height: auto;
+    min-height: 430px;
+    padding: 120px 20px 72px;
+}
+
+body.appearances-page .appearances-wrap,
+body.appearances-page .appearances-calendar-section,
+body.appearances-page .appearances-calendar-embed {
+    box-sizing: border-box;
+}
+
+body.appearances-page .appearances-calendar-section {
+    width: min(100%, 980px);
+}
+
+body.appearances-page .appearances-calendar-embed {
+    max-width: 100%;
+}
+
+body.appearances-page .appearances-calendar-embed iframe {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-height: 820px;
+}
+
+@media (max-width: 760px) {
+    body.appearances-page .about-hero {
+        min-height: 360px;
+        padding: 112px 18px 64px;
+    }
+
+    body.appearances-page .appearances-calendar-embed iframe {
+        min-height: 760px;
+    }
+}
