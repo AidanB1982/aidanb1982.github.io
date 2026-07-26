@@ -131,7 +131,7 @@
     slug: "blackwood-manuscript-audit-workbook",
     series: "Writer Resources",
     category: "Editorial Tools",
-    image: "/assets/logo1.png",
+    image: "/assets/BYA.jpg",
     productId: "16452791796057",
     description: "A self-guided structural revision workbook for fiction writers who want to diagnose chapter function, pacing, escalation, character movement, motif use, continuity, and revision priorities before polishing."
 },
@@ -140,7 +140,7 @@
     slug: "blackwood-structural-manuscript-audit",
     series: "Editorial Services",
     category: "Manuscript Audit",
-    image: "/assets/logo1.png",
+    image: "/assets/BYA.jpg",
     productId: "16452814930265",
     description: "A completed structural audit service for fiction writers who need a clear chapter-by-chapter revision plan before line editing, copyediting, proofreading, formatting, or publication setup."
 }
