@@ -125,31 +125,35 @@
             badge: "Foil Edition",
             image: "/assets/book13.jpg",
             description: "A limited collector edition from the Cursed Bothies file. Available while stock remains."
+        },
+        {
+            id: "16452791796057",
+            slug: "blackwood-manuscript-audit-workbook",
+            title: "Blackwood Manuscript Audit Workbook",
+            subtitle: "Self-Guided Structural Revision System",
+            category: "writer-resources",
+            categoryLabel: "Writer Resources",
+            badge: "Digital Workbook",
+            image: "/assets/BYA.jpg",
+            description: "A self-guided structural revision workbook for fiction writers who want to diagnose chapter function, pacing, escalation, character movement, motif use, continuity, and revision priorities before polishing."
+        },
+        {
+            id: "16452814930265",
+            slug: "blackwood-structural-manuscript-audit",
+            title: "Blackwood Structural Manuscript Audit",
+            subtitle: "Completed Editorial Audit Service",
+            category: "editorial-services",
+            categoryLabel: "Editorial Services",
+            badge: "Audit Service",
+            image: "/assets/BYA.jpg",
+            description: "A completed structural audit service for fiction writers who need a clear chapter-by-chapter revision plan before line editing, copyediting, proofreading, formatting, or publication setup."
         }
-       {
-    title: "Blackwood Manuscript Audit Workbook",
-    slug: "blackwood-manuscript-audit-workbook",
-    series: "Writer Resources",
-    category: "Editorial Tools",
-    image: "/assets/BYA.jpg",
-    productId: "16452791796057",
-    description: "A self-guided structural revision workbook for fiction writers who want to diagnose chapter function, pacing, escalation, character movement, motif use, continuity, and revision priorities before polishing."
-},
-{
-    title: "Blackwood Structural Manuscript Audit",
-    slug: "blackwood-structural-manuscript-audit",
-    series: "Editorial Services",
-    category: "Manuscript Audit",
-    image: "/assets/BYA.jpg",
-    productId: "16452814930265",
-    description: "A completed structural audit service for fiction writers who need a clear chapter-by-chapter revision plan before line editing, copyediting, proofreading, formatting, or publication setup."
-}
     ];
 
     const STORE_FILTERS = [
         {
             value: "all",
-            label: "All Editions"
+            label: "All Files"
         },
         {
             value: "archive-files",
@@ -170,6 +174,14 @@
         {
             value: "limited",
             label: "Limited Editions"
+        },
+        {
+            value: "writer-resources",
+            label: "Writer Resources"
+        },
+        {
+            value: "editorial-services",
+            label: "Editorial Services"
         }
     ];
 
@@ -264,14 +276,20 @@
         card.dataset.storeSlug = product.slug;
         card.dataset.storeCategory = product.category;
         card.dataset.storeTitle = product.title.toLowerCase();
-        card.dataset.storeText = `${product.title} ${product.subtitle} ${product.categoryLabel} ${product.description}`.toLowerCase();
+        card.dataset.storeText = [
+            product.title,
+            product.subtitle,
+            product.categoryLabel,
+            product.badge,
+            product.description
+        ].join(" ").toLowerCase();
 
         const imageWrap = document.createElement("div");
         imageWrap.className = "store-product-image";
 
         const image = document.createElement("img");
         image.src = product.image;
-        image.alt = `${product.title} cover`;
+        image.alt = `${product.title} image`;
         image.loading = "lazy";
 
         imageWrap.appendChild(image);
@@ -419,7 +437,7 @@
 
         const count = visibleProducts.length;
 
-        status.textContent = `${count} ${count === 1 ? "edition" : "editions"} currently shown.`;
+        status.textContent = `${count} ${count === 1 ? "file" : "files"} currently shown.`;
     }
 
     function loadShopifySdk() {
