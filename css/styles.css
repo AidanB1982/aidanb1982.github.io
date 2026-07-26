@@ -9553,3 +9553,120 @@ body.appearances-page .appearance-action-secondary:focus-visible {
         min-width: 0 !important;
     }
 }
+/* ======================================================
+   SOLE TRADER PAGE — CLEAN DOWNLOAD PANEL
+====================================================== */
+
+.sole-trader-resources-section {
+    padding: 90px 24px 110px;
+    background:
+        radial-gradient(circle at center top, rgba(168, 101, 32, 0.08), transparent 42%),
+        linear-gradient(180deg, #080808 0%, #020202 100%);
+}
+
+.sole-trader-download-panel {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: clamp(34px, 5vw, 62px);
+    border: 1px solid rgba(196, 122, 44, 0.22);
+    background:
+        radial-gradient(circle at center top, rgba(196, 122, 44, 0.08), transparent 42%),
+        linear-gradient(145deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.34);
+    box-shadow: 0 34px 90px rgba(0,0,0,0.48);
+}
+
+.sole-trader-download-panel > h2 {
+    margin: 0 0 18px;
+    color: #f2f2f2;
+    font-size: clamp(34px, 5vw, 58px);
+    line-height: 1.05;
+    text-align: center;
+}
+
+.sole-trader-download-intro {
+    max-width: 780px;
+    margin: 0 auto 44px;
+    color: rgba(255,255,255,0.72);
+    font-size: 17px;
+    line-height: 1.75;
+    text-align: center;
+}
+
+.sole-trader-download-list {
+    display: grid;
+    gap: 20px;
+}
+
+.sole-trader-download-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 30px;
+    align-items: center;
+    padding: 28px;
+    border: 1px solid rgba(196, 122, 44, 0.14);
+    background:
+        radial-gradient(circle at left center, rgba(196, 122, 44, 0.055), transparent 38%),
+        rgba(255,255,255,0.012);
+}
+
+.sole-trader-download-copy h3 {
+    margin: 0 0 12px;
+    color: #f2f2f2;
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.1;
+}
+
+.sole-trader-download-copy p:not(.resource-card-kicker) {
+    max-width: 660px;
+    margin: 0 0 18px;
+    color: rgba(255,255,255,0.68);
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.sole-trader-download-item .button {
+    white-space: nowrap;
+}
+
+.sole-trader-resource-note {
+    max-width: 760px;
+    margin: 54px auto 0;
+    text-align: center;
+}
+
+.sole-trader-resource-note h2 {
+    margin: 0 0 18px;
+    color: #f2f2f2;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.08;
+}
+
+.sole-trader-resource-note p {
+    margin: 0 auto 16px;
+    color: rgba(255,255,255,0.66);
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+@media (max-width: 820px) {
+    .sole-trader-resources-section {
+        padding: 70px 18px 90px;
+    }
+
+    .sole-trader-download-item {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        text-align: center;
+    }
+
+    .sole-trader-download-item .button {
+        width: 100%;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .resource-file-meta {
+        justify-content: center;
+    }
+}
