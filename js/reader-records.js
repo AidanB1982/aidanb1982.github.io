@@ -1,6 +1,7 @@
 /* ======================================================
    BLACKWOOD READER RECORDS
-   Front-end bridge for Google Apps Script 
+   Front-end bridge for Google Apps Script
+   Rotating public record view
 ====================================================== */
 
 const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwOWic3DTxR5VkXy0gFythhvDVO6TsOh81jse4LO3YpCyP7SnScUi8p-ccx0SqJPlBb/exec";
@@ -8,52 +9,68 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 (function () {
     "use strict";
 
+    const ROTATION_DELAY = 9000;
+
     const BOOK_META = {
-    "The Black Bothy": {
-        image: "/assets/A8.png",
-        link: "/pages/store.html#the-black-bothy"
-    },
-    "The Drowned Fjord": {
-        image: "/assets/A7.png",
-        link: "/pages/store.html#the-drowned-fjord"
-    },
-    "The Erased Archivist": {
-        image: "/assets/A6.png",
-        link: "/pages/store.html#the-erased-archivist"
-    },
-    "Holdfast": {
-        image: "/assets/A5.png",
-        link: "/pages/holdfast.html"
-    },
-    "Dour Hill House": {
-        image: "/assets/book1.jpg",
-        link: "/pages/store.html#dour-hill-house"
-    },
-    "The Red-Clad Collector": {
-        image: "/assets/book11.png",
-        link: "https://www.amazon.co.uk/dp/B0G76MRK8R"
-    },
-    "Corrour Bothy": {
-        image: "/assets/book2.jpg",
-        link: "/pages/store.html#corrour-bothy"
-    },
-    "The Corrour Bothy": {
-        image: "/assets/book2.jpg",
-        link: "/pages/store.html#corrour-bothy"
-    },
-    "Love, Abused": {
-        image: "/assets/book15.jpg",
-        link: "/pages/store.html#love-abused"
-    },
-    "The Scheme": {
-        image: "/assets/book9.png",
-        link: "/pages/store.html#the-scheme"
-    },
-    "Red Streets": {
-        image: "/assets/book10.jpg",
-        link: "/pages/store.html#red-streets"
-    }
-};
+        "The Black Bothy": {
+            image: "/assets/A8.png",
+            link: "/pages/store.html#the-black-bothy"
+        },
+        "The Drowned Fjord": {
+            image: "/assets/A7.png",
+            link: "/pages/store.html#the-drowned-fjord"
+        },
+        "The Erased Archivist": {
+            image: "/assets/A6.png",
+            link: "/pages/store.html#the-erased-archivist"
+        },
+        "Holdfast": {
+            image: "/assets/A5.png",
+            link: "/pages/holdfast.html"
+        },
+        "Dour Hill House": {
+            image: "/assets/book1.jpg",
+            link: "/pages/store.html#dour-hill-house"
+        },
+        "The Red-Clad Collector": {
+            image: "/assets/book11.png",
+            link: "https://www.amazon.co.uk/dp/B0G76MRK8R"
+        },
+        "Corrour Bothy": {
+            image: "/assets/book2.jpg",
+            link: "/pages/store.html#corrour-bothy"
+        },
+        "The Corrour Bothy": {
+            image: "/assets/book2.jpg",
+            link: "/pages/store.html#corrour-bothy"
+        },
+        "Love, Abused": {
+            image: "/assets/book15.jpg",
+            link: "/pages/store.html#love-abused"
+        },
+        "The Scheme": {
+            image: "/assets/book9.png",
+            link: "/pages/store.html#the-scheme"
+        },
+        "Red Streets": {
+            image: "/assets/book10.jpg",
+            link: "/pages/store.html#red-streets"
+        }
+    };
+
+    const BOOK_ORDER = [
+        "The Black Bothy",
+        "The Drowned Fjord",
+        "The Erased Archivist",
+        "Holdfast",
+        "Dour Hill House",
+        "The Red-Clad Collector",
+        "Corrour Bothy",
+        "The Corrour Bothy",
+        "Love, Abused",
+        "The Scheme",
+        "Red Streets"
+    ];
 
     const MOOD_MAP = {
         "isolated-grief": "Isolated Grief",
@@ -74,7 +91,8 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
         moodFilter: "all",
         list: null,
         bookFilterEl: null,
-        moodFilterEl: null
+        moodFilterEl: null,
+        rotators: new Map()
     };
 
     function endpointConfigured() {
@@ -299,6 +317,8 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
         if (!list) return;
 
+        clearAllRotators();
+
         if (!endpointConfigured()) {
             list.innerHTML = "";
 
@@ -328,6 +348,8 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
                 renderRecords();
             })
             .catch(() => {
+                clearAllRotators();
+
                 list.innerHTML = "";
 
                 const error = document.createElement("p");
@@ -373,28 +395,89 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
     function normaliseRecords(records) {
         return records
             .filter(record => record && record.book && record.readerRecord)
-            .map(record => ({
-                ...record,
-                book: String(record.book || "").trim(),
-                mood: String(record.mood || "").trim(),
-                displayName: String(record.displayName || "").trim(),
-                readerRecord: String(record.readerRecord || "").trim(),
-                timestamp: String(record.timestamp || "").trim(),
-                featured: Boolean(record.featured),
-                spoilerWarning: Boolean(record.spoilerWarning),
-                finalRating: Number(record.finalRating || 0),
-                atmosphere: Number(record.atmosphere || 0),
-                story: Number(record.story || 0),
-                characters: Number(record.characters || 0),
-                dreadTension: Number(record.dreadTension || 0),
-                ending: Number(record.ending || 0)
-            }))
-            .sort((a, b) => {
-                if (a.featured && !b.featured) return -1;
-                if (!a.featured && b.featured) return 1;
+            .map(record => {
+                const atmosphere = parseRating(record.atmosphere);
+                const story = parseRating(record.story);
+                const characters = parseRating(record.characters);
+                const dreadTension = parseRating(record.dreadTension || record.dread);
+                const ending = parseRating(record.ending);
 
-                return a.book.localeCompare(b.book);
-            });
+                const fallbackRating = calculateAverage([
+                    atmosphere,
+                    story,
+                    characters,
+                    dreadTension,
+                    ending
+                ]);
+
+                return {
+                    ...record,
+                    book: String(record.book || "").trim(),
+                    mood: String(record.mood || "").trim(),
+                    displayName: String(record.displayName || "").trim(),
+                    readerRecord: String(record.readerRecord || "").trim(),
+                    timestamp: String(record.timestamp || "").trim(),
+                    featured: parseBoolean(record.featured),
+                    spoilerWarning: parseBoolean(record.spoilerWarning),
+                    finalRating: parseRating(record.finalRating) || fallbackRating,
+                    atmosphere,
+                    story,
+                    characters,
+                    dreadTension,
+                    ending
+                };
+            })
+            .sort(sortRecords);
+    }
+
+    function sortRecords(a, b) {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+
+        const bookA = getBookSortIndex(a.book);
+        const bookB = getBookSortIndex(b.book);
+
+        if (bookA !== bookB) {
+            return bookA - bookB;
+        }
+
+        return a.book.localeCompare(b.book);
+    }
+
+    function getBookSortIndex(book) {
+        const index = BOOK_ORDER.indexOf(book);
+        return index === -1 ? 999 : index;
+    }
+
+    function parseBoolean(value) {
+        if (value === true) return true;
+        if (value === false) return false;
+
+        const clean = String(value || "").trim().toLowerCase();
+
+        return clean === "true" || clean === "yes" || clean === "1" || clean === "featured";
+    }
+
+    function parseRating(value) {
+        const number = Number(value);
+
+        if (!Number.isFinite(number) || number <= 0) {
+            return 0;
+        }
+
+        return number;
+    }
+
+    function calculateAverage(values) {
+        const cleanValues = values.filter(value => Number.isFinite(value) && value > 0);
+
+        if (!cleanValues.length) {
+            return 0;
+        }
+
+        const total = cleanValues.reduce((sum, value) => sum + value, 0);
+
+        return Math.round((total / cleanValues.length) * 10) / 10;
     }
 
     function populateFilters(records) {
@@ -451,6 +534,8 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
         if (!list) return;
 
+        clearAllRotators();
+
         list.innerHTML = "";
 
         const filtered = publicRecordsState.records.filter(record => {
@@ -474,10 +559,35 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             return;
         }
 
-        const grouped = groupRecordsByBook(filtered);
+        const featuredRecords = filtered.filter(record => record.featured);
 
-        Object.keys(grouped).forEach(book => {
-            list.appendChild(createBookGroup(book, grouped[book]));
+        if (featuredRecords.length) {
+            list.appendChild(
+                createRotatorSection({
+                    key: "featured-records",
+                    title: "Featured Reader Records",
+                    countLabel: `${featuredRecords.length} ${featuredRecords.length === 1 ? "featured record" : "featured records"}`,
+                    records: featuredRecords,
+                    featuredSection: true
+                })
+            );
+        }
+
+        const grouped = groupRecordsByBook(filtered);
+        const books = Object.keys(grouped).sort(sortBookNames);
+
+        books.forEach(book => {
+            const records = grouped[book];
+
+            list.appendChild(
+                createRotatorSection({
+                    key: `book-${slugify(book)}`,
+                    title: book,
+                    countLabel: `${records.length} ${records.length === 1 ? "record" : "records"}`,
+                    records,
+                    featuredSection: false
+                })
+            );
         });
     }
 
@@ -490,59 +600,197 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             }
 
             groups[book].push(record);
-
-            groups[book].sort((a, b) => {
-                if (a.featured && !b.featured) return -1;
-                if (!a.featured && b.featured) return 1;
-                return 0;
-            });
+            groups[book].sort(sortRecords);
 
             return groups;
         }, {});
     }
 
-    function createBookGroup(book, records) {
+    function sortBookNames(a, b) {
+        const indexA = getBookSortIndex(a);
+        const indexB = getBookSortIndex(b);
+
+        if (indexA !== indexB) {
+            return indexA - indexB;
+        }
+
+        return a.localeCompare(b);
+    }
+
+    function createRotatorSection(config) {
         const section = document.createElement("section");
-        section.className = "reader-book-group";
+        section.className = config.featuredSection
+            ? "reader-featured-records"
+            : "reader-book-rotator";
+
+        section.dataset.rotatorKey = config.key;
 
         const heading = document.createElement("div");
-        heading.className = "reader-book-group-heading";
+        heading.className = "reader-rotator-heading";
 
         const title = document.createElement("h3");
-        title.className = "reader-book-group-title";
-        title.textContent = book;
+        title.textContent = config.title;
 
         const count = document.createElement("p");
-        count.className = "reader-book-group-count";
-        count.textContent = `${records.length} ${records.length === 1 ? "record" : "records"}`;
+        count.className = "reader-rotator-count";
+        count.textContent = config.countLabel;
 
         heading.appendChild(title);
         heading.appendChild(count);
 
-        const grid = document.createElement("div");
-        grid.className = "reader-book-group-grid";
+        const body = document.createElement("div");
+        body.className = "reader-rotator-body";
+        body.setAttribute("aria-live", "polite");
 
-        records.forEach(record => {
-            grid.appendChild(createRecordCard(record));
-        });
+        const controls = document.createElement("div");
+        controls.className = "reader-rotator-controls";
+
+        const previous = document.createElement("button");
+        previous.type = "button";
+        previous.className = "reader-rotator-button";
+        previous.textContent = "Previous";
+        previous.disabled = config.records.length <= 1;
+
+        const position = document.createElement("p");
+        position.className = "reader-rotator-position";
+
+        const next = document.createElement("button");
+        next.type = "button";
+        next.className = "reader-rotator-button";
+        next.textContent = "Next";
+        next.disabled = config.records.length <= 1;
+
+        controls.appendChild(previous);
+        controls.appendChild(position);
+        controls.appendChild(next);
 
         section.appendChild(heading);
-        section.appendChild(grid);
+        section.appendChild(body);
+        section.appendChild(controls);
+
+        const rotator = {
+            key: config.key,
+            section,
+            body,
+            position,
+            records: config.records,
+            index: 0,
+            timer: null,
+            featuredSection: config.featuredSection
+        };
+
+        publicRecordsState.rotators.set(config.key, rotator);
+
+        previous.addEventListener("click", () => {
+            moveRotator(config.key, -1);
+            restartRotator(config.key);
+        });
+
+        next.addEventListener("click", () => {
+            moveRotator(config.key, 1);
+            restartRotator(config.key);
+        });
+
+        section.addEventListener("mouseenter", () => pauseRotator(config.key));
+        section.addEventListener("mouseleave", () => resumeRotator(config.key));
+
+        section.addEventListener("focusin", () => pauseRotator(config.key));
+        section.addEventListener("focusout", () => {
+            window.setTimeout(() => {
+                if (!section.contains(document.activeElement)) {
+                    resumeRotator(config.key);
+                }
+            }, 50);
+        });
+
+        renderRotator(rotator);
+        startRotator(config.key);
 
         return section;
     }
 
-    function createRecordCard(record) {
+    function renderRotator(rotator) {
+        const record = rotator.records[rotator.index];
+
+        rotator.body.innerHTML = "";
+        rotator.body.appendChild(createRotatorCard(record, rotator.featuredSection));
+
+        rotator.position.textContent = `${rotator.index + 1} of ${rotator.records.length}`;
+    }
+
+    function moveRotator(key, direction) {
+        const rotator = publicRecordsState.rotators.get(key);
+
+        if (!rotator || rotator.records.length <= 1) {
+            return;
+        }
+
+        const nextIndex = rotator.index + direction;
+
+        if (nextIndex < 0) {
+            rotator.index = rotator.records.length - 1;
+        } else if (nextIndex >= rotator.records.length) {
+            rotator.index = 0;
+        } else {
+            rotator.index = nextIndex;
+        }
+
+        renderRotator(rotator);
+    }
+
+    function startRotator(key) {
+        const rotator = publicRecordsState.rotators.get(key);
+
+        if (!rotator || rotator.records.length <= 1 || rotator.timer) {
+            return;
+        }
+
+        rotator.timer = window.setInterval(() => {
+            moveRotator(key, 1);
+        }, ROTATION_DELAY);
+    }
+
+    function pauseRotator(key) {
+        const rotator = publicRecordsState.rotators.get(key);
+
+        if (!rotator || !rotator.timer) {
+            return;
+        }
+
+        window.clearInterval(rotator.timer);
+        rotator.timer = null;
+    }
+
+    function resumeRotator(key) {
+        startRotator(key);
+    }
+
+    function restartRotator(key) {
+        pauseRotator(key);
+        startRotator(key);
+    }
+
+    function clearAllRotators() {
+        publicRecordsState.rotators.forEach(rotator => {
+            if (rotator.timer) {
+                window.clearInterval(rotator.timer);
+            }
+        });
+
+        publicRecordsState.rotators.clear();
+    }
+
+    function createRotatorCard(record, isFeaturedSection) {
         const meta = BOOK_META[record.book] || {
             image: "/assets/A8.png",
             link: "/pages/publications.html"
         };
 
         const card = document.createElement("article");
-        card.className = "reader-public-card is-compact";
+        card.className = "reader-rotator-card";
 
         const coverWrap = document.createElement("div");
-        coverWrap.className = "reader-public-cover";
+        coverWrap.className = "reader-rotator-cover";
 
         const coverLink = document.createElement("a");
         coverLink.href = meta.link;
@@ -561,43 +809,44 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
         coverWrap.appendChild(coverLink);
 
         const content = document.createElement("div");
-        content.className = "reader-public-content";
+        content.className = "reader-rotator-content";
 
         const metaRow = document.createElement("div");
-        metaRow.className = "reader-public-meta";
+        metaRow.className = "reader-rotator-meta";
 
-        metaRow.appendChild(createPill(record.mood || "Filed Record"));
+        metaRow.appendChild(createRotatorPill(record.mood || "Filed Record"));
 
         if (record.featured) {
-            metaRow.appendChild(createPill("Featured"));
+            metaRow.appendChild(createRotatorPill("Featured"));
         }
 
         if (record.spoilerWarning) {
-            metaRow.appendChild(createPill("Spoilers Hidden"));
+            metaRow.appendChild(createRotatorPill("Spoilers Hidden"));
         }
 
         const title = document.createElement("h4");
-        title.textContent = record.book;
+        title.className = "reader-rotator-title";
+        title.textContent = isFeaturedSection ? record.book : "Reader Record";
 
         const finalRating = Number(record.finalRating || 0);
 
         const rating = document.createElement("p");
-        rating.className = "reader-public-rating";
+        rating.className = "reader-rotator-rating";
         rating.textContent = `Final Archive Rating: ${finalRating ? finalRating.toFixed(1) : "—"} / 5`;
-
-        const review = document.createElement("p");
-        review.className = "reader-public-review";
 
         content.appendChild(metaRow);
         content.appendChild(title);
         content.appendChild(rating);
 
+        const review = document.createElement("p");
+        review.className = "reader-rotator-review";
+        review.textContent = record.readerRecord;
+
         if (record.spoilerWarning) {
             review.hidden = true;
-            review.textContent = record.readerRecord;
 
             const spoilerWrap = document.createElement("div");
-            spoilerWrap.className = "reader-public-spoiler";
+            spoilerWrap.className = "reader-rotator-spoiler";
 
             const spoilerButton = document.createElement("button");
             spoilerButton.type = "button";
@@ -610,16 +859,12 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
             spoilerWrap.appendChild(spoilerButton);
             content.appendChild(spoilerWrap);
-            content.appendChild(review);
-        } else {
-            review.textContent = record.readerRecord;
-            content.appendChild(review);
         }
 
-        content.appendChild(createBreakdown(record));
+        content.appendChild(review);
 
         const footer = document.createElement("p");
-        footer.className = "reader-public-footer";
+        footer.className = "reader-rotator-footer";
         footer.textContent = `Filed by ${record.displayName || "A reader"}${record.timestamp ? ` · ${record.timestamp}` : ""}`;
 
         content.appendChild(footer);
@@ -630,43 +875,20 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
         return card;
     }
 
-    function createPill(text) {
+    function createRotatorPill(text) {
         const pill = document.createElement("span");
-        pill.className = "reader-public-pill";
+        pill.className = "reader-rotator-pill";
         pill.textContent = text;
 
         return pill;
     }
 
-    function createBreakdown(record) {
-        const breakdown = document.createElement("div");
-        breakdown.className = "reader-public-breakdown";
-
-        const scores = [
-            ["Atmosphere", record.atmosphere],
-            ["Story", record.story],
-            ["Characters", record.characters],
-            ["Dread", record.dreadTension],
-            ["Ending", record.ending]
-        ];
-
-        scores.forEach(([label, value]) => {
-            const item = document.createElement("div");
-            item.className = "reader-public-score";
-
-            const labelEl = document.createElement("span");
-            labelEl.textContent = label;
-
-            const valueEl = document.createElement("strong");
-            valueEl.textContent = Number(value || 0) ? `${Number(value).toFixed(0)} / 5` : "—";
-
-            item.appendChild(labelEl);
-            item.appendChild(valueEl);
-
-            breakdown.appendChild(item);
-        });
-
-        return breakdown;
+    function slugify(value) {
+        return String(value || "")
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
     }
 
     if (document.readyState === "loading") {
