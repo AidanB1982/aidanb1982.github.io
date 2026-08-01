@@ -6,13 +6,14 @@
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      gtag("js", new Date());
 
-      gtag('config', 'G-1WN8PBHBW4');
+      gtag("config", "G-1WN8PBHBW4");
     </script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Reader Records | Blackwood Publishing</title>
 
     <meta
@@ -21,12 +22,14 @@
     >
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/header.css?v=20260803">
-    <link rel="stylesheet" href="/css/styles.css?v=20260803">
-    <link rel="stylesheet" href="/css/reader-records.css?v=20260813">
+    <link rel="stylesheet" href="/css/header.css?v=20260907">
+    <link rel="stylesheet" href="/css/styles.css?v=20260907">
+    <link rel="stylesheet" href="/css/reader-records.css?v=20260907">
 </head>
 
 <body class="sub-page reader-records-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
@@ -50,7 +53,7 @@
 
         <p class="reader-records-copy">
             Leave a private record for the Archive, or allow it to be considered for public display.
-            Filed public records will appear below with your chosen display name only.
+            Public records rotate below by book, with your chosen display name only.
         </p>
 
     </section>
@@ -79,6 +82,7 @@
 
                 <div class="reader-record-field">
                     <label for="record-book">Book</label>
+
                     <select id="record-book" name="book" required>
                         <option value="" selected disabled>Choose a Blackwood book...</option>
                         <option value="The Black Bothy">The Black Bothy</option>
@@ -96,6 +100,7 @@
 
                 <div class="reader-record-field">
                     <label for="record-mood">Mood</label>
+
                     <select id="record-mood" name="mood" required>
                         <option value="" selected disabled>Choose the mood...</option>
                         <option value="Isolated Grief">Isolated Grief</option>
@@ -113,6 +118,7 @@
 
                 <div class="reader-record-field">
                     <label for="record-display-name">Display Name</label>
+
                     <input
                         id="record-display-name"
                         name="displayName"
@@ -125,6 +131,7 @@
 
                 <div class="reader-record-field">
                     <label for="record-email">Email <span>Optional, not public</span></label>
+
                     <input
                         id="record-email"
                         name="email"
@@ -151,6 +158,7 @@
 
                     <div class="reader-record-field">
                         <label for="rating-atmosphere">Atmosphere</label>
+
                         <select id="rating-atmosphere" name="atmosphere" data-rating-field required>
                             <option value="" selected disabled>Rate...</option>
                             <option value="1">1 — Faint</option>
@@ -163,6 +171,7 @@
 
                     <div class="reader-record-field">
                         <label for="rating-story">Story</label>
+
                         <select id="rating-story" name="story" data-rating-field required>
                             <option value="" selected disabled>Rate...</option>
                             <option value="1">1 — Faint</option>
@@ -175,6 +184,7 @@
 
                     <div class="reader-record-field">
                         <label for="rating-characters">Characters</label>
+
                         <select id="rating-characters" name="characters" data-rating-field required>
                             <option value="" selected disabled>Rate...</option>
                             <option value="1">1 — Faint</option>
@@ -187,6 +197,7 @@
 
                     <div class="reader-record-field">
                         <label for="rating-dread">Dread / Tension</label>
+
                         <select id="rating-dread" name="dread" data-rating-field required>
                             <option value="" selected disabled>Rate...</option>
                             <option value="1">1 — Faint</option>
@@ -199,6 +210,7 @@
 
                     <div class="reader-record-field">
                         <label for="rating-ending">Ending</label>
+
                         <select id="rating-ending" name="ending" data-rating-field required>
                             <option value="" selected disabled>Rate...</option>
                             <option value="1">1 — Faint</option>
@@ -221,6 +233,7 @@
             <!-- REVIEW -->
             <div class="reader-record-field reader-record-field-full">
                 <label for="reader-record-text">Reader Record</label>
+
                 <textarea
                     id="reader-record-text"
                     name="readerRecord"
@@ -271,35 +284,39 @@
             </p>
 
             <h2 id="public-records-title">
-                Filed by the Archive
+                Records Approved for Release
             </h2>
 
             <p>
-                Reader responses filed for public display. Spoilers are hidden until opened.
+                Public reader records are displayed as rotating archive entries. Featured records appear first,
+                followed by one rotating record section for each book. Spoilers remain hidden until opened.
             </p>
         </div>
 
         <div class="reader-records-toolbar reader-records-toolbar-filtered">
 
-    <label class="reader-record-filter">
-        <span>Filter by Book</span>
-        <select id="reader-records-book-filter">
-            <option value="all">All Books</option>
-        </select>
-    </label>
+            <label class="reader-record-filter">
+                <span>Filter by Book</span>
 
-    <label class="reader-record-filter">
-        <span>Filter by Mood</span>
-        <select id="reader-records-mood-filter">
-            <option value="all">All Moods</option>
-        </select>
-    </label>
+                <select id="reader-records-book-filter">
+                    <option value="all">All Books</option>
+                </select>
+            </label>
 
-    <button type="button" class="button ghost" id="reader-records-refresh">
-        Refresh Records
-    </button>
+            <label class="reader-record-filter">
+                <span>Filter by Mood</span>
 
-</div>
+                <select id="reader-records-mood-filter">
+                    <option value="all">All Moods</option>
+                </select>
+            </label>
+
+            <button type="button" class="button ghost" id="reader-records-refresh">
+                Refresh Records
+            </button>
+
+        </div>
+
         <div class="reader-records-list" id="reader-records-list" aria-live="polite">
             <p class="reader-records-loading">
                 Loading filed records...
@@ -315,8 +332,8 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260812" defer></script>
-<script src="/js/reader-records.js?v=20260812" defer></script>
+<script src="/js/header.js?v=20260907" defer></script>
+<script src="/js/reader-records.js?v=20260907" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
