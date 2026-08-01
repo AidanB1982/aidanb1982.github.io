@@ -342,7 +342,7 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             .then(data => {
                 const records = Array.isArray(data)
     ? data
-    : Array.isArray(data.records)
+    : data && Array.isArray(data.records)
         ? data.records
         : [];
 
@@ -595,8 +595,9 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
             );
         }
 
-        const grouped = groupRecordsByBook(filtered);
-        const books = Object.keys(grouped).sort(sortBookNames);
+        const bookRecords = filtered.filter(record => !record.featured);
+const grouped = groupRecordsByBook(bookRecords);
+const books = Object.keys(grouped).sort(sortBookNames);
 
         books.forEach(book => {
             const records = grouped[book];
