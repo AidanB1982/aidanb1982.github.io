@@ -14,6 +14,7 @@ body.editors-page {
 /* =========================
 LAYOUT FIX
 ========================= */
+
 body.editors-page main {
     padding-top: 40px;
 }
@@ -43,19 +44,20 @@ MAIN SECTION
 }
 
 /* =========================
-GRID
+MONTH CONTAINER
 ========================= */
 
 .editor-inner {
     max-width: 1180px;
     margin: 80px auto;
 
-    display: grid;
     gap: 60px 50px;
 
     padding: 50px 40px;
 
-    background: rgba(255,255,255,0.02);
+    background:
+        radial-gradient(circle at 50% 0%, rgba(184,115,51,0.045), transparent 45%),
+        rgba(255,255,255,0.02);
 
     position: relative;
     z-index: 1;
@@ -63,18 +65,23 @@ GRID
     transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-/* Multiple books: equal columns */
+/* Multiple books: centred rows whether 2 or 3 */
 .editor-inner:not(.single) {
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
-    align-items: start;
-    justify-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
 }
 
-/* Single book: centred feature */
+/* Single book: feature layout */
 .editor-inner.single {
-    grid-template-columns: minmax(0, 620px);
+    display: grid;
+    grid-template-columns: 1fr;
     justify-content: center;
-    justify-items: center;
+    align-items: center;
+
+    max-width: 1080px;
+    padding: clamp(34px, 5vw, 64px);
 }
 
 /* SMOOTH FADE BETWEEN MONTHS */
@@ -98,6 +105,24 @@ BOOK CARD
     transform: translateY(12px);
 
     transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+}
+
+/* Multiple-book sizing */
+.editor-inner:not(.single) .pick {
+    flex: 0 1 320px;
+    max-width: 330px;
+}
+
+/* Single-book feature card */
+.editor-inner.single .pick {
+    max-width: 960px;
+
+    display: grid;
+    grid-template-columns: minmax(230px, 320px) minmax(0, 1fr);
+    gap: clamp(34px, 6vw, 72px);
+    align-items: center;
+
+    text-align: left;
 }
 
 /* FADE-IN */
@@ -133,6 +158,22 @@ IMAGE
         drop-shadow(0 10px 30px rgba(184,115,51,0.25));
 }
 
+/* Single-book image */
+.editor-inner.single .pick img {
+    grid-column: 1;
+    grid-row: 1 / span 8;
+
+    width: min(100%, 300px);
+    height: 430px;
+
+    margin: 0 auto;
+
+    filter:
+        drop-shadow(0 60px 140px rgba(0,0,0,1))
+        drop-shadow(0 0 60px rgba(184,115,51,0.28))
+        drop-shadow(0 0 120px rgba(184,115,51,0.12));
+}
+
 /* =========================
 TEXT
 ========================= */
@@ -160,6 +201,43 @@ TEXT
     margin: 0 auto 18px;
 }
 
+/* Single-book text treatment */
+.editor-inner.single .pick h3,
+.editor-inner.single .pick-author,
+.editor-inner.single .pick-note,
+.editor-inner.single .pick .button,
+.editor-inner.single .affiliate-subtle {
+    grid-column: 2;
+}
+
+.editor-inner.single .pick h3 {
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.02;
+    letter-spacing: 1.5px;
+    margin: 0 0 10px;
+
+    color: #f2f2f2;
+}
+
+.editor-inner.single .pick-author {
+    margin: 0 0 28px;
+
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+
+    opacity: 0.55;
+}
+
+.editor-inner.single .pick-note {
+    max-width: 580px;
+    margin: 0 0 28px;
+
+    font-size: 15.5px;
+    line-height: 1.85;
+    opacity: 0.88;
+}
+
 /* =========================
 BUTTON
 ========================= */
@@ -171,6 +249,11 @@ BUTTON
 .pick .button::after {
     content: " →";
     opacity: 0.6;
+}
+
+.editor-inner.single .pick .button {
+    justify-self: start;
+    margin-top: 4px;
 }
 
 /* =========================
@@ -186,19 +269,29 @@ AFFILIATE TEXT
     text-transform: uppercase;
 }
 
+.editor-inner.single .affiliate-subtle {
+    text-align: left;
+}
+
 /* =========================
 HOVER FOCUS MODE
 ========================= */
 
-.editor-inner:hover .pick {
+.editor-inner:not(.single):hover .pick {
     opacity: 0.45;
     filter: blur(0.3px);
 }
 
-.editor-inner .pick:hover {
+.editor-inner:not(.single) .pick:hover {
     opacity: 1;
     transform: translateY(-6px) scale(1.02);
     filter: blur(0);
+}
+
+/* Single feature hover should not dim itself */
+.editor-inner.single:hover .pick {
+    opacity: 1;
+    filter: none;
 }
 
 /* =========================
@@ -209,58 +302,47 @@ ACTIVE PICK
     z-index: 2;
 }
 
-/* Only pulse the active book when it is a single featured month */
+/* Single-book months use image pulse only */
 .editor-inner.single .active-pick {
-    transform: scale(1.03);
-    animation: pickPulse 4s ease-in-out infinite alternate;
+    transform: translateY(0);
+    animation: none;
 }
 
 .editor-inner.single .active-pick img {
-    filter:
-        drop-shadow(0 60px 140px rgba(0,0,0,1))
-        drop-shadow(0 0 60px rgba(184,115,51,0.35))
-        drop-shadow(0 0 120px rgba(184,115,51,0.15));
+    animation: featureCoverPulse 4s ease-in-out infinite alternate;
 }
 
-/* Stop the first book being enlarged in multi-book months */
+/* Multi-book months do not enlarge first book */
 .editor-inner:not(.single) .active-pick {
     animation: none;
     transform: translateY(0);
 }
 
-@keyframes pickPulse {
-    0% { transform: scale(1.03); }
-    100% { transform: scale(1.06); }
+@keyframes featureCoverPulse {
+    0% {
+        filter:
+            drop-shadow(0 50px 120px rgba(0,0,0,1))
+            drop-shadow(0 0 45px rgba(184,115,51,0.22))
+            drop-shadow(0 0 90px rgba(184,115,51,0.1));
+    }
+
+    100% {
+        filter:
+            drop-shadow(0 70px 150px rgba(0,0,0,1))
+            drop-shadow(0 0 68px rgba(184,115,51,0.34))
+            drop-shadow(0 0 130px rgba(184,115,51,0.16));
+    }
 }
 
 /* =========================
 FEATURED PICK
 ========================= */
 
-/* Featured only applies properly on single-book months */
 .editor-inner.single .featured-pick {
-    grid-column: auto;
-    max-width: 560px;
+    max-width: 960px;
 }
 
-.editor-inner.single .featured-pick img {
-    width: 280px;
-    height: 380px;
-}
-
-.editor-inner.single .featured-pick h3 {
-    font-size: 24px;
-}
-
-.editor-inner.single .featured-pick .pick-note {
-    max-width: 460px;
-    font-size: 14.5px;
-    opacity: 0.9;
-}
-
-/* Reset featured styling for months with several books */
 .editor-inner:not(.single) .featured-pick {
-    grid-column: auto;
     max-width: 330px;
 }
 
@@ -345,23 +427,58 @@ RESPONSIVE
 
 @media (max-width: 1000px) {
     .editor-inner:not(.single) {
-        grid-template-columns: repeat(2, minmax(220px, 1fr));
         max-width: 760px;
+    }
+
+    .editor-inner:not(.single) .pick {
+        flex-basis: 300px;
+    }
+
+    .editor-inner.single .pick {
+        grid-template-columns: minmax(210px, 280px) minmax(0, 1fr);
+        gap: 42px;
+    }
+
+    .editor-inner.single .pick img {
+        height: 390px;
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 760px) {
     .editor-inner,
     .editor-inner:not(.single),
     .editor-inner.single {
-        grid-template-columns: 1fr;
-        max-width: 420px;
+        max-width: 440px;
         gap: 56px;
         padding: 35px 22px;
     }
 
-    .pick {
+    .editor-inner:not(.single) .pick {
+        flex-basis: 100%;
         max-width: 320px;
+    }
+
+    .editor-inner.single .pick {
+        grid-template-columns: 1fr;
+        max-width: 340px;
+        text-align: center;
+    }
+
+    .editor-inner.single .pick img,
+    .editor-inner.single .pick h3,
+    .editor-inner.single .pick-author,
+    .editor-inner.single .pick-note,
+    .editor-inner.single .pick .button,
+    .editor-inner.single .affiliate-subtle {
+        grid-column: 1;
+    }
+
+    .editor-inner.single .pick img {
+        grid-row: auto;
+
+        width: 240px;
+        height: 350px;
+        margin: 0 auto 10px;
     }
 
     .pick img,
@@ -370,13 +487,23 @@ RESPONSIVE
         height: 330px;
     }
 
-    .editor-inner.single .featured-pick img {
-        width: 240px;
-        height: 350px;
+    .editor-inner.single .pick h3 {
+        font-size: 30px;
     }
 
-    .editor-inner.single .featured-pick h3 {
-        font-size: 22px;
+    .editor-inner.single .pick-note {
+        max-width: 310px;
+        font-size: 13.5px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .editor-inner.single .pick .button {
+        justify-self: center;
+    }
+
+    .editor-inner.single .affiliate-subtle {
+        text-align: center;
     }
 
     .pick-note {
