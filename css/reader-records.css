@@ -887,3 +887,478 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+/* ======================================================
+   READER RECORDS — ROTATING RECORD VIEW
+   One featured record block + one rotating block per book
+====================================================== */
+
+/* Make the public records area feel more curated */
+.reader-records-public {
+    overflow: hidden;
+}
+
+/* Current grouped layout: reduce long archive walls immediately */
+.reader-book-group-grid {
+    position: relative;
+}
+
+/* Temporary pre-JS behaviour:
+   Show one record per book group instead of every record.
+   The JS update will replace this with real rotation. */
+.reader-book-group-grid .reader-public-card.is-compact {
+    display: none;
+}
+
+.reader-book-group-grid .reader-public-card.is-compact:first-child {
+    display: grid;
+}
+
+/* Book groups become larger, more intentional feature sections */
+.reader-book-group {
+    position: relative;
+
+    margin-top: 34px;
+    padding: clamp(24px, 4vw, 38px);
+
+    border: 1px solid rgba(184, 115, 51, 0.16);
+
+    background:
+        radial-gradient(circle at 12% 28%, rgba(184, 115, 51, 0.08), transparent 32%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006)),
+        rgba(0, 0, 0, 0.28);
+
+    box-shadow:
+        0 26px 70px rgba(0, 0, 0, 0.42),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.reader-book-group + .reader-book-group {
+    margin-top: 34px;
+    padding-top: clamp(24px, 4vw, 38px);
+    border-top: 1px solid rgba(184, 115, 51, 0.16);
+}
+
+/* Cleaner heading for each book section */
+.reader-book-group-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 22px;
+
+    margin: 0 0 24px;
+}
+
+.reader-book-group-title {
+    margin: 0;
+
+    color: #f1ece4;
+
+    font-size: clamp(26px, 4vw, 44px);
+    line-height: 1.04;
+    font-weight: 400;
+}
+
+.reader-book-group-count {
+    margin: 0;
+
+    color: rgba(184, 115, 51, 0.9);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2.4px;
+    line-height: 1.5;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+/* Existing compact card becomes feature-style */
+.reader-public-card.is-compact {
+    grid-template-columns: minmax(110px, 155px) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 42px);
+
+    padding: clamp(22px, 4vw, 34px);
+
+    border-color: rgba(184, 115, 51, 0.18);
+
+    background:
+        radial-gradient(circle at left center, rgba(184, 115, 51, 0.07), transparent 36%),
+        linear-gradient(145deg, rgba(15, 15, 15, 0.98), rgba(5, 5, 5, 0.99));
+}
+
+.reader-public-card.is-compact .reader-public-cover {
+    align-items: flex-start;
+}
+
+.reader-public-card.is-compact .reader-public-cover img {
+    width: 124px;
+    height: 186px;
+
+    object-fit: cover;
+
+    border: 1px solid rgba(184, 115, 51, 0.28);
+
+    box-shadow:
+        0 24px 58px rgba(0, 0, 0, 0.72),
+        0 0 34px rgba(184, 115, 51, 0.08);
+}
+
+.reader-public-card.is-compact .reader-public-content h4 {
+    display: none;
+}
+
+.reader-public-card.is-compact .reader-public-meta {
+    margin-bottom: 14px;
+}
+
+.reader-public-card.is-compact .reader-public-pill {
+    padding: 5px 9px;
+
+    border-color: rgba(184, 115, 51, 0.22);
+
+    font-size: 8.8px;
+    letter-spacing: 1.7px;
+}
+
+.reader-public-card.is-compact .reader-public-rating {
+    margin: 0 0 18px;
+
+    color: rgba(241, 236, 228, 0.82);
+
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.reader-public-card.is-compact .reader-public-review {
+    max-width: 760px;
+    margin: 0 0 20px;
+
+    color: rgba(215, 208, 198, 0.84);
+
+    font-size: clamp(15.5px, 1.7vw, 17px);
+    line-height: 1.78;
+}
+
+/* Rating breakdown becomes less dominant */
+.reader-public-card.is-compact .reader-public-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin: 0 0 16px;
+}
+
+.reader-public-card.is-compact .reader-public-score {
+    min-width: 96px;
+    padding: 8px 9px;
+}
+
+.reader-public-card.is-compact .reader-public-score span {
+    font-size: 7.5px;
+    letter-spacing: 1.2px;
+}
+
+.reader-public-card.is-compact .reader-public-score strong {
+    font-size: 14px;
+}
+
+.reader-public-card.is-compact .reader-public-footer {
+    color: rgba(215, 208, 198, 0.58);
+
+    font-size: 13px;
+}
+
+/* ======================================================
+   FUTURE JS ROTATOR CLASSES
+   These are for the next JS pass.
+====================================================== */
+
+.reader-featured-records,
+.reader-book-rotator {
+    position: relative;
+
+    margin: 34px auto;
+    padding: clamp(24px, 4vw, 40px);
+
+    border: 1px solid rgba(184, 115, 51, 0.18);
+
+    background:
+        radial-gradient(circle at 18% 38%, rgba(184, 115, 51, 0.09), transparent 34%),
+        linear-gradient(145deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.34);
+
+    box-shadow:
+        0 30px 76px rgba(0, 0, 0, 0.48),
+        inset 0 0 0 1px rgba(255,255,255,0.018);
+}
+
+.reader-featured-records {
+    margin-bottom: 42px;
+    border-color: rgba(184, 115, 51, 0.28);
+}
+
+.reader-rotator-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 22px;
+
+    margin-bottom: 24px;
+}
+
+.reader-rotator-heading h3 {
+    margin: 0;
+
+    color: #f1ece4;
+
+    font-size: clamp(26px, 4vw, 44px);
+    line-height: 1.04;
+    font-weight: 400;
+}
+
+.reader-rotator-count {
+    margin: 0;
+
+    color: rgba(184, 115, 51, 0.88);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2.4px;
+    line-height: 1.5;
+    text-transform: uppercase;
+
+    white-space: nowrap;
+}
+
+.reader-rotator-card {
+    display: grid;
+    grid-template-columns: minmax(120px, 165px) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 44px);
+    align-items: start;
+}
+
+.reader-rotator-cover img {
+    width: 135px;
+    height: 202px;
+    object-fit: cover;
+
+    border: 1px solid rgba(184, 115, 51, 0.28);
+
+    box-shadow:
+        0 24px 58px rgba(0, 0, 0, 0.72),
+        0 0 34px rgba(184, 115, 51, 0.08);
+}
+
+.reader-rotator-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+.reader-rotator-pill {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border: 1px solid rgba(184, 115, 51, 0.22);
+
+    color: rgba(184, 115, 51, 0.92);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.8px;
+    letter-spacing: 1.7px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.reader-rotator-title {
+    margin: 0 0 8px;
+
+    color: #f1ece4;
+
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.12;
+    font-weight: 400;
+}
+
+.reader-rotator-rating {
+    margin: 0 0 18px;
+
+    color: rgba(241, 236, 228, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.reader-rotator-review {
+    max-width: 780px;
+    margin: 0 0 20px;
+
+    color: rgba(215, 208, 198, 0.84);
+
+    font-size: clamp(15.5px, 1.7vw, 17px);
+    line-height: 1.78;
+}
+
+.reader-rotator-footer {
+    margin: 0;
+
+    color: rgba(215, 208, 198, 0.58);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.reader-rotator-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 24px;
+    padding-top: 20px;
+
+    border-top: 1px solid rgba(184, 115, 51, 0.12);
+}
+
+.reader-rotator-button {
+    border: 1px solid rgba(184, 115, 51, 0.28);
+    border-radius: 0;
+
+    background: transparent;
+
+    padding: 10px 14px;
+
+    color: #b87333;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    line-height: 1.4;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.reader-rotator-button:hover,
+.reader-rotator-button:focus-visible {
+    border-color: rgba(184, 115, 51, 0.72);
+    background: rgba(184, 115, 51, 0.1);
+    color: #f1ece4;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.reader-rotator-position {
+    color: rgba(215, 208, 198, 0.58);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    text-align: center;
+}
+
+/* Spoiler reveal inside rotator */
+.reader-rotator-spoiler {
+    margin: 0 0 18px;
+}
+
+.reader-rotator-spoiler button {
+    border: 1px solid rgba(184, 115, 51, 0.28);
+    background: transparent;
+
+    padding: 10px 14px;
+
+    color: #b87333;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+/* ======================================================
+   ROTATOR RESPONSIVE
+====================================================== */
+
+@media (max-width: 780px) {
+    .reader-book-group-heading,
+    .reader-rotator-heading {
+        display: block;
+        text-align: center;
+    }
+
+    .reader-book-group-count,
+    .reader-rotator-count {
+        margin-top: 8px;
+        white-space: normal;
+    }
+
+    .reader-public-card.is-compact,
+    .reader-rotator-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .reader-public-card.is-compact .reader-public-cover,
+    .reader-rotator-cover {
+        justify-content: center;
+        display: flex;
+    }
+
+    .reader-public-card.is-compact .reader-public-cover img,
+    .reader-rotator-cover img {
+        width: 118px;
+        height: 177px;
+    }
+
+    .reader-public-card.is-compact .reader-public-breakdown {
+        justify-content: center;
+    }
+
+    .reader-rotator-meta {
+        justify-content: center;
+    }
+
+    .reader-rotator-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .reader-rotator-position {
+        order: -1;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .reader-book-group,
+    .reader-featured-records,
+    .reader-book-rotator {
+        padding: 22px 18px;
+    }
+
+    .reader-rotator-controls {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .reader-rotator-button {
+        width: 100%;
+    }
+}
