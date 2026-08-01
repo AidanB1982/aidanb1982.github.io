@@ -22,8 +22,8 @@
     >
 
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/header.css?v=20260815">
-    <link rel="stylesheet" href="/css/styles.css?v=20260815">
+    <link rel="stylesheet" href="/css/header.css?v=20260902">
+    <link rel="stylesheet" href="/css/styles.css?v=20260902">
 </head>
 
 <body class="home-page">
@@ -33,16 +33,15 @@
 <!-- HEADER -->
 <div id="header-placeholder"></div>
 
-<!-- HOLDFAST COUNTDOWN BANNER -->
+<!-- ARCHIVE FILES PAPERBACK OFFER BANNER -->
 <section
-    class="holdfast-countdown-banner fade-in"
-    data-release-date="2026-07-31T00:00:00+01:00"
-    aria-label="Holdfast release countdown"
+    class="holdfast-countdown-banner fade-in archive-paperback-offer-banner"
+    aria-label="Archive Files paperback offer"
 >
-    <a href="/pages/holdfast.html">
-        <span class="countdown-label">Holdfast releases in</span>
-        <strong id="holdfast-countdown">calculating...</strong>
-        <span class="countdown-action">Unlock the file</span>
+    <a href="https://blackwoodpublishing.co.uk/pages/store.html">
+        <span class="countdown-label">All four Archive Files paperbacks</span>
+        <strong>£35.00</strong>
+        <span class="countdown-action">For two weeks only · Enter the Direct Editions Desk</span>
     </a>
 </section>
 
@@ -359,7 +358,7 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260815" defer></script>
+<script src="/js/header.js?v=20260902" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
@@ -384,42 +383,6 @@ window.addEventListener("load", async () => {
     }
 
 });
-</script>
-
-<script>
-(function () {
-    const banner = document.querySelector(".holdfast-countdown-banner");
-    const output = document.getElementById("holdfast-countdown");
-
-    if (!banner || !output) return;
-
-    const releaseDateValue = banner.getAttribute("data-release-date");
-    const releaseDate = new Date(releaseDateValue).getTime();
-
-    if (Number.isNaN(releaseDate)) {
-        output.textContent = "date pending";
-        return;
-    }
-
-    function updateCountdown() {
-        const now = Date.now();
-        const distance = releaseDate - now;
-
-        if (distance <= 0) {
-            output.textContent = "Holdfast is open";
-            return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((distance / (1000 * 60)) % 60);
-
-        output.textContent = `${days}d ${hours}h ${minutes}m`;
-    }
-
-    updateCountdown();
-    setInterval(updateCountdown, 60000);
-})();
 </script>
 
 </body>
