@@ -1,28 +1,39 @@
 {
   "august-2026": [
-  {
-    "title": "Butterfly",
-    "author": "Orion Monroe",
-    "image": "/assets/Butterlfy.jpg",
-    "note": "A psychological thriller built around accusation, collapse and the violence of being judged before the truth has room to speak. Butterfly moves through ruin with a cold, emotional pressure, tracing what happens when a life is taken apart in public and revenge begins to look less like choice than consequence.",
-    "link": "https://www.amazon.co.uk/Butterfly-Orion-Monroe/dp/B0FLFBQ8RY"
-  },
-  {
-    "title": "The Terminus Of All Things",
-    "author": "Jay Neill",
-    "image": "/assets/Terminus.jpg",
-    "note": "A strange, imaginative portal fantasy where heartbreak opens onto something larger, stranger and far less stable than the world left behind. Endland feels built from cultural debris, memory and discarded futures, giving the adventure a restless energy while asking what survives after things are meant to end.",
-    "link": "https://www.amazon.co.uk/dp/B0FNX2BBXJ?tag=uklinktagbk-21&th=1&psc=1&geniuslink=true"
-  },
-  {
-    "title": "Finding Home",
-    "author": "Lucy Brighton",
-    "image": "/assets/FindingHome.jpg",
-    "note": "A missing person story shaped by secrecy, suspicion and the uneasy pull of a town that seems to know more than it will say. Finding Home draws its tension from buried histories and uncertain trust, where searching for family becomes something darker: a question of who is watching, who is lying, and what was never meant to be found.",
-    "link": "https://www.lucybrighton.com/product-page/finding-home"
-  }
-],
+    {
+      "title": "See Me as I Am",
+      "author": "L.M. Pirie",
+      "image": "/assets/Seemeasiam.jpg",
+      "note": "A raw contemporary romantic tragedy shaped by trauma, survival and the difficult work of being truly seen. See Me as I Am does not soften its darkness, but moves through it with emotional force, tracing a life marked by mistreatment, fear and the fragile possibility of redemption. Beneath the romance is something harder and more human: a story about respect, identity, self-worth and the kind of love that does not erase damage, but stays long enough to witness it.",
+      "link": "https://www.amazon.co.uk/See-Me-Emotional-Contemporary-Undefined-ebook/dp/B0GX32MDPS"
+    }
+  ],
+
   "july-2026": [
+    {
+      "title": "Butterfly",
+      "author": "Orion Monroe",
+      "image": "/assets/Butterlfy.jpg",
+      "note": "A psychological thriller built around accusation, collapse and the violence of being judged before the truth has room to speak. Butterfly moves through ruin with a cold, emotional pressure, tracing what happens when a life is taken apart in public and revenge begins to look less like choice than consequence.",
+      "link": "https://www.amazon.co.uk/Butterfly-Orion-Monroe/dp/B0FLFBQ8RY"
+    },
+    {
+      "title": "The Terminus Of All Things",
+      "author": "Jay Neill",
+      "image": "/assets/Terminus.jpg",
+      "note": "A strange, imaginative portal fantasy where heartbreak opens onto something larger, stranger and far less stable than the world left behind. Endland feels built from cultural debris, memory and discarded futures, giving the adventure a restless energy while asking what survives after things are meant to end.",
+      "link": "https://www.amazon.co.uk/dp/B0FNX2BBXJ?tag=uklinktagbk-21&th=1&psc=1&geniuslink=true"
+    },
+    {
+      "title": "Finding Home",
+      "author": "Lucy Brighton",
+      "image": "/assets/FindingHome.jpg",
+      "note": "A missing person story shaped by secrecy, suspicion and the uneasy pull of a town that seems to know more than it will say. Finding Home draws its tension from buried histories and uncertain trust, where searching for family becomes something darker: a question of who is watching, who is lying, and what was never meant to be found.",
+      "link": "https://www.lucybrighton.com/product-page/finding-home"
+    }
+  ],
+
+  "june-2026": [
     {
       "title": "Grace",
       "author": "A.M. Shine",
@@ -45,7 +56,8 @@
       "link": "https://uk.bookshop.org/a/17286/9781037205798"
     }
   ],
-  "june-2026": [
+
+  "may-2026": [
     {
       "title": "Land",
       "author": "Maggie O’Farrell",
@@ -68,16 +80,15 @@
       "link": "https://uk.bookshop.org/a/17286/9781035086955"
     }
   ],
-  "may-2026": [
+
+  "april-2026": [
     {
       "title": "The Lamb",
       "author": "Lucy Rose",
       "image": "/assets/editormay.jpg",
       "note": "A girl is raised at the edge of a forest, within a life shaped by ritual, hunger, and a mother’s careful, enclosing love. Strangers are taken in from the cold, fed, and quietly consumed. It is the only world she knows. When that pattern begins to shift, so too does her understanding of what binds her there. Desire, control, and inheritance begin to blur, and the possibility of leaving comes into view. It moves with restraint, allowing the unease to gather slowly. What lingers is not shock, but recognition, and the cost of stepping beyond what has always been.",
       "link": "https://uk.bookshop.org/a/17286/9781399619752"
-    }
-  ],
-  "april-2026": [
+    },
     {
       "title": "Starve Acre",
       "author": "Andrew Michael Hurley",
