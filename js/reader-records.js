@@ -340,7 +340,11 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
         requestJsonp(BLACKWOOD_READER_RECORDS_ENDPOINT)
             .then(data => {
-                const records = Array.isArray(data.records) ? data.records : [];
+                const records = Array.isArray(data)
+    ? data
+    : Array.isArray(data.records)
+        ? data.records
+        : [];
 
                 publicRecordsState.records = normaliseRecords(records);
 
@@ -361,36 +365,54 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
     }
 
     function requestJsonp(url) {
-        return new Promise((resolve, reject) => {
-            const callbackName = `blackwoodReaderRecords_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    return new Promise((resolve, reject) => {
+        const callbackName = `blackwoodReaderRecords_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const timeoutLimit = 10000;
 
-            window[callbackName] = data => {
-                resolve(data);
-                cleanup();
-            };
+        let settled = false;
 
-            const script = document.createElement("script");
-            const separator = url.includes("?") ? "&" : "?";
+        const script = document.createElement("script");
+        const separator = url.includes("?") ? "&" : "?";
 
-            script.src = `${url}${separator}callback=${callbackName}&cache=${Date.now()}`;
-            script.async = true;
+        const timeout = window.setTimeout(() => {
+            if (settled) return;
 
-            script.onerror = () => {
-                reject(new Error("JSONP request failed."));
-                cleanup();
-            };
+            settled = true;
+            cleanup();
+            reject(new Error("Reader Records request timed out."));
+        }, timeoutLimit);
 
-            function cleanup() {
-                delete window[callbackName];
+        window[callbackName] = data => {
+            if (settled) return;
 
-                if (script.parentNode) {
-                    script.parentNode.removeChild(script);
-                }
+            settled = true;
+            cleanup();
+            resolve(data);
+        };
+
+        script.src = `${url}${separator}callback=${callbackName}&cache=${Date.now()}`;
+        script.async = true;
+
+        script.onerror = () => {
+            if (settled) return;
+
+            settled = true;
+            cleanup();
+            reject(new Error("Reader Records request failed."));
+        };
+
+        function cleanup() {
+            window.clearTimeout(timeout);
+            delete window[callbackName];
+
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
             }
+        }
 
-            document.body.appendChild(script);
-        });
-    }
+        document.body.appendChild(script);
+    });
+}
 
     function normaliseRecords(records) {
         return records
