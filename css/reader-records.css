@@ -3,16 +3,122 @@
    Blackwood Publishing
 ====================================================== */
 
+body.reader-records-page,
 .reader-records-page {
     background:
         radial-gradient(circle at top, rgba(184, 115, 51, 0.06), transparent 34%),
         linear-gradient(180deg, #050505 0%, #090909 42%, #030303 100%);
+    color: #f1ece4;
+}
+
+/* Failsafe against global fade-in rules */
+body.reader-records-page .fade-in {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
 }
 
 .reader-records-wrap {
     width: min(100%, 1180px);
     margin: 0 auto;
     padding: 150px 24px 80px;
+}
+
+/* ======================================================
+   BUTTON SAFETY
+====================================================== */
+
+body.reader-records-page .button,
+body.reader-records-page button.button {
+    -webkit-text-fill-color: currentColor !important;
+    background-clip: border-box !important;
+}
+
+body.reader-records-page .button.copper,
+body.reader-records-page button.button.copper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 42px;
+    padding: 10px 18px;
+
+    border: 1px solid rgba(184, 115, 51, 0.42);
+    background:
+        linear-gradient(145deg, rgba(184, 115, 51, 0.16), rgba(184, 115, 51, 0.05)),
+        rgba(0, 0, 0, 0.38);
+
+    color: #d49a61 !important;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 2.2px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+        color 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease,
+        opacity 0.25s ease;
+}
+
+body.reader-records-page .button.copper:hover,
+body.reader-records-page button.button.copper:hover,
+body.reader-records-page .button.copper:focus-visible,
+body.reader-records-page button.button.copper:focus-visible {
+    color: #f1ece4 !important;
+    border-color: rgba(184, 115, 51, 0.78);
+    background:
+        linear-gradient(145deg, rgba(184, 115, 51, 0.22), rgba(184, 115, 51, 0.08)),
+        rgba(0, 0, 0, 0.44);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+body.reader-records-page .button.ghost,
+body.reader-records-page button.button.ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+    padding: 7px 14px;
+
+    border: 1px solid rgba(184, 115, 51, 0.28);
+    background: transparent;
+
+    color: #b87333 !important;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+        color 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+body.reader-records-page .button.ghost:hover,
+body.reader-records-page button.button.ghost:hover,
+body.reader-records-page .button.ghost:focus-visible,
+body.reader-records-page button.button.ghost:focus-visible {
+    color: #f1ece4 !important;
+    border-color: rgba(184, 115, 51, 0.72);
+    background: rgba(184, 115, 51, 0.1);
+    transform: translateY(-2px);
+    outline: none;
 }
 
 /* ======================================================
@@ -28,44 +134,43 @@
 .reader-records-kicker {
     margin: 0 0 14px;
 
+    color: #b87333;
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 11px;
     letter-spacing: 3px;
     line-height: 1.5;
     text-transform: uppercase;
-
-    color: #b87333;
 }
 
 .reader-records-hero h1 {
     margin: 0 0 22px;
 
+    color: #f1ece4;
+
     font-size: clamp(42px, 7vw, 82px);
     line-height: 0.95;
     font-weight: 400;
     letter-spacing: 2px;
-
-    color: #f1ece4;
 }
 
 .reader-records-lead {
     margin: 0 0 18px;
 
+    color: rgba(241, 236, 228, 0.9);
+
     font-size: 22px;
     line-height: 1.45;
-
-    color: rgba(241, 236, 228, 0.9);
 }
 
 .reader-records-copy {
+    max-width: 680px;
     margin: 0 auto;
 
-    max-width: 680px;
+    color: rgba(215, 208, 198, 0.78);
 
     font-size: 16px;
     line-height: 1.8;
-
-    color: rgba(215, 208, 198, 0.78);
 }
 
 /* ======================================================
@@ -90,6 +195,11 @@
         inset 0 0 0 1px rgba(255, 255, 255, 0.025);
 }
 
+.reader-records-public {
+    overflow: hidden;
+    padding: 38px 44px 46px;
+}
+
 .reader-records-section-heading {
     max-width: 720px;
     margin: 0 auto 36px;
@@ -99,22 +209,21 @@
 .reader-records-section-heading h2 {
     margin: 0 0 18px;
 
+    color: #f1ece4;
+
     font-size: clamp(30px, 4vw, 48px);
     line-height: 1.1;
     font-weight: 400;
-
-    color: #f1ece4;
 }
 
 .reader-records-section-heading p:last-child {
+    max-width: 660px;
     margin: 0 auto;
 
-    max-width: 660px;
+    color: rgba(215, 208, 198, 0.76);
 
     font-size: 15.5px;
     line-height: 1.75;
-
-    color: rgba(215, 208, 198, 0.76);
 }
 
 /* ======================================================
@@ -149,13 +258,13 @@
 
 .reader-record-field label,
 .reader-record-ratings legend {
+    color: rgba(184, 115, 51, 0.95);
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10.5px;
     letter-spacing: 2.2px;
     line-height: 1.5;
     text-transform: uppercase;
-
-    color: rgba(184, 115, 51, 0.95);
 }
 
 .reader-record-field label span {
@@ -206,7 +315,6 @@
 .reader-record-field select:focus,
 .reader-record-field textarea:focus {
     outline: none;
-
     border-color: rgba(184, 115, 51, 0.7);
 
     box-shadow:
@@ -235,10 +343,10 @@
 .reader-record-rating-note {
     margin: 0 0 24px;
 
+    color: rgba(215, 208, 198, 0.7);
+
     font-size: 14.5px;
     line-height: 1.7;
-
-    color: rgba(215, 208, 198, 0.7);
 }
 
 .reader-record-final-rating {
@@ -257,27 +365,28 @@
 }
 
 .reader-record-final-rating span {
+    color: #b87333;
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10.5px;
     letter-spacing: 2.4px;
     text-transform: uppercase;
-
-    color: #b87333;
 }
 
 .reader-record-final-rating strong {
+    color: #f1ece4;
+
     font-size: 28px;
     line-height: 1;
-
-    color: #f1ece4;
 }
 
 .reader-record-count {
     margin: 8px 0 0;
 
+    color: rgba(215, 208, 198, 0.55);
+
     text-align: right;
     font-size: 12px;
-    color: rgba(215, 208, 198, 0.55);
 }
 
 /* ======================================================
@@ -311,10 +420,10 @@
 }
 
 .reader-record-check span {
+    color: rgba(215, 208, 198, 0.76);
+
     font-size: 14.5px;
     line-height: 1.65;
-
-    color: rgba(215, 208, 198, 0.76);
 }
 
 .reader-record-actions {
@@ -327,10 +436,10 @@
 .reader-record-status {
     margin: 0;
 
+    color: rgba(215, 208, 198, 0.8);
+
     font-size: 14px;
     line-height: 1.6;
-
-    color: rgba(215, 208, 198, 0.8);
 }
 
 .reader-record-status.is-success {
@@ -342,7 +451,7 @@
 }
 
 /* ======================================================
-   PUBLIC RECORDS
+   PUBLIC RECORDS TOOLBAR
 ====================================================== */
 
 .reader-records-toolbar {
@@ -352,253 +461,6 @@
     margin: -10px 0 34px;
 }
 
-.reader-records-list {
-    display: grid;
-    gap: 24px;
-}
-
-.reader-records-loading,
-.reader-records-empty {
-    margin: 0;
-
-    text-align: center;
-    font-size: 15px;
-    line-height: 1.7;
-
-    color: rgba(215, 208, 198, 0.68);
-}
-
-.reader-public-card {
-    display: grid;
-    grid-template-columns: 130px minmax(0, 1fr);
-    gap: 26px;
-
-    padding: 24px;
-
-    border: 1px solid rgba(184, 115, 51, 0.18);
-
-    background:
-        linear-gradient(145deg, rgba(15, 15, 15, 0.98), rgba(5, 5, 5, 0.99));
-
-    box-shadow:
-        0 22px 58px rgba(0, 0, 0, 0.48),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
-}
-
-.reader-public-cover img {
-    display: block;
-
-    width: 120px;
-    height: 180px;
-
-    object-fit: cover;
-
-    border: 1px solid rgba(184, 115, 51, 0.22);
-
-    box-shadow:
-        0 20px 42px rgba(0, 0, 0, 0.68),
-        0 0 26px rgba(184, 115, 51, 0.06);
-}
-
-.reader-public-content {
-    min-width: 0;
-}
-
-.reader-public-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    margin-bottom: 12px;
-}
-
-.reader-public-pill {
-    display: inline-flex;
-    align-items: center;
-
-    padding: 5px 9px;
-
-    border: 1px solid rgba(184, 115, 51, 0.18);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.5px;
-    letter-spacing: 1.8px;
-    line-height: 1.4;
-    text-transform: uppercase;
-
-    color: rgba(184, 115, 51, 0.9);
-}
-
-.reader-public-content h3 {
-    margin: 0 0 10px;
-
-    font-size: 27px;
-    line-height: 1.2;
-    font-weight: 400;
-
-    color: #f1ece4;
-}
-
-.reader-public-rating {
-    margin: 0 0 18px;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    color: rgba(241, 236, 228, 0.82);
-}
-
-.reader-public-review {
-    margin: 0 0 20px;
-
-    font-size: 16px;
-    line-height: 1.75;
-
-    color: rgba(215, 208, 198, 0.82);
-}
-
-.reader-public-spoiler {
-    margin: 0 0 20px;
-}
-
-.reader-public-spoiler button {
-    border: 1px solid rgba(184, 115, 51, 0.28);
-    background: transparent;
-
-    padding: 10px 14px;
-
-    color: #b87333;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-
-    cursor: pointer;
-}
-
-.reader-public-breakdown {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 10px;
-
-    margin: 0 0 20px;
-}
-
-.reader-public-score {
-    padding: 12px 10px;
-
-    border: 1px solid rgba(184, 115, 51, 0.12);
-
-    background: rgba(255, 255, 255, 0.018);
-
-    text-align: center;
-}
-
-.reader-public-score span {
-    display: block;
-
-    margin-bottom: 7px;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 8.5px;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-
-    color: rgba(184, 115, 51, 0.82);
-}
-
-.reader-public-score strong {
-    color: #f1ece4;
-}
-
-.reader-public-footer {
-    margin: 0;
-
-    font-size: 13px;
-    line-height: 1.6;
-
-    color: rgba(215, 208, 198, 0.58);
-}
-
-/* ======================================================
-   RESPONSIVE
-====================================================== */
-
-@media (max-width: 980px) {
-    .reader-records-wrap {
-        padding-top: 130px;
-    }
-
-    .reader-records-panel,
-    .reader-records-public {
-        padding: 34px 24px;
-    }
-
-    .reader-record-rating-grid,
-    .reader-public-breakdown {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .reader-public-card {
-        grid-template-columns: 1fr;
-    }
-
-    .reader-public-cover {
-        display: flex;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 680px) {
-    .reader-records-wrap {
-        padding: 112px 16px 64px;
-    }
-
-    .reader-records-panel,
-    .reader-records-public {
-        padding: 28px 18px;
-    }
-
-    .reader-record-form-grid,
-    .reader-record-rating-grid,
-    .reader-public-breakdown {
-        grid-template-columns: 1fr;
-    }
-
-    .reader-record-actions {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .reader-record-actions .button,
-    .reader-records-toolbar .button {
-        width: 100%;
-        text-align: center;
-    }
-
-    .reader-record-final-rating {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .reader-public-content h3 {
-        font-size: 24px;
-    }
-}
-/* ======================================================
-   READER RECORDS — COMPACT GROUPED PUBLIC VIEW
-   Add at bottom of /css/reader-records.css
-====================================================== */
-
-/* Tighten the public panel */
-.reader-records-public {
-    padding: 38px 44px 46px;
-}
-
-/* Filter toolbar */
 .reader-records-toolbar-filtered {
     display: flex;
     flex-wrap: wrap;
@@ -659,418 +521,30 @@
     color: #f1ece4;
 }
 
-.reader-records-toolbar-filtered .button {
-    min-height: 34px;
-    padding: 7px 14px;
-
-    font-size: 10px;
-    letter-spacing: 2px;
-}
-
-/* Book group */
-.reader-book-group {
-    margin-top: 26px;
-}
-
-.reader-book-group + .reader-book-group {
-    margin-top: 36px;
-    padding-top: 30px;
-
-    border-top: 1px solid rgba(184, 115, 51, 0.12);
-}
-
-.reader-book-group-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 18px;
-
-    margin: 0 0 16px;
-}
-
-.reader-book-group-title {
-    margin: 0;
-
-    font-size: clamp(22px, 2.8vw, 32px);
-    line-height: 1.15;
-    font-weight: 400;
-
-    color: #f1ece4;
-}
-
-.reader-book-group-count {
-    margin: 0;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    line-height: 1.4;
-    text-transform: uppercase;
-
-    color: rgba(184, 115, 51, 0.86);
-}
-
-.reader-book-group-grid {
-    display: grid;
-    gap: 16px;
-}
-
-/* Compact card */
-.reader-public-card.is-compact {
-    grid-template-columns: 108px minmax(0, 1fr);
-    gap: 22px;
-
-    padding: 20px 24px;
-}
-
-.reader-public-card.is-compact .reader-public-cover {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-}
-
-.reader-public-card.is-compact .reader-public-cover img {
-    width: 92px;
-    height: 138px;
-}
-
-.reader-public-card.is-compact .reader-public-meta {
-    margin-bottom: 10px;
-}
-
-.reader-public-card.is-compact .reader-public-pill {
-    padding: 4px 8px;
-
-    font-size: 8.5px;
-    letter-spacing: 1.6px;
-}
-
-/* JS now uses h4 inside compact cards */
-.reader-public-card.is-compact .reader-public-content h4 {
-    margin: 0 0 8px;
-
-    font-size: 21px;
-    line-height: 1.2;
-    font-weight: 400;
-
-    color: #f1ece4;
-}
-
-.reader-public-card.is-compact .reader-public-rating {
-    margin: 0 0 12px;
-
-    font-size: 10px;
-    letter-spacing: 1.8px;
-}
-
-.reader-public-card.is-compact .reader-public-review {
-    margin: 0 0 16px;
-
-    font-size: 15px;
-    line-height: 1.65;
-
-    color: rgba(215, 208, 198, 0.82);
-}
-
-/* Smaller rating boxes */
-.reader-public-card.is-compact .reader-public-breakdown {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
-
-    margin: 0 0 14px;
-}
-
-.reader-public-card.is-compact .reader-public-score {
-    padding: 9px 8px;
-}
-
-.reader-public-card.is-compact .reader-public-score span {
-    margin-bottom: 5px;
-
-    font-size: 7.8px;
-    letter-spacing: 1.25px;
-}
-
-.reader-public-card.is-compact .reader-public-score strong {
-    font-size: 15px;
-    line-height: 1;
-}
-
-.reader-public-card.is-compact .reader-public-footer {
-    font-size: 12.5px;
-}
-
-/* Optional: make single-record groups feel less oversized */
-.reader-book-group:has(.reader-public-card.is-compact:only-child) .reader-public-card.is-compact {
-    max-width: 100%;
-}
-
 /* ======================================================
-   COMPACT RESPONSIVE
+   PUBLIC RECORD STATES
 ====================================================== */
 
-@media (max-width: 980px) {
-    .reader-records-public {
-        padding: 32px 24px 38px;
-    }
-
-    .reader-records-toolbar-filtered {
-        align-items: stretch;
-    }
-
-    .reader-record-filter {
-        min-width: 210px;
-    }
-
-    .reader-public-card.is-compact {
-        grid-template-columns: 96px minmax(0, 1fr);
-        gap: 18px;
-        padding: 18px;
-    }
-
-    .reader-public-card.is-compact .reader-public-cover img {
-        width: 82px;
-        height: 123px;
-    }
-
-    .reader-public-card.is-compact .reader-public-breakdown {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 680px) {
-    .reader-records-public {
-        padding: 28px 18px 34px;
-    }
-
-    .reader-records-toolbar-filtered {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-
-        margin-bottom: 28px;
-    }
-
-    .reader-record-filter {
-        min-width: 0;
-    }
-
-    .reader-records-toolbar-filtered .button {
-        width: 100%;
-    }
-
-    .reader-book-group-heading {
-        display: block;
-    }
-
-    .reader-book-group-count {
-        margin-top: 6px;
-    }
-
-    .reader-public-card.is-compact {
-        grid-template-columns: 1fr;
-        gap: 16px;
-
-        padding: 18px;
-    }
-
-    .reader-public-card.is-compact .reader-public-cover {
-        justify-content: flex-start;
-    }
-
-    .reader-public-card.is-compact .reader-public-cover img {
-        width: 86px;
-        height: 129px;
-    }
-
-    .reader-public-card.is-compact .reader-public-breakdown {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-/* ======================================================
-   READER RECORDS — ROTATING RECORD VIEW
-   One featured record block + one rotating block per book
-====================================================== */
-
-/* Make the public records area feel more curated */
-.reader-records-public {
-    overflow: hidden;
-}
-
-/* Current grouped layout: reduce long archive walls immediately */
-.reader-book-group-grid {
-    position: relative;
-}
-
-/* Temporary pre-JS behaviour:
-   Show one record per book group instead of every record.
-   The JS update will replace this with real rotation. */
-.reader-book-group-grid .reader-public-card.is-compact {
-    display: none;
-}
-
-.reader-book-group-grid .reader-public-card.is-compact:first-child {
+.reader-records-list {
     display: grid;
+    gap: 24px;
 }
 
-/* Book groups become larger, more intentional feature sections */
-.reader-book-group {
-    position: relative;
-
-    margin-top: 34px;
-    padding: clamp(24px, 4vw, 38px);
-
-    border: 1px solid rgba(184, 115, 51, 0.16);
-
-    background:
-        radial-gradient(circle at 12% 28%, rgba(184, 115, 51, 0.08), transparent 32%),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006)),
-        rgba(0, 0, 0, 0.28);
-
-    box-shadow:
-        0 26px 70px rgba(0, 0, 0, 0.42),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
-}
-
-.reader-book-group + .reader-book-group {
-    margin-top: 34px;
-    padding-top: clamp(24px, 4vw, 38px);
-    border-top: 1px solid rgba(184, 115, 51, 0.16);
-}
-
-/* Cleaner heading for each book section */
-.reader-book-group-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 22px;
-
-    margin: 0 0 24px;
-}
-
-.reader-book-group-title {
+.reader-records-loading,
+.reader-records-empty {
     margin: 0;
+    padding: 32px 18px;
 
-    color: #f1ece4;
+    color: rgba(215, 208, 198, 0.68);
 
-    font-size: clamp(26px, 4vw, 44px);
-    line-height: 1.04;
-    font-weight: 400;
-}
-
-.reader-book-group-count {
-    margin: 0;
-
-    color: rgba(184, 115, 51, 0.9);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    letter-spacing: 2.4px;
-    line-height: 1.5;
-    text-transform: uppercase;
-
-    white-space: nowrap;
-}
-
-/* Existing compact card becomes feature-style */
-.reader-public-card.is-compact {
-    grid-template-columns: minmax(110px, 155px) minmax(0, 1fr);
-    gap: clamp(24px, 4vw, 42px);
-
-    padding: clamp(22px, 4vw, 34px);
-
-    border-color: rgba(184, 115, 51, 0.18);
-
-    background:
-        radial-gradient(circle at left center, rgba(184, 115, 51, 0.07), transparent 36%),
-        linear-gradient(145deg, rgba(15, 15, 15, 0.98), rgba(5, 5, 5, 0.99));
-}
-
-.reader-public-card.is-compact .reader-public-cover {
-    align-items: flex-start;
-}
-
-.reader-public-card.is-compact .reader-public-cover img {
-    width: 124px;
-    height: 186px;
-
-    object-fit: cover;
-
-    border: 1px solid rgba(184, 115, 51, 0.28);
-
-    box-shadow:
-        0 24px 58px rgba(0, 0, 0, 0.72),
-        0 0 34px rgba(184, 115, 51, 0.08);
-}
-
-.reader-public-card.is-compact .reader-public-content h4 {
-    display: none;
-}
-
-.reader-public-card.is-compact .reader-public-meta {
-    margin-bottom: 14px;
-}
-
-.reader-public-card.is-compact .reader-public-pill {
-    padding: 5px 9px;
-
-    border-color: rgba(184, 115, 51, 0.22);
-
-    font-size: 8.8px;
-    letter-spacing: 1.7px;
-}
-
-.reader-public-card.is-compact .reader-public-rating {
-    margin: 0 0 18px;
-
-    color: rgba(241, 236, 228, 0.82);
-
-    font-size: 11px;
-    letter-spacing: 2px;
-}
-
-.reader-public-card.is-compact .reader-public-review {
-    max-width: 760px;
-    margin: 0 0 20px;
-
-    color: rgba(215, 208, 198, 0.84);
-
-    font-size: clamp(15.5px, 1.7vw, 17px);
-    line-height: 1.78;
-}
-
-/* Rating breakdown becomes less dominant */
-.reader-public-card.is-compact .reader-public-breakdown {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-
-    margin: 0 0 16px;
-}
-
-.reader-public-card.is-compact .reader-public-score {
-    min-width: 96px;
-    padding: 8px 9px;
-}
-
-.reader-public-card.is-compact .reader-public-score span {
-    font-size: 7.5px;
-    letter-spacing: 1.2px;
-}
-
-.reader-public-card.is-compact .reader-public-score strong {
-    font-size: 14px;
-}
-
-.reader-public-card.is-compact .reader-public-footer {
-    color: rgba(215, 208, 198, 0.58);
-
-    font-size: 13px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1.7;
 }
 
 /* ======================================================
-   FUTURE JS ROTATOR CLASSES
-   These are for the next JS pass.
+   ROTATING RECORD VIEW
+   JS classes used by /js/reader-records.js
 ====================================================== */
 
 .reader-featured-records,
@@ -1095,6 +569,12 @@
 .reader-featured-records {
     margin-bottom: 42px;
     border-color: rgba(184, 115, 51, 0.28);
+
+    background:
+        radial-gradient(circle at 16% 40%, rgba(184, 115, 51, 0.13), transparent 34%),
+        radial-gradient(circle at 80% 10%, rgba(184, 115, 51, 0.06), transparent 30%),
+        linear-gradient(145deg, rgba(255,255,255,0.024), rgba(255,255,255,0.006)),
+        rgba(0, 0, 0, 0.38);
 }
 
 .reader-rotator-heading {
@@ -1130,11 +610,38 @@
     white-space: nowrap;
 }
 
+.reader-rotator-body {
+    min-height: 220px;
+}
+
 .reader-rotator-card {
     display: grid;
     grid-template-columns: minmax(120px, 165px) minmax(0, 1fr);
     gap: clamp(24px, 4vw, 44px);
     align-items: start;
+
+    animation: readerRecordFade 0.35s ease both;
+}
+
+@keyframes readerRecordFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reader-rotator-cover {
+    display: flex;
+    justify-content: center;
+}
+
+.reader-rotator-cover a {
+    display: inline-block;
 }
 
 .reader-rotator-cover img {
@@ -1147,6 +654,27 @@
     box-shadow:
         0 24px 58px rgba(0, 0, 0, 0.72),
         0 0 34px rgba(184, 115, 51, 0.08);
+
+    transition:
+        transform 0.3s ease,
+        filter 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.reader-rotator-cover a:hover img,
+.reader-rotator-cover a:focus-visible img {
+    transform: translateY(-4px) scale(1.015);
+    filter: brightness(1.08);
+    border-color: rgba(184, 115, 51, 0.5);
+}
+
+.reader-rotator-cover a:focus-visible {
+    outline: 1px solid rgba(184, 115, 51, 0.55);
+    outline-offset: 8px;
+}
+
+.reader-rotator-content {
+    min-width: 0;
 }
 
 .reader-rotator-meta {
@@ -1248,7 +776,8 @@
         background 0.25s ease,
         border-color 0.25s ease,
         color 0.25s ease,
-        transform 0.25s ease;
+        transform 0.25s ease,
+        opacity 0.25s ease;
 }
 
 .reader-rotator-button:hover,
@@ -1258,6 +787,12 @@
     color: #f1ece4;
     transform: translateY(-2px);
     outline: none;
+}
+
+.reader-rotator-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.32;
+    transform: none;
 }
 
 .reader-rotator-position {
@@ -1272,11 +807,146 @@
 }
 
 /* Spoiler reveal inside rotator */
+
 .reader-rotator-spoiler {
     margin: 0 0 18px;
 }
 
 .reader-rotator-spoiler button {
+    border: 1px solid rgba(184, 115, 51, 0.28);
+    border-radius: 0;
+
+    background: transparent;
+
+    padding: 10px 14px;
+
+    color: #b87333;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.reader-rotator-spoiler button:hover,
+.reader-rotator-spoiler button:focus-visible {
+    border-color: rgba(184, 115, 51, 0.72);
+    background: rgba(184, 115, 51, 0.1);
+    color: #f1ece4;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+/* ======================================================
+   LEGACY PUBLIC CARD COMPATIBILITY
+   Safe fallback if older JS is cached briefly
+====================================================== */
+
+.reader-public-card {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    gap: 26px;
+
+    padding: 24px;
+
+    border: 1px solid rgba(184, 115, 51, 0.18);
+
+    background:
+        linear-gradient(145deg, rgba(15, 15, 15, 0.98), rgba(5, 5, 5, 0.99));
+
+    box-shadow:
+        0 22px 58px rgba(0, 0, 0, 0.48),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.reader-public-cover img {
+    display: block;
+
+    width: 120px;
+    height: 180px;
+
+    object-fit: cover;
+
+    border: 1px solid rgba(184, 115, 51, 0.22);
+
+    box-shadow:
+        0 20px 42px rgba(0, 0, 0, 0.68),
+        0 0 26px rgba(184, 115, 51, 0.06);
+}
+
+.reader-public-content {
+    min-width: 0;
+}
+
+.reader-public-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-bottom: 12px;
+}
+
+.reader-public-pill {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 5px 9px;
+
+    border: 1px solid rgba(184, 115, 51, 0.18);
+
+    color: rgba(184, 115, 51, 0.9);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 1.8px;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.reader-public-content h3,
+.reader-public-content h4 {
+    margin: 0 0 10px;
+
+    color: #f1ece4;
+
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 400;
+}
+
+.reader-public-rating {
+    margin: 0 0 18px;
+
+    color: rgba(241, 236, 228, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.reader-public-review {
+    margin: 0 0 20px;
+
+    color: rgba(215, 208, 198, 0.82);
+
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.reader-public-spoiler {
+    margin: 0 0 20px;
+}
+
+.reader-public-spoiler button {
     border: 1px solid rgba(184, 115, 51, 0.28);
     background: transparent;
 
@@ -1292,43 +962,112 @@
     cursor: pointer;
 }
 
+.reader-public-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin: 0 0 16px;
+}
+
+.reader-public-score {
+    min-width: 96px;
+    padding: 8px 9px;
+
+    border: 1px solid rgba(184, 115, 51, 0.12);
+
+    background: rgba(255, 255, 255, 0.018);
+
+    text-align: center;
+}
+
+.reader-public-score span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: rgba(184, 115, 51, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 7.5px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.reader-public-score strong {
+    color: #f1ece4;
+    font-size: 14px;
+}
+
+.reader-public-footer {
+    margin: 0;
+
+    color: rgba(215, 208, 198, 0.58);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
 /* ======================================================
-   ROTATOR RESPONSIVE
+   RESPONSIVE
 ====================================================== */
 
+@media (max-width: 980px) {
+    .reader-records-wrap {
+        padding-top: 130px;
+    }
+
+    .reader-records-panel,
+    .reader-records-public {
+        padding: 34px 24px;
+    }
+
+    .reader-record-rating-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .reader-records-toolbar-filtered {
+        align-items: stretch;
+    }
+
+    .reader-record-filter {
+        min-width: 210px;
+    }
+
+    .reader-public-card {
+        grid-template-columns: 1fr;
+    }
+
+    .reader-public-cover {
+        display: flex;
+        justify-content: center;
+    }
+}
+
 @media (max-width: 780px) {
-    .reader-book-group-heading,
     .reader-rotator-heading {
         display: block;
         text-align: center;
     }
 
-    .reader-book-group-count,
     .reader-rotator-count {
         margin-top: 8px;
         white-space: normal;
     }
 
-    .reader-public-card.is-compact,
     .reader-rotator-card {
         grid-template-columns: 1fr;
         text-align: center;
     }
 
-    .reader-public-card.is-compact .reader-public-cover,
     .reader-rotator-cover {
         justify-content: center;
         display: flex;
     }
 
-    .reader-public-card.is-compact .reader-public-cover img,
     .reader-rotator-cover img {
         width: 118px;
         height: 177px;
-    }
-
-    .reader-public-card.is-compact .reader-public-breakdown {
-        justify-content: center;
     }
 
     .reader-rotator-meta {
@@ -1346,8 +1085,78 @@
     }
 }
 
+@media (max-width: 680px) {
+    .reader-records-wrap {
+        padding: 112px 16px 64px;
+    }
+
+    .reader-records-panel,
+    .reader-records-public {
+        padding: 28px 18px;
+    }
+
+    .reader-record-form-grid,
+    .reader-record-rating-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .reader-record-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reader-record-actions .button,
+    .reader-records-toolbar .button {
+        width: 100%;
+        text-align: center;
+    }
+
+    .reader-record-final-rating {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reader-records-toolbar-filtered {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+
+        margin-bottom: 28px;
+    }
+
+    .reader-record-filter {
+        min-width: 0;
+    }
+
+    .reader-records-toolbar-filtered .button {
+        width: 100%;
+    }
+
+    .reader-public-card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+
+        padding: 18px;
+
+        text-align: center;
+    }
+
+    .reader-public-cover {
+        justify-content: center;
+    }
+
+    .reader-public-cover img {
+        width: 86px;
+        height: 129px;
+    }
+
+    .reader-public-meta,
+    .reader-public-breakdown {
+        justify-content: center;
+    }
+}
+
 @media (max-width: 520px) {
-    .reader-book-group,
     .reader-featured-records,
     .reader-book-rotator {
         padding: 22px 18px;
