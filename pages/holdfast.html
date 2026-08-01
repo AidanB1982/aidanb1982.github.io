@@ -6,9 +6,9 @@
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      gtag("js", new Date());
 
-      gtag('config', 'G-1WN8PBHBW4');
+      gtag("config", "G-1WN8PBHBW4");
     </script>
 
     <meta charset="UTF-8">
@@ -18,15 +18,15 @@
 
     <meta
         name="description"
-        content="A restricted Blackwood Publishing archive transmission for Holdfast. Enter the file designation to unlock the audio file and archive fragment."
+        content="Holdfast by Aidan Blackwood, Book Four of The Archive Files. Listen to the archive transmission, read the recovered prologue, and order the direct paperback edition through Blackwood Publishing."
     >
 
-    <link rel="stylesheet" href="/css/header.css?v=20260815">
-<link rel="stylesheet" href="/css/styles.css?v=20260815">
-<link rel="stylesheet" href="/css/holdfast.css?v=20260815">
+    <link rel="stylesheet" href="/css/header.css?v=20260902">
+    <link rel="stylesheet" href="/css/styles.css?v=20260902">
+    <link rel="stylesheet" href="/css/holdfast.css?v=20260902">
 </head>
 
-<body class="sub-page holdfast-page">
+<body class="sub-page holdfast-page is-unlocked">
 
 <a class="skip-link" href="#main-content">Skip to content</a>
 
@@ -42,7 +42,7 @@
             <div class="holdfast-title-area">
                 <div>
                     <p class="holdfast-kicker">
-                        Blackwood Publishing / Restricted Transmission
+                        Blackwood Publishing / Archive File 04
                     </p>
 
                     <h1 id="holdfast-title" class="holdfast-title">
@@ -50,7 +50,7 @@
                     </h1>
 
                     <p class="holdfast-subtitle">
-                        A sealed record from the Blackwood archive. The file waits for the correct designation.
+                        Book Four of <em>The Archive Files</em>. The transmission is open.
                     </p>
                 </div>
             </div>
@@ -58,53 +58,19 @@
             <aside class="access-panel" aria-labelledby="access-title">
 
                 <div class="access-status" id="access-status">
-                    Access locked
+                    Archive file open
                 </div>
 
                 <h2 id="access-title" class="access-title">
-                    Enter File Designation
+                    Transmission 1042
                 </h2>
 
                 <p class="access-copy">
-                    The archive is listening. Enter the file designation to unlock the Holdfast transmission.
+                    The Holdfast archive transmission has been released. Listen to the recovered audio file,
+                    then continue into the prologue fragment below.
                 </p>
 
-                <p class="file-designation">
-                    File designation: <span>Holdfast-04</span>
-                </p>
-
-                <div class="archivist-note" id="access-hint">
-                    <p class="archivist-note-label">Archivist Note</p>
-                    <p>The correct key is already present in this record.</p>
-                    <p>Archive files retain their designations.</p>
-                    <p>Enter the designation exactly as recorded.</p>
-                </div>
-
-                <form class="access-form" id="access-form" autocomplete="off">
-                    <label class="access-label" for="access-code">
-                        File designation
-                    </label>
-
-                    <input
-                        class="access-input"
-                        id="access-code"
-                        name="access-code"
-                        type="password"
-                        placeholder="Enter designation"
-                        aria-describedby="access-hint access-message"
-                        required
-                    >
-
-                    <button class="access-button" type="submit">
-                        Submit Designation
-                    </button>
-
-                    <p class="access-message" id="access-message" aria-live="polite">
-                        Awaiting file designation.
-                    </p>
-                </form>
-
-                <div class="transmission-panel" id="transmission-panel">
+                <div class="transmission-panel" id="transmission-panel" style="display:block; opacity:1; visibility:visible;">
 
                     <p class="transmission-heading">
                         Archive file 04 / Transmission 1042
@@ -128,53 +94,49 @@
                     </audio>
 
                     <p class="transmission-note" id="transmission-note">
-                        Audio file locked to manual playback. Press play to begin.
+                        Press play to begin the Holdfast transmission.
                     </p>
 
                     <div class="fragment-prompt">
                         <p>
-                            Archive fragment unlocked. Read the recovered prologue below.
+                            Archive fragment available. Read the recovered prologue below.
                         </p>
 
                         <a class="fragment-jump-button" href="#holdfast-prologue">
-                            Read Unlocked Fragment
+                            Read Fragment
                         </a>
                     </div>
 
                     <div class="preorder-panel" aria-labelledby="preorder-heading">
                         <p class="preorder-heading" id="preorder-heading">
-                            Archive continuation unlocked
+                            Holdfast now available
                         </p>
 
                         <p class="preorder-copy">
-                            The transmission has opened the next record. Holdfast is now available to pre-order.
+                            The fourth Archive File is now available through the Blackwood Desk.
                         </p>
 
-                       <a
-    class="preorder-button"
-    href="/pages/store.html#holdfast"
->
-    Pre-order Direct Edition
-</a>
+                        <a
+                            class="preorder-button"
+                            href="/pages/store.html#holdfast"
+                        >
+                            Buy Holdfast Direct Edition
+                        </a>
                     </div>
-
-                    <button class="seal-button" type="button" id="seal-button">
-                        Seal Archive
-                    </button>
 
                 </div>
 
             </aside>
 
             <section
-                class="prologue-panel locked-reading"
+                class="prologue-panel"
                 id="holdfast-prologue"
                 aria-labelledby="prologue-title"
-                hidden
+                style="display:block; opacity:1; visibility:visible;"
             >
 
                 <p class="prologue-kicker">
-                    Unlocked Archive Fragment
+                    Archive Fragment
                 </p>
 
                 <h2 id="prologue-title">
@@ -289,16 +251,37 @@
                 </h2>
 
                 <p>
-                    Begin with <em>The Black Bothy</em>, Book One. <em>Holdfast</em> is Book Four,
-                    opening on 31 July.
+                    Begin with <em>The Black Bothy</em>, Book One. <em>Holdfast</em> is Book Four
+                    of the archive sequence and is now available.
                 </p>
 
-              <a
-    class="route-button"
-    href="/pages/store.html#the-black-bothy"
->
-    Begin with Book One
-</a>
+                <a
+                    class="route-button"
+                    href="/pages/store.html#the-black-bothy"
+                >
+                    Begin with Book One
+                </a>
+            </article>
+
+            <article class="holdfast-route-card">
+                <p class="route-kicker">
+                    Current File
+                </p>
+
+                <h2>
+                    Order Holdfast
+                </h2>
+
+                <p>
+                    Continue the archive with <em>Holdfast</em>, now available through the Blackwood Desk.
+                </p>
+
+                <a
+                    class="route-button"
+                    href="/pages/store.html#holdfast"
+                >
+                    Buy Holdfast Direct Edition
+                </a>
             </article>
 
         </div>
@@ -306,7 +289,7 @@
     </section>
 
     <p class="archive-footer-note">
-        Blackwood Publishing — Archive access monitored
+        Blackwood Publishing — Archive file open
     </p>
 
 </main>
@@ -315,8 +298,78 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260815" defer></script>
-<script src="/js/holdfast.js?v=20260815" defer></script>
+<script src="/js/header.js?v=20260902" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+    try {
+        if (typeof loadHeader === "function") {
+            await loadHeader("simple");
+        }
+    } catch (error) {
+        console.error("Header failed to load:", error);
+    }
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+    const playButton = document.getElementById("play-button");
+    const audio = document.getElementById("holdfast-audio");
+    const note = document.getElementById("transmission-note");
+    const soundwave = document.getElementById("soundwave-box");
+
+    if (!playButton || !audio) {
+        return;
+    }
+
+    playButton.addEventListener("click", async () => {
+        if (audio.paused) {
+            try {
+                await audio.play();
+                playButton.textContent = "Pause Transmission";
+
+                if (note) {
+                    note.textContent = "Transmission playing.";
+                }
+
+                if (soundwave) {
+                    soundwave.classList.add("is-playing");
+                }
+            } catch (error) {
+                if (note) {
+                    note.textContent = "The transmission could not be played. Please try again.";
+                }
+            }
+
+            return;
+        }
+
+        audio.pause();
+        playButton.textContent = "Play Transmission";
+
+        if (note) {
+            note.textContent = "Transmission paused.";
+        }
+
+        if (soundwave) {
+            soundwave.classList.remove("is-playing");
+        }
+    });
+
+    audio.addEventListener("ended", () => {
+        playButton.textContent = "Play Transmission";
+
+        if (note) {
+            note.textContent = "Transmission complete.";
+        }
+
+        if (soundwave) {
+            soundwave.classList.remove("is-playing");
+        }
+    });
+});
+</script>
 
 </body>
 </html>
