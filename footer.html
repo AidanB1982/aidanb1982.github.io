@@ -31,61 +31,79 @@
         </div>
 
         <!-- ARCHIVE SIGNUP -->
-        <section class="footer-archive-signup" aria-labelledby="footer-archive-title">
+<section class="footer-archive-signup" aria-labelledby="footer-archive-title">
 
-            <p class="footer-archive-kicker">
-                Blackwood Archive
-            </p>
+    <p class="footer-archive-kicker">
+        Blackwood Archive
+    </p>
 
-            <h2 id="footer-archive-title">
-                Join the Archive
-            </h2>
+    <h2 id="footer-archive-title">
+        Join the Archive
+    </h2>
 
-            <p>
-                Receive new records, fragments, field notes, publication notices, and release updates from Blackwood Publishing.
-                Not all accounts are released at once.
-            </p>
+    <p>
+        Receive new records, fragments, field notes, publication notices, and release updates from Blackwood Publishing.
+        Not all accounts are released at once.
+    </p>
 
-            <form 
-                class="footer-ml-form"
-                action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" 
-                method="post" 
-                target="footer-mailerlite-frame"
-            >
-                <label class="sr-only" for="footer-email">
-                    Email address
-                </label>
+    <form
+        class="footer-ml-form"
+        action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe"
+        method="post"
+        target="footer-mailerlite-frame"
+        accept-charset="utf-8"
+        autocomplete="on"
+        onsubmit="
+            document.getElementById('footer-archive-status').textContent = 'Filing your request...';
+            this.querySelector('[data-footer-submit]').textContent = 'Filing...';
+            window.setTimeout(() => {
+                document.getElementById('footer-archive-status').textContent = 'Thank you. Check your inbox to confirm your place in the Archive.';
+                this.querySelector('[data-footer-submit]').textContent = 'Filed';
+                this.reset();
+            }, 1200);
+        "
+    >
+        <label class="sr-only" for="footer-email">
+            Email address
+        </label>
 
-                <input 
-                    id="footer-email"
-                    type="email" 
-                    name="fields[email]" 
-                    placeholder="Your email address" 
-                    required
-                >
+        <input
+            id="footer-email"
+            type="email"
+            name="fields[email]"
+            placeholder="Your email address"
+            autocomplete="email"
+            required
+        >
 
-                <input 
-                    type="hidden" 
-                    name="ml-submit" 
-                    value="1"
-                >
+        <input
+            type="hidden"
+            name="ml-submit"
+            value="1"
+        >
 
-                <button type="submit">
-                    Join the Archive
-                </button>
-            </form>
+        <input
+            type="hidden"
+            name="anticsrf"
+            value="true"
+        >
 
-            <iframe
-                name="footer-mailerlite-frame"
-                title="Mailing list signup"
-                style="display:none;"
-            ></iframe>
+        <button type="submit" data-footer-submit>
+            Join the Archive
+        </button>
+    </form>
 
-            <p class="footer-archive-note">
-                You can unsubscribe at any time.
-            </p>
+    <iframe
+        name="footer-mailerlite-frame"
+        title="Mailing list signup"
+        style="display:none;"
+    ></iframe>
 
-        </section>
+    <p class="footer-archive-note" id="footer-archive-status" aria-live="polite">
+        You can unsubscribe at any time.
+    </p>
+
+</section>
 
         <!-- CENTER SEAL -->
         <div class="footer-seal-wrap">
