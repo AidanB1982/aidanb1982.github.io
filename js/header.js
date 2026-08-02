@@ -8,7 +8,7 @@ document.documentElement.classList.remove("no-js");
 // LOAD HEADER + FOOTER
 // =========================
 async function loadHeader(type = "hero") {
- 
+
     const fileMap = {
         hero: "header.html",
         simple: "header-simple.html"
@@ -21,7 +21,10 @@ async function loadHeader(type = "hero") {
 
         // HEADER
         const headerRes = await fetch(`${base}${file}`);
-        if (!headerRes.ok) throw new Error(`Failed to load ${file}`); 
+
+        if (!headerRes.ok) {
+            throw new Error(`Failed to load ${file}`);
+        }
 
         const headerHTML = await headerRes.text();
         const headerContainer = document.getElementById("header-placeholder");
@@ -33,13 +36,17 @@ async function loadHeader(type = "hero") {
 
         // FOOTER
         const footerRes = await fetch(`${base}footer.html`);
-        if (!footerRes.ok) throw new Error("Failed to load footer");
+
+        if (!footerRes.ok) {
+            throw new Error("Failed to load footer");
+        }
 
         const footerHTML = await footerRes.text();
         const footerContainer = document.getElementById("footer-placeholder");
 
         if (footerContainer) {
             footerContainer.innerHTML = footerHTML;
+            initFooterArchiveSignup(footerContainer);
         }
 
         // INIT SYSTEMS
@@ -54,6 +61,159 @@ async function loadHeader(type = "hero") {
     } catch (err) {
         console.error("Layout load failed:", err);
     }
+}
+
+
+// =========================
+// FOOTER ARCHIVE SIGNUP
+// =========================
+function initFooterArchiveSignup(footerContainer) {
+
+    if (!footerContainer) return;
+
+    const form = footerContainer.querySelector(".footer-ml-form");
+
+    if (!form || form.dataset.initialised === "true") return;
+
+    form.dataset.initialised = "true";
+
+    const emailInput = form.querySelector("input[type='email']");
+    const submitButton = form.querySelector("button[type='submit']");
+
+    let status = footerContainer.querySelector("#footer-archive-status");
+
+    if (!status) {
+        status = footerContainer.querySelector(".footer-archive-note");
+    }
+
+    if (!status) {
+        status = document.createElement("p");
+        status.className = "footer-archive-note";
+        form.insertAdjacentElement("afterend", status);
+    }
+
+    status.setAttribute("aria-live", "polite");
+
+    let iframe = footerContainer.querySelector('iframe[name="footer-mailerlite-frame"]');
+
+    if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.name = "footer-mailerlite-frame";
+        iframe.title = "Mailing list signup";
+        iframe.style.display = "none";
+        form.insertAdjacentElement("afterend", iframe);
+    }
+
+    form.setAttribute("target", "footer-mailerlite-frame");
+    form.setAttribute("method", "post");
+    form.setAttribute("accept-charset", "utf-8");
+
+    ensureHiddenInput(form, "ml-submit", "1");
+    ensureHiddenInput(form, "anticsrf", "true");
+
+    const originalButtonText = submitButton
+        ? submitButton.textContent.trim()
+        : "Join the Archive";
+
+    let hasSubmitted = false;
+    let fallbackTimer = null;
+    let resetButtonTimer = null;
+
+    function setStatus(message, type) {
+        status.textContent = message;
+        status.classList.remove("is-success", "is-error", "is-loading");
+
+        if (type) {
+            status.classList.add(type);
+        }
+    }
+
+    function resetButtonSoon() {
+        if (!submitButton) return;
+
+        window.clearTimeout(resetButtonTimer);
+
+        resetButtonTimer = window.setTimeout(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = originalButtonText;
+        }, 2600);
+    }
+
+    function finishSignup() {
+        if (!hasSubmitted) return;
+
+        hasSubmitted = false;
+
+        window.clearTimeout(fallbackTimer);
+
+        setStatus(
+            "Thank you. Check your inbox to confirm your place in the Archive.",
+            "is-success"
+        );
+
+        form.reset();
+
+        if (submitButton) {
+            submitButton.textContent = "Filed";
+        }
+
+        resetButtonSoon();
+    }
+
+    form.addEventListener("submit", event => {
+
+        if (!emailInput || !emailInput.checkValidity()) {
+            event.preventDefault();
+
+            setStatus("Please enter a valid email address.", "is-error");
+
+            if (emailInput) {
+                emailInput.focus();
+            }
+
+            return;
+        }
+
+        hasSubmitted = true;
+
+        setStatus("Filing your request...", "is-loading");
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Filing...";
+        }
+
+        window.clearTimeout(fallbackTimer);
+
+        fallbackTimer = window.setTimeout(() => {
+            finishSignup();
+        }, 3200);
+
+        /*
+           Do not preventDefault here.
+           The form still submits normally into the hidden MailerLite iframe.
+        */
+    });
+
+    iframe.addEventListener("load", () => {
+        if (!hasSubmitted) return;
+
+        finishSignup();
+    });
+}
+
+
+function ensureHiddenInput(form, name, value) {
+    let input = form.querySelector(`input[name="${name}"]`);
+
+    if (!input) {
+        input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        form.appendChild(input);
+    }
+
+    input.value = value;
 }
 
 
@@ -110,7 +270,7 @@ function initBlackwoodDropdownNav(headerContainer) {
         </div>
 
         <a href="/pages/holdfast.html" class="blackwood-nav-link">Holdfast</a>
-        
+
         <a href="/pages/store.html" class="blackwood-nav-link">Direct Editions</a>
 
         <div class="blackwood-nav-item has-dropdown">
@@ -132,27 +292,27 @@ function initBlackwoodDropdownNav(headerContainer) {
             </div>
         </div>
 
-       <div class="blackwood-nav-item has-dropdown">
-    <button
-        class="blackwood-nav-link blackwood-dropdown-toggle"
-        type="button"
-        aria-expanded="false"
-        aria-haspopup="true"
-    >
-        About
-        <span class="dropdown-mark" aria-hidden="true">▾</span>
-    </button>
+        <div class="blackwood-nav-item has-dropdown">
+            <button
+                class="blackwood-nav-link blackwood-dropdown-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-haspopup="true"
+            >
+                About
+                <span class="dropdown-mark" aria-hidden="true">▾</span>
+            </button>
 
-    <div class="blackwood-dropdown" role="menu">
-        <a href="/pages/author.html" role="menuitem">Aidan Blackwood</a>
-        <a href="/pages/miren-vale.html" role="menuitem">Miren Vale</a>
-        <a href="/pages/appearances.html" role="menuitem">Appearances</a>
-        <a href="/pages/about.html" role="menuitem">About Blackwood</a>
-        <a href="/pages/contact.html" role="menuitem">Contact</a>
-    </div>
-</div>
+            <div class="blackwood-dropdown" role="menu">
+                <a href="/pages/author.html" role="menuitem">Aidan Blackwood</a>
+                <a href="/pages/miren-vale.html" role="menuitem">Miren Vale</a>
+                <a href="/pages/appearances.html" role="menuitem">Appearances</a>
+                <a href="/pages/about.html" role="menuitem">About Blackwood</a>
+                <a href="/pages/contact.html" role="menuitem">Contact</a>
+            </div>
+        </div>
 
-<a href="/pages/CommunitySpotlight.html" class="blackwood-nav-link">Community</a>
+        <a href="/pages/CommunitySpotlight.html" class="blackwood-nav-link">Community</a>
     `;
 
     const dropdownItems = existingNav.querySelectorAll(".has-dropdown");
@@ -228,6 +388,8 @@ function initBlackwoodDropdownNav(headerContainer) {
         event.stopPropagation();
     });
 }
+
+
 // =========================
 // GLOBAL CURSOR LIGHTING
 // =========================
@@ -324,6 +486,7 @@ function initScrollFade() {
 function initEntity() {
 
     const entity = document.querySelector(".entity");
+
     if (!entity) return;
 
     function triggerEntity() {
@@ -382,6 +545,7 @@ function initFadeIn() {
 function initSpotlight() {
 
     const works = document.querySelector(".works");
+
     if (!works) return;
 
     works.addEventListener("mousemove", (e) => {
@@ -446,7 +610,7 @@ function initQuotes() {
                 span.classList.add("distort");
             }
 
-            span.textContent = word + " ";
+            span.textContent = `${word} `;
             span.style.animationDelay = `${i * 0.2}s`;
 
             el.appendChild(span);
@@ -558,6 +722,7 @@ function initQuotes() {
 function initReviewRotator() {
 
     const containers = document.querySelectorAll(".review-snippet");
+
     if (!containers.length) return;
 
     const reviews = {
