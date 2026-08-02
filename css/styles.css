@@ -9670,3 +9670,10 @@ body.appearances-page .appearance-action-secondary:focus-visible {
         justify-content: center;
     }
 }
+.footer-archive-note {
+    margin: 14px auto 0;
+    color: rgba(230, 230, 230, 0.48);
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+}
