@@ -255,6 +255,23 @@ function initBlackwoodDropdownNav(headerContainer) {
                 aria-expanded="false"
                 aria-haspopup="true"
             >
+                New Releases
+                <span class="dropdown-mark" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="blackwood-dropdown" role="menu">
+                <a href="/pages/holdfast.html" role="menuitem">Holdfast</a>
+                <a href="/pages/miren-vale.html" role="menuitem">The Crossing</a>
+            </div>
+        </div>
+
+        <div class="blackwood-nav-item has-dropdown">
+            <button
+                class="blackwood-nav-link blackwood-dropdown-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-haspopup="true"
+            >
                 The Works
                 <span class="dropdown-mark" aria-hidden="true">▾</span>
             </button>
@@ -269,9 +286,7 @@ function initBlackwoodDropdownNav(headerContainer) {
             </div>
         </div>
 
-        <a href="/pages/holdfast.html" class="blackwood-nav-link">Holdfast</a>
-
-        <a href="/pages/store.html" class="blackwood-nav-link">Direct Editions</a>
+        <a href="/pages/store.html" class="blackwood-nav-link">Blackwood Store</a>
 
         <div class="blackwood-nav-item has-dropdown">
             <button
