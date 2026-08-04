@@ -150,18 +150,6 @@
     line-height: 1.6;
 }
 
-.arc-status.is-loading {
-    color: rgba(255, 255, 255, 0.72);
-}
-
-.arc-status.is-success {
-    color: #d6b181;
-}
-
-.arc-status.is-error {
-    color: #ffb1a7;
-}
-
 .arc-bot-field {
     position: absolute;
     left: -9999px;
@@ -223,19 +211,25 @@
             title, format, location, and review timing.
         </p>
 
-       <form
-    class="arc-form"
-    id="arc-team-form"
-    action="https://script.google.com/macros/s/AKfycbyhg5jKRLFSn0UehYkBoibsiIosT71kLWMvsQmJYckGsuMj2fX5k6o9Z4cotR2ChwBu/exec"
-    method="post"
-    target="arc-team-frame"
-    accept-charset="UTF-8"
-    novalidate
->
+        <form
+            class="arc-form"
+            id="arc-team-form"
+            action="https://script.google.com/macros/s/AKfycbyhg5jKRLFSn0UehYkBoibsiIosT71kLWMvsQmJYckGsuMj2fX5k6o9Z4cotR2ChwBu/exec"
+            method="post"
+            target="_blank"
+            accept-charset="UTF-8"
+        >
 
             <div class="arc-bot-field" aria-hidden="true">
                 <label for="arc-website">Website</label>
-                <input type="text" id="arc-website" name="website" tabindex="-1" autocomplete="off">
+                <input
+                    type="text"
+                    id="arc-website"
+                    name="website"
+                    value=""
+                    tabindex="-1"
+                    autocomplete="off"
+                >
             </div>
 
             <input type="hidden" name="sourcePage" value="ARC Team Page">
@@ -423,17 +417,12 @@
                 </button>
 
                 <p class="arc-status" id="arc-team-status" aria-live="polite">
-                    Required fields are marked with an asterisk.
+                    Required fields are marked with an asterisk. This test version opens the Google response in a new tab.
                 </p>
             </div>
 
         </form>
-<iframe
-    id="arc-team-frame"
-    name="arc-team-frame"
-    title="ARC Team submission"
-    style="display:none;"
-></iframe>
+
     </section>
 
 </main>
@@ -442,7 +431,6 @@
 <div id="footer-placeholder"></div>
 
 <script src="/js/header.js?v=20260913" defer></script>
-<script src="/js/arc-team.js?v=20260917" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
