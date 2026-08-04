@@ -1,5 +1,6 @@
 // =========================
 // BLACKWOOD ARC TEAM FORM
+// Native form POST version
 // =========================
 
 const BLACKWOOD_ARC_TEAM_ENDPOINT = "https://script.google.com/macros/s/AKfycbyhg5jKRLFSn0UehYkBoibsiIosT71kLWMvsQmJYckGsuMj2fX5k6o9Z4cotR2ChwBu/exec";
@@ -18,90 +19,99 @@ function initArcTeamForm() {
     if (form.dataset.arcInitialised === "true") return;
     form.dataset.arcInitialised = "true";
 
-    form.addEventListener("submit", async event => {
-        event.preventDefault();
+    form.action = BLACKWOOD_ARC_TEAM_ENDPOINT;
+    form.method = "post";
+    form.target = "arc-team-frame";
+    form.acceptCharset = "UTF-8";
 
+    const iframe = ensureArcIframe();
+
+    let hasSubmitted = false;
+    let fallbackTimer = null;
+    let resetTimer = null;
+
+    form.addEventListener("submit", event => {
         setArcStatus(status, "", "");
 
         const validationMessage = validateArcTeamForm(form);
 
         if (validationMessage) {
+            event.preventDefault();
             setArcStatus(status, validationMessage, "is-error");
             return;
         }
 
-        /*
-            Important:
-            The Apps Script ignores submissions if data.website has a value.
-            Some browsers/password managers can accidentally autofill hidden fields
-            named "website", so we clear it before building the payload.
-        */
         clearBotField(form);
 
-        const payload = buildArcPayload(form);
+        hasSubmitted = true;
 
         submitButton.disabled = true;
         submitButton.textContent = "Filing application...";
+
         setArcStatus(status, "Filing your ARC application...", "is-loading");
 
-        try {
-            await sendArcApplication(payload);
+        window.clearTimeout(fallbackTimer);
 
-            form.reset();
+        fallbackTimer = window.setTimeout(() => {
+            finishArcSubmission(form, submitButton, status);
+            hasSubmitted = false;
+        }, 3500);
 
-            setArcStatus(
-                status,
-                "Thank you — your ARC Team application has been filed.",
-                "is-success"
-            );
-
-            submitButton.textContent = "Application Filed";
-
-            window.setTimeout(() => {
-                submitButton.disabled = false;
-                submitButton.textContent = "Apply to Join the ARC Team";
-
-                setArcStatus(
-                    status,
-                    "Required fields are marked with an asterisk.",
-                    ""
-                );
-            }, 6000);
-
-        } catch (error) {
-            console.error("ARC Team submission failed:", error);
-
-            setArcStatus(
-                status,
-                "Something went wrong. Please try again in a moment.",
-                "is-error"
-            );
-
-            submitButton.disabled = false;
-            submitButton.textContent = "Apply to Join the ARC Team";
-        }
+        /*
+            Do not call preventDefault here.
+            The form submits normally to Google Apps Script through the hidden iframe.
+        */
     });
+
+    iframe.addEventListener("load", () => {
+        if (!hasSubmitted) return;
+
+        hasSubmitted = false;
+
+        window.clearTimeout(fallbackTimer);
+
+        finishArcSubmission(form, submitButton, status);
+    });
+
+    function finishArcSubmission(activeForm, activeButton, activeStatus) {
+        activeForm.reset();
+
+        setArcStatus(
+            activeStatus,
+            "Thank you — your ARC Team application has been filed.",
+            "is-success"
+        );
+
+        activeButton.textContent = "Application Filed";
+
+        window.clearTimeout(resetTimer);
+
+        resetTimer = window.setTimeout(() => {
+            activeButton.disabled = false;
+            activeButton.textContent = "Apply to Join the ARC Team";
+
+            setArcStatus(
+                activeStatus,
+                "Required fields are marked with an asterisk.",
+                ""
+            );
+        }, 6000);
+    }
 }
 
-async function sendArcApplication(payload) {
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => {
-        controller.abort();
-    }, 15000);
+function ensureArcIframe() {
+    let iframe = document.getElementById("arc-team-frame");
 
-    try {
-        await fetch(BLACKWOOD_ARC_TEAM_ENDPOINT, {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify(payload),
-            signal: controller.signal
-        });
-    } finally {
-        window.clearTimeout(timeout);
+    if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "arc-team-frame";
+        iframe.name = "arc-team-frame";
+        iframe.title = "ARC Team submission";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
     }
+
+    return iframe;
 }
 
 function validateArcTeamForm(form) {
@@ -133,33 +143,6 @@ function validateArcTeamForm(form) {
     return "";
 }
 
-function buildArcPayload(form) {
-    return {
-        website: "",
-        name: getFormValue(form, "name"),
-        email: getFormValue(form, "email"),
-        country: getFormValue(form, "country"),
-        preferredFormat: getFormValue(form, "preferredFormat"),
-        preferredGenres: getFormValue(form, "preferredGenres"),
-        blackwoodInterests: getFormValue(form, "blackwoodInterests"),
-        reviewPlatforms: getFormValue(form, "reviewPlatforms"),
-        amazonProfile: getFormValue(form, "amazonProfile"),
-        goodreadsProfile: getFormValue(form, "goodreadsProfile"),
-        storyGraphProfile: getFormValue(form, "storyGraphProfile"),
-        instagram: getFormValue(form, "instagram"),
-        tiktok: getFormValue(form, "tiktok"),
-        blogWebsite: getFormValue(form, "blogWebsite"),
-        previousArcExperience: getFormValue(form, "previousArcExperience"),
-        canReviewByDeadline: getFormValue(form, "canReviewByDeadline"),
-        reviewTimeframe: getFormValue(form, "reviewTimeframe"),
-        interestedIn: getFormValue(form, "interestedIn"),
-        whyJoinArcTeam: getFormValue(form, "whyJoinArcTeam"),
-        consentToBeContacted: isChecked(form, "consentToBeContacted") ? "Yes" : "No",
-        privacyAgreement: isChecked(form, "privacyAgreement") ? "Yes" : "No",
-        sourcePage: getFormValue(form, "sourcePage") || "ARC Team Page"
-    };
-}
-
 function clearBotField(form) {
     const botField = form.elements.website;
 
@@ -174,12 +157,6 @@ function getFormValue(form, name) {
     if (!field) return "";
 
     return String(field.value || "").trim();
-}
-
-function isChecked(form, name) {
-    const field = form.elements[name];
-
-    return Boolean(field && field.checked);
 }
 
 function focusField(form, name) {
