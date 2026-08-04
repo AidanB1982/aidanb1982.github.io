@@ -327,7 +327,17 @@ function initBlackwoodDropdownNav(headerContainer) {
             </div>
         </div>
 
-        <a href="/pages/CommunitySpotlight.html" class="blackwood-nav-link">Community</a>
+       <div class="blackwood-nav-item has-dropdown">
+    <button class="blackwood-nav-link blackwood-nav-button" type="button" aria-expanded="false">
+        Community
+        <span aria-hidden="true">▾</span>
+    </button>
+
+    <div class="blackwood-dropdown">
+        <a href="/pages/arc-team.html">ARC Team</a>
+        <a href="/pages/CommunitySpotlight.html">Community Spotlight</a>
+    </div>
+</div>
     `;
 
     const dropdownItems = existingNav.querySelectorAll(".has-dropdown");
