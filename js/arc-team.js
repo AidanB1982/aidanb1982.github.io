@@ -15,10 +15,13 @@ function initArcTeamForm() {
 
     if (!form || !submitButton || !status) return;
 
+    if (form.dataset.arcInitialised === "true") return;
+    form.dataset.arcInitialised = "true";
+
     form.addEventListener("submit", async event => {
         event.preventDefault();
 
-        status.classList.remove("is-success", "is-error", "is-loading");
+        setArcStatus(status, "", "");
 
         const validationMessage = validateArcTeamForm(form);
 
@@ -27,6 +30,14 @@ function initArcTeamForm() {
             return;
         }
 
+        /*
+            Important:
+            The Apps Script ignores submissions if data.website has a value.
+            Some browsers/password managers can accidentally autofill hidden fields
+            named "website", so we clear it before building the payload.
+        */
+        clearBotField(form);
+
         const payload = buildArcPayload(form);
 
         submitButton.disabled = true;
@@ -34,14 +45,7 @@ function initArcTeamForm() {
         setArcStatus(status, "Filing your ARC application...", "is-loading");
 
         try {
-            await fetch(BLACKWOOD_ARC_TEAM_ENDPOINT, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify(payload)
-            });
+            await sendArcApplication(payload);
 
             form.reset();
 
@@ -56,6 +60,7 @@ function initArcTeamForm() {
             window.setTimeout(() => {
                 submitButton.disabled = false;
                 submitButton.textContent = "Apply to Join the ARC Team";
+
                 setArcStatus(
                     status,
                     "Required fields are marked with an asterisk.",
@@ -76,6 +81,27 @@ function initArcTeamForm() {
             submitButton.textContent = "Apply to Join the ARC Team";
         }
     });
+}
+
+async function sendArcApplication(payload) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+        controller.abort();
+    }, 15000);
+
+    try {
+        await fetch(BLACKWOOD_ARC_TEAM_ENDPOINT, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+    } finally {
+        window.clearTimeout(timeout);
+    }
 }
 
 function validateArcTeamForm(form) {
@@ -109,7 +135,7 @@ function validateArcTeamForm(form) {
 
 function buildArcPayload(form) {
     return {
-        website: getFormValue(form, "website"),
+        website: "",
         name: getFormValue(form, "name"),
         email: getFormValue(form, "email"),
         country: getFormValue(form, "country"),
@@ -132,6 +158,14 @@ function buildArcPayload(form) {
         privacyAgreement: isChecked(form, "privacyAgreement") ? "Yes" : "No",
         sourcePage: getFormValue(form, "sourcePage") || "ARC Team Page"
     };
+}
+
+function clearBotField(form) {
+    const botField = form.elements.website;
+
+    if (botField) {
+        botField.value = "";
+    }
 }
 
 function getFormValue(form, name) {
