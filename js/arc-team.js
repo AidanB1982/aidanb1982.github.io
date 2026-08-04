@@ -2,7 +2,7 @@
 // BLACKWOOD ARC TEAM FORM
 // =========================
 
-const BLACKWOOD_ARC_TEAM_ENDPOINT = "https://script.google.com/macros/s/AKfycbwz1pbfH-ukGcclkfzmlvDtlXlll47Pda-C3U1zZAK0lcP_xv9f79HKF6HKN0JECo0l/exec";
+const BLACKWOOD_ARC_TEAM_ENDPOINT = "https://script.google.com/macros/s/AKfycbyhg5jKRLFSn0UehYkBoibsiIosT71kLWMvsQmJYckGsuMj2fX5k6o9Z4cotR2ChwBu/exec";
 
 document.addEventListener("DOMContentLoaded", () => {
     initArcTeamForm();
