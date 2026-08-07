@@ -1,7 +1,7 @@
 /* =========================
    BLACKWOOD CIRCLE MEMBERS
    /css/members.css
-   ========================= */
+========================= */
 
 :root {
     --circle-black: #030303;
@@ -30,11 +30,33 @@ body.blackwood-circle-page {
     color: var(--circle-text);
 }
 
+body.members-page main {
+    min-height: 72vh;
+}
+
 .blackwood-circle-wrap {
     max-width: 1120px;
     margin: 0 auto;
     padding: 80px 22px 110px;
 }
+
+/* =========================
+   MEMBERS HERO VISIBILITY
+========================= */
+
+.circle-hero-note {
+    opacity: 0.55;
+    font-size: 14px;
+}
+
+body.members-page.is-circle-signed-in .circle-signed-out-only {
+    display: none !important;
+}
+
+body.members-page.is-circle-signed-in #blackwood-circle-app {
+    margin-top: 110px;
+}
+
 /* =========================
    MEMBERS PAGE FOOTER
 ========================= */
@@ -90,13 +112,18 @@ body.members-page .site-footer-links a:focus-visible {
     color: #b87333;
     outline: none;
 }
+
+/* =========================
+   APP ROOT
+========================= */
+
 #blackwood-circle-app {
     min-height: 420px;
 }
 
 /* =========================
    SHARED TYPOGRAPHY
-   ========================= */
+========================= */
 
 .circle-kicker {
     margin: 0 0 12px;
@@ -131,7 +158,7 @@ body.members-page .site-footer-links a:focus-visible {
 
 /* =========================
    LOADING / ERROR
-   ========================= */
+========================= */
 
 .circle-loading,
 .circle-error {
@@ -150,7 +177,7 @@ body.members-page .site-footer-links a:focus-visible {
 
 /* =========================
    AUTH AREA
-   ========================= */
+========================= */
 
 .circle-auth-shell {
     display: grid;
@@ -171,6 +198,8 @@ body.members-page .site-footer-links a:focus-visible {
 }
 
 .circle-auth-card {
+    position: sticky;
+    top: 24px;
     border: 1px solid var(--circle-border);
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
@@ -178,8 +207,6 @@ body.members-page .site-footer-links a:focus-visible {
     box-shadow: var(--circle-shadow);
     border-radius: 10px;
     padding: 24px;
-    position: sticky;
-    top: 24px;
 }
 
 .circle-auth-tabs {
@@ -283,7 +310,7 @@ body.members-page .site-footer-links a:focus-visible {
 
 /* =========================
    DASHBOARD
-   ========================= */
+========================= */
 
 .circle-dashboard {
     display: grid;
@@ -294,7 +321,7 @@ body.members-page .site-footer-links a:focus-visible {
     border: 1px solid var(--circle-border);
     background:
         radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(61, 121, 136, 0.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(61, 121, 136, 0.1), transparent 28%),
         linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
         var(--circle-panel);
     box-shadow: var(--circle-shadow);
@@ -349,7 +376,7 @@ body.members-page .site-footer-links a:focus-visible {
 
 /* =========================
    SECTIONS
-   ========================= */
+========================= */
 
 .circle-section {
     border: 1px solid var(--circle-border);
@@ -376,8 +403,8 @@ body.members-page .site-footer-links a:focus-visible {
 }
 
 /* =========================
-   POSTS
-   ========================= */
+   POSTS / REWARDS / POINTS
+========================= */
 
 .circle-post-list,
 .circle-reward-list,
@@ -433,10 +460,6 @@ body.members-page .site-footer-links a:focus-visible {
     margin-bottom: 0;
 }
 
-/* =========================
-   REWARDS
-   ========================= */
-
 .circle-reward-card {
     position: relative;
     overflow: hidden;
@@ -475,10 +498,6 @@ body.members-page .site-footer-links a:focus-visible {
     font-size: 12px;
 }
 
-/* =========================
-   POINTS
-   ========================= */
-
 .circle-points-card {
     display: grid;
     gap: 6px;
@@ -508,7 +527,7 @@ body.members-page .site-footer-links a:focus-visible {
 
 /* =========================
    BUTTONS
-   ========================= */
+========================= */
 
 .button.ghost,
 .circle-auth-card .button.ghost,
@@ -525,178 +544,36 @@ body.members-page .site-footer-links a:focus-visible {
     background: rgba(196, 122, 44, 0.1);
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
-
-@media (max-width: 980px) {
-    .circle-auth-shell {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-auth-card {
-        position: static;
-    }
-
-    .circle-dashboard-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .circle-profile-form {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 620px) {
-    .blackwood-circle-wrap {
-        padding: 58px 18px 88px;
-    }
-
-    .circle-auth-intro,
-    .circle-auth-card,
-    .circle-dashboard-hero,
-    .circle-section,
-    .circle-loading,
-    .circle-error {
-        border-radius: 8px;
-    }
-
-    .circle-dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-auth-tabs {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-dashboard-actions {
-        align-items: stretch;
-    }
-
-    .circle-dashboard-actions .button,
-    .circle-profile-form .button,
-    .circle-auth-form .button {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
-}
-
-/* =========================
-   REDUCED MOTION
-   ========================= */
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-    }
-}
-/* =========================
-   BLACKWOOD CIRCLE BUTTON FIX
-   Keeps global site button styles from flattening member buttons
-   ========================= */
-
+/* Circle app button protection */
 #blackwood-circle-app .button,
 #blackwood-circle-app button.button,
 #blackwood-circle-app .button.copper,
-#blackwood-circle-app button.button.copper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 12px 24px;
-    border: 1px solid rgba(196, 122, 44, 0.78);
-    border-radius: 4px;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.22), rgba(196, 122, 44, 0.08)),
-        rgba(0, 0, 0, 0.48);
-    color: #d6b181;
-    font: inherit;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    line-height: 1;
-    text-transform: uppercase;
-    text-decoration: none;
-    cursor: pointer;
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 12px 28px rgba(0, 0, 0, 0.28);
-    transition:
-        background 180ms ease,
-        border-color 180ms ease,
-        color 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease;
-}
-
-#blackwood-circle-app .button:hover,
-#blackwood-circle-app button.button:hover,
-#blackwood-circle-app .button:focus-visible,
-#blackwood-circle-app button.button:focus-visible {
-    border-color: #c47a2c;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.34), rgba(196, 122, 44, 0.12)),
-        rgba(0, 0, 0, 0.64);
-    color: #efe7dc;
-    outline: none;
-    transform: translateY(-1px);
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-        0 16px 36px rgba(0, 0, 0, 0.36);
-}
-
-#blackwood-circle-app .button.ghost,
-#blackwood-circle-app button.button.ghost {
-    background: transparent;
-    border-color: rgba(196, 122, 44, 0.42);
-    color: rgba(214, 177, 129, 0.86);
-}
-
-#blackwood-circle-app .button.ghost:hover,
-#blackwood-circle-app button.button.ghost:hover,
-#blackwood-circle-app .button.ghost:focus-visible,
-#blackwood-circle-app button.button.ghost:focus-visible {
-    background: rgba(196, 122, 44, 0.1);
-    border-color: rgba(196, 122, 44, 0.82);
-    color: #efe7dc;
-}
-/* =========================
-   BLACKWOOD CIRCLE BUTTONS
-   Final override for native/global button styling
-   ========================= */
-
+#blackwood-circle-app button.button.copper,
 body.members-page #blackwood-circle-app button.circle-button,
 body.blackwood-circle-page #blackwood-circle-app button.circle-button,
 body.members-page #blackwood-circle-app .circle-dashboard-actions button,
 body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"],
 body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"] {
-    all: unset;
     box-sizing: border-box !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    min-height: 46px !important;
-    padding: 13px 24px !important;
+    min-height: 44px !important;
+    padding: 12px 24px !important;
+    border: 1px solid rgba(196, 122, 44, 0.78) !important;
     border-radius: 4px !important;
-    border: 1px solid rgba(196, 122, 44, 0.82) !important;
     background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.28), rgba(196, 122, 44, 0.10)),
-        rgba(0, 0, 0, 0.58) !important;
+        linear-gradient(180deg, rgba(196, 122, 44, 0.22), rgba(196, 122, 44, 0.08)),
+        rgba(0, 0, 0, 0.48) !important;
     color: #d6b181 !important;
-    font-family: inherit !important;
+    font: inherit !important;
     font-size: 12px !important;
     font-weight: 700 !important;
     letter-spacing: 0.22em !important;
-    line-height: 1.1 !important;
+    line-height: 1 !important;
     text-transform: uppercase !important;
-    text-align: center !important;
     text-decoration: none !important;
+    text-align: center !important;
     cursor: pointer !important;
     white-space: nowrap !important;
     box-shadow:
@@ -710,6 +587,10 @@ body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"] 
         box-shadow 180ms ease !important;
 }
 
+#blackwood-circle-app .button:hover,
+#blackwood-circle-app button.button:hover,
+#blackwood-circle-app .button:focus-visible,
+#blackwood-circle-app button.button:focus-visible,
 body.members-page #blackwood-circle-app button.circle-button:hover,
 body.blackwood-circle-page #blackwood-circle-app button.circle-button:hover,
 body.members-page #blackwood-circle-app .circle-dashboard-actions button:hover,
@@ -722,8 +603,8 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
 body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:focus-visible {
     border-color: #c47a2c !important;
     background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.38), rgba(196, 122, 44, 0.14)),
-        rgba(0, 0, 0, 0.72) !important;
+        linear-gradient(180deg, rgba(196, 122, 44, 0.34), rgba(196, 122, 44, 0.12)),
+        rgba(0, 0, 0, 0.64) !important;
     color: #efe7dc !important;
     outline: none !important;
     transform: translateY(-1px) !important;
@@ -732,6 +613,8 @@ body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:
         0 16px 36px rgba(0, 0, 0, 0.36) !important;
 }
 
+#blackwood-circle-app .button.ghost,
+#blackwood-circle-app button.button.ghost,
 body.members-page #blackwood-circle-app button.circle-button-secondary,
 body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary,
 body.members-page #blackwood-circle-app #circle-sign-out {
@@ -740,6 +623,10 @@ body.members-page #blackwood-circle-app #circle-sign-out {
     color: rgba(214, 177, 129, 0.9) !important;
 }
 
+#blackwood-circle-app .button.ghost:hover,
+#blackwood-circle-app button.button.ghost:hover,
+#blackwood-circle-app .button.ghost:focus-visible,
+#blackwood-circle-app button.button.ghost:focus-visible,
 body.members-page #blackwood-circle-app button.circle-button-secondary:hover,
 body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:hover,
 body.members-page #blackwood-circle-app #circle-sign-out:hover,
@@ -755,6 +642,11 @@ body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
 body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"] {
     width: 100% !important;
 }
+
+/* =========================
+   REDEMPTION CODES
+========================= */
+
 #blackwood-circle-app .circle-redemption-code {
     margin-top: 14px;
 }
@@ -783,6 +675,7 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
 #blackwood-circle-app .circle-redemption-code span {
     color: #d6b181;
 }
+
 /* =========================
    BLACKWOOD CIRCLE PUBLIC EXPLAINER
 ========================= */
@@ -905,6 +798,28 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
     text-align: center;
 }
 
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 980px) {
+    .circle-auth-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-auth-card {
+        position: static;
+    }
+
+    .circle-dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .circle-profile-form {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 860px) {
     .circle-public-grid,
     .circle-earning-panel {
@@ -918,6 +833,47 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
 
     .circle-earning-row strong {
         min-width: 0;
+    }
+}
+
+@media (max-width: 760px) {
+    body.members-page.is-circle-signed-in #blackwood-circle-app {
+        margin-top: 92px;
+    }
+}
+
+@media (max-width: 620px) {
+    .blackwood-circle-wrap {
+        padding: 58px 18px 88px;
+    }
+
+    .circle-auth-intro,
+    .circle-auth-card,
+    .circle-dashboard-hero,
+    .circle-section,
+    .circle-loading,
+    .circle-error {
+        border-radius: 8px;
+    }
+
+    .circle-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-auth-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-dashboard-actions {
+        align-items: stretch;
+    }
+
+    .circle-dashboard-actions .button,
+    .circle-profile-form .button,
+    .circle-auth-form .button {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
     }
 }
 
@@ -944,38 +900,18 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
         width: 100%;
     }
 }
-/* ======================================================
-   MEMBERS PAGE — HIDE INTRO WHEN LOGGED IN
-====================================================== */
 
-body.members-page.is-circle-signed-in .circle-signed-out-only {
-    display: none !important;
-}
+/* =========================
+   REDUCED MOTION
+========================= */
 
-body.members-page.is-circle-signed-in #blackwood-circle-app {
-    margin-top: 110px;
-}
-
-@media (max-width: 760px) {
-    body.members-page.is-circle-signed-in #blackwood-circle-app {
-        margin-top: 92px;
-    }
-}
-body.members-page.is-circle-signed-in .circle-signed-out-only {
-    display: none !important;
-}
-
-body.members-page.is-circle-signed-in #blackwood-circle-app {
-    margin-top: 110px;
-}
-
-.circle-hero-note {
-    opacity: 0.55;
-    font-size: 14px;
-}
-
-@media (max-width: 760px) {
-    body.members-page.is-circle-signed-in #blackwood-circle-app {
-        margin-top: 92px;
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
