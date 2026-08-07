@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>The Blackwood Circle | Blackwood Publishing</title>
+
+<meta
+    name="description"
+    content="The Blackwood Circle is the private members area for Blackwood Publishing readers, ARC members, rewards, behind-the-scenes notes, and reader records."
+>
+
+<link rel="stylesheet" href="/css/header.css?v=20260913">
+<link rel="stylesheet" href="/css/styles.css?v=20260913">
+<link rel="stylesheet" href="/css/members.css?v=20260807">
+
+</head>
+
+<body class="sub-page members-page blackwood-circle-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<div id="header-placeholder"></div>
+
+<section class="about-hero">
+
+    <div class="about-hero-overlay"></div>
+
+    <div class="about-hero-content fade-in">
+        <p class="about-intro-line">Private Reader Access</p>
+
+        <h1>The Blackwood Circle</h1>
+
+        <p class="about-intro-line">
+            Reader records. Private notes. Rewards. Dispatches from the archive.
+        </p>
+
+        <p class="about-intro-line" style="opacity:0.55; font-size:14px;">
+            Sign in to access your Blackwood member record and members-only material.
+        </p>
+    </div>
+
+</section>
+
+<main id="main-content" class="blackwood-circle-wrap">
+
+    <div id="blackwood-circle-app">
+        <section class="circle-loading">
+            <p class="circle-kicker">The Blackwood Circle</p>
+            <h1>Opening the archive...</h1>
+            <p>
+                Your member record is being retrieved.
+            </p>
+        </section>
+    </div>
+
+    <noscript>
+        <section class="circle-error">
+            <p class="circle-kicker">The Blackwood Circle</p>
+            <h1>JavaScript is required</h1>
+            <p>
+                The Blackwood Circle uses secure member login. Please enable JavaScript
+                in your browser to access the members area.
+            </p>
+        </section>
+    </noscript>
+
+</main>
+
+<div style="height:40px;"></div>
+
+<div id="footer-placeholder"></div>
+
+<script src="/js/header.js?v=20260921" defer></script>
+<script src="/js/members.js?v=20260807" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
+        console.error("Header failed to load");
+        return;
+    }
+
+    await loadHeader("simple");
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+});
+</script>
+
+</body>
+</html>
