@@ -887,7 +887,7 @@ function initReviewRotator() {
 
         circleLink.innerHTML = `
             <span class="blackwood-circle-access-mark" aria-hidden="true">◎</span>
-            <span class="blackwood-circle-access-text">The Circle</span>
+            <span class="blackwood-circle-access-text"> </span>
         `;
 
         document.body.appendChild(circleLink);
