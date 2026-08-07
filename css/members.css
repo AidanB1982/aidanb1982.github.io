@@ -701,3 +701,31 @@ body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
 body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"] {
     width: 100% !important;
 }
+#blackwood-circle-app .circle-redemption-code {
+    margin-top: 14px;
+}
+
+#blackwood-circle-app .circle-redemption-code code {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    margin-top: 6px;
+    padding: 11px 15px;
+    border: 1px solid rgba(214, 177, 129, 0.48);
+    border-radius: 4px;
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.18), rgba(196, 122, 44, 0.08)),
+        rgba(0, 0, 0, 0.5);
+    color: #efe7dc;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    word-break: break-word;
+}
+
+#blackwood-circle-app .circle-redemption-notice strong,
+#blackwood-circle-app .circle-redemption-code span {
+    color: #d6b181;
+}
