@@ -612,3 +612,92 @@ body.blackwood-circle-page {
     border-color: rgba(196, 122, 44, 0.82);
     color: #efe7dc;
 }
+/* =========================
+   BLACKWOOD CIRCLE BUTTONS
+   Final override for native/global button styling
+   ========================= */
+
+body.members-page #blackwood-circle-app button.circle-button,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button,
+body.members-page #blackwood-circle-app .circle-dashboard-actions button,
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"],
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"] {
+    all: unset;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 46px !important;
+    padding: 13px 24px !important;
+    border-radius: 4px !important;
+    border: 1px solid rgba(196, 122, 44, 0.82) !important;
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.28), rgba(196, 122, 44, 0.10)),
+        rgba(0, 0, 0, 0.58) !important;
+    color: #d6b181 !important;
+    font-family: inherit !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.22em !important;
+    line-height: 1.1 !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 12px 28px rgba(0, 0, 0, 0.28) !important;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease !important;
+}
+
+body.members-page #blackwood-circle-app button.circle-button:hover,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button:hover,
+body.members-page #blackwood-circle-app .circle-dashboard-actions button:hover,
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:hover,
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:hover,
+body.members-page #blackwood-circle-app button.circle-button:focus-visible,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button:focus-visible,
+body.members-page #blackwood-circle-app .circle-dashboard-actions button:focus-visible,
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:focus-visible,
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:focus-visible {
+    border-color: #c47a2c !important;
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.38), rgba(196, 122, 44, 0.14)),
+        rgba(0, 0, 0, 0.72) !important;
+    color: #efe7dc !important;
+    outline: none !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 16px 36px rgba(0, 0, 0, 0.36) !important;
+}
+
+body.members-page #blackwood-circle-app button.circle-button-secondary,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary,
+body.members-page #blackwood-circle-app #circle-sign-out {
+    border-color: rgba(196, 122, 44, 0.45) !important;
+    background: transparent !important;
+    color: rgba(214, 177, 129, 0.9) !important;
+}
+
+body.members-page #blackwood-circle-app button.circle-button-secondary:hover,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:hover,
+body.members-page #blackwood-circle-app #circle-sign-out:hover,
+body.members-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
+body.members-page #blackwood-circle-app #circle-sign-out:focus-visible {
+    border-color: rgba(196, 122, 44, 0.88) !important;
+    background: rgba(196, 122, 44, 0.1) !important;
+    color: #efe7dc !important;
+}
+
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"] {
+    width: 100% !important;
+}
