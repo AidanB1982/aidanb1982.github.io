@@ -1,96 +1,157 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>The Blackwood Circle | Blackwood Publishing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-    name="description"
-    content="The Blackwood Circle is the private members area for Blackwood Publishing readers, ARC members, rewards, behind-the-scenes notes, and reader records."
->
+    <title>The Blackwood Circle | Blackwood Publishing</title>
 
-<link rel="stylesheet" href="/css/header.css?v=20260913">
-<link rel="stylesheet" href="/css/styles.css?v=20260913">
-<link rel="stylesheet" href="/css/members.css?v=20260813">
+    <meta
+        name="description"
+        content="The Blackwood Circle is the private members area for Blackwood Publishing readers, ARC members, rewards, behind-the-scenes notes, and reader records."
+    >
 
+    <link rel="stylesheet" href="/css/header.css?v=20260923">
+    <link rel="stylesheet" href="/css/members.css?v=20260819">
+
+    <script src="/js/header.js?v=20260923" defer></script>
+    <script src="/js/members.js?v=20260818" defer></script>
 </head>
 
-<body class="sub-page members-page blackwood-circle-page">
+<body>
+    <a class="skip-link" href="#blackwood-circle-app">Skip to content</a>
 
-<a class="skip-link" href="#main-content">Skip to content</a>
+    <main>
+        <section class="about-hero about-hero-circle" aria-labelledby="blackwood-circle-title">
+            <div class="about-hero-overlay"></div>
 
-<div id="header-placeholder"></div>
+            <div class="about-hero-content fade-in">
+                <p class="about-intro-line">Private Reader Access</p>
 
-<section class="about-hero">
+                <h1 id="blackwood-circle-title">The Blackwood Circle</h1>
 
-    <div class="about-hero-overlay"></div>
+                <p class="about-intro-line">
+                    Reader records. Private notes. Rewards. Dispatches from the archive.
+                </p>
 
-    <div class="about-hero-content fade-in">
-        <p class="about-intro-line">Private Reader Access</p>
-
-        <h1>The Blackwood Circle</h1>
-
-        <p class="about-intro-line">
-            Reader records. Private notes. Rewards. Dispatches from the archive.
-        </p>
-
-        <p class="about-intro-line" style="opacity:0.55; font-size:14px;">
-            Sign in to access your Blackwood member record and members-only material.
-        </p>
-    </div>
-
-</section>
-
-<main id="main-content" class="blackwood-circle-wrap">
-
-    <div id="blackwood-circle-app">
-        <section class="circle-loading">
-            <p class="circle-kicker">The Blackwood Circle</p>
-            <h1>Opening the archive...</h1>
-            <p>
-                Your member record is being retrieved.
-            </p>
+                <p class="about-intro-line" style="opacity:0.55; font-size:14px;">
+                    Sign in to access your Blackwood member record and members-only material.
+                </p>
+            </div>
         </section>
-    </div>
 
-    <noscript>
-        <section class="circle-error">
-            <p class="circle-kicker">The Blackwood Circle</p>
-            <h1>JavaScript is required</h1>
-            <p>
-                The Blackwood Circle uses secure member login. Please enable JavaScript
-                in your browser to access the members area.
-            </p>
+        <section class="circle-public-explainer" aria-labelledby="circle-how-title">
+            <div class="circle-public-explainer-inner">
+                <div class="circle-public-heading">
+                    <p class="circle-kicker">How The Circle Works</p>
+
+                    <h2 id="circle-how-title">Read. Record. Earn. Return.</h2>
+
+                    <p>
+                        The Blackwood Circle is your private reader record. Earn points through
+                        Blackwood reading activity, unlock milestones, and redeem rewards through
+                        the Blackwood Desk.
+                    </p>
+                </div>
+
+                <div class="circle-public-grid">
+                    <article class="circle-public-card">
+                        <span class="circle-public-number">01</span>
+
+                        <h3>Join The Circle</h3>
+
+                        <p>
+                            Create a free member record to track your points, rewards, redemptions,
+                            reader activity, and private Blackwood updates.
+                        </p>
+                    </article>
+
+                    <article class="circle-public-card">
+                        <span class="circle-public-number">02</span>
+
+                        <h3>Earn Points</h3>
+
+                        <p>
+                            Submit Reader Records, purchase through the Blackwood Desk, and take part
+                            in future Circle activity to build your points total.
+                        </p>
+                    </article>
+
+                    <article class="circle-public-card">
+                        <span class="circle-public-number">03</span>
+
+                        <h3>Unlock Rewards</h3>
+
+                        <p>
+                            Reach milestones, request rewards, and redeem Circle discounts once your
+                            points balance reaches the required level.
+                        </p>
+                    </article>
+                </div>
+
+                <div class="circle-earning-panel" aria-label="Blackwood Circle earning guide">
+                    <div class="circle-earning-row">
+                        <strong>+25 points</strong>
+                        <span>Welcome bonus when you join The Blackwood Circle.</span>
+                    </div>
+
+                    <div class="circle-earning-row">
+                        <strong>+10 points</strong>
+                        <span>Submit a Reader Record while signed in.</span>
+                    </div>
+
+                    <div class="circle-earning-row">
+                        <strong>+5 points per £1</strong>
+                        <span>Earn points on Blackwood Desk purchases.</span>
+                    </div>
+
+                    <div class="circle-earning-row">
+                        <strong>100 points</strong>
+                        <span>Redeem for a Circle discount reward.</span>
+                    </div>
+                </div>
+
+                <div class="circle-public-actions">
+                    <a class="circle-button circle-button-primary" href="#blackwood-circle-app">
+                        Sign In / Join The Circle
+                    </a>
+
+                    <a class="circle-button circle-button-secondary" href="/pages/reader-records.html">
+                        Submit a Reader Record
+                    </a>
+
+                    <a class="circle-button circle-button-secondary" href="/pages/store.html">
+                        Visit the Blackwood Desk
+                    </a>
+                </div>
+            </div>
         </section>
-    </noscript>
 
-</main>
+        <div id="blackwood-circle-app">
+            <section class="circle-loading">
+                <p class="circle-kicker">The Blackwood Circle</p>
 
-<div style="height:40px;"></div>
+                <h1>Opening the archive...</h1>
 
-<div id="footer-placeholder"></div>
+                <p>
+                    Your member record is being retrieved.
+                </p>
+            </section>
+        </div>
 
-<script src="/js/header.js?v=20260921" defer></script>
-<script src="/js/members.js?v=20260818" defer></script>
+        <noscript>
+            <section class="circle-error">
+                <p class="circle-kicker">The Blackwood Circle</p>
 
-<script>
-window.addEventListener("load", async () => {
+                <h1>JavaScript is required</h1>
 
-    if (typeof loadHeader !== "function") {
-        console.error("Header failed to load");
-        return;
-    }
-
-    await loadHeader("simple");
-
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
-
-});
-</script>
-
+                <p>
+                    The Blackwood Circle uses secure member login. Please enable JavaScript
+                    in your browser to access the members area.
+                </p>
+            </section>
+        </noscript>
+    </main>
 </body>
 </html>
