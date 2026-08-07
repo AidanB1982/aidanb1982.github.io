@@ -1,6 +1,6 @@
 // =========================
 // BLACKWOOD CIRCLE MEMBERS
-// Supabase Auth + Member Dashboard + Rewards Redemption
+// Supabase Auth + Member Dashboard + Rewards Redemption + Password Reset
 // =========================
 
 const BLACKWOOD_MEMBERS_CONFIG = {
@@ -21,7 +21,8 @@ const BlackwoodMembersState = {
     redemptions: [],
     activeAuthMode: "signin",
     isLoading: false,
-    isRedeeming: false
+    isRedeeming: false,
+    isPasswordRecovery: false
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -55,6 +56,22 @@ async function initBlackwoodMembersArea() {
             }
         );
 
+        BlackwoodMembersState.client.auth.onAuthStateChange((event, session) => {
+            BlackwoodMembersState.session = session || null;
+
+            if (event === "PASSWORD_RECOVERY" || (session && isPasswordResetRoute())) {
+                BlackwoodMembersState.isPasswordRecovery = true;
+                renderPasswordUpdateView();
+                return;
+            }
+
+            if (BlackwoodMembersState.session) {
+                loadMemberDashboard();
+            } else {
+                renderAuthView();
+            }
+        });
+
         const { data, error } = await BlackwoodMembersState.client.auth.getSession();
 
         if (error) {
@@ -63,15 +80,11 @@ async function initBlackwoodMembersArea() {
 
         BlackwoodMembersState.session = data.session || null;
 
-        BlackwoodMembersState.client.auth.onAuthStateChange((_event, session) => {
-            BlackwoodMembersState.session = session || null;
-
-            if (BlackwoodMembersState.session) {
-                loadMemberDashboard();
-            } else {
-                renderAuthView();
-            }
-        });
+        if (BlackwoodMembersState.session && isPasswordResetRoute()) {
+            BlackwoodMembersState.isPasswordRecovery = true;
+            renderPasswordUpdateView();
+            return;
+        }
 
         if (BlackwoodMembersState.session) {
             await loadMemberDashboard();
@@ -191,6 +204,10 @@ function renderAuthView() {
                     <button type="submit" class="circle-button circle-button-primary">
                         Enter the Circle
                     </button>
+
+                    <button type="button" class="circle-button circle-button-secondary" id="circle-forgot-password-button">
+                        Forgotten your password?
+                    </button>
                 </form>
 
                 <form
@@ -235,6 +252,35 @@ function renderAuthView() {
                     </button>
                 </form>
 
+                <form
+                    id="circle-password-reset-request-form"
+                    class="circle-auth-form"
+                    ${BlackwoodMembersState.activeAuthMode === "reset" ? "" : "hidden"}
+                    novalidate
+                >
+                    <p>
+                        Enter your Blackwood Circle email address and we’ll send you a secure password reset link.
+                    </p>
+
+                    <label>
+                        Email address
+                        <input
+                            type="email"
+                            id="circle-password-reset-email"
+                            autocomplete="email"
+                            required
+                        >
+                    </label>
+
+                    <button type="submit" class="circle-button circle-button-primary">
+                        Send Reset Link
+                    </button>
+
+                    <button type="button" class="circle-button circle-button-secondary" id="circle-back-to-signin-button">
+                        Back to Sign In
+                    </button>
+                </form>
+
                 <p class="circle-auth-status" id="circle-auth-status" aria-live="polite"></p>
             </div>
         </section>
@@ -253,6 +299,9 @@ function bindAuthEvents() {
 
     const signInForm = document.getElementById("circle-sign-in-form");
     const signUpForm = document.getElementById("circle-sign-up-form");
+    const resetRequestForm = document.getElementById("circle-password-reset-request-form");
+    const forgotPasswordButton = document.getElementById("circle-forgot-password-button");
+    const backToSignInButton = document.getElementById("circle-back-to-signin-button");
 
     if (signInForm) {
         signInForm.addEventListener("submit", handleMemberSignIn);
@@ -260,6 +309,24 @@ function bindAuthEvents() {
 
     if (signUpForm) {
         signUpForm.addEventListener("submit", handleMemberSignUp);
+    }
+
+    if (resetRequestForm) {
+        resetRequestForm.addEventListener("submit", handlePasswordResetRequest);
+    }
+
+    if (forgotPasswordButton) {
+        forgotPasswordButton.addEventListener("click", () => {
+            BlackwoodMembersState.activeAuthMode = "reset";
+            renderAuthView();
+        });
+    }
+
+    if (backToSignInButton) {
+        backToSignInButton.addEventListener("click", () => {
+            BlackwoodMembersState.activeAuthMode = "signin";
+            renderAuthView();
+        });
     }
 }
 
@@ -358,6 +425,135 @@ async function handleMemberSignUp(event) {
         );
     } catch (error) {
         console.error("Blackwood Circle sign up failed:", error);
+        setAuthStatus(cleanSupabaseError(error.message), "is-error");
+    }
+}
+
+async function handlePasswordResetRequest(event) {
+    event.preventDefault();
+
+    const email = getInputValue("circle-password-reset-email");
+
+    if (!isValidEmail(email)) {
+        setAuthStatus("Please enter a valid email address.", "is-error");
+        return;
+    }
+
+    setAuthStatus("Sending password reset link...", "is-loading");
+
+    try {
+        const { error } = await BlackwoodMembersState.client.auth.resetPasswordForEmail(email, {
+            redirectTo: getPasswordResetRedirectUrl()
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        setAuthStatus(
+            "Check your inbox. If that email has a Blackwood Circle account, a reset link has been sent.",
+            "is-success"
+        );
+    } catch (error) {
+        console.error("Password reset request failed:", error);
+        setAuthStatus(cleanSupabaseError(error.message), "is-error");
+    }
+}
+
+function renderPasswordUpdateView() {
+    const app = BlackwoodMembersState.app;
+
+    app.innerHTML = `
+        <section class="circle-auth-shell" aria-labelledby="circle-password-update-title">
+            <div class="circle-auth-intro">
+                <p class="circle-kicker">The Blackwood Circle</p>
+                <h1 id="circle-password-update-title">Set a New Password</h1>
+                <p>
+                    Choose a new password for your Blackwood Circle account.
+                </p>
+            </div>
+
+            <div class="circle-auth-card">
+                <form id="circle-password-update-form" class="circle-auth-form" novalidate>
+                    <label>
+                        New password
+                        <input
+                            type="password"
+                            id="circle-new-password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Confirm new password
+                        <input
+                            type="password"
+                            id="circle-confirm-new-password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                    </label>
+
+                    <button type="submit" class="circle-button circle-button-primary">
+                        Update Password
+                    </button>
+                </form>
+
+                <p class="circle-auth-status" id="circle-auth-status" aria-live="polite"></p>
+            </div>
+        </section>
+    `;
+
+    const form = document.getElementById("circle-password-update-form");
+
+    if (form) {
+        form.addEventListener("submit", handlePasswordUpdate);
+    }
+}
+
+async function handlePasswordUpdate(event) {
+    event.preventDefault();
+
+    const password = getInputValue("circle-new-password");
+    const confirmPassword = getInputValue("circle-confirm-new-password");
+
+    if (password.length < 8) {
+        setAuthStatus("Please use a password of at least 8 characters.", "is-error");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        setAuthStatus("The passwords do not match.", "is-error");
+        return;
+    }
+
+    setAuthStatus("Updating your password...", "is-loading");
+
+    try {
+        const { error } = await BlackwoodMembersState.client.auth.updateUser({
+            password
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        BlackwoodMembersState.isPasswordRecovery = false;
+
+        window.history.replaceState(
+            {},
+            document.title,
+            BLACKWOOD_MEMBERS_CONFIG.membersPagePath
+        );
+
+        setAuthStatus("Password updated. Opening your member record...", "is-success");
+
+        await loadMemberDashboard();
+    } catch (error) {
+        console.error("Password update failed:", error);
         setAuthStatus(cleanSupabaseError(error.message), "is-error");
     }
 }
@@ -964,6 +1160,25 @@ function isActiveRedemption(redemption) {
 }
 
 // =========================
+// PASSWORD RESET HELPERS
+// =========================
+
+function getPasswordResetRedirectUrl() {
+    return `${window.location.origin}${BLACKWOOD_MEMBERS_CONFIG.membersPagePath}?reset-password=1`;
+}
+
+function isPasswordResetRoute() {
+    const search = String(window.location.search || "").toLowerCase();
+    const hash = String(window.location.hash || "").toLowerCase();
+
+    return (
+        search.includes("reset-password=1") ||
+        search.includes("type=recovery") ||
+        hash.includes("type=recovery")
+    );
+}
+
+// =========================
 // RENDER HELPERS
 // =========================
 
@@ -1086,6 +1301,10 @@ function cleanSupabaseError(message) {
 
     if (/already have this reward/i.test(cleaned) || /pending redemption request/i.test(cleaned)) {
         return "You already have a pending redemption request for this reward.";
+    }
+
+    if (/password/i.test(cleaned) && /weak/i.test(cleaned)) {
+        return "Please choose a stronger password.";
     }
 
     return cleaned;
