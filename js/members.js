@@ -187,7 +187,7 @@ function renderAuthView() {
                         >
                     </label>
 
-                    <button type="submit" class="button copper">
+                    <button type="submit" class="circle-button circle-button-primary">
                         Enter the Circle
                     </button>
                 </form>
@@ -229,7 +229,7 @@ function renderAuthView() {
                         >
                     </label>
 
-                    <button type="submit" class="button copper">
+                    <button type="submit" class="circle-button circle-button-primary">
                         Create Member Record
                     </button>
                 </form>
@@ -454,11 +454,14 @@ async function loadMemberDashboard() {
 function renderDashboard() {
     const app = BlackwoodMembersState.app;
     const member = BlackwoodMembersState.member || {};
+
     const pointsFromHistory = BlackwoodMembersState.points.reduce((total, item) => {
         return total + Number(item.points || 0);
     }, 0);
 
-    const pointsTotal = Number(member.points_total || 0) || pointsFromHistory;
+    const profilePoints = Number(member.points_total || 0);
+    const pointsTotal = profilePoints > 0 ? profilePoints : pointsFromHistory;
+
     const displayName = member.display_name || member.reader_name || member.email || "Reader";
     const tier = member.member_tier || "Reader";
     const status = member.member_status || "active";
@@ -498,13 +501,13 @@ function renderDashboard() {
             </div>
 
             <div class="circle-dashboard-actions">
-               <button type="button" class="circle-button circle-button-primary" id="circle-refresh-dashboard">
-    Refresh Record
-</button>
+                <button type="button" class="circle-button circle-button-primary" id="circle-refresh-dashboard">
+                    Refresh Record
+                </button>
 
-<button type="button" class="circle-button circle-button-secondary" id="circle-sign-out">
-    Sign Out
-</button>
+                <button type="button" class="circle-button circle-button-secondary" id="circle-sign-out">
+                    Sign Out
+                </button>
 
                 <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
             </div>
@@ -531,7 +534,7 @@ function renderDashboard() {
                         >
                     </label>
 
-                    <button type="submit" class="button copper">
+                    <button type="submit" class="circle-button circle-button-primary">
                         Save Reader Record
                     </button>
                 </form>
@@ -730,7 +733,7 @@ function renderErrorState(message) {
             <p class="circle-kicker">The Blackwood Circle</p>
             <h1>Something went wrong</h1>
             <p>${escapeHtml(message)}</p>
-            <button type="button" class="button copper" onclick="window.location.reload()">
+            <button type="button" class="circle-button circle-button-primary" onclick="window.location.reload()">
                 Refresh Page
             </button>
         </section>
