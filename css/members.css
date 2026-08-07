@@ -542,3 +542,73 @@ body.blackwood-circle-page {
         animation-iteration-count: 1 !important;
     }
 }
+/* =========================
+   BLACKWOOD CIRCLE BUTTON FIX
+   Keeps global site button styles from flattening member buttons
+   ========================= */
+
+#blackwood-circle-app .button,
+#blackwood-circle-app button.button,
+#blackwood-circle-app .button.copper,
+#blackwood-circle-app button.button.copper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px 24px;
+    border: 1px solid rgba(196, 122, 44, 0.78);
+    border-radius: 4px;
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.22), rgba(196, 122, 44, 0.08)),
+        rgba(0, 0, 0, 0.48);
+    color: #d6b181;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 12px 28px rgba(0, 0, 0, 0.28);
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease;
+}
+
+#blackwood-circle-app .button:hover,
+#blackwood-circle-app button.button:hover,
+#blackwood-circle-app .button:focus-visible,
+#blackwood-circle-app button.button:focus-visible {
+    border-color: #c47a2c;
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.34), rgba(196, 122, 44, 0.12)),
+        rgba(0, 0, 0, 0.64);
+    color: #efe7dc;
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 16px 36px rgba(0, 0, 0, 0.36);
+}
+
+#blackwood-circle-app .button.ghost,
+#blackwood-circle-app button.button.ghost {
+    background: transparent;
+    border-color: rgba(196, 122, 44, 0.42);
+    color: rgba(214, 177, 129, 0.86);
+}
+
+#blackwood-circle-app .button.ghost:hover,
+#blackwood-circle-app button.button.ghost:hover,
+#blackwood-circle-app .button.ghost:focus-visible,
+#blackwood-circle-app button.button.ghost:focus-visible {
+    background: rgba(196, 122, 44, 0.1);
+    border-color: rgba(196, 122, 44, 0.82);
+    color: #efe7dc;
+}
