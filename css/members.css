@@ -1,1 +1,544 @@
+/* =========================
+   BLACKWOOD CIRCLE MEMBERS
+   /css/members.css
+   ========================= */
 
+:root {
+    --circle-black: #030303;
+    --circle-charcoal: #0b0b0b;
+    --circle-panel: rgba(12, 12, 12, 0.88);
+    --circle-panel-soft: rgba(255, 255, 255, 0.035);
+    --circle-border: rgba(196, 122, 44, 0.28);
+    --circle-border-strong: rgba(196, 122, 44, 0.58);
+    --circle-copper: #c47a2c;
+    --circle-copper-soft: #d6b181;
+    --circle-cream: #efe7dc;
+    --circle-text: rgba(255, 255, 255, 0.76);
+    --circle-muted: rgba(255, 255, 255, 0.52);
+    --circle-faint: rgba(255, 255, 255, 0.34);
+    --circle-error: #ffb1a7;
+    --circle-success: #d6b181;
+    --circle-shadow: 0 28px 90px rgba(0, 0, 0, 0.55);
+}
+
+body.members-page,
+body.blackwood-circle-page {
+    background:
+        radial-gradient(circle at top center, rgba(196, 122, 44, 0.13), transparent 32%),
+        radial-gradient(circle at 80% 15%, rgba(61, 121, 136, 0.12), transparent 28%),
+        linear-gradient(180deg, #050505 0%, #0d0d0d 46%, #020202 100%);
+    color: var(--circle-text);
+}
+
+.blackwood-circle-wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 80px 22px 110px;
+}
+
+#blackwood-circle-app {
+    min-height: 420px;
+}
+
+/* =========================
+   SHARED TYPOGRAPHY
+   ========================= */
+
+.circle-kicker {
+    margin: 0 0 12px;
+    color: var(--circle-copper);
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.circle-auth-intro h1,
+.circle-dashboard-hero h1,
+.circle-loading h1,
+.circle-error h1 {
+    margin: 0 0 18px;
+    color: var(--circle-cream);
+    font-size: clamp(34px, 6vw, 62px);
+    line-height: 1.02;
+    letter-spacing: 0.02em;
+}
+
+.circle-auth-intro p,
+.circle-dashboard-hero p,
+.circle-loading p,
+.circle-error p {
+    max-width: 760px;
+    margin: 0;
+    color: var(--circle-text);
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+/* =========================
+   LOADING / ERROR
+   ========================= */
+
+.circle-loading,
+.circle-error {
+    border: 1px solid var(--circle-border);
+    background:
+        linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
+        var(--circle-panel);
+    box-shadow: var(--circle-shadow);
+    border-radius: 10px;
+    padding: clamp(34px, 6vw, 64px);
+}
+
+.circle-error .button {
+    margin-top: 28px;
+}
+
+/* =========================
+   AUTH AREA
+   ========================= */
+
+.circle-auth-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+    gap: clamp(28px, 5vw, 54px);
+    align-items: start;
+}
+
+.circle-auth-intro {
+    border: 1px solid var(--circle-border);
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 34%),
+        linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.015)),
+        var(--circle-panel);
+    box-shadow: var(--circle-shadow);
+    border-radius: 10px;
+    padding: clamp(34px, 6vw, 58px);
+}
+
+.circle-auth-card {
+    border: 1px solid var(--circle-border);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+        rgba(0, 0, 0, 0.48);
+    box-shadow: var(--circle-shadow);
+    border-radius: 10px;
+    padding: 24px;
+    position: sticky;
+    top: 24px;
+}
+
+.circle-auth-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.circle-auth-tab {
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    background: rgba(0, 0, 0, 0.34);
+    color: var(--circle-muted);
+    padding: 12px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.circle-auth-tab:hover,
+.circle-auth-tab:focus-visible {
+    border-color: var(--circle-border-strong);
+    color: var(--circle-cream);
+    outline: none;
+}
+
+.circle-auth-tab.is-active {
+    border-color: var(--circle-copper);
+    background: rgba(196, 122, 44, 0.14);
+    color: var(--circle-copper-soft);
+}
+
+.circle-auth-form {
+    display: grid;
+    gap: 18px;
+}
+
+.circle-auth-form[hidden] {
+    display: none;
+}
+
+.circle-auth-form label,
+.circle-profile-form label {
+    display: grid;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.circle-auth-form input,
+.circle-profile-form input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    background: rgba(0, 0, 0, 0.5);
+    color: var(--circle-cream);
+    padding: 13px 14px;
+    border-radius: 4px;
+    font: inherit;
+}
+
+.circle-auth-form input:focus,
+.circle-profile-form input:focus {
+    outline: none;
+    border-color: rgba(196, 122, 44, 0.85);
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.12);
+}
+
+.circle-auth-status,
+.circle-dashboard-status {
+    min-height: 22px;
+    margin: 16px 0 0;
+    color: var(--circle-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.circle-auth-status.is-loading,
+.circle-dashboard-status.is-loading {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.circle-auth-status.is-success,
+.circle-dashboard-status.is-success {
+    color: var(--circle-success);
+}
+
+.circle-auth-status.is-error,
+.circle-dashboard-status.is-error {
+    color: var(--circle-error);
+}
+
+/* =========================
+   DASHBOARD
+   ========================= */
+
+.circle-dashboard {
+    display: grid;
+    gap: 28px;
+}
+
+.circle-dashboard-hero {
+    border: 1px solid var(--circle-border);
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(61, 121, 136, 0.10), transparent 28%),
+        linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
+        var(--circle-panel);
+    box-shadow: var(--circle-shadow);
+    border-radius: 10px;
+    padding: clamp(34px, 6vw, 62px);
+}
+
+.circle-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.circle-stat-card {
+    border: 1px solid rgba(196, 122, 44, 0.22);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
+        rgba(0, 0, 0, 0.46);
+    border-radius: 8px;
+    padding: 22px;
+    min-height: 98px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+}
+
+.circle-stat-label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--circle-muted);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.circle-stat-card strong {
+    display: block;
+    color: var(--circle-cream);
+    font-size: clamp(22px, 3vw, 34px);
+    line-height: 1.1;
+    font-weight: 600;
+}
+
+.circle-dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+}
+
+.circle-dashboard-actions .circle-dashboard-status {
+    margin: 0;
+}
+
+/* =========================
+   SECTIONS
+   ========================= */
+
+.circle-section {
+    border: 1px solid var(--circle-border);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012)),
+        rgba(0, 0, 0, 0.42);
+    border-radius: 10px;
+    padding: clamp(24px, 4vw, 38px);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+}
+
+.circle-section h2 {
+    margin: 0 0 22px;
+    color: var(--circle-cream);
+    font-size: clamp(24px, 4vw, 36px);
+    line-height: 1.15;
+}
+
+.circle-profile-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+    gap: 16px;
+    align-items: end;
+}
+
+/* =========================
+   POSTS
+   ========================= */
+
+.circle-post-list,
+.circle-reward-list,
+.circle-points-list {
+    display: grid;
+    gap: 18px;
+}
+
+.circle-post-card,
+.circle-reward-card,
+.circle-points-card,
+.circle-empty-card {
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    background: rgba(0, 0, 0, 0.36);
+    border-radius: 8px;
+    padding: 22px;
+}
+
+.circle-post-card h3,
+.circle-reward-card h3 {
+    margin: 0 0 12px;
+    color: var(--circle-cream);
+    font-size: 22px;
+    line-height: 1.25;
+}
+
+.circle-post-meta,
+.circle-reward-status {
+    margin: 0 0 10px;
+    color: var(--circle-copper-soft);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.circle-post-excerpt {
+    margin: 0 0 16px;
+    color: rgba(255, 255, 255, 0.67);
+    font-style: italic;
+    line-height: 1.7;
+}
+
+.circle-post-body {
+    color: var(--circle-text);
+    line-height: 1.78;
+}
+
+.circle-post-body p {
+    margin: 0 0 16px;
+}
+
+.circle-post-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================
+   REWARDS
+   ========================= */
+
+.circle-reward-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.circle-reward-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(196, 122, 44, 0.12), transparent 45%);
+    opacity: 0;
+    transition: opacity 180ms ease;
+}
+
+.circle-reward-card.is-unlocked {
+    border-color: rgba(214, 177, 129, 0.42);
+}
+
+.circle-reward-card.is-unlocked::before {
+    opacity: 1;
+}
+
+.circle-reward-card.is-locked {
+    opacity: 0.78;
+}
+
+.circle-reward-card p {
+    margin: 0 0 12px;
+    color: var(--circle-text);
+    line-height: 1.7;
+}
+
+.circle-reward-card small {
+    color: var(--circle-muted);
+    font-size: 12px;
+}
+
+/* =========================
+   POINTS
+   ========================= */
+
+.circle-points-card {
+    display: grid;
+    gap: 6px;
+}
+
+.circle-points-card strong {
+    color: var(--circle-copper-soft);
+    font-size: 18px;
+}
+
+.circle-points-card p {
+    margin: 0;
+    color: var(--circle-text);
+    line-height: 1.6;
+}
+
+.circle-points-card small,
+.circle-empty-card p {
+    margin: 0;
+    color: var(--circle-muted);
+    line-height: 1.6;
+}
+
+.circle-empty-card {
+    border-style: dashed;
+}
+
+/* =========================
+   BUTTONS
+   ========================= */
+
+.button.ghost,
+.circle-auth-card .button.ghost,
+.circle-dashboard .button.ghost {
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    background: transparent;
+    color: var(--circle-copper-soft);
+}
+
+.button.ghost:hover,
+.button.ghost:focus-visible {
+    border-color: var(--circle-copper);
+    color: var(--circle-cream);
+    background: rgba(196, 122, 44, 0.1);
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 980px) {
+    .circle-auth-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-auth-card {
+        position: static;
+    }
+
+    .circle-dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .circle-profile-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .blackwood-circle-wrap {
+        padding: 58px 18px 88px;
+    }
+
+    .circle-auth-intro,
+    .circle-auth-card,
+    .circle-dashboard-hero,
+    .circle-section,
+    .circle-loading,
+    .circle-error {
+        border-radius: 8px;
+    }
+
+    .circle-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-auth-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-dashboard-actions {
+        align-items: stretch;
+    }
+
+    .circle-dashboard-actions .button,
+    .circle-profile-form .button,
+    .circle-auth-form .button {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* =========================
+   REDUCED MOTION
+   ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
