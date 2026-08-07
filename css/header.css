@@ -894,3 +894,116 @@ body.sub-page .blackwood-nav {
         display: none;
     }
 }
+/* =========================
+   BLACKWOOD CIRCLE PROMO PANEL
+========================= */
+
+.blackwood-circle-promo {
+    width: min(940px, calc(100% - 32px));
+    margin: 34px auto;
+}
+
+.blackwood-circle-promo-content {
+    padding: clamp(24px, 4vw, 38px);
+    border: 1px solid rgba(214, 177, 129, 0.24);
+    border-radius: 10px;
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.14), transparent 34%),
+        linear-gradient(180deg, rgba(24, 18, 14, 0.96), rgba(9, 7, 6, 0.96));
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+    text-align: center;
+}
+
+.blackwood-circle-promo-kicker {
+    margin: 0 0 10px;
+    color: #c49a6c;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.blackwood-circle-promo h2 {
+    margin: 0 0 14px;
+    color: #f4ead7;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(26px, 4vw, 40px);
+    line-height: 1.15;
+    font-weight: normal;
+}
+
+.blackwood-circle-promo p {
+    max-width: 680px;
+    margin: 0 auto;
+    color: rgba(239, 231, 220, 0.76);
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.blackwood-circle-promo strong {
+    color: #d6b181;
+}
+
+.blackwood-circle-promo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+}
+
+.blackwood-circle-promo-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px 18px;
+    border-radius: 4px;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.blackwood-circle-promo-button.primary {
+    border: 1px solid rgba(214, 177, 129, 0.45);
+    background: #8f4f2d;
+    color: #fff7ed;
+}
+
+.blackwood-circle-promo-button.secondary {
+    border: 1px solid rgba(214, 177, 129, 0.28);
+    background: rgba(0, 0, 0, 0.22);
+    color: #efe7dc;
+}
+
+.blackwood-circle-promo-button:hover,
+.blackwood-circle-promo-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(214, 177, 129, 0.75);
+}
+
+@media (max-width: 560px) {
+    .blackwood-circle-promo {
+        width: min(100% - 22px, 940px);
+        margin: 26px auto;
+    }
+
+    .blackwood-circle-promo-content {
+        padding: 24px 18px;
+    }
+
+    .blackwood-circle-promo-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .blackwood-circle-promo-button {
+        width: 100%;
+        text-align: center;
+    }
+}
