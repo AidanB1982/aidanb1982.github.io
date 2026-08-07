@@ -961,3 +961,21 @@ body.members-page.is-circle-signed-in #blackwood-circle-app {
         margin-top: 92px;
     }
 }
+body.members-page.is-circle-signed-in .circle-signed-out-only {
+    display: none !important;
+}
+
+body.members-page.is-circle-signed-in #blackwood-circle-app {
+    margin-top: 110px;
+}
+
+.circle-hero-note {
+    opacity: 0.55;
+    font-size: 14px;
+}
+
+@media (max-width: 760px) {
+    body.members-page.is-circle-signed-in #blackwood-circle-app {
+        margin-top: 92px;
+    }
+}
