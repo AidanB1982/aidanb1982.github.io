@@ -868,3 +868,29 @@ body.sub-page .blackwood-nav {
         padding: 0;
     }
 }
+/* Signed-in Blackwood Circle state */
+
+.blackwood-circle-access.is-signed-in {
+    border-color: rgba(214, 177, 129, 0.72);
+    background:
+        linear-gradient(180deg, rgba(214, 177, 129, 0.20), rgba(196, 122, 44, 0.08)),
+        rgba(0, 0, 0, 0.58);
+}
+
+.blackwood-circle-access.is-loading {
+    opacity: 0.78;
+}
+
+.blackwood-circle-access-points {
+    margin-left: 2px;
+    padding-left: 9px;
+    border-left: 1px solid rgba(196, 122, 44, 0.45);
+    color: #efe7dc;
+    letter-spacing: 0.12em;
+}
+
+@media (max-width: 520px) {
+    .blackwood-circle-access-points {
+        display: none;
+    }
+}
