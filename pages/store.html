@@ -1,8 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <!-- Google tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
 
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+    </script>
+
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>The Direct Editions | Blackwood Publishing</title>
@@ -17,12 +29,13 @@
     <link rel="preconnect" href="https://sdks.shopifycdn.com">
     <link rel="preconnect" href="https://cdn.shopify.com">
 
-    <link rel="stylesheet" href="/css/header.css?v=20260831">
+    <link rel="stylesheet" href="/css/header.css?v=20260924">
     <link rel="stylesheet" href="/css/styles.css?v=20260831">
     <link rel="stylesheet" href="/css/store.css?v=20260902">
 </head>
 
-<body class="sub-page store-page">
+<body>
+    <a class="skip-link" href="#blackwood-store">Skip to content</a>
 
     <header class="simple-header">
         <div class="header-inner">
@@ -59,64 +72,82 @@
             </h1>
 
             <p class="store-lead">
-    Paperbacks, bundles, writer resources, editorial services, and selected Blackwood files,
-    gathered in one place.
-</p>
-
-<p class="store-copy">
-    Browse Archive Files paperbacks, limited editions, practical workbooks, manuscript tools,
-    and selected Blackwood Publishing services through the official Blackwood Desk.
-</p>
+                Paperbacks, bundles, writer resources, editorial services, and selected Blackwood files,
+                gathered in one place.
+            </p>
         </section>
 
-<!-- ARCHIVE FILES PAPERBACK OFFER -->
-<section
-    class="store-offer-banner fade-in"
-    aria-label="Archive Files paperback offer"
->
+        <!-- BLACKWOOD CIRCLE REWARDS PROMO -->
+        <section class="blackwood-circle-promo fade-in" aria-labelledby="store-circle-promo-title">
+            <div class="blackwood-circle-promo-content">
+                <p class="blackwood-circle-promo-kicker">
+                    Blackwood Circle Rewards
+                </p>
 
-    <div class="store-offer-banner-inner">
+                <h2 id="store-circle-promo-title">
+                    Earn points through the Blackwood Catalogue
+                </h2>
 
-        <p class="store-offer-kicker">
-            Limited Archive Offer
-        </p>
+                <p>
+                    Blackwood Circle members earn <strong>+5 points per £1 spent</strong>
+                    on eligible Blackwood purchases. Use the same email for your Circle account
+                    and checkout, and your points are added automatically after payment.
+                </p>
 
-        <h2>
-            All four Archive Files paperbacks
-        </h2>
+                <div class="blackwood-circle-promo-actions">
+                    <a class="blackwood-circle-promo-button primary" href="/pages/members.html">
+                        Join The Circle
+                    </a>
 
-        <div class="store-offer-price-row">
-            <strong>£35.00</strong>
-            <span>for two weeks only</span>
-        </div>
+                    <a class="blackwood-circle-promo-button secondary" href="#blackwood-store">
+                        Browse the Catalogue
+                    </a>
+                </div>
+            </div>
+        </section>
 
-        <p class="store-offer-saving">
-            Normally £47.96 · Save £12.96
-        </p>
+        <section class="store-offer-banner fade-in" aria-label="Limited Archive Offer">
+            <div class="store-offer-banner-inner">
 
-        <p class="store-offer-note">
-            Discount applied automatically at checkout when all four Archive Files paperbacks are added to cart.
-        </p>
+                <p class="store-offer-kicker">
+                    Limited Archive Offer
+                </p>
 
-        <a href="#the-black-bothy" class="button copper">
-            View Archive Files
-        </a>
+                <h2>
+                    All four Archive Files paperbacks
+                </h2>
 
-    </div>
+                <div class="store-offer-price-row">
+                    <strong>£35.00</strong>
+                    <span>for two weeks only</span>
+                </div>
 
-</section>
+                <p class="store-offer-saving">
+                    Normally £47.96 · Save £12.96
+                </p>
 
-<section class="store-panel fade-in" aria-labelledby="direct-editions-heading">
+                <p class="store-offer-note">
+                    Discount applied automatically at checkout when all four Archive Files paperbacks are added to cart.
+                </p>
+
+                <a href="#the-black-bothy" class="button copper">
+                    View Archive Files
+                </a>
+
+            </div>
+        </section>
+
+        <section class="store-panel fade-in" id="blackwood-store" aria-labelledby="direct-editions-heading">
 
             <div class="store-panel-heading">
                 <p class="store-kicker">Filed for Purchase</p>
 
                 <h2 id="direct-editions-heading">
-                 
+                    The Blackwood Catalogue
                 </h2>
 
                 <p>
-                    Browse the desk by file, series, or edition type. Checkout is handled securely
+                    Browse the catalogue by file, series, or edition type. Checkout is handled securely
                     through Shopify.
                 </p>
             </div>
@@ -125,7 +156,7 @@
 
                 <div class="store-search-wrap">
                     <label for="blackwood-store-search">
-                        Search the Desk
+                        Search the Catalogue
                     </label>
 
                     <input
@@ -156,7 +187,7 @@
                 id="blackwood-store-status"
                 aria-live="polite"
             >
-                Preparing the Blackwood Desk...
+                Preparing the Blackwood Catalogue...
             </p>
 
             <div
@@ -167,7 +198,7 @@
 
             <noscript>
                 <p class="store-status is-error">
-                    JavaScript is required to load the Blackwood Desk and Shopify checkout.
+                    JavaScript is required to load the Blackwood Catalogue and Shopify checkout.
                 </p>
             </noscript>
 
@@ -214,8 +245,8 @@
 
                 <p>
                     The Blackwood Catalogue includes physical editions, signed copies, limited releases,
-    writer resources, and selected editorial services. Kindle editions remain available
-    through Amazon where applicable.
+                    writer resources, and selected editorial services. Kindle editions remain available
+                    through Amazon where applicable.
                 </p>
             </div>
 
@@ -256,8 +287,7 @@
 
     <div id="footer-placeholder"></div>
 
-    <script src="/js/header.js?v=20260831" defer></script>
+    <script src="/js/header.js?v=20260923" defer></script>
     <script src="/js/store.js?v=20260831" defer></script>
-
 </body>
 </html>
