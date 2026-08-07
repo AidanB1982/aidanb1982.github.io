@@ -1,6 +1,7 @@
 /* =========================
    RESET
 ========================= */
+
 html,
 body {
     margin: 0;
@@ -8,8 +9,32 @@ body {
 }
 
 /* =========================
+   ACCESSIBILITY
+========================= */
+
+.skip-link {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 100000;
+    padding: 10px 14px;
+    background: #0f0d0b;
+    color: #efe7dc;
+    border: 1px solid rgba(214, 177, 129, 0.45);
+    border-radius: 4px;
+    text-decoration: none;
+    transform: translateY(-160%);
+    transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+/* =========================
    HERO
 ========================= */
+
 .hero {
     position: relative;
 
@@ -22,7 +47,7 @@ body {
     text-align: center;
 
     background:
-        linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.65)),
+        linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65)),
         url("/assets/forest.png") center 40% / cover no-repeat;
 
     color: #e6e6e6;
@@ -38,11 +63,11 @@ body {
 
     background: linear-gradient(
         to bottom,
-        rgba(0,0,0,0) 50%,
-        rgba(0,0,0,0.2) 65%,
-        rgba(0,0,0,0.5) 78%,
-        rgba(0,0,0,0.75) 88%,
-        rgba(0,0,0,0.92) 95%,
+        rgba(0, 0, 0, 0) 50%,
+        rgba(0, 0, 0, 0.2) 65%,
+        rgba(0, 0, 0, 0.5) 78%,
+        rgba(0, 0, 0, 0.75) 88%,
+        rgba(0, 0, 0, 0.92) 95%,
         #000 100%
     );
 
@@ -53,6 +78,7 @@ body {
 /* =========================
    HERO CONTENT
 ========================= */
+
 .hero-inner {
     position: relative;
     z-index: 20;
@@ -77,6 +103,7 @@ body {
    SHARED NAV
    Used by hero header and simple header
 ========================= */
+
 .nav-inline,
 .blackwood-nav {
     position: relative;
@@ -144,7 +171,7 @@ body {
     width: 0;
     height: 1px;
 
-    background: rgba(184,115,51,0.65);
+    background: rgba(184, 115, 51, 0.65);
 
     transition: width 0.3s ease;
 }
@@ -165,6 +192,7 @@ body {
 /* =========================
    DROPDOWNS
 ========================= */
+
 .blackwood-nav-item {
     position: relative;
 }
@@ -189,7 +217,7 @@ body {
 
     box-shadow:
         0 26px 70px rgba(0, 0, 0, 0.78),
-        inset 0 0 0 1px rgba(255,255,255,0.025);
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025);
 
     opacity: 0;
     visibility: hidden;
@@ -251,6 +279,7 @@ body {
 /* =========================
    FOG
 ========================= */
+
 .fog {
     position: absolute;
     top: -10%;
@@ -274,7 +303,7 @@ body {
     background: radial-gradient(
         ellipse at center,
         transparent 50%,
-        rgba(0,0,0,0.4) 80%,
+        rgba(0, 0, 0, 0.4) 80%,
         #000 100%
     );
 }
@@ -330,6 +359,7 @@ body {
 /* =========================
    ENTITY
 ========================= */
+
 .entity {
     position: absolute;
     bottom: 6%;
@@ -354,8 +384,8 @@ body {
     mask-image: linear-gradient(
         to top,
         transparent 0%,
-        rgba(0,0,0,0.7) 40%,
-        rgba(0,0,0,1) 100%
+        rgba(0, 0, 0, 0.7) 40%,
+        rgba(0, 0, 0, 1) 100%
     );
 }
 
@@ -378,6 +408,7 @@ body {
 /* =========================
    SIMPLE HEADER / TOP BAR
 ========================= */
+
 .simple-header {
     position: absolute;
     top: 0;
@@ -392,8 +423,8 @@ body {
     justify-content: center;
 
     background: linear-gradient(
-        rgba(0,0,0,0.4),
-        rgba(0,0,0,0.15),
+        rgba(0, 0, 0, 0.4),
+        rgba(0, 0, 0, 0.15),
         transparent
     );
 }
@@ -435,6 +466,7 @@ body {
 /* =========================
    SUB PAGE MODE
 ========================= */
+
 body.sub-page .hero {
     height: 420px;
     min-height: unset;
@@ -459,6 +491,7 @@ body.sub-page .blackwood-nav {
 /* =========================
    TABLET
 ========================= */
+
 @media (max-width: 980px) {
     .simple-header {
         padding: 18px 22px;
@@ -487,6 +520,7 @@ body.sub-page .blackwood-nav {
 /* =========================
    MOBILE
 ========================= */
+
 @media (max-width: 760px) {
     .hero-inner {
         padding: 50px 18px 0;
@@ -564,6 +598,7 @@ body.sub-page .blackwood-nav {
         transform: translateX(-50%) translateY(0);
     }
 }
+
 /* ======================================================
    HEADER NAV — FINAL DESKTOP ROW + DROPDOWN FIX
    Updated for Reader Records nav item
@@ -781,35 +816,45 @@ body.sub-page .blackwood-nav {
         transform: translateX(-50%) translateY(0) !important;
     }
 }
+
 /* =========================
    BLACKWOOD CIRCLE HEADER ACCESS
-   ========================= */
+========================= */
 
 .blackwood-circle-access {
     position: fixed;
     top: 24px;
     right: 28px;
     z-index: 9999;
+
     display: inline-flex;
     align-items: center;
     gap: 8px;
+
     padding: 10px 14px;
+
     border: 1px solid rgba(196, 122, 44, 0.58);
     border-radius: 999px;
+
     background:
         linear-gradient(180deg, rgba(196, 122, 44, 0.16), rgba(196, 122, 44, 0.06)),
         rgba(0, 0, 0, 0.46);
+
     color: #d6b181;
+
     text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.18em;
     font-size: 10px;
     font-weight: 700;
     line-height: 1;
+
     backdrop-filter: blur(8px);
+
     box-shadow:
         0 12px 32px rgba(0, 0, 0, 0.34),
         inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+
     transition:
         color 180ms ease,
         border-color 180ms ease,
@@ -822,11 +867,14 @@ body.sub-page .blackwood-nav {
 .blackwood-circle-access:focus-visible {
     color: #efe7dc;
     border-color: rgba(196, 122, 44, 0.9);
+
     background:
         linear-gradient(180deg, rgba(196, 122, 44, 0.26), rgba(196, 122, 44, 0.10)),
         rgba(0, 0, 0, 0.62);
+
     transform: translateY(-1px);
     outline: none;
+
     box-shadow:
         0 16px 40px rgba(0, 0, 0, 0.42),
         inset 0 0 0 1px rgba(255, 255, 255, 0.055);
@@ -842,36 +890,9 @@ body.sub-page .blackwood-nav {
     line-height: 1;
 }
 
-@media (max-width: 760px) {
-    .blackwood-circle-access {
-        top: 14px;
-        right: 14px;
-        padding: 9px 11px;
-        font-size: 9px;
-        letter-spacing: 0.14em;
-    }
-
-    .blackwood-circle-access-mark {
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 430px) {
-    .blackwood-circle-access-text {
-        display: none;
-    }
-
-    .blackwood-circle-access {
-        width: 36px;
-        height: 36px;
-        justify-content: center;
-        padding: 0;
-    }
-}
-/* Signed-in Blackwood Circle state */
-
 .blackwood-circle-access.is-signed-in {
     border-color: rgba(214, 177, 129, 0.72);
+
     background:
         linear-gradient(180deg, rgba(214, 177, 129, 0.20), rgba(196, 122, 44, 0.08)),
         rgba(0, 0, 0, 0.58);
@@ -889,11 +910,39 @@ body.sub-page .blackwood-nav {
     letter-spacing: 0.12em;
 }
 
+@media (max-width: 760px) {
+    .blackwood-circle-access {
+        top: 14px;
+        right: 14px;
+        padding: 9px 11px;
+        font-size: 9px;
+        letter-spacing: 0.14em;
+    }
+
+    .blackwood-circle-access-mark {
+        font-size: 12px;
+    }
+}
+
 @media (max-width: 520px) {
     .blackwood-circle-access-points {
         display: none;
     }
 }
+
+@media (max-width: 430px) {
+    .blackwood-circle-access-text {
+        display: none;
+    }
+
+    .blackwood-circle-access {
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+        padding: 0;
+    }
+}
+
 /* =========================
    BLACKWOOD CIRCLE PROMO PANEL
 ========================= */
@@ -907,16 +956,20 @@ body.sub-page .blackwood-nav {
     padding: clamp(24px, 4vw, 38px);
     border: 1px solid rgba(214, 177, 129, 0.24);
     border-radius: 10px;
+
     background:
         radial-gradient(circle at top left, rgba(196, 122, 44, 0.14), transparent 34%),
         linear-gradient(180deg, rgba(24, 18, 14, 0.96), rgba(9, 7, 6, 0.96));
+
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
     text-align: center;
 }
 
 .blackwood-circle-promo-kicker {
     margin: 0 0 10px;
+
     color: #c49a6c;
+
     font-size: 12px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -924,7 +977,9 @@ body.sub-page .blackwood-nav {
 
 .blackwood-circle-promo h2 {
     margin: 0 0 14px;
+
     color: #f4ead7;
+
     font-family: Georgia, "Times New Roman", serif;
     font-size: clamp(26px, 4vw, 40px);
     line-height: 1.15;
@@ -934,7 +989,9 @@ body.sub-page .blackwood-nav {
 .blackwood-circle-promo p {
     max-width: 680px;
     margin: 0 auto;
+
     color: rgba(239, 231, 220, 0.76);
+
     font-size: 16px;
     line-height: 1.7;
 }
@@ -948,6 +1005,7 @@ body.sub-page .blackwood-nav {
     flex-wrap: wrap;
     gap: 12px;
     justify-content: center;
+
     margin-top: 24px;
 }
 
@@ -955,13 +1013,17 @@ body.sub-page .blackwood-nav {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
     min-height: 44px;
     padding: 12px 18px;
+
     border-radius: 4px;
+
     font-size: 13px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
+
     transition:
         transform 0.2s ease,
         border-color 0.2s ease,
@@ -985,6 +1047,7 @@ body.sub-page .blackwood-nav {
 .blackwood-circle-promo-button:focus-visible {
     transform: translateY(-1px);
     border-color: rgba(214, 177, 129, 0.75);
+    outline: none;
 }
 
 @media (max-width: 560px) {
