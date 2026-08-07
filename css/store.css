@@ -843,3 +843,317 @@ body.store-page .shopify-buy__btn {
         width: 100% !important;
     }
 }
+/* ======================================================
+   STORE FINAL OVERRIDE — COMPACT BANNERS + SMALL BUTTONS
+====================================================== */
+
+body.store-page {
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.82) 0%,
+            rgba(0, 0, 0, 0.76) 42%,
+            rgba(0, 0, 0, 0.92) 100%
+        ),
+        radial-gradient(circle at top, rgba(184, 115, 51, 0.1), transparent 38%),
+        url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
+        #050505 !important;
+    color: #f1ece4 !important;
+}
+
+body.store-page .store-wrap {
+    width: min(100%, 1240px) !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 104px 24px 80px !important;
+}
+
+body.store-page .store-visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+}
+
+/* Remove any oversized hero behaviour */
+body.store-page .store-hero {
+    display: none !important;
+}
+
+/* Circle rewards — compact strip */
+body.store-page .blackwood-circle-promo {
+    width: 100vw !important;
+    max-width: none !important;
+    margin: 0 0 24px !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+}
+
+body.store-page .blackwood-circle-promo-content {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 18px 24px 20px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.88),
+            rgba(38, 24, 17, 0.82),
+            rgba(0, 0, 0, 0.88)
+        ) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(214, 177, 129, 0.18),
+        inset 0 -1px 0 rgba(214, 177, 129, 0.18) !important;
+    text-align: center !important;
+}
+
+body.store-page .blackwood-circle-promo-kicker {
+    margin: 0 0 5px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.22em !important;
+}
+
+body.store-page .blackwood-circle-promo h2 {
+    max-width: 760px !important;
+    margin: 0 auto 7px !important;
+    font-size: clamp(20px, 2.1vw, 28px) !important;
+    line-height: 1.12 !important;
+}
+
+body.store-page .blackwood-circle-promo p {
+    max-width: 700px !important;
+    margin: 0 auto !important;
+    font-size: 12.8px !important;
+    line-height: 1.48 !important;
+}
+
+/* Archive offer — compact banner */
+body.store-page .store-offer-banner {
+    width: 100vw !important;
+    max-width: none !important;
+    margin: 0 0 28px !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.9),
+            rgba(38, 24, 17, 0.82),
+            rgba(0, 0, 0, 0.9)
+        ) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(184, 115, 51, 0.24),
+        inset 0 -1px 0 rgba(184, 115, 51, 0.24) !important;
+}
+
+body.store-page .store-offer-banner-inner {
+    width: min(1180px, calc(100% - 44px)) !important;
+    margin: 0 auto !important;
+    padding: 18px 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    grid-template-areas:
+        "kicker price cta"
+        "title price cta"
+        "note saving cta" !important;
+    align-items: center !important;
+    gap: 6px 24px !important;
+    text-align: left !important;
+}
+
+body.store-page .store-offer-kicker {
+    grid-area: kicker !important;
+    margin: 0 !important;
+    font-size: 8.8px !important;
+    letter-spacing: 0.24em !important;
+}
+
+body.store-page .store-offer-banner h2 {
+    grid-area: title !important;
+    max-width: 590px !important;
+    margin: 0 !important;
+    font-size: clamp(22px, 2.5vw, 34px) !important;
+    line-height: 1.05 !important;
+}
+
+body.store-page .store-offer-price-row {
+    grid-area: price !important;
+    display: grid !important;
+    gap: 2px !important;
+    margin: 0 !important;
+    text-align: center !important;
+}
+
+body.store-page .store-offer-price-row strong {
+    font-size: clamp(24px, 2.8vw, 34px) !important;
+    line-height: 1 !important;
+}
+
+body.store-page .store-offer-price-row span {
+    font-size: 8px !important;
+    letter-spacing: 0.16em !important;
+}
+
+body.store-page .store-offer-saving {
+    grid-area: saving !important;
+    margin: 0 !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+body.store-page .store-offer-note {
+    grid-area: note !important;
+    max-width: 650px !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.42 !important;
+}
+
+/* Small buttons everywhere in store */
+body.store-page .blackwood-circle-promo-button,
+body.store-page .store-offer-banner .button,
+body.store-page .store-filter-button {
+    min-height: 28px !important;
+    padding: 5px 10px !important;
+    font-size: 8.5px !important;
+    letter-spacing: 0.13em !important;
+    line-height: 1.2 !important;
+    border-radius: 2px !important;
+}
+
+body.store-page .blackwood-circle-promo-actions {
+    margin-top: 10px !important;
+    gap: 8px !important;
+}
+
+body.store-page .store-offer-banner .button {
+    grid-area: cta !important;
+    width: auto !important;
+    max-width: max-content !important;
+    white-space: nowrap !important;
+}
+
+/* Catalogue panel tighter */
+body.store-page .store-panel {
+    width: min(100%, 1120px) !important;
+    margin: 28px auto 50px !important;
+    padding: 28px 30px !important;
+}
+
+body.store-page .store-products-panel {
+    margin-top: 26px !important;
+}
+
+body.store-page .store-controls {
+    margin: 0 auto !important;
+    gap: 22px !important;
+}
+
+body.store-page .store-search-wrap input {
+    min-height: 40px !important;
+    padding: 9px 14px !important;
+    font-size: 13.5px !important;
+}
+
+body.store-page .store-filter-button {
+    min-width: 102px !important;
+}
+
+body.store-page .store-status {
+    margin: 22px auto 22px !important;
+    font-size: 9px !important;
+}
+
+/* Shopify buttons */
+body.store-page .shopify-buy__btn {
+    min-height: 30px !important;
+    padding: 6px 14px !important;
+    font-size: 8.5px !important;
+    letter-spacing: 0.13em !important;
+}
+
+body.store-page .shopify-buy__quantity {
+    width: 38px !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    font-size: 10px !important;
+}
+
+/* Header safety */
+body.store-page #header-placeholder {
+    display: block !important;
+    min-height: 1px !important;
+}
+
+@media (max-width: 1080px) {
+    body.store-page .store-offer-banner-inner {
+        grid-template-columns: 1fr !important;
+        grid-template-areas:
+            "kicker"
+            "title"
+            "price"
+            "saving"
+            "note"
+            "cta" !important;
+        justify-items: center !important;
+        text-align: center !important;
+        gap: 7px !important;
+        padding: 22px 0 !important;
+    }
+
+    body.store-page .store-offer-banner .button {
+        margin-top: 6px !important;
+    }
+}
+
+@media (max-width: 760px) {
+    body.store-page {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.86) 0%,
+                rgba(0, 0, 0, 0.78) 38%,
+                rgba(0, 0, 0, 0.92) 100%
+            ),
+            radial-gradient(circle at top, rgba(184, 115, 51, 0.1), transparent 38%),
+            url("/assets/ArchiveFilesBG.png") center top / cover no-repeat,
+            #050505 !important;
+    }
+
+    body.store-page .store-wrap {
+        padding: 92px 16px 70px !important;
+    }
+
+    body.store-page .blackwood-circle-promo-content {
+        padding: 20px 16px !important;
+    }
+
+    body.store-page .blackwood-circle-promo h2 {
+        font-size: clamp(21px, 6.5vw, 29px) !important;
+    }
+
+    body.store-page .blackwood-circle-promo-actions {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+
+    body.store-page .blackwood-circle-promo-button {
+        width: min(100%, 250px) !important;
+    }
+
+    body.store-page .store-panel {
+        padding: 24px 16px !important;
+    }
+
+    body.store-page .store-filter-button {
+        width: 100% !important;
+    }
+}
