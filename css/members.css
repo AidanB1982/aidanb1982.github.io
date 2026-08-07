@@ -729,3 +729,164 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
 #blackwood-circle-app .circle-redemption-code span {
     color: #d6b181;
 }
+/* =========================
+   BLACKWOOD CIRCLE PUBLIC EXPLAINER
+========================= */
+
+.circle-public-explainer {
+    width: min(1120px, calc(100% - 32px));
+    margin: 42px auto 34px;
+}
+
+.circle-public-explainer-inner {
+    padding: clamp(28px, 4vw, 46px);
+    border: 1px solid rgba(214, 177, 129, 0.22);
+    border-radius: 10px;
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(24, 18, 14, 0.94), rgba(10, 8, 7, 0.96));
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+}
+
+.circle-public-heading {
+    max-width: 760px;
+    margin: 0 auto 30px;
+    text-align: center;
+}
+
+.circle-public-heading h2 {
+    margin: 0 0 14px;
+    color: #f4ead7;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(30px, 5vw, 48px);
+    line-height: 1.1;
+}
+
+.circle-public-heading p {
+    margin: 0;
+    color: rgba(239, 231, 220, 0.76);
+    font-size: 16px;
+    line-height: 1.75;
+}
+
+.circle-public-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 32px 0;
+}
+
+.circle-public-card {
+    padding: 24px;
+    border: 1px solid rgba(214, 177, 129, 0.18);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.circle-public-number {
+    display: inline-flex;
+    margin-bottom: 14px;
+    color: #c49a6c;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.circle-public-card h3 {
+    margin: 0 0 10px;
+    color: #f4ead7;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 22px;
+}
+
+.circle-public-card p {
+    margin: 0;
+    color: rgba(239, 231, 220, 0.72);
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.circle-earning-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 34px 0 30px;
+    padding: 18px;
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 8px;
+    background: rgba(196, 122, 44, 0.07);
+}
+
+.circle-earning-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.24);
+}
+
+.circle-earning-row strong {
+    flex: 0 0 auto;
+    min-width: 112px;
+    color: #d6b181;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px;
+}
+
+.circle-earning-row span {
+    color: rgba(239, 231, 220, 0.76);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.circle-public-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.circle-public-actions .circle-button {
+    text-align: center;
+}
+
+@media (max-width: 860px) {
+    .circle-public-grid,
+    .circle-earning-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-earning-row {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .circle-earning-row strong {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .circle-public-explainer {
+        width: min(100% - 22px, 1120px);
+        margin-top: 28px;
+    }
+
+    .circle-public-explainer-inner {
+        padding: 24px 18px;
+    }
+
+    .circle-public-card {
+        padding: 20px;
+    }
+
+    .circle-public-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .circle-public-actions .circle-button {
+        width: 100%;
+    }
+}
