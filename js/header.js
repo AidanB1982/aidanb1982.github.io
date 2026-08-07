@@ -1039,7 +1039,7 @@ function initReviewRotator() {
 
         circleLink.innerHTML = `
             <span class="blackwood-circle-access-mark" aria-hidden="true">◎</span>
-            <span class="blackwood-circle-access-text">My Circle</span>
+            <span class="blackwood-circle-access-text"></span>
             <span class="blackwood-circle-access-points">${pointsLabel}</span>
         `;
     }
