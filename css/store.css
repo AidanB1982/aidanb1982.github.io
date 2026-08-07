@@ -777,3 +777,69 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
         font-size: 22px;
     }
 }
+/* ======================================================
+   STORE PAGE — SMALLER BUTTON FIX
+====================================================== */
+
+body.store-page .blackwood-circle-promo-button,
+body.store-page .store-offer-banner .button,
+body.store-page .store-filter-button {
+    min-height: 30px !important;
+    padding: 6px 11px !important;
+    font-size: 8.8px !important;
+    letter-spacing: 0.14em !important;
+    line-height: 1.2 !important;
+}
+
+body.store-page .blackwood-circle-promo-actions {
+    margin-top: 12px !important;
+    gap: 8px !important;
+}
+
+body.store-page .store-offer-banner .button {
+    min-width: auto !important;
+    width: auto !important;
+    max-width: max-content !important;
+}
+
+body.store-page .store-filter-button {
+    min-width: 104px !important;
+}
+
+/* Shopify buttons */
+body.store-page .shopify-buy__btn,
+body.store-page .shopify-buy__cart-toggle,
+body.store-page .shopify-buy__quantity,
+body.store-page .shopify-buy__quantity-increment,
+body.store-page .shopify-buy__quantity-decrement {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.14em !important;
+}
+
+body.store-page .shopify-buy__quantity {
+    width: 42px !important;
+}
+
+body.store-page .shopify-buy__btn {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+    body.store-page .blackwood-circle-promo-button,
+    body.store-page .store-offer-banner .button,
+    body.store-page .store-filter-button {
+        min-height: 34px !important;
+        padding: 8px 12px !important;
+        font-size: 9px !important;
+    }
+
+    body.store-page .store-filter-button {
+        width: 100% !important;
+    }
+}
