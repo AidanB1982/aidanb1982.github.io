@@ -283,6 +283,11 @@ const BLACKWOOD_CIRCLE_CONFIG = {
                         "Your reader record has been received. Sign into The Blackwood Circle before submitting next time to earn +10 points.",
                         "is-success"
                     );
+                } else if (pointsResult.reason === "supabase-error" && pointsResult.message) {
+                    setStatus(
+                        `Your reader record has been received. ${pointsResult.message}`,
+                        "is-success"
+                    );
                 } else {
                     setStatus(
                         "Your reader record has been received. Circle points could not be awarded for this submission.",
@@ -452,7 +457,7 @@ const BLACKWOOD_CIRCLE_CONFIG = {
         const clean = String(message || "").trim();
 
         if (/already been awarded/i.test(clean)) {
-            return "Reader Record points have already been awarded for this submission.";
+            return "Reader Record points have already been awarded for this submission or book.";
         }
 
         if (/daily reader record points limit/i.test(clean)) {
