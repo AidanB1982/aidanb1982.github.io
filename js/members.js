@@ -1346,3 +1346,114 @@ function escapeHtml(value) {
 function escapeAttribute(value) {
     return escapeHtml(value).replace(/`/g, "&#096;");
 }
+(function () {
+    "use strict";
+
+    const CONFIG = {
+        supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
+        supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
+        supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    };
+
+    let visibilityClient = null;
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initialiseMemberIntroVisibility);
+    } else {
+        initialiseMemberIntroVisibility();
+    }
+
+    async function initialiseMemberIntroVisibility() {
+        if (!document.body.classList.contains("members-page")) {
+            return;
+        }
+
+        try {
+            await loadSupabaseLibrary();
+
+            visibilityClient = window.supabase.createClient(
+                CONFIG.supabaseUrl,
+                CONFIG.supabaseKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
+                    }
+                }
+            );
+
+            const { data, error } = await visibilityClient.auth.getSession();
+
+            if (error) {
+                throw error;
+            }
+
+            updateMemberIntroVisibility(data.session || null);
+
+            visibilityClient.auth.onAuthStateChange(function (_event, session) {
+                updateMemberIntroVisibility(session || null);
+            });
+
+        } catch (error) {
+            console.warn("Member intro visibility check failed:", error);
+            document.body.classList.remove("is-circle-signed-in");
+            document.body.classList.add("is-circle-signed-out");
+        }
+    }
+
+    function updateMemberIntroVisibility(session) {
+        if (session && session.user) {
+            document.body.classList.add("is-circle-signed-in");
+            document.body.classList.remove("is-circle-signed-out");
+            return;
+        }
+
+        document.body.classList.remove("is-circle-signed-in");
+        document.body.classList.add("is-circle-signed-out");
+    }
+
+    function loadSupabaseLibrary() {
+        return new Promise(function (resolve, reject) {
+            if (window.supabase && typeof window.supabase.createClient === "function") {
+                resolve();
+                return;
+            }
+
+            const existingScript = document.querySelector("script[data-members-visibility-supabase]");
+
+            if (existingScript) {
+                existingScript.addEventListener("load", function () {
+                    resolve();
+                }, { once: true });
+
+                existingScript.addEventListener("error", function () {
+                    reject(new Error("Supabase could not be loaded."));
+                }, { once: true });
+
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.src = CONFIG.supabaseCdn;
+            script.async = true;
+            script.defer = true;
+            script.dataset.membersVisibilitySupabase = "true";
+
+            script.onload = function () {
+                if (window.supabase && typeof window.supabase.createClient === "function") {
+                    resolve();
+                    return;
+                }
+
+                reject(new Error("Supabase loaded, but createClient was unavailable."));
+            };
+
+            script.onerror = function () {
+                reject(new Error("Supabase could not be loaded."));
+            };
+
+            document.head.appendChild(script);
+        });
+    }
+})();
