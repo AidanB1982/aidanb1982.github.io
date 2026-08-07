@@ -1,6 +1,6 @@
 // =========================
 // BLACKWOOD CIRCLE MEMBERS
-// Supabase Auth + Member Dashboard
+// Supabase Auth + Member Dashboard + Rewards Redemption
 // =========================
 
 const BLACKWOOD_MEMBERS_CONFIG = {
@@ -18,8 +18,10 @@ const BlackwoodMembersState = {
     posts: [],
     rewards: [],
     points: [],
+    redemptions: [],
     activeAuthMode: "signin",
-    isLoading: false
+    isLoading: false,
+    isRedeeming: false
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -378,6 +380,7 @@ async function handleMemberSignOut() {
         BlackwoodMembersState.posts = [];
         BlackwoodMembersState.rewards = [];
         BlackwoodMembersState.points = [];
+        BlackwoodMembersState.redemptions = [];
 
         renderAuthView();
 
@@ -406,7 +409,8 @@ async function loadMemberDashboard() {
             profileResult,
             postsResult,
             rewardsResult,
-            pointsResult
+            pointsResult,
+            redemptionsResult
         ] = await Promise.all([
             BlackwoodMembersState.client
                 .from("member_profiles")
@@ -430,6 +434,12 @@ async function loadMemberDashboard() {
                 .from("member_points")
                 .select("*")
                 .eq("member_id", user.id)
+                .order("created_at", { ascending: false }),
+
+            BlackwoodMembersState.client
+                .from("member_redemptions")
+                .select("*")
+                .eq("member_id", user.id)
                 .order("created_at", { ascending: false })
         ]);
 
@@ -437,11 +447,13 @@ async function loadMemberDashboard() {
         if (postsResult.error) throw postsResult.error;
         if (rewardsResult.error) throw rewardsResult.error;
         if (pointsResult.error) throw pointsResult.error;
+        if (redemptionsResult.error) throw redemptionsResult.error;
 
         BlackwoodMembersState.member = profileResult.data || buildFallbackProfile(user);
         BlackwoodMembersState.posts = postsResult.data || [];
         BlackwoodMembersState.rewards = rewardsResult.data || [];
         BlackwoodMembersState.points = pointsResult.data || [];
+        BlackwoodMembersState.redemptions = redemptionsResult.data || [];
 
         renderDashboard();
 
@@ -459,8 +471,8 @@ function renderDashboard() {
         return total + Number(item.points || 0);
     }, 0);
 
-    const profilePoints = Number(member.points_total || 0);
-    const pointsTotal = profilePoints > 0 ? profilePoints : pointsFromHistory;
+    const profilePoints = Number(member.points_total);
+    const pointsTotal = Number.isFinite(profilePoints) ? profilePoints : pointsFromHistory;
 
     const displayName = member.display_name || member.reader_name || member.email || "Reader";
     const tier = member.member_tier || "Reader";
@@ -554,6 +566,13 @@ function renderDashboard() {
                 </div>
             </section>
 
+            <section class="circle-section" aria-labelledby="circle-redemptions-title">
+                <h2 id="circle-redemptions-title">Redemptions</h2>
+                <div class="circle-redemption-list">
+                    ${renderRedemptions()}
+                </div>
+            </section>
+
             <section class="circle-section" aria-labelledby="circle-points-title">
                 <h2 id="circle-points-title">Points History</h2>
                 <div class="circle-points-list">
@@ -608,13 +627,18 @@ function renderRewards(pointsTotal) {
     }
 
     return BlackwoodMembersState.rewards.map(reward => {
+        const rewardId = Number(reward.id);
         const required = Number(reward.points_required || 0);
         const unlocked = pointsTotal >= required;
+        const isRedeemable = reward.is_redeemable === true;
+        const latestRedemption = getLatestRedemptionForReward(rewardId);
+        const activeRedemption = isActiveRedemption(latestRedemption);
+        const canRedeem = isRedeemable && unlocked && !activeRedemption;
 
         return `
-            <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"}">
+            <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"} ${isRedeemable ? "is-redeemable" : ""}">
                 <p class="circle-reward-status">
-                    ${unlocked ? "Unlocked" : `${required - pointsTotal} points to unlock`}
+                    ${renderRewardStatusText(unlocked, required, pointsTotal, latestRedemption)}
                 </p>
 
                 <h3>${escapeHtml(reward.title)}</h3>
@@ -624,6 +648,133 @@ function renderRewards(pointsTotal) {
                 <small>
                     Requires ${required} points · ${escapeHtml(reward.required_tier || "Reader")}
                 </small>
+
+                ${renderRewardAction(reward, canRedeem, latestRedemption)}
+            </article>
+        `;
+    }).join("");
+}
+
+function renderRewardStatusText(unlocked, required, pointsTotal, latestRedemption) {
+    if (latestRedemption && latestRedemption.status === "pending") {
+        return "Pending";
+    }
+
+    if (latestRedemption && latestRedemption.status === "issued") {
+        return "Issued";
+    }
+
+    if (latestRedemption && latestRedemption.status === "used") {
+        return "Used";
+    }
+
+    if (latestRedemption && latestRedemption.status === "cancelled") {
+        return "Cancelled";
+    }
+
+    if (unlocked) {
+        return "Unlocked";
+    }
+
+    return `${required - pointsTotal} points to unlock`;
+}
+
+function renderRewardAction(reward, canRedeem, latestRedemption) {
+    const isRedeemable = reward.is_redeemable === true;
+
+    if (!isRedeemable) {
+        return "";
+    }
+
+    if (latestRedemption && latestRedemption.status === "pending") {
+        return `
+            <div class="circle-redemption-notice is-pending">
+                <strong>Redemption requested</strong>
+                <p>Your discount code will be issued manually and shown here once ready.</p>
+            </div>
+        `;
+    }
+
+    if (latestRedemption && latestRedemption.status === "issued") {
+        return `
+            <div class="circle-redemption-notice is-issued">
+                <strong>Discount code issued</strong>
+                ${latestRedemption.discount_code ? `
+                    <div class="circle-redemption-code">
+                        <span>Your code</span>
+                        <code>${escapeHtml(latestRedemption.discount_code)}</code>
+                    </div>
+                ` : `
+                    <p>Your discount code has been issued and will appear here shortly.</p>
+                `}
+            </div>
+        `;
+    }
+
+    if (latestRedemption && latestRedemption.status === "used") {
+        return `
+            <div class="circle-redemption-notice is-used">
+                <strong>Reward used</strong>
+                <p>This redemption has already been used.</p>
+            </div>
+        `;
+    }
+
+    if (!canRedeem) {
+        return "";
+    }
+
+    return `
+        <button
+            type="button"
+            class="circle-button circle-button-primary circle-redeem-button"
+            data-redeem-reward-id="${Number(reward.id)}"
+            data-reward-title="${escapeAttribute(reward.title || "this reward")}"
+            data-points-cost="${Number(reward.points_required || 0)}"
+        >
+            Redeem Reward
+        </button>
+    `;
+}
+
+function renderRedemptions() {
+    if (!BlackwoodMembersState.redemptions.length) {
+        return `
+            <article class="circle-empty-card">
+                <p>No rewards have been redeemed yet.</p>
+                <p>Unlocked rewards can be requested from the Rewards section above.</p>
+            </article>
+        `;
+    }
+
+    return BlackwoodMembersState.redemptions.map(redemption => {
+        const status = capitalise(redemption.status || "pending");
+        const requestedDate = redemption.requested_at
+            ? formatDate(redemption.requested_at)
+            : formatDate(redemption.created_at);
+
+        return `
+            <article class="circle-redemption-card">
+                <p class="circle-post-meta">
+                    ${escapeHtml(status)} · ${escapeHtml(requestedDate)}
+                </p>
+
+                <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+
+                <p>
+                    ${Number(redemption.points_cost || 0)} points redeemed.
+                </p>
+
+                ${redemption.discount_code ? `
+                    <div class="circle-redemption-code">
+                        <span>Discount code</span>
+                        <code>${escapeHtml(redemption.discount_code)}</code>
+                    </div>
+                ` : `
+                    <p class="circle-muted-line">
+                        Discount code pending manual issue.
+                    </p>
+                `}
             </article>
         `;
     }).join("");
@@ -669,6 +820,10 @@ function bindDashboardEvents() {
     if (profileForm) {
         profileForm.addEventListener("submit", handleProfileSave);
     }
+
+    document.querySelectorAll("[data-redeem-reward-id]").forEach(button => {
+        button.addEventListener("click", handleRewardRedemption);
+    });
 }
 
 async function handleProfileSave(event) {
@@ -704,14 +859,91 @@ async function handleProfileSave(event) {
             throw error;
         }
 
-        setDashboardStatus("Reader record saved.", "is-success");
-
         await loadMemberDashboard();
+        setDashboardStatus("Reader record saved.", "is-success");
 
     } catch (error) {
         console.error("Profile save failed:", error);
         setDashboardStatus("Your reader record could not be saved.", "is-error");
     }
+}
+
+async function handleRewardRedemption(event) {
+    const button = event.currentTarget;
+    const rewardId = Number(button.dataset.redeemRewardId || 0);
+    const rewardTitle = button.dataset.rewardTitle || "this reward";
+    const pointsCost = Number(button.dataset.pointsCost || 0);
+
+    if (!rewardId) {
+        setDashboardStatus("This reward could not be redeemed.", "is-error");
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Redeem "${rewardTitle}" for ${pointsCost} points?\n\nYour points will be deducted and the discount code will be issued manually.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    if (BlackwoodMembersState.isRedeeming) {
+        return;
+    }
+
+    BlackwoodMembersState.isRedeeming = true;
+    button.disabled = true;
+    button.textContent = "Requesting...";
+
+    setDashboardStatus("Requesting reward redemption...", "is-loading");
+
+    try {
+        const { error } = await BlackwoodMembersState.client.rpc(
+            "request_member_reward_redemption",
+            {
+                p_reward_id: rewardId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        await loadMemberDashboard();
+
+        setDashboardStatus(
+            "Reward requested. Your discount code will be issued manually.",
+            "is-success"
+        );
+
+    } catch (error) {
+        console.error("Reward redemption failed:", error);
+        setDashboardStatus(cleanSupabaseError(error.message), "is-error");
+
+        button.disabled = false;
+        button.textContent = "Redeem Reward";
+
+    } finally {
+        BlackwoodMembersState.isRedeeming = false;
+    }
+}
+
+// =========================
+// REDEMPTION HELPERS
+// =========================
+
+function getLatestRedemptionForReward(rewardId) {
+    return BlackwoodMembersState.redemptions.find(redemption => {
+        return Number(redemption.reward_id) === Number(rewardId);
+    }) || null;
+}
+
+function isActiveRedemption(redemption) {
+    if (!redemption) {
+        return false;
+    }
+
+    return ["pending", "issued"].includes(String(redemption.status || "").toLowerCase());
 }
 
 // =========================
@@ -825,6 +1057,18 @@ function cleanSupabaseError(message) {
 
     if (/user already registered/i.test(cleaned)) {
         return "That email address already has a Blackwood Circle account.";
+    }
+
+    if (/not available for redemption/i.test(cleaned)) {
+        return "This reward is not currently available for redemption.";
+    }
+
+    if (/not enough points/i.test(cleaned)) {
+        return "You do not have enough points for this reward.";
+    }
+
+    if (/already have this reward/i.test(cleaned)) {
+        return "You already have this reward pending or issued.";
     }
 
     return cleaned;
