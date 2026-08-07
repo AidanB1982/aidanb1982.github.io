@@ -1,356 +1,336 @@
-<!DOCTYPE html>
-<html lang="en" class="no-js">
-<head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag("js", new Date());
-
-      gtag("config", "G-1WN8PBHBW4");
-    </script>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Reader Records | Blackwood Publishing</title>
-
-    <meta
-        name="description"
-        content="File a reader record for a Blackwood Publishing book. Share what stayed with you, rate the record, and help other readers choose where to begin."
-    >
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="/css/header.css?v=20260907">
-    <link rel="stylesheet" href="/css/styles.css?v=20260910">
-    <link rel="stylesheet" href="/css/reader-records.css?v=20260910">
-</head>
-
-<body class="sub-page reader-records-page">
-
-<a class="skip-link" href="#main-content">Skip to content</a>
-
-<!-- HEADER -->
-<div id="header-placeholder"></div>
-
-<main id="main-content" class="reader-records-wrap">
-
-    <!-- HERO -->
-    <section class="reader-records-hero fade-in" aria-labelledby="reader-records-title">
-
-        <p class="reader-records-kicker">
-            Blackwood Archive
-        </p>
-
-        <h1 id="reader-records-title">
-            Reader Records
-        </h1>
-
-        <p class="reader-records-lead">
-            File what stayed with you.
-        </p>
-
-        <p class="reader-records-copy">
-            Leave a private record for the Archive, or allow it to be considered for public display.
-            Public records rotate below by book, with your chosen display name only.
-        </p>
-
-    </section>
-
-    <!-- SUBMISSION FORM -->
-    <section class="reader-records-panel fade-in" aria-labelledby="file-record-title">
-
-        <div class="reader-records-section-heading">
-            <p class="reader-records-kicker">
-                File a Reader Record
-            </p>
-
-            <h2 id="file-record-title">
-                Tell the Archive what remained.
-            </h2>
-
-            <p>
-                Choose the book, choose the mood, rate the record, and leave a short response.
-                Email is optional and will never be displayed publicly.
-            </p>
-        </div>
-
-        <form class="reader-record-form" id="reader-record-form" novalidate>
-
-            <div class="reader-record-form-grid">
-
-                <div class="reader-record-field">
-                    <label for="record-book">Book</label>
-
-                    <select id="record-book" name="book" required>
-                        <option value="" selected disabled>Choose a Blackwood book...</option>
-                        <option value="The Black Bothy">The Black Bothy</option>
-                        <option value="The Drowned Fjord">The Drowned Fjord</option>
-                        <option value="The Erased Archivist">The Erased Archivist</option>
-                        <option value="Holdfast">Holdfast</option>
-                        <option value="Dour Hill House">Dour Hill House</option>
-                        <option value="The Red-Clad Collector">The Red-Clad Collector</option>
-                        <option value="Corrour Bothy">Corrour Bothy</option>
-                        <option value="Love, Abused">Love, Abused</option>
-                        <option value="The Scheme">The Scheme</option>
-                        <option value="Red Streets">Red Streets</option>
-                    </select>
-                </div>
-
-                <div class="reader-record-field">
-                    <label for="record-mood">Mood</label>
-
-                    <select id="record-mood" name="mood" required>
-                        <option value="" selected disabled>Choose the mood...</option>
-                        <option value="Isolated Grief">Isolated Grief</option>
-                        <option value="Uncanny Obsession">Uncanny Obsession</option>
-                        <option value="Dark and Twisted">Dark and Twisted</option>
-                        <option value="Bleak Coastal Dread">Bleak Coastal Dread</option>
-                        <option value="Identity Collapse">Identity Collapse</option>
-                        <option value="Haunted Memory">Haunted Memory</option>
-                        <option value="Domestic Haunting">Domestic Haunting</option>
-                        <option value="Urban Pressure">Urban Pressure</option>
-                        <option value="Emotional Damage">Emotional Damage</option>
-                        <option value="Blood on the Pavement">Blood on the Pavement</option>
-                    </select>
-                </div>
-
-                <div class="reader-record-field">
-                    <label for="record-display-name">Display Name</label>
-
-                    <input
-                        id="record-display-name"
-                        name="displayName"
-                        type="text"
-                        maxlength="60"
-                        placeholder="First name, initials, or username"
-                        required
-                    >
-                </div>
-
-                <div class="reader-record-field">
-                    <label for="record-email">Email <span>Optional, not public</span></label>
-
-                    <input
-                        id="record-email"
-                        name="email"
-                        type="email"
-                        maxlength="180"
-                        placeholder="Only if you want Blackwood to contact you"
-                    >
-                </div>
-
-            </div>
-
-            <!-- RATINGS -->
-            <fieldset class="reader-record-ratings">
-
-                <legend>
-                    Archive Rating
-                </legend>
-
-                <p class="reader-record-rating-note">
-                    Rate each category from 1 to 5. Your Final Archive Rating is calculated automatically.
-                </p>
-
-                <div class="reader-record-rating-grid">
-
-                    <div class="reader-record-field">
-                        <label for="rating-atmosphere">Atmosphere</label>
-
-                        <select id="rating-atmosphere" name="atmosphere" data-rating-field required>
-                            <option value="" selected disabled>Rate...</option>
-                            <option value="1">1 — Faint</option>
-                            <option value="2">2 — Present</option>
-                            <option value="3">3 — Strong</option>
-                            <option value="4">4 — Heavy</option>
-                            <option value="5">5 — Unforgettable</option>
-                        </select>
-                    </div>
-
-                    <div class="reader-record-field">
-                        <label for="rating-story">Story</label>
-
-                        <select id="rating-story" name="story" data-rating-field required>
-                            <option value="" selected disabled>Rate...</option>
-                            <option value="1">1 — Faint</option>
-                            <option value="2">2 — Present</option>
-                            <option value="3">3 — Strong</option>
-                            <option value="4">4 — Heavy</option>
-                            <option value="5">5 — Unforgettable</option>
-                        </select>
-                    </div>
-
-                    <div class="reader-record-field">
-                        <label for="rating-characters">Characters</label>
-
-                        <select id="rating-characters" name="characters" data-rating-field required>
-                            <option value="" selected disabled>Rate...</option>
-                            <option value="1">1 — Faint</option>
-                            <option value="2">2 — Present</option>
-                            <option value="3">3 — Strong</option>
-                            <option value="4">4 — Heavy</option>
-                            <option value="5">5 — Unforgettable</option>
-                        </select>
-                    </div>
-
-                    <div class="reader-record-field">
-                        <label for="rating-dread">Dread / Tension</label>
-
-                        <select id="rating-dread" name="dread" data-rating-field required>
-                            <option value="" selected disabled>Rate...</option>
-                            <option value="1">1 — Faint</option>
-                            <option value="2">2 — Present</option>
-                            <option value="3">3 — Strong</option>
-                            <option value="4">4 — Heavy</option>
-                            <option value="5">5 — Unforgettable</option>
-                        </select>
-                    </div>
-
-                    <div class="reader-record-field">
-                        <label for="rating-ending">Ending</label>
-
-                        <select id="rating-ending" name="ending" data-rating-field required>
-                            <option value="" selected disabled>Rate...</option>
-                            <option value="1">1 — Faint</option>
-                            <option value="2">2 — Present</option>
-                            <option value="3">3 — Strong</option>
-                            <option value="4">4 — Heavy</option>
-                            <option value="5">5 — Unforgettable</option>
-                        </select>
-                    </div>
-
-                </div>
-
-                <div class="reader-record-final-rating" aria-live="polite">
-                    <span>Final Archive Rating</span>
-                    <strong id="final-rating-display">—</strong>
-                </div>
-
-            </fieldset>
-
-            <!-- REVIEW -->
-            <div class="reader-record-field reader-record-field-full">
-                <label for="reader-record-text">Reader Record</label>
-
-                <textarea
-                    id="reader-record-text"
-                    name="readerRecord"
-                    rows="8"
-                    maxlength="3000"
-                    placeholder="What stayed with you after closing the book?"
-                    required
-                ></textarea>
-
-                <p class="reader-record-count">
-                    <span id="reader-record-count">0</span>/3000
-                </p>
-            </div>
-
-            <!-- PERMISSIONS -->
-            <div class="reader-record-checks">
-
-                <label class="reader-record-check">
-                    <input type="checkbox" name="spoilerWarning" value="true">
-                    <span>This record contains spoilers.</span>
-                </label>
-
-                <label class="reader-record-check">
-                    <input type="checkbox" name="permissionToPublish" value="true">
-                    <span>I allow this record to be considered for public display using my display name only.</span>
-                </label>
-
-            </div>
-
-            <div class="reader-record-actions">
-                <button type="submit" class="button copper" id="reader-record-submit">
-                    Submit Reader Record
-                </button>
-
-                <p class="reader-record-status" id="reader-record-status" aria-live="polite"></p>
-            </div>
-
-        </form>
-
-    </section>
-
-    <!-- PUBLIC RECORDS -->
-    <section class="reader-records-public fade-in" aria-labelledby="public-records-title">
-
-        <div class="reader-records-section-heading">
-            <p class="reader-records-kicker">
-                Filed by Readers
-            </p>
-
-            <h2 id="public-records-title">
-                Records Approved for Release
-            </h2>
-
-            <p>
-                Public reader records are displayed as rotating archive entries. Featured records appear first,
-                followed by one rotating record section for each book. Spoilers remain hidden until opened.
-            </p>
-        </div>
-
-        <div class="reader-records-toolbar reader-records-toolbar-filtered">
-
-            <label class="reader-record-filter">
-                <span>Filter by Book</span>
-
-                <select id="reader-records-book-filter">
-                    <option value="all">All Books</option>
-                </select>
-            </label>
-
-            <label class="reader-record-filter">
-                <span>Filter by Mood</span>
-
-                <select id="reader-records-mood-filter">
-                    <option value="all">All Moods</option>
-                </select>
-            </label>
-
-            <button type="button" class="button ghost" id="reader-records-refresh">
-                Refresh Records
-            </button>
-
-        </div>
-
-        <div class="reader-records-list" id="reader-records-list" aria-live="polite">
-            <p class="reader-records-loading">
-                Loading filed records...
-            </p>
-        </div>
-
-    </section>
-
-</main>
-
-<!-- FOOTER -->
-<div style="height:40px;"></div>
-<div id="footer-placeholder"></div>
-
-<!-- JS -->
-<script src="/js/header.js?v=20260910" defer></script>
-<script src="/js/reader-records.js?v=20260910" defer></script>
-
-<script>
-window.addEventListener("load", async () => {
-
-    if (typeof loadHeader !== "function") {
-        console.error("Header failed to load");
-        return;
-    }
-
-    await loadHeader("simple");
-
-    if (typeof initFadeIn === "function") {
-        initFadeIn();
-    }
-
-});
+  gtag("config", "G-1WN8PBHBW4");
 </script>
 
-</body>
-</html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reader Records | Blackwood Publishing</title>
+
+<meta
+    name="description"
+    content="File a reader record for a Blackwood Publishing book. Share what stayed with you, rate the record, and help other readers choose where to begin."
+>
+
+<!-- CSS -->
+<link rel="stylesheet" href="/css/header.css?v=20260924">
+<link rel="stylesheet" href="/css/styles.css?v=20260910">
+<link rel="stylesheet" href="/css/reader-records.css?v=20260910">
+
+<a class="skip-link" href="#reader-record-form">Skip to content</a>
+
+<!-- HERO -->
+<section class="reader-records-hero fade-in" aria-labelledby="reader-records-title">
+
+    <p class="reader-records-kicker">
+        Blackwood Archive
+    </p>
+
+    <h1 id="reader-records-title">
+        Reader Records
+    </h1>
+
+    <p class="reader-records-lead">
+        File what stayed with you.
+    </p>
+
+    <p class="reader-records-copy">
+        Leave a private record for the Archive, or allow it to be considered for public display.
+        Public records rotate below by book, with your chosen display name only.
+    </p>
+
+</section>
+
+<!-- BLACKWOOD CIRCLE POINTS PROMO -->
+<section class="blackwood-circle-promo fade-in" aria-labelledby="reader-record-circle-promo-title">
+    <div class="blackwood-circle-promo-content">
+        <p class="blackwood-circle-promo-kicker">
+            Blackwood Circle Points
+        </p>
+
+        <h2 id="reader-record-circle-promo-title">
+            Earn +10 points for submitting a Reader Record
+        </h2>
+
+        <p>
+            Sign into The Blackwood Circle before submitting your Reader Record and
+            your account will automatically receive <strong>+10 Circle points</strong>.
+        </p>
+
+        <div class="blackwood-circle-promo-actions">
+            <a class="blackwood-circle-promo-button primary" href="/pages/members.html">
+                Sign Into The Circle
+            </a>
+
+            <a class="blackwood-circle-promo-button secondary" href="#reader-record-form">
+                Continue to Reader Record
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SUBMISSION FORM -->
+<section class="reader-records-panel fade-in" aria-labelledby="file-record-title">
+
+    <div class="reader-records-section-heading">
+        <p class="reader-records-kicker">
+            File a Reader Record
+        </p>
+
+        <h2 id="file-record-title">
+            Tell the Archive what remained.
+        </h2>
+
+        <p>
+            Choose the book, choose the mood, rate the record, and leave a short response.
+            Email is optional and will never be displayed publicly.
+        </p>
+    </div>
+
+    <form class="reader-record-form" id="reader-record-form" novalidate>
+
+        <div class="reader-record-form-grid">
+
+            <div class="reader-record-field">
+                <label for="record-book">Book</label>
+
+                <select id="record-book" name="book" required>
+                    <option value="" selected disabled>Choose a Blackwood book...</option>
+                    <option value="The Black Bothy">The Black Bothy</option>
+                    <option value="The Drowned Fjord">The Drowned Fjord</option>
+                    <option value="The Erased Archivist">The Erased Archivist</option>
+                    <option value="Holdfast">Holdfast</option>
+                    <option value="Dour Hill House">Dour Hill House</option>
+                    <option value="The Red-Clad Collector">The Red-Clad Collector</option>
+                    <option value="Corrour Bothy">Corrour Bothy</option>
+                    <option value="Love, Abused">Love, Abused</option>
+                    <option value="The Scheme">The Scheme</option>
+                    <option value="Red Streets">Red Streets</option>
+                </select>
+            </div>
+
+            <div class="reader-record-field">
+                <label for="record-mood">Mood</label>
+
+                <select id="record-mood" name="mood" required>
+                    <option value="" selected disabled>Choose the mood...</option>
+                    <option value="Isolated Grief">Isolated Grief</option>
+                    <option value="Uncanny Obsession">Uncanny Obsession</option>
+                    <option value="Dark and Twisted">Dark and Twisted</option>
+                    <option value="Bleak Coastal Dread">Bleak Coastal Dread</option>
+                    <option value="Identity Collapse">Identity Collapse</option>
+                    <option value="Haunted Memory">Haunted Memory</option>
+                    <option value="Domestic Haunting">Domestic Haunting</option>
+                    <option value="Urban Pressure">Urban Pressure</option>
+                    <option value="Emotional Damage">Emotional Damage</option>
+                    <option value="Blood on the Pavement">Blood on the Pavement</option>
+                </select>
+            </div>
+
+            <div class="reader-record-field">
+                <label for="record-display-name">Display Name</label>
+
+                <input
+                    id="record-display-name"
+                    name="displayName"
+                    type="text"
+                    maxlength="60"
+                    placeholder="First name, initials, or username"
+                    required
+                >
+            </div>
+
+            <div class="reader-record-field">
+                <label for="record-email">Email <span>Optional, not public</span></label>
+
+                <input
+                    id="record-email"
+                    name="email"
+                    type="email"
+                    maxlength="180"
+                    placeholder="Only if you want Blackwood to contact you"
+                >
+            </div>
+
+        </div>
+
+        <!-- RATINGS -->
+        <fieldset class="reader-record-ratings">
+
+            <legend>
+                Archive Rating
+            </legend>
+
+            <p class="reader-record-rating-note">
+                Rate each category from 1 to 5. Your Final Archive Rating is calculated automatically.
+            </p>
+
+            <div class="reader-record-rating-grid">
+
+                <div class="reader-record-field">
+                    <label for="rating-atmosphere">Atmosphere</label>
+
+                    <select id="rating-atmosphere" name="atmosphere" data-rating-field required>
+                        <option value="" selected disabled>Rate...</option>
+                        <option value="1">1 — Faint</option>
+                        <option value="2">2 — Present</option>
+                        <option value="3">3 — Strong</option>
+                        <option value="4">4 — Heavy</option>
+                        <option value="5">5 — Unforgettable</option>
+                    </select>
+                </div>
+
+                <div class="reader-record-field">
+                    <label for="rating-story">Story</label>
+
+                    <select id="rating-story" name="story" data-rating-field required>
+                        <option value="" selected disabled>Rate...</option>
+                        <option value="1">1 — Faint</option>
+                        <option value="2">2 — Present</option>
+                        <option value="3">3 — Strong</option>
+                        <option value="4">4 — Heavy</option>
+                        <option value="5">5 — Unforgettable</option>
+                    </select>
+                </div>
+
+                <div class="reader-record-field">
+                    <label for="rating-characters">Characters</label>
+
+                    <select id="rating-characters" name="characters" data-rating-field required>
+                        <option value="" selected disabled>Rate...</option>
+                        <option value="1">1 — Faint</option>
+                        <option value="2">2 — Present</option>
+                        <option value="3">3 — Strong</option>
+                        <option value="4">4 — Heavy</option>
+                        <option value="5">5 — Unforgettable</option>
+                    </select>
+                </div>
+
+                <div class="reader-record-field">
+                    <label for="rating-dread">Dread / Tension</label>
+
+                    <select id="rating-dread" name="dread" data-rating-field required>
+                        <option value="" selected disabled>Rate...</option>
+                        <option value="1">1 — Faint</option>
+                        <option value="2">2 — Present</option>
+                        <option value="3">3 — Strong</option>
+                        <option value="4">4 — Heavy</option>
+                        <option value="5">5 — Unforgettable</option>
+                    </select>
+                </div>
+
+                <div class="reader-record-field">
+                    <label for="rating-ending">Ending</label>
+
+                    <select id="rating-ending" name="ending" data-rating-field required>
+                        <option value="" selected disabled>Rate...</option>
+                        <option value="1">1 — Faint</option>
+                        <option value="2">2 — Present</option>
+                        <option value="3">3 — Strong</option>
+                        <option value="4">4 — Heavy</option>
+                        <option value="5">5 — Unforgettable</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="reader-record-final-rating" aria-live="polite">
+                <span>Final Archive Rating</span>
+                <strong id="final-rating-display">—</strong>
+            </div>
+
+        </fieldset>
+
+        <!-- REVIEW -->
+        <div class="reader-record-field reader-record-field-full">
+            <label for="reader-record-text">Reader Record</label>
+
+            <textarea
+                id="reader-record-text"
+                name="readerRecord"
+                rows="8"
+                maxlength="3000"
+                placeholder="What stayed with you after closing the book?"
+                required
+            ></textarea>
+
+            <p class="reader-record-count">
+                <span id="reader-record-count">0</span>/3000
+            </p>
+        </div>
+
+        <!-- PERMISSIONS -->
+        <div class="reader-record-checks">
+
+            <label class="reader-record-check">
+                <input type="checkbox" name="spoilerWarning" value="true">
+                <span>This record contains spoilers.</span>
+            </label>
+
+            <label class="reader-record-check">
+                <input type="checkbox" name="permissionToPublish" value="true">
+                <span>I allow this record to be considered for public display using my display name only.</span>
+            </label>
+
+        </div>
+
+        <div class="reader-record-actions">
+            <button type="submit" class="button copper" id="reader-record-submit">
+                Submit Reader Record
+            </button>
+
+            <p class="reader-record-status" id="reader-record-status" aria-live="polite"></p>
+        </div>
+
+    </form>
+
+</section>
+
+<!-- PUBLIC RECORDS -->
+<section class="reader-records-public fade-in" aria-labelledby="public-records-title">
+
+    <div class="reader-records-section-heading">
+        <p class="reader-records-kicker">
+            Filed by Readers
+        </p>
+
+        <h2 id="public-records-title">
+            Records Approved for Release
+        </h2>
+
+        <p>
+            Public reader records are displayed as rotating archive entries. Featured records appear first,
+            followed by one rotating record section for each book. Spoilers remain hidden until opened.
+        </p>
+    </div>
+
+    <div class="reader-records-toolbar reader-records-toolbar-filtered">
+
+        <label class="reader-record-filter">
+            <span>Filter by Book</span>
+
+            <select id="reader-records-book-filter">
+                <option value="all">All Books</option>
+            </select>
+        </label>
+
+        <label class="reader-record-filter">
+            <span>Filter by Mood</span>
+
+            <select id="reader-records-mood-filter">
+                <option value="all">All Moods</option>
+            </select>
+        </label>
+
+        <button type="button" class="button ghost" id="reader-records-refresh">
+            Refresh Records
+        </button>
+
+    </div>
+
+    <div class="reader-records-list" id="reader-records-list" aria-live="polite">
+        <p class="reader-records-loading">
+            Loading filed records...
+        </p>
+    </div>
+
+</section>
