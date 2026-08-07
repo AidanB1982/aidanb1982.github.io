@@ -1,6 +1,5 @@
 /* ======================================================
    BLACKWOOD STORE
-   The Blackwood Catalogue
 ====================================================== */
 
 body.store-page,
@@ -11,10 +10,10 @@ body.store-page,
         linear-gradient(
             180deg,
             rgba(0, 0, 0, 0.82) 0%,
-            rgba(0, 0, 0, 0.74) 34%,
-            rgba(0, 0, 0, 0.9) 100%
+            rgba(0, 0, 0, 0.76) 42%,
+            rgba(0, 0, 0, 0.92) 100%
         ),
-        radial-gradient(circle at top, rgba(184, 115, 51, 0.12), transparent 38%),
+        radial-gradient(circle at top, rgba(184, 115, 51, 0.1), transparent 38%),
         url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
         #050505;
     color: #f1ece4;
@@ -26,66 +25,30 @@ body.store-page,
     transform: none !important;
 }
 
+.store-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
 .store-wrap {
     width: min(100%, 1240px);
     box-sizing: border-box;
     margin: 0 auto;
-    padding: 112px 24px 80px;
+    padding: 108px 24px 80px;
 }
 
 /* ======================================================
-   HERO
-====================================================== */
-
-.store-hero {
-    max-width: 830px;
-    margin: 0 auto 30px;
-    text-align: center;
-}
-
-.store-kicker {
-    margin: 0 0 12px;
-    color: #b87333;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10.5px;
-    letter-spacing: 3px;
-    line-height: 1.5;
-    text-transform: uppercase;
-}
-
-.store-hero h1 {
-    margin: 0 0 18px;
-    color: #f1ece4;
-    font-size: clamp(46px, 6vw, 82px);
-    line-height: 0.96;
-    font-weight: 400;
-    letter-spacing: 2px;
-}
-
-.store-lead {
-    max-width: 700px;
-    margin: 0 auto;
-    color: rgba(241, 236, 228, 0.88);
-    font-size: clamp(18px, 2vw, 23px);
-    line-height: 1.45;
-}
-
-.store-copy {
-    max-width: 720px;
-    margin: 0 auto;
-    color: rgba(215, 208, 198, 0.76);
-    font-size: 16px;
-    line-height: 1.8;
-}
-
-/* ======================================================
-   FULL-WIDTH CIRCLE REWARDS BANNER
+   CIRCLE REWARDS BANNER
 ====================================================== */
 
 body.store-page .blackwood-circle-promo {
     width: 100vw;
     max-width: none;
-    margin: 28px 0 38px;
+    margin: 0 0 28px;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
@@ -93,15 +56,15 @@ body.store-page .blackwood-circle-promo {
 body.store-page .blackwood-circle-promo-content {
     box-sizing: border-box;
     width: 100%;
-    padding: 24px 24px 26px;
+    padding: 22px 24px 24px;
     border: 0;
     border-radius: 0;
     background:
         linear-gradient(
             90deg,
-            rgba(0, 0, 0, 0.84),
-            rgba(38, 24, 17, 0.86),
-            rgba(0, 0, 0, 0.84)
+            rgba(0, 0, 0, 0.86),
+            rgba(38, 24, 17, 0.84),
+            rgba(0, 0, 0, 0.86)
         );
     box-shadow:
         inset 0 1px 0 rgba(214, 177, 129, 0.18),
@@ -110,7 +73,7 @@ body.store-page .blackwood-circle-promo-content {
 }
 
 body.store-page .blackwood-circle-promo-kicker {
-    margin: 0 0 7px;
+    margin: 0 0 6px;
     color: #c49a6c;
     font-size: 10px;
     letter-spacing: 0.22em;
@@ -118,20 +81,20 @@ body.store-page .blackwood-circle-promo-kicker {
 }
 
 body.store-page .blackwood-circle-promo h2 {
-    max-width: 900px;
-    margin: 0 auto 9px;
+    max-width: 780px;
+    margin: 0 auto 8px;
     color: #f4ead7;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(26px, 3vw, 40px);
-    line-height: 1.08;
+    font-size: clamp(22px, 2.3vw, 31px);
+    line-height: 1.12;
     font-weight: normal;
 }
 
 body.store-page .blackwood-circle-promo p {
-    max-width: 760px;
+    max-width: 720px;
     margin: 0 auto;
     color: rgba(239, 231, 220, 0.76);
-    font-size: 14.5px;
+    font-size: 13.5px;
     line-height: 1.55;
 }
 
@@ -143,18 +106,18 @@ body.store-page .blackwood-circle-promo-actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 11px;
-    margin-top: 18px;
+    gap: 10px;
+    margin-top: 16px;
 }
 
 body.store-page .blackwood-circle-promo-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 38px;
-    padding: 9px 15px;
+    min-height: 36px;
+    padding: 8px 14px;
     border-radius: 3px;
-    font-size: 10.5px;
+    font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
@@ -180,13 +143,13 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 }
 
 /* ======================================================
-   FULL-WIDTH ARCHIVE OFFER BANNER
+   ARCHIVE OFFER BANNER
 ====================================================== */
 
 .store-page .store-offer-banner {
     width: 100vw;
     max-width: none;
-    margin: 34px 0 40px;
+    margin: 0 0 32px;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
     padding: 0;
@@ -211,11 +174,11 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
         "title price cta"
         "note saving cta";
     align-items: center;
-    gap: 8px 28px;
+    gap: 7px 28px;
     width: min(1180px, calc(100% - 44px));
     box-sizing: border-box;
     margin: 0 auto;
-    padding: 24px 0;
+    padding: 22px 0;
     text-align: left;
 }
 
@@ -224,26 +187,26 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
     margin: 0;
     color: #b87333;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    letter-spacing: 0.28em;
+    font-size: 9.5px;
+    letter-spacing: 0.26em;
     line-height: 1.5;
     text-transform: uppercase;
 }
 
 .store-page .store-offer-banner h2 {
     grid-area: title;
-    max-width: 720px;
+    max-width: 620px;
     margin: 0;
     color: #f2f2f2;
-    font-size: clamp(30px, 3.6vw, 52px);
-    line-height: 1.04;
+    font-size: clamp(24px, 2.8vw, 38px);
+    line-height: 1.06;
     font-weight: normal;
 }
 
 .store-page .store-offer-price-row {
     grid-area: price;
     display: grid;
-    gap: 4px;
+    gap: 3px;
     margin: 0;
     text-align: center;
 }
@@ -251,7 +214,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 .store-page .store-offer-price-row strong {
     color: #d49a61;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(32px, 3.4vw, 46px);
+    font-size: clamp(26px, 3vw, 38px);
     line-height: 1;
     font-weight: normal;
 }
@@ -259,7 +222,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 .store-page .store-offer-price-row span {
     color: rgba(242, 242, 242, 0.7);
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.5px;
+    font-size: 8.5px;
     letter-spacing: 0.18em;
     line-height: 1.4;
     text-transform: uppercase;
@@ -269,7 +232,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
     grid-area: saving;
     margin: 0;
     color: rgba(242, 242, 242, 0.78);
-    font-size: 13.5px;
+    font-size: 12.5px;
     letter-spacing: 0.08em;
     text-align: center;
     white-space: nowrap;
@@ -277,11 +240,11 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 
 .store-page .store-offer-note {
     grid-area: note;
-    max-width: 720px;
+    max-width: 680px;
     margin: 0;
     color: rgba(242, 242, 242, 0.62);
-    font-size: 13.5px;
-    line-height: 1.55;
+    font-size: 12.8px;
+    line-height: 1.45;
 }
 
 .store-page .store-offer-banner .button {
@@ -289,14 +252,15 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 38px;
-    padding: 9px 15px;
+    min-height: 36px;
+    padding: 8px 14px;
     border: 1px solid rgba(184, 115, 51, 0.48);
     background: rgba(0, 0, 0, 0.24);
-    color: #d49a61;
+    color: #d49a61 !important;
+    -webkit-text-fill-color: currentColor !important;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 10.5px;
-    letter-spacing: 0.18em;
+    font-size: 10px;
+    letter-spacing: 0.16em;
     line-height: 1.4;
     text-transform: uppercase;
     text-decoration: none;
@@ -307,7 +271,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 .store-page .store-offer-banner .button:focus-visible {
     border-color: rgba(184, 115, 51, 0.78);
     background: rgba(184, 115, 51, 0.1);
-    color: #f1ece4;
+    color: #f1ece4 !important;
     outline: none;
 }
 
@@ -319,8 +283,8 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
     position: relative;
     box-sizing: border-box;
     width: min(100%, 1120px);
-    margin: 34px auto 54px;
-    padding: 34px 32px;
+    margin: 30px auto 52px;
+    padding: 32px;
     border: 1px solid rgba(184, 115, 51, 0.18);
     background:
         radial-gradient(circle at top left, rgba(184, 115, 51, 0.07), transparent 34%),
@@ -330,26 +294,30 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
         inset 0 0 0 1px rgba(255, 255, 255, 0.025);
 }
 
+.store-products-panel {
+    margin-top: 28px;
+}
+
 .store-panel-heading {
-    max-width: 760px;
-    margin: 0 auto 28px;
+    max-width: 720px;
+    margin: 0 auto 26px;
     text-align: center;
 }
 
 .store-panel-heading h2 {
-    margin: 0 0 14px;
+    margin: 0 0 12px;
     color: #f1ece4;
-    font-size: clamp(32px, 3.6vw, 52px);
-    line-height: 1.1;
+    font-size: clamp(26px, 3vw, 40px);
+    line-height: 1.12;
     font-weight: 400;
 }
 
 .store-panel-heading p {
-    max-width: 680px;
+    max-width: 660px;
     margin: 0 auto;
     color: rgba(215, 208, 198, 0.74);
-    font-size: 14.5px;
-    line-height: 1.65;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 /* ======================================================
@@ -358,10 +326,10 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 
 .store-controls {
     max-width: 980px;
-    margin: 28px auto 0;
+    margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 26px;
+    gap: 24px;
     align-items: center;
 }
 
@@ -387,15 +355,15 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 
 .store-search-wrap input {
     width: 100%;
-    min-height: 44px;
+    min-height: 42px;
     box-sizing: border-box;
-    padding: 11px 15px;
+    padding: 10px 15px;
     border: 1px solid rgba(184, 115, 51, 0.26);
     border-radius: 0;
     background: rgba(0, 0, 0, 0.42);
     color: #f1ece4;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 14.5px;
+    font-size: 14px;
     text-align: center;
     box-shadow: none;
 }
@@ -427,9 +395,9 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 }
 
 .store-filter-button {
-    min-width: 124px;
-    min-height: 36px;
-    padding: 10px 13px;
+    min-width: 122px;
+    min-height: 35px;
+    padding: 9px 13px;
     border: 1px solid rgba(184, 115, 51, 0.24);
     border-radius: 0;
     background: rgba(0, 0, 0, 0.28);
@@ -464,7 +432,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 }
 
 .store-status {
-    margin: 26px auto 24px;
+    margin: 24px auto 24px;
     text-align: center;
     color: rgba(241, 236, 228, 0.48);
     font-family: Arial, Helvetica, sans-serif;
@@ -651,7 +619,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 }
 
 /* ======================================================
-   NOTES / FAQ
+   NOTES
 ====================================================== */
 
 .store-note-grid {
@@ -707,21 +675,17 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
         justify-items: center;
         text-align: center;
         gap: 8px;
-        padding: 28px 0;
-    }
-
-    .store-page .store-offer-note {
-        margin-top: 4px;
+        padding: 26px 0;
     }
 
     .store-page .store-offer-banner .button {
-        margin-top: 10px;
+        margin-top: 8px;
     }
 }
 
 @media (max-width: 900px) {
     .store-wrap {
-        padding-top: 100px;
+        padding-top: 98px;
     }
 
     .store-panel {
@@ -739,7 +703,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
             linear-gradient(
                 180deg,
                 rgba(0, 0, 0, 0.86) 0%,
-                rgba(0, 0, 0, 0.76) 38%,
+                rgba(0, 0, 0, 0.78) 38%,
                 rgba(0, 0, 0, 0.92) 100%
             ),
             radial-gradient(circle at top, rgba(184, 115, 51, 0.1), transparent 38%),
@@ -748,23 +712,15 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
     }
 
     .store-wrap {
-        padding: 96px 16px 70px;
-    }
-
-    .store-hero {
-        margin-bottom: 24px;
-    }
-
-    .store-lead {
-        font-size: 18px;
+        padding: 94px 16px 70px;
     }
 
     body.store-page .blackwood-circle-promo-content {
-        padding: 24px 18px;
+        padding: 22px 18px;
     }
 
     body.store-page .blackwood-circle-promo h2 {
-        font-size: clamp(25px, 8vw, 34px);
+        font-size: clamp(23px, 7vw, 31px);
     }
 
     body.store-page .blackwood-circle-promo-actions {
@@ -778,7 +734,7 @@ body.store-page .blackwood-circle-promo-button:focus-visible {
 
     .store-panel {
         width: min(100%, 1120px);
-        padding: 28px 18px;
+        padding: 26px 18px;
     }
 
     .store-filters {
