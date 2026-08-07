@@ -78,7 +78,6 @@ async function initBlackwoodMembersArea() {
         } else {
             renderAuthView();
         }
-
     } catch (error) {
         console.error("Blackwood Circle initialisation failed:", error);
         renderErrorState("The Blackwood Circle could not be opened. Please refresh and try again.");
@@ -300,7 +299,6 @@ async function handleMemberSignIn(event) {
         }
 
         await loadMemberDashboard();
-
     } catch (error) {
         console.error("Blackwood Circle sign in failed:", error);
         setAuthStatus(cleanSupabaseError(error.message), "is-error");
@@ -358,7 +356,6 @@ async function handleMemberSignUp(event) {
             "Almost there. Please check your inbox and confirm your email address before signing in.",
             "is-success"
         );
-
     } catch (error) {
         console.error("Blackwood Circle sign up failed:", error);
         setAuthStatus(cleanSupabaseError(error.message), "is-error");
@@ -383,7 +380,6 @@ async function handleMemberSignOut() {
         BlackwoodMembersState.redemptions = [];
 
         renderAuthView();
-
     } catch (error) {
         console.error("Blackwood Circle sign out failed:", error);
         setDashboardStatus("Sign out failed. Please try again.", "is-error");
@@ -456,7 +452,6 @@ async function loadMemberDashboard() {
         BlackwoodMembersState.redemptions = redemptionsResult.data || [];
 
         renderDashboard();
-
     } catch (error) {
         console.error("Blackwood Circle dashboard failed:", error);
         renderErrorState("Your member record could not be loaded. Please refresh and try again.");
@@ -656,19 +651,27 @@ function renderRewards(pointsTotal) {
 }
 
 function renderRewardStatusText(unlocked, required, pointsTotal, latestRedemption) {
-    if (latestRedemption && latestRedemption.status === "pending") {
+    const latestStatus = latestRedemption
+        ? String(latestRedemption.status || "").toLowerCase()
+        : "";
+
+    if (latestStatus === "pending") {
         return "Pending";
     }
 
-    if (latestRedemption && latestRedemption.status === "issued") {
+    if (unlocked && ["issued", "used", "cancelled"].includes(latestStatus)) {
+        return "Unlocked again";
+    }
+
+    if (latestStatus === "issued") {
         return "Issued";
     }
 
-    if (latestRedemption && latestRedemption.status === "used") {
+    if (latestStatus === "used") {
         return "Used";
     }
 
-    if (latestRedemption && latestRedemption.status === "cancelled") {
+    if (latestStatus === "cancelled") {
         return "Cancelled";
     }
 
@@ -686,7 +689,11 @@ function renderRewardAction(reward, canRedeem, latestRedemption) {
         return "";
     }
 
-    if (latestRedemption && latestRedemption.status === "pending") {
+    const latestStatus = latestRedemption
+        ? String(latestRedemption.status || "").toLowerCase()
+        : "";
+
+    if (latestStatus === "pending") {
         return `
             <div class="circle-redemption-notice is-pending">
                 <strong>Redemption requested</strong>
@@ -695,10 +702,12 @@ function renderRewardAction(reward, canRedeem, latestRedemption) {
         `;
     }
 
-    if (latestRedemption && latestRedemption.status === "issued") {
-        return `
+    let existingRedemptionNotice = "";
+
+    if (latestStatus === "issued") {
+        existingRedemptionNotice = `
             <div class="circle-redemption-notice is-issued">
-                <strong>Discount code issued</strong>
+                <strong>Previous discount code issued</strong>
                 ${latestRedemption.discount_code ? `
                     <div class="circle-redemption-code">
                         <span>Your code</span>
@@ -711,20 +720,31 @@ function renderRewardAction(reward, canRedeem, latestRedemption) {
         `;
     }
 
-    if (latestRedemption && latestRedemption.status === "used") {
-        return `
+    if (latestStatus === "used") {
+        existingRedemptionNotice = `
             <div class="circle-redemption-notice is-used">
-                <strong>Reward used</strong>
+                <strong>Previous reward used</strong>
                 <p>This redemption has already been used.</p>
             </div>
         `;
     }
 
+    if (latestStatus === "cancelled") {
+        existingRedemptionNotice = `
+            <div class="circle-redemption-notice is-cancelled">
+                <strong>Previous redemption cancelled</strong>
+                <p>This redemption is no longer active.</p>
+            </div>
+        `;
+    }
+
     if (!canRedeem) {
-        return "";
+        return existingRedemptionNotice;
     }
 
     return `
+        ${existingRedemptionNotice}
+
         <button
             type="button"
             class="circle-button circle-button-primary circle-redeem-button"
@@ -785,7 +805,7 @@ function renderPointsHistory() {
         return `
             <article class="circle-empty-card">
                 <p>No points have been recorded yet.</p>
-                <p>Points and rewards will be added in a later phase.</p>
+                <p>Points and rewards will appear here once your reader activity begins.</p>
             </article>
         `;
     }
@@ -861,7 +881,6 @@ async function handleProfileSave(event) {
 
         await loadMemberDashboard();
         setDashboardStatus("Reader record saved.", "is-success");
-
     } catch (error) {
         console.error("Profile save failed:", error);
         setDashboardStatus("Your reader record could not be saved.", "is-error");
@@ -915,14 +934,12 @@ async function handleRewardRedemption(event) {
             "Reward requested. Your discount code will be issued manually.",
             "is-success"
         );
-
     } catch (error) {
         console.error("Reward redemption failed:", error);
         setDashboardStatus(cleanSupabaseError(error.message), "is-error");
 
         button.disabled = false;
         button.textContent = "Redeem Reward";
-
     } finally {
         BlackwoodMembersState.isRedeeming = false;
     }
@@ -943,7 +960,7 @@ function isActiveRedemption(redemption) {
         return false;
     }
 
-    return ["pending", "issued"].includes(String(redemption.status || "").toLowerCase());
+    return String(redemption.status || "").toLowerCase() === "pending";
 }
 
 // =========================
@@ -1067,8 +1084,8 @@ function cleanSupabaseError(message) {
         return "You do not have enough points for this reward.";
     }
 
-    if (/already have this reward/i.test(cleaned)) {
-        return "You already have this reward pending or issued.";
+    if (/already have this reward/i.test(cleaned) || /pending redemption request/i.test(cleaned)) {
+        return "You already have a pending redemption request for this reward.";
     }
 
     return cleaned;
