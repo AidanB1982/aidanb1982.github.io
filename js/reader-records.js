@@ -2,14 +2,24 @@
    BLACKWOOD READER RECORDS
    Front-end bridge for Google Apps Script
    Rotating public record view
+   Blackwood Circle +10 points support
 ====================================================== */
 
 const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwOWic3DTxR5VkXy0gFythhvDVO6TsOh81jse4LO3YpCyP7SnScUi8p-ccx0SqJPlBb/exec";
+
+const BLACKWOOD_CIRCLE_CONFIG = {
+    supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
+    supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
+    supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+    readerRecordPoints: 10
+};
 
 (function () {
     "use strict";
 
     const ROTATION_DELAY = 9000;
+
+    let blackwoodCircleClientPromise = null;
 
     const BOOK_META = {
         "The Black Bothy": {
@@ -203,8 +213,10 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
 
             const rawMood = String(formData.get("mood") || "").trim();
             const cleanMood = MOOD_MAP[rawMood] || rawMood;
+            const recordId = createReaderRecordId();
 
             const payload = {
+                recordId,
                 book: String(formData.get("book") || "").trim(),
                 mood: cleanMood,
                 displayName: String(formData.get("displayName") || "").trim(),
@@ -227,6 +239,13 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
                 },
                 body: JSON.stringify(payload)
             });
+
+            return {
+                success: true,
+                recordId: payload.recordId,
+                book: payload.book,
+                displayName: payload.displayName
+            };
         }
 
         ratingFields.forEach(field => {
@@ -251,12 +270,25 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
                     submitButton.textContent = "Filing Record...";
                 }
 
-                await submitRecord();
+                const result = await submitRecord();
+                const pointsResult = await awardReaderRecordPoints(result);
 
-                setStatus(
-                    "Your reader record has been received. It will be reviewed before being added to the Archive.",
-                    "is-success"
-                );
+                if (pointsResult.awarded) {
+                    setStatus(
+                        `Your reader record has been received. +${pointsResult.points} Blackwood Circle points awarded.`,
+                        "is-success"
+                    );
+                } else if (pointsResult.reason === "not-signed-in") {
+                    setStatus(
+                        "Your reader record has been received. Sign into The Blackwood Circle before submitting next time to earn +10 points.",
+                        "is-success"
+                    );
+                } else {
+                    setStatus(
+                        "Your reader record has been received. Circle points could not be awarded for this submission.",
+                        "is-success"
+                    );
+                }
 
                 form.reset();
                 updateCount();
@@ -271,6 +303,167 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
                 }
             }
         });
+    }
+
+    /* ======================================================
+       BLACKWOOD CIRCLE POINTS
+    ====================================================== */
+
+    async function awardReaderRecordPoints(result) {
+        const recordId = String(result && result.recordId ? result.recordId : "").trim();
+        const bookTitle = String(result && result.book ? result.book : "").trim();
+        const displayName = String(result && result.displayName ? result.displayName : "").trim();
+
+        if (!recordId || !bookTitle) {
+            return {
+                awarded: false,
+                reason: "missing-record-data"
+            };
+        }
+
+        try {
+            const client = await getBlackwoodCircleClient();
+
+            const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+            if (sessionError) {
+                throw sessionError;
+            }
+
+            const session = sessionData && sessionData.session ? sessionData.session : null;
+
+            if (!session || !session.user) {
+                return {
+                    awarded: false,
+                    reason: "not-signed-in"
+                };
+            }
+
+            const { data, error } = await client.rpc("award_reader_record_points", {
+                p_record_id: recordId,
+                p_book_title: bookTitle,
+                p_display_name: displayName
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            return {
+                awarded: true,
+                points: Number(data && data.points_awarded ? data.points_awarded : BLACKWOOD_CIRCLE_CONFIG.readerRecordPoints),
+                message: data && data.message ? data.message : "+10 Blackwood Circle points awarded."
+            };
+
+        } catch (error) {
+            console.warn("Reader Record points could not be awarded:", error);
+
+            return {
+                awarded: false,
+                reason: "supabase-error",
+                message: cleanSupabaseMessage(error.message)
+            };
+        }
+    }
+
+    function getBlackwoodCircleClient() {
+        if (blackwoodCircleClientPromise) {
+            return blackwoodCircleClientPromise;
+        }
+
+        blackwoodCircleClientPromise = loadSupabaseLibrary().then(() => {
+            return window.supabase.createClient(
+                BLACKWOOD_CIRCLE_CONFIG.supabaseUrl,
+                BLACKWOOD_CIRCLE_CONFIG.supabaseKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
+                    }
+                }
+            );
+        });
+
+        return blackwoodCircleClientPromise;
+    }
+
+    function loadSupabaseLibrary() {
+        return new Promise((resolve, reject) => {
+            if (window.supabase && typeof window.supabase.createClient === "function") {
+                resolve();
+                return;
+            }
+
+            const existingScript = document.querySelector("script[data-blackwood-supabase]");
+
+            if (existingScript) {
+                existingScript.addEventListener("load", () => resolve(), { once: true });
+                existingScript.addEventListener("error", () => reject(new Error("Supabase could not be loaded.")), { once: true });
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.src = BLACKWOOD_CIRCLE_CONFIG.supabaseCdn;
+            script.async = true;
+            script.defer = true;
+            script.dataset.blackwoodSupabase = "true";
+
+            script.onload = () => {
+                if (window.supabase && typeof window.supabase.createClient === "function") {
+                    resolve();
+                } else {
+                    reject(new Error("Supabase loaded, but createClient was unavailable."));
+                }
+            };
+
+            script.onerror = () => {
+                reject(new Error("Supabase could not be loaded."));
+            };
+
+            document.head.appendChild(script);
+        });
+    }
+
+    function createReaderRecordId() {
+        const date = new Date();
+
+        const year = date.getFullYear();
+        const month = padTwo(date.getMonth() + 1);
+        const day = padTwo(date.getDate());
+        const hours = padTwo(date.getHours());
+        const minutes = padTwo(date.getMinutes());
+        const seconds = padTwo(date.getSeconds());
+
+        const randomPart = Math.random()
+            .toString(36)
+            .slice(2, 8)
+            .toUpperCase()
+            .padEnd(6, "X");
+
+        return `BRR-${year}${month}${day}-${hours}${minutes}${seconds}-${randomPart}`;
+    }
+
+    function padTwo(value) {
+        return String(value).padStart(2, "0");
+    }
+
+    function cleanSupabaseMessage(message) {
+        const clean = String(message || "").trim();
+
+        if (/already been awarded/i.test(clean)) {
+            return "Reader Record points have already been awarded for this submission.";
+        }
+
+        if (/daily reader record points limit/i.test(clean)) {
+            return "Daily Reader Record points limit reached.";
+        }
+
+        if (/signed into/i.test(clean)) {
+            return "Please sign into The Blackwood Circle to earn points.";
+        }
+
+        return clean || "Circle points could not be awarded.";
     }
 
     /* ======================================================
@@ -341,10 +534,10 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
         requestJsonp(BLACKWOOD_READER_RECORDS_ENDPOINT)
             .then(data => {
                 const records = Array.isArray(data)
-    ? data
-    : data && Array.isArray(data.records)
-        ? data.records
-        : [];
+                    ? data
+                    : data && Array.isArray(data.records)
+                        ? data.records
+                        : [];
 
                 publicRecordsState.records = normaliseRecords(records);
 
@@ -365,54 +558,54 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
     }
 
     function requestJsonp(url) {
-    return new Promise((resolve, reject) => {
-        const callbackName = `blackwoodReaderRecords_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-        const timeoutLimit = 10000;
+        return new Promise((resolve, reject) => {
+            const callbackName = `blackwoodReaderRecords_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+            const timeoutLimit = 10000;
 
-        let settled = false;
+            let settled = false;
 
-        const script = document.createElement("script");
-        const separator = url.includes("?") ? "&" : "?";
+            const script = document.createElement("script");
+            const separator = url.includes("?") ? "&" : "?";
 
-        const timeout = window.setTimeout(() => {
-            if (settled) return;
+            const timeout = window.setTimeout(() => {
+                if (settled) return;
 
-            settled = true;
-            cleanup();
-            reject(new Error("Reader Records request timed out."));
-        }, timeoutLimit);
+                settled = true;
+                cleanup();
+                reject(new Error("Reader Records request timed out."));
+            }, timeoutLimit);
 
-        window[callbackName] = data => {
-            if (settled) return;
+            window[callbackName] = data => {
+                if (settled) return;
 
-            settled = true;
-            cleanup();
-            resolve(data);
-        };
+                settled = true;
+                cleanup();
+                resolve(data);
+            };
 
-        script.src = `${url}${separator}callback=${callbackName}&cache=${Date.now()}`;
-        script.async = true;
+            script.src = `${url}${separator}callback=${callbackName}&cache=${Date.now()}`;
+            script.async = true;
 
-        script.onerror = () => {
-            if (settled) return;
+            script.onerror = () => {
+                if (settled) return;
 
-            settled = true;
-            cleanup();
-            reject(new Error("Reader Records request failed."));
-        };
+                settled = true;
+                cleanup();
+                reject(new Error("Reader Records request failed."));
+            };
 
-        function cleanup() {
-            window.clearTimeout(timeout);
-            delete window[callbackName];
+            function cleanup() {
+                window.clearTimeout(timeout);
+                delete window[callbackName];
 
-            if (script.parentNode) {
-                script.parentNode.removeChild(script);
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
             }
-        }
 
-        document.body.appendChild(script);
-    });
-}
+            document.body.appendChild(script);
+        });
+    }
 
     function normaliseRecords(records) {
         return records
@@ -596,8 +789,8 @@ const BLACKWOOD_READER_RECORDS_ENDPOINT = "https://script.google.com/macros/s/AK
         }
 
         const bookRecords = filtered.filter(record => !record.featured);
-const grouped = groupRecordsByBook(bookRecords);
-const books = Object.keys(grouped).sort(sortBookNames);
+        const grouped = groupRecordsByBook(bookRecords);
+        const books = Object.keys(grouped).sort(sortBookNames);
 
         books.forEach(book => {
             const records = grouped[book];
