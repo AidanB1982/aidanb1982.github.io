@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
     <!-- Google tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
@@ -24,14 +24,16 @@
         content="The Blackwood Circle is the private members area for Blackwood Publishing readers, ARC members, rewards, behind-the-scenes notes, and reader records."
     >
 
+    <link rel="icon" href="/assets/favicon.png" type="image/png">
+
     <!-- CSS -->
     <link rel="stylesheet" href="/css/header.css?v=20260924">
     <link rel="stylesheet" href="/css/styles.css?v=20260910">
-    <link rel="stylesheet" href="/css/members.css?v=20260819">
+    <link rel="stylesheet" href="/css/members.css?v=20260820">
 
     <!-- JS -->
-    <script src="/js/header.js?v=20260923" defer></script>
-    <script src="/js/members.js?v=20260818" defer></script>
+    <script src="/js/header.js?v=20260924" defer></script>
+    <script src="/js/members.js?v=20260819" defer></script>
 </head>
 
 <body class="members-page sub-page">
@@ -40,7 +42,10 @@
     <div id="header-placeholder"></div>
 
     <main>
-        <section class="about-hero about-hero-circle" aria-labelledby="blackwood-circle-title">
+        <section
+            class="about-hero about-hero-circle circle-signed-out-only"
+            aria-labelledby="blackwood-circle-title"
+        >
             <div class="about-hero-overlay"></div>
 
             <div class="about-hero-content fade-in">
@@ -56,13 +61,16 @@
                     Reader records. Private notes. Rewards. Dispatches from the archive.
                 </p>
 
-                <p class="about-intro-line" style="opacity:0.55; font-size:14px;">
+                <p class="about-intro-line circle-hero-note">
                     Sign in to access your Blackwood member record and members-only material.
                 </p>
             </div>
         </section>
 
-        <section class="circle-public-explainer" aria-labelledby="circle-how-title">
+        <section
+            class="circle-public-explainer circle-signed-out-only"
+            aria-labelledby="circle-how-title"
+        >
             <div class="circle-public-explainer-inner">
                 <div class="circle-public-heading">
                     <p class="circle-kicker">
@@ -76,7 +84,7 @@
                     <p>
                         The Blackwood Circle is your private reader record. Earn points through
                         Blackwood reading activity, unlock milestones, and redeem rewards through
-                        the Blackwood Desk.
+                        the Blackwood Store.
                     </p>
                 </div>
 
@@ -98,7 +106,7 @@
                         <h3>Earn Points</h3>
 
                         <p>
-                            Submit Reader Records, purchase through the Blackwood Desk, and take part
+                            Submit Reader Records, purchase through the Blackwood Store, and take part
                             in future Circle activity to build your points total.
                         </p>
                     </article>
@@ -128,7 +136,7 @@
 
                     <div class="circle-earning-row">
                         <strong>+5 points per £1</strong>
-                        <span>Earn points on Blackwood Desk purchases.</span>
+                        <span>Earn points on eligible Blackwood Store purchases.</span>
                     </div>
 
                     <div class="circle-earning-row">
@@ -147,7 +155,7 @@
                     </a>
 
                     <a class="circle-button circle-button-secondary" href="/pages/store.html">
-                        Visit the Blackwood Desk
+                        Visit the Blackwood Store
                     </a>
                 </div>
             </div>
