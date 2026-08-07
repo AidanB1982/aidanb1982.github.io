@@ -498,13 +498,13 @@ function renderDashboard() {
             </div>
 
             <div class="circle-dashboard-actions">
-                <button type="button" class="button copper" id="circle-refresh-dashboard">
-                    Refresh Record
-                </button>
+               <button type="button" class="circle-button circle-button-primary" id="circle-refresh-dashboard">
+    Refresh Record
+</button>
 
-                <button type="button" class="button ghost" id="circle-sign-out">
-                    Sign Out
-                </button>
+<button type="button" class="circle-button circle-button-secondary" id="circle-sign-out">
+    Sign Out
+</button>
 
                 <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
             </div>
