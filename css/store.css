@@ -868,3 +868,56 @@
         width: 100%;
     }
 }
+/* =========================
+   STORE PAGE BACKGROUND + GAP FIX
+========================= */
+
+body.store-page {
+    min-height: 100vh;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.82) 0%,
+            rgba(0, 0, 0, 0.72) 34%,
+            rgba(0, 0, 0, 0.88) 100%
+        ),
+        radial-gradient(circle at top, rgba(184, 115, 51, 0.12), transparent 38%),
+        url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
+        #050505;
+    color: #f1ece4;
+}
+
+body.store-page .store-wrap {
+    padding-top: 112px !important;
+}
+
+body.store-page .store-hero {
+    margin-top: 0 !important;
+}
+
+body.store-page .blackwood-circle-promo {
+    margin-top: 26px;
+}
+
+@media (max-width: 760px) {
+    body.store-page {
+        background:
+            linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.86) 0%,
+                rgba(0, 0, 0, 0.76) 38%,
+                rgba(0, 0, 0, 0.9) 100%
+            ),
+            radial-gradient(circle at top, rgba(184, 115, 51, 0.1), transparent 38%),
+            url("/assets/ArchiveFilesBG.png") center top / cover no-repeat,
+            #050505;
+    }
+
+    body.store-page .store-wrap {
+        padding-top: 96px !important;
+    }
+
+    body.store-page .blackwood-circle-promo {
+        margin-top: 20px;
+    }
+}
