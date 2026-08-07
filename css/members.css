@@ -915,3 +915,20 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
         animation-iteration-count: 1 !important;
     }
 }
+/* =========================
+   MEMBERS PAGE — HEADER GAP FIX
+========================= */
+
+body.members-page.is-circle-signed-in #blackwood-circle-app {
+    padding-top: 72px !important;
+}
+
+body.members-page.is-circle-signed-in .circle-dashboard-hero {
+    margin-top: 0 !important;
+}
+
+@media (max-width: 760px) {
+    body.members-page.is-circle-signed-in #blackwood-circle-app {
+        padding-top: 58px !important;
+    }
+}
