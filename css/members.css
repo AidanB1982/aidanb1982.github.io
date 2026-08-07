@@ -944,3 +944,20 @@ body.members-page #blackwood-circle-app .circle-profile-form button[type="submit
         width: 100%;
     }
 }
+/* ======================================================
+   MEMBERS PAGE — HIDE INTRO WHEN LOGGED IN
+====================================================== */
+
+body.members-page.is-circle-signed-in .circle-signed-out-only {
+    display: none !important;
+}
+
+body.members-page.is-circle-signed-in #blackwood-circle-app {
+    margin-top: 110px;
+}
+
+@media (max-width: 760px) {
+    body.members-page.is-circle-signed-in #blackwood-circle-app {
+        margin-top: 92px;
+    }
+}
