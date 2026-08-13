@@ -115,6 +115,7 @@ const BLACKWOOD_CIRCLE_CONFIG = {
     function initReaderRecords() {
         initForm();
         initPublicRecords();
+        initCirclePointsPrompt();
     }
 
     /* ======================================================
@@ -308,6 +309,138 @@ const BLACKWOOD_CIRCLE_CONFIG = {
                 }
             }
         });
+    }
+
+    /* ======================================================
+       BLACKWOOD CIRCLE POINTS PROMPT
+    ====================================================== */
+
+    async function initCirclePointsPrompt() {
+        const promptSection = findCirclePointsPrompt();
+
+        if (!promptSection) {
+            return;
+        }
+
+        const signInButton = findPromptButton(promptSection, [
+            "sign into the circle",
+            "sign in to the circle",
+            "sign into circle",
+            "sign in"
+        ]);
+
+        const continueButton = findPromptButton(promptSection, [
+            "continue to reader record",
+            "continue"
+        ]);
+
+        try {
+            const client = await getBlackwoodCircleClient();
+            const { data, error } = await client.auth.getSession();
+
+            if (error) {
+                throw error;
+            }
+
+            const session = data && data.session ? data.session : null;
+            const isSignedIn = Boolean(session && session.user);
+
+            if (isSignedIn) {
+                if (signInButton) {
+                    signInButton.hidden = true;
+                    signInButton.setAttribute("aria-hidden", "true");
+                }
+
+                if (continueButton) {
+                    continueButton.hidden = true;
+                    continueButton.setAttribute("aria-hidden", "true");
+                }
+
+                promptSection.classList.add("is-circle-signed-in");
+                promptSection.classList.remove("is-circle-signed-out");
+
+                updateCirclePromptCopy(
+                    promptSection,
+                    "You are signed into The Blackwood Circle. Submit your Reader Record below and your account will automatically receive +10 Circle points."
+                );
+
+                return;
+            }
+
+            if (continueButton) {
+                continueButton.hidden = true;
+                continueButton.setAttribute("aria-hidden", "true");
+            }
+
+            if (signInButton) {
+                signInButton.hidden = false;
+                signInButton.removeAttribute("aria-hidden");
+            }
+
+            promptSection.classList.add("is-circle-signed-out");
+            promptSection.classList.remove("is-circle-signed-in");
+
+        } catch (error) {
+            console.warn("Circle points prompt could not check sign-in status:", error);
+
+            if (continueButton) {
+                continueButton.hidden = true;
+                continueButton.setAttribute("aria-hidden", "true");
+            }
+
+            if (signInButton) {
+                signInButton.hidden = false;
+                signInButton.removeAttribute("aria-hidden");
+            }
+
+            promptSection.classList.add("is-circle-signed-out");
+            promptSection.classList.remove("is-circle-signed-in");
+        }
+    }
+
+    function findCirclePointsPrompt() {
+        const sections = Array.from(document.querySelectorAll("section, article, div"));
+
+        return sections.find(section => {
+            const text = String(section.textContent || "").toLowerCase();
+
+            return (
+                text.includes("blackwood circle points") &&
+                text.includes("earn +10 points")
+            );
+        }) || null;
+    }
+
+    function findPromptButton(container, labels) {
+        const buttons = Array.from(container.querySelectorAll("a, button"));
+
+        return buttons.find(button => {
+            const text = String(button.textContent || "").trim().toLowerCase();
+
+            return labels.some(label => text.includes(label));
+        }) || null;
+    }
+
+    function updateCirclePromptCopy(container, message) {
+        const paragraphs = Array.from(container.querySelectorAll("p"));
+
+        const targetParagraph = paragraphs.find(paragraph => {
+            const text = String(paragraph.textContent || "").toLowerCase();
+
+            return (
+                text.includes("sign into") ||
+                text.includes("sign in") ||
+                text.includes("automatically receive") ||
+                text.includes("circle points")
+            );
+        });
+
+        if (targetParagraph) {
+            targetParagraph.innerHTML = message.replace(
+                "+10 Circle points",
+                "<strong>+10 Circle points</strong>"
+            );
+        }
     }
 
     /* ======================================================
