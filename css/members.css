@@ -1,7 +1,7 @@
 /* =========================
    BLACKWOOD CIRCLE MEMBERS
    /css/members.css
-   Compact dashboard pass
+   Compact dashboard + Behind the Files carousel
 ========================= */
 
 :root {
@@ -28,10 +28,21 @@
 
 body.members-page,
 body.blackwood-circle-page {
+    min-height: 100vh;
+    overflow-x: hidden;
+
     background:
-        radial-gradient(circle at top center, rgba(196, 122, 44, 0.11), transparent 30%),
-        radial-gradient(circle at 80% 15%, rgba(61, 121, 136, 0.09), transparent 25%),
-        linear-gradient(180deg, #050505 0%, #0d0d0d 46%, #020202 100%);
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.86) 0%,
+            rgba(0, 0, 0, 0.72) 34%,
+            rgba(0, 0, 0, 0.92) 100%
+        ),
+        radial-gradient(circle at top center, rgba(196, 122, 44, 0.12), transparent 34%),
+        radial-gradient(circle at 80% 15%, rgba(61, 121, 136, 0.08), transparent 26%),
+        url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
+        #050505;
+
     color: var(--circle-text);
 }
 
@@ -49,993 +60,10 @@ body.members-page main {
     min-height: 360px;
 }
 
-/* =========================
-   SIGNED-IN HEADER GAP
-========================= */
-
-body.members-page.is-circle-signed-in .circle-signed-out-only {
-    display: none !important;
-}
-
-body.members-page.is-circle-signed-in #blackwood-circle-app {
-    margin-top: 0 !important;
-    padding-top: 42px !important;
-}
-
-body.members-page.is-circle-signed-in .circle-dashboard-hero {
-    margin-top: 0 !important;
-}
-
-/* =========================
-   SHARED TYPOGRAPHY
-========================= */
-
-.circle-kicker {
-    margin: 0 0 8px;
-    color: var(--circle-copper);
-    text-transform: uppercase;
-    letter-spacing: 0.24em;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.circle-auth-intro h1,
-.circle-dashboard-hero h1,
-.circle-loading h1,
-.circle-error h1 {
-    margin: 0 0 12px;
-    color: var(--circle-cream);
-    font-size: clamp(30px, 5vw, 48px);
-    line-height: 1.02;
-    letter-spacing: 0.015em;
-}
-
-.circle-auth-intro p,
-.circle-dashboard-hero p,
-.circle-loading p,
-.circle-error p {
-    max-width: 760px;
-    margin: 0;
-    color: var(--circle-text);
-    font-size: 14.5px;
-    line-height: 1.58;
-}
-
-.circle-hero-note {
-    opacity: 0.55;
-    font-size: 13px;
-}
-
-/* =========================
-   LOADING / ERROR
-========================= */
-
-.circle-loading,
-.circle-error {
-    border: 1px solid var(--circle-border);
-    background:
-        linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
-        var(--circle-panel);
-    box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: clamp(26px, 4vw, 42px);
-}
-
-.circle-error .button {
-    margin-top: 22px;
-}
-
-/* =========================
-   AUTH AREA
-========================= */
-
-.circle-auth-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
-    gap: clamp(24px, 4vw, 44px);
-    align-items: start;
-}
-
-.circle-auth-intro {
-    border: 1px solid var(--circle-border);
-    background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
-        linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.014)),
-        var(--circle-panel);
-    box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: clamp(28px, 5vw, 48px);
-}
-
-.circle-auth-card {
-    position: sticky;
-    top: 24px;
-    border: 1px solid var(--circle-border);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
-        rgba(0, 0, 0, 0.48);
-    box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: 22px;
-}
-
-.circle-auth-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-bottom: 18px;
-}
-
-.circle-auth-tab {
-    border: 1px solid rgba(196, 122, 44, 0.24);
-    background: rgba(0, 0, 0, 0.34);
-    color: var(--circle-muted);
-    padding: 11px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font: inherit;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition:
-        border-color 180ms ease,
-        background 180ms ease,
-        color 180ms ease,
-        transform 180ms ease;
-}
-
-.circle-auth-tab:hover,
-.circle-auth-tab:focus-visible {
-    border-color: var(--circle-border-strong);
-    color: var(--circle-cream);
-    outline: none;
-}
-
-.circle-auth-tab.is-active {
-    border-color: var(--circle-copper);
-    background: rgba(196, 122, 44, 0.14);
-    color: var(--circle-copper-soft);
-}
-
-.circle-auth-form {
-    display: grid;
-    gap: 16px;
-}
-
-.circle-auth-form[hidden] {
-    display: none;
-}
-
-.circle-auth-form label,
-.circle-profile-form label {
-    display: grid;
-    gap: 7px;
-    color: rgba(255, 255, 255, 0.78);
-    font-size: 12.5px;
-    line-height: 1.45;
-}
-
-.circle-auth-form input,
-.circle-profile-form input {
-    width: 100%;
-    box-sizing: border-box;
-    border: 1px solid rgba(196, 122, 44, 0.25);
-    background: rgba(0, 0, 0, 0.5);
-    color: var(--circle-cream);
-    padding: 11px 13px;
-    border-radius: 4px;
-    font: inherit;
-    font-size: 13.5px;
-}
-
-.circle-auth-form input:focus,
-.circle-profile-form input:focus {
-    outline: none;
-    border-color: rgba(196, 122, 44, 0.82);
-    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
-}
-
-.circle-auth-status,
-.circle-dashboard-status {
-    min-height: 20px;
-    margin: 12px 0 0;
-    color: var(--circle-muted);
-    font-size: 12.5px;
-    line-height: 1.5;
-}
-
-.circle-auth-status.is-loading,
-.circle-dashboard-status.is-loading {
-    color: rgba(255, 255, 255, 0.72);
-}
-
-.circle-auth-status.is-success,
-.circle-dashboard-status.is-success {
-    color: var(--circle-success);
-}
-
-.circle-auth-status.is-error,
-.circle-dashboard-status.is-error {
-    color: var(--circle-error);
-}
-
-/* =========================
-   DASHBOARD
-========================= */
-
-.circle-dashboard {
-    display: grid;
-    gap: 18px;
-}
-
-.circle-dashboard-hero {
-    border: 1px solid var(--circle-border);
-    background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
-        radial-gradient(circle at bottom right, rgba(61, 121, 136, 0.08), transparent 26%),
-        linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
-        var(--circle-panel);
-    box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: clamp(24px, 4vw, 38px);
-}
-
-.circle-dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.circle-stat-card {
-    border: 1px solid rgba(196, 122, 44, 0.18);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.038), rgba(255, 255, 255, 0.01)),
-        rgba(0, 0, 0, 0.46);
-    border-radius: 7px;
-    padding: 15px 16px;
-    min-height: 64px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
-}
-
-.circle-stat-label {
-    display: block;
-    margin-bottom: 6px;
-    color: var(--circle-muted);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-}
-
-.circle-stat-card strong {
-    display: block;
-    color: var(--circle-cream);
-    font-size: clamp(18px, 2vw, 26px);
-    line-height: 1.05;
-    font-weight: 600;
-}
-
-.circle-dashboard-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-
-.circle-dashboard-actions .circle-dashboard-status {
-    margin: 0;
-}
-
-/* =========================
-   OPTIONAL LEAVE RECORD CTA
-   Use with a link to:
-   /pages/reader-records.html
-========================= */
-
-.circle-reader-record-cta {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 18px;
-    align-items: center;
-    border: 1px solid rgba(196, 122, 44, 0.26);
-    background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.1), rgba(0, 0, 0, 0.34)),
-        rgba(0, 0, 0, 0.42);
-    border-radius: 8px;
-    padding: 18px 20px;
-    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.32);
-}
-
-.circle-reader-record-cta h2,
-.circle-reader-record-cta h3 {
-    margin: 0 0 6px;
-    color: var(--circle-cream);
-    font-size: clamp(21px, 2.6vw, 30px);
-    line-height: 1.1;
-}
-
-.circle-reader-record-cta p {
-    margin: 0;
-    color: var(--circle-text);
-    font-size: 14px;
-    line-height: 1.55;
-}
-
-/* =========================
-   SECTIONS
-========================= */
-
-.circle-section {
-    border: 1px solid var(--circle-border);
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.034), rgba(255, 255, 255, 0.01)),
-        rgba(0, 0, 0, 0.42);
-    border-radius: 8px;
-    padding: clamp(18px, 3vw, 28px);
-    box-shadow: 0 18px 52px rgba(0, 0, 0, 0.34);
-}
-
-.circle-section h2 {
-    margin: 0 0 16px;
-    color: var(--circle-cream);
-    font-size: clamp(24px, 3vw, 32px);
-    line-height: 1.12;
-}
-
-.circle-profile-form {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-    gap: 12px;
-    align-items: end;
-}
-
-/* =========================
-   POSTS / REWARDS / POINTS
-========================= */
-
-.circle-post-list,
-.circle-reward-list,
-.circle-points-list {
-    display: grid;
-    gap: 12px;
-}
-
-.circle-post-card,
-.circle-reward-card,
-.circle-points-card,
-.circle-empty-card {
-    border: 1px solid rgba(196, 122, 44, 0.17);
-    background: rgba(0, 0, 0, 0.34);
-    border-radius: 7px;
-    padding: 16px 18px;
-}
-
-.circle-post-card h3,
-.circle-reward-card h3 {
-    margin: 0 0 8px;
-    color: var(--circle-cream);
-    font-size: clamp(18px, 2vw, 22px);
-    line-height: 1.2;
-}
-
-.circle-post-meta,
-.circle-reward-status {
-    margin: 0 0 8px;
-    color: var(--circle-copper-soft);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-}
-
-.circle-post-excerpt {
-    margin: 0 0 10px;
-    color: rgba(255, 255, 255, 0.65);
-    font-size: 13.5px;
-    font-style: italic;
-    line-height: 1.55;
-}
-
-.circle-post-body {
-    color: var(--circle-text);
-    font-size: 14px;
-    line-height: 1.58;
-}
-
-.circle-post-body p {
-    margin: 0 0 10px;
-}
-
-.circle-post-body p:last-child {
-    margin-bottom: 0;
-}
-
-.circle-reward-card {
-    position: relative;
+body.is-bfa-modal-open {
     overflow: hidden;
 }
 
-.circle-reward-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(90deg, rgba(196, 122, 44, 0.1), transparent 42%);
-    opacity: 0;
-    transition: opacity 180ms ease;
-}
-
-.circle-reward-card.is-unlocked {
-    border-color: rgba(214, 177, 129, 0.36);
-}
-
-.circle-reward-card.is-unlocked::before {
-    opacity: 1;
-}
-
-.circle-reward-card.is-locked {
-    opacity: 0.76;
-}
-
-.circle-reward-card p {
-    margin: 0 0 8px;
-    color: var(--circle-text);
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.circle-reward-card small {
-    color: var(--circle-muted);
-    font-size: 11.5px;
-}
-
-.circle-points-card {
-    display: grid;
-    gap: 4px;
-    min-height: 0;
-}
-
-.circle-points-card strong {
-    color: var(--circle-copper-soft);
-    font-size: 16px;
-}
-
-.circle-points-card p {
-    margin: 0;
-    color: var(--circle-text);
-    font-size: 14px;
-    line-height: 1.45;
-}
-
-.circle-points-card small,
-.circle-empty-card p {
-    margin: 0;
-    color: var(--circle-muted);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.circle-empty-card {
-    border-style: dashed;
-}
-
-/* =========================
-   COMPACT REWARD / REDEMPTION DETAILS
-========================= */
-
-#blackwood-circle-app .circle-redemption-code {
-    margin-top: 10px;
-}
-
-#blackwood-circle-app .circle-redemption-code code {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    max-width: 100%;
-    margin-top: 5px;
-    padding: 8px 12px;
-    border: 1px solid rgba(214, 177, 129, 0.42);
-    border-radius: 4px;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.16), rgba(196, 122, 44, 0.07)),
-        rgba(0, 0, 0, 0.5);
-    color: #efe7dc;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    word-break: break-word;
-}
-
-#blackwood-circle-app .circle-redemption-notice strong,
-#blackwood-circle-app .circle-redemption-code span {
-    color: #d6b181;
-}
-
-/* =========================
-   BUTTONS
-========================= */
-
-.button.ghost,
-.circle-auth-card .button.ghost,
-.circle-dashboard .button.ghost {
-    border: 1px solid rgba(196, 122, 44, 0.34);
-    background: transparent;
-    color: var(--circle-copper-soft);
-}
-
-.button.ghost:hover,
-.button.ghost:focus-visible {
-    border-color: var(--circle-copper);
-    color: var(--circle-cream);
-    background: rgba(196, 122, 44, 0.1);
-}
-
-/* Circle app button protection */
-#blackwood-circle-app .button,
-#blackwood-circle-app button.button,
-#blackwood-circle-app .button.copper,
-#blackwood-circle-app button.button.copper,
-body.members-page #blackwood-circle-app button.circle-button,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button,
-body.members-page #blackwood-circle-app .circle-dashboard-actions button,
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"],
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"] {
-    box-sizing: border-box !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: 38px !important;
-    padding: 10px 18px !important;
-    border: 1px solid rgba(196, 122, 44, 0.7) !important;
-    border-radius: 4px !important;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.2), rgba(196, 122, 44, 0.07)),
-        rgba(0, 0, 0, 0.48) !important;
-    color: #d6b181 !important;
-    font: inherit !important;
-    font-size: 10.5px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.18em !important;
-    line-height: 1 !important;
-    text-transform: uppercase !important;
-    text-decoration: none !important;
-    text-align: center !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
-        0 10px 22px rgba(0, 0, 0, 0.24) !important;
-    transition:
-        background 180ms ease,
-        border-color 180ms ease,
-        color 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease !important;
-}
-
-#blackwood-circle-app .button:hover,
-#blackwood-circle-app button.button:hover,
-#blackwood-circle-app .button:focus-visible,
-#blackwood-circle-app button.button:focus-visible,
-body.members-page #blackwood-circle-app button.circle-button:hover,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button:hover,
-body.members-page #blackwood-circle-app .circle-dashboard-actions button:hover,
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:hover,
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:hover,
-body.members-page #blackwood-circle-app button.circle-button:focus-visible,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button:focus-visible,
-body.members-page #blackwood-circle-app .circle-dashboard-actions button:focus-visible,
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:focus-visible,
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:focus-visible {
-    border-color: #c47a2c !important;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.3), rgba(196, 122, 44, 0.1)),
-        rgba(0, 0, 0, 0.64) !important;
-    color: #efe7dc !important;
-    outline: none !important;
-    transform: translateY(-1px) !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-        0 13px 30px rgba(0, 0, 0, 0.32) !important;
-}
-
-#blackwood-circle-app .button.ghost,
-#blackwood-circle-app button.button.ghost,
-body.members-page #blackwood-circle-app button.circle-button-secondary,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary,
-body.members-page #blackwood-circle-app #circle-sign-out {
-    border-color: rgba(196, 122, 44, 0.42) !important;
-    background: transparent !important;
-    color: rgba(214, 177, 129, 0.9) !important;
-}
-
-#blackwood-circle-app .button.ghost:hover,
-#blackwood-circle-app button.button.ghost:hover,
-#blackwood-circle-app .button.ghost:focus-visible,
-#blackwood-circle-app button.button.ghost:focus-visible,
-body.members-page #blackwood-circle-app button.circle-button-secondary:hover,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:hover,
-body.members-page #blackwood-circle-app #circle-sign-out:hover,
-body.members-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
-body.members-page #blackwood-circle-app #circle-sign-out:focus-visible {
-    border-color: rgba(196, 122, 44, 0.84) !important;
-    background: rgba(196, 122, 44, 0.1) !important;
-    color: #efe7dc !important;
-}
-
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"] {
-    width: 100% !important;
-}
-
-/* =========================
-   PUBLIC EXPLAINER
-========================= */
-
-.circle-public-explainer {
-    width: min(1120px, calc(100% - 32px));
-    margin: 34px auto 30px;
-}
-
-.circle-public-explainer-inner {
-    padding: clamp(24px, 4vw, 38px);
-    border: 1px solid rgba(214, 177, 129, 0.2);
-    border-radius: 8px;
-    background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
-        linear-gradient(180deg, rgba(24, 18, 14, 0.94), rgba(10, 8, 7, 0.96));
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
-}
-
-.circle-public-heading {
-    max-width: 760px;
-    margin: 0 auto 24px;
-    text-align: center;
-}
-
-.circle-public-heading h2 {
-    margin: 0 0 10px;
-    color: #f4ead7;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(26px, 4vw, 40px);
-    line-height: 1.08;
-}
-
-.circle-public-heading p {
-    margin: 0;
-    color: rgba(239, 231, 220, 0.76);
-    font-size: 14.5px;
-    line-height: 1.6;
-}
-
-.circle-public-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin: 24px 0;
-}
-
-.circle-public-card {
-    padding: 18px;
-    border: 1px solid rgba(214, 177, 129, 0.16);
-    border-radius: 7px;
-    background: rgba(0, 0, 0, 0.26);
-}
-
-.circle-public-number {
-    display: inline-flex;
-    margin-bottom: 10px;
-    color: #c49a6c;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-}
-
-.circle-public-card h3 {
-    margin: 0 0 8px;
-    color: #f4ead7;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 19px;
-}
-
-.circle-public-card p {
-    margin: 0;
-    color: rgba(239, 231, 220, 0.72);
-    font-size: 13.5px;
-    line-height: 1.55;
-}
-
-.circle-earning-panel {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin: 24px 0 22px;
-    padding: 14px;
-    border: 1px solid rgba(196, 122, 44, 0.2);
-    border-radius: 7px;
-    background: rgba(196, 122, 44, 0.06);
-}
-
-.circle-earning-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    padding: 12px;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.22);
-}
-
-.circle-earning-row strong {
-    flex: 0 0 auto;
-    min-width: 98px;
-    color: #d6b181;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 14.5px;
-}
-
-.circle-earning-row span {
-    color: rgba(239, 231, 220, 0.76);
-    font-size: 13px;
-    line-height: 1.45;
-}
-
-.circle-public-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-.circle-public-actions .circle-button {
-    text-align: center;
-}
-
-/* =========================
-   MEMBERS PAGE FOOTER
-========================= */
-
-body.members-page .site-footer {
-    padding: 44px 24px 38px;
-    border-top: 1px solid rgba(184, 115, 51, 0.16);
-    background:
-        radial-gradient(circle at top, rgba(184, 115, 51, 0.07), transparent 32%),
-        #030303;
-    color: rgba(215, 208, 198, 0.72);
-    text-align: center;
-}
-
-body.members-page .site-footer-inner {
-    max-width: 820px;
-    margin: 0 auto;
-}
-
-body.members-page .site-footer-kicker {
-    margin: 0 0 10px;
-    color: #b87333;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-}
-
-body.members-page .site-footer p {
-    margin: 0 auto 16px;
-    font-size: 13.5px;
-    line-height: 1.6;
-}
-
-body.members-page .site-footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 20px;
-}
-
-body.members-page .site-footer-links a {
-    color: rgba(241, 236, 228, 0.7);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.5px;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    text-decoration: none;
-}
-
-body.members-page .site-footer-links a:hover,
-body.members-page .site-footer-links a:focus-visible {
-    color: #b87333;
-    outline: none;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 980px) {
-    .circle-auth-shell {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-auth-card {
-        position: static;
-    }
-
-    .circle-dashboard-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .circle-profile-form {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-reader-record-cta {
-        grid-template-columns: 1fr;
-        align-items: start;
-    }
-}
-
-@media (max-width: 860px) {
-    .circle-public-grid,
-    .circle-earning-panel {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-earning-row {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .circle-earning-row strong {
-        min-width: 0;
-    }
-}
-
-@media (max-width: 760px) {
-    body.members-page.is-circle-signed-in #blackwood-circle-app {
-        padding-top: 34px !important;
-    }
-}
-
-@media (max-width: 620px) {
-    .blackwood-circle-wrap {
-        padding: 50px 16px 76px;
-    }
-
-    .circle-auth-intro,
-    .circle-auth-card,
-    .circle-dashboard-hero,
-    .circle-section,
-    .circle-loading,
-    .circle-error {
-        border-radius: 7px;
-    }
-
-    .circle-dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-auth-tabs {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-dashboard-actions {
-        align-items: stretch;
-    }
-
-    .circle-dashboard-actions .button,
-    .circle-profile-form .button,
-    .circle-auth-form .button {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .circle-reader-record-cta {
-        padding: 16px;
-    }
-}
-
-@media (max-width: 560px) {
-    .circle-public-explainer {
-        width: min(100% - 22px, 1120px);
-        margin-top: 24px;
-    }
-
-    .circle-public-explainer-inner {
-        padding: 22px 16px;
-    }
-
-    .circle-public-card {
-        padding: 17px;
-    }
-
-    .circle-public-actions {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .circle-public-actions .circle-button {
-        width: 100%;
-    }
-}
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-    }
-}
-/* =========================
-   MEMBERS PAGE — FINAL SPACING + READER RECORD CTA FIX
-========================= */
-
-/* Push signed-in Circle dashboard safely below the fixed header */
-body.members-page.is-circle-signed-in #blackwood-circle-app {
-    padding-top: 118px !important;
-}
-
-/* Keep the hero compact once it has cleared the header */
-body.members-page.is-circle-signed-in .circle-dashboard-hero {
-    padding-top: 30px !important;
-    padding-bottom: 30px !important;
-}/* =========================
-   BLACKWOOD CIRCLE MEMBERS
-   /css/members.css
-   Compact dashboard + ledger pass
-========================= */
-
-:root {
-    --circle-black: #030303;
-    --circle-charcoal: #0b0b0b;
-    --circle-panel: rgba(12, 12, 12, 0.88);
-    --circle-panel-soft: rgba(255, 255, 255, 0.03);
-    --circle-border: rgba(196, 122, 44, 0.22);
-    --circle-border-strong: rgba(196, 122, 44, 0.52);
-    --circle-copper: #c47a2c;
-    --circle-copper-soft: #d6b181;
-    --circle-cream: #efe7dc;
-    --circle-text: rgba(255, 255, 255, 0.74);
-    --circle-muted: rgba(255, 255, 255, 0.5);
-    --circle-faint: rgba(255, 255, 255, 0.32);
-    --circle-error: #ffb1a7;
-    --circle-success: #d6b181;
-    --circle-shadow: 0 18px 54px rgba(0, 0, 0, 0.45);
-}
-
-/* =========================
-   PAGE BASE
-========================= */
-
-body.members-page,
-body.blackwood-circle-page {
-    background:
-        radial-gradient(circle at top center, rgba(196, 122, 44, 0.11), transparent 30%),
-        radial-gradient(circle at 80% 15%, rgba(61, 121, 136, 0.09), transparent 25%),
-        linear-gradient(180deg, #050505 0%, #0d0d0d 46%, #020202 100%);
-    color: var(--circle-text);
-}
-
-body.members-page main {
-    min-height: 72vh;
-}
-
-.blackwood-circle-wrap {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 64px 22px 82px;
-}
-
-#blackwood-circle-app {
-    min-height: 360px;
-}
-
 /* =========================
    SIGNED-IN HEADER GAP
 ========================= */
@@ -1061,11 +89,15 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-kicker {
     margin: 0 0 8px;
+
     color: var(--circle-copper);
-    text-transform: uppercase;
-    letter-spacing: 0.24em;
+
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     font-weight: 700;
+    letter-spacing: 0.24em;
+    line-height: 1.5;
+    text-transform: uppercase;
 }
 
 .circle-auth-intro h1,
@@ -1073,7 +105,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-loading h1,
 .circle-error h1 {
     margin: 0 0 12px;
+
     color: var(--circle-cream);
+
     font-size: clamp(30px, 5vw, 48px);
     line-height: 1.02;
     letter-spacing: 0.015em;
@@ -1085,7 +119,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-error p {
     max-width: 760px;
     margin: 0;
+
     color: var(--circle-text);
+
     font-size: 14.5px;
     line-height: 1.58;
 }
@@ -1102,15 +138,19 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-loading,
 .circle-error {
     border: 1px solid var(--circle-border);
+    border-radius: 8px;
+
+    padding: clamp(26px, 4vw, 42px);
+
     background:
         linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
         var(--circle-panel);
+
     box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: clamp(26px, 4vw, 42px);
 }
 
-.circle-error .button {
+.circle-error .button,
+.circle-error .circle-button {
     margin-top: 22px;
 }
 
@@ -1127,45 +167,58 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-auth-intro {
     border: 1px solid var(--circle-border);
+    border-radius: 8px;
+
+    padding: clamp(28px, 5vw, 48px);
+
     background:
         radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
         linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.014)),
         var(--circle-panel);
+
     box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: clamp(28px, 5vw, 48px);
 }
 
 .circle-auth-card {
     position: sticky;
     top: 24px;
+
     border: 1px solid var(--circle-border);
+    border-radius: 8px;
+
+    padding: 22px;
+
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
         rgba(0, 0, 0, 0.48);
+
     box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: 22px;
 }
 
 .circle-auth-tabs {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+
     margin-bottom: 18px;
 }
 
 .circle-auth-tab {
     border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 4px;
+
     background: rgba(0, 0, 0, 0.34);
     color: var(--circle-muted);
+
     padding: 11px 10px;
-    border-radius: 4px;
-    cursor: pointer;
+
     font: inherit;
     font-size: 12px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+
+    cursor: pointer;
+
     transition:
         border-color 180ms ease,
         background 180ms ease,
@@ -1199,7 +252,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-profile-form label {
     display: grid;
     gap: 7px;
+
     color: rgba(255, 255, 255, 0.78);
+
     font-size: 12.5px;
     line-height: 1.45;
 }
@@ -1208,19 +263,23 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-profile-form input {
     width: 100%;
     box-sizing: border-box;
+
     border: 1px solid rgba(196, 122, 44, 0.25);
+    border-radius: 4px;
+
     background: rgba(0, 0, 0, 0.5);
     color: var(--circle-cream);
+
     padding: 11px 13px;
-    border-radius: 4px;
+
     font: inherit;
     font-size: 13.5px;
 }
 
 .circle-auth-form input:focus,
 .circle-profile-form input:focus {
-    outline: none;
     border-color: rgba(196, 122, 44, 0.82);
+    outline: none;
     box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
 }
 
@@ -1228,7 +287,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-dashboard-status {
     min-height: 20px;
     margin: 12px 0 0;
+
     color: var(--circle-muted);
+
     font-size: 12.5px;
     line-height: 1.5;
 }
@@ -1259,14 +320,17 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-dashboard-hero {
     border: 1px solid var(--circle-border);
+    border-radius: 8px;
+
+    padding: clamp(24px, 4vw, 38px);
+
     background:
         radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
         radial-gradient(circle at bottom right, rgba(61, 121, 136, 0.08), transparent 26%),
         linear-gradient(180deg, var(--circle-panel-soft), rgba(255, 255, 255, 0.012)),
         var(--circle-panel);
+
     box-shadow: var(--circle-shadow);
-    border-radius: 8px;
-    padding: clamp(24px, 4vw, 38px);
 }
 
 .circle-dashboard-grid {
@@ -1276,20 +340,27 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 }
 
 .circle-stat-card {
+    min-height: 64px;
+
     border: 1px solid rgba(196, 122, 44, 0.18);
+    border-radius: 7px;
+
+    padding: 15px 16px;
+
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.038), rgba(255, 255, 255, 0.01)),
         rgba(0, 0, 0, 0.46);
-    border-radius: 7px;
-    padding: 15px 16px;
-    min-height: 64px;
+
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
 }
 
 .circle-stat-label {
     display: block;
     margin-bottom: 6px;
+
     color: var(--circle-muted);
+
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1297,7 +368,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-stat-card strong {
     display: block;
+
     color: var(--circle-cream);
+
     font-size: clamp(18px, 2vw, 26px);
     line-height: 1.05;
     font-weight: 600;
@@ -1319,32 +392,92 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 ========================= */
 
 .circle-reader-record-cta {
+    position: relative;
+    overflow: hidden;
+
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 18px;
     align-items: center;
-    border: 1px solid rgba(196, 122, 44, 0.26);
-    background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.1), rgba(0, 0, 0, 0.34)),
-        rgba(0, 0, 0, 0.42);
+
+    border: 1px solid rgba(196, 122, 44, 0.28);
     border-radius: 8px;
-    padding: 18px 20px;
-    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.32);
+
+    padding: 20px;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.12), rgba(0, 0, 0, 0.42)),
+        rgba(0, 0, 0, 0.54);
+
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
 }
 
 .circle-reader-record-cta h2,
 .circle-reader-record-cta h3 {
     margin: 0 0 6px;
+
     color: var(--circle-cream);
-    font-size: clamp(21px, 2.6vw, 30px);
+
+    font-size: clamp(24px, 3vw, 34px);
     line-height: 1.1;
 }
 
 .circle-reader-record-cta p {
     margin: 0;
-    color: var(--circle-text);
+
+    color: rgba(255, 255, 255, 0.76);
+
     font-size: 14px;
     line-height: 1.55;
+}
+
+.circle-reader-record-button {
+    box-sizing: border-box;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 40px;
+    min-width: 220px;
+
+    padding: 11px 18px;
+
+    border: 1px solid rgba(196, 122, 44, 0.78);
+    border-radius: 4px;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.24), rgba(196, 122, 44, 0.08)),
+        rgba(0, 0, 0, 0.58);
+
+    color: #d6b181 !important;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+
+    white-space: nowrap;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.circle-reader-record-button:hover,
+.circle-reader-record-button:focus-visible {
+    border-color: #c47a2c;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.36), rgba(196, 122, 44, 0.12)),
+        rgba(0, 0, 0, 0.7);
+
+    color: #efe7dc !important;
+    outline: none;
 }
 
 /* =========================
@@ -1353,17 +486,22 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-section {
     border: 1px solid var(--circle-border);
+    border-radius: 8px;
+
+    padding: clamp(18px, 3vw, 28px);
+
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.034), rgba(255, 255, 255, 0.01)),
         rgba(0, 0, 0, 0.42);
-    border-radius: 8px;
-    padding: clamp(18px, 3vw, 28px);
+
     box-shadow: 0 18px 52px rgba(0, 0, 0, 0.34);
 }
 
 .circle-section h2 {
     margin: 0 0 16px;
+
     color: var(--circle-cream);
+
     font-size: clamp(24px, 3vw, 32px);
     line-height: 1.12;
 }
@@ -1373,6 +511,349 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
     gap: 12px;
     align-items: end;
+}
+
+body.members-page.is-circle-signed-in .circle-profile-form {
+    align-items: end;
+}
+
+/* =========================
+   BEHIND THE FILES CAROUSEL
+========================= */
+
+.circle-bfa-section {
+    overflow: hidden;
+}
+
+.circle-bfa-section-heading {
+    max-width: 760px;
+    margin: 0 auto 18px;
+    text-align: center;
+}
+
+.circle-bfa-section-heading h2 {
+    margin: 0 0 10px;
+}
+
+.circle-bfa-section-heading p:last-child {
+    max-width: 680px;
+    margin: 0 auto;
+
+    color: rgba(239, 231, 220, 0.68);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.circle-bfa-carousel {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+    gap: 0;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 8px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 34%),
+        linear-gradient(145deg, rgba(12, 12, 12, 0.96), rgba(0, 0, 0, 0.72));
+
+    box-shadow:
+        0 18px 48px rgba(0, 0, 0, 0.36),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.circle-bfa-image-wrap {
+    position: relative;
+    min-height: 320px;
+    overflow: hidden;
+    background: #050505;
+}
+
+.circle-bfa-image-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.2) 68%, rgba(0, 0, 0, 0.62) 100%),
+        radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.26) 72%);
+}
+
+.circle-bfa-image-wrap img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    min-height: 320px;
+
+    object-fit: cover;
+    filter: saturate(0.82) contrast(1.08);
+}
+
+.circle-bfa-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    min-width: 0;
+
+    padding: clamp(22px, 4vw, 36px);
+}
+
+.circle-bfa-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    margin-bottom: 14px;
+}
+
+.circle-bfa-meta span {
+    display: inline-flex;
+    align-items: center;
+
+    width: fit-content;
+
+    padding: 5px 8px;
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--circle-copper-soft);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1.35;
+    text-transform: uppercase;
+}
+
+.circle-bfa-meta span[hidden] {
+    display: none;
+}
+
+.circle-bfa-content h3 {
+    margin: 0 0 12px;
+
+    color: var(--circle-cream);
+
+    font-size: clamp(26px, 4vw, 44px);
+    line-height: 1.02;
+    font-weight: 400;
+}
+
+.circle-bfa-excerpt {
+    margin: 0 0 22px;
+
+    color: rgba(239, 231, 220, 0.72);
+
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.65;
+}
+
+.circle-bfa-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+
+    margin-top: auto;
+}
+
+.circle-bfa-control,
+.circle-bfa-read {
+    box-sizing: border-box;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+
+    padding: 10px 15px;
+
+    border: 1px solid rgba(196, 122, 44, 0.62);
+    border-radius: 4px;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.16), rgba(196, 122, 44, 0.06)),
+        rgba(0, 0, 0, 0.46);
+
+    color: var(--circle-copper-soft);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.circle-bfa-read {
+    border-color: rgba(196, 122, 44, 0.82);
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.32), rgba(196, 122, 44, 0.11)),
+        rgba(74, 34, 12, 0.56);
+
+    color: #fff1de;
+}
+
+.circle-bfa-control:hover,
+.circle-bfa-control:focus-visible,
+.circle-bfa-read:hover,
+.circle-bfa-read:focus-visible {
+    border-color: var(--circle-copper);
+    color: var(--circle-cream);
+    outline: none;
+}
+
+.circle-bfa-control:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+}
+
+.circle-bfa-position {
+    margin: 12px 0 0;
+
+    color: var(--circle-muted);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* =========================
+   BEHIND THE FILES MODAL
+========================= */
+
+.circle-bfa-modal[hidden] {
+    display: none !important;
+}
+
+.circle-bfa-modal {
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 22px;
+
+    background:
+        radial-gradient(circle at top, rgba(196, 122, 44, 0.16), transparent 38%),
+        rgba(0, 0, 0, 0.84);
+
+    backdrop-filter: blur(8px);
+}
+
+.circle-bfa-modal-panel {
+    position: relative;
+
+    width: min(920px, 100%);
+    max-height: min(82vh, 860px);
+
+    overflow: auto;
+
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    border-radius: 10px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(16, 16, 16, 0.98), rgba(3, 3, 3, 0.99));
+
+    box-shadow:
+        0 34px 110px rgba(0, 0, 0, 0.82),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
+
+.circle-bfa-modal-close {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    float: right;
+
+    margin: 14px 14px 0 0;
+
+    min-height: 34px;
+
+    padding: 8px 12px;
+
+    border: 1px solid rgba(196, 122, 44, 0.48);
+    border-radius: 4px;
+
+    background: rgba(0, 0, 0, 0.78);
+    color: var(--circle-copper-soft);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.circle-bfa-modal-close:hover,
+.circle-bfa-modal-close:focus-visible {
+    border-color: var(--circle-copper);
+    color: var(--circle-cream);
+    outline: none;
+}
+
+.circle-bfa-modal-image {
+    display: block;
+
+    width: 100%;
+    height: min(320px, 38vh);
+
+    object-fit: cover;
+
+    border-bottom: 1px solid rgba(196, 122, 44, 0.18);
+
+    filter: saturate(0.86) contrast(1.08);
+}
+
+.circle-bfa-modal-content {
+    padding: clamp(24px, 4vw, 44px);
+}
+
+.circle-bfa-modal-content h3 {
+    margin: 0 0 18px;
+
+    color: var(--circle-cream);
+
+    font-size: clamp(32px, 5vw, 58px);
+    line-height: 0.98;
+    font-weight: 400;
+}
+
+.circle-bfa-modal-body {
+    color: rgba(239, 231, 220, 0.78);
+
+    font-size: 16px;
+    line-height: 1.76;
+}
+
+.circle-bfa-modal-body p {
+    margin: 0 0 16px;
+}
+
+.circle-bfa-modal-body p:last-child {
+    margin-bottom: 0;
 }
 
 /* =========================
@@ -1390,15 +871,19 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-reward-card,
 .circle-empty-card {
     border: 1px solid rgba(196, 122, 44, 0.17);
-    background: rgba(0, 0, 0, 0.34);
     border-radius: 7px;
+
     padding: 16px 18px;
+
+    background: rgba(0, 0, 0, 0.34);
 }
 
 .circle-post-card h3,
 .circle-reward-card h3 {
     margin: 0 0 8px;
+
     color: var(--circle-cream);
+
     font-size: clamp(18px, 2vw, 22px);
     line-height: 1.2;
 }
@@ -1406,7 +891,10 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 .circle-post-meta,
 .circle-reward-status {
     margin: 0 0 8px;
+
     color: var(--circle-copper-soft);
+
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1414,7 +902,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-post-excerpt {
     margin: 0 0 10px;
+
     color: rgba(255, 255, 255, 0.65);
+
     font-size: 13.5px;
     font-style: italic;
     line-height: 1.55;
@@ -1422,6 +912,7 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-post-body {
     color: var(--circle-text);
+
     font-size: 14px;
     line-height: 1.58;
 }
@@ -1447,8 +938,11 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
     content: "";
     position: absolute;
     inset: 0;
+
     pointer-events: none;
+
     background: linear-gradient(90deg, rgba(196, 122, 44, 0.1), transparent 42%);
+
     opacity: 0;
     transition: opacity 180ms ease;
 }
@@ -1467,7 +961,9 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
 
 .circle-reward-card p {
     margin: 0 0 8px;
+
     color: var(--circle-text);
+
     font-size: 14px;
     line-height: 1.5;
 }
@@ -1477,618 +973,6 @@ body.members-page.is-circle-signed-in .circle-dashboard-hero {
     font-size: 11.5px;
 }
 
-/* =========================
-   POINTS HISTORY — COMPACT LEDGER
-========================= */
-
-.circle-points-list {
-    gap: 0;
-    border: 1px solid rgba(196, 122, 44, 0.17);
-    border-radius: 7px;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.28);
-}
-
-.circle-points-card {
-    display: grid;
-    grid-template-columns: 130px minmax(0, 1fr) 120px;
-    gap: 18px;
-    align-items: center;
-    min-height: 0;
-    padding: 12px 16px;
-    border: 0;
-    border-bottom: 1px solid rgba(196, 122, 44, 0.13);
-    border-radius: 0;
-    background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.035), transparent 44%),
-        rgba(0, 0, 0, 0.22);
-}
-
-.circle-points-card:last-child {
-    border-bottom: 0;
-}
-
-.circle-points-card strong {
-    color: var(--circle-copper-soft);
-    font-size: 15px;
-    line-height: 1.2;
-    white-space: nowrap;
-}
-
-.circle-points-card p {
-    margin: 0;
-    color: var(--circle-text);
-    font-size: 13.5px;
-    line-height: 1.35;
-    min-width: 0;
-}
-
-.circle-points-card small {
-    margin: 0;
-    color: var(--circle-muted);
-    font-size: 11.5px;
-    line-height: 1.35;
-    text-align: right;
-    white-space: nowrap;
-}
-
-.circle-empty-card {
-    border: 1px dashed rgba(196, 122, 44, 0.17);
-    background: rgba(0, 0, 0, 0.34);
-    border-radius: 7px;
-    padding: 16px 18px;
-}
-
-.circle-empty-card p {
-    margin: 0;
-    color: var(--circle-muted);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-/* =========================
-   COMPACT REDEMPTION DETAILS
-========================= */
-
-#blackwood-circle-app .circle-redemption-code {
-    margin-top: 10px;
-}
-
-#blackwood-circle-app .circle-redemption-code code {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    max-width: 100%;
-    margin-top: 5px;
-    padding: 8px 12px;
-    border: 1px solid rgba(214, 177, 129, 0.42);
-    border-radius: 4px;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.16), rgba(196, 122, 44, 0.07)),
-        rgba(0, 0, 0, 0.5);
-    color: #efe7dc;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    word-break: break-word;
-}
-
-#blackwood-circle-app .circle-redemption-notice strong,
-#blackwood-circle-app .circle-redemption-code span {
-    color: #d6b181;
-}
-
-/* =========================
-   BUTTONS
-========================= */
-
-.button.ghost,
-.circle-auth-card .button.ghost,
-.circle-dashboard .button.ghost {
-    border: 1px solid rgba(196, 122, 44, 0.34);
-    background: transparent;
-    color: var(--circle-copper-soft);
-}
-
-.button.ghost:hover,
-.button.ghost:focus-visible {
-    border-color: var(--circle-copper);
-    color: var(--circle-cream);
-    background: rgba(196, 122, 44, 0.1);
-}
-
-#blackwood-circle-app .button,
-#blackwood-circle-app button.button,
-#blackwood-circle-app .button.copper,
-#blackwood-circle-app button.button.copper,
-body.members-page #blackwood-circle-app button.circle-button,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button,
-body.members-page #blackwood-circle-app .circle-dashboard-actions button,
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"],
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"] {
-    box-sizing: border-box !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-height: 38px !important;
-    padding: 10px 18px !important;
-    border: 1px solid rgba(196, 122, 44, 0.7) !important;
-    border-radius: 4px !important;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.2), rgba(196, 122, 44, 0.07)),
-        rgba(0, 0, 0, 0.48) !important;
-    color: #d6b181 !important;
-    font: inherit !important;
-    font-size: 10.5px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.18em !important;
-    line-height: 1 !important;
-    text-transform: uppercase !important;
-    text-decoration: none !important;
-    text-align: center !important;
-    cursor: pointer !important;
-    white-space: nowrap !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
-        0 10px 22px rgba(0, 0, 0, 0.24) !important;
-    transition:
-        background 180ms ease,
-        border-color 180ms ease,
-        color 180ms ease,
-        transform 180ms ease,
-        box-shadow 180ms ease !important;
-}
-
-#blackwood-circle-app .button:hover,
-#blackwood-circle-app button.button:hover,
-#blackwood-circle-app .button:focus-visible,
-#blackwood-circle-app button.button:focus-visible,
-body.members-page #blackwood-circle-app button.circle-button:hover,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button:hover,
-body.members-page #blackwood-circle-app .circle-dashboard-actions button:hover,
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:hover,
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:hover,
-body.members-page #blackwood-circle-app button.circle-button:focus-visible,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button:focus-visible,
-body.members-page #blackwood-circle-app .circle-dashboard-actions button:focus-visible,
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:focus-visible,
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:focus-visible {
-    border-color: #c47a2c !important;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.3), rgba(196, 122, 44, 0.1)),
-        rgba(0, 0, 0, 0.64) !important;
-    color: #efe7dc !important;
-    outline: none !important;
-    transform: translateY(-1px) !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-        0 13px 30px rgba(0, 0, 0, 0.32) !important;
-}
-
-#blackwood-circle-app .button.ghost,
-#blackwood-circle-app button.button.ghost,
-body.members-page #blackwood-circle-app button.circle-button-secondary,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary,
-body.members-page #blackwood-circle-app #circle-sign-out {
-    border-color: rgba(196, 122, 44, 0.42) !important;
-    background: transparent !important;
-    color: rgba(214, 177, 129, 0.9) !important;
-}
-
-#blackwood-circle-app .button.ghost:hover,
-#blackwood-circle-app button.button.ghost:hover,
-#blackwood-circle-app .button.ghost:focus-visible,
-#blackwood-circle-app button.button.ghost:focus-visible,
-body.members-page #blackwood-circle-app button.circle-button-secondary:hover,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:hover,
-body.members-page #blackwood-circle-app #circle-sign-out:hover,
-body.members-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
-body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
-body.members-page #blackwood-circle-app #circle-sign-out:focus-visible {
-    border-color: rgba(196, 122, 44, 0.84) !important;
-    background: rgba(196, 122, 44, 0.1) !important;
-    color: #efe7dc !important;
-}
-
-body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
-body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"] {
-    width: 100% !important;
-}
-
-/* =========================
-   PUBLIC EXPLAINER
-========================= */
-
-.circle-public-explainer {
-    width: min(1120px, calc(100% - 32px));
-    margin: 34px auto 30px;
-}
-
-.circle-public-explainer-inner {
-    padding: clamp(24px, 4vw, 38px);
-    border: 1px solid rgba(214, 177, 129, 0.2);
-    border-radius: 8px;
-    background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
-        linear-gradient(180deg, rgba(24, 18, 14, 0.94), rgba(10, 8, 7, 0.96));
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
-}
-
-.circle-public-heading {
-    max-width: 760px;
-    margin: 0 auto 24px;
-    text-align: center;
-}
-
-.circle-public-heading h2 {
-    margin: 0 0 10px;
-    color: #f4ead7;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(26px, 4vw, 40px);
-    line-height: 1.08;
-}
-
-.circle-public-heading p {
-    margin: 0;
-    color: rgba(239, 231, 220, 0.76);
-    font-size: 14.5px;
-    line-height: 1.6;
-}
-
-.circle-public-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-    margin: 24px 0;
-}
-
-.circle-public-card {
-    padding: 18px;
-    border: 1px solid rgba(214, 177, 129, 0.16);
-    border-radius: 7px;
-    background: rgba(0, 0, 0, 0.26);
-}
-
-.circle-public-number {
-    display: inline-flex;
-    margin-bottom: 10px;
-    color: #c49a6c;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-}
-
-.circle-public-card h3 {
-    margin: 0 0 8px;
-    color: #f4ead7;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 19px;
-}
-
-.circle-public-card p {
-    margin: 0;
-    color: rgba(239, 231, 220, 0.72);
-    font-size: 13.5px;
-    line-height: 1.55;
-}
-
-.circle-earning-panel {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin: 24px 0 22px;
-    padding: 14px;
-    border: 1px solid rgba(196, 122, 44, 0.2);
-    border-radius: 7px;
-    background: rgba(196, 122, 44, 0.06);
-}
-
-.circle-earning-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    padding: 12px;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.22);
-}
-
-.circle-earning-row strong {
-    flex: 0 0 auto;
-    min-width: 98px;
-    color: #d6b181;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 14.5px;
-}
-
-.circle-earning-row span {
-    color: rgba(239, 231, 220, 0.76);
-    font-size: 13px;
-    line-height: 1.45;
-}
-
-.circle-public-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-.circle-public-actions .circle-button {
-    text-align: center;
-}
-
-/* =========================
-   MEMBERS PAGE FOOTER
-========================= */
-
-body.members-page .site-footer {
-    padding: 44px 24px 38px;
-    border-top: 1px solid rgba(184, 115, 51, 0.16);
-    background:
-        radial-gradient(circle at top, rgba(184, 115, 51, 0.07), transparent 32%),
-        #030303;
-    color: rgba(215, 208, 198, 0.72);
-    text-align: center;
-}
-
-body.members-page .site-footer-inner {
-    max-width: 820px;
-    margin: 0 auto;
-}
-
-body.members-page .site-footer-kicker {
-    margin: 0 0 10px;
-    color: #b87333;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-}
-
-body.members-page .site-footer p {
-    margin: 0 auto 16px;
-    font-size: 13.5px;
-    line-height: 1.6;
-}
-
-body.members-page .site-footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 20px;
-}
-
-body.members-page .site-footer-links a {
-    color: rgba(241, 236, 228, 0.7);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9.5px;
-    letter-spacing: 1.8px;
-    text-transform: uppercase;
-    text-decoration: none;
-}
-
-body.members-page .site-footer-links a:hover,
-body.members-page .site-footer-links a:focus-visible {
-    color: #b87333;
-    outline: none;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 980px) {
-    .circle-auth-shell {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-auth-card {
-        position: static;
-    }
-
-    .circle-dashboard-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .circle-profile-form {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-reader-record-cta {
-        grid-template-columns: 1fr;
-        align-items: start;
-    }
-}
-
-@media (max-width: 860px) {
-    .circle-public-grid,
-    .circle-earning-panel {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-earning-row {
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .circle-earning-row strong {
-        min-width: 0;
-    }
-}
-
-@media (max-width: 760px) {
-    body.members-page.is-circle-signed-in #blackwood-circle-app {
-        padding-top: 96px !important;
-    }
-
-    .circle-points-card {
-        grid-template-columns: 96px minmax(0, 1fr);
-        gap: 6px 12px;
-        padding: 11px 13px;
-    }
-
-    .circle-points-card small {
-        grid-column: 2;
-        text-align: left;
-    }
-
-    .circle-reader-record-cta {
-        grid-template-columns: 1fr;
-        padding: 16px;
-    }
-
-    .circle-reader-record-cta .button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 620px) {
-    .blackwood-circle-wrap {
-        padding: 50px 16px 76px;
-    }
-
-    .circle-auth-intro,
-    .circle-auth-card,
-    .circle-dashboard-hero,
-    .circle-section,
-    .circle-loading,
-    .circle-error {
-        border-radius: 7px;
-    }
-
-    .circle-dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-auth-tabs {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-dashboard-actions {
-        align-items: stretch;
-    }
-
-    .circle-dashboard-actions .button,
-    .circle-profile-form .button,
-    .circle-auth-form .button {
-        width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .circle-reader-record-cta {
-        padding: 16px;
-    }
-}
-
-@media (max-width: 560px) {
-    .circle-public-explainer {
-        width: min(100% - 22px, 1120px);
-        margin-top: 24px;
-    }
-
-    .circle-public-explainer-inner {
-        padding: 22px 16px;
-    }
-
-    .circle-public-card {
-        padding: 17px;
-    }
-
-    .circle-public-actions {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .circle-public-actions .circle-button {
-        width: 100%;
-    }
-
-    .circle-points-card {
-        grid-template-columns: 1fr;
-        gap: 4px;
-    }
-
-    .circle-points-card strong,
-    .circle-points-card p,
-    .circle-points-card small {
-        text-align: left;
-    }
-
-    .circle-points-card small {
-        grid-column: auto;
-    }
-}
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-    }
-}
-
-/* Make the profile/edit section less dominant */
-body.members-page.is-circle-signed-in .circle-profile-form {
-    align-items: end;
-}
-
-/* This is for the real review submission CTA, not the profile form */
-.circle-reader-record-cta {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 18px;
-    align-items: center;
-
-    border: 1px solid rgba(196, 122, 44, 0.26);
-    border-radius: 8px;
-
-    padding: 18px 20px;
-
-    background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.1), rgba(0, 0, 0, 0.34)),
-        rgba(0, 0, 0, 0.42);
-
-    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.32);
-}
-
-.circle-reader-record-cta h2,
-.circle-reader-record-cta h3 {
-    margin: 0 0 6px;
-    color: var(--circle-cream);
-    font-size: clamp(21px, 2.6vw, 30px);
-    line-height: 1.1;
-}
-
-.circle-reader-record-cta p {
-    margin: 0;
-    color: var(--circle-text);
-    font-size: 14px;
-    line-height: 1.55;
-}
-
-@media (max-width: 760px) {
-    body.members-page.is-circle-signed-in #blackwood-circle-app {
-        padding-top: 96px !important;
-    }
-
-    .circle-reader-record-cta {
-        grid-template-columns: 1fr;
-        padding: 16px;
-    }
-
-    .circle-reader-record-cta .button {
-        width: 100%;
-    }
-}
 /* =========================
    POINTS HISTORY — COLLAPSIBLE DROPDOWN
 ========================= */
@@ -2103,18 +987,22 @@ body.members-page.is-circle-signed-in .circle-profile-form {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 14px;
     align-items: center;
+
     padding: 18px 20px;
 }
 
 .circle-section-toggle-header h2 {
     margin: 0 !important;
+
     font-size: clamp(22px, 3vw, 30px) !important;
     line-height: 1.1;
 }
 
 .circle-section-toggle-button {
     box-sizing: border-box;
+
     min-height: 34px;
+
     padding: 8px 14px;
 
     border: 1px solid rgba(196, 122, 44, 0.62);
@@ -2151,110 +1039,572 @@ body.members-page.is-circle-signed-in .circle-profile-form {
     display: none;
 }
 
-/* keeps the ledger/table look when opened */
 .circle-collapsible-section .circle-points-list {
     margin-top: 0;
 }
 
-@media (max-width: 620px) {
-    .circle-section-toggle-header {
-        grid-template-columns: 1fr;
-        padding: 16px;
-    }
-
-    .circle-section-toggle-button {
-        width: 100%;
-    }
-
-    .circle-collapsible-content {
-        padding: 0 14px 14px;
-    }
-}
 /* =========================
-   MEMBERS DASHBOARD — CTA + BACKGROUND CLEANUP
+   POINTS HISTORY — COMPACT LEDGER
 ========================= */
 
-body.members-page,
-body.blackwood-circle-page {
-    background:
-        linear-gradient(
-            180deg,
-            rgba(0, 0, 0, 0.86) 0%,
-            rgba(0, 0, 0, 0.72) 34%,
-            rgba(0, 0, 0, 0.92) 100%
-        ),
-        radial-gradient(circle at top center, rgba(196, 122, 44, 0.12), transparent 34%),
-        radial-gradient(circle at 80% 15%, rgba(61, 121, 136, 0.08), transparent 26%),
-        url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
-        #050505;
+.circle-points-list {
+    gap: 0;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.17);
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.28);
 }
 
-.circle-reader-record-cta {
-    position: relative;
-    overflow: hidden;
+.circle-points-card {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 130px minmax(0, 1fr) 120px;
     gap: 18px;
     align-items: center;
-    border: 1px solid rgba(196, 122, 44, 0.28);
-    border-radius: 8px;
-    padding: 20px;
+
+    min-height: 0;
+
+    padding: 12px 16px;
+
+    border: 0;
+    border-bottom: 1px solid rgba(196, 122, 44, 0.13);
+    border-radius: 0;
+
     background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.12), rgba(0, 0, 0, 0.42)),
-        rgba(0, 0, 0, 0.54);
-    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
+        linear-gradient(90deg, rgba(196, 122, 44, 0.035), transparent 44%),
+        rgba(0, 0, 0, 0.22);
 }
 
-.circle-reader-record-cta h2 {
-    margin: 0 0 6px;
-    color: var(--circle-cream);
-    font-size: clamp(24px, 3vw, 34px);
-    line-height: 1.1;
+.circle-points-card:last-child {
+    border-bottom: 0;
 }
 
-.circle-reader-record-cta p {
+.circle-points-card strong {
+    color: var(--circle-copper-soft);
+
+    font-size: 15px;
+    line-height: 1.2;
+
+    white-space: nowrap;
+}
+
+.circle-points-card p {
+    min-width: 0;
     margin: 0;
-    color: rgba(255, 255, 255, 0.76);
-    font-size: 14px;
+
+    color: var(--circle-text);
+
+    font-size: 13.5px;
+    line-height: 1.35;
+}
+
+.circle-points-card small {
+    margin: 0;
+
+    color: var(--circle-muted);
+
+    font-size: 11.5px;
+    line-height: 1.35;
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+.circle-empty-card {
+    border: 1px dashed rgba(196, 122, 44, 0.17);
+    border-radius: 7px;
+
+    padding: 16px 18px;
+
+    background: rgba(0, 0, 0, 0.34);
+}
+
+.circle-empty-card p {
+    margin: 0;
+
+    color: var(--circle-muted);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+/* =========================
+   REDEMPTION DETAILS
+========================= */
+
+#blackwood-circle-app .circle-redemption-code {
+    margin-top: 10px;
+}
+
+#blackwood-circle-app .circle-redemption-code code {
+    display: inline-flex;
+    align-items: center;
+
+    width: fit-content;
+    max-width: 100%;
+
+    margin-top: 5px;
+    padding: 8px 12px;
+
+    border: 1px solid rgba(214, 177, 129, 0.42);
+    border-radius: 4px;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.16), rgba(196, 122, 44, 0.07)),
+        rgba(0, 0, 0, 0.5);
+
+    color: #efe7dc;
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+
+    word-break: break-word;
+}
+
+#blackwood-circle-app .circle-redemption-notice strong,
+#blackwood-circle-app .circle-redemption-code span {
+    color: #d6b181;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.button.ghost,
+.circle-auth-card .button.ghost,
+.circle-dashboard .button.ghost {
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    background: transparent;
+    color: var(--circle-copper-soft);
+}
+
+.button.ghost:hover,
+.button.ghost:focus-visible {
+    border-color: var(--circle-copper);
+    color: var(--circle-cream);
+    background: rgba(196, 122, 44, 0.1);
+}
+
+#blackwood-circle-app .button,
+#blackwood-circle-app button.button,
+#blackwood-circle-app .button.copper,
+#blackwood-circle-app button.button.copper,
+body.members-page #blackwood-circle-app button.circle-button,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button,
+body.members-page #blackwood-circle-app .circle-dashboard-actions button,
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"],
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
+body.members-page #blackwood-circle-app #circle-sign-out {
+    box-sizing: border-box !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-height: 38px !important;
+
+    padding: 10px 18px !important;
+
+    border: 1px solid rgba(196, 122, 44, 0.7) !important;
+    border-radius: 4px !important;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.2), rgba(196, 122, 44, 0.07)),
+        rgba(0, 0, 0, 0.48) !important;
+
+    color: #d6b181 !important;
+
+    font: inherit !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.18em !important;
+    line-height: 1 !important;
+    text-transform: uppercase !important;
+    text-decoration: none !important;
+    text-align: center !important;
+
+    cursor: pointer !important;
+    white-space: nowrap !important;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+        0 10px 22px rgba(0, 0, 0, 0.24) !important;
+
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease !important;
+}
+
+#blackwood-circle-app .button:hover,
+#blackwood-circle-app button.button:hover,
+#blackwood-circle-app .button:focus-visible,
+#blackwood-circle-app button.button:focus-visible,
+body.members-page #blackwood-circle-app button.circle-button:hover,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button:hover,
+body.members-page #blackwood-circle-app .circle-dashboard-actions button:hover,
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:hover,
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:hover,
+body.members-page #blackwood-circle-app button.circle-button:focus-visible,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button:focus-visible,
+body.members-page #blackwood-circle-app .circle-dashboard-actions button:focus-visible,
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"]:focus-visible,
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"]:focus-visible {
+    border-color: #c47a2c !important;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.3), rgba(196, 122, 44, 0.1)),
+        rgba(0, 0, 0, 0.64) !important;
+
+    color: #efe7dc !important;
+    outline: none !important;
+
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 13px 30px rgba(0, 0, 0, 0.32) !important;
+}
+
+#blackwood-circle-app .button.ghost,
+#blackwood-circle-app button.button.ghost,
+body.members-page #blackwood-circle-app button.circle-button-secondary,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary,
+body.members-page #blackwood-circle-app #circle-sign-out {
+    border-color: rgba(196, 122, 44, 0.42) !important;
+    background: transparent !important;
+    color: rgba(214, 177, 129, 0.9) !important;
+}
+
+#blackwood-circle-app .button.ghost:hover,
+#blackwood-circle-app button.button.ghost:hover,
+#blackwood-circle-app .button.ghost:focus-visible,
+#blackwood-circle-app button.button.ghost:focus-visible,
+body.members-page #blackwood-circle-app button.circle-button-secondary:hover,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:hover,
+body.members-page #blackwood-circle-app #circle-sign-out:hover,
+body.members-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
+body.blackwood-circle-page #blackwood-circle-app button.circle-button-secondary:focus-visible,
+body.members-page #blackwood-circle-app #circle-sign-out:focus-visible {
+    border-color: rgba(196, 122, 44, 0.84) !important;
+    background: rgba(196, 122, 44, 0.1) !important;
+    color: #efe7dc !important;
+}
+
+body.members-page #blackwood-circle-app .circle-auth-form button[type="submit"],
+body.members-page #blackwood-circle-app .circle-profile-form button[type="submit"] {
+    width: 100% !important;
+}
+
+/* =========================
+   PUBLIC EXPLAINER
+========================= */
+
+.circle-public-explainer {
+    width: min(1120px, calc(100% - 32px));
+    margin: 34px auto 30px;
+}
+
+.circle-public-explainer-inner {
+    padding: clamp(24px, 4vw, 38px);
+
+    border: 1px solid rgba(214, 177, 129, 0.2);
+    border-radius: 8px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
+        linear-gradient(180deg, rgba(24, 18, 14, 0.94), rgba(10, 8, 7, 0.96));
+
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+}
+
+.circle-public-heading {
+    max-width: 760px;
+    margin: 0 auto 24px;
+    text-align: center;
+}
+
+.circle-public-heading h2 {
+    margin: 0 0 10px;
+
+    color: #f4ead7;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(26px, 4vw, 40px);
+    line-height: 1.08;
+}
+
+.circle-public-heading p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.76);
+
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+.circle-public-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+
+    margin: 24px 0;
+}
+
+.circle-public-card {
+    padding: 18px;
+
+    border: 1px solid rgba(214, 177, 129, 0.16);
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.26);
+}
+
+.circle-public-number {
+    display: inline-flex;
+
+    margin-bottom: 10px;
+
+    color: #c49a6c;
+
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.circle-public-card h3 {
+    margin: 0 0 8px;
+
+    color: #f4ead7;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 19px;
+}
+
+.circle-public-card p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.72);
+
+    font-size: 13.5px;
     line-height: 1.55;
 }
 
-.circle-reader-record-button {
+.circle-earning-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+
+    margin: 24px 0 22px;
+    padding: 14px;
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 7px;
+
+    background: rgba(196, 122, 44, 0.06);
+}
+
+.circle-earning-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    padding: 12px;
+
+    border-radius: 6px;
+
+    background: rgba(0, 0, 0, 0.22);
+}
+
+.circle-earning-row strong {
+    flex: 0 0 auto;
+    min-width: 98px;
+
+    color: #d6b181;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14.5px;
+}
+
+.circle-earning-row span {
+    color: rgba(239, 231, 220, 0.76);
+
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.circle-public-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.circle-public-actions .circle-button,
+.circle-public-actions a {
     box-sizing: border-box;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 40px;
-    min-width: 220px;
-    padding: 11px 18px;
-    border: 1px solid rgba(196, 122, 44, 0.78);
+
+    min-height: 38px;
+
+    padding: 10px 18px;
+
+    border: 1px solid rgba(196, 122, 44, 0.68);
     border-radius: 4px;
+
     background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.24), rgba(196, 122, 44, 0.08)),
-        rgba(0, 0, 0, 0.58);
-    color: #d6b181 !important;
+        linear-gradient(180deg, rgba(196, 122, 44, 0.18), rgba(196, 122, 44, 0.06)),
+        rgba(0, 0, 0, 0.44);
+
+    color: var(--circle-copper-soft);
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: 0.18em;
-    line-height: 1;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     text-decoration: none;
     text-align: center;
-    white-space: nowrap;
-    box-shadow:
-        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 10px 24px rgba(0, 0, 0, 0.28);
 }
 
-.circle-reader-record-button:hover,
-.circle-reader-record-button:focus-visible {
-    border-color: #c47a2c;
-    background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.36), rgba(196, 122, 44, 0.12)),
-        rgba(0, 0, 0, 0.7);
-    color: #efe7dc !important;
+.circle-public-actions .circle-button:hover,
+.circle-public-actions .circle-button:focus-visible,
+.circle-public-actions a:hover,
+.circle-public-actions a:focus-visible {
+    border-color: var(--circle-copper);
+    color: var(--circle-cream);
     outline: none;
+}
+
+/* =========================
+   MEMBERS PAGE FOOTER
+========================= */
+
+body.members-page .site-footer {
+    padding: 44px 24px 38px;
+
+    border-top: 1px solid rgba(184, 115, 51, 0.16);
+
+    background:
+        radial-gradient(circle at top, rgba(184, 115, 51, 0.07), transparent 32%),
+        #030303;
+
+    color: rgba(215, 208, 198, 0.72);
+
+    text-align: center;
+}
+
+body.members-page .site-footer-inner {
+    max-width: 820px;
+    margin: 0 auto;
+}
+
+body.members-page .site-footer-kicker {
+    margin: 0 0 10px;
+
+    color: #b87333;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+}
+
+body.members-page .site-footer p {
+    margin: 0 auto 16px;
+
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+body.members-page .site-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 20px;
+}
+
+body.members-page .site-footer-links a {
+    color: rgba(241, 236, 228, 0.7);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+body.members-page .site-footer-links a:hover,
+body.members-page .site-footer-links a:focus-visible {
+    color: #b87333;
+    outline: none;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 980px) {
+    .circle-auth-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-auth-card {
+        position: static;
+    }
+
+    .circle-dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .circle-profile-form {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-reader-record-cta {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .circle-bfa-carousel {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-bfa-image-wrap,
+    .circle-bfa-image-wrap img {
+        min-height: 260px;
+    }
+
+    .circle-bfa-image-wrap::after {
+        background:
+            linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.28) 76%, rgba(0, 0, 0, 0.62) 100%),
+            radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.24) 72%);
+    }
+}
+
+@media (max-width: 860px) {
+    .circle-public-grid,
+    .circle-earning-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-earning-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .circle-earning-row strong {
+        min-width: 0;
+    }
 }
 
 @media (max-width: 760px) {
@@ -2272,6 +1622,10 @@ body.blackwood-circle-page {
             #050505;
     }
 
+    body.members-page.is-circle-signed-in #blackwood-circle-app {
+        padding-top: 96px !important;
+    }
+
     .circle-reader-record-cta {
         grid-template-columns: 1fr;
         padding: 18px;
@@ -2280,5 +1634,158 @@ body.blackwood-circle-page {
     .circle-reader-record-button {
         width: 100%;
         min-width: 0;
+    }
+
+    .circle-points-card {
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 6px 12px;
+        padding: 11px 13px;
+    }
+
+    .circle-points-card small {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .circle-bfa-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .circle-bfa-control,
+    .circle-bfa-read {
+        width: 100%;
+    }
+}
+
+@media (max-width: 620px) {
+    .blackwood-circle-wrap {
+        padding: 50px 16px 76px;
+    }
+
+    .circle-auth-intro,
+    .circle-auth-card,
+    .circle-dashboard-hero,
+    .circle-section,
+    .circle-loading,
+    .circle-error {
+        border-radius: 7px;
+    }
+
+    .circle-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-auth-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-dashboard-actions {
+        align-items: stretch;
+    }
+
+    .circle-dashboard-actions .button,
+    .circle-profile-form .button,
+    .circle-auth-form .button {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .circle-section-toggle-header {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .circle-section-toggle-button {
+        width: 100%;
+    }
+
+    .circle-collapsible-content {
+        padding: 0 14px 14px;
+    }
+
+    .circle-bfa-content {
+        padding: 20px;
+    }
+
+    .circle-bfa-content h3 {
+        font-size: clamp(25px, 8vw, 36px);
+    }
+
+    .circle-bfa-modal {
+        padding: 14px;
+    }
+
+    .circle-bfa-modal-panel {
+        max-height: 86vh;
+    }
+
+    .circle-bfa-modal-content {
+        padding: 22px 18px;
+    }
+
+    .circle-bfa-modal-content h3 {
+        font-size: clamp(28px, 9vw, 42px);
+    }
+
+    .circle-bfa-modal-body {
+        font-size: 15px;
+        line-height: 1.68;
+    }
+}
+
+@media (max-width: 560px) {
+    .circle-public-explainer {
+        width: min(100% - 22px, 1120px);
+        margin-top: 24px;
+    }
+
+    .circle-public-explainer-inner {
+        padding: 22px 16px;
+    }
+
+    .circle-public-card {
+        padding: 17px;
+    }
+
+    .circle-public-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .circle-public-actions .circle-button,
+    .circle-public-actions a {
+        width: 100%;
+    }
+
+    .circle-points-card {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .circle-points-card strong,
+    .circle-points-card p,
+    .circle-points-card small {
+        text-align: left;
+    }
+
+    .circle-points-card small {
+        grid-column: auto;
+    }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
