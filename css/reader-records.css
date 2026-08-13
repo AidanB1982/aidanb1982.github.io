@@ -1228,3 +1228,8 @@ body.reader-records-page .site-footer-links a:focus-visible {
     color: #b87333;
     outline: none;
 }
+/* Circle points prompt visibility safety */
+.reader-records-page [hidden],
+.reader-records-page .is-hidden {
+    display: none !important;
+}
