@@ -27,21 +27,24 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/css/header.css?v=20260924">
     <link rel="stylesheet" href="/css/styles.css?v=20260910">
-    <link rel="stylesheet" href="/css/reader-records.css?v=20260913">
+    <link rel="stylesheet" href="/css/reader-records.css?v=20260915">
 
     <!-- JS -->
     <script src="/js/header.js?v=20260923" defer></script>
-    <script src="/js/reader-records.js?v=20260913" defer></script>
+    <script src="/js/reader-records.js?v=20260914" defer></script>
 </head>
 
 <body class="reader-records-page">
+
     <a class="skip-link" href="#reader-record-form">Skip to content</a>
 
     <div id="header-placeholder"></div>
 
     <main class="reader-records-wrap">
+
         <!-- HERO -->
         <section class="reader-records-hero fade-in" aria-labelledby="reader-records-title">
+
             <p class="reader-records-kicker">
                 Blackwood Archive
             </p>
@@ -58,11 +61,14 @@
                 Leave a private record for the Archive, or allow it to be considered for public display.
                 Public records rotate below by book, with your chosen display name only.
             </p>
+
         </section>
 
         <!-- BLACKWOOD CIRCLE POINTS PROMO -->
         <section class="blackwood-circle-promo fade-in" aria-labelledby="reader-record-circle-promo-title">
+
             <div class="blackwood-circle-promo-content">
+
                 <p class="blackwood-circle-promo-kicker">
                     Blackwood Circle Points
                 </p>
@@ -77,28 +83,34 @@
                 </p>
 
                 <div class="blackwood-circle-promo-actions">
-                   <a 
-    id="reader-record-circle-signin"
-    class="blackwood-circle-promo-button primary" 
-    href="/pages/members.html"
->
-    Sign Into The Circle
-</a>
 
-<a 
-    id="reader-record-circle-continue"
-    class="blackwood-circle-promo-button secondary" 
-    href="#reader-record-form"
->
-    Continue to Reader Record
-</a>
+                    <a
+                        id="reader-record-circle-signin"
+                        class="blackwood-circle-promo-button primary"
+                        href="/pages/members.html"
+                    >
+                        Sign Into The Circle
+                    </a>
+
+                    <a
+                        id="reader-record-circle-continue"
+                        class="blackwood-circle-promo-button secondary"
+                        href="#reader-record-form"
+                    >
+                        Continue to Reader Record
+                    </a>
+
                 </div>
+
             </div>
+
         </section>
 
         <!-- SUBMISSION FORM -->
         <section class="reader-records-panel fade-in" aria-labelledby="file-record-title">
+
             <div class="reader-records-section-heading">
+
                 <p class="reader-records-kicker">
                     File a Reader Record
                 </p>
@@ -111,10 +123,13 @@
                     Choose the book, choose the mood, rate the record, and leave a short response.
                     Email is optional and will never be displayed publicly.
                 </p>
+
             </div>
 
             <form class="reader-record-form" id="reader-record-form" novalidate>
+
                 <div class="reader-record-form-grid">
+
                     <div class="reader-record-field">
                         <label for="record-book">Book</label>
 
@@ -165,7 +180,9 @@
                     </div>
 
                     <div class="reader-record-field">
-                        <label for="record-email">Email <span>Optional, not public</span></label>
+                        <label for="record-email">
+                            Email <span>Optional, not public</span>
+                        </label>
 
                         <input
                             id="record-email"
@@ -175,10 +192,12 @@
                             placeholder="Only if you want Blackwood to contact you"
                         >
                     </div>
+
                 </div>
 
                 <!-- RATINGS -->
                 <fieldset class="reader-record-ratings">
+
                     <legend>
                         Archive Rating
                     </legend>
@@ -188,6 +207,7 @@
                     </p>
 
                     <div class="reader-record-rating-grid">
+
                         <div class="reader-record-field">
                             <label for="rating-atmosphere">Atmosphere</label>
 
@@ -252,16 +272,19 @@
                                 <option value="5">5 — Unforgettable</option>
                             </select>
                         </div>
+
                     </div>
 
                     <div class="reader-record-final-rating" aria-live="polite">
                         <span>Final Archive Rating</span>
                         <strong id="final-rating-display">—</strong>
                     </div>
+
                 </fieldset>
 
                 <!-- REVIEW -->
                 <div class="reader-record-field reader-record-field-full">
+
                     <label for="reader-record-text">Reader Record</label>
 
                     <textarea
@@ -276,10 +299,12 @@
                     <p class="reader-record-count">
                         <span id="reader-record-count">0</span>/3000
                     </p>
+
                 </div>
 
                 <!-- PERMISSIONS -->
                 <div class="reader-record-checks">
+
                     <label class="reader-record-check">
                         <input type="checkbox" name="spoilerWarning" value="true">
                         <span>This record contains spoilers.</span>
@@ -289,21 +314,28 @@
                         <input type="checkbox" name="permissionToPublish" value="true">
                         <span>I allow this record to be considered for public display using my display name only.</span>
                     </label>
+
                 </div>
 
                 <div class="reader-record-actions">
+
                     <button type="submit" class="button copper" id="reader-record-submit">
                         Submit Reader Record
                     </button>
 
                     <p class="reader-record-status" id="reader-record-status" aria-live="polite"></p>
+
                 </div>
+
             </form>
+
         </section>
 
         <!-- PUBLIC RECORDS -->
         <section class="reader-records-public fade-in" aria-labelledby="public-records-title">
+
             <div class="reader-records-section-heading">
+
                 <p class="reader-records-kicker">
                     Filed by Readers
                 </p>
@@ -316,9 +348,11 @@
                     Public reader records are displayed as rotating archive entries. Featured records appear first,
                     followed by one rotating record section for each book. Spoilers remain hidden until opened.
                 </p>
+
             </div>
 
             <div class="reader-records-toolbar reader-records-toolbar-filtered">
+
                 <label class="reader-record-filter">
                     <span>Filter by Book</span>
 
@@ -338,6 +372,7 @@
                 <button type="button" class="button ghost" id="reader-records-refresh">
                     Refresh Records
                 </button>
+
             </div>
 
             <div class="reader-records-list" id="reader-records-list" aria-live="polite">
@@ -345,9 +380,12 @@
                     Loading filed records...
                 </p>
             </div>
+
         </section>
+
     </main>
 
-  <div id="footer-placeholder"></div>
+    <div id="footer-placeholder"></div>
+
 </body>
 </html>
