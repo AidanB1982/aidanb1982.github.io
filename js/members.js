@@ -1,6 +1,7 @@
 // =========================
 // BLACKWOOD CIRCLE MEMBERS
 // Supabase Auth + Member Dashboard + Rewards Redemption + Password Reset
+// Behind the Files carousel powered by /data/BFA.json
 // =========================
 
 (function () {
@@ -11,6 +12,8 @@
         supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
         membersPagePath: "/pages/members.html",
         readerRecordsPagePath: "/pages/reader-records.html",
+        behindFilesJsonPath: "/data/BFA.json",
+        behindFilesFallbackImage: "/assets/ArchiveFilesBG.png",
         supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     };
 
@@ -20,12 +23,15 @@
         session: null,
         member: null,
         posts: [],
+        behindFiles: [],
+        behindFilesIndex: 0,
         rewards: [],
         points: [],
         redemptions: [],
         activeAuthMode: "signin",
         isRedeeming: false,
-        isPasswordRecovery: false
+        isPasswordRecovery: false,
+        escapeListenerBound: false
     };
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -616,6 +622,8 @@
             BlackwoodMembersState.session = null;
             BlackwoodMembersState.member = null;
             BlackwoodMembersState.posts = [];
+            BlackwoodMembersState.behindFiles = [];
+            BlackwoodMembersState.behindFilesIndex = 0;
             BlackwoodMembersState.rewards = [];
             BlackwoodMembersState.points = [];
             BlackwoodMembersState.redemptions = [];
@@ -647,7 +655,8 @@
 
             const [
                 profileResult,
-                postsResult,
+                legacyPosts,
+                behindFiles,
                 rewardsResult,
                 pointsResult,
                 redemptionsResult
@@ -658,11 +667,9 @@
                     .eq("id", user.id)
                     .maybeSingle(),
 
-                BlackwoodMembersState.client
-                    .from("member_posts")
-                    .select("*")
-                    .eq("is_published", true)
-                    .order("published_at", { ascending: false }),
+                loadLegacyMemberPosts(),
+
+                loadBehindFilesPosts(),
 
                 BlackwoodMembersState.client
                     .from("member_rewards")
@@ -684,13 +691,14 @@
             ]);
 
             if (profileResult.error) throw profileResult.error;
-            if (postsResult.error) throw postsResult.error;
             if (rewardsResult.error) throw rewardsResult.error;
             if (pointsResult.error) throw pointsResult.error;
             if (redemptionsResult.error) throw redemptionsResult.error;
 
             BlackwoodMembersState.member = profileResult.data || buildFallbackProfile(user);
-            BlackwoodMembersState.posts = postsResult.data || [];
+            BlackwoodMembersState.posts = legacyPosts || [];
+            BlackwoodMembersState.behindFiles = behindFiles || [];
+            BlackwoodMembersState.behindFilesIndex = 0;
             BlackwoodMembersState.rewards = rewardsResult.data || [];
             BlackwoodMembersState.points = pointsResult.data || [];
             BlackwoodMembersState.redemptions = redemptionsResult.data || [];
@@ -701,6 +709,90 @@
             console.error("Blackwood Circle dashboard failed:", error);
             renderErrorState("Your member record could not be loaded. Please refresh and try again.");
         }
+    }
+
+    async function loadLegacyMemberPosts() {
+        try {
+            const { data, error } = await BlackwoodMembersState.client
+                .from("member_posts")
+                .select("*")
+                .eq("is_published", true)
+                .order("published_at", { ascending: false });
+
+            if (error) {
+                console.warn("Legacy member_posts could not be loaded:", error.message);
+                return [];
+            }
+
+            return Array.isArray(data) ? data : [];
+
+        } catch (error) {
+            console.warn("Legacy member_posts query failed:", error);
+            return [];
+        }
+    }
+
+    async function loadBehindFilesPosts() {
+        try {
+            const response = await fetch(
+                `${BLACKWOOD_MEMBERS_CONFIG.behindFilesJsonPath}?cache=${Date.now()}`
+            );
+
+            if (!response.ok) {
+                throw new Error("BFA.json could not be loaded.");
+            }
+
+            const data = await response.json();
+            const posts = Array.isArray(data.posts) ? data.posts : [];
+
+            return normaliseBehindFilesPosts(posts);
+
+        } catch (error) {
+            console.warn("Behind the Files JSON could not be loaded:", error);
+            return [];
+        }
+    }
+
+    function normaliseBehindFilesPosts(posts) {
+        return posts
+            .filter(function (post) {
+                return post && post.published === true;
+            })
+            .map(function (post) {
+                return {
+                    id: String(post.id || createFallbackPostId(post)).trim(),
+                    title: String(post.title || "Untitled File").trim(),
+                    category: String(post.category || "Behind the Files").trim(),
+                    excerpt: String(post.excerpt || "").trim(),
+                    body: String(post.body || "").trim(),
+                    image: String(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage).trim(),
+                    published: post.published === true,
+                    pinned: post.pinned === true,
+                    publishedAt: String(post.publishedAt || "").trim()
+                };
+            })
+            .sort(sortBehindFilesPosts);
+    }
+
+    function sortBehindFilesPosts(a, b) {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+
+        return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+    }
+
+    function createFallbackPostId(post) {
+        const title = String(post && post.title ? post.title : "behind-file")
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 48);
+
+        const date = String(post && post.publishedAt ? post.publishedAt : "undated")
+            .replace(/[^0-9]/g, "");
+
+        return `bfa-${date || "undated"}-${title || "file"}`;
     }
 
     function renderDashboard() {
@@ -781,12 +873,7 @@
                     </a>
                 </section>
 
-                <section class="circle-section" aria-labelledby="circle-posts-title">
-                    <h2 id="circle-posts-title">Behind the Files</h2>
-                    <div class="circle-post-list">
-                        ${renderPosts()}
-                    </div>
-                </section>
+                ${renderBehindFilesCarousel()}
 
                 <section class="circle-section" aria-labelledby="circle-rewards-title">
                     <h2 id="circle-rewards-title">Rewards</h2>
@@ -835,37 +922,415 @@
         bindDashboardEvents();
     }
 
-    function renderPosts() {
-        if (!BlackwoodMembersState.posts.length) {
+    // =========================
+    // BEHIND THE FILES CAROUSEL
+    // =========================
+
+    function getBehindFilesForDisplay() {
+        if (BlackwoodMembersState.behindFiles.length) {
+            return BlackwoodMembersState.behindFiles;
+        }
+
+        return convertLegacyPostsToBehindFiles(BlackwoodMembersState.posts);
+    }
+
+    function convertLegacyPostsToBehindFiles(posts) {
+        if (!Array.isArray(posts) || !posts.length) {
+            return [];
+        }
+
+        return posts.map(function (post) {
+            return {
+                id: String(post.id || createFallbackPostId(post)),
+                title: String(post.title || "Untitled File"),
+                category: String(post.category || "Behind the Files"),
+                excerpt: String(post.excerpt || ""),
+                body: String(post.body || ""),
+                image: String(post.image_url || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage),
+                published: true,
+                pinned: false,
+                publishedAt: String(post.published_at || post.created_at || "")
+            };
+        });
+    }
+
+    function renderBehindFilesCarousel() {
+        const posts = getBehindFilesForDisplay();
+
+        if (!posts.length) {
             return `
-                <article class="circle-empty-card">
-                    <p>No Blackwood Circle posts are available yet.</p>
-                </article>
+                <section class="circle-section circle-bfa-section" aria-labelledby="circle-posts-title">
+                    <div class="circle-bfa-section-heading">
+                        <p class="circle-kicker">Private Dispatches</p>
+                        <h2 id="circle-posts-title">Behind the Files</h2>
+                        <p>
+                            Weekly dispatches, production notes, release progress, and private Blackwood updates will appear here.
+                        </p>
+                    </div>
+
+                    <article class="circle-empty-card">
+                        <p>No Behind the Files updates have been filed yet.</p>
+                    </article>
+                </section>
             `;
         }
 
-        return BlackwoodMembersState.posts.map(function (post) {
-            const publishedDate = post.published_at
-                ? formatDate(post.published_at)
-                : "Filed in the archive";
+        BlackwoodMembersState.behindFilesIndex = clampBehindFilesIndex(BlackwoodMembersState.behindFilesIndex, posts);
+        const post = posts[BlackwoodMembersState.behindFilesIndex];
+        const hasMultiplePosts = posts.length > 1;
 
-            return `
-                <article class="circle-post-card">
-                    <p class="circle-post-meta">
-                        ${escapeHtml(post.category || "Behind the Files")} · ${escapeHtml(publishedDate)}
+        return `
+            <section class="circle-section circle-bfa-section" aria-labelledby="circle-posts-title">
+                <div class="circle-bfa-section-heading">
+                    <p class="circle-kicker">Private Dispatches</p>
+                    <h2 id="circle-posts-title">Behind the Files</h2>
+                    <p>
+                        Weekly notes, production fragments, ARC notices, release progress,
+                        and private updates from the Blackwood desk.
                     </p>
+                </div>
 
-                    <h3>${escapeHtml(post.title)}</h3>
+                <article class="circle-bfa-carousel" id="circle-bfa-carousel">
+                    <div class="circle-bfa-image-wrap">
+                        <img
+                            id="circle-bfa-image"
+                            src="${escapeAttribute(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage)}"
+                            alt=""
+                            loading="lazy"
+                        >
+                    </div>
 
-                    ${post.excerpt ? `<p class="circle-post-excerpt">${escapeHtml(post.excerpt)}</p>` : ""}
+                    <div class="circle-bfa-content">
+                        <div class="circle-bfa-meta">
+                            <span id="circle-bfa-category">${escapeHtml(post.category)}</span>
+                            <span id="circle-bfa-date">${escapeHtml(formatBehindFileDate(post.publishedAt))}</span>
+                            <span id="circle-bfa-pinned" ${post.pinned ? "" : "hidden"}>Pinned</span>
+                        </div>
 
-                    <div class="circle-post-body">
-                        ${formatPlainTextAsHtml(post.body)}
+                        <h3 id="circle-bfa-title">${escapeHtml(post.title)}</h3>
+
+                        <p class="circle-bfa-excerpt" id="circle-bfa-excerpt">
+                            ${escapeHtml(post.excerpt || "Open this file to read the full dispatch.")}
+                        </p>
+
+                        <div class="circle-bfa-controls">
+                            <button
+                                type="button"
+                                class="circle-bfa-control"
+                                id="circle-bfa-prev"
+                                ${hasMultiplePosts ? "" : "disabled"}
+                            >
+                                Previous
+                            </button>
+
+                            <button
+                                type="button"
+                                class="circle-bfa-read"
+                                id="circle-bfa-read"
+                            >
+                                Read File
+                            </button>
+
+                            <button
+                                type="button"
+                                class="circle-bfa-control"
+                                id="circle-bfa-next"
+                                ${hasMultiplePosts ? "" : "disabled"}
+                            >
+                                Next
+                            </button>
+                        </div>
+
+                        <p class="circle-bfa-position" id="circle-bfa-position">
+                            ${BlackwoodMembersState.behindFilesIndex + 1} of ${posts.length}
+                        </p>
                     </div>
                 </article>
-            `;
-        }).join("");
+
+                <div
+                    class="circle-bfa-modal"
+                    id="circle-bfa-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="circle-bfa-modal-title"
+                    hidden
+                >
+                    <div class="circle-bfa-modal-panel" role="document">
+                        <button
+                            type="button"
+                            class="circle-bfa-modal-close"
+                            data-bfa-modal-close
+                        >
+                            Close File
+                        </button>
+
+                        <img
+                            class="circle-bfa-modal-image"
+                            id="circle-bfa-modal-image"
+                            src="${escapeAttribute(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage)}"
+                            alt=""
+                        >
+
+                        <div class="circle-bfa-modal-content">
+                            <div class="circle-bfa-meta">
+                                <span id="circle-bfa-modal-category">${escapeHtml(post.category)}</span>
+                                <span id="circle-bfa-modal-date">${escapeHtml(formatBehindFileDate(post.publishedAt))}</span>
+                                <span id="circle-bfa-modal-pinned" ${post.pinned ? "" : "hidden"}>Pinned</span>
+                            </div>
+
+                            <h3 id="circle-bfa-modal-title">${escapeHtml(post.title)}</h3>
+
+                            <div class="circle-bfa-modal-body" id="circle-bfa-modal-body">
+                                ${formatPlainTextAsHtml(post.body || post.excerpt || "No file text has been added yet.")}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
     }
+
+    function bindBehindFilesCarousel() {
+        const posts = getBehindFilesForDisplay();
+
+        if (!posts.length) {
+            return;
+        }
+
+        const previousButton = document.getElementById("circle-bfa-prev");
+        const nextButton = document.getElementById("circle-bfa-next");
+        const readButton = document.getElementById("circle-bfa-read");
+        const modal = document.getElementById("circle-bfa-modal");
+        const image = document.getElementById("circle-bfa-image");
+        const modalImage = document.getElementById("circle-bfa-modal-image");
+
+        if (previousButton) {
+            previousButton.addEventListener("click", function () {
+                moveBehindFilesCarousel(-1);
+            });
+        }
+
+        if (nextButton) {
+            nextButton.addEventListener("click", function () {
+                moveBehindFilesCarousel(1);
+            });
+        }
+
+        if (readButton) {
+            readButton.addEventListener("click", openBehindFileModal);
+        }
+
+        if (modal) {
+            modal.addEventListener("click", function (event) {
+                if (event.target === modal) {
+                    closeBehindFileModal();
+                }
+            });
+        }
+
+        document.querySelectorAll("[data-bfa-modal-close]").forEach(function (button) {
+            button.addEventListener("click", closeBehindFileModal);
+        });
+
+        if (image) {
+            image.addEventListener("error", function () {
+                image.src = BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
+            });
+        }
+
+        if (modalImage) {
+            modalImage.addEventListener("error", function () {
+                modalImage.src = BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
+            });
+        }
+
+        if (!BlackwoodMembersState.escapeListenerBound) {
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeBehindFileModal();
+                }
+            });
+
+            BlackwoodMembersState.escapeListenerBound = true;
+        }
+    }
+
+    function moveBehindFilesCarousel(direction) {
+        const posts = getBehindFilesForDisplay();
+
+        if (posts.length <= 1) {
+            return;
+        }
+
+        const nextIndex = BlackwoodMembersState.behindFilesIndex + direction;
+
+        if (nextIndex < 0) {
+            BlackwoodMembersState.behindFilesIndex = posts.length - 1;
+        } else if (nextIndex >= posts.length) {
+            BlackwoodMembersState.behindFilesIndex = 0;
+        } else {
+            BlackwoodMembersState.behindFilesIndex = nextIndex;
+        }
+
+        updateBehindFilesCarousel();
+    }
+
+    function updateBehindFilesCarousel() {
+        const posts = getBehindFilesForDisplay();
+        const post = posts[clampBehindFilesIndex(BlackwoodMembersState.behindFilesIndex, posts)];
+
+        if (!post) {
+            return;
+        }
+
+        const image = document.getElementById("circle-bfa-image");
+        const category = document.getElementById("circle-bfa-category");
+        const date = document.getElementById("circle-bfa-date");
+        const pinned = document.getElementById("circle-bfa-pinned");
+        const title = document.getElementById("circle-bfa-title");
+        const excerpt = document.getElementById("circle-bfa-excerpt");
+        const position = document.getElementById("circle-bfa-position");
+
+        if (image) {
+            image.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
+        }
+
+        if (category) {
+            category.textContent = post.category;
+        }
+
+        if (date) {
+            date.textContent = formatBehindFileDate(post.publishedAt);
+        }
+
+        if (pinned) {
+            pinned.hidden = !post.pinned;
+        }
+
+        if (title) {
+            title.textContent = post.title;
+        }
+
+        if (excerpt) {
+            excerpt.textContent = post.excerpt || "Open this file to read the full dispatch.";
+        }
+
+        if (position) {
+            position.textContent = `${BlackwoodMembersState.behindFilesIndex + 1} of ${posts.length}`;
+        }
+
+        updateBehindFileModalContent(post);
+    }
+
+    function openBehindFileModal() {
+        const modal = document.getElementById("circle-bfa-modal");
+        const closeButton = modal ? modal.querySelector("[data-bfa-modal-close]") : null;
+        const posts = getBehindFilesForDisplay();
+        const post = posts[clampBehindFilesIndex(BlackwoodMembersState.behindFilesIndex, posts)];
+
+        if (!modal || !post) {
+            return;
+        }
+
+        updateBehindFileModalContent(post);
+
+        modal.hidden = false;
+        document.body.classList.add("is-bfa-modal-open");
+
+        if (closeButton) {
+            closeButton.focus();
+        }
+    }
+
+    function closeBehindFileModal() {
+        const modal = document.getElementById("circle-bfa-modal");
+
+        if (!modal || modal.hidden) {
+            return;
+        }
+
+        modal.hidden = true;
+        document.body.classList.remove("is-bfa-modal-open");
+
+        const readButton = document.getElementById("circle-bfa-read");
+
+        if (readButton) {
+            readButton.focus();
+        }
+    }
+
+    function updateBehindFileModalContent(post) {
+        const modalImage = document.getElementById("circle-bfa-modal-image");
+        const modalCategory = document.getElementById("circle-bfa-modal-category");
+        const modalDate = document.getElementById("circle-bfa-modal-date");
+        const modalPinned = document.getElementById("circle-bfa-modal-pinned");
+        const modalTitle = document.getElementById("circle-bfa-modal-title");
+        const modalBody = document.getElementById("circle-bfa-modal-body");
+
+        if (modalImage) {
+            modalImage.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
+        }
+
+        if (modalCategory) {
+            modalCategory.textContent = post.category;
+        }
+
+        if (modalDate) {
+            modalDate.textContent = formatBehindFileDate(post.publishedAt);
+        }
+
+        if (modalPinned) {
+            modalPinned.hidden = !post.pinned;
+        }
+
+        if (modalTitle) {
+            modalTitle.textContent = post.title;
+        }
+
+        if (modalBody) {
+            modalBody.innerHTML = formatPlainTextAsHtml(
+                post.body || post.excerpt || "No file text has been added yet."
+            );
+        }
+    }
+
+    function clampBehindFilesIndex(index, posts) {
+        if (!Array.isArray(posts) || !posts.length) {
+            return 0;
+        }
+
+        if (index < 0) {
+            return 0;
+        }
+
+        if (index >= posts.length) {
+            return posts.length - 1;
+        }
+
+        return index;
+    }
+
+    function formatBehindFileDate(value) {
+        if (!value) {
+            return "Filed in the archive";
+        }
+
+        const date = new Date(`${value}T12:00:00`);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
+
+        return date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+    // =========================
+    // REWARDS / REDEMPTIONS / POINTS
+    // =========================
 
     function renderRewards(pointsTotal) {
         if (!BlackwoodMembersState.rewards.length) {
@@ -1064,7 +1529,6 @@
     function bindDashboardEvents() {
         const signOutButton = document.getElementById("circle-sign-out");
         const refreshButton = document.getElementById("circle-refresh-dashboard");
-        
 
         if (signOutButton) {
             signOutButton.addEventListener("click", handleMemberSignOut);
@@ -1078,6 +1542,7 @@
             button.addEventListener("click", handleRewardRedemption);
         });
 
+        bindBehindFilesCarousel();
         bindPointsHistoryToggle();
     }
 
@@ -1096,48 +1561,6 @@
             button.textContent = isOpen ? "Hide history" : "Show history";
             button.setAttribute("aria-expanded", String(isOpen));
         });
-    }
-
-    async function handleProfileSave(event) {
-        event.preventDefault();
-
-        if (!BlackwoodMembersState.session || !BlackwoodMembersState.session.user) {
-            setDashboardStatus("Please sign in again.", "is-error");
-            return;
-        }
-
-        const displayName = getInputValue("circle-profile-display-name");
-        const readerName = getInputValue("circle-profile-reader-name");
-
-        if (!displayName && !readerName) {
-            setDashboardStatus("Please enter at least one name.", "is-error");
-            return;
-        }
-
-        setDashboardStatus("Saving your Circle profile...", "is-loading");
-
-        try {
-            const userId = BlackwoodMembersState.session.user.id;
-
-            const { error } = await BlackwoodMembersState.client
-                .from("member_profiles")
-                .update({
-                    display_name: displayName,
-                    reader_name: readerName
-                })
-                .eq("id", userId);
-
-            if (error) {
-                throw error;
-            }
-
-            await loadMemberDashboard();
-            setDashboardStatus("Circle profile saved.", "is-success");
-
-        } catch (error) {
-            console.error("Profile save failed:", error);
-            setDashboardStatus("Your Circle profile could not be saved.", "is-error");
-        }
     }
 
     async function handleRewardRedemption(event) {
