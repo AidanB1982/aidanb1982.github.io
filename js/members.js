@@ -812,13 +812,33 @@
                     </div>
                 </section>
 
-                <section class="circle-section" aria-labelledby="circle-points-title">
-                    <h2 id="circle-points-title">Points History</h2>
-                    <div class="circle-points-list">
-                        ${renderPointsHistory()}
-                    </div>
-                </section>
-            </section>
+                <section 
+    class="circle-section circle-collapsible-section is-collapsed" 
+    aria-labelledby="circle-points-title"
+>
+    <div class="circle-section-toggle-header">
+        <h2 id="circle-points-title">Points History</h2>
+
+        <button 
+            type="button" 
+            class="circle-section-toggle-button" 
+            id="circle-points-history-toggle"
+            aria-expanded="false"
+            aria-controls="circle-points-history-content"
+        >
+            Show history
+        </button>
+    </div>
+
+    <div 
+        class="circle-collapsible-content" 
+        id="circle-points-history-content"
+    >
+        <div class="circle-points-list">
+            ${renderPointsHistory()}
+        </div>
+    </div>
+</section>
         `;
 
         bindDashboardEvents();
