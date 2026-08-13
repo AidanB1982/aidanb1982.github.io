@@ -10,6 +10,7 @@
         supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
         supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
         membersPagePath: "/pages/members.html",
+        readerRecordsPagePath: "/pages/reader-records.html",
         supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     };
 
@@ -763,8 +764,22 @@
                     <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
                 </div>
 
+                <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
+                    <div>
+                        <h2 id="circle-reader-record-cta-title">Leave a Reader Record</h2>
+                        <p>
+                            Finished a Blackwood title? Submit a reader record, share your review,
+                            and earn Circle points when your record is approved.
+                        </p>
+                    </div>
+
+                    <a href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" class="button copper">
+                        Leave a Reader Record
+                    </a>
+                </section>
+
                 <section class="circle-section" aria-labelledby="circle-profile-title">
-                    <h2 id="circle-profile-title">Your Reader Record</h2>
+                    <h2 id="circle-profile-title">Your Circle Profile</h2>
 
                     <form id="circle-profile-form" class="circle-profile-form" novalidate>
                         <label>
@@ -786,7 +801,7 @@
                         </label>
 
                         <button type="submit" class="circle-button circle-button-primary">
-                            Save Reader Record
+                            Save Circle Profile
                         </button>
                     </form>
                 </section>
@@ -813,52 +828,36 @@
                 </section>
 
                 <section 
-    class="circle-section circle-collapsible-section is-collapsed" 
-    aria-labelledby="circle-points-title"
->
-    <div class="circle-section-toggle-header">
-        <h2 id="circle-points-title">Points History</h2>
+                    class="circle-section circle-collapsible-section is-collapsed" 
+                    aria-labelledby="circle-points-title"
+                >
+                    <div class="circle-section-toggle-header">
+                        <h2 id="circle-points-title">Points History</h2>
 
-        <button 
-            type="button" 
-            class="circle-section-toggle-button" 
-            id="circle-points-history-toggle"
-            aria-expanded="false"
-            aria-controls="circle-points-history-content"
-        >
-            Show history
-        </button>
-    </div>
+                        <button 
+                            type="button" 
+                            class="circle-section-toggle-button" 
+                            id="circle-points-history-toggle"
+                            aria-expanded="false"
+                            aria-controls="circle-points-history-content"
+                        >
+                            Show history
+                        </button>
+                    </div>
 
-    <div 
-        class="circle-collapsible-content" 
-        id="circle-points-history-content"
-    >
-        <div class="circle-points-list">
-            ${renderPointsHistory()}
-        </div>
-    </div>
-</section>
+                    <div 
+                        class="circle-collapsible-content" 
+                        id="circle-points-history-content"
+                    >
+                        <div class="circle-points-list">
+                            ${renderPointsHistory()}
+                        </div>
+                    </div>
+                </section>
+            </section>
         `;
 
         bindDashboardEvents();
-
-        function bindPointsHistoryToggle() {
-    const section = document.querySelector(".circle-collapsible-section");
-    const button = document.getElementById("circle-points-history-toggle");
-
-    if (!section || !button) {
-        return;
-    }
-
-    button.addEventListener("click", function () {
-        const isCollapsed = section.classList.toggle("is-collapsed");
-        const isOpen = !isCollapsed;
-
-        button.textContent = isOpen ? "Hide history" : "Show history";
-        button.setAttribute("aria-expanded", String(isOpen));
-    });
-}
     }
 
     function renderPosts() {
@@ -1107,8 +1106,25 @@
         document.querySelectorAll("[data-redeem-reward-id]").forEach(function (button) {
             button.addEventListener("click", handleRewardRedemption);
         });
-        
+
         bindPointsHistoryToggle();
+    }
+
+    function bindPointsHistoryToggle() {
+        const button = document.getElementById("circle-points-history-toggle");
+        const section = button ? button.closest(".circle-collapsible-section") : null;
+
+        if (!section || !button) {
+            return;
+        }
+
+        button.addEventListener("click", function () {
+            const isCollapsed = section.classList.toggle("is-collapsed");
+            const isOpen = !isCollapsed;
+
+            button.textContent = isOpen ? "Hide history" : "Show history";
+            button.setAttribute("aria-expanded", String(isOpen));
+        });
     }
 
     async function handleProfileSave(event) {
@@ -1127,7 +1143,7 @@
             return;
         }
 
-        setDashboardStatus("Saving your reader record...", "is-loading");
+        setDashboardStatus("Saving your Circle profile...", "is-loading");
 
         try {
             const userId = BlackwoodMembersState.session.user.id;
@@ -1145,11 +1161,11 @@
             }
 
             await loadMemberDashboard();
-            setDashboardStatus("Reader record saved.", "is-success");
+            setDashboardStatus("Circle profile saved.", "is-success");
 
         } catch (error) {
             console.error("Profile save failed:", error);
-            setDashboardStatus("Your reader record could not be saved.", "is-error");
+            setDashboardStatus("Your Circle profile could not be saved.", "is-error");
         }
     }
 
