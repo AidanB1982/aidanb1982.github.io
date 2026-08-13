@@ -773,20 +773,6 @@
                         </p>
                     </div>
 
-                    <a href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" class="button copper">
-                        Leave a Reader Record
-                    </a>
-                </section>
-
-                                <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
-                    <div>
-                        <h2 id="circle-reader-record-cta-title">Leave a Reader Record</h2>
-                        <p>
-                            Finished a Blackwood title? Submit a reader record, share your review,
-                            and earn Circle points when your record is approved.
-                        </p>
-                    </div>
-
                     <a 
                         href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" 
                         class="circle-reader-record-button"
