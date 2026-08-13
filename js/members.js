@@ -842,6 +842,23 @@
         `;
 
         bindDashboardEvents();
+
+        function bindPointsHistoryToggle() {
+    const section = document.querySelector(".circle-collapsible-section");
+    const button = document.getElementById("circle-points-history-toggle");
+
+    if (!section || !button) {
+        return;
+    }
+
+    button.addEventListener("click", function () {
+        const isCollapsed = section.classList.toggle("is-collapsed");
+        const isOpen = !isCollapsed;
+
+        button.textContent = isOpen ? "Hide history" : "Show history";
+        button.setAttribute("aria-expanded", String(isOpen));
+    });
+}
     }
 
     function renderPosts() {
@@ -1090,6 +1107,8 @@
         document.querySelectorAll("[data-redeem-reward-id]").forEach(function (button) {
             button.addEventListener("click", handleRewardRedemption);
         });
+        
+        bindPointsHistoryToggle();
     }
 
     async function handleProfileSave(event) {
