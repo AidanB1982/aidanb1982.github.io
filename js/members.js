@@ -778,32 +778,21 @@
                     </a>
                 </section>
 
-                <section class="circle-section" aria-labelledby="circle-profile-title">
-                    <h2 id="circle-profile-title">Your Circle Profile</h2>
+                                <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
+                    <div>
+                        <h2 id="circle-reader-record-cta-title">Leave a Reader Record</h2>
+                        <p>
+                            Finished a Blackwood title? Submit a reader record, share your review,
+                            and earn Circle points when your record is approved.
+                        </p>
+                    </div>
 
-                    <form id="circle-profile-form" class="circle-profile-form" novalidate>
-                        <label>
-                            Display name
-                            <input
-                                type="text"
-                                id="circle-profile-display-name"
-                                value="${escapeAttribute(member.display_name || "")}"
-                            >
-                        </label>
-
-                        <label>
-                            Reader name
-                            <input
-                                type="text"
-                                id="circle-profile-reader-name"
-                                value="${escapeAttribute(member.reader_name || "")}"
-                            >
-                        </label>
-
-                        <button type="submit" class="circle-button circle-button-primary">
-                            Save Circle Profile
-                        </button>
-                    </form>
+                    <a 
+                        href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" 
+                        class="circle-reader-record-button"
+                    >
+                        Leave a Reader Record
+                    </a>
                 </section>
 
                 <section class="circle-section" aria-labelledby="circle-posts-title">
@@ -1089,7 +1078,7 @@
     function bindDashboardEvents() {
         const signOutButton = document.getElementById("circle-sign-out");
         const refreshButton = document.getElementById("circle-refresh-dashboard");
-        const profileForm = document.getElementById("circle-profile-form");
+        
 
         if (signOutButton) {
             signOutButton.addEventListener("click", handleMemberSignOut);
@@ -1097,10 +1086,6 @@
 
         if (refreshButton) {
             refreshButton.addEventListener("click", loadMemberDashboard);
-        }
-
-        if (profileForm) {
-            profileForm.addEventListener("submit", handleProfileSave);
         }
 
         document.querySelectorAll("[data-redeem-reward-id]").forEach(function (button) {
