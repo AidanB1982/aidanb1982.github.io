@@ -1,1 +1,952 @@
-to be updated later
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <!-- Google tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Behind the Files Admin | Blackwood Publishing</title>
+
+    <meta
+        name="description"
+        content="Private Behind the Files drafting desk for Blackwood Circle updates."
+    >
+
+    <link rel="icon" href="/assets/favicon.png" type="image/png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/header.css?v=20260924">
+    <link rel="stylesheet" href="/css/styles.css?v=20260910">
+
+    <style>
+        :root {
+            --bfa-black: #030303;
+            --bfa-panel: rgba(10, 10, 10, 0.92);
+            --bfa-panel-soft: rgba(255, 255, 255, 0.035);
+            --bfa-border: rgba(196, 122, 44, 0.24);
+            --bfa-border-strong: rgba(196, 122, 44, 0.56);
+            --bfa-copper: #c47a2c;
+            --bfa-copper-soft: #d6b181;
+            --bfa-cream: #efe7dc;
+            --bfa-text: rgba(255, 255, 255, 0.74);
+            --bfa-muted: rgba(255, 255, 255, 0.48);
+            --bfa-error: #ffb1a7;
+            --bfa-success: #d6b181;
+            --bfa-shadow: 0 24px 72px rgba(0, 0, 0, 0.52);
+        }
+
+        body.behind-files-admin-page {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(0, 0, 0, 0.86) 0%,
+                    rgba(0, 0, 0, 0.74) 38%,
+                    rgba(0, 0, 0, 0.94) 100%
+                ),
+                radial-gradient(circle at top center, rgba(196, 122, 44, 0.13), transparent 34%),
+                radial-gradient(circle at 82% 16%, rgba(61, 121, 136, 0.1), transparent 28%),
+                url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
+                #050505;
+            color: var(--bfa-text);
+        }
+
+        .bfa-wrap {
+            width: min(100%, 1240px);
+            box-sizing: border-box;
+            margin: 0 auto;
+            padding: 132px 24px 90px;
+        }
+
+        .bfa-hero {
+            max-width: 860px;
+            margin: 0 auto 34px;
+            text-align: center;
+        }
+
+        .bfa-kicker,
+        .bfa-card-kicker,
+        .bfa-label,
+        .bfa-status-pill {
+            margin: 0;
+            color: var(--bfa-copper-soft);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.24em;
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+
+        .bfa-hero h1 {
+            margin: 10px 0 14px;
+            color: var(--bfa-cream);
+            font-size: clamp(42px, 6vw, 76px);
+            line-height: 0.96;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .bfa-hero p:last-child {
+            max-width: 720px;
+            margin: 0 auto;
+            color: rgba(239, 231, 220, 0.76);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .bfa-warning {
+            max-width: 920px;
+            margin: 0 auto 26px;
+            padding: 15px 18px;
+            border: 1px solid rgba(196, 122, 44, 0.22);
+            border-radius: 8px;
+            background:
+                linear-gradient(90deg, rgba(196, 122, 44, 0.09), transparent),
+                rgba(0, 0, 0, 0.5);
+            color: rgba(239, 231, 220, 0.7);
+            font-size: 13.5px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .bfa-desk {
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .bfa-panel {
+            border: 1px solid var(--bfa-border);
+            border-radius: 10px;
+            background:
+                radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
+                linear-gradient(180deg, var(--bfa-panel-soft), rgba(255, 255, 255, 0.012)),
+                var(--bfa-panel);
+            box-shadow: var(--bfa-shadow);
+        }
+
+        .bfa-panel-inner {
+            padding: clamp(22px, 3vw, 34px);
+        }
+
+        .bfa-panel h2 {
+            margin: 8px 0 18px;
+            color: var(--bfa-cream);
+            font-size: clamp(26px, 3vw, 38px);
+            line-height: 1.08;
+            font-weight: 400;
+        }
+
+        .bfa-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .bfa-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .bfa-field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .bfa-field-full {
+            grid-column: 1 / -1;
+        }
+
+        .bfa-field label,
+        .bfa-check span {
+            color: rgba(239, 231, 220, 0.78);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .bfa-field label strong {
+            color: var(--bfa-copper-soft);
+            font-weight: 400;
+        }
+
+        .bfa-field input,
+        .bfa-field select,
+        .bfa-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(196, 122, 44, 0.25);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.56);
+            color: var(--bfa-cream);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+        }
+
+        .bfa-field input,
+        .bfa-field select {
+            min-height: 44px;
+            padding: 10px 12px;
+        }
+
+        .bfa-field textarea {
+            min-height: 150px;
+            padding: 12px;
+            resize: vertical;
+        }
+
+        .bfa-field textarea#bfa-body {
+            min-height: 260px;
+        }
+
+        .bfa-field input:focus,
+        .bfa-field select:focus,
+        .bfa-field textarea:focus {
+            outline: none;
+            border-color: rgba(196, 122, 44, 0.84);
+            box-shadow:
+                0 0 0 3px rgba(196, 122, 44, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+        }
+
+        .bfa-field select option {
+            background: #090909;
+            color: var(--bfa-cream);
+        }
+
+        .bfa-checks {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .bfa-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid rgba(196, 122, 44, 0.16);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.28);
+            cursor: pointer;
+        }
+
+        .bfa-check input {
+            margin-top: 3px;
+            accent-color: var(--bfa-copper);
+        }
+
+        .bfa-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 6px;
+        }
+
+        .bfa-button {
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 11px 17px;
+            border: 1px solid rgba(196, 122, 44, 0.7);
+            border-radius: 4px;
+            background:
+                linear-gradient(180deg, rgba(196, 122, 44, 0.22), rgba(196, 122, 44, 0.08)),
+                rgba(0, 0, 0, 0.48);
+            color: var(--bfa-copper-soft);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            line-height: 1;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+                0 10px 22px rgba(0, 0, 0, 0.24);
+        }
+
+        .bfa-button:hover,
+        .bfa-button:focus-visible {
+            border-color: var(--bfa-copper);
+            color: var(--bfa-cream);
+            outline: none;
+        }
+
+        .bfa-button.primary {
+            background:
+                linear-gradient(180deg, rgba(196, 122, 44, 0.38), rgba(196, 122, 44, 0.16)),
+                rgba(82, 42, 18, 0.82);
+            color: #fff4e7;
+        }
+
+        .bfa-status {
+            min-height: 20px;
+            margin: 4px 0 0;
+            color: var(--bfa-muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .bfa-status.is-success {
+            color: var(--bfa-success);
+        }
+
+        .bfa-status.is-error {
+            color: var(--bfa-error);
+        }
+
+        .bfa-preview-card {
+            overflow: hidden;
+            border: 1px solid rgba(196, 122, 44, 0.2);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.38);
+        }
+
+        .bfa-preview-image {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 7;
+            object-fit: cover;
+            background:
+                radial-gradient(circle at center, rgba(196, 122, 44, 0.16), transparent 44%),
+                #060606;
+            border-bottom: 1px solid rgba(196, 122, 44, 0.16);
+        }
+
+        .bfa-preview-content {
+            padding: 20px;
+        }
+
+        .bfa-preview-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .bfa-status-pill {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 5px 8px;
+            border: 1px solid rgba(196, 122, 44, 0.2);
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.22);
+            font-size: 8.5px;
+            letter-spacing: 0.16em;
+        }
+
+        .bfa-preview-card h3 {
+            margin: 0 0 10px;
+            color: var(--bfa-cream);
+            font-size: clamp(24px, 3vw, 34px);
+            line-height: 1.08;
+            font-weight: 400;
+        }
+
+        .bfa-preview-excerpt {
+            margin: 0 0 14px;
+            color: rgba(239, 231, 220, 0.68);
+            font-size: 14.5px;
+            font-style: italic;
+            line-height: 1.6;
+        }
+
+        .bfa-preview-body {
+            color: rgba(239, 231, 220, 0.74);
+            font-size: 14px;
+            line-height: 1.68;
+        }
+
+        .bfa-preview-body p {
+            margin: 0 0 12px;
+        }
+
+        .bfa-preview-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bfa-json-box {
+            margin-top: 16px;
+        }
+
+        .bfa-json-output {
+            width: 100%;
+            min-height: 240px;
+            box-sizing: border-box;
+            margin-top: 10px;
+            padding: 14px;
+            border: 1px solid rgba(196, 122, 44, 0.18);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.66);
+            color: rgba(239, 231, 220, 0.78);
+            font-family: Consolas, Monaco, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.55;
+            resize: vertical;
+        }
+
+        .bfa-existing-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .bfa-existing-item {
+            padding: 13px 14px;
+            border: 1px solid rgba(196, 122, 44, 0.16);
+            border-radius: 7px;
+            background: rgba(0, 0, 0, 0.28);
+        }
+
+        .bfa-existing-item h3 {
+            margin: 4px 0 6px;
+            color: var(--bfa-cream);
+            font-size: 18px;
+            line-height: 1.2;
+            font-weight: 400;
+        }
+
+        .bfa-existing-item p {
+            margin: 0;
+            color: rgba(239, 231, 220, 0.62);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .bfa-muted {
+            color: var(--bfa-muted);
+        }
+
+        @media (max-width: 980px) {
+            .bfa-desk {
+                grid-template-columns: 1fr;
+            }
+
+            .bfa-wrap {
+                padding-top: 118px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .bfa-wrap {
+                padding: 104px 16px 72px;
+            }
+
+            .bfa-grid,
+            .bfa-checks {
+                grid-template-columns: 1fr;
+            }
+
+            .bfa-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .bfa-button {
+                width: 100%;
+            }
+
+            .bfa-preview-content {
+                padding: 17px;
+            }
+        }
+    </style>
+
+    <!-- JS -->
+    <script src="/js/header.js?v=20260924" defer></script>
+</head>
+
+<body class="behind-files-admin-page">
+
+    <a class="skip-link" href="#bfa-title">Skip to content</a>
+
+    <div id="header-placeholder"></div>
+
+    <main class="bfa-wrap">
+
+        <section class="bfa-hero" aria-labelledby="bfa-title">
+            <p class="bfa-kicker">Private Blackwood Desk</p>
+
+            <h1 id="bfa-title">Behind the Files Admin</h1>
+
+            <p>
+                Draft weekly Circle updates, production notes, ARC notices, cover previews,
+                and private Blackwood dispatches for the member archive.
+            </p>
+        </section>
+
+        <p class="bfa-warning">
+            This page prepares entries for <strong>/data/BFA.json</strong>. It does not save directly to GitHub.
+            Generate the post JSON, copy it, and paste it into the <strong>posts</strong> array.
+        </p>
+
+        <section class="bfa-desk" aria-label="Behind the Files drafting desk">
+
+            <section class="bfa-panel" aria-labelledby="bfa-form-title">
+                <div class="bfa-panel-inner">
+
+                    <p class="bfa-card-kicker">Draft File</p>
+
+                    <h2 id="bfa-form-title">Create a Circle Update</h2>
+
+                    <form class="bfa-form" id="bfa-form">
+
+                        <div class="bfa-grid">
+
+                            <div class="bfa-field">
+                                <label for="bfa-post-title">Title <strong>*</strong></label>
+                                <input
+                                    id="bfa-post-title"
+                                    type="text"
+                                    maxlength="120"
+                                    placeholder="This Week at Blackwood"
+                                    required
+                                >
+                            </div>
+
+                            <div class="bfa-field">
+                                <label for="bfa-category">Category</label>
+                                <select id="bfa-category">
+                                    <option value="Weekly Dispatch">Weekly Dispatch</option>
+                                    <option value="Production Note">Production Note</option>
+                                    <option value="Cover Preview">Cover Preview</option>
+                                    <option value="ARC Notice">ARC Notice</option>
+                                    <option value="Release Update">Release Update</option>
+                                    <option value="Fragment">Fragment</option>
+                                    <option value="Store Update">Store Update</option>
+                                    <option value="Circle Notice">Circle Notice</option>
+                                </select>
+                            </div>
+
+                            <div class="bfa-field">
+                                <label for="bfa-date">Published Date</label>
+                                <input id="bfa-date" type="date">
+                            </div>
+
+                            <div class="bfa-field">
+                                <label for="bfa-image">Image URL</label>
+                                <input
+                                    id="bfa-image"
+                                    type="text"
+                                    placeholder="/assets/ArchiveFilesBG.png"
+                                >
+                            </div>
+
+                            <div class="bfa-field bfa-field-full">
+                                <label for="bfa-excerpt">Short Excerpt</label>
+                                <textarea
+                                    id="bfa-excerpt"
+                                    maxlength="360"
+                                    placeholder="A short line for the carousel or dashboard preview."
+                                ></textarea>
+                            </div>
+
+                            <div class="bfa-field bfa-field-full">
+                                <label for="bfa-body">Main Body <strong>*</strong></label>
+                                <textarea
+                                    id="bfa-body"
+                                    placeholder="Write the full Behind the Files update here."
+                                    required
+                                ></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="bfa-checks">
+
+                            <label class="bfa-check">
+                                <input id="bfa-published" type="checkbox" checked>
+                                <span>Published</span>
+                            </label>
+
+                            <label class="bfa-check">
+                                <input id="bfa-pinned" type="checkbox">
+                                <span>Pinned / featured</span>
+                            </label>
+
+                        </div>
+
+                        <div class="bfa-actions">
+                            <button type="button" class="bfa-button primary" id="bfa-generate">
+                                Generate JSON
+                            </button>
+
+                            <button type="button" class="bfa-button" id="bfa-copy">
+                                Copy JSON
+                            </button>
+
+                            <button type="reset" class="bfa-button" id="bfa-reset">
+                                Clear Draft
+                            </button>
+                        </div>
+
+                        <p class="bfa-status" id="bfa-status" aria-live="polite"></p>
+
+                    </form>
+
+                    <div class="bfa-json-box">
+                        <p class="bfa-label">Generated Post JSON</p>
+
+                        <textarea
+                            class="bfa-json-output"
+                            id="bfa-json-output"
+                            readonly
+                            spellcheck="false"
+                            placeholder="Generate a post to see the JSON here."
+                        ></textarea>
+                    </div>
+
+                </div>
+            </section>
+
+            <aside class="bfa-panel" aria-labelledby="bfa-preview-title">
+                <div class="bfa-panel-inner">
+
+                    <p class="bfa-card-kicker">Preview</p>
+
+                    <h2 id="bfa-preview-title">Circle Display</h2>
+
+                    <article class="bfa-preview-card">
+
+                        <img
+                            class="bfa-preview-image"
+                            id="bfa-preview-image"
+                            src="/assets/ArchiveFilesBG.png"
+                            alt=""
+                        >
+
+                        <div class="bfa-preview-content">
+
+                            <div class="bfa-preview-meta">
+                                <span class="bfa-status-pill" id="bfa-preview-category">
+                                    Weekly Dispatch
+                                </span>
+
+                                <span class="bfa-status-pill" id="bfa-preview-date">
+                                    Filed today
+                                </span>
+
+                                <span class="bfa-status-pill" id="bfa-preview-pinned" hidden>
+                                    Pinned
+                                </span>
+                            </div>
+
+                            <h3 id="bfa-preview-heading">
+                                This Week at Blackwood
+                            </h3>
+
+                            <p class="bfa-preview-excerpt" id="bfa-preview-excerpt">
+                                A short preview of the dispatch will appear here.
+                            </p>
+
+                            <div class="bfa-preview-body" id="bfa-preview-body">
+                                <p>
+                                    The full Behind the Files update will appear here as you draft it.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <div class="bfa-json-box">
+                        <p class="bfa-label">Current BFA.json Posts</p>
+
+                        <div class="bfa-existing-list" id="bfa-existing-list">
+                            <article class="bfa-existing-item">
+                                <p class="bfa-muted">Loading existing files...</p>
+                            </article>
+                        </div>
+                    </div>
+
+                </div>
+            </aside>
+
+        </section>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        window.addEventListener("load", async function () {
+            try {
+                if (typeof loadHeader === "function") {
+                    await loadHeader("simple");
+                }
+            } catch (error) {
+                console.warn("Header could not be loaded:", error);
+            }
+
+            initBehindFilesAdmin();
+        });
+
+        function initBehindFilesAdmin() {
+            const form = document.getElementById("bfa-form");
+            const title = document.getElementById("bfa-post-title");
+            const category = document.getElementById("bfa-category");
+            const date = document.getElementById("bfa-date");
+            const image = document.getElementById("bfa-image");
+            const excerpt = document.getElementById("bfa-excerpt");
+            const body = document.getElementById("bfa-body");
+            const published = document.getElementById("bfa-published");
+            const pinned = document.getElementById("bfa-pinned");
+            const generate = document.getElementById("bfa-generate");
+            const copy = document.getElementById("bfa-copy");
+            const status = document.getElementById("bfa-status");
+            const output = document.getElementById("bfa-json-output");
+
+            const previewImage = document.getElementById("bfa-preview-image");
+            const previewCategory = document.getElementById("bfa-preview-category");
+            const previewDate = document.getElementById("bfa-preview-date");
+            const previewPinned = document.getElementById("bfa-preview-pinned");
+            const previewHeading = document.getElementById("bfa-preview-heading");
+            const previewExcerpt = document.getElementById("bfa-preview-excerpt");
+            const previewBody = document.getElementById("bfa-preview-body");
+
+            const today = new Date().toISOString().slice(0, 10);
+
+            date.value = today;
+            image.value = "/assets/ArchiveFilesBG.png";
+
+            [
+                title,
+                category,
+                date,
+                image,
+                excerpt,
+                body,
+                published,
+                pinned
+            ].forEach(function (field) {
+                field.addEventListener("input", updatePreview);
+                field.addEventListener("change", updatePreview);
+            });
+
+            generate.addEventListener("click", function () {
+                try {
+                    const post = buildPostObject();
+
+                    output.value = JSON.stringify(post, null, 4);
+
+                    setStatus("Post JSON generated. Copy it into /data/BFA.json.", "is-success");
+                } catch (error) {
+                    setStatus(error.message, "is-error");
+                }
+            });
+
+            copy.addEventListener("click", async function () {
+                if (!output.value.trim()) {
+                    setStatus("Generate the JSON before copying.", "is-error");
+                    return;
+                }
+
+                try {
+                    await navigator.clipboard.writeText(output.value);
+                    setStatus("Post JSON copied to clipboard.", "is-success");
+                } catch (error) {
+                    output.focus();
+                    output.select();
+                    setStatus("Clipboard copy failed. The JSON has been selected for manual copy.", "is-error");
+                }
+            });
+
+            form.addEventListener("reset", function () {
+                window.setTimeout(function () {
+                    date.value = today;
+                    image.value = "/assets/ArchiveFilesBG.png";
+                    published.checked = true;
+                    pinned.checked = false;
+                    output.value = "";
+                    setStatus("", "");
+                    updatePreview();
+                }, 0);
+            });
+
+            updatePreview();
+            loadExistingPosts();
+
+            function buildPostObject() {
+                const cleanTitle = title.value.trim();
+                const cleanBody = body.value.trim();
+                const cleanDate = date.value || today;
+
+                if (!cleanTitle) {
+                    title.focus();
+                    throw new Error("Please enter a title.");
+                }
+
+                if (!cleanBody) {
+                    body.focus();
+                    throw new Error("Please enter the main body.");
+                }
+
+                return {
+                    id: createPostId(cleanTitle, cleanDate),
+                    title: cleanTitle,
+                    category: category.value || "Weekly Dispatch",
+                    excerpt: excerpt.value.trim(),
+                    body: cleanBody,
+                    image: image.value.trim() || "/assets/ArchiveFilesBG.png",
+                    published: published.checked,
+                    pinned: pinned.checked,
+                    publishedAt: cleanDate
+                };
+            }
+
+            function updatePreview() {
+                const cleanTitle = title.value.trim() || "This Week at Blackwood";
+                const cleanCategory = category.value || "Weekly Dispatch";
+                const cleanDate = date.value || today;
+                const cleanImage = image.value.trim() || "/assets/ArchiveFilesBG.png";
+                const cleanExcerpt = excerpt.value.trim() || "A short preview of the dispatch will appear here.";
+                const cleanBody = body.value.trim() || "The full Behind the Files update will appear here as you draft it.";
+
+                previewImage.src = cleanImage;
+                previewCategory.textContent = cleanCategory;
+                previewDate.textContent = formatDate(cleanDate);
+                previewPinned.hidden = !pinned.checked;
+                previewHeading.textContent = cleanTitle;
+                previewExcerpt.textContent = cleanExcerpt;
+                previewBody.innerHTML = formatPlainText(cleanBody);
+            }
+
+            async function loadExistingPosts() {
+                const list = document.getElementById("bfa-existing-list");
+
+                try {
+                    const response = await fetch("/data/BFA.json?cache=" + Date.now());
+
+                    if (!response.ok) {
+                        throw new Error("BFA.json could not be loaded.");
+                    }
+
+                    const data = await response.json();
+                    const posts = Array.isArray(data.posts) ? data.posts : [];
+
+                    if (!posts.length) {
+                        list.innerHTML = `
+                            <article class="bfa-existing-item">
+                                <p class="bfa-muted">No Behind the Files posts are in BFA.json yet.</p>
+                            </article>
+                        `;
+                        return;
+                    }
+
+                    list.innerHTML = posts
+                        .slice()
+                        .sort(function (a, b) {
+                            return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+                        })
+                        .slice(0, 6)
+                        .map(function (post) {
+                            return `
+                                <article class="bfa-existing-item">
+                                    <p class="bfa-status-pill">${escapeHtml(post.category || "Behind the Files")}</p>
+                                    <h3>${escapeHtml(post.title || "Untitled File")}</h3>
+                                    <p>${escapeHtml(post.publishedAt || "Undated")} ${post.pinned ? "· Pinned" : ""} ${post.published === false ? "· Draft" : ""}</p>
+                                </article>
+                            `;
+                        })
+                        .join("");
+
+                } catch (error) {
+                    list.innerHTML = `
+                        <article class="bfa-existing-item">
+                            <p class="bfa-muted">Existing posts could not be loaded yet.</p>
+                        </article>
+                    `;
+                }
+            }
+
+            function setStatus(message, className) {
+                status.textContent = message || "";
+                status.classList.remove("is-success", "is-error");
+
+                if (className) {
+                    status.classList.add(className);
+                }
+            }
+        }
+
+        function createPostId(title, date) {
+            const slug = String(title || "behind-file")
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/^-+|-+$/g, "")
+                .slice(0, 48);
+
+            const random = Math.random().toString(36).slice(2, 7);
+
+            return "bfa-" + String(date || "").replace(/-/g, "") + "-" + slug + "-" + random;
+        }
+
+        function formatDate(value) {
+            if (!value) {
+                return "Filed today";
+            }
+
+            const date = new Date(value + "T12:00:00");
+
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+
+            return date.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        function formatPlainText(value) {
+            const clean = escapeHtml(value || "");
+
+            if (!clean) {
+                return "";
+            }
+
+            return clean
+                .split(/\n{2,}/)
+                .map(function (paragraph) {
+                    return "<p>" + paragraph.replace(/\n/g, "<br>") + "</p>";
+                })
+                .join("");
+        }
+
+        function escapeHtml(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+
+</body>
+</html>
