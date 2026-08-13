@@ -2103,10 +2103,7 @@ body.members-page.is-circle-signed-in .circle-profile-form {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 14px;
     align-items: center;
-
     padding: 18px 20px;
-
-    border-bottom: 1px solid rgba(196, 122, 44, 0.16);
 }
 
 .circle-section-toggle-header h2 {
@@ -2147,15 +2144,16 @@ body.members-page.is-circle-signed-in .circle-profile-form {
 }
 
 .circle-collapsible-content {
-    padding: 16px 18px 18px;
+    padding: 0 18px 18px;
 }
 
 .circle-collapsible-section.is-collapsed .circle-collapsible-content {
     display: none;
 }
 
-.circle-collapsible-section.is-collapsed .circle-section-toggle-header {
-    border-bottom: 0;
+/* keeps the ledger/table look when opened */
+.circle-collapsible-section .circle-points-list {
+    margin-top: 0;
 }
 
 @media (max-width: 620px) {
