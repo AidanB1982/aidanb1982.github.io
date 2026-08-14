@@ -1854,3 +1854,106 @@ body.members-page .site-footer-links a:focus-visible {
         padding: 10px;
     }
 }
+/* =========================
+   BEHIND THE FILES — REACTIONS
+========================= */
+
+.circle-bfa-reactions {
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(196, 122, 44, 0.2);
+}
+
+.circle-bfa-reactions-heading h4 {
+    margin: 0 0 8px;
+    color: var(--circle-cream);
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1.08;
+    font-weight: 400;
+}
+
+.circle-bfa-reactions-heading p {
+    margin: 0 0 16px;
+    color: rgba(239, 231, 220, 0.62);
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.circle-bfa-reaction-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.circle-bfa-reaction-button {
+    box-sizing: border-box;
+    min-height: 36px;
+    padding: 9px 13px;
+    border: 1px solid rgba(196, 122, 44, 0.44);
+    border-radius: 999px;
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.1), rgba(196, 122, 44, 0.035)),
+        rgba(0, 0, 0, 0.48);
+    color: rgba(214, 177, 129, 0.88);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    line-height: 1;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.circle-bfa-reaction-button:hover,
+.circle-bfa-reaction-button:focus-visible {
+    border-color: rgba(196, 122, 44, 0.86);
+    color: var(--circle-cream);
+    outline: none;
+}
+
+.circle-bfa-reaction-button.is-active {
+    border-color: var(--circle-copper);
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.34), rgba(196, 122, 44, 0.12)),
+        rgba(74, 34, 12, 0.58);
+    color: #fff1de;
+}
+
+.circle-bfa-reaction-button:disabled {
+    opacity: 0.58;
+    cursor: wait;
+}
+
+.circle-bfa-reaction-status {
+    min-height: 19px;
+    margin: 12px 0 0;
+    color: var(--circle-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+.circle-bfa-reaction-status.is-success {
+    color: var(--circle-success);
+}
+
+.circle-bfa-reaction-status.is-error {
+    color: var(--circle-error);
+}
+
+.circle-bfa-reaction-status.is-loading {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.circle-bfa-reaction-status.is-muted {
+    color: var(--circle-muted);
+}
+
+@media (max-width: 620px) {
+    .circle-bfa-reaction-buttons {
+        flex-direction: column;
+    }
+
+    .circle-bfa-reaction-button {
+        width: 100%;
+    }
+}
