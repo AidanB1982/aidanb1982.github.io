@@ -2,6 +2,7 @@
 // BLACKWOOD CIRCLE MEMBERS
 // Supabase Auth + Member Dashboard + Rewards Redemption + Password Reset
 // Behind the Files carousel powered by /data/BFA.json
+// Behind the Files reactions powered by Supabase
 // =========================
 
 (function () {
@@ -17,6 +18,25 @@
         supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     };
 
+    const BLACKWOOD_BFA_REACTIONS = [
+        {
+            label: "Filed",
+            description: "I read this file."
+        },
+        {
+            label: "Haunting",
+            description: "This stayed with me."
+        },
+        {
+            label: "More Like This",
+            description: "I want more of this."
+        },
+        {
+            label: "Stayed With Me",
+            description: "This left a mark."
+        }
+    ];
+
     const BlackwoodMembersState = {
         app: null,
         client: null,
@@ -25,11 +45,13 @@
         posts: [],
         behindFiles: [],
         behindFilesIndex: 0,
+        postReactions: [],
         rewards: [],
         points: [],
         redemptions: [],
         activeAuthMode: "signin",
         isRedeeming: false,
+        isReactingToBehindFile: false,
         isPasswordRecovery: false,
         escapeListenerBound: false
     };
@@ -624,9 +646,11 @@
             BlackwoodMembersState.posts = [];
             BlackwoodMembersState.behindFiles = [];
             BlackwoodMembersState.behindFilesIndex = 0;
+            BlackwoodMembersState.postReactions = [];
             BlackwoodMembersState.rewards = [];
             BlackwoodMembersState.points = [];
             BlackwoodMembersState.redemptions = [];
+            BlackwoodMembersState.isReactingToBehindFile = false;
 
             updateMemberIntroVisibility(null);
             renderAuthView();
@@ -657,6 +681,7 @@
                 profileResult,
                 legacyPosts,
                 behindFiles,
+                postReactions,
                 rewardsResult,
                 pointsResult,
                 redemptionsResult
@@ -670,6 +695,8 @@
                 loadLegacyMemberPosts(),
 
                 loadBehindFilesPosts(),
+
+                loadMemberPostReactions(),
 
                 BlackwoodMembersState.client
                     .from("member_rewards")
@@ -699,6 +726,7 @@
             BlackwoodMembersState.posts = legacyPosts || [];
             BlackwoodMembersState.behindFiles = behindFiles || [];
             BlackwoodMembersState.behindFilesIndex = 0;
+            BlackwoodMembersState.postReactions = postReactions || [];
             BlackwoodMembersState.rewards = rewardsResult.data || [];
             BlackwoodMembersState.points = pointsResult.data || [];
             BlackwoodMembersState.redemptions = redemptionsResult.data || [];
@@ -749,6 +777,31 @@
 
         } catch (error) {
             console.warn("Behind the Files JSON could not be loaded:", error);
+            return [];
+        }
+    }
+
+    async function loadMemberPostReactions() {
+        if (!BlackwoodMembersState.session || !BlackwoodMembersState.session.user) {
+            return [];
+        }
+
+        try {
+            const { data, error } = await BlackwoodMembersState.client
+                .from("member_post_reactions")
+                .select("*")
+                .eq("member_id", BlackwoodMembersState.session.user.id)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.warn("Member post reactions could not be loaded:", error.message);
+                return [];
+            }
+
+            return Array.isArray(data) ? data : [];
+
+        } catch (error) {
+            console.warn("Member post reactions query failed:", error);
             return [];
         }
     }
@@ -830,7 +883,7 @@
 
                     <article class="circle-stat-card">
                         <span class="circle-stat-label">Points</span>
-                        <strong>${pointsTotal}</strong>
+                        <strong id="circle-points-total">${pointsTotal}</strong>
                     </article>
 
                     <article class="circle-stat-card">
@@ -975,7 +1028,11 @@
             `;
         }
 
-        BlackwoodMembersState.behindFilesIndex = clampBehindFilesIndex(BlackwoodMembersState.behindFilesIndex, posts);
+        BlackwoodMembersState.behindFilesIndex = clampBehindFilesIndex(
+            BlackwoodMembersState.behindFilesIndex,
+            posts
+        );
+
         const post = posts[BlackwoodMembersState.behindFilesIndex];
         const hasMultiplePosts = posts.length > 1;
 
@@ -1083,6 +1140,10 @@
                             <div class="circle-bfa-modal-body" id="circle-bfa-modal-body">
                                 ${formatPlainTextAsHtml(post.body || post.excerpt || "No file text has been added yet.")}
                             </div>
+
+                            <div id="circle-bfa-reactions-slot">
+                                ${renderBehindFileReactions(post)}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1143,6 +1204,8 @@
                 modalImage.src = BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
             });
         }
+
+        bindBehindFileReactionButtons();
 
         if (!BlackwoodMembersState.escapeListenerBound) {
             document.addEventListener("keydown", function (event) {
@@ -1266,6 +1329,7 @@
         const modalPinned = document.getElementById("circle-bfa-modal-pinned");
         const modalTitle = document.getElementById("circle-bfa-modal-title");
         const modalBody = document.getElementById("circle-bfa-modal-body");
+        const reactionsSlot = document.getElementById("circle-bfa-reactions-slot");
 
         if (modalImage) {
             modalImage.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
@@ -1292,6 +1356,222 @@
                 post.body || post.excerpt || "No file text has been added yet."
             );
         }
+
+        if (reactionsSlot) {
+            reactionsSlot.innerHTML = renderBehindFileReactions(post);
+            bindBehindFileReactionButtons();
+        }
+    }
+
+    function renderBehindFileReactions(post) {
+        const existingReaction = getReactionForPost(post.id);
+        const existingLabel = existingReaction ? existingReaction.reaction : "";
+        const hasReacted = Boolean(existingReaction);
+
+        return `
+            <section class="circle-bfa-reactions" aria-labelledby="circle-bfa-reactions-title">
+                <div class="circle-bfa-reactions-heading">
+                    <h4 id="circle-bfa-reactions-title">React to this file</h4>
+                    <p>
+                        ${
+                            hasReacted
+                                ? "Your reaction has been filed. You can change it, but points are only awarded once per file."
+                                : "File a reaction and receive +5 Circle points. One points award per file."
+                        }
+                    </p>
+                </div>
+
+                <div class="circle-bfa-reaction-buttons">
+                    ${BLACKWOOD_BFA_REACTIONS.map(function (reaction) {
+                        const isActive = existingLabel === reaction.label;
+
+                        return `
+                            <button
+                                type="button"
+                                class="circle-bfa-reaction-button ${isActive ? "is-active" : ""}"
+                                data-bfa-post-id="${escapeAttribute(post.id)}"
+                                data-bfa-reaction="${escapeAttribute(reaction.label)}"
+                                title="${escapeAttribute(reaction.description)}"
+                            >
+                                ${escapeHtml(reaction.label)}
+                            </button>
+                        `;
+                    }).join("")}
+                </div>
+
+                <p class="circle-bfa-reaction-status" id="circle-bfa-reaction-status" aria-live="polite">
+                    ${
+                        hasReacted
+                            ? `Current reaction: ${escapeHtml(existingLabel)}`
+                            : "No reaction filed yet."
+                    }
+                </p>
+            </section>
+        `;
+    }
+
+    function bindBehindFileReactionButtons() {
+        document.querySelectorAll("[data-bfa-reaction]").forEach(function (button) {
+            button.addEventListener("click", handleBehindFileReaction);
+        });
+    }
+
+    async function handleBehindFileReaction(event) {
+        const button = event.currentTarget;
+        const postId = button.dataset.bfaPostId || "";
+        const reaction = button.dataset.bfaReaction || "";
+
+        if (!postId || !reaction) {
+            setReactionStatus("This reaction could not be filed.", "is-error");
+            return;
+        }
+
+        if (BlackwoodMembersState.isReactingToBehindFile) {
+            return;
+        }
+
+        BlackwoodMembersState.isReactingToBehindFile = true;
+
+        document.querySelectorAll("[data-bfa-reaction]").forEach(function (reactionButton) {
+            reactionButton.disabled = true;
+        });
+
+        setReactionStatus("Filing your reaction...", "is-loading");
+
+        try {
+            const { data, error } = await BlackwoodMembersState.client.rpc("react_to_bfa_post", {
+                p_post_id: postId,
+                p_reaction: reaction
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            const result = normaliseRpcResult(data);
+            const awardedPoints = Number(result.points || 0);
+
+            upsertLocalReaction(postId, reaction, awardedPoints);
+
+            if (result.awarded === true) {
+                applyLocalPointAward(awardedPoints || 5, "Reacted to a Behind the Files dispatch");
+            }
+
+            updateReactionButtons(postId, reaction);
+
+            setReactionStatus(
+                result.message || "Reaction filed.",
+                result.awarded === true ? "is-success" : "is-muted"
+            );
+
+        } catch (error) {
+            console.error("Behind the Files reaction failed:", error);
+            setReactionStatus(cleanSupabaseError(error.message), "is-error");
+
+        } finally {
+            BlackwoodMembersState.isReactingToBehindFile = false;
+
+            document.querySelectorAll("[data-bfa-reaction]").forEach(function (reactionButton) {
+                reactionButton.disabled = false;
+            });
+        }
+    }
+
+    function setReactionStatus(message, className) {
+        const status = document.getElementById("circle-bfa-reaction-status");
+
+        if (!status) {
+            return;
+        }
+
+        status.textContent = message || "";
+        status.classList.remove("is-success", "is-error", "is-loading", "is-muted");
+
+        if (className) {
+            status.classList.add(className);
+        }
+    }
+
+    function getReactionForPost(postId) {
+        return BlackwoodMembersState.postReactions.find(function (reaction) {
+            return String(reaction.post_id || "") === String(postId || "");
+        }) || null;
+    }
+
+    function upsertLocalReaction(postId, reaction, pointsAwarded) {
+        const existing = getReactionForPost(postId);
+
+        if (existing) {
+            existing.reaction = reaction;
+            existing.updated_at = new Date().toISOString();
+            return;
+        }
+
+        BlackwoodMembersState.postReactions.unshift({
+            member_id: BlackwoodMembersState.session && BlackwoodMembersState.session.user
+                ? BlackwoodMembersState.session.user.id
+                : "",
+            post_id: postId,
+            reaction,
+            points_awarded: Number(pointsAwarded || 0),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        });
+    }
+
+    function updateReactionButtons(postId, reaction) {
+        document.querySelectorAll("[data-bfa-reaction]").forEach(function (button) {
+            const isSamePost = String(button.dataset.bfaPostId || "") === String(postId || "");
+            const isSameReaction = String(button.dataset.bfaReaction || "") === String(reaction || "");
+
+            button.classList.toggle("is-active", isSamePost && isSameReaction);
+        });
+    }
+
+    function applyLocalPointAward(points, reason) {
+        const cleanPoints = Number(points || 0);
+
+        if (!cleanPoints) {
+            return;
+        }
+
+        if (BlackwoodMembersState.member) {
+            BlackwoodMembersState.member.points_total = Number(BlackwoodMembersState.member.points_total || 0) + cleanPoints;
+        }
+
+        BlackwoodMembersState.points.unshift({
+            points: cleanPoints,
+            reason: reason || "Blackwood Circle activity",
+            created_at: new Date().toISOString()
+        });
+
+        const pointsTotal = document.getElementById("circle-points-total");
+
+        if (pointsTotal) {
+            pointsTotal.textContent = String(Number(pointsTotal.textContent || 0) + cleanPoints);
+        }
+
+        const pointsList = document.querySelector(".circle-points-list");
+
+        if (pointsList) {
+            pointsList.innerHTML = renderPointsHistory();
+        }
+    }
+
+    function normaliseRpcResult(data) {
+        if (!data) {
+            return {};
+        }
+
+        if (typeof data === "string") {
+            try {
+                return JSON.parse(data);
+            } catch (error) {
+                return {};
+            }
+        }
+
+        return data;
     }
 
     function clampBehindFilesIndex(index, posts) {
@@ -1792,6 +2072,10 @@
 
         if (/already have this reward/i.test(cleaned) || /pending redemption request/i.test(cleaned)) {
             return "You already have a pending redemption request for this reward.";
+        }
+
+        if (/reaction is not available/i.test(cleaned) || /not available/i.test(cleaned)) {
+            return "That reaction is not available.";
         }
 
         if (/password/i.test(cleaned) && /weak/i.test(cleaned)) {
