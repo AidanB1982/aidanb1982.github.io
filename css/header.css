@@ -1125,3 +1125,142 @@ body.sub-page .blackwood-nav {
 .blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible .blackwood-dropdown-subtitle {
     color: rgba(239, 231, 220, 0.9);
 }
+/* =========================
+   HEADER DROPDOWN FIX
+   Keeps each dropdown attached to its own nav item
+========================= */
+
+.blackwood-nav-item {
+    position: relative;
+}
+
+/* Hide all dropdowns by default */
+.blackwood-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 50%;
+    z-index: 9999;
+
+    min-width: 230px;
+    padding: 10px 0;
+
+    background: rgba(5, 4, 3, 0.96);
+    border: 1px solid rgba(196, 122, 44, 0.32);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateX(-50%) translateY(8px);
+    transition:
+        opacity 180ms ease,
+        visibility 180ms ease,
+        transform 180ms ease;
+}
+
+/* Show only the dropdown belonging to the hovered/focused nav item */
+.blackwood-nav-item:hover > .blackwood-dropdown,
+.blackwood-nav-item:focus-within > .blackwood-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Keep normal dropdown links consistent */
+.blackwood-dropdown a {
+    display: block;
+    padding: 11px 18px;
+    color: rgba(239, 231, 220, 0.86);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    line-height: 1.25;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.blackwood-dropdown a:hover,
+.blackwood-dropdown a:focus-visible {
+    background: rgba(196, 122, 44, 0.1);
+    color: #ffffff;
+    outline: none;
+}
+
+/* New Releases dropdown: same structure, just with a second line */
+.blackwood-dropdown-releases {
+    left: 50%;
+    min-width: 305px;
+    padding: 0;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature {
+    display: block;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(196, 122, 44, 0.22);
+    white-space: normal;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:last-child {
+    border-bottom: none;
+}
+
+.blackwood-dropdown-title {
+    display: block;
+    color: #f3eadc;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.blackwood-dropdown-subtitle {
+    display: block;
+    margin-top: 5px;
+    color: rgba(214, 177, 129, 0.84);
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+    text-transform: uppercase;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:hover,
+.blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible {
+    background: rgba(196, 122, 44, 0.1);
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:hover .blackwood-dropdown-title,
+.blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible .blackwood-dropdown-title {
+    color: #ffffff;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:hover .blackwood-dropdown-subtitle,
+.blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible .blackwood-dropdown-subtitle {
+    color: rgba(239, 231, 220, 0.94);
+}
+
+/* Mobile safety */
+@media (max-width: 900px) {
+    .blackwood-dropdown {
+        position: static;
+        min-width: 0;
+        width: 100%;
+        margin-top: 8px;
+
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+
+        transform: none;
+        box-shadow: none;
+    }
+
+    .blackwood-dropdown-releases {
+        min-width: 0;
+    }
+}
