@@ -320,12 +320,12 @@
                     aria-expanded="false"
                     aria-haspopup="true"
                 >
-                    The Works
+                    The Books
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
                 <div class="blackwood-dropdown" role="menu">
-                    <a href="/pages/publications.html" role="menuitem">All Works</a>
+                    <a href="/pages/publications.html" role="menuitem">All Publications</a>
                     <a href="/pages/archive-files.html" role="menuitem">The Archive Files</a>
                     <a href="/pages/cursed-bothies.html" role="menuitem">The Cursed Bothies</a>
                     <a href="/pages/hard-silence.html" role="menuitem">Hard Silence</a>
@@ -348,9 +348,9 @@
                 </button>
 
                 <div class="blackwood-dropdown" role="menu">
-                    <a href="/pages/reading-lists.html" role="menuitem">Reading Lists</a>
-                    <a href="/pages/editors-picks.html" role="menuitem">Marked for Record</a>
-                    <a href="/pages/recovered-files.html" role="menuitem">Recovered Files</a>
+                    <a href="/pages/reading-lists.html" role="menuitem">Recommended Reads</a>
+                    <a href="/pages/editors-picks.html" role="menuitem">Editor Picks</a>
+                    <a href="/pages/recovered-files.html" role="menuitem">Short Reads</a>
                     <a href="/pages/reader-records.html" role="menuitem">Reader Records</a>
                 </div>
             </div>
