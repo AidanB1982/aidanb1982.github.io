@@ -12,113 +12,148 @@
             </div>
 
             <!-- RIGHT -->
-            <div class="footer-links">
+            <nav class="footer-links" aria-label="Footer navigation">
 
                 <div class="footer-col">
                     <p class="footer-heading">Explore</p>
+                    <a href="/">Start Here</a>
                     <a href="/pages/publications.html">The Works</a>
-                    <a href="/pages/holdfast.html">Holdfast</a>
+                    <a href="/pages/holdfast.html">New Releases</a>
                     <a href="/pages/reading-lists.html">Reading Lists</a>
+                    <a href="/pages/arc-team.html">ARC Team</a>
+                    <a href="/pages/members.html">The Blackwood Circle</a>
                     <a href="/pages/contact.html">Contact</a>
+                </div>
 
-                    <p class="footer-heading" style="margin-top:20px;">Legal</p>
+                <div class="footer-col">
+                    <p class="footer-heading">Authors / Imprints</p>
+                    <a href="/pages/author.html">Aidan Blackwood</a>
+                    <a href="/pages/miren-vale.html">Miren Vale</a>
+                    
+                </div>
+
+                <div class="footer-col">
+                    <p class="footer-heading">Reader Areas</p>
+                    <a href="/pages/reader-records.html">Reader Records</a>
+                    <a href="/pages/members.html">The Blackwood Circle</a>
+                    <a href="/pages/arc-team.html">ARC Team</a>
+                    <a href="/pages/resources.html">Resources</a>
+                </div>
+
+                <div class="footer-col">
+                    <p class="footer-heading">Legal</p>
                     <a href="/pages/privacy-policy.html">Privacy Policy</a>
+                    <a href="/pages/refund-policy.html">Refund Policy</a>
+                    <a href="/pages/terms-of-service.html">Terms of Service</a>
                     <a href="/security-policy.html">Security Policy</a>
                 </div>
 
-            </div>
+            </nav>
 
         </div>
 
-        <!-- ARCHIVE SIGNUP -->
-<section class="footer-archive-signup" aria-labelledby="footer-archive-title">
+        <!-- BLACKWOOD CIRCLE SIGNUP -->
+        <section class="footer-archive-signup" aria-labelledby="footer-circle-title">
 
-    <p class="footer-archive-kicker">
-        Blackwood Archive
-    </p>
+            <p class="footer-archive-kicker">
+                The Blackwood Circle
+            </p>
 
-    <h2 id="footer-archive-title">
-        Join the Archive
-    </h2>
+            <h2 id="footer-circle-title">
+                Join the Blackwood Circle
+            </h2>
 
-    <p>
-        Receive new records, fragments, field notes, publication notices, and release updates from Blackwood Publishing.
-        Not all accounts are released at once.
-    </p>
+            <p>
+                Create your reader record inside the archive.
+            </p>
 
-    <form
-        class="footer-ml-form"
-        action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe"
-        method="post"
-        target="footer-mailerlite-frame"
-        accept-charset="utf-8"
-        autocomplete="on"
-        onsubmit="
-            document.getElementById('footer-archive-status').textContent = 'Filing your request...';
-            this.querySelector('[data-footer-submit]').textContent = 'Filing...';
-            window.setTimeout(() => {
-                document.getElementById('footer-archive-status').textContent = 'Thank you. Check your inbox to confirm your place in the Archive.';
-                this.querySelector('[data-footer-submit]').textContent = 'Filed';
-                this.reset();
-            }, 1200);
-        "
-    >
-        <label class="sr-only" for="footer-email">
-            Email address
-        </label>
+            <p>
+                Receive private dispatches, ARC notices, release updates, rewards,
+                and fragments from behind the books.
+            </p>
 
-        <input
-            id="footer-email"
-            type="email"
-            name="fields[email]"
-            placeholder="Your email address"
-            autocomplete="email"
-            required
-        >
+            <p>
+                Some records are only kept inside the Circle.
+            </p>
 
-        <input
-            type="hidden"
-            name="ml-submit"
-            value="1"
-        >
+            <form
+                class="footer-ml-form"
+                action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe"
+                method="post"
+                target="footer-mailerlite-frame"
+                accept-charset="utf-8"
+                autocomplete="on"
+                onsubmit="
+                    document.getElementById('footer-archive-status').textContent = 'Opening the Circle...';
+                    this.querySelector('[data-footer-submit]').textContent = 'Entering...';
+                    window.setTimeout(() => {
+                        document.getElementById('footer-archive-status').textContent = 'Thank you. Check your inbox to confirm your place inside the Circle.';
+                        this.querySelector('[data-footer-submit]').textContent = 'Entered';
+                        this.reset();
+                    }, 1200);
+                "
+            >
+                <label class="sr-only" for="footer-email">
+                    Email address
+                </label>
 
-        <input
-            type="hidden"
-            name="anticsrf"
-            value="true"
-        >
+                <input
+                    id="footer-email"
+                    type="email"
+                    name="fields[email]"
+                    placeholder="Your email address"
+                    autocomplete="email"
+                    required
+                >
 
-        <button type="submit" data-footer-submit>
-            Join the Archive
-        </button>
-    </form>
+                <input
+                    type="hidden"
+                    name="ml-submit"
+                    value="1"
+                >
 
-    <iframe
-        name="footer-mailerlite-frame"
-        title="Mailing list signup"
-        style="display:none;"
-    ></iframe>
+                <input
+                    type="hidden"
+                    name="anticsrf"
+                    value="true"
+                >
 
-    <p class="footer-archive-note" id="footer-archive-status" aria-live="polite">
-        You can unsubscribe at any time.
-    </p>
+                <button type="submit" data-footer-submit>
+                    Enter the Circle
+                </button>
+            </form>
 
-</section>
+            <iframe
+                name="footer-mailerlite-frame"
+                title="Mailing list signup"
+                style="display:none;"
+            ></iframe>
+
+            <p class="footer-archive-note" id="footer-archive-status" aria-live="polite">
+                You can unsubscribe at any time.
+            </p>
+
+        </section>
 
         <!-- CENTER SEAL -->
         <div class="footer-seal-wrap">
-            <img src="/assets/seal.png" class="footer-seal" alt="Blackwood Seal">
+            <img src="/assets/seal.png" class="footer-seal" alt="Blackwood Publishing seal">
         </div>
 
         <div class="footer-divider"></div>
 
         <!-- BOTTOM -->
         <div class="footer-bottom">
-            <p>© 2026 Blackwood Publishing — All works protected</p>
+            <p>
+                © 2026 Blackwood Publishing. Independent literary imprint. All works protected.
+            </p>
 
             <p class="footer-legal">
-                All rights reserved · 
                 <a href="/pages/privacy-policy.html">Privacy Policy</a>
+                ·
+                <a href="/pages/refund-policy.html">Refund Policy</a>
+                ·
+                <a href="/pages/terms-of-service.html">Terms of Service</a>
                 ·
                 <a href="/security-policy.html">Security Policy</a>
             </p>
