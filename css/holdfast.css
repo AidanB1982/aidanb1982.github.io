@@ -1099,3 +1099,21 @@ body.holdfast-page {
         width: 100%;
     }
 }
+/* =========================
+   HOLDFAST PROLOGUE
+========================= */
+
+.holdfast-page .prologue-text {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.holdfast-page .prologue-text * {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.holdfast-page .prologue-text {
+    cursor: default;
+}
