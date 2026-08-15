@@ -4,10 +4,15 @@
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag("js", new Date());
+      document.documentElement.classList.remove("no-js");
 
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+          dataLayer.push(arguments);
+      }
+
+      gtag("js", new Date());
       gtag("config", "G-1WN8PBHBW4");
     </script>
 
@@ -18,12 +23,12 @@
 
     <meta
         name="description"
-        content="Holdfast by Aidan Blackwood, Book Four of The Archive Files. Listen to the archive transmission, read the recovered prologue, and order the direct paperback edition through Blackwood Publishing."
+        content="Holdfast by Aidan Blackwood, Book Four of The Archive Files. Listen to the archive transmission, read the recovered prologue, buy on Amazon, or order the signed paperback through Blackwood Publishing."
     >
 
     <link rel="stylesheet" href="/css/header.css?v=20260902">
     <link rel="stylesheet" href="/css/styles.css?v=20260902">
-    <link rel="stylesheet" href="/css/holdfast.css?v=20260902">
+    <link rel="stylesheet" href="/css/holdfast.css?v=20260903">
 </head>
 
 <body class="sub-page holdfast-page is-unlocked">
@@ -69,6 +74,31 @@
                     The Holdfast archive transmission has been released. Listen to the recovered audio file,
                     then continue into the prologue fragment below.
                 </p>
+
+                <div class="holdfast-hero-actions" aria-label="Holdfast purchase and reading options">
+                    <a
+                        class="holdfast-hero-button primary"
+                        href="https://www.amazon.co.uk/HoldFast-Book-Four-Archive-Files/dp/1919555528"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Buy on Amazon
+                    </a>
+
+                    <a
+                        class="holdfast-hero-button secondary"
+                        href="/pages/store.html"
+                    >
+                        Order Signed Paperback
+                    </a>
+
+                    <a
+                        class="holdfast-hero-button ghost"
+                        href="/pages/store.html#the-black-bothy"
+                    >
+                        Start The Archive Files
+                    </a>
+                </div>
 
                 <div class="transmission-panel" id="transmission-panel" style="display:block; opacity:1; visibility:visible;">
 
@@ -120,7 +150,7 @@
                             class="preorder-button"
                             href="/pages/store.html#holdfast"
                         >
-                            Buy Holdfast Direct Edition
+                            Order Signed Paperback
                         </a>
                     </div>
 
@@ -280,7 +310,7 @@
                     class="route-button"
                     href="/pages/store.html#holdfast"
                 >
-                    Buy Holdfast Direct Edition
+                    Order Signed Paperback
                 </a>
             </article>
 
