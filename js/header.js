@@ -350,7 +350,7 @@
                 </div>
             </div>
 
-            <a href="/pages/store.html" class="blackwood-nav-link">Blackwood Store</a>
+            <a href="/pages/store.html" class="blackwood-nav-link">Store</a>
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
