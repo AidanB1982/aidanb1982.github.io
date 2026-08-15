@@ -307,11 +307,27 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu">
-                    <a href="/pages/holdfast.html" role="menuitem">Holdfast</a>
-                    <a href="/pages/miren-vale.html" role="menuitem">The Crossing</a>
-                </div>
-            </div>
+                <div class="blackwood-dropdown blackwood-dropdown-releases" role="menu" aria-label="New releases">
+    <a 
+        href="/pages/holdfast.html" 
+        role="menuitem"
+        class="blackwood-dropdown-feature"
+        aria-label="Holdfast, Book Four of The Archive Files"
+    >
+        <span class="blackwood-dropdown-title">HOLDFAST</span>
+        <span class="blackwood-dropdown-subtitle">Book Four of The Archive Files</span>
+    </a>
+
+    <a 
+        href="/pages/miren-vale.html" 
+        role="menuitem"
+        class="blackwood-dropdown-feature"
+        aria-label="The Crossing, a dark literary fantasy by Miren Vale"
+    >
+        <span class="blackwood-dropdown-title">THE CROSSING</span>
+        <span class="blackwood-dropdown-subtitle">A dark literary fantasy by Miren Vale</span>
+    </a>
+</div>
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
