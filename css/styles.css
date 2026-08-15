@@ -9767,3 +9767,32 @@ body.appearances-page .appearance-action-secondary:focus-visible {
         width: 100%;
     }
 }
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 28px;
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-archive-signup p {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 900px) {
+    .footer-links {
+        grid-template-columns: repeat(2, minmax(140px, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .footer-links {
+        grid-template-columns: 1fr;
+    }
+}
