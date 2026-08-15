@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="/css/header.css?v=20260902">
     <link rel="stylesheet" href="/css/styles.css?v=20260902">
-    <link rel="stylesheet" href="/css/holdfast.css?v=20260904">
+    <link rel="stylesheet" href="/css/holdfast.css?v=20260905">
 </head>
 
 <body class="sub-page holdfast-page is-unlocked">
@@ -127,7 +127,7 @@
                         Press play to begin the Holdfast transmission.
                     </p>
 
-                                </div>
+                </div>
 
             </aside>
 
@@ -253,6 +253,76 @@
 <script src="/js/header.js?v=20260902" defer></script>
 
 <script>
+function initHoldfastCopyBlock() {
+    const prologue = document.querySelector(".prologue-text");
+
+    if (!prologue) {
+        return;
+    }
+
+    let copyBlockTimer = null;
+
+    const blockedEvents = [
+        "copy",
+        "cut",
+        "contextmenu",
+        "dragstart",
+        "selectstart"
+    ];
+
+    blockedEvents.forEach((eventName) => {
+        prologue.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            showCopyBlockedMessage();
+        });
+    });
+
+    document.addEventListener("keydown", (event) => {
+        const key = String(event.key || "").toLowerCase();
+        const isProtectedShortcut = (event.ctrlKey || event.metaKey) && ["a", "c", "x", "s", "p"].includes(key);
+
+        if (!isProtectedShortcut) {
+            return;
+        }
+
+        const activeElement = document.activeElement;
+        const selection = window.getSelection();
+        const selectedNode = selection && selection.anchorNode ? selection.anchorNode : null;
+        const selectedElement = selectedNode && selectedNode.nodeType === Node.TEXT_NODE
+            ? selectedNode.parentElement
+            : selectedNode;
+
+        const isInsidePrologue =
+            prologue.contains(activeElement) ||
+            prologue.contains(selectedElement);
+
+        if (!isInsidePrologue) {
+            return;
+        }
+
+        event.preventDefault();
+        showCopyBlockedMessage();
+    });
+
+    function showCopyBlockedMessage() {
+        const note = document.querySelector(".prologue-protection-note");
+
+        if (!note) {
+            return;
+        }
+
+        note.textContent = "Archive Reading Copy. Copying is disabled for this fragment.";
+
+        if (copyBlockTimer) {
+            window.clearTimeout(copyBlockTimer);
+        }
+
+        copyBlockTimer = window.setTimeout(() => {
+            note.textContent = "Archive Reading Copy.";
+        }, 2200);
+    }
+}
+
 window.addEventListener("load", async () => {
     try {
         if (typeof loadHeader === "function") {
@@ -265,6 +335,8 @@ window.addEventListener("load", async () => {
     if (typeof initFadeIn === "function") {
         initFadeIn();
     }
+
+    initHoldfastCopyBlock();
 
     const playButton = document.getElementById("play-button");
     const audio = document.getElementById("holdfast-audio");
