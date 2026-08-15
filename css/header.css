@@ -1070,3 +1070,58 @@ body.sub-page .blackwood-nav {
         text-align: center;
     }
 }
+/* =========================
+   HEADER — STRONGER NEW RELEASES DROPDOWN
+========================= */
+
+.blackwood-dropdown-releases {
+    min-width: 260px;
+    padding: 8px;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature {
+    display: block;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(196, 122, 44, 0.18);
+    text-decoration: none;
+    white-space: normal;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:last-child {
+    border-bottom: none;
+}
+
+.blackwood-dropdown-title {
+    display: block;
+    color: #f3eadc;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1.2;
+}
+
+.blackwood-dropdown-subtitle {
+    display: block;
+    margin-top: 4px;
+    color: rgba(214, 177, 129, 0.78);
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:hover,
+.blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible {
+    background: rgba(196, 122, 44, 0.11);
+    outline: none;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:hover .blackwood-dropdown-title,
+.blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible .blackwood-dropdown-title {
+    color: #ffffff;
+}
+
+.blackwood-dropdown-releases .blackwood-dropdown-feature:hover .blackwood-dropdown-subtitle,
+.blackwood-dropdown-releases .blackwood-dropdown-feature:focus-visible .blackwood-dropdown-subtitle {
+    color: rgba(239, 231, 220, 0.9);
+}
