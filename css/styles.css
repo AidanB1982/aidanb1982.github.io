@@ -9677,3 +9677,93 @@ body.appearances-page .appearance-action-secondary:focus-visible {
     line-height: 1.6;
     text-align: center;
 }
+/* =========================
+   BOOK / AUTHOR HERO CTA BUTTONS
+========================= */
+
+.book-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.book-hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.book-hero-button.primary {
+    border: 1px solid rgba(196, 122, 44, 0.9);
+    background: linear-gradient(180deg, rgba(196, 122, 44, 0.92), rgba(126, 62, 20, 0.92));
+    color: #fff4e5;
+}
+
+.book-hero-button.secondary {
+    border: 1px solid rgba(214, 177, 129, 0.64);
+    background: rgba(20, 12, 8, 0.72);
+    color: #f3eadc;
+}
+
+.book-hero-button.ghost {
+    border: 1px solid rgba(214, 177, 129, 0.34);
+    background: rgba(0, 0, 0, 0.24);
+    color: rgba(239, 231, 220, 0.82);
+}
+
+.book-hero-button:hover,
+.book-hero-button:focus-visible {
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.book-hero-button.primary:hover,
+.book-hero-button.primary:focus-visible {
+    background: linear-gradient(180deg, rgba(218, 146, 61, 0.98), rgba(151, 73, 22, 0.98));
+    color: #ffffff;
+}
+
+.book-hero-button.secondary:hover,
+.book-hero-button.secondary:focus-visible,
+.book-hero-button.ghost:hover,
+.book-hero-button.ghost:focus-visible {
+    border-color: rgba(196, 122, 44, 0.82);
+    background: rgba(196, 122, 44, 0.12);
+    color: #ffffff;
+}
+
+.author-positioning-line {
+    max-width: 720px;
+    margin: 18px 0 0;
+    color: rgba(239, 231, 220, 0.82);
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.65;
+}
+
+@media (max-width: 620px) {
+    .book-hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .book-hero-button {
+        width: 100%;
+    }
+}
