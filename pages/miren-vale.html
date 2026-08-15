@@ -1,14 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="en-GB" class="no-js">
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      document.documentElement.classList.remove("no-js");
 
-      gtag('config', 'G-1WN8PBHBW4');
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+          dataLayer.push(arguments);
+      }
+
+      gtag("js", new Date());
+      gtag("config", "G-1WN8PBHBW4");
     </script>
 
     <meta charset="UTF-8">
@@ -18,11 +23,11 @@
 
     <meta
         name="description"
-        content="Miren Vale writes dark literary fantasy, folk horror, and ghost-soaked fiction shaped by inheritance, ritual, thresholds, and the unseen. Author of The Crossing."
+        content="Miren Vale writes dark literary fantasy for readers drawn to thresholds, old bargains, memory, grief, and the places we are warned not to enter. Begin with The Crossing."
     >
 
-    <link rel="stylesheet" href="/css/header.css?v=20260818">
-    <link rel="stylesheet" href="/css/styles.css?v=20260818">
+    <link rel="stylesheet" href="/css/header.css?v=20260902">
+    <link rel="stylesheet" href="/css/styles.css?v=20260902">
 </head>
 
 <body class="sub-page author-page miren-vale-page">
@@ -44,9 +49,21 @@
             Dark fantasy, folk horror, and ghost-soaked fiction shaped by inheritance, ritual, and the unseen.
         </p>
 
-        <p class="about-intro-line" style="opacity:0.5; font-size:14px;">
-            Stories concerned with thresholds, buried knowledge, and what follows once the old warnings are ignored.
+        <p class="about-intro-line" style="opacity:0.78; font-size:18px; max-width:780px;">
+            Miren Vale writes dark literary fantasy for readers drawn to thresholds,
+            old bargains, memory, grief, and the places we are warned not to enter.
         </p>
+
+        <div class="work-actions" style="margin-top:28px;">
+            <a
+                href="https://www.amazon.co.uk/Crossing-Literary-Fantasy-Memory-Silence-ebook/dp/B0GJG2MRGN"
+                class="button copper"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Begin with The Crossing
+            </a>
+        </div>
     </div>
 
 </section>
@@ -74,7 +91,7 @@
                 </p>
 
                 <p>
-                    Miren Vale writes dark fantasy and folk horror rooted in isolated communities,
+                    Miren Vale writes dark literary fantasy and folk horror rooted in isolated communities,
                     old beliefs, ruined places, and the consequences of answering what should have
                     been ignored.
                 </p>
@@ -129,7 +146,7 @@
             <div class="miren-book-copy">
 
                 <p class="miren-book-kicker">
-                    Forthcoming Work
+                    New Release
                 </p>
 
                 <h2 id="the-crossing-title">
@@ -160,18 +177,27 @@
                     Each person has been summoned. Each has been noticed.
                 </p>
 
+                <p>
+                    Once the threshold has been crossed, something always follows.
+                </p>
+
                 <p class="miren-book-note">
                     Dark literary fantasy / folk horror. Thresholds, ritual, memory, coastal ruins,
                     hidden trials, and old powers waiting beneath the surface.
                 </p>
 
                 <p class="miren-book-date">
-                    Publication date: 21 Aug. 2026
+                    Publication date: 14 September 2026
                 </p>
 
                 <div class="work-actions">
-                    <a href="/pages/publications.html#the-crossing" class="button copper">
-                        View in The Works
+                    <a
+                        href="https://www.amazon.co.uk/Crossing-Literary-Fantasy-Memory-Silence-ebook/dp/B0GJG2MRGN"
+                        class="button copper"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Begin with The Crossing
                     </a>
 
                     <a href="/pages/contact.html" class="button ghost">
@@ -203,6 +229,17 @@
             Keep pace. Do not answer the voices behind you. Do not turn.
         </p>
 
+        <div class="work-actions" style="margin-top:28px;">
+            <a
+                href="https://www.amazon.co.uk/Crossing-Literary-Fantasy-Memory-Silence-ebook/dp/B0GJG2MRGN"
+                class="button copper"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Enter The Crossing
+            </a>
+        </div>
+
     </section>
 
     <!-- ROUTES -->
@@ -233,22 +270,21 @@
 <div id="footer-placeholder"></div>
 
 <!-- JS -->
-<script src="/js/header.js?v=20260818" defer></script>
+<script src="/js/header.js?v=20260902" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
-
-    if (typeof loadHeader !== "function") {
-        console.error("Header failed to load");
-        return;
+    try {
+        if (typeof loadHeader === "function") {
+            await loadHeader("simple");
+        }
+    } catch (error) {
+        console.error("Header failed to load:", error);
     }
-
-    await loadHeader("simple");
 
     if (typeof initFadeIn === "function") {
         initFadeIn();
     }
-
 });
 </script>
 
