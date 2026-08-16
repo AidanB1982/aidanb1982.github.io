@@ -375,8 +375,8 @@
                         </h3>
 
                         <p class="bookshelf-modal-copy">
-                            Select a book, then mark whether you own it, have read it, received it as an ARC,
-                            or would like it signed one day.
+                            You can add owned books, books you have read, ARC copies, signed editions, or titles you want to follow.
+                            Add private notes, thoughts, edition details, reading memories, or anything you want to keep with this book.
                         </p>
 
                         ${
@@ -453,7 +453,7 @@
                                 </h3>
 
                                 <p class="bookshelf-modal-copy">
-                                    ${escapeHtml(book.author)}. Keep your private shelf record for this title.
+                                    ${escapeHtml(book.author)}. Keep a private record for this title.
                                 </p>
 
                                 <form 
@@ -484,7 +484,7 @@
 
                                         <label class="bookshelf-check">
                                             <input type="checkbox" name="wants_signed" ${record.wants_signed ? "checked" : ""}>
-                                            <span>I would like this signed</span>
+                                            <span>I'd like this signed</span>
                                         </label>
                                     </div>
 
@@ -522,7 +522,7 @@
                                                 ? ""
                                                 : `
                                                     <button type="button" class="bookshelf-modal-button danger" data-bookshelf-remove>
-                                                        Remove from Shelf
+                                                        Remove from My Shelf
                                                     </button>
                                                 `
                                         }
