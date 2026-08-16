@@ -3,6 +3,7 @@
 // Supabase Auth + Member Dashboard + Rewards Redemption + Password Reset
 // Behind the Files carousel powered by /data/BFA.json
 // Behind the Files reactions powered by Supabase
+// Blackwood Bookshelf powered by /js/member-bookshelf.js
 // =========================
 
 (function () {
@@ -926,6 +927,8 @@
                     </a>
                 </section>
 
+                ${renderBookshelfMount()}
+
                 ${renderBehindFilesCarousel()}
 
                 <section class="circle-section" aria-labelledby="circle-rewards-title">
@@ -973,6 +976,34 @@
         `;
 
         bindDashboardEvents();
+    }
+
+    function renderBookshelfMount() {
+        return `
+            <section 
+                class="circle-section blackwood-bookshelf-section" 
+                id="blackwood-bookshelf-root"
+                aria-label="My Blackwood Bookshelf"
+            >
+                <div class="circle-empty-card">
+                    <p>Opening your Blackwood Bookshelf...</p>
+                </div>
+            </section>
+        `;
+    }
+
+    function bindBlackwoodBookshelf() {
+        const root = document.getElementById("blackwood-bookshelf-root");
+
+        if (!root || typeof window.initBlackwoodBookshelf !== "function") {
+            return;
+        }
+
+        window.initBlackwoodBookshelf({
+            root,
+            client: BlackwoodMembersState.client,
+            session: BlackwoodMembersState.session
+        });
     }
 
     // =========================
@@ -1755,6 +1786,11 @@
                 ? formatDate(redemption.requested_at)
                 : formatDate(redemption.created_at);
 
+            const pointsCost = Number(redemption.points_cost || 0);
+            const pointsLine = pointsCost > 0
+                ? `${pointsCost} points redeemed.`
+                : "Complimentary reward issued.";
+
             return `
                 <article class="circle-reward-card circle-redemption-card">
                     <p class="circle-post-meta">
@@ -1764,7 +1800,7 @@
                     <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
 
                     <p>
-                        ${Number(redemption.points_cost || 0)} points redeemed.
+                        ${escapeHtml(pointsLine)}
                     </p>
 
                     ${redemption.discount_code ? `
@@ -1822,6 +1858,7 @@
             button.addEventListener("click", handleRewardRedemption);
         });
 
+        bindBlackwoodBookshelf();
         bindBehindFilesCarousel();
         bindPointsHistoryToggle();
     }
