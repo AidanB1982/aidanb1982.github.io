@@ -7,7 +7,7 @@
 (function () {
     "use strict";
 
-    const BLACKWOOD_ARC_PROFILE_ENDPOINT = "https://script.google.com/macros/s/AKfycbw9gvEAbs9j2_hj_WOvJ8IVPXaV7G8esiCFoi4LDEQTOunVnnECS0VRynX6PpApiuZr/exec";
+    const BLACKWOOD_ARC_PROFILE_ENDPOINT = "https://script.google.com/macros/s/AKfycbwxZ1Qwc_EkRgrWjjkf8kx_HXw2TIPYz9hkws4dPHVaMzC8cLPXtMxQyWv30OenpZNh/exec";
 
     const ARC_EDITABLE_FIELDS = [
         {
