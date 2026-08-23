@@ -28,12 +28,9 @@
             type: "select",
             options: [
                 "",
-                "Kindle / ebook",
-                "Paperback",
-                "Either",
-                "BookFunnel",
-                "PDF",
-                "Other"
+                "Digital Arc",
+                 "Paperback ARC",
+                 "Either"
             ]
         },
         {
