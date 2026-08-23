@@ -343,3 +343,99 @@
         width: 100%;
     }
 }
+/* =========================
+   ARC PROFILE — COLLAPSIBLE DETAILS
+========================= */
+
+.arc-profile-details {
+    margin-top: 24px;
+    border: 1px solid rgba(214, 177, 129, 0.2);
+    border-radius: 18px;
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.36));
+    overflow: hidden;
+}
+
+.arc-profile-details-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+    cursor: pointer;
+    list-style: none;
+    transition:
+        background 180ms ease,
+        color 180ms ease;
+}
+
+.arc-profile-details-summary::-webkit-details-marker {
+    display: none;
+}
+
+.arc-profile-details-summary::after {
+    content: "+";
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(196, 122, 44, 0.44);
+    border-radius: 999px;
+    color: rgba(214, 177, 129, 0.92);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.arc-profile-details[open] .arc-profile-details-summary::after {
+    content: "−";
+}
+
+.arc-profile-details-summary:hover,
+.arc-profile-details-summary:focus-visible {
+    background: rgba(196, 122, 44, 0.08);
+    outline: none;
+}
+
+.arc-profile-details-summary span {
+    display: block;
+    color: #f3eadc;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 400;
+    line-height: 1.08;
+}
+
+.arc-profile-details-summary small {
+    display: block;
+    margin-top: 5px;
+    color: rgba(239, 231, 220, 0.56);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.arc-profile-details .arc-profile-form {
+    padding: 0 20px 22px;
+}
+
+.arc-profile-details .arc-profile-form-heading {
+    padding-top: 4px;
+}
+
+@media (max-width: 720px) {
+    .arc-profile-details-summary {
+        align-items: flex-start;
+        padding: 16px;
+    }
+
+    .arc-profile-details-summary small {
+        max-width: 220px;
+    }
+
+    .arc-profile-details .arc-profile-form {
+        padding: 0 16px 18px;
+    }
+}
