@@ -10,6 +10,9 @@
     const BLACKWOOD_ARC_PROFILE_ENDPOINT = "https://script.google.com/macros/s/AKfycbwxZ1Qwc_EkRgrWjjkf8kx_HXw2TIPYz9hkws4dPHVaMzC8cLPXtMxQyWv30OenpZNh/exec";
     const BLACKWOOD_ARC_WELCOME_POSTER = "/assets/blackwood-arc-welcome.jpg";
 
+    const BLACKWOOD_SUPABASE_PUBLIC_KEY = "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
+    const BLACKWOOD_WATERMARKED_ARC_FUNCTION_URL = "https://bmnlynjldlnxfvunqbqq.supabase.co/functions/v1/generate-watermarked-arc";
+
     const ARC_EDITABLE_FIELDS = [
         {
             key: "Name",
@@ -334,7 +337,7 @@
             profile
         });
 
-        bindCurrentArcCardActions(root);
+        bindCurrentArcCardActions(root, session);
     }
 
     function renderArcWelcomePoster(applicationStatus) {
@@ -399,8 +402,7 @@
         }
 
         const title = readOnly["ARC Title"] || "Current Blackwood ARC";
-        const deliveryLink = readOnly["ARC Delivery Link"] || "";
-        const platform = readOnly["ARC Delivery Platform"] || "Private delivery";
+        const platform = readOnly["ARC Delivery Platform"] || "Blackwood ARC Vault";
         const instructions = readOnly["ARC Reader Instructions"] || "";
         const dueDate = readOnly["Review Due Date"] || "";
         const arcSentDate = readOnly["ARC Sent Date"] || "";
@@ -417,7 +419,7 @@
                     </h3>
 
                     <p>
-                        Your active ARC is filed below. Use the delivery link to open your copy,
+                        Your active ARC is filed below. Generate your private watermarked copy,
                         then return here to add your review link when it is live.
                     </p>
 
@@ -451,16 +453,13 @@
                     ` : ""}
 
                     <div class="arc-current-actions">
-                        ${looksLikeUrl(deliveryLink) ? `
-                            <a
-                                href="${escapeAttribute(deliveryLink)}"
-                                class="arc-profile-button arc-profile-button-primary"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Open ARC
-                            </a>
-                        ` : ""}
+                        <button
+                            type="button"
+                            class="arc-profile-button arc-profile-button-primary"
+                            data-generate-watermarked-arc
+                        >
+                            Generate Watermarked ARC
+                        </button>
 
                         ${reviewLink && looksLikeUrl(reviewLink) ? `
                             <a
@@ -481,32 +480,93 @@
                             ${reviewLink ? "Update Review Link" : "Add Review Link"}
                         </button>
                     </div>
+
+                    <p class="arc-current-download-message" data-watermarked-arc-message aria-live="polite"></p>
                 </div>
             </section>
         `;
     }
 
-    function bindCurrentArcCardActions(root) {
-        const button = root.querySelector("[data-open-arc-review-link]");
+    function bindCurrentArcCardActions(root, session) {
+        const reviewButton = root.querySelector("[data-open-arc-review-link]");
+        const downloadButton = root.querySelector("[data-generate-watermarked-arc]");
+        const downloadMessage = root.querySelector("[data-watermarked-arc-message]");
 
-        if (!button) {
+        if (reviewButton) {
+            reviewButton.addEventListener("click", function () {
+                const details = root.querySelector(".arc-profile-details");
+                const reviewLinkField = root.querySelector("#arc-profile-review-link");
+
+                if (details) {
+                    details.open = true;
+                }
+
+                if (reviewLinkField) {
+                    reviewLinkField.focus();
+                    reviewLinkField.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                }
+            });
+        }
+
+        if (!downloadButton) {
             return;
         }
 
-        button.addEventListener("click", function () {
-            const details = root.querySelector(".arc-profile-details");
-            const reviewLinkField = root.querySelector("#arc-profile-review-link");
-
-            if (details) {
-                details.open = true;
+        downloadButton.addEventListener("click", async function () {
+            if (!session || !session.access_token) {
+                setWatermarkedArcMessage(
+                    downloadMessage,
+                    "Please sign into The Blackwood Circle before generating your ARC.",
+                    "error"
+                );
+                return;
             }
 
-            if (reviewLinkField) {
-                reviewLinkField.focus();
-                reviewLinkField.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
+            const originalText = downloadButton.textContent;
+
+            downloadButton.disabled = true;
+            downloadButton.textContent = "Preparing ARC...";
+
+            setWatermarkedArcMessage(
+                downloadMessage,
+                "Preparing your private watermarked copy. This may take a few moments.",
+                "loading"
+            );
+
+            try {
+                const result = await requestWatermarkedArcDownload(session);
+
+                if (!result.ok || !result.downloadUrl) {
+                    throw new Error(result.error || "The watermarked ARC could not be generated.");
+                }
+
+                setWatermarkedArcMessage(
+                    downloadMessage,
+                    "Your watermarked ARC is ready. Download starting...",
+                    "success"
+                );
+
+                triggerWatermarkedArcDownload(result.downloadUrl);
+
+                window.setTimeout(function () {
+                    downloadButton.disabled = false;
+                    downloadButton.textContent = "Generate Again";
+                }, 1200);
+
+            } catch (error) {
+                console.warn("Watermarked ARC download failed:", error);
+
+                downloadButton.disabled = false;
+                downloadButton.textContent = originalText;
+
+                setWatermarkedArcMessage(
+                    downloadMessage,
+                    error.message || "The watermarked ARC could not be generated.",
+                    "error"
+                );
             }
         });
     }
@@ -735,6 +795,59 @@
             return JSON.parse(text);
         } catch (error) {
             throw new Error("ARC endpoint returned an invalid response.");
+        }
+    }
+
+    async function requestWatermarkedArcDownload(session) {
+        const response = await fetch(BLACKWOOD_WATERMARKED_ARC_FUNCTION_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + session.access_token,
+                "apikey": BLACKWOOD_SUPABASE_PUBLIC_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+        });
+
+        const text = await response.text();
+        let payload = {};
+
+        try {
+            payload = text ? JSON.parse(text) : {};
+        } catch (error) {
+            throw new Error("The ARC vault returned an invalid response.");
+        }
+
+        if (!response.ok) {
+            throw new Error(payload.error || "The ARC vault returned " + response.status + ".");
+        }
+
+        return payload;
+    }
+
+    function triggerWatermarkedArcDownload(downloadUrl) {
+        const link = document.createElement("a");
+
+        link.href = downloadUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.download = "";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    function setWatermarkedArcMessage(messageElement, text, state) {
+        if (!messageElement) {
+            return;
+        }
+
+        messageElement.textContent = text || "";
+        messageElement.className = "arc-current-download-message";
+
+        if (state) {
+            messageElement.classList.add("is-" + state);
         }
     }
 
