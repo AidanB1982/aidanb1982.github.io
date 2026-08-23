@@ -57,6 +57,12 @@
             placeholder: "Amazon, Goodreads, StoryGraph, Instagram, TikTok, blog..."
         },
         {
+            key: "Review Link",
+            label: "Review Link",
+            type: "url",
+            placeholder: "https://..."
+        },
+        {
             key: "Amazon Profile",
             label: "Amazon Profile",
             type: "url",
@@ -281,6 +287,8 @@
 
                 ${renderArcWelcomePoster(applicationStatus)}
 
+                ${renderCurrentArcCard(readOnly)}
+
                 <details class="arc-profile-details">
                     <summary class="arc-profile-details-summary">
                         <span>
@@ -325,6 +333,8 @@
             session,
             profile
         });
+
+        bindCurrentArcCardActions(root);
     }
 
     function renderArcWelcomePoster(applicationStatus) {
@@ -383,6 +393,135 @@
         `;
     }
 
+    function renderCurrentArcCard(readOnly) {
+        if (!isCurrentArcAvailable(readOnly)) {
+            return "";
+        }
+
+        const title = readOnly["ARC Title"] || "Current Blackwood ARC";
+        const deliveryLink = readOnly["ARC Delivery Link"] || "";
+        const platform = readOnly["ARC Delivery Platform"] || "Private delivery";
+        const instructions = readOnly["ARC Reader Instructions"] || "";
+        const dueDate = readOnly["Review Due Date"] || "";
+        const arcSentDate = readOnly["ARC Sent Date"] || "";
+        const reviewLink = readOnly["Review Link"] || "";
+        const reviewReceived = readOnly["Review Received"] || "";
+
+        return `
+            <section class="arc-current-card" aria-labelledby="arc-current-title">
+                <div class="arc-current-card-main">
+                    <p class="arc-profile-kicker">Current ARC</p>
+
+                    <h3 id="arc-current-title">
+                        ${escapeHtml(title)}
+                    </h3>
+
+                    <p>
+                        Your active ARC is filed below. Use the delivery link to open your copy,
+                        then return here to add your review link when it is live.
+                    </p>
+
+                    <div class="arc-current-meta">
+                        <div>
+                            <span>Delivery</span>
+                            <strong>${escapeHtml(platform)}</strong>
+                        </div>
+
+                        <div>
+                            <span>Review Due</span>
+                            <strong>${escapeHtml(dueDate || "Not recorded")}</strong>
+                        </div>
+
+                        <div>
+                            <span>Sent</span>
+                            <strong>${escapeHtml(arcSentDate || "Recently")}</strong>
+                        </div>
+
+                        <div>
+                            <span>Review Status</span>
+                            <strong>${escapeHtml(reviewReceived || "Not received")}</strong>
+                        </div>
+                    </div>
+
+                    ${instructions ? `
+                        <div class="arc-current-instructions">
+                            <strong>Reader instructions</strong>
+                            <p>${formatPlainTextAsHtml(instructions)}</p>
+                        </div>
+                    ` : ""}
+
+                    <div class="arc-current-actions">
+                        ${looksLikeUrl(deliveryLink) ? `
+                            <a
+                                href="${escapeAttribute(deliveryLink)}"
+                                class="arc-profile-button arc-profile-button-primary"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Open ARC
+                            </a>
+                        ` : ""}
+
+                        ${reviewLink && looksLikeUrl(reviewLink) ? `
+                            <a
+                                href="${escapeAttribute(reviewLink)}"
+                                class="arc-profile-button arc-profile-button-secondary"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                View Filed Review
+                            </a>
+                        ` : ""}
+
+                        <button
+                            type="button"
+                            class="arc-profile-button arc-profile-button-secondary"
+                            data-open-arc-review-link
+                        >
+                            ${reviewLink ? "Update Review Link" : "Add Review Link"}
+                        </button>
+                    </div>
+                </div>
+            </section>
+        `;
+    }
+
+    function bindCurrentArcCardActions(root) {
+        const button = root.querySelector("[data-open-arc-review-link]");
+
+        if (!button) {
+            return;
+        }
+
+        button.addEventListener("click", function () {
+            const details = root.querySelector(".arc-profile-details");
+            const reviewLinkField = root.querySelector("#arc-profile-review-link");
+
+            if (details) {
+                details.open = true;
+            }
+
+            if (reviewLinkField) {
+                reviewLinkField.focus();
+                reviewLinkField.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        });
+    }
+
+    function isCurrentArcAvailable(readOnly) {
+        const status = readOnly["Application Status"] || "";
+        const arcSent = readOnly["ARC Sent"] || "";
+        const title = readOnly["ARC Title"] || "";
+        const deliveryLink = readOnly["ARC Delivery Link"] || "";
+
+        return isAcceptedArcProfileStatus(status) &&
+            isArcSentValue(arcSent) &&
+            Boolean(title || deliveryLink);
+    }
+
     function isAcceptedArcProfileStatus(applicationStatus) {
         const cleanStatus = String(applicationStatus || "")
             .trim()
@@ -394,6 +533,19 @@
             "arc team",
             "arc team member"
         ].indexOf(cleanStatus) !== -1;
+    }
+
+    function isArcSentValue(value) {
+        const cleanValue = String(value || "")
+            .trim()
+            .toLowerCase();
+
+        return [
+            "yes",
+            "sent",
+            "true",
+            "delivered"
+        ].indexOf(cleanValue) !== -1;
     }
 
     function renderReadOnlyFields(readOnly) {
@@ -616,6 +768,15 @@
 
     function looksLikeUrl(value) {
         return /^https?:\/\//i.test(String(value || "").trim());
+    }
+
+    function formatPlainTextAsHtml(value) {
+        return escapeHtml(value || "")
+            .split(/\n{2,}/)
+            .map(function (paragraph) {
+                return paragraph.replace(/\n/g, "<br>");
+            })
+            .join("<br><br>");
     }
 
     function escapeHtml(value) {
