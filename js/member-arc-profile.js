@@ -458,7 +458,7 @@
                             class="arc-profile-button arc-profile-button-primary"
                             data-generate-watermarked-arc
                         >
-                            Generate Watermarked ARC
+                            Open My ARC Copy
                         </button>
 
                         ${reviewLink && looksLikeUrl(reviewLink) ? `
@@ -532,7 +532,7 @@
 
             setWatermarkedArcMessage(
                 downloadMessage,
-                "Preparing your private watermarked copy. This may take a few moments.",
+                "Preparing your private ARC copy. This may take a few moments.",
                 "loading"
             );
 
@@ -540,12 +540,12 @@
                 const result = await requestWatermarkedArcDownload(session);
 
                 if (!result.ok || !result.downloadUrl) {
-                    throw new Error(result.error || "The watermarked ARC could not be generated.");
+                    throw new Error(result.error || "The ARC could not be generated.");
                 }
 
                 setWatermarkedArcMessage(
                     downloadMessage,
-                    "Your watermarked ARC is ready. Download starting...",
+                    "Your ARC copy is ready. Download starting...",
                     "success"
                 );
 
@@ -553,7 +553,7 @@
 
                 window.setTimeout(function () {
                     downloadButton.disabled = false;
-                    downloadButton.textContent = "Generate Again";
+                    downloadButton.textContent = "Open Again";
                 }, 1200);
 
             } catch (error) {
