@@ -251,31 +251,42 @@
     }
 
     function renderArcProfile(root, options) {
-        const session = options.session;
-        const profile = options.profile || {};
-        const editable = profile.editable || {};
-        const readOnly = profile.readOnly || {};
+    const session = options.session;
+    const profile = options.profile || {};
+    const editable = profile.editable || {};
+    const readOnly = profile.readOnly || {};
 
-        root.innerHTML = `
-            <div class="arc-profile-card">
-                <div class="arc-profile-heading">
-                    <div>
-                        <p class="arc-profile-kicker">ARC Team</p>
-                        <h2>My ARC Profile</h2>
-                        <p>
-                            This is the reader profile Blackwood uses when selecting ARC readers,
-                            sending advance copies, and tracking review links.
-                        </p>
-                    </div>
-
-                    <div class="arc-profile-seal" aria-hidden="true">
-                        ARC
-                    </div>
+    root.innerHTML = `
+        <div class="arc-profile-card">
+            <div class="arc-profile-heading">
+                <div>
+                    <p class="arc-profile-kicker">ARC Team</p>
+                    <h2>My ARC Profile</h2>
+                    <p>
+                        This is the reader profile Blackwood uses when selecting ARC readers,
+                        sending advance copies, and tracking review links.
+                    </p>
                 </div>
 
-                <div class="arc-profile-status-panel" aria-label="ARC profile status">
-                    ${renderReadOnlyFields(readOnly)}
+                <div class="arc-profile-seal" aria-hidden="true">
+                    ARC
                 </div>
+            </div>
+
+            <div class="arc-profile-status-panel" aria-label="ARC profile status">
+                ${renderReadOnlyFields(readOnly)}
+            </div>
+
+            <details class="arc-profile-details">
+                <summary class="arc-profile-details-summary">
+                    <span>
+                        View / Edit Reader Details
+                    </span>
+
+                    <small>
+                        Preferences, platforms, links, and ARC reader notes
+                    </small>
+                </summary>
 
                 <form class="arc-profile-form" data-arc-profile-form>
                     <div class="arc-profile-form-heading">
@@ -302,14 +313,15 @@
 
                     <p class="arc-profile-message" data-arc-profile-message aria-live="polite"></p>
                 </form>
-            </div>
-        `;
+            </details>
+        </div>
+    `;
 
-        bindArcProfileForm(root, {
-            session,
-            profile
-        });
-    }
+    bindArcProfileForm(root, {
+        session,
+        profile
+    });
+}
 
     function renderReadOnlyFields(readOnly) {
         return ARC_READ_ONLY_FIELDS.map(function (field) {
