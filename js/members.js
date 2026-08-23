@@ -3,6 +3,7 @@
 // Supabase Auth + Member Dashboard + Rewards Redemption + Password Reset
 // Behind the Files carousel powered by /data/BFA.json
 // Behind the Files reactions powered by Supabase
+// ARC Profile powered by /js/member-arc-profile.js
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
 // =========================
 
@@ -863,7 +864,7 @@
         const displayName = member.display_name || member.reader_name || member.email || "Reader";
         const tier = member.member_tier || "Reader";
         const status = member.member_status || "active";
-        const arcLabel = member.is_arc_member ? "ARC Team Member" : "Circle Member";
+        const arcLabel = isArcMemberProfile(member) ? "ARC Team Member" : "Circle Member";
 
         app.innerHTML = `
             <section class="circle-dashboard" id="circle-dashboard">
@@ -927,6 +928,8 @@
                     </a>
                 </section>
 
+                ${renderArcProfileMount()}
+
                 ${renderBookshelfMount()}
 
                 ${renderBehindFilesCarousel()}
@@ -977,6 +980,56 @@
 
         bindDashboardEvents();
     }
+
+    // =========================
+    // ARC PROFILE
+    // =========================
+
+    function renderArcProfileMount() {
+        const member = BlackwoodMembersState.member;
+
+        if (!isArcMemberProfile(member)) {
+            return "";
+        }
+
+        return `
+            <section 
+                class="circle-section member-arc-profile-section" 
+                id="blackwood-arc-profile-root"
+                aria-label="My ARC Profile"
+            >
+                <div class="circle-empty-card">
+                    <p>Opening your ARC profile...</p>
+                </div>
+            </section>
+        `;
+    }
+
+    function isArcMemberProfile(member) {
+        if (!member) {
+            return false;
+        }
+
+        return member.is_arc_member === true ||
+            String(member.is_arc_member || "").toLowerCase() === "true";
+    }
+
+    function bindMemberArcProfile() {
+        const root = document.getElementById("blackwood-arc-profile-root");
+
+        if (!root || typeof window.initBlackwoodArcProfile !== "function") {
+            return;
+        }
+
+        window.initBlackwoodArcProfile({
+            root,
+            session: BlackwoodMembersState.session
+        });
+    }
+
+    // =========================
+    // BLACKWOOD BOOKSHELF
+    // =========================
 
     function renderBookshelfMount() {
         return `
@@ -1858,6 +1911,7 @@
             button.addEventListener("click", handleRewardRedemption);
         });
 
+        bindMemberArcProfile();
         bindBlackwoodBookshelf();
         bindBehindFilesCarousel();
         bindPointsHistoryToggle();
