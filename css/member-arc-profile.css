@@ -1,0 +1,345 @@
+/* ======================================================
+   BLACKWOOD CIRCLE — MEMBER ARC PROFILE
+====================================================== */
+
+.member-arc-profile-section {
+    margin-top: 34px;
+}
+
+.arc-profile-card {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(22px, 4vw, 34px);
+    border: 1px solid rgba(196, 122, 44, 0.25);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at top right, rgba(196, 122, 44, 0.14), transparent 36%),
+        linear-gradient(180deg, rgba(20, 13, 8, 0.96), rgba(7, 5, 4, 0.97));
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.arc-profile-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.035), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(91, 126, 151, 0.08), transparent 34%);
+    opacity: 0.95;
+}
+
+.arc-profile-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.arc-profile-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+    margin-bottom: 24px;
+}
+
+.arc-profile-kicker {
+    margin: 0 0 8px;
+    color: rgba(214, 177, 129, 0.86);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.arc-profile-heading h2,
+.arc-profile-card h2 {
+    margin: 0 0 10px;
+    color: #f3eadc;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(30px, 4vw, 46px);
+    font-weight: 400;
+    line-height: 1.05;
+}
+
+.arc-profile-heading p,
+.arc-profile-card > p,
+.arc-profile-form-heading p,
+.arc-profile-small-note {
+    margin: 0;
+    max-width: 760px;
+    color: rgba(239, 231, 220, 0.66);
+    font-size: 14.5px;
+    line-height: 1.65;
+}
+
+.arc-profile-seal {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 74px;
+    height: 74px;
+    border: 1px solid rgba(196, 122, 44, 0.45);
+    border-radius: 999px;
+    background:
+        radial-gradient(circle, rgba(196, 122, 44, 0.22), rgba(61, 28, 10, 0.48));
+    color: rgba(239, 231, 220, 0.92);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    box-shadow:
+        inset 0 0 18px rgba(0, 0, 0, 0.42),
+        0 12px 30px rgba(0, 0, 0, 0.34);
+}
+
+.arc-profile-status-panel {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 22px 0 30px;
+}
+
+.arc-profile-status-item {
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1px solid rgba(214, 177, 129, 0.16);
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.arc-profile-status-item span {
+    display: block;
+    margin-bottom: 6px;
+    color: rgba(214, 177, 129, 0.72);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.arc-profile-status-item strong,
+.arc-profile-status-item a {
+    display: block;
+    overflow-wrap: anywhere;
+    color: rgba(239, 231, 220, 0.9);
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+}
+
+.arc-profile-status-item a {
+    color: rgba(214, 177, 129, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.arc-profile-form {
+    margin-top: 8px;
+}
+
+.arc-profile-form-heading {
+    margin-bottom: 18px;
+}
+
+.arc-profile-form-heading h3 {
+    margin: 0 0 7px;
+    color: #f3eadc;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 400;
+    line-height: 1.1;
+}
+
+.arc-profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.arc-profile-field {
+    min-width: 0;
+}
+
+.arc-profile-field-wide {
+    grid-column: 1 / -1;
+}
+
+.arc-profile-field label {
+    display: block;
+    margin: 0 0 7px;
+    color: rgba(214, 177, 129, 0.84);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.25;
+    text-transform: uppercase;
+}
+
+.arc-profile-field input,
+.arc-profile-field textarea,
+.arc-profile-field select {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(214, 177, 129, 0.24);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.34);
+    color: rgba(239, 231, 220, 0.94);
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+    outline: none;
+    transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.arc-profile-field input,
+.arc-profile-field select {
+    min-height: 46px;
+    padding: 0 13px;
+}
+
+.arc-profile-field textarea {
+    min-height: 116px;
+    padding: 13px;
+    resize: vertical;
+}
+
+.arc-profile-field input::placeholder,
+.arc-profile-field textarea::placeholder {
+    color: rgba(239, 231, 220, 0.34);
+}
+
+.arc-profile-field input:focus,
+.arc-profile-field textarea:focus,
+.arc-profile-field select:focus {
+    border-color: rgba(196, 122, 44, 0.72);
+    background: rgba(0, 0, 0, 0.48);
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.13);
+}
+
+.arc-profile-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.arc-profile-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 11px 16px;
+    border-radius: 999px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    line-height: 1.1;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease,
+        color 180ms ease,
+        opacity 180ms ease;
+}
+
+.arc-profile-button:hover,
+.arc-profile-button:focus-visible {
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.arc-profile-button-primary {
+    border: 1px solid rgba(196, 122, 44, 0.92);
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.92), rgba(104, 48, 16, 0.95));
+    color: #fff3e4;
+}
+
+.arc-profile-button-secondary {
+    border: 1px solid rgba(214, 177, 129, 0.34);
+    background: rgba(0, 0, 0, 0.24);
+    color: rgba(239, 231, 220, 0.72);
+}
+
+.arc-profile-button:disabled {
+    opacity: 0.56;
+    cursor: wait;
+    transform: none;
+}
+
+.arc-profile-message {
+    min-height: 20px;
+    margin: 14px 0 0;
+    color: rgba(239, 231, 220, 0.62);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.arc-profile-message.is-loading {
+    color: rgba(239, 231, 220, 0.76);
+}
+
+.arc-profile-message.is-success {
+    color: #9bd69b;
+}
+
+.arc-profile-message.is-error {
+    color: #ff9b8f;
+}
+
+.arc-profile-card-loading,
+.arc-profile-card-muted,
+.arc-profile-card-error {
+    padding: clamp(22px, 4vw, 34px);
+}
+
+.arc-profile-card-error {
+    border-color: rgba(255, 112, 92, 0.28);
+}
+
+.arc-profile-card-muted {
+    border-color: rgba(214, 177, 129, 0.18);
+}
+
+@media (max-width: 980px) {
+    .arc-profile-status-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .arc-profile-heading {
+        flex-direction: column;
+    }
+
+    .arc-profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .arc-profile-status-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .arc-profile-actions {
+        flex-direction: column;
+    }
+
+    .arc-profile-button {
+        width: 100%;
+    }
+}
