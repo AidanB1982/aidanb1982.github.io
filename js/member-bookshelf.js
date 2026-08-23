@@ -102,7 +102,7 @@
         },
         {
             id: "sanae-per-mortem",
-            title: "Sanae Per Mortem",
+            title: "Sanare Per Mortem",
             author: "Aidan Blackwood",
             series: "Standalone Work",
             spine: "/assets/SanareSpine.png",
