@@ -23,16 +23,20 @@
             placeholder: "Country"
         },
         {
-            key: "Preferred Format",
-            label: "Preferred Format",
-            type: "select",
-            options: [
-                "",
-                "Digital Arc",
-                 "Paperback ARC",
-                 "Either"
-            ]
-        },
+    key: "Preferred Format",
+    label: "Preferred Format",
+    type: "select",
+    options: [
+        "",
+        "Digital ARC",
+        "Paperback ARC",
+        "Either",
+        "BookFunnel",
+        "Kindle / ebook",
+        "PDF",
+        "Other"
+    ]
+},
         {
             key: "Preferred Genres",
             label: "Preferred Genres",
