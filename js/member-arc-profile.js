@@ -8,6 +8,7 @@
     "use strict";
 
     const BLACKWOOD_ARC_PROFILE_ENDPOINT = "https://script.google.com/macros/s/AKfycbwxZ1Qwc_EkRgrWjjkf8kx_HXw2TIPYz9hkws4dPHVaMzC8cLPXtMxQyWv30OenpZNh/exec";
+    const BLACKWOOD_ARC_WELCOME_POSTER = "/assets/blackwood-arc-welcome.jpg";
 
     const ARC_EDITABLE_FIELDS = [
         {
@@ -23,20 +24,20 @@
             placeholder: "Country"
         },
         {
-    key: "Preferred Format",
-    label: "Preferred Format",
-    type: "select",
-    options: [
-        "",
-        "Digital ARC",
-        "Paperback ARC",
-        "Either",
-        "BookFunnel",
-        "Kindle / ebook",
-        "PDF",
-        "Other"
-    ]
-},
+            key: "Preferred Format",
+            label: "Preferred Format",
+            type: "select",
+            options: [
+                "",
+                "Digital ARC",
+                "Paperback ARC",
+                "Either",
+                "BookFunnel",
+                "Kindle / ebook",
+                "PDF",
+                "Other"
+            ]
+        },
         {
             key: "Preferred Genres",
             label: "Preferred Genres",
@@ -251,77 +252,149 @@
     }
 
     function renderArcProfile(root, options) {
-    const session = options.session;
-    const profile = options.profile || {};
-    const editable = profile.editable || {};
-    const readOnly = profile.readOnly || {};
+        const session = options.session;
+        const profile = options.profile || {};
+        const editable = profile.editable || {};
+        const readOnly = profile.readOnly || {};
+        const applicationStatus = readOnly["Application Status"] || "";
 
-    root.innerHTML = `
-        <div class="arc-profile-card">
-            <div class="arc-profile-heading">
-                <div>
-                    <p class="arc-profile-kicker">ARC Team</p>
-                    <h2>My ARC Profile</h2>
-                    <p>
-                        This is the reader profile Blackwood uses when selecting ARC readers,
-                        sending advance copies, and tracking review links.
-                    </p>
-                </div>
-
-                <div class="arc-profile-seal" aria-hidden="true">
-                    ARC
-                </div>
-            </div>
-
-            <div class="arc-profile-status-panel" aria-label="ARC profile status">
-                ${renderReadOnlyFields(readOnly)}
-            </div>
-
-            <details class="arc-profile-details">
-                <summary class="arc-profile-details-summary">
-                    <span>
-                        View / Edit Reader Details
-                    </span>
-
-                    <small>
-                        Preferences, platforms, links, and ARC reader notes
-                    </small>
-                </summary>
-
-                <form class="arc-profile-form" data-arc-profile-form>
-                    <div class="arc-profile-form-heading">
-                        <h3>Reader Details</h3>
+        root.innerHTML = `
+            <div class="arc-profile-card">
+                <div class="arc-profile-heading">
+                    <div>
+                        <p class="arc-profile-kicker">ARC Team</p>
+                        <h2>My ARC Profile</h2>
                         <p>
-                            Keep your preferences, review platforms, and reader details up to date.
-                            Your email and ARC status are locked to your Circle account.
+                            This is the reader profile Blackwood uses when selecting ARC readers,
+                            sending advance copies, and tracking review links.
                         </p>
                     </div>
 
-                    <div class="arc-profile-grid">
-                        ${renderEditableFields(editable)}
+                    <div class="arc-profile-seal" aria-hidden="true">
+                        ARC
                     </div>
+                </div>
 
-                    <div class="arc-profile-actions">
-                        <button type="submit" class="arc-profile-button arc-profile-button-primary" data-arc-save-button>
-                            Save ARC Profile
-                        </button>
+                <div class="arc-profile-status-panel" aria-label="ARC profile status">
+                    ${renderReadOnlyFields(readOnly)}
+                </div>
 
-                        <button type="button" class="arc-profile-button arc-profile-button-secondary" data-arc-reset-button>
-                            Reset Changes
-                        </button>
+                ${renderArcWelcomePoster(applicationStatus)}
+
+                <details class="arc-profile-details">
+                    <summary class="arc-profile-details-summary">
+                        <span>
+                            View / Edit Reader Details
+                        </span>
+
+                        <small>
+                            Preferences, platforms, links, and ARC reader notes
+                        </small>
+                    </summary>
+
+                    <form class="arc-profile-form" data-arc-profile-form>
+                        <div class="arc-profile-form-heading">
+                            <h3>Reader Details</h3>
+                            <p>
+                                Keep your preferences, review platforms, and reader details up to date.
+                                Your email and ARC status are locked to your Circle account.
+                            </p>
+                        </div>
+
+                        <div class="arc-profile-grid">
+                            ${renderEditableFields(editable)}
+                        </div>
+
+                        <div class="arc-profile-actions">
+                            <button type="submit" class="arc-profile-button arc-profile-button-primary" data-arc-save-button>
+                                Save ARC Profile
+                            </button>
+
+                            <button type="button" class="arc-profile-button arc-profile-button-secondary" data-arc-reset-button>
+                                Reset Changes
+                            </button>
+                        </div>
+
+                        <p class="arc-profile-message" data-arc-profile-message aria-live="polite"></p>
+                    </form>
+                </details>
+            </div>
+        `;
+
+        bindArcProfileForm(root, {
+            session,
+            profile
+        });
+    }
+
+    function renderArcWelcomePoster(applicationStatus) {
+        if (!isAcceptedArcProfileStatus(applicationStatus)) {
+            return "";
+        }
+
+        return `
+            <section class="arc-welcome-poster" aria-labelledby="arc-welcome-poster-title">
+                <div class="arc-welcome-poster-copy">
+                    <p class="arc-profile-kicker">Welcome Poster</p>
+
+                    <h3 id="arc-welcome-poster-title">
+                        Welcome to the ARC Team
+                    </h3>
+
+                    <p>
+                        Your official Blackwood ARC Team welcome poster is now filed inside your Circle profile.
+                        Open it full size or save a copy for your own archive.
+                    </p>
+
+                    <div class="arc-welcome-poster-actions">
+                        <a
+                            href="${escapeAttribute(BLACKWOOD_ARC_WELCOME_POSTER)}"
+                            class="arc-profile-button arc-profile-button-primary"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Open Poster
+                        </a>
+
+                        <a
+                            href="${escapeAttribute(BLACKWOOD_ARC_WELCOME_POSTER)}"
+                            class="arc-profile-button arc-profile-button-secondary"
+                            download
+                        >
+                            Download Poster
+                        </a>
                     </div>
+                </div>
 
-                    <p class="arc-profile-message" data-arc-profile-message aria-live="polite"></p>
-                </form>
-            </details>
-        </div>
-    `;
+                <a
+                    class="arc-welcome-poster-preview"
+                    href="${escapeAttribute(BLACKWOOD_ARC_WELCOME_POSTER)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open the Blackwood ARC Team welcome poster"
+                >
+                    <img
+                        src="${escapeAttribute(BLACKWOOD_ARC_WELCOME_POSTER)}"
+                        alt="Welcome to the ARC Team poster by Blackwood Publishing"
+                        loading="lazy"
+                    >
+                </a>
+            </section>
+        `;
+    }
 
-    bindArcProfileForm(root, {
-        session,
-        profile
-    });
-}
+    function isAcceptedArcProfileStatus(applicationStatus) {
+        const cleanStatus = String(applicationStatus || "")
+            .trim()
+            .toLowerCase();
+
+        return [
+            "accepted",
+            "approved",
+            "arc team",
+            "arc team member"
+        ].indexOf(cleanStatus) !== -1;
+    }
 
     function renderReadOnlyFields(readOnly) {
         return ARC_READ_ONLY_FIELDS.map(function (field) {
