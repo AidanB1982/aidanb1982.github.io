@@ -167,10 +167,7 @@
             key: "Review Received",
             label: "Review Received"
         },
-        {
-            key: "Review Link",
-            label: "Review Link"
-        },
+        
         {
             key: "Application ID",
             label: "Application ID"
