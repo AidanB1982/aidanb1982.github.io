@@ -3,6 +3,7 @@
 // Pulls editable ARC profile from Apps Script.
 // Pulls ARC file assignments from Supabase.
 // Requires copyright acceptance before opening ARC download.
+// Allows ARC readers to submit/update review links.
 // ======================================================
 
 (function () {
@@ -574,6 +575,7 @@
                             class="arc-profile-button arc-profile-button-secondary"
                             target="_blank"
                             rel="noopener noreferrer"
+                            data-arc-review-view-link
                         >
                             View Filed Review
                         </a>
@@ -588,6 +590,41 @@
                     </button>
                 </div>
 
+                <form class="arc-review-link-panel" data-arc-review-form hidden>
+                    <label for="arc-review-link-${safeAssignmentId}">
+                        Review link
+                    </label>
+
+                    <div class="arc-review-link-row">
+                        <input
+                            id="arc-review-link-${safeAssignmentId}"
+                            type="url"
+                            value="${escapeAttribute(reviewLink)}"
+                            placeholder="https://..."
+                            data-arc-review-link-input
+                        >
+
+                        <button
+                            type="submit"
+                            class="arc-profile-button arc-profile-button-primary"
+                            data-save-arc-review-link
+                            data-assignment-id="${safeAssignmentId}"
+                        >
+                            Save Review Link
+                        </button>
+
+                        <button
+                            type="button"
+                            class="arc-profile-button arc-profile-button-secondary"
+                            data-cancel-arc-review-link
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
+                    <p class="arc-review-link-message" data-arc-review-link-message aria-live="polite"></p>
+                </form>
+
                 <p class="arc-current-download-message" data-watermarked-arc-message aria-live="polite"></p>
             </article>
         `;
@@ -600,6 +637,10 @@
             const terms = Array.from(card.querySelectorAll("[data-arc-term]"));
             const downloadButton = card.querySelector("[data-generate-watermarked-arc]");
             const reviewButton = card.querySelector("[data-open-arc-review-link]");
+            const reviewForm = card.querySelector("[data-arc-review-form]");
+            const reviewInput = card.querySelector("[data-arc-review-link-input]");
+            const reviewCancelButton = card.querySelector("[data-cancel-arc-review-link]");
+            const reviewMessage = card.querySelector("[data-arc-review-link-message]");
             const message = card.querySelector("[data-watermarked-arc-message]");
 
             terms.forEach(function (checkbox) {
@@ -610,21 +651,97 @@
 
             updateArcVaultButtonState(card);
 
-            if (reviewButton) {
+            if (reviewButton && reviewForm) {
                 reviewButton.addEventListener("click", function () {
-                    const details = root.querySelector(".arc-profile-details");
-                    const reviewLinkField = root.querySelector("#arc-profile-review-link");
+                    reviewForm.hidden = !reviewForm.hidden;
 
-                    if (details) {
-                        details.open = true;
-                    }
-
-                    if (reviewLinkField) {
-                        reviewLinkField.focus();
-                        reviewLinkField.scrollIntoView({
+                    if (!reviewForm.hidden && reviewInput) {
+                        reviewInput.focus();
+                        reviewInput.scrollIntoView({
                             behavior: "smooth",
                             block: "center"
                         });
+                    }
+                });
+            }
+
+            if (reviewCancelButton && reviewForm) {
+                reviewCancelButton.addEventListener("click", function () {
+                    reviewForm.hidden = true;
+                    setArcReviewLinkMessage(reviewMessage, "", "");
+                });
+            }
+
+            if (reviewForm) {
+                reviewForm.addEventListener("submit", async function (event) {
+                    event.preventDefault();
+
+                    const saveButton = reviewForm.querySelector("[data-save-arc-review-link]");
+                    const assignmentId = saveButton
+                        ? saveButton.getAttribute("data-assignment-id") || ""
+                        : card.getAttribute("data-assignment-id") || "";
+
+                    const reviewLink = reviewInput
+                        ? String(reviewInput.value || "").trim()
+                        : "";
+
+                    if (!reviewLink || !looksLikeUrl(reviewLink)) {
+                        setArcReviewLinkMessage(
+                            reviewMessage,
+                            "Please enter a valid review link starting with http:// or https://",
+                            "error"
+                        );
+                        return;
+                    }
+
+                    if (!session || !session.access_token) {
+                        setArcReviewLinkMessage(
+                            reviewMessage,
+                            "Please sign into The Blackwood Circle before filing your review link.",
+                            "error"
+                        );
+                        return;
+                    }
+
+                    const originalText = saveButton ? saveButton.textContent : "";
+
+                    if (saveButton) {
+                        saveButton.disabled = true;
+                        saveButton.textContent = "Filing...";
+                    }
+
+                    setArcReviewLinkMessage(
+                        reviewMessage,
+                        "Filing your review link...",
+                        "loading"
+                    );
+
+                    try {
+                        await requestArcReviewLinkSave(session, assignmentId, reviewLink);
+
+                        setArcReviewLinkMessage(
+                            reviewMessage,
+                            "Review link filed. Refreshing ARC record...",
+                            "success"
+                        );
+
+                        window.setTimeout(function () {
+                            loadArcVault(root, session);
+                        }, 800);
+
+                    } catch (error) {
+                        console.warn("ARC review link save failed:", error);
+
+                        if (saveButton) {
+                            saveButton.disabled = false;
+                            saveButton.textContent = originalText || "Save Review Link";
+                        }
+
+                        setArcReviewLinkMessage(
+                            reviewMessage,
+                            error.message || "The review link could not be filed.",
+                            "error"
+                        );
                     }
                 });
             }
@@ -725,115 +842,124 @@
     }
 
     async function fetchArcAssignments(session) {
-    const memberId = getSessionUserId(session);
+        const memberId = getSessionUserId(session);
 
-    if (!memberId) {
-        throw new Error("Your Circle member ID could not be confirmed.");
-    }
-
-    const baseSelect = [
-        "id",
-        "member_id",
-        "arc_file_id",
-        "application_id",
-        "status",
-        "review_due_date",
-        "review_link",
-        "watermarked_storage_bucket",
-        "watermarked_storage_path",
-        "download_count",
-        "last_downloaded_at",
-        "created_at"
-    ];
-
-    const selectWithArcFile = baseSelect.concat([
-        "arc_files(title,slug,author_name,mime_type)"
-    ]).join(",");
-
-    let assignments = [];
-
-    try {
-        assignments = await supabaseRestSelect(session, "arc_file_assignments", {
-            select: selectWithArcFile,
-            member_id: "eq." + memberId,
-            status: "eq.active",
-            order: "created_at.desc"
-        });
-    } catch (error) {
-        console.warn("ARC assignment join failed, trying assignment-only fetch:", error);
-
-        assignments = await supabaseRestSelect(session, "arc_file_assignments", {
-            select: baseSelect.join(","),
-            member_id: "eq." + memberId,
-            status: "eq.active",
-            order: "created_at.desc"
-        });
-    }
-
-    return enrichArcAssignmentsWithFileDetails(session, assignments);
-}
-async function enrichArcAssignmentsWithFileDetails(session, assignments) {
-    if (!Array.isArray(assignments) || !assignments.length) {
-        return [];
-    }
-
-    const missingFileDetails = assignments.filter(function (assignment) {
-        const arcFile = normalizeArcFileRelation(assignment.arc_files);
-
-        return !arcFile.title && assignment.arc_file_id;
-    });
-
-    if (!missingFileDetails.length) {
-        return assignments;
-    }
-
-    const arcFileIds = Array.from(new Set(
-        missingFileDetails
-            .map(function (assignment) {
-                return Number(assignment.arc_file_id);
-            })
-            .filter(function (id) {
-                return Number.isFinite(id) && id > 0;
-            })
-    ));
-
-    if (!arcFileIds.length) {
-        return assignments;
-    }
-
-    const arcFiles = await fetchArcFilesByIds(session, arcFileIds);
-    const arcFileMap = {};
-
-    arcFiles.forEach(function (arcFile) {
-        arcFileMap[String(arcFile.id)] = arcFile;
-    });
-
-    return assignments.map(function (assignment) {
-        const existingArcFile = normalizeArcFileRelation(assignment.arc_files);
-
-        if (existingArcFile.title) {
-            return assignment;
+        if (!memberId) {
+            throw new Error("Your Circle member ID could not be confirmed.");
         }
 
-        const fallbackArcFile = arcFileMap[String(assignment.arc_file_id)] || {};
+        const baseSelect = [
+            "id",
+            "member_id",
+            "arc_file_id",
+            "application_id",
+            "status",
+            "review_due_date",
+            "review_link",
+            "watermarked_storage_bucket",
+            "watermarked_storage_path",
+            "download_count",
+            "last_downloaded_at",
+            "created_at"
+        ];
 
-        return {
-            ...assignment,
-            arc_files: fallbackArcFile
-        };
-    });
-}
+        const selectWithArcFile = baseSelect.concat([
+            "arc_files(title,slug,author_name,mime_type)"
+        ]).join(",");
 
-async function fetchArcFilesByIds(session, arcFileIds) {
-    if (!arcFileIds.length) {
-        return [];
+        let assignments = [];
+
+        try {
+            assignments = await supabaseRestSelect(session, "arc_file_assignments", {
+                select: selectWithArcFile,
+                member_id: "eq." + memberId,
+                status: "eq.active",
+                order: "created_at.desc"
+            });
+        } catch (error) {
+            console.warn("ARC assignment join failed, trying assignment-only fetch:", error);
+
+            assignments = await supabaseRestSelect(session, "arc_file_assignments", {
+                select: baseSelect.join(","),
+                member_id: "eq." + memberId,
+                status: "eq.active",
+                order: "created_at.desc"
+            });
+        }
+
+        return enrichArcAssignmentsWithFileDetails(session, assignments);
     }
 
-    return supabaseRestSelect(session, "arc_files", {
-        select: "id,title,slug,author_name,mime_type",
-        id: "in.(" + arcFileIds.join(",") + ")"
-    });
-}
+    async function enrichArcAssignmentsWithFileDetails(session, assignments) {
+        if (!Array.isArray(assignments) || !assignments.length) {
+            return [];
+        }
+
+        const missingFileDetails = assignments.filter(function (assignment) {
+            const arcFile = normalizeArcFileRelation(assignment.arc_files);
+
+            return !arcFile.title && assignment.arc_file_id;
+        });
+
+        if (!missingFileDetails.length) {
+            return assignments;
+        }
+
+        const arcFileIds = Array.from(new Set(
+            missingFileDetails
+                .map(function (assignment) {
+                    return Number(assignment.arc_file_id);
+                })
+                .filter(function (id) {
+                    return Number.isFinite(id) && id > 0;
+                })
+        ));
+
+        if (!arcFileIds.length) {
+            return assignments;
+        }
+
+        try {
+            const arcFiles = await fetchArcFilesByIds(session, arcFileIds);
+            const arcFileMap = {};
+
+            arcFiles.forEach(function (arcFile) {
+                arcFileMap[String(arcFile.id)] = arcFile;
+            });
+
+            return assignments.map(function (assignment) {
+                const existingArcFile = normalizeArcFileRelation(assignment.arc_files);
+
+                if (existingArcFile.title) {
+                    return assignment;
+                }
+
+                const fallbackArcFile = arcFileMap[String(assignment.arc_file_id)] || {};
+
+                return {
+                    ...assignment,
+                    arc_files: fallbackArcFile
+                };
+            });
+
+        } catch (error) {
+            console.warn("ARC file title fallback failed:", error);
+
+            return assignments;
+        }
+    }
+
+    async function fetchArcFilesByIds(session, arcFileIds) {
+        if (!arcFileIds.length) {
+            return [];
+        }
+
+        return supabaseRestSelect(session, "arc_files", {
+            select: "id,title,slug,author_name,mime_type",
+            id: "in.(" + arcFileIds.join(",") + ")"
+        });
+    }
+
     async function supabaseRestSelect(session, tableName, queryParams) {
         const url = new URL(BLACKWOOD_SUPABASE_URL + "/rest/v1/" + tableName);
 
@@ -910,6 +1036,53 @@ async function fetchArcFilesByIds(session, arcFileIds) {
             ok: payload.ok !== false && Boolean(downloadUrl),
             downloadUrl
         };
+    }
+
+    async function requestArcReviewLinkSave(session, assignmentId, reviewLink) {
+        const cleanAssignmentId = Number(assignmentId);
+
+        if (!Number.isFinite(cleanAssignmentId) || cleanAssignmentId <= 0) {
+            throw new Error("ARC assignment could not be confirmed.");
+        }
+
+        return supabaseRestRpc(session, "submit_arc_review_link", {
+            p_assignment_id: cleanAssignmentId,
+            p_review_link: reviewLink
+        });
+    }
+
+    async function supabaseRestRpc(session, functionName, payload) {
+        const url = BLACKWOOD_SUPABASE_URL + "/rest/v1/rpc/" + functionName;
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "apikey": BLACKWOOD_SUPABASE_PUBLIC_KEY,
+                "Authorization": "Bearer " + session.access_token,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload || {})
+        });
+
+        const text = await response.text();
+        let result = null;
+
+        try {
+            result = text ? JSON.parse(text) : null;
+        } catch (error) {
+            throw new Error("The ARC vault returned an invalid review-link response.");
+        }
+
+        if (!response.ok) {
+            const message = result && (result.message || result.error || result.details)
+                ? result.message || result.error || result.details
+                : "The ARC vault returned " + response.status + ".";
+
+            throw new Error(message);
+        }
+
+        return result;
     }
 
     function triggerWatermarkedArcDownload(downloadUrl) {
@@ -1122,6 +1295,19 @@ async function fetchArcFilesByIds(session, arcFileIds) {
 
         messageElement.textContent = text || "";
         messageElement.className = "arc-current-download-message";
+
+        if (state) {
+            messageElement.classList.add("is-" + state);
+        }
+    }
+
+    function setArcReviewLinkMessage(messageElement, text, state) {
+        if (!messageElement) {
+            return;
+        }
+
+        messageElement.textContent = text || "";
+        messageElement.className = "arc-review-link-message";
 
         if (state) {
             messageElement.classList.add("is-" + state);
