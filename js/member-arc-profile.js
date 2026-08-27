@@ -4,6 +4,8 @@
 // Pulls ARC file assignments from Supabase.
 // Requires copyright acceptance before opening ARC download.
 // Allows ARC readers to submit/update review links.
+// Shows review status labels: Active, Due Soon, Due Today,
+// Overdue, Review Filed.
 // ======================================================
 
 (function () {
@@ -491,7 +493,7 @@
         const assignmentId = String(assignment.id || "");
         const title = arcFile.title || "Current Blackwood ARC";
         const authorName = arcFile.author_name || "Blackwood Publishing";
-        const status = assignment.status || "active";
+        const reviewStatus = getArcReviewStatus(assignment);
         const reviewDueDate = assignment.review_due_date || "";
         const downloadCount = Number(assignment.download_count || 0);
         const lastDownloadedAt = assignment.last_downloaded_at || "";
@@ -513,8 +515,8 @@
                         </p>
                     </div>
 
-                    <span class="arc-vault-status">
-                        ${escapeHtml(status)}
+                    <span class="arc-vault-status ${escapeAttribute(reviewStatus.className)}">
+                        ${escapeHtml(reviewStatus.label)}
                     </span>
                 </div>
 
@@ -1401,6 +1403,74 @@
                 })
                 .join("")
         );
+    }
+
+    function getArcReviewStatus(assignment) {
+        const reviewLink = assignment.review_link || "";
+        const reviewDueDate = assignment.review_due_date || "";
+
+        if (reviewLink && looksLikeUrl(reviewLink)) {
+            return {
+                label: "Review Filed",
+                className: "is-review-filed"
+            };
+        }
+
+        const daysUntilDue = getDaysUntilDate(reviewDueDate);
+
+        if (daysUntilDue === null) {
+            return {
+                label: "Active",
+                className: "is-active"
+            };
+        }
+
+        if (daysUntilDue < 0) {
+            return {
+                label: "Overdue",
+                className: "is-overdue"
+            };
+        }
+
+        if (daysUntilDue === 0) {
+            return {
+                label: "Due Today",
+                className: "is-due-today"
+            };
+        }
+
+        if (daysUntilDue <= 7) {
+            return {
+                label: "Due Soon",
+                className: "is-due-soon"
+            };
+        }
+
+        return {
+            label: "Active",
+            className: "is-active"
+        };
+    }
+
+    function getDaysUntilDate(value) {
+        if (!value) {
+            return null;
+        }
+
+        const dueDate = new Date(value + "T00:00:00");
+
+        if (Number.isNaN(dueDate.getTime())) {
+            return null;
+        }
+
+        const today = new Date();
+
+        today.setHours(0, 0, 0, 0);
+        dueDate.setHours(0, 0, 0, 0);
+
+        const difference = dueDate.getTime() - today.getTime();
+
+        return Math.round(difference / 86400000);
     }
 
     function formatDateForDisplay(value) {
