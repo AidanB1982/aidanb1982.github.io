@@ -277,9 +277,8 @@
                     <div>
                         <p class="arc-profile-kicker">ARC Team</p>
                         <h2>My ARC Profile</h2>
-                        <p>
-                            This is the reader profile Blackwood uses when selecting ARC readers,
-                            sending advance copies, and tracking review links.
+                        <p>This is the reader profile Blackwood uses when selecting ARC readers,
+                        sending advance copies, and managing review records.
                         </p>
                     </div>
 
