@@ -745,3 +745,73 @@
         justify-self: start;
     }
 }
+.arc-review-link-panel {
+    display: grid;
+    gap: 12px;
+    border: 1px solid rgba(196, 122, 44, 0.18);
+    background: rgba(196, 122, 44, 0.045);
+    border-radius: 8px;
+    padding: 18px;
+    margin: 18px 0 4px;
+}
+
+.arc-review-link-panel[hidden] {
+    display: none;
+}
+
+.arc-review-link-panel label {
+    color: #f2f2f2;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.arc-review-link-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto auto;
+    gap: 12px;
+    align-items: center;
+}
+
+.arc-review-link-row input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    background: rgba(0, 0, 0, 0.48);
+    color: #f2f2f2;
+    padding: 12px 13px;
+    border-radius: 4px;
+    font: inherit;
+}
+
+.arc-review-link-row input:focus {
+    outline: none;
+    border-color: rgba(196, 122, 44, 0.85);
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.12);
+}
+
+.arc-review-link-message {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.arc-review-link-message.is-loading {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.arc-review-link-message.is-success {
+    color: #d6b181;
+}
+
+.arc-review-link-message.is-error {
+    color: #ffb1a7;
+}
+
+@media (max-width: 760px) {
+    .arc-review-link-row {
+        grid-template-columns: 1fr;
+    }
+}
