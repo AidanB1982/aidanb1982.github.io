@@ -6,6 +6,7 @@
 // Allows ARC readers to submit/update review links.
 // Shows review status labels: Active, Due Soon, Due Today,
 // Overdue, Review Filed.
+// Includes admin-only ARC Assignment Monitor.
 // ======================================================
 
 (function () {
@@ -65,12 +66,6 @@
             label: "Review Platforms",
             type: "textarea",
             placeholder: "Amazon, Goodreads, StoryGraph, Instagram, TikTok, blog..."
-        },
-        {
-            key: "Review Link",
-            label: "Review Link",
-            type: "url",
-            placeholder: "https://..."
         },
         {
             key: "Amazon Profile",
@@ -167,7 +162,6 @@
             key: "Review Received",
             label: "Review Received"
         },
-        
         {
             key: "Application ID",
             label: "Application ID"
@@ -277,8 +271,9 @@
                     <div>
                         <p class="arc-profile-kicker">ARC Team</p>
                         <h2>My ARC Profile</h2>
-                        <p>This is the reader profile Blackwood uses when selecting ARC readers,
-                        sending advance copies, and managing review records.
+                        <p>
+                            This is the reader profile Blackwood uses when selecting ARC readers,
+                            sending advance copies, and managing review records.
                         </p>
                     </div>
 
@@ -296,6 +291,8 @@
                 <div data-arc-vault-root>
                     ${renderArcVaultLoading()}
                 </div>
+
+                <div data-arc-admin-root></div>
 
                 <details class="arc-profile-details">
                     <summary class="arc-profile-details-summary">
@@ -343,6 +340,7 @@
         });
 
         loadArcVault(root, session);
+        loadArcAdminDashboard(root, session);
     }
 
     function renderArcWelcomePoster(applicationStatus) {
@@ -482,6 +480,147 @@
                 </div>
             </section>
         `;
+    }
+
+    async function loadArcAdminDashboard(root, session) {
+        const adminRoot = root.querySelector("[data-arc-admin-root]");
+
+        if (!adminRoot || !session || !session.access_token) {
+            return;
+        }
+
+        adminRoot.innerHTML = "";
+
+        try {
+            const rows = await supabaseRestRpc(session, "get_arc_admin_dashboard", {});
+
+            if (!Array.isArray(rows) || !rows.length) {
+                adminRoot.innerHTML = "";
+                return;
+            }
+
+            adminRoot.innerHTML = renderArcAdminDashboard(rows);
+
+        } catch (error) {
+            console.warn("Blackwood ARC Admin dashboard unavailable:", error);
+            adminRoot.innerHTML = "";
+        }
+    }
+
+    function renderArcAdminDashboard(rows) {
+        return `
+            <section class="arc-admin-card" aria-labelledby="arc-admin-title">
+                <div class="arc-admin-heading">
+                    <div>
+                        <p class="arc-profile-kicker">ARC Admin</p>
+
+                        <h3 id="arc-admin-title">
+                            ARC Assignment Monitor
+                        </h3>
+
+                        <p>
+                            Active ARC assignments, reader downloads, due dates, and filed review links.
+                        </p>
+                    </div>
+
+                    <span class="arc-admin-count">
+                        ${escapeHtml(String(rows.length))} Active
+                    </span>
+                </div>
+
+                <div class="arc-admin-table-wrap">
+                    <table class="arc-admin-table">
+                        <thead>
+                            <tr>
+                                <th>Reader</th>
+                                <th>ARC</th>
+                                <th>Due</th>
+                                <th>Status</th>
+                                <th>Downloads</th>
+                                <th>Last Opened</th>
+                                <th>Review</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            ${rows.map(renderArcAdminRow).join("")}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        `;
+    }
+
+    function renderArcAdminRow(row) {
+        const reviewStatus = row.review_status || "Active";
+        const reviewClass = getArcAdminStatusClass(reviewStatus);
+        const reviewLink = row.review_link || "";
+
+        return `
+            <tr>
+                <td>
+                    <strong>${escapeHtml(row.reader_name || "Unknown reader")}</strong>
+                    <span>${escapeHtml(row.reader_email || "No email recorded")}</span>
+                </td>
+
+                <td>
+                    <strong>${escapeHtml(row.title || "Unknown ARC")}</strong>
+                    <span>${escapeHtml(row.author_name || "Blackwood Publishing")}</span>
+                </td>
+
+                <td>
+                    ${escapeHtml(formatDateForDisplay(row.review_due_date) || "Not recorded")}
+                </td>
+
+                <td>
+                    <span class="arc-admin-status ${escapeAttribute(reviewClass)}">
+                        ${escapeHtml(reviewStatus)}
+                    </span>
+                </td>
+
+                <td>
+                    ${escapeHtml(String(Number(row.download_count || 0)))}
+                </td>
+
+                <td>
+                    ${escapeHtml(formatDateTimeForDisplay(row.last_downloaded_at) || "Not yet")}
+                </td>
+
+                <td>
+                    ${reviewLink && looksLikeUrl(reviewLink) ? `
+                        <a href="${escapeAttribute(reviewLink)}" target="_blank" rel="noopener noreferrer">
+                            View Review
+                        </a>
+                    ` : `
+                        <span class="arc-admin-muted">Not filed</span>
+                    `}
+                </td>
+            </tr>
+        `;
+    }
+
+    function getArcAdminStatusClass(status) {
+        const cleanStatus = String(status || "")
+            .trim()
+            .toLowerCase();
+
+        if (cleanStatus === "review filed") {
+            return "is-review-filed";
+        }
+
+        if (cleanStatus === "overdue") {
+            return "is-overdue";
+        }
+
+        if (cleanStatus === "due today") {
+            return "is-due-today";
+        }
+
+        if (cleanStatus === "due soon") {
+            return "is-due-soon";
+        }
+
+        return "is-active";
     }
 
     function renderArcVaultAssignment(assignment) {
@@ -725,6 +864,7 @@
 
                         window.setTimeout(function () {
                             loadArcVault(root, session);
+                            loadArcAdminDashboard(root, session);
                         }, 800);
 
                     } catch (error) {
@@ -796,6 +936,7 @@
 
                     window.setTimeout(function () {
                         loadArcVault(root, session);
+                        loadArcAdminDashboard(root, session);
                     }, 1400);
 
                 } catch (error) {
@@ -1100,17 +1241,6 @@
         return ARC_READ_ONLY_FIELDS.map(function (field) {
             const rawValue = readOnly[field.key] || "";
             const value = rawValue ? rawValue : "Not recorded";
-
-            if (field.key === "Review Link" && looksLikeUrl(rawValue)) {
-                return `
-                    <div class="arc-profile-status-item">
-                        <span>${escapeHtml(field.label)}</span>
-                        <a href="${escapeAttribute(rawValue)}" target="_blank" rel="noopener noreferrer">
-                            View Review
-                        </a>
-                    </div>
-                `;
-            }
 
             return `
                 <div class="arc-profile-status-item">
