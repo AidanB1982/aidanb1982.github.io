@@ -725,60 +725,115 @@
     }
 
     async function fetchArcAssignments(session) {
-        const memberId = getSessionUserId(session);
+    const memberId = getSessionUserId(session);
 
-        if (!memberId) {
-            throw new Error("Your Circle member ID could not be confirmed.");
-        }
-
-        const selectWithArcFile = [
-            "id",
-            "member_id",
-            "arc_file_id",
-            "application_id",
-            "status",
-            "review_due_date",
-            "review_link",
-            "watermarked_storage_bucket",
-            "watermarked_storage_path",
-            "download_count",
-            "last_downloaded_at",
-            "created_at",
-            "arc_files(title,slug,author_name,mime_type)"
-        ].join(",");
-
-        try {
-            return await supabaseRestSelect(session, "arc_file_assignments", {
-                select: selectWithArcFile,
-                member_id: "eq." + memberId,
-                status: "eq.active",
-                order: "created_at.desc"
-            });
-        } catch (error) {
-            console.warn("ARC assignment join failed, trying fallback:", error);
-
-            return supabaseRestSelect(session, "arc_file_assignments", {
-                select: [
-                    "id",
-                    "member_id",
-                    "arc_file_id",
-                    "application_id",
-                    "status",
-                    "review_due_date",
-                    "review_link",
-                    "watermarked_storage_bucket",
-                    "watermarked_storage_path",
-                    "download_count",
-                    "last_downloaded_at",
-                    "created_at"
-                ].join(","),
-                member_id: "eq." + memberId,
-                status: "eq.active",
-                order: "created_at.desc"
-            });
-        }
+    if (!memberId) {
+        throw new Error("Your Circle member ID could not be confirmed.");
     }
 
+    const baseSelect = [
+        "id",
+        "member_id",
+        "arc_file_id",
+        "application_id",
+        "status",
+        "review_due_date",
+        "review_link",
+        "watermarked_storage_bucket",
+        "watermarked_storage_path",
+        "download_count",
+        "last_downloaded_at",
+        "created_at"
+    ];
+
+    const selectWithArcFile = baseSelect.concat([
+        "arc_files(title,slug,author_name,mime_type)"
+    ]).join(",");
+
+    let assignments = [];
+
+    try {
+        assignments = await supabaseRestSelect(session, "arc_file_assignments", {
+            select: selectWithArcFile,
+            member_id: "eq." + memberId,
+            status: "eq.active",
+            order: "created_at.desc"
+        });
+    } catch (error) {
+        console.warn("ARC assignment join failed, trying assignment-only fetch:", error);
+
+        assignments = await supabaseRestSelect(session, "arc_file_assignments", {
+            select: baseSelect.join(","),
+            member_id: "eq." + memberId,
+            status: "eq.active",
+            order: "created_at.desc"
+        });
+    }
+
+    return enrichArcAssignmentsWithFileDetails(session, assignments);
+}
+async function enrichArcAssignmentsWithFileDetails(session, assignments) {
+    if (!Array.isArray(assignments) || !assignments.length) {
+        return [];
+    }
+
+    const missingFileDetails = assignments.filter(function (assignment) {
+        const arcFile = normalizeArcFileRelation(assignment.arc_files);
+
+        return !arcFile.title && assignment.arc_file_id;
+    });
+
+    if (!missingFileDetails.length) {
+        return assignments;
+    }
+
+    const arcFileIds = Array.from(new Set(
+        missingFileDetails
+            .map(function (assignment) {
+                return Number(assignment.arc_file_id);
+            })
+            .filter(function (id) {
+                return Number.isFinite(id) && id > 0;
+            })
+    ));
+
+    if (!arcFileIds.length) {
+        return assignments;
+    }
+
+    const arcFiles = await fetchArcFilesByIds(session, arcFileIds);
+    const arcFileMap = {};
+
+    arcFiles.forEach(function (arcFile) {
+        arcFileMap[String(arcFile.id)] = arcFile;
+    });
+
+    return assignments.map(function (assignment) {
+        const existingArcFile = normalizeArcFileRelation(assignment.arc_files);
+
+        if (existingArcFile.title) {
+            return assignment;
+        }
+
+        const fallbackArcFile = arcFileMap[String(assignment.arc_file_id)] || {};
+
+        return {
+            ...assignment,
+            arc_files: fallbackArcFile
+        };
+    });
+}
+
+async function fetchArcFilesByIds(session, arcFileIds) {
+    if (!arcFileIds.length) {
+        return [];
+    }
+
+    return supabaseRestSelect(session, "arc_files", {
+        select: "id,title,slug,author_name,mime_type",
+        id: "in.(" + arcFileIds.join(",") + ")"
+    });
+}
     async function supabaseRestSelect(session, tableName, queryParams) {
         const url = new URL(BLACKWOOD_SUPABASE_URL + "/rest/v1/" + tableName);
 
