@@ -1264,3 +1264,121 @@ body.sub-page .blackwood-nav {
         min-width: 0;
     }
 }
+/* ======================================================
+   BLACKWOOD HEADER — DROPDOWN NORMALISATION
+   Keeps all header dropdowns hidden until active.
+   ====================================================== */
+
+.blackwood-nav-item.has-dropdown {
+    position: relative;
+}
+
+.blackwood-nav-button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.blackwood-nav-button span {
+    margin-left: 4px;
+    font-size: 0.75em;
+}
+
+.blackwood-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 0;
+    z-index: 9999;
+
+    min-width: 230px;
+    padding: 14px 0;
+
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    background:
+        linear-gradient(180deg, rgba(16, 10, 6, 0.98), rgba(2, 4, 5, 0.98));
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.55);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px);
+
+    transition:
+        opacity 160ms ease,
+        visibility 160ms ease,
+        transform 160ms ease;
+}
+
+.blackwood-nav-item.has-dropdown:hover > .blackwood-dropdown,
+.blackwood-nav-item.has-dropdown:focus-within > .blackwood-dropdown,
+.blackwood-nav-item.has-dropdown.is-open > .blackwood-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.blackwood-dropdown a {
+    display: block;
+    padding: 10px 18px;
+    color: rgba(244, 239, 230, 0.86);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.blackwood-dropdown a strong {
+    display: block;
+    color: #f4efe6;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    text-transform: uppercase;
+}
+
+.blackwood-dropdown a span {
+    display: block;
+    margin-top: 3px;
+    color: rgba(214, 177, 129, 0.78);
+    font-size: 11px;
+    font-style: italic;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+}
+
+.blackwood-dropdown a:hover,
+.blackwood-dropdown a:focus {
+    background: rgba(196, 122, 44, 0.12);
+    color: #ffffff;
+}
+
+.blackwood-dropdown a:hover strong,
+.blackwood-dropdown a:focus strong {
+    color: #d6b181;
+}
+
+/* Make sure old dropdown variants do not remain stuck open */
+.blackwood-new-releases-dropdown,
+.new-releases-dropdown,
+.nav-dropdown,
+.dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.blackwood-nav-item.has-dropdown:hover > .blackwood-new-releases-dropdown,
+.blackwood-nav-item.has-dropdown:focus-within > .blackwood-new-releases-dropdown,
+.blackwood-nav-item.has-dropdown:hover > .new-releases-dropdown,
+.blackwood-nav-item.has-dropdown:focus-within > .new-releases-dropdown,
+.blackwood-nav-item.has-dropdown:hover > .nav-dropdown,
+.blackwood-nav-item.has-dropdown:focus-within > .nav-dropdown,
+.blackwood-nav-item.has-dropdown:hover > .dropdown-menu,
+.blackwood-nav-item.has-dropdown:focus-within > .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
