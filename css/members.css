@@ -1957,3 +1957,298 @@ body.members-page .site-footer-links a:focus-visible {
         width: 100%;
     }
 }
+/* =========================
+   PHASE 2A — MEMBER HOME DASHBOARD
+   Circle command desk summary layer
+========================= */
+
+.circle-home-dashboard {
+    position: relative;
+    overflow: hidden;
+
+    display: grid;
+    gap: 18px;
+
+    border: 1px solid rgba(196, 122, 44, 0.26);
+    border-radius: 9px;
+
+    padding: clamp(20px, 4vw, 34px);
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.13), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(61, 121, 136, 0.08), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.042), rgba(255, 255, 255, 0.012)),
+        rgba(0, 0, 0, 0.58);
+
+    box-shadow:
+        0 22px 64px rgba(0, 0, 0, 0.42),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.circle-home-dashboard::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.08), transparent 44%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 36%);
+
+    opacity: 0.9;
+}
+
+.circle-home-dashboard > * {
+    position: relative;
+    z-index: 1;
+}
+
+.circle-home-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 22px;
+    align-items: start;
+}
+
+.circle-home-main h2 {
+    margin: 0 0 10px;
+
+    color: var(--circle-cream);
+
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.04;
+    font-weight: 400;
+}
+
+.circle-home-main p {
+    max-width: 740px;
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.72);
+
+    font-size: 14.5px;
+    line-height: 1.62;
+}
+
+.circle-home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    justify-content: flex-end;
+
+    max-width: 420px;
+}
+
+/* Anchor buttons inside the member app */
+body.members-page #blackwood-circle-app a.circle-button,
+body.blackwood-circle-page #blackwood-circle-app a.circle-button {
+    box-sizing: border-box;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+
+    padding: 10px 16px;
+
+    border: 1px solid rgba(196, 122, 44, 0.68);
+    border-radius: 4px;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.18), rgba(196, 122, 44, 0.06)),
+        rgba(0, 0, 0, 0.48);
+
+    color: #d6b181 !important;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+
+    white-space: nowrap;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+        0 10px 22px rgba(0, 0, 0, 0.24);
+
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease,
+        box-shadow 180ms ease;
+}
+
+body.members-page #blackwood-circle-app a.circle-button:hover,
+body.members-page #blackwood-circle-app a.circle-button:focus-visible,
+body.blackwood-circle-page #blackwood-circle-app a.circle-button:hover,
+body.blackwood-circle-page #blackwood-circle-app a.circle-button:focus-visible {
+    border-color: #c47a2c;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.3), rgba(196, 122, 44, 0.1)),
+        rgba(0, 0, 0, 0.64);
+
+    color: #efe7dc !important;
+    outline: none;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 13px 30px rgba(0, 0, 0, 0.32);
+}
+
+body.members-page #blackwood-circle-app a.circle-button-secondary,
+body.blackwood-circle-page #blackwood-circle-app a.circle-button-secondary {
+    border-color: rgba(196, 122, 44, 0.42);
+    background: transparent;
+    color: rgba(214, 177, 129, 0.9) !important;
+}
+
+body.members-page #blackwood-circle-app a.circle-button-secondary:hover,
+body.members-page #blackwood-circle-app a.circle-button-secondary:focus-visible,
+body.blackwood-circle-page #blackwood-circle-app a.circle-button-secondary:hover,
+body.blackwood-circle-page #blackwood-circle-app a.circle-button-secondary:focus-visible {
+    border-color: rgba(196, 122, 44, 0.84);
+    background: rgba(196, 122, 44, 0.1);
+    color: #efe7dc !important;
+}
+
+.circle-home-stat-grid {
+    margin-top: 2px;
+}
+
+.circle-stat-card small {
+    display: block;
+
+    margin-top: 8px;
+
+    color: rgba(239, 231, 220, 0.46);
+
+    font-size: 11.5px;
+    line-height: 1.35;
+}
+
+.circle-home-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.circle-home-summary-card {
+    min-height: 112px;
+
+    border: 1px solid rgba(196, 122, 44, 0.18);
+    border-radius: 8px;
+
+    padding: 17px 18px;
+
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+        rgba(0, 0, 0, 0.36);
+
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018),
+        0 14px 34px rgba(0, 0, 0, 0.24);
+}
+
+.circle-home-summary-card span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: var(--circle-copper-soft);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.circle-home-summary-card h3 {
+    margin: 0 0 8px;
+
+    color: var(--circle-cream);
+
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.12;
+    font-weight: 500;
+}
+
+.circle-home-summary-card p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.64);
+
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+/* Keep anchor jumps below fixed header */
+#blackwood-arc-profile-root,
+#blackwood-bookshelf-root,
+#circle-posts-title,
+#circle-rewards-title,
+#circle-redemptions-title,
+#circle-points-title {
+    scroll-margin-top: 128px;
+}
+
+/* =========================
+   PHASE 2A RESPONSIVE
+========================= */
+
+@media (max-width: 980px) {
+    .circle-home-main {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-home-actions {
+        justify-content: flex-start;
+        max-width: none;
+    }
+
+    .circle-home-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .circle-home-dashboard {
+        padding: 20px 16px;
+    }
+
+    .circle-home-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    body.members-page #blackwood-circle-app .circle-home-actions a.circle-button,
+    body.blackwood-circle-page #blackwood-circle-app .circle-home-actions a.circle-button {
+        width: 100%;
+    }
+
+    .circle-home-summary-card {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 620px) {
+    .circle-home-main h2 {
+        font-size: clamp(25px, 8vw, 34px);
+    }
+
+    .circle-home-main p,
+    .circle-home-summary-card p {
+        font-size: 13.5px;
+    }
+}
