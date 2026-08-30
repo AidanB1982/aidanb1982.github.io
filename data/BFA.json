@@ -1,6 +1,17 @@
 {
     "posts": [
         {
+            "id": "bfa-20260830-this-week-at-blackwood-foi0o",
+            "title": "This Week at Blackwood",
+            "category": "Weekly Dispatch",
+            "excerpt": "The Crossing enters ARC circulation, the Blackwood Circle opens further, and the house prepares for September.",
+            "body": "This week at Blackwood has been centred on The Crossing by Miren Vale, which is now moving into the hands of advance readers ahead of publication on 14 September. ARC readers have been contacted, and the first stage of the release is now underway as we begin gathering early responses and preparing the book for its arrival in the wider catalogue.\n\nThe Blackwood Circle is also beginning to take on a larger role within the house. It is becoming the place where readers can build their Blackwood record, collect points, follow new publications and receive selected notices from the archive. Approved ARC readers will also receive access to a separate advance-reading area within the Circle, with access issued individually for each reader.\n\nBehind the scenes, work continues on the systems that allow Blackwood Publishing to grow beyond a single author and into a working independent press. That means developing the reader programme, organising ARC access, refining catalogue presentation, strengthening direct editions and continuing conversations with booksellers. The Black Bothy is currently with Waterstones St Andrews for consideration following the arrival of review copies, while further bookseller outreach continues around the Scottish catalogue.\n\nSeptember will belong largely to The Crossing. Over the coming weeks we will be following the ARC response, preparing publication material and introducing more of Miren Vale’s novel before its release. The book opens with an invitation hidden inside an unmarked library book and leads towards a ruined chapel, an old ritual and a crossing shaped by memory, silence and the cost of being noticed.\n\nAlongside the release, work will continue on the wider Blackwood catalogue and on the structure behind the house itself. The aim remains simple: each publication should feel connected to something larger, with readers able to move from one book, record or author into another part of the archive.\n\nMore will be issued as September approaches.",
+            "image": "/assets/CrossingARC.png",
+            "published": true,
+            "pinned": true,
+            "publishedAt": "2026-08-30"
+        },
+        {
             "id": "bfa-20260815-the-crossing-arc-now-open-wga1o",
             "title": "The Crossing ARC Now Open",
             "category": "ARC Notice",
