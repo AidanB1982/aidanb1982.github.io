@@ -508,8 +508,9 @@
     }
 
     function renderArcAdminDashboard(rows) {
-        return `
-            <section class="arc-admin-card" aria-labelledby="arc-admin-title">
+    return `
+        <details class="arc-admin-card arc-admin-collapsible" data-arc-admin-details>
+            <summary class="arc-admin-summary">
                 <div class="arc-admin-heading">
                     <div>
                         <p class="arc-profile-kicker">ARC Admin</p>
@@ -523,11 +524,19 @@
                         </p>
                     </div>
 
-                    <span class="arc-admin-count">
-                        ${escapeHtml(String(rows.length))} Active
-                    </span>
-                </div>
+                    <div class="arc-admin-summary-meta">
+                        <span class="arc-admin-count">
+                            ${escapeHtml(String(rows.length))} Active
+                        </span>
 
+                        <span class="arc-admin-chevron" aria-hidden="true">
+                            ▾
+                        </span>
+                    </div>
+                </div>
+            </summary>
+
+            <div class="arc-admin-body">
                 <div class="arc-admin-table-wrap">
                     <table class="arc-admin-table">
                         <thead>
@@ -547,9 +556,10 @@
                         </tbody>
                     </table>
                 </div>
-            </section>
-        `;
-    }
+            </div>
+        </details>
+    `;
+}
 
     function renderArcAdminRow(row) {
         const reviewStatus = row.review_status || "Active";
