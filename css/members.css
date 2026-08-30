@@ -2252,3 +2252,30 @@ body.blackwood-circle-page #blackwood-circle-app a.circle-button-secondary:focus
         font-size: 13.5px;
     }
 }
+/* =========================
+   PHASE 2A — MEMBER DASHBOARD WIDTH POLISH
+========================= */
+
+body.members-page.is-circle-signed-in #blackwood-circle-app {
+    width: min(1180px, calc(100% - 36px));
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body.members-page.is-circle-signed-in .circle-dashboard {
+    gap: 20px;
+}
+
+body.members-page.is-circle-signed-in .circle-dashboard-hero,
+body.members-page.is-circle-signed-in .circle-home-dashboard,
+body.members-page.is-circle-signed-in .circle-reader-record-cta,
+body.members-page.is-circle-signed-in .circle-section {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 760px) {
+    body.members-page.is-circle-signed-in #blackwood-circle-app {
+        width: min(100% - 22px, 1180px);
+    }
+}
