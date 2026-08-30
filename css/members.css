@@ -2279,3 +2279,303 @@ body.members-page.is-circle-signed-in .circle-section {
         width: min(100% - 22px, 1180px);
     }
 }
+/* =========================
+   PHASE 2B — REWARDS POLISH
+   Reward badges, progress bars, issued-code display,
+   copy-code button, and cleaner redemption states.
+========================= */
+
+.circle-reward-card-header,
+.circle-redemption-card-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+.circle-reward-card-header .circle-reward-status,
+.circle-redemption-card-header .circle-post-meta {
+    margin: 0;
+}
+
+.circle-reward-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: fit-content;
+    max-width: 100%;
+
+    padding: 6px 9px;
+
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.42);
+    color: rgba(214, 177, 129, 0.86);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.circle-reward-badge.is-unlocked,
+.circle-reward-badge.is-issued {
+    border-color: rgba(125, 190, 145, 0.58);
+    background: rgba(125, 190, 145, 0.11);
+    color: #bde5c5;
+}
+
+.circle-reward-badge.is-milestone {
+    border-color: rgba(214, 177, 129, 0.52);
+    background: rgba(214, 177, 129, 0.1);
+    color: #f0cf9a;
+}
+
+.circle-reward-badge.is-locked {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.045);
+    color: rgba(239, 231, 220, 0.52);
+}
+
+.circle-reward-badge.is-pending {
+    border-color: rgba(255, 198, 112, 0.56);
+    background: rgba(255, 198, 112, 0.11);
+    color: #ffd28a;
+}
+
+.circle-reward-badge.is-used {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.055);
+    color: rgba(239, 231, 220, 0.58);
+}
+
+.circle-reward-badge.is-cancelled {
+    border-color: rgba(255, 126, 112, 0.5);
+    background: rgba(255, 126, 112, 0.1);
+    color: #ffb1a7;
+}
+
+.circle-reward-card.is-redeemable {
+    border-color: rgba(196, 122, 44, 0.24);
+}
+
+.circle-reward-card.is-milestone {
+    background:
+        linear-gradient(90deg, rgba(214, 177, 129, 0.045), transparent 46%),
+        rgba(0, 0, 0, 0.34);
+}
+
+.circle-reward-card.is-redeemable.is-unlocked {
+    border-color: rgba(125, 190, 145, 0.36);
+    box-shadow:
+        inset 0 0 0 1px rgba(125, 190, 145, 0.04),
+        0 16px 42px rgba(0, 0, 0, 0.28);
+}
+
+.circle-reward-progress {
+    position: relative;
+    overflow: hidden;
+
+    height: 7px;
+
+    margin: 14px 0 7px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.circle-reward-progress span {
+    display: block;
+
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.74), rgba(214, 177, 129, 0.92));
+
+    box-shadow: 0 0 18px rgba(196, 122, 44, 0.2);
+}
+
+.circle-reward-progress-note {
+    margin: 0 0 12px !important;
+
+    color: rgba(239, 231, 220, 0.48) !important;
+
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+}
+
+.circle-redemption-notice {
+    margin-top: 14px;
+    padding: 13px 14px;
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.circle-redemption-notice.is-pending {
+    border-color: rgba(255, 198, 112, 0.28);
+    background: rgba(255, 198, 112, 0.055);
+}
+
+.circle-redemption-notice.is-issued {
+    border-color: rgba(125, 190, 145, 0.3);
+    background: rgba(125, 190, 145, 0.055);
+}
+
+.circle-redemption-notice.is-used {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.circle-redemption-notice.is-cancelled {
+    border-color: rgba(255, 126, 112, 0.26);
+    background: rgba(255, 126, 112, 0.055);
+}
+
+.circle-redemption-notice strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #d6b181;
+
+    font-size: 13px;
+}
+
+.circle-redemption-notice p {
+    margin: 0 !important;
+
+    color: rgba(239, 231, 220, 0.62) !important;
+
+    font-size: 13px !important;
+}
+
+.circle-redemption-code {
+    margin-top: 12px;
+}
+
+.circle-redemption-code span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #d6b181;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.circle-redemption-code-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+}
+
+#blackwood-circle-app .circle-redemption-code-row code {
+    margin: 0;
+}
+
+.circle-copy-code-button {
+    box-sizing: border-box;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+
+    padding: 8px 12px;
+
+    border: 1px solid rgba(196, 122, 44, 0.52);
+    border-radius: 4px;
+
+    background:
+        linear-gradient(180deg, rgba(196, 122, 44, 0.13), rgba(196, 122, 44, 0.05)),
+        rgba(0, 0, 0, 0.44);
+
+    color: #d6b181;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    line-height: 1;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.circle-copy-code-button:hover,
+.circle-copy-code-button:focus-visible,
+.circle-copy-code-button.is-copied {
+    border-color: rgba(214, 177, 129, 0.82);
+    background: rgba(196, 122, 44, 0.12);
+    color: #efe7dc;
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.circle-copy-code-button.is-copied {
+    border-color: rgba(125, 190, 145, 0.62);
+    background: rgba(125, 190, 145, 0.12);
+    color: #bde5c5;
+}
+
+.circle-redemptions-empty p + p {
+    margin-top: 6px;
+}
+
+.circle-muted-line {
+    color: rgba(239, 231, 220, 0.48) !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+}
+
+/* Keep reward text readable where older rules apply */
+.circle-reward-card .circle-redemption-code-row code {
+    word-break: break-word;
+}
+
+/* =========================
+   PHASE 2B — MOBILE REWARDS
+========================= */
+
+@media (max-width: 620px) {
+    .circle-reward-card-header,
+    .circle-redemption-card-header,
+    .circle-redemption-code-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .circle-reward-badge {
+        width: 100%;
+    }
+
+    .circle-copy-code-button {
+        width: 100%;
+    }
+}
