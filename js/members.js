@@ -2031,179 +2031,297 @@
     // =========================
 
     function renderRewards(pointsTotal) {
-        if (!BlackwoodMembersState.rewards.length) {
-            return `
-                <article class="circle-empty-card">
-                    <p>No rewards have been filed yet.</p>
-                </article>
-            `;
-        }
-
-        return BlackwoodMembersState.rewards.map(function (reward) {
-            const rewardId = Number(reward.id);
-            const required = Number(reward.points_required || 0);
-            const unlocked = pointsTotal >= required;
-            const isRedeemable = reward.is_redeemable === true;
-            const latestRedemption = getLatestRedemptionForReward(rewardId);
-            const activeRedemption = isActiveRedemption(latestRedemption);
-            const canRedeem = isRedeemable && unlocked && !activeRedemption;
-
-            return `
-                <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"} ${isRedeemable ? "is-redeemable" : ""}">
-                    <p class="circle-reward-status">
-                        ${renderRewardStatusText(unlocked, required, pointsTotal, latestRedemption)}
-                    </p>
-
-                    <h3>${escapeHtml(reward.title)}</h3>
-
-                    <p>${escapeHtml(reward.description || "")}</p>
-
-                    <small>
-                        Requires ${required} points · ${escapeHtml(reward.required_tier || "Reader")}
-                    </small>
-
-                    ${renderRewardAction(reward, canRedeem, latestRedemption)}
-                </article>
-            `;
-        }).join("");
-    }
-
-    function renderRewardStatusText(unlocked, required, pointsTotal, latestRedemption) {
-        const latestStatus = latestRedemption
-            ? String(latestRedemption.status || "").toLowerCase()
-            : "";
-
-        if (latestStatus === "pending") return "Pending";
-        if (latestStatus === "issued") return "Issued";
-        if (latestStatus === "used") return "Used";
-        if (latestStatus === "cancelled") return "Cancelled";
-        if (unlocked) return "Unlocked";
-
-        return `${required - pointsTotal} points to unlock`;
-    }
-
-    function renderRewardAction(reward, canRedeem, latestRedemption) {
-        const isRedeemable = reward.is_redeemable === true;
-
-        if (!isRedeemable) {
-            return "";
-        }
-
-        const latestStatus = latestRedemption
-            ? String(latestRedemption.status || "").toLowerCase()
-            : "";
-
-        if (latestStatus === "pending") {
-            return `
-                <div class="circle-redemption-notice is-pending">
-                    <strong>Redemption requested</strong>
-                    <p>Your discount code will be issued manually and shown here once ready.</p>
-                </div>
-            `;
-        }
-
-        let existingRedemptionNotice = "";
-
-        if (latestStatus === "issued") {
-            existingRedemptionNotice = `
-                <div class="circle-redemption-notice is-issued">
-                    <strong>Previous discount code issued</strong>
-                    ${latestRedemption.discount_code ? `
-                        <div class="circle-redemption-code">
-                            <span>Your code</span>
-                            <code>${escapeHtml(latestRedemption.discount_code)}</code>
-                        </div>
-                    ` : `
-                        <p>Your discount code has been issued and will appear here shortly.</p>
-                    `}
-                </div>
-            `;
-        }
-
-        if (latestStatus === "used") {
-            existingRedemptionNotice = `
-                <div class="circle-redemption-notice is-used">
-                    <strong>Previous reward used</strong>
-                    <p>This redemption has already been used.</p>
-                </div>
-            `;
-        }
-
-        if (latestStatus === "cancelled") {
-            existingRedemptionNotice = `
-                <div class="circle-redemption-notice is-cancelled">
-                    <strong>Previous redemption cancelled</strong>
-                    <p>This redemption is no longer active.</p>
-                </div>
-            `;
-        }
-
-        if (!canRedeem) {
-            return existingRedemptionNotice;
-        }
-
+    if (!BlackwoodMembersState.rewards.length) {
         return `
-            ${existingRedemptionNotice}
-
-            <button
-                type="button"
-                class="circle-button circle-button-primary circle-redeem-button"
-                data-redeem-reward-id="${Number(reward.id)}"
-                data-reward-title="${escapeAttribute(reward.title || "this reward")}"
-                data-points-cost="${Number(reward.points_required || 0)}"
-            >
-                Redeem Reward
-            </button>
+            <article class="circle-empty-card">
+                <p>No rewards have been filed yet.</p>
+            </article>
         `;
     }
 
-    function renderRedemptions() {
-        if (!BlackwoodMembersState.redemptions.length) {
-            return `
-                <article class="circle-empty-card">
-                    <p>No rewards have been redeemed yet.</p>
-                    <p>Unlocked rewards can be requested from the Rewards section above.</p>
-                </article>
-            `;
-        }
+    return BlackwoodMembersState.rewards.map(function (reward) {
+        const rewardId = Number(reward.id);
+        const required = Number(reward.points_required || 0);
+        const unlocked = pointsTotal >= required;
+        const isRedeemable = reward.is_redeemable === true;
+        const latestRedemption = getLatestRedemptionForReward(rewardId, reward.title);
+        const activeRedemption = isActiveRedemption(latestRedemption);
+        const canRedeem = isRedeemable && unlocked && !activeRedemption;
 
-        return BlackwoodMembersState.redemptions.map(function (redemption) {
-            const status = capitalise(redemption.status || "pending");
-            const requestedDate = redemption.requested_at
-                ? formatDate(redemption.requested_at)
-                : formatDate(redemption.created_at);
+        const rewardStatus = getRewardStatusInfo({
+            reward,
+            pointsTotal,
+            latestRedemption,
+            unlocked,
+            isRedeemable
+        });
 
-            const pointsCost = Number(redemption.points_cost || 0);
-            const pointsLine = pointsCost > 0
-                ? `${pointsCost} points redeemed.`
-                : "Complimentary reward issued.";
-
-            return `
-                <article class="circle-reward-card circle-redemption-card">
-                    <p class="circle-post-meta">
-                        ${escapeHtml(status)} · ${escapeHtml(requestedDate)}
+        return `
+            <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"} ${isRedeemable ? "is-redeemable" : "is-milestone"}">
+                <div class="circle-reward-card-header">
+                    <p class="circle-reward-status">
+                        ${escapeHtml(isRedeemable ? "Redeemable Reward" : "Circle Milestone")}
                     </p>
 
-                    <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+                    <span class="circle-reward-badge ${escapeAttribute(rewardStatus.className)}">
+                        ${escapeHtml(rewardStatus.label)}
+                    </span>
+                </div>
 
-                    <p>
-                        ${escapeHtml(pointsLine)}
-                    </p>
+                <h3>${escapeHtml(reward.title)}</h3>
 
-                    ${redemption.discount_code ? `
-                        <div class="circle-redemption-code">
-                            <span>Discount code</span>
-                            <code>${escapeHtml(redemption.discount_code)}</code>
-                        </div>
-                    ` : `
-                        <p class="circle-muted-line">
-                            Discount code pending manual issue.
-                        </p>
-                    `}
-                </article>
-            `;
-        }).join("");
+                <p>${escapeHtml(reward.description || "")}</p>
+
+                <small>
+                    Requires ${required} points · ${escapeHtml(reward.required_tier || "Reader")}
+                </small>
+
+                ${renderRewardProgress(pointsTotal, required, unlocked)}
+
+                ${renderRewardAction(reward, canRedeem, latestRedemption)}
+            </article>
+        `;
+    }).join("");
+}
+
+function getRewardStatusInfo(options) {
+    const reward = options.reward || {};
+    const pointsTotal = Number(options.pointsTotal || 0);
+    const latestRedemption = options.latestRedemption || null;
+    const unlocked = options.unlocked === true;
+    const isRedeemable = options.isRedeemable === true;
+    const required = Number(reward.points_required || 0);
+
+    const latestStatus = latestRedemption
+        ? String(latestRedemption.status || "").toLowerCase()
+        : "";
+
+    if (latestStatus === "pending") {
+        return {
+            label: "Request Pending",
+            className: "is-pending"
+        };
     }
+
+    if (latestStatus === "issued") {
+        return {
+            label: "Code Issued",
+            className: "is-issued"
+        };
+    }
+
+    if (latestStatus === "used") {
+        return {
+            label: "Used",
+            className: "is-used"
+        };
+    }
+
+    if (latestStatus === "cancelled") {
+        return {
+            label: "Cancelled",
+            className: "is-cancelled"
+        };
+    }
+
+    if (!unlocked) {
+        return {
+            label: `${Math.max(0, required - pointsTotal)} Points To Unlock`,
+            className: "is-locked"
+        };
+    }
+
+    if (isRedeemable) {
+        return {
+            label: "Unlocked",
+            className: "is-unlocked"
+        };
+    }
+
+    return {
+        label: "Milestone Reached",
+        className: "is-milestone"
+    };
+}
+
+function renderRewardProgress(pointsTotal, required, unlocked) {
+    const cleanRequired = Math.max(0, Number(required || 0));
+    const cleanPoints = Math.max(0, Number(pointsTotal || 0));
+
+    if (!cleanRequired) {
+        return "";
+    }
+
+    const progress = Math.min(100, Math.round((cleanPoints / cleanRequired) * 100));
+    const remaining = Math.max(0, cleanRequired - cleanPoints);
+
+    return `
+        <div class="circle-reward-progress" aria-label="Reward progress">
+            <span style="width: ${escapeAttribute(String(progress))}%"></span>
+        </div>
+
+        <p class="circle-reward-progress-note">
+            ${
+                unlocked
+                    ? "Unlocked and available on your Circle record."
+                    : `${remaining} more points needed.`
+            }
+        </p>
+    `;
+}
+
+function renderRewardAction(reward, canRedeem, latestRedemption) {
+    const isRedeemable = reward.is_redeemable === true;
+
+    if (!isRedeemable) {
+        return "";
+    }
+
+    const latestStatus = latestRedemption
+        ? String(latestRedemption.status || "").toLowerCase()
+        : "";
+
+    if (latestStatus === "pending") {
+        return `
+            <div class="circle-redemption-notice is-pending">
+                <strong>Redemption requested</strong>
+                <p>Your discount code or reward confirmation will be issued manually and shown here once ready.</p>
+            </div>
+        `;
+    }
+
+    let existingRedemptionNotice = "";
+
+    if (latestStatus === "issued") {
+        existingRedemptionNotice = `
+            <div class="circle-redemption-notice is-issued">
+                <strong>Reward issued</strong>
+
+                ${latestRedemption.discount_code ? `
+                    <div class="circle-redemption-code">
+                        <span>Your Circle code</span>
+
+                        <div class="circle-redemption-code-row">
+                            <code>${escapeHtml(latestRedemption.discount_code)}</code>
+
+                            <button
+                                type="button"
+                                class="circle-copy-code-button"
+                                data-copy-discount-code="${escapeAttribute(latestRedemption.discount_code)}"
+                            >
+                                Copy Code
+                            </button>
+                        </div>
+                    </div>
+                ` : `
+                    <p>Your reward has been issued and will appear here shortly.</p>
+                `}
+            </div>
+        `;
+    }
+
+    if (latestStatus === "used") {
+        existingRedemptionNotice = `
+            <div class="circle-redemption-notice is-used">
+                <strong>Reward used</strong>
+                <p>This redemption has already been used.</p>
+            </div>
+        `;
+    }
+
+    if (latestStatus === "cancelled") {
+        existingRedemptionNotice = `
+            <div class="circle-redemption-notice is-cancelled">
+                <strong>Redemption cancelled</strong>
+                <p>This redemption is no longer active.</p>
+            </div>
+        `;
+    }
+
+    if (!canRedeem) {
+        return existingRedemptionNotice;
+    }
+
+    return `
+        ${existingRedemptionNotice}
+
+        <button
+            type="button"
+            class="circle-button circle-button-primary circle-redeem-button"
+            data-redeem-reward-id="${Number(reward.id)}"
+            data-reward-title="${escapeAttribute(reward.title || "this reward")}"
+            data-points-cost="${Number(reward.points_required || 0)}"
+        >
+            Redeem Reward
+        </button>
+    `;
+}
+
+function renderRedemptions() {
+    if (!BlackwoodMembersState.redemptions.length) {
+        return `
+            <article class="circle-empty-card circle-redemptions-empty">
+                <p>No rewards claimed yet.</p>
+                <p>When you unlock a Circle reward, your request and discount code will appear here.</p>
+            </article>
+        `;
+    }
+
+    return BlackwoodMembersState.redemptions.map(function (redemption) {
+        const cleanStatus = String(redemption.status || "pending").toLowerCase();
+        const status = capitalise(cleanStatus);
+        const requestedDate = redemption.requested_at
+            ? formatDate(redemption.requested_at)
+            : formatDate(redemption.created_at);
+
+        const pointsCost = Number(redemption.points_cost || 0);
+        const pointsLine = pointsCost > 0
+            ? `${pointsCost} points redeemed.`
+            : "Complimentary reward issued.";
+
+        return `
+            <article class="circle-reward-card circle-redemption-card">
+                <div class="circle-redemption-card-header">
+                    <p class="circle-post-meta">
+                        ${escapeHtml(requestedDate)}
+                    </p>
+
+                    <span class="circle-reward-badge is-${escapeAttribute(cleanStatus)}">
+                        ${escapeHtml(status)}
+                    </span>
+                </div>
+
+                <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+
+                <p>
+                    ${escapeHtml(pointsLine)}
+                </p>
+
+                ${redemption.discount_code ? `
+                    <div class="circle-redemption-code">
+                        <span>Discount code</span>
+
+                        <div class="circle-redemption-code-row">
+                            <code>${escapeHtml(redemption.discount_code)}</code>
+
+                            <button
+                                type="button"
+                                class="circle-copy-code-button"
+                                data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
+                            >
+                                Copy Code
+                            </button>
+                        </div>
+                    </div>
+                ` : `
+                    <p class="circle-muted-line">
+                        Discount code pending manual issue.
+                    </p>
+                `}
+            </article>
+        `;
+    }).join("");
+}
 
     function renderPointsHistory() {
         if (!BlackwoodMembersState.points.length) {
@@ -2245,6 +2363,10 @@
             button.addEventListener("click", handleRewardRedemption);
         });
 
+        document.querySelectorAll("[data-copy-discount-code]").forEach(function (button) {
+        button.addEventListener("click", handleCopyDiscountCode);
+        });
+        
         bindMemberArcProfile();
         bindBlackwoodBookshelf();
         bindBehindFilesCarousel();
@@ -2332,11 +2454,19 @@
     // REDEMPTION HELPERS
     // =========================
 
-    function getLatestRedemptionForReward(rewardId) {
-        return BlackwoodMembersState.redemptions.find(function (redemption) {
-            return Number(redemption.reward_id) === Number(rewardId);
-        }) || null;
+    function getLatestRedemptionForReward(rewardId, rewardTitle) {
+    const byRewardId = BlackwoodMembersState.redemptions.find(function (redemption) {
+        return Number(redemption.reward_id) === Number(rewardId);
+    });
+
+    if (byRewardId) {
+        return byRewardId;
     }
+
+    return BlackwoodMembersState.redemptions.find(function (redemption) {
+        return lowerClean(redemption.reward_title) === lowerClean(rewardTitle);
+    }) || null;
+}
 
     function isActiveRedemption(redemption) {
         if (!redemption) {
@@ -2533,7 +2663,69 @@
 
         return text.charAt(0).toUpperCase() + text.slice(1);
     }
+    async function handleCopyDiscountCode(event) {
+    const button = event.currentTarget;
+    const code = button.getAttribute("data-copy-discount-code") || "";
 
+    if (!code) {
+        setDashboardStatus("No discount code was found to copy.", "is-error");
+        return;
+    }
+
+    const originalText = button.textContent;
+
+    try {
+        await copyTextToClipboard(code);
+
+        button.textContent = "Copied";
+        button.classList.add("is-copied");
+
+        setDashboardStatus("Discount code copied to clipboard.", "is-success");
+
+        window.setTimeout(function () {
+            button.textContent = originalText || "Copy Code";
+            button.classList.remove("is-copied");
+        }, 1600);
+
+    } catch (error) {
+        console.warn("Copy discount code failed:", error);
+        setDashboardStatus("The code could not be copied. Please copy it manually.", "is-error");
+    }
+}
+
+async function copyTextToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+    }
+
+    const textarea = document.createElement("textarea");
+
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    textarea.style.top = "0";
+
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    const copied = document.execCommand("copy");
+
+    textarea.remove();
+
+    if (!copied) {
+        throw new Error("Copy command failed.");
+    }
+}
+
+function lowerClean(value) {
+    return String(value || "")
+        .trim()
+        .toLowerCase();
+}
+    
     function looksLikeUrl(value) {
         return /^https?:\/\//i.test(String(value || "").trim());
     }
