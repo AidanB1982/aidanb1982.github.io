@@ -298,7 +298,7 @@
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
-                    class="blackwood-nav-link blackwood-dropdown-toggle"
+                    class="blackwood-nav-link blackwood-nav-button blackwood-dropdown-toggle"
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
@@ -308,30 +308,31 @@
                 </button>
 
                 <div class="blackwood-dropdown blackwood-dropdown-releases" role="menu" aria-label="New releases">
-    <a 
-        href="/pages/holdfast.html" 
-        role="menuitem"
-        class="blackwood-dropdown-feature"
-        aria-label="Holdfast, Book Four of The Archive Files"
-    >
-        <span class="blackwood-dropdown-title">HOLDFAST</span>
-        <span class="blackwood-dropdown-subtitle">Book Four of The Archive Files</span>
-    </a>
+                    <a
+                        href="/pages/holdfast.html"
+                        role="menuitem"
+                        class="blackwood-dropdown-feature"
+                        aria-label="Holdfast, Book Four of The Archive Files"
+                    >
+                        <span class="blackwood-dropdown-title">HOLDFAST</span>
+                        <span class="blackwood-dropdown-subtitle">Book Four of The Archive Files</span>
+                    </a>
 
-    <a 
-        href="/pages/miren-vale.html" 
-        role="menuitem"
-        class="blackwood-dropdown-feature"
-        aria-label="The Crossing, a dark literary fantasy by Miren Vale"
-    >
-        <span class="blackwood-dropdown-title">THE CROSSING</span>
-        <span class="blackwood-dropdown-subtitle">A dark literary fantasy by Miren Vale</span>
-    </a>
-</div>
+                    <a
+                        href="/pages/miren-vale.html"
+                        role="menuitem"
+                        class="blackwood-dropdown-feature"
+                        aria-label="The Crossing, a dark literary fantasy by Miren Vale"
+                    >
+                        <span class="blackwood-dropdown-title">THE CROSSING</span>
+                        <span class="blackwood-dropdown-subtitle">A dark literary fantasy by Miren Vale</span>
+                    </a>
+                </div>
+            </div>
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
-                    class="blackwood-nav-link blackwood-dropdown-toggle"
+                    class="blackwood-nav-link blackwood-nav-button blackwood-dropdown-toggle"
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
@@ -340,7 +341,7 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu">
+                <div class="blackwood-dropdown" role="menu" aria-label="The Books">
                     <a href="/pages/publications.html" role="menuitem">All Publications</a>
                     <a href="/pages/archive-files.html" role="menuitem">The Archive Files</a>
                     <a href="/pages/cursed-bothies.html" role="menuitem">The Cursed Bothies</a>
@@ -350,11 +351,11 @@
                 </div>
             </div>
 
-            <a href="/pages/store.html" class="blackwood-nav-link">Store  </a>
+            <a href="/pages/store.html" class="blackwood-nav-link">Store</a>
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
-                    class="blackwood-nav-link blackwood-dropdown-toggle"
+                    class="blackwood-nav-link blackwood-nav-button blackwood-dropdown-toggle"
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
@@ -363,7 +364,7 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu">
+                <div class="blackwood-dropdown" role="menu" aria-label="Reading">
                     <a href="/pages/reading-lists.html" role="menuitem">Recommended Reads</a>
                     <a href="/pages/editors-picks.html" role="menuitem">Editor Picks</a>
                     <a href="/pages/recovered-files.html" role="menuitem">Short Reads</a>
@@ -373,7 +374,7 @@
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
-                    class="blackwood-nav-link blackwood-dropdown-toggle"
+                    class="blackwood-nav-link blackwood-nav-button blackwood-dropdown-toggle"
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
@@ -382,7 +383,7 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu">
+                <div class="blackwood-dropdown" role="menu" aria-label="About">
                     <a href="/pages/author.html" role="menuitem">Aidan Blackwood</a>
                     <a href="/pages/miren-vale.html" role="menuitem">Miren Vale</a>
                     <a href="/pages/appearances.html" role="menuitem">Appearances</a>
@@ -393,7 +394,7 @@
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
-                    class="blackwood-nav-link blackwood-dropdown-toggle"
+                    class="blackwood-nav-link blackwood-nav-button blackwood-dropdown-toggle"
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
@@ -402,7 +403,7 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu">
+                <div class="blackwood-dropdown" role="menu" aria-label="Community">
                     <a href="/pages/arc-team.html" role="menuitem">ARC Team</a>
                     <a href="/pages/CommunitySpotlight.html" role="menuitem">Community Spotlight</a>
                     <a href="/pages/members.html" role="menuitem">The Blackwood Circle</a>
