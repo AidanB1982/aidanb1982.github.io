@@ -5,6 +5,7 @@
 // Behind the Files reactions powered by Supabase
 // ARC Profile powered by /js/member-arc-profile.js
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
+// Phase 2A: Member Home Dashboard summary layer
 // =========================
 
 (function () {
@@ -51,6 +52,7 @@
         rewards: [],
         points: [],
         redemptions: [],
+        arcAssignments: [],
         activeAuthMode: "signin",
         isRedeeming: false,
         isReactingToBehindFile: false,
@@ -652,6 +654,7 @@
             BlackwoodMembersState.rewards = [];
             BlackwoodMembersState.points = [];
             BlackwoodMembersState.redemptions = [];
+            BlackwoodMembersState.arcAssignments = [];
             BlackwoodMembersState.isReactingToBehindFile = false;
 
             updateMemberIntroVisibility(null);
@@ -686,7 +689,8 @@
                 postReactions,
                 rewardsResult,
                 pointsResult,
-                redemptionsResult
+                redemptionsResult,
+                arcAssignments
             ] = await Promise.all([
                 BlackwoodMembersState.client
                     .from("member_profiles")
@@ -716,7 +720,9 @@
                     .from("member_redemptions")
                     .select("*")
                     .eq("member_id", user.id)
-                    .order("created_at", { ascending: false })
+                    .order("created_at", { ascending: false }),
+
+                loadMemberArcAssignmentsForDashboard(user.id)
             ]);
 
             if (profileResult.error) throw profileResult.error;
@@ -732,12 +738,77 @@
             BlackwoodMembersState.rewards = rewardsResult.data || [];
             BlackwoodMembersState.points = pointsResult.data || [];
             BlackwoodMembersState.redemptions = redemptionsResult.data || [];
+            BlackwoodMembersState.arcAssignments = arcAssignments || [];
 
             renderDashboard();
 
         } catch (error) {
             console.error("Blackwood Circle dashboard failed:", error);
             renderErrorState("Your member record could not be loaded. Please refresh and try again.");
+        }
+    }
+
+    async function loadMemberArcAssignmentsForDashboard(memberId) {
+        if (!memberId) {
+            return [];
+        }
+
+        try {
+            const { data, error } = await BlackwoodMembersState.client
+                .from("arc_file_assignments")
+                .select(`
+                    id,
+                    member_id,
+                    arc_file_id,
+                    application_id,
+                    status,
+                    review_due_date,
+                    review_link,
+                    download_count,
+                    last_downloaded_at,
+                    created_at,
+                    arc_files (
+                        title,
+                        slug,
+                        author_name
+                    )
+                `)
+                .eq("member_id", memberId)
+                .eq("status", "active")
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.warn("ARC assignments with file details could not be loaded:", error.message);
+                return loadMemberArcAssignmentsFallback(memberId);
+            }
+
+            return Array.isArray(data) ? data : [];
+
+        } catch (error) {
+            console.warn("ARC assignments query failed:", error);
+            return loadMemberArcAssignmentsFallback(memberId);
+        }
+    }
+
+    async function loadMemberArcAssignmentsFallback(memberId) {
+        try {
+            const { data, error } = await BlackwoodMembersState.client
+                .from("arc_file_assignments")
+                .select("id,member_id,arc_file_id,application_id,status,review_due_date,review_link,download_count,last_downloaded_at,created_at")
+                .eq("member_id", memberId)
+                .eq("status", "active")
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.warn("ARC assignment fallback query failed:", error.message);
+                return [];
+            }
+
+            return Array.isArray(data) ? data : [];
+
+        } catch (error) {
+            console.warn("ARC assignment fallback failed:", error);
+            return [];
         }
     }
 
@@ -877,27 +948,12 @@
                     </p>
                 </div>
 
-                <div class="circle-dashboard-grid">
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Member Tier</span>
-                        <strong>${escapeHtml(tier)}</strong>
-                    </article>
-
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Points</span>
-                        <strong id="circle-points-total">${pointsTotal}</strong>
-                    </article>
-
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Status</span>
-                        <strong>${escapeHtml(capitalise(status))}</strong>
-                    </article>
-
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Access</span>
-                        <strong>${escapeHtml(arcLabel)}</strong>
-                    </article>
-                </div>
+                ${renderMemberHomeDashboard(member, pointsTotal, {
+                    displayName,
+                    tier,
+                    status,
+                    arcLabel
+                })}
 
                 <div class="circle-dashboard-actions">
                     <button type="button" class="circle-button circle-button-primary" id="circle-refresh-dashboard">
@@ -979,6 +1035,279 @@
         `;
 
         bindDashboardEvents();
+    }
+
+    function renderMemberHomeDashboard(member, pointsTotal, summary) {
+        const arcSummary = getArcDashboardSummary(member);
+        const rewardSummary = getRewardsDashboardSummary(pointsTotal);
+        const redemptionSummary = getRedemptionDashboardSummary();
+        const latestDispatch = getLatestBehindFile();
+        const arcHref = isArcMemberProfile(member) ? "#blackwood-arc-profile-root" : "/pages/arc-team.html";
+        const arcActionLabel = isArcMemberProfile(member) ? "Open ARC Vault" : "Apply for ARC Team";
+
+        return `
+            <section class="circle-home-dashboard" aria-labelledby="circle-home-dashboard-title">
+                <div class="circle-home-main">
+                    <div>
+                        <p class="circle-kicker">Member Home</p>
+
+                        <h2 id="circle-home-dashboard-title">
+                            Your Circle command desk
+                        </h2>
+
+                        <p>
+                            A quick view of your points, ARC access, rewards, private dispatches,
+                            and Blackwood reader activity.
+                        </p>
+                    </div>
+
+                    <div class="circle-home-actions">
+                        <a href="${escapeAttribute(arcHref)}" class="circle-button circle-button-primary">
+                            ${escapeHtml(arcActionLabel)}
+                        </a>
+
+                        <a href="#circle-rewards-title" class="circle-button circle-button-secondary">
+                            View Rewards
+                        </a>
+
+                        <a href="#circle-posts-title" class="circle-button circle-button-secondary">
+                            Latest Dispatch
+                        </a>
+
+                        <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
+                            My Bookshelf
+                        </a>
+                    </div>
+                </div>
+
+                <div class="circle-dashboard-grid circle-home-stat-grid">
+                    <article class="circle-stat-card">
+                        <span class="circle-stat-label">Points</span>
+                        <strong id="circle-home-points-total">${escapeHtml(String(pointsTotal))}</strong>
+                        <small>Current Circle total</small>
+                    </article>
+
+                    <article class="circle-stat-card">
+                        <span class="circle-stat-label">Member Tier</span>
+                        <strong>${escapeHtml(summary.tier)}</strong>
+                        <small>${escapeHtml(capitalise(summary.status))}</small>
+                    </article>
+
+                    <article class="circle-stat-card">
+                        <span class="circle-stat-label">Access</span>
+                        <strong>${escapeHtml(summary.arcLabel)}</strong>
+                        <small>${escapeHtml(arcSummary.shortLine)}</small>
+                    </article>
+
+                    <article class="circle-stat-card">
+                        <span class="circle-stat-label">Rewards</span>
+                        <strong>${escapeHtml(rewardSummary.headline)}</strong>
+                        <small>${escapeHtml(rewardSummary.detail)}</small>
+                    </article>
+                </div>
+
+                <div class="circle-home-summary-grid">
+                    <article class="circle-home-summary-card">
+                        <span>ARC Desk</span>
+                        <h3>${escapeHtml(arcSummary.headline)}</h3>
+                        <p>${escapeHtml(arcSummary.detail)}</p>
+                    </article>
+
+                    <article class="circle-home-summary-card">
+                        <span>Latest Dispatch</span>
+                        <h3>${escapeHtml(latestDispatch.title)}</h3>
+                        <p>${escapeHtml(latestDispatch.detail)}</p>
+                    </article>
+
+                    <article class="circle-home-summary-card">
+                        <span>Reward Desk</span>
+                        <h3>${escapeHtml(redemptionSummary.headline)}</h3>
+                        <p>${escapeHtml(redemptionSummary.detail)}</p>
+                    </article>
+                </div>
+            </section>
+        `;
+    }
+
+    function getArcDashboardSummary(member) {
+        const assignments = Array.isArray(BlackwoodMembersState.arcAssignments)
+            ? BlackwoodMembersState.arcAssignments
+            : [];
+
+        const isArcMember = isArcMemberProfile(member);
+        const activeAssignments = assignments.filter(function (assignment) {
+            return String(assignment.status || "active").toLowerCase() === "active";
+        });
+
+        const reviewFiledCount = activeAssignments.filter(function (assignment) {
+            return looksLikeUrl(assignment.review_link || "");
+        }).length;
+
+        const downloadedCount = activeAssignments.filter(function (assignment) {
+            return Number(assignment.download_count || 0) > 0;
+        }).length;
+
+        const nextDueAssignment = activeAssignments
+            .filter(function (assignment) {
+                return Boolean(assignment.review_due_date);
+            })
+            .sort(function (a, b) {
+                return String(a.review_due_date).localeCompare(String(b.review_due_date));
+            })[0] || null;
+
+        if (!isArcMember) {
+            return {
+                headline: "Not enrolled",
+                shortLine: "Standard Circle access",
+                detail: "ARC Team access has not been enabled for this member record yet."
+            };
+        }
+
+        if (!activeAssignments.length) {
+            return {
+                headline: "ARC Team ready",
+                shortLine: "No active ARC files",
+                detail: "You are marked as an ARC Team member. New assignments will appear when issued."
+            };
+        }
+
+        const activeLabel = activeAssignments.length === 1
+            ? "1 active ARC"
+            : `${activeAssignments.length} active ARCs`;
+
+        const reviewLabel = reviewFiledCount === 1
+            ? "1 review filed"
+            : `${reviewFiledCount} reviews filed`;
+
+        const downloadLabel = downloadedCount === 1
+            ? "1 opened"
+            : `${downloadedCount} opened`;
+
+        const dueLine = nextDueAssignment
+            ? `Next review due ${formatDate(nextDueAssignment.review_due_date)}.`
+            : "No review due date recorded.";
+
+        return {
+            headline: activeLabel,
+            shortLine: `${downloadLabel} · ${reviewLabel}`,
+            detail: `${dueLine} ${downloadLabel}. ${reviewLabel}.`
+        };
+    }
+
+    function getRewardsDashboardSummary(pointsTotal) {
+        const rewards = Array.isArray(BlackwoodMembersState.rewards)
+            ? BlackwoodMembersState.rewards
+            : [];
+
+        const unlockedRewards = rewards.filter(function (reward) {
+            return pointsTotal >= Number(reward.points_required || 0);
+        });
+
+        const redeemableUnlockedRewards = unlockedRewards.filter(function (reward) {
+            return reward.is_redeemable === true;
+        });
+
+        if (!rewards.length) {
+            return {
+                headline: "None filed",
+                detail: "Rewards will appear once they are added to the Circle."
+            };
+        }
+
+        if (!unlockedRewards.length) {
+            const nextReward = rewards
+                .slice()
+                .sort(function (a, b) {
+                    return Number(a.points_required || 0) - Number(b.points_required || 0);
+                })[0];
+
+            const pointsNeeded = Math.max(0, Number(nextReward.points_required || 0) - pointsTotal);
+
+            return {
+                headline: `${pointsNeeded} to unlock`,
+                detail: "Next reward milestone"
+            };
+        }
+
+        if (redeemableUnlockedRewards.length) {
+            return {
+                headline: `${redeemableUnlockedRewards.length} unlocked`,
+                detail: "Redeemable reward available"
+            };
+        }
+
+        return {
+            headline: `${unlockedRewards.length} unlocked`,
+            detail: "Reward milestone reached"
+        };
+    }
+
+    function getRedemptionDashboardSummary() {
+        const redemptions = Array.isArray(BlackwoodMembersState.redemptions)
+            ? BlackwoodMembersState.redemptions
+            : [];
+
+        if (!redemptions.length) {
+            return {
+                headline: "No redemptions yet",
+                detail: "Unlocked rewards can be requested from the Rewards section."
+            };
+        }
+
+        const pending = redemptions.filter(function (redemption) {
+            return String(redemption.status || "").toLowerCase() === "pending";
+        });
+
+        const issued = redemptions.filter(function (redemption) {
+            return String(redemption.status || "").toLowerCase() === "issued";
+        });
+
+        const latestWithCode = redemptions.find(function (redemption) {
+            return Boolean(redemption.discount_code);
+        });
+
+        if (pending.length) {
+            return {
+                headline: `${pending.length} pending`,
+                detail: "A reward request is waiting to be issued."
+            };
+        }
+
+        if (latestWithCode) {
+            return {
+                headline: "Code issued",
+                detail: `${latestWithCode.reward_title || "Reward"} is available in your redemption history.`
+            };
+        }
+
+        if (issued.length) {
+            return {
+                headline: `${issued.length} issued`,
+                detail: "Issued rewards are listed in your redemption history."
+            };
+        }
+
+        return {
+            headline: `${redemptions.length} filed`,
+            detail: "Your previous reward requests are listed below."
+        };
+    }
+
+    function getLatestBehindFile() {
+        const posts = getBehindFilesForDisplay();
+        const post = posts[0] || null;
+
+        if (!post) {
+            return {
+                title: "No dispatch filed",
+                detail: "Private Blackwood dispatches will appear here once published."
+            };
+        }
+
+        return {
+            title: post.title || "Untitled Dispatch",
+            detail: `${post.category || "Behind the Files"} · ${formatBehindFileDate(post.publishedAt)}`
+        };
     }
 
     // =========================
@@ -1630,9 +1959,14 @@
         });
 
         const pointsTotal = document.getElementById("circle-points-total");
+        const homePointsTotal = document.getElementById("circle-home-points-total");
 
         if (pointsTotal) {
             pointsTotal.textContent = String(Number(pointsTotal.textContent || 0) + cleanPoints);
+        }
+
+        if (homePointsTotal) {
+            homePointsTotal.textContent = String(Number(homePointsTotal.textContent || 0) + cleanPoints);
         }
 
         const pointsList = document.querySelector(".circle-points-list");
@@ -2198,6 +2532,10 @@
         if (!text) return "";
 
         return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function looksLikeUrl(value) {
+        return /^https?:\/\//i.test(String(value || "").trim());
     }
 
     function escapeHtml(value) {
