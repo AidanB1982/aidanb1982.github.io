@@ -759,16 +759,31 @@ function bindArcAdminFilters(adminRoot) {
             }
 
             if (visibleCount) {
-                visibleCount.textContent = shownCount + " Showing";
-            }
-
+            visibleCount.textContent = getArcAdminVisibleCountLabel(selectedFilter, shownCount);
+        }
+            
             if (filterNote) {
                 filterNote.textContent = getArcAdminFilterNote(selectedFilter, shownCount);
             }
         });
     });
 }
-
+    
+function getArcAdminFilterNote(selectedFilter, shownCount) {
+        const labelMap = {
+            all: "all active ARC assignments",
+            "not-opened": "readers who have not opened their ARC yet",
+            downloaded: "readers who have downloaded but not filed a review",
+            "review-filed": "readers with filed review links",
+            "due-soon": "assignments due soon or due today",
+            overdue: "overdue ARC assignments"
+        };
+    
+        const label = labelMap[selectedFilter] || "matching ARC assignments";
+    
+        return "Showing " + shownCount + " " + label + ".";
+    }
+    
 function doesArcAdminRowMatchFilter(row, selectedFilter) {
     const filterType = row.getAttribute("data-arc-admin-filter-type") || "not-opened";
     const status = row.getAttribute("data-arc-admin-status") || "";
