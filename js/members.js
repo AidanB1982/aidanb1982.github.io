@@ -1052,7 +1052,7 @@
                         <p class="circle-kicker">Member Home</p>
 
                         <h2 id="circle-home-dashboard-title">
-                            Your Circle command desk
+                            Your Circle
                         </h2>
 
                         <p>
