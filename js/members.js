@@ -2076,7 +2076,7 @@
                     Requires ${required} points · ${escapeHtml(reward.required_tier || "Reader")}
                 </small>
 
-                ${renderRewardProgress(pointsTotal, required, unlocked)}
+                ${renderRewardProgress(pointsTotal, required, unlocked, isRedeemable)}
 
                 ${renderRewardAction(reward, canRedeem, latestRedemption)}
             </article>
@@ -2144,7 +2144,7 @@ function getRewardStatusInfo(options) {
     };
 }
 
-function renderRewardProgress(pointsTotal, required, unlocked) {
+function renderRewardProgress(pointsTotal, required, unlocked, isRedeemable) {
     const cleanRequired = Math.max(0, Number(required || 0));
     const cleanPoints = Math.max(0, Number(pointsTotal || 0));
 
@@ -2155,17 +2155,23 @@ function renderRewardProgress(pointsTotal, required, unlocked) {
     const progress = Math.min(100, Math.round((cleanPoints / cleanRequired) * 100));
     const remaining = Math.max(0, cleanRequired - cleanPoints);
 
+    let note = `${remaining} more points needed.`;
+
+    if (unlocked && isRedeemable) {
+        note = "Unlocked and available to redeem.";
+    }
+
+    if (unlocked && !isRedeemable) {
+        note = "Milestone reached on your Circle record.";
+    }
+
     return `
         <div class="circle-reward-progress" aria-label="Reward progress">
             <span style="width: ${escapeAttribute(String(progress))}%"></span>
         </div>
 
         <p class="circle-reward-progress-note">
-            ${
-                unlocked
-                    ? "Unlocked and available on your Circle record."
-                    : `${remaining} more points needed.`
-            }
+            ${escapeHtml(note)}
         </p>
     `;
 }
