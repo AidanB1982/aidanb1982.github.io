@@ -1100,3 +1100,93 @@
         justify-content: flex-start;
     }
 }
+.arc-admin-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 4px 0 14px;
+}
+
+.arc-admin-filter {
+    appearance: none;
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    border-radius: 999px;
+    background: rgba(196, 122, 44, 0.06);
+    color: rgba(244, 239, 230, 0.78);
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.arc-admin-filter span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    min-height: 22px;
+    margin-left: 7px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.34);
+    color: #d6b181;
+    font-size: 11px;
+    line-height: 1;
+}
+
+.arc-admin-filter:hover,
+.arc-admin-filter:focus-visible {
+    border-color: rgba(214, 177, 129, 0.72);
+    background: rgba(196, 122, 44, 0.14);
+    color: #f4efe6;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.arc-admin-filter.is-active {
+    border-color: rgba(214, 177, 129, 0.86);
+    background: linear-gradient(135deg, rgba(126, 65, 22, 0.95), rgba(196, 122, 44, 0.72));
+    color: #fff3dc;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.arc-admin-filter.is-active span {
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff3dc;
+}
+
+.arc-admin-filter-note {
+    margin: 0 0 16px;
+    color: rgba(244, 239, 230, 0.62);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.arc-admin-empty-row td {
+    padding: 24px 16px;
+    color: rgba(244, 239, 230, 0.48);
+    font-style: italic;
+    text-align: center;
+}
+
+@media (max-width: 760px) {
+    .arc-admin-filters {
+        gap: 8px;
+    }
+
+    .arc-admin-filter {
+        width: 100%;
+        justify-content: space-between;
+        display: inline-flex;
+        align-items: center;
+    }
+}
