@@ -500,6 +500,7 @@
             }
 
             adminRoot.innerHTML = renderArcAdminDashboard(rows);
+            bindArcAdminFilters(adminRoot);
 
         } catch (error) {
             console.warn("Blackwood ARC Admin dashboard unavailable:", error);
@@ -508,6 +509,8 @@
     }
 
     function renderArcAdminDashboard(rows) {
+    const counts = getArcAdminFilterCounts(rows);
+
     return `
         <details class="arc-admin-card arc-admin-collapsible" data-arc-admin-details>
             <summary class="arc-admin-summary">
@@ -525,7 +528,7 @@
                     </div>
 
                     <div class="arc-admin-summary-meta">
-                        <span class="arc-admin-count">
+                        <span class="arc-admin-count" data-arc-admin-visible-count>
                             ${escapeHtml(String(rows.length))} Active
                         </span>
 
@@ -537,6 +540,36 @@
             </summary>
 
             <div class="arc-admin-body">
+                <div class="arc-admin-filters" role="group" aria-label="Filter ARC assignments">
+                    <button type="button" class="arc-admin-filter is-active" data-arc-admin-filter="all">
+                        All <span>${escapeHtml(String(counts.all))}</span>
+                    </button>
+
+                    <button type="button" class="arc-admin-filter" data-arc-admin-filter="not-opened">
+                        Not Opened <span>${escapeHtml(String(counts.notOpened))}</span>
+                    </button>
+
+                    <button type="button" class="arc-admin-filter" data-arc-admin-filter="downloaded">
+                        Downloaded <span>${escapeHtml(String(counts.downloaded))}</span>
+                    </button>
+
+                    <button type="button" class="arc-admin-filter" data-arc-admin-filter="review-filed">
+                        Review Filed <span>${escapeHtml(String(counts.reviewFiled))}</span>
+                    </button>
+
+                    <button type="button" class="arc-admin-filter" data-arc-admin-filter="due-soon">
+                        Due Soon <span>${escapeHtml(String(counts.dueSoon))}</span>
+                    </button>
+
+                    <button type="button" class="arc-admin-filter" data-arc-admin-filter="overdue">
+                        Overdue <span>${escapeHtml(String(counts.overdue))}</span>
+                    </button>
+                </div>
+
+                <p class="arc-admin-filter-note" data-arc-admin-filter-note>
+                    Showing all active ARC assignments.
+                </p>
+
                 <div class="arc-admin-table-wrap">
                     <table class="arc-admin-table">
                         <thead>
@@ -553,6 +586,12 @@
 
                         <tbody>
                             ${rows.map(renderArcAdminRow).join("")}
+
+                            <tr class="arc-admin-empty-row" data-arc-admin-empty-row hidden>
+                                <td colspan="7">
+                                    No ARC assignments match this filter.
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -562,53 +601,220 @@
 }
 
     function renderArcAdminRow(row) {
-        const reviewStatus = row.review_status || "Active";
-        const reviewClass = getArcAdminStatusClass(reviewStatus);
-        const reviewLink = row.review_link || "";
+    const reviewStatus = row.review_status || "Active";
+    const reviewClass = getArcAdminStatusClass(reviewStatus);
+    const reviewLink = row.review_link || "";
+    const downloadCount = Number(row.download_count || 0);
+    const filterType = getArcAdminRowFilterType(row);
 
-        return `
-            <tr>
-                <td>
-                    <strong>${escapeHtml(row.reader_name || "Unknown reader")}</strong>
-                    <span>${escapeHtml(row.reader_email || "No email recorded")}</span>
-                </td>
+    return `
+        <tr
+            data-arc-admin-row
+            data-arc-admin-filter-type="${escapeAttribute(filterType)}"
+            data-arc-admin-status="${escapeAttribute(String(reviewStatus).toLowerCase())}"
+            data-arc-admin-download-count="${escapeAttribute(String(downloadCount))}"
+        >
+            <td>
+                <strong>${escapeHtml(row.reader_name || "Unknown reader")}</strong>
+                <span>${escapeHtml(row.reader_email || "No email recorded")}</span>
+            </td>
 
-                <td>
-                    <strong>${escapeHtml(row.title || "Unknown ARC")}</strong>
-                    <span>${escapeHtml(row.author_name || "Blackwood Publishing")}</span>
-                </td>
+            <td>
+                <strong>${escapeHtml(row.title || "Unknown ARC")}</strong>
+                <span>${escapeHtml(row.author_name || "Blackwood Publishing")}</span>
+            </td>
 
-                <td>
-                    ${escapeHtml(formatDateForDisplay(row.review_due_date) || "Not recorded")}
-                </td>
+            <td>
+                ${escapeHtml(formatDateForDisplay(row.review_due_date) || "Not recorded")}
+            </td>
 
-                <td>
-                    <span class="arc-admin-status ${escapeAttribute(reviewClass)}">
-                        ${escapeHtml(reviewStatus)}
-                    </span>
-                </td>
+            <td>
+                <span class="arc-admin-status ${escapeAttribute(reviewClass)}">
+                    ${escapeHtml(reviewStatus)}
+                </span>
+            </td>
 
-                <td>
-                    ${escapeHtml(String(Number(row.download_count || 0)))}
-                </td>
+            <td>
+                ${escapeHtml(String(downloadCount))}
+            </td>
 
-                <td>
-                    ${escapeHtml(formatDateTimeForDisplay(row.last_downloaded_at) || "Not yet")}
-                </td>
+            <td>
+                ${escapeHtml(formatDateTimeForDisplay(row.last_downloaded_at) || "Not yet")}
+            </td>
 
-                <td>
-                    ${reviewLink && looksLikeUrl(reviewLink) ? `
-                        <a href="${escapeAttribute(reviewLink)}" target="_blank" rel="noopener noreferrer">
-                            View Review
-                        </a>
-                    ` : `
-                        <span class="arc-admin-muted">Not filed</span>
-                    `}
-                </td>
-            </tr>
-        `;
+            <td>
+                ${reviewLink && looksLikeUrl(reviewLink) ? `
+                    <a href="${escapeAttribute(reviewLink)}" target="_blank" rel="noopener noreferrer">
+                        View Review
+                    </a>
+                ` : `
+                    <span class="arc-admin-muted">Not filed</span>
+                `}
+            </td>
+        </tr>
+    `;
+}
+function getArcAdminFilterCounts(rows) {
+    const counts = {
+        all: 0,
+        notOpened: 0,
+        downloaded: 0,
+        reviewFiled: 0,
+        dueSoon: 0,
+        overdue: 0
+    };
+
+    rows.forEach(function (row) {
+        const status = String(row.review_status || "")
+            .trim()
+            .toLowerCase();
+
+        const downloadCount = Number(row.download_count || 0);
+        const hasReview = status === "review filed";
+
+        counts.all += 1;
+
+        if (downloadCount <= 0) {
+            counts.notOpened += 1;
+        }
+
+        if (downloadCount > 0 && !hasReview) {
+            counts.downloaded += 1;
+        }
+
+        if (hasReview) {
+            counts.reviewFiled += 1;
+        }
+
+        if (status === "due soon" || status === "due today") {
+            counts.dueSoon += 1;
+        }
+
+        if (status === "overdue") {
+            counts.overdue += 1;
+        }
+    });
+
+    return counts;
+}
+
+function getArcAdminRowFilterType(row) {
+    const status = String(row.review_status || "")
+        .trim()
+        .toLowerCase();
+
+    const downloadCount = Number(row.download_count || 0);
+
+    if (status === "review filed") {
+        return "review-filed";
     }
 
+    if (status === "overdue") {
+        return "overdue";
+    }
+
+    if (status === "due soon" || status === "due today") {
+        return "due-soon";
+    }
+
+    if (downloadCount > 0) {
+        return "downloaded";
+    }
+
+    return "not-opened";
+}
+
+function bindArcAdminFilters(adminRoot) {
+    const filterButtons = Array.from(adminRoot.querySelectorAll("[data-arc-admin-filter]"));
+    const rows = Array.from(adminRoot.querySelectorAll("[data-arc-admin-row]"));
+    const emptyRow = adminRoot.querySelector("[data-arc-admin-empty-row]");
+    const visibleCount = adminRoot.querySelector("[data-arc-admin-visible-count]");
+    const filterNote = adminRoot.querySelector("[data-arc-admin-filter-note]");
+
+    if (!filterButtons.length || !rows.length) {
+        return;
+    }
+
+    filterButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            const selectedFilter = button.getAttribute("data-arc-admin-filter") || "all";
+            let shownCount = 0;
+
+            filterButtons.forEach(function (filterButton) {
+                filterButton.classList.toggle("is-active", filterButton === button);
+            });
+
+            rows.forEach(function (row) {
+                const shouldShow = doesArcAdminRowMatchFilter(row, selectedFilter);
+
+                row.hidden = !shouldShow;
+
+                if (shouldShow) {
+                    shownCount += 1;
+                }
+            });
+
+            if (emptyRow) {
+                emptyRow.hidden = shownCount > 0;
+            }
+
+            if (visibleCount) {
+                visibleCount.textContent = shownCount + " Showing";
+            }
+
+            if (filterNote) {
+                filterNote.textContent = getArcAdminFilterNote(selectedFilter, shownCount);
+            }
+        });
+    });
+}
+
+function doesArcAdminRowMatchFilter(row, selectedFilter) {
+    const filterType = row.getAttribute("data-arc-admin-filter-type") || "not-opened";
+    const status = row.getAttribute("data-arc-admin-status") || "";
+    const downloadCount = Number(row.getAttribute("data-arc-admin-download-count") || 0);
+
+    if (selectedFilter === "all") {
+        return true;
+    }
+
+    if (selectedFilter === "not-opened") {
+        return downloadCount <= 0;
+    }
+
+    if (selectedFilter === "downloaded") {
+        return downloadCount > 0 && status !== "review filed";
+    }
+
+    if (selectedFilter === "review-filed") {
+        return status === "review filed";
+    }
+
+    if (selectedFilter === "due-soon") {
+        return status === "due soon" || status === "due today";
+    }
+
+    if (selectedFilter === "overdue") {
+        return status === "overdue";
+    }
+
+    return filterType === selectedFilter;
+}
+
+function getArcAdminFilterNote(selectedFilter, shownCount) {
+    const labelMap = {
+        all: "all active ARC assignments",
+        "not-opened": "readers who have not opened their ARC yet",
+        downloaded: "readers who have downloaded but not filed a review",
+        "review-filed": "readers with filed review links",
+        "due-soon": "assignments due soon or due today",
+        overdue: "overdue ARC assignments"
+    };
+
+    const label = labelMap[selectedFilter] || "matching ARC assignments";
+
+    return "Showing " + shownCount + " " + label + ".";
+}
     function getArcAdminStatusClass(status) {
         const cleanStatus = String(status || "")
             .trim()
