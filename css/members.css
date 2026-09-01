@@ -45,6 +45,7 @@
     padding: clamp(32px, 6vw, 82px) 0 clamp(54px, 8vw, 110px);
 }
 
+.members-page.is-circle-signed-in .circle-signed-out-only,
 .members-page.is-circle-signed-in .circle-public-intro,
 .members-page.is-circle-signed-in .members-public-intro,
 .members-page.is-circle-signed-in .circle-how-it-works,
@@ -53,6 +54,9 @@
     display: none !important;
 }
 
+.members-page.is-circle-signed-out .circle-signed-in-only {
+    display: none !important;
+}
 .circle-kicker,
 .circle-post-meta,
 .circle-reward-status,
