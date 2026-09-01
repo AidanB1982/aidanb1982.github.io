@@ -171,6 +171,8 @@
         statusType: "",
         isBusy: false,
         isDrawerOpen: false,
+        draggingBookId: "",
+        draggingFromStageId: "",
         escapeListenerBound: false
     };
 
@@ -386,122 +388,135 @@
     }
 
     function renderShelfStage(stage, stageItems) {
-        const count = stageItems.length;
-        const countLabel = count === 1 ? "1 book" : `${count} books`;
+    const count = stageItems.length;
+    const countLabel = count === 1 ? "1 book" : `${count} books`;
 
-        return `
-            <section 
-                class="bookshelf-stage ${count ? "has-books" : "is-empty"}" 
-                data-bookshelf-stage="${escapeAttribute(stage.id)}"
-                aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
-            >
-                <div class="bookshelf-stage-header">
-                    <div>
-                        <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
-                            ${escapeHtml(stage.label)}
-                        </h3>
-                        <p>${escapeHtml(stage.description)}</p>
-                    </div>
-
-                    <span>${escapeHtml(countLabel)}</span>
+    return `
+        <section 
+            class="bookshelf-stage ${count ? "has-books" : "is-empty"}" 
+            data-bookshelf-stage="${escapeAttribute(stage.id)}"
+            data-bookshelf-drop-stage="${escapeAttribute(stage.id)}"
+            aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
+        >
+            <div class="bookshelf-stage-header">
+                <div>
+                    <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
+                        ${escapeHtml(stage.label)}
+                    </h3>
+                    <p>${escapeHtml(stage.description)}</p>
                 </div>
 
-                ${
-                    count
-                        ? `
-                            <div class="bookshelf-spine-list bookshelf-stage-spine-list">
-                                ${stageItems.map(function (item, index) {
-                                    return renderShelfSpine(item.book, item.record, index, stageItems.length);
-                                }).join("")}
-                            </div>
-                        `
-                        : `
-                            <div class="bookshelf-stage-empty">
-                                <p>No books on this shelf yet.</p>
-                            </div>
-                        `
-                }
-            </section>
-        `;
-    }
+                <span>${escapeHtml(countLabel)}</span>
+            </div>
+
+            ${
+                count
+                    ? `
+                        <div 
+                            class="bookshelf-spine-list bookshelf-stage-spine-list"
+                            data-bookshelf-drop-list="${escapeAttribute(stage.id)}"
+                        >
+                            ${stageItems.map(function (item, index) {
+                                return renderShelfSpine(item.book, item.record, index, stageItems.length);
+                            }).join("")}
+                        </div>
+                    `
+                    : `
+                        <div 
+                            class="bookshelf-stage-empty"
+                            data-bookshelf-empty-drop="${escapeAttribute(stage.id)}"
+                        >
+                            <p>No books on this shelf yet. Drop a book here to file it.</p>
+                        </div>
+                    `
+            }
+        </section>
+    `;
+}
 
     function renderShelfSpine(book, record, index, stageLength) {
-        const badges = [];
-        const stage = getShelfStageById(record.shelf_status);
-        const canMoveEarlier = index > 0;
-        const canMoveLater = index < stageLength - 1;
+    const badges = [];
+    const stage = getShelfStageById(record.shelf_status);
+    const canMoveEarlier = index > 0;
+    const canMoveLater = index < stageLength - 1;
 
-        badges.push(stage ? stage.shortLabel : "Filed");
+    badges.push(stage ? stage.shortLabel : "Filed");
 
-        if (record.is_favourite) badges.push("Favourite");
-        if (record.is_arc) badges.push("ARC");
-        if (record.owned) badges.push("Own");
-        if (record.has_read) badges.push("Read");
-        if (record.is_signed) badges.push("Signed");
-        if (record.wants_signed) badges.push("Wants Signed");
+    if (record.is_favourite) badges.push("Favourite");
+    if (record.is_arc) badges.push("ARC");
+    if (record.owned) badges.push("Own");
+    if (record.has_read) badges.push("Read");
+    if (record.is_signed) badges.push("Signed");
+    if (record.wants_signed) badges.push("Wants Signed");
 
-        return `
-            <div class="bookshelf-book-slot">
-                <button
-                    type="button"
-                    class="bookshelf-spine-button ${record.owned ? "is-owned" : ""} ${record.has_read ? "is-read" : ""} ${record.is_signed ? "is-signed" : ""} ${record.is_favourite ? "is-favourite" : ""}"
-                    data-bookshelf-open-book="${escapeAttribute(book.id)}"
-                    aria-label="Open shelf record for ${escapeAttribute(book.title)}"
+    return `
+        <div 
+            class="bookshelf-book-slot"
+            draggable="true"
+            data-bookshelf-drag-book="${escapeAttribute(book.id)}"
+            data-bookshelf-drop-before="${escapeAttribute(book.id)}"
+            data-bookshelf-stage-book="${escapeAttribute(record.shelf_status)}"
+        >
+            <button
+                type="button"
+                class="bookshelf-spine-button ${record.owned ? "is-owned" : ""} ${record.has_read ? "is-read" : ""} ${record.is_signed ? "is-signed" : ""} ${record.is_favourite ? "is-favourite" : ""}"
+                data-bookshelf-open-book="${escapeAttribute(book.id)}"
+                aria-label="Open shelf record for ${escapeAttribute(book.title)}"
+            >
+                <img
+                    src="${escapeAttribute(book.spine)}"
+                    alt=""
+                    loading="lazy"
+                    data-bookshelf-spine-image
                 >
-                    <img
-                        src="${escapeAttribute(book.spine)}"
-                        alt=""
-                        loading="lazy"
-                        data-bookshelf-spine-image
+
+                <span class="bookshelf-spine-fallback">
+                    ${escapeHtml(book.title)}
+                </span>
+            </button>
+
+            <div class="bookshelf-spine-badges" aria-hidden="true">
+                ${badges.slice(0, 4).map(function (badge) {
+                    return `<span>${escapeHtml(badge)}</span>`;
+                }).join("")}
+            </div>
+
+            <div class="bookshelf-spine-controls">
+                <label>
+                    <span>Move to</span>
+
+                    <select 
+                        data-bookshelf-stage-select
+                        data-bookshelf-book-id="${escapeAttribute(book.id)}"
+                        aria-label="Move ${escapeAttribute(book.title)} to another shelf"
                     >
+                        ${renderShelfStageOptions(record.shelf_status)}
+                    </select>
+                </label>
 
-                    <span class="bookshelf-spine-fallback">
-                        ${escapeHtml(book.title)}
-                    </span>
-                </button>
+                <div class="bookshelf-order-controls" aria-label="Rearrange ${escapeAttribute(book.title)}">
+                    <button
+                        type="button"
+                        data-bookshelf-move="earlier"
+                        data-bookshelf-book-id="${escapeAttribute(book.id)}"
+                        ${canMoveEarlier ? "" : "disabled"}
+                    >
+                        Earlier
+                    </button>
 
-                <div class="bookshelf-spine-badges" aria-hidden="true">
-                    ${badges.slice(0, 4).map(function (badge) {
-                        return `<span>${escapeHtml(badge)}</span>`;
-                    }).join("")}
-                </div>
-
-                <div class="bookshelf-spine-controls">
-                    <label>
-                        <span>Move to</span>
-
-                        <select 
-                            data-bookshelf-stage-select
-                            data-bookshelf-book-id="${escapeAttribute(book.id)}"
-                            aria-label="Move ${escapeAttribute(book.title)} to another shelf"
-                        >
-                            ${renderShelfStageOptions(record.shelf_status)}
-                        </select>
-                    </label>
-
-                    <div class="bookshelf-order-controls" aria-label="Rearrange ${escapeAttribute(book.title)}">
-                        <button
-                            type="button"
-                            data-bookshelf-move="earlier"
-                            data-bookshelf-book-id="${escapeAttribute(book.id)}"
-                            ${canMoveEarlier ? "" : "disabled"}
-                        >
-                            Earlier
-                        </button>
-
-                        <button
-                            type="button"
-                            data-bookshelf-move="later"
-                            data-bookshelf-book-id="${escapeAttribute(book.id)}"
-                            ${canMoveLater ? "" : "disabled"}
-                        >
-                            Later
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        data-bookshelf-move="later"
+                        data-bookshelf-book-id="${escapeAttribute(book.id)}"
+                        ${canMoveLater ? "" : "disabled"}
+                    >
+                        Later
+                    </button>
                 </div>
             </div>
-        `;
-    }
+        </div>
+    `;
+}
 
     function renderEmptyShelf() {
         return `
@@ -745,65 +760,363 @@
     }
 
     function bindBookshelfEvents() {
-        const drawer = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-drawer]");
+    const drawer = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-drawer]");
 
-        if (drawer) {
-            drawer.addEventListener("toggle", function () {
-                BlackwoodBookshelfState.isDrawerOpen = drawer.open;
-            });
+    if (drawer) {
+        drawer.addEventListener("toggle", function () {
+            BlackwoodBookshelfState.isDrawerOpen = drawer.open;
+        });
+    }
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-add]").forEach(function (button) {
+        button.addEventListener("click", openBookPickerModal);
+    });
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-open-book]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            openBookRecordModal(button.dataset.bookshelfOpenBook || "");
+        });
+    });
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-pick-book]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            openBookRecordModal(button.dataset.bookshelfPickBook || "");
+        });
+    });
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-close]").forEach(function (button) {
+        button.addEventListener("click", closeBookshelfModal);
+    });
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-stage-select]").forEach(function (select) {
+        select.addEventListener("change", handleQuickShelfStatusChange);
+    });
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-move]").forEach(function (button) {
+        button.addEventListener("click", handleMoveShelfRecord);
+    });
+
+    bindBookshelfDragAndDrop();
+
+    const modal = BlackwoodBookshelfState.root.querySelector(".bookshelf-modal");
+
+    if (modal) {
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                closeBookshelfModal();
+            }
+        });
+    }
+
+    const form = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-record-form]");
+
+    if (form) {
+        form.addEventListener("submit", handleSaveShelfRecord);
+    }
+
+    const removeButton = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-remove]");
+
+    if (removeButton) {
+        removeButton.addEventListener("click", handleRemoveShelfRecord);
+    }
+}
+
+   function bindBookshelfDragAndDrop() {
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-drag-book]").forEach(function (slot) {
+        slot.addEventListener("dragstart", handleBookshelfDragStart);
+        slot.addEventListener("dragend", handleBookshelfDragEnd);
+    });
+
+    BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-drop-stage]").forEach(function (stage) {
+        stage.addEventListener("dragover", handleBookshelfDragOver);
+        stage.addEventListener("dragenter", handleBookshelfDragOver);
+        stage.addEventListener("dragleave", handleBookshelfDragLeave);
+        stage.addEventListener("drop", handleBookshelfDrop);
+    });
+}
+
+function handleBookshelfDragStart(event) {
+    if (BlackwoodBookshelfState.isBusy) {
+        event.preventDefault();
+        return;
+    }
+
+    const interactiveElement = event.target.closest(
+        "select, input, textarea, .bookshelf-order-controls button"
+    );
+
+    if (interactiveElement) {
+        event.preventDefault();
+        return;
+    }
+
+    const slot = event.currentTarget;
+    const bookId = slot.dataset.bookshelfDragBook || "";
+    const record = getRecordByBookId(bookId);
+
+    if (!bookId || !record) {
+        event.preventDefault();
+        return;
+    }
+
+    BlackwoodBookshelfState.draggingBookId = bookId;
+    BlackwoodBookshelfState.draggingFromStageId = record.shelf_status || "want_to_read";
+
+    if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", bookId);
+    }
+
+    window.setTimeout(function () {
+        slot.classList.add("is-dragging");
+        document.body.classList.add("is-bookshelf-dragging");
+    }, 0);
+}
+
+function handleBookshelfDragOver(event) {
+    const draggingBookId = BlackwoodBookshelfState.draggingBookId;
+
+    if (!draggingBookId) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+    }
+
+    clearBookshelfDropIndicators();
+
+    const dropInfo = getBookshelfDropInfo(event);
+
+    if (dropInfo.stageElement) {
+        dropInfo.stageElement.classList.add("is-drag-over");
+    }
+
+    if (dropInfo.slotElement && dropInfo.slotElement.dataset.bookshelfDragBook !== draggingBookId) {
+        dropInfo.slotElement.classList.add(dropInfo.dropAfter ? "is-drop-after" : "is-drop-before");
+    }
+}
+
+function handleBookshelfDragLeave(event) {
+    const stage = event.currentTarget;
+
+    if (!stage || stage.contains(event.relatedTarget)) {
+        return;
+    }
+
+    stage.classList.remove("is-drag-over");
+
+    stage.querySelectorAll(".is-drop-before, .is-drop-after").forEach(function (element) {
+        element.classList.remove("is-drop-before", "is-drop-after");
+    });
+}
+
+async function handleBookshelfDrop(event) {
+    const draggedBookId = event.dataTransfer
+        ? event.dataTransfer.getData("text/plain") || BlackwoodBookshelfState.draggingBookId
+        : BlackwoodBookshelfState.draggingBookId;
+
+    if (!draggedBookId) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const dropInfo = getBookshelfDropInfo(event);
+
+    clearBookshelfDropIndicators();
+
+    if (!dropInfo.stageId) {
+        resetBookshelfDragState();
+        return;
+    }
+
+    await moveShelfRecordByDrag(draggedBookId, dropInfo.stageId, dropInfo.beforeBookId);
+}
+
+function handleBookshelfDragEnd() {
+    clearBookshelfDropIndicators();
+    resetBookshelfDragState();
+}
+
+async function moveShelfRecordByDrag(bookId, targetStageId, beforeBookId) {
+    if (BlackwoodBookshelfState.isBusy) {
+        return;
+    }
+
+    const book = getBookById(bookId);
+    const record = getRecordByBookId(bookId);
+    const cleanTargetStage = normaliseShelfStatus(targetStageId);
+
+    if (!book || !record) {
+        setBookshelfStatus("That book could not be moved.", "is-error");
+        return;
+    }
+
+    const currentStage = normaliseShelfStatus(record.shelf_status);
+
+    let targetItems = getShelfItemsForStage(cleanTargetStage).filter(function (item) {
+        return item.record.book_id !== bookId;
+    });
+
+    const movedItem = {
+        book,
+        record: {
+            ...record,
+            shelf_status: cleanTargetStage
+        }
+    };
+
+    const insertIndex = beforeBookId
+        ? targetItems.findIndex(function (item) {
+            return item.record.book_id === beforeBookId;
+        })
+        : -1;
+
+    if (insertIndex >= 0) {
+        targetItems.splice(insertIndex, 0, movedItem);
+    } else {
+        targetItems.push(movedItem);
+    }
+
+    const sourceItems = currentStage === cleanTargetStage
+        ? []
+        : getShelfItemsForStage(currentStage).filter(function (item) {
+            return item.record.book_id !== bookId;
+        });
+
+    BlackwoodBookshelfState.isBusy = true;
+    setBookshelfStatus(`Moving ${book.title}...`, "is-loading");
+
+    try {
+        if (sourceItems.length) {
+            await saveShelfStageOrderForDrag(sourceItems, currentStage);
         }
 
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-add]").forEach(function (button) {
-            button.addEventListener("click", openBookPickerModal);
-        });
+        await saveShelfStageOrderForDrag(targetItems, cleanTargetStage);
 
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-open-book]").forEach(function (button) {
-            button.addEventListener("click", function () {
-                openBookRecordModal(button.dataset.bookshelfOpenBook || "");
-            });
-        });
+        await loadBookshelfRecords();
 
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-pick-book]").forEach(function (button) {
-            button.addEventListener("click", function () {
-                openBookRecordModal(button.dataset.bookshelfPickBook || "");
-            });
-        });
+        BlackwoodBookshelfState.isDrawerOpen = true;
+        BlackwoodBookshelfState.statusMessage = `${book.title} moved to ${getShelfStageLabel(cleanTargetStage)}.`;
+        BlackwoodBookshelfState.statusType = "is-success";
 
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-close]").forEach(function (button) {
-            button.addEventListener("click", closeBookshelfModal);
-        });
+        renderBookshelf();
 
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-stage-select]").forEach(function (select) {
-            select.addEventListener("change", handleQuickShelfStatusChange);
-        });
+    } catch (error) {
+        console.error("Bookshelf drag move failed:", error);
+        setBookshelfStatus(cleanBookshelfError(error.message), "is-error");
 
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-move]").forEach(function (button) {
-            button.addEventListener("click", handleMoveShelfRecord);
-        });
+    } finally {
+        BlackwoodBookshelfState.isBusy = false;
+        resetBookshelfDragState();
+    }
+}
 
-        const modal = BlackwoodBookshelfState.root.querySelector(".bookshelf-modal");
+async function saveShelfStageOrderForDrag(stageItems, stageId) {
+    const userId = getCurrentUserId();
+    const cleanStageId = normaliseShelfStatus(stageId);
+    const now = new Date().toISOString();
 
-        if (modal) {
-            modal.addEventListener("click", function (event) {
-                if (event.target === modal) {
-                    closeBookshelfModal();
-                }
-            });
+    if (!userId) {
+        throw new Error("Sign in required.");
+    }
+
+    const updates = stageItems.map(function (item, index) {
+        const payload = {
+            shelf_status: cleanStageId,
+            shelf_position: (index + 1) * 10,
+            updated_at: now
+        };
+
+        if (cleanStageId === "favourite") {
+            payload.is_favourite = true;
         }
 
-        const form = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-record-form]");
+        return BlackwoodBookshelfState.client
+            .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
+            .update(payload)
+            .eq("member_id", userId)
+            .eq("book_id", item.record.book_id);
+    });
 
-        if (form) {
-            form.addEventListener("submit", handleSaveShelfRecord);
-        }
+    const results = await Promise.all(updates);
 
-        const removeButton = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-remove]");
+    const failedResult = results.find(function (result) {
+        return result && result.error;
+    });
 
-        if (removeButton) {
-            removeButton.addEventListener("click", handleRemoveShelfRecord);
+    if (failedResult && failedResult.error) {
+        throw failedResult.error;
+    }
+}
+
+function getBookshelfDropInfo(event) {
+    const stageElement = event.target.closest("[data-bookshelf-drop-stage]");
+    const slotElement = event.target.closest("[data-bookshelf-drop-before]");
+
+    const stageId = stageElement
+        ? normaliseShelfStatus(stageElement.dataset.bookshelfDropStage || "")
+        : "";
+
+    let beforeBookId = "";
+    let dropAfter = false;
+
+    if (slotElement && stageId) {
+        const slotBookId = slotElement.dataset.bookshelfDropBefore || "";
+        const rect = slotElement.getBoundingClientRect();
+        const midpoint = rect.left + rect.width / 2;
+
+        dropAfter = event.clientX > midpoint;
+
+        if (dropAfter) {
+            beforeBookId = getNextBookIdAfter(slotBookId, stageId);
+        } else {
+            beforeBookId = slotBookId;
         }
     }
 
+    return {
+        stageElement,
+        slotElement,
+        stageId,
+        beforeBookId,
+        dropAfter
+    };
+}
+
+function getNextBookIdAfter(bookId, stageId) {
+    const items = getShelfItemsForStage(stageId);
+    const currentIndex = items.findIndex(function (item) {
+        return item.record.book_id === bookId;
+    });
+
+    if (currentIndex < 0 || currentIndex >= items.length - 1) {
+        return "";
+    }
+
+    return items[currentIndex + 1].record.book_id;
+}
+
+function clearBookshelfDropIndicators() {
+    if (!BlackwoodBookshelfState.root) {
+        return;
+    }
+
+    BlackwoodBookshelfState.root.querySelectorAll(".is-drag-over, .is-drop-before, .is-drop-after, .is-dragging").forEach(function (element) {
+        element.classList.remove("is-drag-over", "is-drop-before", "is-drop-after", "is-dragging");
+    });
+}
+
+function resetBookshelfDragState() {
+    BlackwoodBookshelfState.draggingBookId = "";
+    BlackwoodBookshelfState.draggingFromStageId = "";
+
+    document.body.classList.remove("is-bookshelf-dragging");
+} 
+    
     function bindBookshelfImageFallbacks() {
         BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-spine-image]").forEach(function (image) {
             image.addEventListener("error", function () {
