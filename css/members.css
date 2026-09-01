@@ -4173,3 +4173,626 @@
         return escapeHtml(value).replace(/`/g, "&#096;");
     }
 })();
+/* =========================
+   PHASE 2D — ADMIN REWARD FULFILMENT DESK
+========================= */
+
+.circle-admin-reward-section {
+    position: relative;
+}
+
+.circle-admin-reward-desk {
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    border-radius: 10px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.13), transparent 36%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008)),
+        rgba(0, 0, 0, 0.46);
+
+    box-shadow:
+        0 20px 54px rgba(0, 0, 0, 0.34),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.circle-admin-reward-summary {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, auto);
+    gap: 22px;
+    align-items: center;
+
+    padding: clamp(20px, 3vw, 30px);
+
+    cursor: pointer;
+    list-style: none;
+}
+
+.circle-admin-reward-summary::-webkit-details-marker {
+    display: none;
+}
+
+.circle-admin-reward-summary::marker {
+    content: "";
+}
+
+.circle-admin-reward-summary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.08), transparent 52%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 46%);
+}
+
+.circle-admin-reward-summary > * {
+    position: relative;
+    z-index: 1;
+}
+
+.circle-admin-reward-summary h2 {
+    margin: 0 0 10px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    font-weight: 400;
+}
+
+.circle-admin-reward-summary p {
+    max-width: 780px;
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.66);
+
+    font-size: 14.5px;
+    line-height: 1.65;
+}
+
+.circle-admin-reward-summary-side {
+    display: grid;
+    gap: 7px;
+    justify-items: end;
+
+    text-align: right;
+}
+
+.circle-admin-reward-summary-side span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+
+    padding: 8px 13px;
+
+    border: 1px solid rgba(196, 122, 44, 0.44);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.44);
+    color: rgba(214, 177, 129, 0.95);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.circle-admin-reward-summary-side small {
+    max-width: 230px;
+
+    color: rgba(239, 231, 220, 0.54);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.circle-admin-reward-panel {
+    padding: 0 clamp(16px, 3vw, 30px) clamp(20px, 3vw, 30px);
+
+    border-top: 1px solid rgba(196, 122, 44, 0.16);
+}
+
+/* Filters */
+
+.circle-admin-reward-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    margin: 22px 0 16px;
+}
+
+.circle-admin-reward-filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 34px;
+
+    padding: 7px 10px;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.36);
+    color: rgba(239, 231, 220, 0.62);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.circle-admin-reward-filters button:hover,
+.circle-admin-reward-filters button:focus-visible {
+    border-color: rgba(214, 177, 129, 0.68);
+    color: #efe7dc;
+    outline: none;
+}
+
+.circle-admin-reward-filters button.is-active {
+    border-color: rgba(214, 177, 129, 0.86);
+    background: rgba(196, 122, 44, 0.14);
+    color: #fff1de;
+}
+
+.circle-admin-reward-filters button strong {
+    display: inline-grid;
+    place-items: center;
+
+    min-width: 22px;
+    height: 22px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(214, 177, 129, 0.92);
+
+    font-size: 10px;
+}
+
+/* Status */
+
+.circle-admin-reward-status {
+    min-height: 20px;
+    margin: 0 0 16px;
+
+    color: rgba(239, 231, 220, 0.58);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.circle-admin-reward-status.is-success {
+    color: var(--circle-success, #9acb9a);
+}
+
+.circle-admin-reward-status.is-error {
+    color: var(--circle-error, #d97c68);
+}
+
+.circle-admin-reward-status.is-loading {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* List / Cards */
+
+.circle-admin-reward-list {
+    display: grid;
+    gap: 16px;
+}
+
+.circle-admin-reward-card {
+    position: relative;
+    overflow: hidden;
+
+    padding: clamp(18px, 3vw, 24px);
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 9px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.08), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.006)),
+        rgba(0, 0, 0, 0.36);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.035),
+        0 16px 40px rgba(0, 0, 0, 0.24);
+}
+
+.circle-admin-reward-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+
+    width: 4px;
+
+    background: rgba(196, 122, 44, 0.38);
+}
+
+.circle-admin-reward-card.is-issued::before {
+    background: rgba(154, 203, 154, 0.58);
+}
+
+.circle-admin-reward-card.is-used::before {
+    background: rgba(130, 160, 190, 0.58);
+}
+
+.circle-admin-reward-card.is-cancelled::before {
+    background: rgba(217, 124, 104, 0.62);
+}
+
+.circle-admin-reward-card-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: start;
+
+    margin-bottom: 16px;
+}
+
+.circle-admin-reward-card-header h3 {
+    margin: 5px 0 8px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.12;
+    font-weight: 400;
+}
+
+.circle-admin-reward-card-header p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.62);
+
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.circle-admin-reward-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.circle-reward-badge.is-delivery {
+    border-color: rgba(214, 177, 129, 0.48);
+    background: rgba(196, 122, 44, 0.12);
+    color: rgba(255, 231, 196, 0.92);
+}
+
+/* Meta */
+
+.circle-admin-reward-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+
+    margin: 0 0 16px;
+}
+
+.circle-admin-reward-meta-grid div {
+    padding: 12px;
+
+    border: 1px solid rgba(196, 122, 44, 0.16);
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.circle-admin-reward-meta-grid span {
+    display: block;
+
+    margin: 0 0 6px;
+
+    color: rgba(214, 177, 129, 0.76);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.circle-admin-reward-meta-grid strong {
+    display: block;
+
+    color: rgba(239, 231, 220, 0.88);
+
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+/* Delivery */
+
+.circle-admin-delivery-card {
+    display: grid;
+    gap: 14px;
+
+    margin: 0 0 16px;
+    padding: 15px;
+
+    border: 1px solid rgba(154, 203, 154, 0.24);
+    border-radius: 8px;
+
+    background:
+        linear-gradient(180deg, rgba(154, 203, 154, 0.08), rgba(154, 203, 154, 0.025)),
+        rgba(0, 0, 0, 0.28);
+}
+
+.circle-admin-delivery-card.is-needed {
+    border-color: rgba(217, 124, 104, 0.3);
+    background:
+        linear-gradient(180deg, rgba(217, 124, 104, 0.08), rgba(217, 124, 104, 0.025)),
+        rgba(0, 0, 0, 0.28);
+}
+
+.circle-admin-delivery-card strong {
+    display: block;
+
+    margin: 0 0 9px;
+
+    color: #f3eadc;
+
+    font-size: 16px;
+    line-height: 1.3;
+}
+
+.circle-admin-delivery-card address {
+    display: grid;
+    gap: 4px;
+
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.76);
+
+    font-size: 14px;
+    line-height: 1.45;
+    font-style: normal;
+}
+
+.circle-admin-delivery-card address span {
+    display: block;
+}
+
+.circle-admin-delivery-card p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.64);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.circle-admin-delivery-card p span {
+    display: block;
+
+    margin: 0 0 5px;
+
+    color: rgba(214, 177, 129, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* Form */
+
+.circle-admin-reward-form {
+    display: grid;
+    gap: 14px;
+}
+
+.circle-admin-reward-form-grid {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.8fr) minmax(170px, 0.8fr) minmax(240px, 1.4fr);
+    gap: 12px;
+    align-items: stretch;
+}
+
+.circle-admin-reward-form label {
+    display: grid;
+    gap: 8px;
+
+    color: rgba(214, 177, 129, 0.86);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.circle-admin-reward-form input,
+.circle-admin-reward-form select,
+.circle-admin-reward-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(196, 122, 44, 0.26);
+    border-radius: 6px;
+
+    background: rgba(0, 0, 0, 0.48);
+    color: #f3eadc;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.circle-admin-reward-form input,
+.circle-admin-reward-form select {
+    min-height: 42px;
+    padding: 9px 11px;
+}
+
+.circle-admin-reward-form textarea {
+    min-height: 94px;
+    padding: 11px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.circle-admin-reward-form input:focus,
+.circle-admin-reward-form select:focus,
+.circle-admin-reward-form textarea:focus {
+    border-color: rgba(214, 177, 129, 0.74);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
+}
+
+.circle-admin-reward-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+}
+
+.circle-admin-reward-actions .circle-button {
+    min-height: 38px;
+    padding: 10px 14px;
+    font-size: 9px;
+}
+
+.circle-button.is-danger {
+    border-color: rgba(217, 124, 104, 0.58);
+    color: rgba(255, 210, 202, 0.94);
+}
+
+.circle-button.is-danger:hover,
+.circle-button.is-danger:focus-visible {
+    border-color: rgba(255, 160, 145, 0.86);
+    background: rgba(217, 124, 104, 0.16);
+    color: #ffffff;
+}
+
+.circle-admin-reward-actions .circle-button:disabled,
+.circle-admin-reward-form input:disabled,
+.circle-admin-reward-form select:disabled,
+.circle-admin-reward-form textarea:disabled,
+.circle-admin-reward-filters button:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+
+.circle-admin-reward-warning {
+    margin: 0;
+    padding: 11px 13px;
+
+    border: 1px solid rgba(217, 124, 104, 0.28);
+    border-radius: 7px;
+
+    background: rgba(217, 124, 104, 0.08);
+    color: rgba(255, 205, 196, 0.86);
+
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.circle-admin-reward-error {
+    margin-top: 20px;
+}
+
+/* Autofill */
+
+.circle-admin-reward-form input:-webkit-autofill,
+.circle-admin-reward-form input:-webkit-autofill:hover,
+.circle-admin-reward-form input:-webkit-autofill:focus,
+.circle-admin-reward-form textarea:-webkit-autofill,
+.circle-admin-reward-form textarea:-webkit-autofill:hover,
+.circle-admin-reward-form textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #efe7dc;
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.82) inset;
+    caret-color: #efe7dc;
+}
+
+/* Responsive */
+
+@media (max-width: 980px) {
+    .circle-admin-reward-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-admin-reward-summary-side {
+        justify-items: start;
+        text-align: left;
+    }
+
+    .circle-admin-reward-card-header {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-admin-reward-badges {
+        justify-content: flex-start;
+    }
+
+    .circle-admin-reward-meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .circle-admin-reward-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .circle-admin-reward-summary {
+        padding: 18px;
+    }
+
+    .circle-admin-reward-panel {
+        padding: 0 14px 18px;
+    }
+
+    .circle-admin-reward-filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .circle-admin-reward-filters button {
+        justify-content: space-between;
+    }
+
+    .circle-admin-reward-card {
+        padding: 18px 15px;
+    }
+
+    .circle-admin-reward-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-admin-reward-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .circle-admin-reward-actions .circle-button {
+        width: 100%;
+    }
+}
