@@ -2349,9 +2349,16 @@ function renderRedemptionCodeOrStatus(redemption) {
         `;
     }
 
-    if (isPhysicalDeliveryReward(redemption) && !hasDeliveryAddress(redemption)) {
+    if (isPhysicalDeliveryReward(redemption)) {
         return "";
     }
+
+    return `
+        <p class="circle-muted-line">
+            ${escapeHtml(getRedemptionPendingText(redemption))}
+        </p>
+    `;
+}
 
     return `
         <p class="circle-muted-line">
