@@ -1,6 +1,7 @@
 // =========================
 // BLACKWOOD MEMBER BOOKSHELF
 // Private shelf records powered by Supabase
+// Phase 2C: Collapsible shelf drawer + shelf stages + rearrange controls
 // =========================
 
 (function () {
@@ -10,6 +11,45 @@
         rootId: "blackwood-bookshelf-root",
         tableName: "member_book_shelf"
     };
+
+    const BLACKWOOD_BOOKSHELF_STAGES = [
+        {
+            id: "want_to_read",
+            label: "Want to Read",
+            shortLabel: "Want",
+            description: "Books marked for future reading."
+        },
+        {
+            id: "tbr",
+            label: "TBR",
+            shortLabel: "TBR",
+            description: "Books waiting on your Blackwood desk."
+        },
+        {
+            id: "reading",
+            label: "Reading",
+            shortLabel: "Reading",
+            description: "Books currently open."
+        },
+        {
+            id: "read",
+            label: "Read",
+            shortLabel: "Read",
+            description: "Books you have finished."
+        },
+        {
+            id: "reviewed",
+            label: "Reviewed",
+            shortLabel: "Reviewed",
+            description: "Books with a reader record or review filed."
+        },
+        {
+            id: "favourite",
+            label: "Favourite",
+            shortLabel: "Favourite",
+            description: "Books kept close in the archive."
+        }
+    ];
 
     const BLACKWOOD_BOOKSHELF_BOOKS = [
         {
@@ -130,6 +170,7 @@
         statusMessage: "",
         statusType: "",
         isBusy: false,
+        isDrawerOpen: false,
         escapeListenerBound: false
     };
 
@@ -178,19 +219,32 @@
             return;
         }
 
-        const { data, error } = await BlackwoodBookshelfState.client
+        let result = await BlackwoodBookshelfState.client
             .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
             .select("*")
             .eq("member_id", userId)
+            .order("shelf_status", { ascending: true })
+            .order("shelf_position", { ascending: true })
             .order("shelf_order", { ascending: true })
             .order("created_at", { ascending: true });
 
-        if (error) {
-            throw error;
+        if (result.error && /shelf_status|shelf_position/i.test(String(result.error.message || ""))) {
+            console.warn("Bookshelf stage columns unavailable, using legacy shelf order:", result.error.message);
+
+            result = await BlackwoodBookshelfState.client
+                .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
+                .select("*")
+                .eq("member_id", userId)
+                .order("shelf_order", { ascending: true })
+                .order("created_at", { ascending: true });
         }
 
-        BlackwoodBookshelfState.shelfRecords = Array.isArray(data)
-            ? data.map(normaliseShelfRecord)
+        if (result.error) {
+            throw result.error;
+        }
+
+        BlackwoodBookshelfState.shelfRecords = Array.isArray(result.data)
+            ? result.data.map(normaliseShelfRecord)
             : [];
     }
 
@@ -232,37 +286,63 @@
 
     function renderBookshelf() {
         const shelfItems = getShelfItems();
+        const totalBooks = shelfItems.length;
+        const totalLabel = totalBooks === 1 ? "1 Book" : `${totalBooks} Books`;
 
         BlackwoodBookshelfState.root.innerHTML = `
             <div class="blackwood-bookshelf">
-                <div class="bookshelf-header">
-                    <div>
-                        <p class="bookshelf-kicker">Private Reader Shelf</p>
-                        <h2>My Blackwood Bookshelf</h2>
-                        <p>
-                            Keep a private record of the Blackwood books on your shelf.
-                            Mark the editions you own, note signed copies, and keep your own thoughts beside each title.
-                        </p>
-                    </div>
-
-                    <button type="button" class="bookshelf-add-button" data-bookshelf-add>
-                        Add to Your Collection
-                    </button>
-                </div>
-
-                <p 
-                    class="bookshelf-status ${escapeAttribute(BlackwoodBookshelfState.statusType)}" 
-                    id="blackwood-bookshelf-status" 
-                    aria-live="polite"
+                <details 
+                    class="bookshelf-drawer" 
+                    data-bookshelf-drawer
+                    ${BlackwoodBookshelfState.isDrawerOpen ? "open" : ""}
                 >
-                    ${escapeHtml(BlackwoodBookshelfState.statusMessage)}
-                </p>
+                    <summary class="bookshelf-drawer-summary">
+                        <div class="bookshelf-drawer-title-block">
+                            <p class="bookshelf-kicker">Private Reader Shelf</p>
+                            <h2>My Blackwood Bookshelf</h2>
+                            <p>
+                                Your books are grouped by reading stage, keeping the member page tidy while your archive grows.
+                            </p>
+                        </div>
 
-                ${
-                    shelfItems.length
-                        ? renderShelfBoard(shelfItems)
-                        : renderEmptyShelf()
-                }
+                        <div class="bookshelf-drawer-summary-side">
+                            <span class="bookshelf-total-pill">${escapeHtml(totalLabel)}</span>
+                            <span class="bookshelf-drawer-chevrons" aria-hidden="true"></span>
+                        </div>
+                    </summary>
+
+                    <div class="bookshelf-drawer-panel">
+                        <div class="bookshelf-header">
+                            <div>
+                                <p class="bookshelf-kicker">Shelf Stages</p>
+                                <h3>Your private reading board</h3>
+                                <p>
+                                    Move books between shelves, mark owned or signed editions, and rearrange titles inside each stage.
+                                </p>
+                            </div>
+
+                            <button type="button" class="bookshelf-add-button" data-bookshelf-add>
+                                Add to Your Collection
+                            </button>
+                        </div>
+
+                        ${renderBookshelfStageSummary(shelfItems)}
+
+                        <p 
+                            class="bookshelf-status ${escapeAttribute(BlackwoodBookshelfState.statusType)}" 
+                            id="blackwood-bookshelf-status" 
+                            aria-live="polite"
+                        >
+                            ${escapeHtml(BlackwoodBookshelfState.statusMessage)}
+                        </p>
+
+                        ${
+                            shelfItems.length
+                                ? renderShelfBoard(shelfItems)
+                                : renderEmptyShelf()
+                        }
+                    </div>
+                </details>
             </div>
 
             ${renderBookshelfModal()}
@@ -272,21 +352,88 @@
         bindBookshelfImageFallbacks();
     }
 
-    function renderShelfBoard(shelfItems) {
+    function renderBookshelfStageSummary(shelfItems) {
+        const counts = getShelfStageCounts(shelfItems);
+
         return `
-            <div class="bookshelf-board" aria-label="Your Blackwood book shelf">
-                <div class="bookshelf-spine-list">
-                    ${shelfItems.map(function (item) {
-                        return renderShelfSpine(item.book, item.record);
-                    }).join("")}
-                </div>
+            <div class="bookshelf-stage-summary" aria-label="Bookshelf stage summary">
+                ${BLACKWOOD_BOOKSHELF_STAGES.map(function (stage) {
+                    const count = counts[stage.id] || 0;
+
+                    return `
+                        <span class="bookshelf-stage-pill ${count ? "has-books" : "is-empty"}">
+                            <strong>${escapeHtml(stage.shortLabel)}</strong>
+                            <span>${count}</span>
+                        </span>
+                    `;
+                }).join("")}
             </div>
         `;
     }
 
-    function renderShelfSpine(book, record) {
-        const badges = [];
+    function renderShelfBoard(shelfItems) {
+        return `
+            <div class="bookshelf-board" aria-label="Your Blackwood book shelves">
+                ${BLACKWOOD_BOOKSHELF_STAGES.map(function (stage) {
+                    const stageItems = shelfItems.filter(function (item) {
+                        return item.record.shelf_status === stage.id;
+                    });
 
+                    return renderShelfStage(stage, stageItems);
+                }).join("")}
+            </div>
+        `;
+    }
+
+    function renderShelfStage(stage, stageItems) {
+        const count = stageItems.length;
+        const countLabel = count === 1 ? "1 book" : `${count} books`;
+
+        return `
+            <section 
+                class="bookshelf-stage ${count ? "has-books" : "is-empty"}" 
+                data-bookshelf-stage="${escapeAttribute(stage.id)}"
+                aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
+            >
+                <div class="bookshelf-stage-header">
+                    <div>
+                        <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
+                            ${escapeHtml(stage.label)}
+                        </h3>
+                        <p>${escapeHtml(stage.description)}</p>
+                    </div>
+
+                    <span>${escapeHtml(countLabel)}</span>
+                </div>
+
+                ${
+                    count
+                        ? `
+                            <div class="bookshelf-spine-list bookshelf-stage-spine-list">
+                                ${stageItems.map(function (item, index) {
+                                    return renderShelfSpine(item.book, item.record, index, stageItems.length);
+                                }).join("")}
+                            </div>
+                        `
+                        : `
+                            <div class="bookshelf-stage-empty">
+                                <p>No books on this shelf yet.</p>
+                            </div>
+                        `
+                }
+            </section>
+        `;
+    }
+
+    function renderShelfSpine(book, record, index, stageLength) {
+        const badges = [];
+        const stage = getShelfStageById(record.shelf_status);
+        const canMoveEarlier = index > 0;
+        const canMoveLater = index < stageLength - 1;
+
+        badges.push(stage ? stage.shortLabel : "Filed");
+
+        if (record.is_favourite) badges.push("Favourite");
         if (record.is_arc) badges.push("ARC");
         if (record.owned) badges.push("Own");
         if (record.has_read) badges.push("Read");
@@ -297,7 +444,7 @@
             <div class="bookshelf-book-slot">
                 <button
                     type="button"
-                    class="bookshelf-spine-button ${record.owned ? "is-owned" : ""} ${record.has_read ? "is-read" : ""} ${record.is_signed ? "is-signed" : ""}"
+                    class="bookshelf-spine-button ${record.owned ? "is-owned" : ""} ${record.has_read ? "is-read" : ""} ${record.is_signed ? "is-signed" : ""} ${record.is_favourite ? "is-favourite" : ""}"
                     data-bookshelf-open-book="${escapeAttribute(book.id)}"
                     aria-label="Open shelf record for ${escapeAttribute(book.title)}"
                 >
@@ -314,9 +461,43 @@
                 </button>
 
                 <div class="bookshelf-spine-badges" aria-hidden="true">
-                    ${badges.slice(0, 3).map(function (badge) {
+                    ${badges.slice(0, 4).map(function (badge) {
                         return `<span>${escapeHtml(badge)}</span>`;
                     }).join("")}
+                </div>
+
+                <div class="bookshelf-spine-controls">
+                    <label>
+                        <span>Move to</span>
+
+                        <select 
+                            data-bookshelf-stage-select
+                            data-bookshelf-book-id="${escapeAttribute(book.id)}"
+                            aria-label="Move ${escapeAttribute(book.title)} to another shelf"
+                        >
+                            ${renderShelfStageOptions(record.shelf_status)}
+                        </select>
+                    </label>
+
+                    <div class="bookshelf-order-controls" aria-label="Rearrange ${escapeAttribute(book.title)}">
+                        <button
+                            type="button"
+                            data-bookshelf-move="earlier"
+                            data-bookshelf-book-id="${escapeAttribute(book.id)}"
+                            ${canMoveEarlier ? "" : "disabled"}
+                        >
+                            Earlier
+                        </button>
+
+                        <button
+                            type="button"
+                            data-bookshelf-move="later"
+                            data-bookshelf-book-id="${escapeAttribute(book.id)}"
+                            ${canMoveLater ? "" : "disabled"}
+                        >
+                            Later
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -375,8 +556,8 @@
                         </h3>
 
                         <p class="bookshelf-modal-copy">
-                            You can add owned books, books you have read, ARC copies, signed editions, or titles you want to follow.
-                            Add private notes, thoughts, edition details, reading memories, or anything you want to keep with this book.
+                            Add owned books, books you want to read, ARC copies, signed editions, reviewed titles,
+                            or favourites you want to keep close in the archive.
                         </p>
 
                         ${
@@ -389,7 +570,7 @@
                                 : `
                                     <div class="bookshelf-empty-card">
                                         <h3>Every current spine is already on your shelf.</h3>
-                                        <p>You can click any spine on your shelf to update notes or statuses.</p>
+                                        <p>You can click any spine on your shelf to update notes, stages, or statuses.</p>
                                     </div>
                                 `
                         }
@@ -461,6 +642,14 @@
                                     data-bookshelf-record-form
                                     data-bookshelf-book-id="${escapeAttribute(book.id)}"
                                 >
+                                    <label class="bookshelf-field">
+                                        <span>Shelf stage</span>
+
+                                        <select name="shelf_status">
+                                            ${renderShelfStageOptions(record.shelf_status)}
+                                        </select>
+                                    </label>
+
                                     <div class="bookshelf-check-grid">
                                         <label class="bookshelf-check">
                                             <input type="checkbox" name="owned" ${record.owned ? "checked" : ""}>
@@ -485,6 +674,11 @@
                                         <label class="bookshelf-check">
                                             <input type="checkbox" name="wants_signed" ${record.wants_signed ? "checked" : ""}>
                                             <span>I'd like this signed</span>
+                                        </label>
+
+                                        <label class="bookshelf-check">
+                                            <input type="checkbox" name="is_favourite" ${record.is_favourite ? "checked" : ""}>
+                                            <span>Keep as favourite</span>
                                         </label>
                                     </div>
 
@@ -538,7 +732,27 @@
         `;
     }
 
+    function renderShelfStageOptions(currentStatus) {
+        const cleanStatus = normaliseShelfStatus(currentStatus);
+
+        return BLACKWOOD_BOOKSHELF_STAGES.map(function (stage) {
+            return `
+                <option value="${escapeAttribute(stage.id)}" ${stage.id === cleanStatus ? "selected" : ""}>
+                    ${escapeHtml(stage.label)}
+                </option>
+            `;
+        }).join("");
+    }
+
     function bindBookshelfEvents() {
+        const drawer = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-drawer]");
+
+        if (drawer) {
+            drawer.addEventListener("toggle", function () {
+                BlackwoodBookshelfState.isDrawerOpen = drawer.open;
+            });
+        }
+
         BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-add]").forEach(function (button) {
             button.addEventListener("click", openBookPickerModal);
         });
@@ -557,6 +771,14 @@
 
         BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-close]").forEach(function (button) {
             button.addEventListener("click", closeBookshelfModal);
+        });
+
+        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-stage-select]").forEach(function (select) {
+            select.addEventListener("change", handleQuickShelfStatusChange);
+        });
+
+        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-move]").forEach(function (button) {
+            button.addEventListener("click", handleMoveShelfRecord);
         });
 
         const modal = BlackwoodBookshelfState.root.querySelector(".bookshelf-modal");
@@ -611,6 +833,7 @@
     }
 
     function openBookPickerModal() {
+        BlackwoodBookshelfState.isDrawerOpen = true;
         BlackwoodBookshelfState.modalMode = "picker";
         BlackwoodBookshelfState.activeBookId = "";
         renderBookshelf();
@@ -624,6 +847,7 @@
             return;
         }
 
+        BlackwoodBookshelfState.isDrawerOpen = true;
         BlackwoodBookshelfState.modalMode = "record";
         BlackwoodBookshelfState.activeBookId = book.id;
         renderBookshelf();
@@ -657,6 +881,20 @@
         setBookshelfModalStatus("Saving shelf record...", "is-loading");
 
         const existingRecord = getRecordByBookId(book.id);
+        const selectedShelfStatus = normaliseShelfStatus(
+            form.elements.shelf_status ? form.elements.shelf_status.value : "want_to_read"
+        );
+
+        const shouldKeepPosition = existingRecord &&
+            existingRecord.shelf_status === selectedShelfStatus &&
+            Number(existingRecord.shelf_position || 0) > 0;
+
+        const shelfPosition = shouldKeepPosition
+            ? Number(existingRecord.shelf_position || 0)
+            : getNextShelfPosition(selectedShelfStatus);
+
+        const isFavourite = Boolean(form.elements.is_favourite && form.elements.is_favourite.checked) ||
+            selectedShelfStatus === "favourite";
 
         const record = {
             member_id: userId,
@@ -667,6 +905,9 @@
             is_arc: Boolean(form.elements.is_arc && form.elements.is_arc.checked),
             is_signed: Boolean(form.elements.is_signed && form.elements.is_signed.checked),
             wants_signed: Boolean(form.elements.wants_signed && form.elements.wants_signed.checked),
+            is_favourite: isFavourite,
+            shelf_status: selectedShelfStatus,
+            shelf_position: shelfPosition,
             format: String(form.elements.format ? form.elements.format.value : "Not specified").trim() || "Not specified",
             notes: String(form.elements.notes ? form.elements.notes.value : "").trim(),
             shelf_order: existingRecord
@@ -690,6 +931,7 @@
 
             BlackwoodBookshelfState.modalMode = "closed";
             BlackwoodBookshelfState.activeBookId = "";
+            BlackwoodBookshelfState.isDrawerOpen = true;
             BlackwoodBookshelfState.statusMessage = existingRecord
                 ? `${book.title} shelf record saved.`
                 : `${book.title} has been placed on your shelf.`;
@@ -742,6 +984,7 @@
 
             BlackwoodBookshelfState.modalMode = "closed";
             BlackwoodBookshelfState.activeBookId = "";
+            BlackwoodBookshelfState.isDrawerOpen = true;
             BlackwoodBookshelfState.statusMessage = `${book.title} has been removed from your shelf.`;
             BlackwoodBookshelfState.statusType = "is-success";
 
@@ -756,6 +999,164 @@
         }
     }
 
+    async function handleQuickShelfStatusChange(event) {
+        if (BlackwoodBookshelfState.isBusy) {
+            return;
+        }
+
+        const select = event.currentTarget;
+        const bookId = select.dataset.bookshelfBookId || "";
+        const book = getBookById(bookId);
+        const record = getRecordByBookId(bookId);
+        const nextStatus = normaliseShelfStatus(select.value);
+
+        if (!book || !record) {
+            setBookshelfStatus("That shelf record could not be moved.", "is-error");
+            return;
+        }
+
+        if (record.shelf_status === nextStatus) {
+            return;
+        }
+
+        BlackwoodBookshelfState.isBusy = true;
+        select.disabled = true;
+        setBookshelfStatus(`Moving ${book.title}...`, "is-loading");
+
+        try {
+            const nextPosition = getNextShelfPosition(nextStatus);
+            const updatePayload = {
+                shelf_status: nextStatus,
+                shelf_position: nextPosition,
+                updated_at: new Date().toISOString()
+            };
+
+            if (nextStatus === "favourite") {
+                updatePayload.is_favourite = true;
+            }
+
+            const { error } = await BlackwoodBookshelfState.client
+                .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
+                .update(updatePayload)
+                .eq("member_id", getCurrentUserId())
+                .eq("book_id", book.id);
+
+            if (error) {
+                throw error;
+            }
+
+            await loadBookshelfRecords();
+
+            BlackwoodBookshelfState.isDrawerOpen = true;
+            BlackwoodBookshelfState.statusMessage = `${book.title} moved to ${getShelfStageLabel(nextStatus)}.`;
+            BlackwoodBookshelfState.statusType = "is-success";
+
+            renderBookshelf();
+
+        } catch (error) {
+            console.error("Shelf stage move failed:", error);
+            setBookshelfStatus(cleanBookshelfError(error.message), "is-error");
+            select.disabled = false;
+
+        } finally {
+            BlackwoodBookshelfState.isBusy = false;
+        }
+    }
+
+    async function handleMoveShelfRecord(event) {
+        if (BlackwoodBookshelfState.isBusy) {
+            return;
+        }
+
+        const button = event.currentTarget;
+        const bookId = button.dataset.bookshelfBookId || "";
+        const direction = button.dataset.bookshelfMove || "";
+        const book = getBookById(bookId);
+        const record = getRecordByBookId(bookId);
+
+        if (!book || !record || !direction) {
+            setBookshelfStatus("That shelf record could not be rearranged.", "is-error");
+            return;
+        }
+
+        const stageItems = getShelfItemsForStage(record.shelf_status);
+        const currentIndex = stageItems.findIndex(function (item) {
+            return item.record.book_id === bookId;
+        });
+
+        if (currentIndex < 0) {
+            setBookshelfStatus("That shelf position could not be found.", "is-error");
+            return;
+        }
+
+        const targetIndex = direction === "earlier"
+            ? currentIndex - 1
+            : currentIndex + 1;
+
+        if (targetIndex < 0 || targetIndex >= stageItems.length) {
+            return;
+        }
+
+        const reorderedItems = stageItems.slice();
+        const movedItem = reorderedItems.splice(currentIndex, 1)[0];
+
+        reorderedItems.splice(targetIndex, 0, movedItem);
+
+        BlackwoodBookshelfState.isBusy = true;
+        button.disabled = true;
+        setBookshelfStatus(`Rearranging ${book.title}...`, "is-loading");
+
+        try {
+            await saveShelfStageOrder(reorderedItems);
+
+            await loadBookshelfRecords();
+
+            BlackwoodBookshelfState.isDrawerOpen = true;
+            BlackwoodBookshelfState.statusMessage = `${book.title} shelf position updated.`;
+            BlackwoodBookshelfState.statusType = "is-success";
+
+            renderBookshelf();
+
+        } catch (error) {
+            console.error("Shelf reorder failed:", error);
+            setBookshelfStatus(cleanBookshelfError(error.message), "is-error");
+            button.disabled = false;
+
+        } finally {
+            BlackwoodBookshelfState.isBusy = false;
+        }
+    }
+
+    async function saveShelfStageOrder(stageItems) {
+        const userId = getCurrentUserId();
+
+        if (!userId) {
+            throw new Error("Sign in required.");
+        }
+
+        const updates = stageItems.map(function (item, index) {
+            const position = (index + 1) * 10;
+
+            return BlackwoodBookshelfState.client
+                .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
+                .update({
+                    shelf_position: position,
+                    updated_at: new Date().toISOString()
+                })
+                .eq("member_id", userId)
+                .eq("book_id", item.record.book_id);
+        });
+
+        const results = await Promise.all(updates);
+        const failedResult = results.find(function (result) {
+            return result && result.error;
+        });
+
+        if (failedResult && failedResult.error) {
+            throw failedResult.error;
+        }
+    }
+
     function getShelfItems() {
         return BlackwoodBookshelfState.shelfRecords
             .map(function (record) {
@@ -767,16 +1168,40 @@
             .filter(function (item) {
                 return Boolean(item.book);
             })
-            .sort(function (a, b) {
-                const aOrder = Number(a.record.shelf_order || a.book.defaultOrder || 1000);
-                const bOrder = Number(b.record.shelf_order || b.book.defaultOrder || 1000);
+            .sort(sortShelfItems);
+    }
 
-                if (aOrder !== bOrder) {
-                    return aOrder - bOrder;
-                }
+    function getShelfItemsForStage(stageId) {
+        const cleanStageId = normaliseShelfStatus(stageId);
 
-                return String(a.book.title).localeCompare(String(b.book.title));
-            });
+        return getShelfItems().filter(function (item) {
+            return item.record.shelf_status === cleanStageId;
+        });
+    }
+
+    function sortShelfItems(a, b) {
+        const aStageOrder = getShelfStageOrder(a.record.shelf_status);
+        const bStageOrder = getShelfStageOrder(b.record.shelf_status);
+
+        if (aStageOrder !== bStageOrder) {
+            return aStageOrder - bStageOrder;
+        }
+
+        const aPosition = Number(a.record.shelf_position || a.record.shelf_order || a.book.defaultOrder || 1000);
+        const bPosition = Number(b.record.shelf_position || b.record.shelf_order || b.book.defaultOrder || 1000);
+
+        if (aPosition !== bPosition) {
+            return aPosition - bPosition;
+        }
+
+        const aOrder = Number(a.record.shelf_order || a.book.defaultOrder || 1000);
+        const bOrder = Number(b.record.shelf_order || b.book.defaultOrder || 1000);
+
+        if (aOrder !== bOrder) {
+            return aOrder - bOrder;
+        }
+
+        return String(a.book.title).localeCompare(String(b.book.title));
     }
 
     function getAvailableBooks() {
@@ -812,11 +1237,14 @@
             member_id: getCurrentUserId(),
             book_id: book.id,
             book_title: book.title,
-            owned: true,
+            owned: false,
             has_read: false,
             is_arc: false,
             is_signed: false,
             wants_signed: false,
+            is_favourite: false,
+            shelf_status: "want_to_read",
+            shelf_position: getNextShelfPosition("want_to_read"),
             format: "Not specified",
             notes: "",
             shelf_order: book.defaultOrder || 1000
@@ -824,6 +1252,10 @@
     }
 
     function normaliseShelfRecord(record) {
+        const cleanShelfStatus = normaliseShelfStatus(
+            record.shelf_status || deriveShelfStatusFromLegacyRecord(record)
+        );
+
         return {
             id: record.id,
             member_id: record.member_id,
@@ -834,12 +1266,99 @@
             is_arc: record.is_arc === true,
             is_signed: record.is_signed === true,
             wants_signed: record.wants_signed === true,
+            is_favourite: record.is_favourite === true || cleanShelfStatus === "favourite",
+            shelf_status: cleanShelfStatus,
+            shelf_position: Number(record.shelf_position || record.shelf_order || 1000),
             format: String(record.format || "Not specified").trim(),
             notes: String(record.notes || "").trim(),
             shelf_order: Number(record.shelf_order || 1000),
             created_at: record.created_at,
             updated_at: record.updated_at
         };
+    }
+
+    function deriveShelfStatusFromLegacyRecord(record) {
+        if (!record) {
+            return "want_to_read";
+        }
+
+        if (record.is_favourite === true) {
+            return "favourite";
+        }
+
+        if (record.has_read === true) {
+            return "read";
+        }
+
+        if (record.owned === true || record.is_arc === true) {
+            return "tbr";
+        }
+
+        return "want_to_read";
+    }
+
+    function getShelfStageCounts(shelfItems) {
+        return shelfItems.reduce(function (counts, item) {
+            const status = normaliseShelfStatus(item.record.shelf_status);
+
+            counts[status] = (counts[status] || 0) + 1;
+
+            return counts;
+        }, {});
+    }
+
+    function getShelfStageById(stageId) {
+        const cleanStageId = normaliseShelfStatus(stageId);
+
+        return BLACKWOOD_BOOKSHELF_STAGES.find(function (stage) {
+            return stage.id === cleanStageId;
+        }) || BLACKWOOD_BOOKSHELF_STAGES[0];
+    }
+
+    function getShelfStageLabel(stageId) {
+        const stage = getShelfStageById(stageId);
+
+        return stage ? stage.label : "Want to Read";
+    }
+
+    function getShelfStageOrder(stageId) {
+        const cleanStageId = normaliseShelfStatus(stageId);
+        const index = BLACKWOOD_BOOKSHELF_STAGES.findIndex(function (stage) {
+            return stage.id === cleanStageId;
+        });
+
+        return index >= 0 ? index : 999;
+    }
+
+    function getNextShelfPosition(stageId) {
+        const stageItems = getShelfItemsForStage(stageId);
+
+        if (!stageItems.length) {
+            return 10;
+        }
+
+        const highestPosition = stageItems.reduce(function (highest, item) {
+            return Math.max(
+                highest,
+                Number(item.record.shelf_position || item.record.shelf_order || item.book.defaultOrder || 0)
+            );
+        }, 0);
+
+        return highestPosition + 10;
+    }
+
+    function normaliseShelfStatus(value) {
+        const cleanValue = String(value || "")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "_")
+            .replace(/-/g, "_");
+
+        const allowed = BLACKWOOD_BOOKSHELF_STAGES.some(function (stage) {
+            return stage.id === cleanValue;
+        });
+
+        return allowed ? cleanValue : "want_to_read";
     }
 
     function setBookshelfStatus(message, className) {
@@ -868,7 +1387,7 @@
         }
 
         status.textContent = message || "";
-        status.classList.remove("is-error", "is-loading");
+        status.classList.remove("is-success", "is-error", "is-loading");
 
         if (className) {
             status.classList.add(className);
@@ -896,6 +1415,10 @@
 
         if (/row-level security/i.test(cleaned)) {
             return "Your shelf record could not be saved securely. Please sign out and back in.";
+        }
+
+        if (/shelf_status|shelf_position|is_favourite/i.test(cleaned)) {
+            return "Bookshelf stage fields are missing in Supabase. Please run the Phase 2C bookshelf SQL first.";
         }
 
         return cleaned;
