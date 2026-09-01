@@ -2359,13 +2359,6 @@ function renderRedemptionCodeOrStatus(redemption) {
         </p>
     `;
 }
-
-    return `
-        <p class="circle-muted-line">
-            ${escapeHtml(getRedemptionPendingText(redemption))}
-        </p>
-    `;
-}
     function renderPointsHistory() {
         if (!BlackwoodMembersState.points.length) {
             return `
