@@ -2322,32 +2322,43 @@
 
                     ${renderRedemptionDeliveryAddress(redemption)}
 
-                    ${redemption.discount_code ? `
-                        <div class="circle-redemption-code">
-                            <span>Discount code</span>
-
-                            <div class="circle-redemption-code-row">
-                                <code>${escapeHtml(redemption.discount_code)}</code>
-
-                                <button
-                                    type="button"
-                                    class="circle-copy-code-button"
-                                    data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
-                                >
-                                    Copy Code
-                                </button>
-                            </div>
-                        </div>
-                    ` : `
-                        <p class="circle-muted-line">
-                            ${escapeHtml(getRedemptionPendingText(redemption))}
-                        </p>
-                    `}
+                   ${renderRedemptionCodeOrStatus(redemption)}
+                   
                 </article>
             `;
         }).join("");
     }
+function renderRedemptionCodeOrStatus(redemption) {
+    if (redemption.discount_code) {
+        return `
+            <div class="circle-redemption-code">
+                <span>Discount code</span>
 
+                <div class="circle-redemption-code-row">
+                    <code>${escapeHtml(redemption.discount_code)}</code>
+
+                    <button
+                        type="button"
+                        class="circle-copy-code-button"
+                        data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
+                    >
+                        Copy Code
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    if (isPhysicalDeliveryReward(redemption) && !hasDeliveryAddress(redemption)) {
+        return "";
+    }
+
+    return `
+        <p class="circle-muted-line">
+            ${escapeHtml(getRedemptionPendingText(redemption))}
+        </p>
+    `;
+}
     function renderPointsHistory() {
         if (!BlackwoodMembersState.points.length) {
             return `
