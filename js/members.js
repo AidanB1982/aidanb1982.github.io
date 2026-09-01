@@ -6,6 +6,7 @@
 // ARC Profile powered by /js/member-arc-profile.js
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
 // Phase 2A: Member Home Dashboard summary layer
+// Phase 2B: Rewards polish + delivery address collection
 // =========================
 
 (function () {
@@ -55,6 +56,7 @@
         arcAssignments: [],
         activeAuthMode: "signin",
         isRedeeming: false,
+        isSubmittingDeliveryAddress: false,
         isReactingToBehindFile: false,
         isPasswordRecovery: false,
         escapeListenerBound: false
@@ -655,6 +657,8 @@
             BlackwoodMembersState.points = [];
             BlackwoodMembersState.redemptions = [];
             BlackwoodMembersState.arcAssignments = [];
+            BlackwoodMembersState.isRedeeming = false;
+            BlackwoodMembersState.isSubmittingDeliveryAddress = false;
             BlackwoodMembersState.isReactingToBehindFile = false;
 
             updateMemberIntroVisibility(null);
@@ -1262,9 +1266,22 @@
             return String(redemption.status || "").toLowerCase() === "issued";
         });
 
+        const awaitingAddress = redemptions.filter(function (redemption) {
+            return isPhysicalDeliveryReward(redemption) &&
+                String(redemption.delivery_status || "").toLowerCase() === "address_required" &&
+                !hasDeliveryAddress(redemption);
+        });
+
         const latestWithCode = redemptions.find(function (redemption) {
             return Boolean(redemption.discount_code);
         });
+
+        if (awaitingAddress.length) {
+            return {
+                headline: `${awaitingAddress.length} address needed`,
+                detail: "A physical reward is waiting for delivery details."
+            };
+        }
 
         if (pending.length) {
             return {
@@ -2031,303 +2048,305 @@
     // =========================
 
     function renderRewards(pointsTotal) {
-    if (!BlackwoodMembersState.rewards.length) {
-        return `
-            <article class="circle-empty-card">
-                <p>No rewards have been filed yet.</p>
-            </article>
-        `;
+        if (!BlackwoodMembersState.rewards.length) {
+            return `
+                <article class="circle-empty-card">
+                    <p>No rewards have been filed yet.</p>
+                </article>
+            `;
+        }
+
+        return BlackwoodMembersState.rewards.map(function (reward) {
+            const rewardId = Number(reward.id);
+            const required = Number(reward.points_required || 0);
+            const unlocked = pointsTotal >= required;
+            const isRedeemable = reward.is_redeemable === true;
+            const latestRedemption = getLatestRedemptionForReward(rewardId, reward.title);
+            const activeRedemption = isActiveRedemption(latestRedemption);
+            const canRedeem = isRedeemable && unlocked && !activeRedemption;
+
+            const rewardStatus = getRewardStatusInfo({
+                reward,
+                pointsTotal,
+                latestRedemption,
+                unlocked,
+                isRedeemable
+            });
+
+            return `
+                <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"} ${isRedeemable ? "is-redeemable" : "is-milestone"}">
+                    <div class="circle-reward-card-header">
+                        <p class="circle-reward-status">
+                            ${escapeHtml(isRedeemable ? "Redeemable Reward" : "Circle Milestone")}
+                        </p>
+
+                        <span class="circle-reward-badge ${escapeAttribute(rewardStatus.className)}">
+                            ${escapeHtml(rewardStatus.label)}
+                        </span>
+                    </div>
+
+                    <h3>${escapeHtml(reward.title)}</h3>
+
+                    <p>${escapeHtml(reward.description || "")}</p>
+
+                    <small>
+                        Requires ${required} points · ${escapeHtml(reward.required_tier || "Reader")}
+                    </small>
+
+                    ${renderRewardProgress(pointsTotal, required, unlocked, isRedeemable)}
+
+                    ${renderRewardAction(reward, canRedeem, latestRedemption)}
+                </article>
+            `;
+        }).join("");
     }
 
-    return BlackwoodMembersState.rewards.map(function (reward) {
-        const rewardId = Number(reward.id);
+    function getRewardStatusInfo(options) {
+        const reward = options.reward || {};
+        const pointsTotal = Number(options.pointsTotal || 0);
+        const latestRedemption = options.latestRedemption || null;
+        const unlocked = options.unlocked === true;
+        const isRedeemable = options.isRedeemable === true;
         const required = Number(reward.points_required || 0);
-        const unlocked = pointsTotal >= required;
+
+        const latestStatus = latestRedemption
+            ? String(latestRedemption.status || "").toLowerCase()
+            : "";
+
+        if (latestStatus === "pending") {
+            return {
+                label: "Request Pending",
+                className: "is-pending"
+            };
+        }
+
+        if (latestStatus === "issued") {
+            return {
+                label: latestRedemption.discount_code ? "Code Issued" : "Reward Issued",
+                className: "is-issued"
+            };
+        }
+
+        if (latestStatus === "used") {
+            return {
+                label: "Used",
+                className: "is-used"
+            };
+        }
+
+        if (latestStatus === "cancelled") {
+            return {
+                label: "Cancelled",
+                className: "is-cancelled"
+            };
+        }
+
+        if (!unlocked) {
+            return {
+                label: `${Math.max(0, required - pointsTotal)} Points To Unlock`,
+                className: "is-locked"
+            };
+        }
+
+        if (isRedeemable) {
+            return {
+                label: "Unlocked",
+                className: "is-unlocked"
+            };
+        }
+
+        return {
+            label: "Milestone Reached",
+            className: "is-milestone"
+        };
+    }
+
+    function renderRewardProgress(pointsTotal, required, unlocked, isRedeemable) {
+        const cleanRequired = Math.max(0, Number(required || 0));
+        const cleanPoints = Math.max(0, Number(pointsTotal || 0));
+
+        if (!cleanRequired) {
+            return "";
+        }
+
+        const progress = Math.min(100, Math.round((cleanPoints / cleanRequired) * 100));
+        const remaining = Math.max(0, cleanRequired - cleanPoints);
+
+        let note = `${remaining} more points needed.`;
+
+        if (unlocked && isRedeemable) {
+            note = "Unlocked and available to redeem.";
+        }
+
+        if (unlocked && !isRedeemable) {
+            note = "Milestone reached on your Circle record.";
+        }
+
+        return `
+            <div class="circle-reward-progress" aria-label="Reward progress">
+                <span style="width: ${escapeAttribute(String(progress))}%"></span>
+            </div>
+
+            <p class="circle-reward-progress-note">
+                ${escapeHtml(note)}
+            </p>
+        `;
+    }
+
+    function renderRewardAction(reward, canRedeem, latestRedemption) {
         const isRedeemable = reward.is_redeemable === true;
-        const latestRedemption = getLatestRedemptionForReward(rewardId, reward.title);
-        const activeRedemption = isActiveRedemption(latestRedemption);
-        const canRedeem = isRedeemable && unlocked && !activeRedemption;
 
-        const rewardStatus = getRewardStatusInfo({
-            reward,
-            pointsTotal,
-            latestRedemption,
-            unlocked,
-            isRedeemable
-        });
+        if (!isRedeemable) {
+            return "";
+        }
 
-        return `
-            <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"} ${isRedeemable ? "is-redeemable" : "is-milestone"}">
-                <div class="circle-reward-card-header">
-                    <p class="circle-reward-status">
-                        ${escapeHtml(isRedeemable ? "Redeemable Reward" : "Circle Milestone")}
-                    </p>
+        const latestStatus = latestRedemption
+            ? String(latestRedemption.status || "").toLowerCase()
+            : "";
 
-                    <span class="circle-reward-badge ${escapeAttribute(rewardStatus.className)}">
-                        ${escapeHtml(rewardStatus.label)}
-                    </span>
+        if (latestStatus === "pending") {
+            return `
+                <div class="circle-redemption-notice is-pending">
+                    <strong>Redemption requested</strong>
+                    <p>Your reward request is waiting to be reviewed. Physical rewards may require a delivery address.</p>
                 </div>
+            `;
+        }
 
-                <h3>${escapeHtml(reward.title)}</h3>
+        let existingRedemptionNotice = "";
 
-                <p>${escapeHtml(reward.description || "")}</p>
+        if (latestStatus === "issued") {
+            existingRedemptionNotice = `
+                <div class="circle-redemption-notice is-issued">
+                    <strong>Reward issued</strong>
 
-                <small>
-                    Requires ${required} points · ${escapeHtml(reward.required_tier || "Reader")}
-                </small>
+                    ${latestRedemption.discount_code ? `
+                        <div class="circle-redemption-code">
+                            <span>Your Circle code</span>
 
-                ${renderRewardProgress(pointsTotal, required, unlocked, isRedeemable)}
+                            <div class="circle-redemption-code-row">
+                                <code>${escapeHtml(latestRedemption.discount_code)}</code>
 
-                ${renderRewardAction(reward, canRedeem, latestRedemption)}
-            </article>
-        `;
-    }).join("");
-}
-
-function getRewardStatusInfo(options) {
-    const reward = options.reward || {};
-    const pointsTotal = Number(options.pointsTotal || 0);
-    const latestRedemption = options.latestRedemption || null;
-    const unlocked = options.unlocked === true;
-    const isRedeemable = options.isRedeemable === true;
-    const required = Number(reward.points_required || 0);
-
-    const latestStatus = latestRedemption
-        ? String(latestRedemption.status || "").toLowerCase()
-        : "";
-
-    if (latestStatus === "pending") {
-        return {
-            label: "Request Pending",
-            className: "is-pending"
-        };
-    }
-
-    if (latestStatus === "issued") {
-        return {
-            label: "Code Issued",
-            className: "is-issued"
-        };
-    }
-
-    if (latestStatus === "used") {
-        return {
-            label: "Used",
-            className: "is-used"
-        };
-    }
-
-    if (latestStatus === "cancelled") {
-        return {
-            label: "Cancelled",
-            className: "is-cancelled"
-        };
-    }
-
-    if (!unlocked) {
-        return {
-            label: `${Math.max(0, required - pointsTotal)} Points To Unlock`,
-            className: "is-locked"
-        };
-    }
-
-    if (isRedeemable) {
-        return {
-            label: "Unlocked",
-            className: "is-unlocked"
-        };
-    }
-
-    return {
-        label: "Milestone Reached",
-        className: "is-milestone"
-    };
-}
-
-function renderRewardProgress(pointsTotal, required, unlocked, isRedeemable) {
-    const cleanRequired = Math.max(0, Number(required || 0));
-    const cleanPoints = Math.max(0, Number(pointsTotal || 0));
-
-    if (!cleanRequired) {
-        return "";
-    }
-
-    const progress = Math.min(100, Math.round((cleanPoints / cleanRequired) * 100));
-    const remaining = Math.max(0, cleanRequired - cleanPoints);
-
-    let note = `${remaining} more points needed.`;
-
-    if (unlocked && isRedeemable) {
-        note = "Unlocked and available to redeem.";
-    }
-
-    if (unlocked && !isRedeemable) {
-        note = "Milestone reached on your Circle record.";
-    }
-
-    return `
-        <div class="circle-reward-progress" aria-label="Reward progress">
-            <span style="width: ${escapeAttribute(String(progress))}%"></span>
-        </div>
-
-        <p class="circle-reward-progress-note">
-            ${escapeHtml(note)}
-        </p>
-    `;
-}
-
-function renderRewardAction(reward, canRedeem, latestRedemption) {
-    const isRedeemable = reward.is_redeemable === true;
-
-    if (!isRedeemable) {
-        return "";
-    }
-
-    const latestStatus = latestRedemption
-        ? String(latestRedemption.status || "").toLowerCase()
-        : "";
-
-    if (latestStatus === "pending") {
-        return `
-            <div class="circle-redemption-notice is-pending">
-                <strong>Redemption requested</strong>
-                <p>Your discount code or reward confirmation will be issued manually and shown here once ready.</p>
-            </div>
-        `;
-    }
-
-    let existingRedemptionNotice = "";
-
-    if (latestStatus === "issued") {
-        existingRedemptionNotice = `
-            <div class="circle-redemption-notice is-issued">
-                <strong>Reward issued</strong>
-
-                ${latestRedemption.discount_code ? `
-                    <div class="circle-redemption-code">
-                        <span>Your Circle code</span>
-
-                        <div class="circle-redemption-code-row">
-                            <code>${escapeHtml(latestRedemption.discount_code)}</code>
-
-                            <button
-                                type="button"
-                                class="circle-copy-code-button"
-                                data-copy-discount-code="${escapeAttribute(latestRedemption.discount_code)}"
-                            >
-                                Copy Code
-                            </button>
+                                <button
+                                    type="button"
+                                    class="circle-copy-code-button"
+                                    data-copy-discount-code="${escapeAttribute(latestRedemption.discount_code)}"
+                                >
+                                    Copy Code
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ` : `
-                    <p>Your reward has been issued and will appear here shortly.</p>
-                `}
-            </div>
-        `;
-    }
-
-    if (latestStatus === "used") {
-        existingRedemptionNotice = `
-            <div class="circle-redemption-notice is-used">
-                <strong>Reward used</strong>
-                <p>This redemption has already been used.</p>
-            </div>
-        `;
-    }
-
-    if (latestStatus === "cancelled") {
-        existingRedemptionNotice = `
-            <div class="circle-redemption-notice is-cancelled">
-                <strong>Redemption cancelled</strong>
-                <p>This redemption is no longer active.</p>
-            </div>
-        `;
-    }
-
-    if (!canRedeem) {
-        return existingRedemptionNotice;
-    }
-
-    return `
-        ${existingRedemptionNotice}
-
-        <button
-            type="button"
-            class="circle-button circle-button-primary circle-redeem-button"
-            data-redeem-reward-id="${Number(reward.id)}"
-            data-reward-title="${escapeAttribute(reward.title || "this reward")}"
-            data-points-cost="${Number(reward.points_required || 0)}"
-        >
-            Redeem Reward
-        </button>
-    `;
-}
-
-function renderRedemptions() {
-    if (!BlackwoodMembersState.redemptions.length) {
-        return `
-            <article class="circle-empty-card circle-redemptions-empty">
-                <p>No rewards claimed yet.</p>
-                <p>When you unlock a Circle reward, your request and discount code will appear here.</p>
-            </article>
-        `;
-    }
-
-    return BlackwoodMembersState.redemptions.map(function (redemption) {
-        const cleanStatus = String(redemption.status || "pending").toLowerCase();
-        const status = capitalise(cleanStatus);
-        const requestedDate = redemption.requested_at
-            ? formatDate(redemption.requested_at)
-            : formatDate(redemption.created_at);
-
-        const pointsCost = Number(redemption.points_cost || 0);
-        const pointsLine = pointsCost > 0
-            ? `${pointsCost} points redeemed.`
-            : "Complimentary reward issued.";
-
-        return `
-            <article class="circle-reward-card circle-redemption-card">
-                <div class="circle-redemption-card-header">
-                    <p class="circle-post-meta">
-                        ${escapeHtml(requestedDate)}
-                    </p>
-
-                    <span class="circle-reward-badge is-${escapeAttribute(cleanStatus)}">
-                        ${escapeHtml(status)}
-                    </span>
+                    ` : `
+                        <p>Your reward has been issued. No discount code is required for this reward.</p>
+                    `}
                 </div>
+            `;
+        }
 
-                <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+        if (latestStatus === "used") {
+            existingRedemptionNotice = `
+                <div class="circle-redemption-notice is-used">
+                    <strong>Reward used</strong>
+                    <p>This redemption has already been used.</p>
+                </div>
+            `;
+        }
 
-                <p>
-                    ${escapeHtml(pointsLine)}
-                </p>
+        if (latestStatus === "cancelled") {
+            existingRedemptionNotice = `
+                <div class="circle-redemption-notice is-cancelled">
+                    <strong>Redemption cancelled</strong>
+                    <p>This redemption is no longer active.</p>
+                </div>
+            `;
+        }
 
-                ${redemption.discount_code ? `
-                    <div class="circle-redemption-code">
-                        <span>Discount code</span>
+        if (!canRedeem) {
+            return existingRedemptionNotice;
+        }
 
-                        <div class="circle-redemption-code-row">
-                            <code>${escapeHtml(redemption.discount_code)}</code>
+        return `
+            ${existingRedemptionNotice}
 
-                            <button
-                                type="button"
-                                class="circle-copy-code-button"
-                                data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
-                            >
-                                Copy Code
-                            </button>
-                        </div>
-                    </div>
-                ` : `
-                    <p class="circle-muted-line">
-                        Discount code pending manual issue.
-                    </p>
-                `}
-            </article>
+            <button
+                type="button"
+                class="circle-button circle-button-primary circle-redeem-button"
+                data-redeem-reward-id="${Number(reward.id)}"
+                data-reward-title="${escapeAttribute(reward.title || "this reward")}"
+                data-points-cost="${Number(reward.points_required || 0)}"
+            >
+                Redeem Reward
+            </button>
         `;
-    }).join("");
-}
+    }
+
+    function renderRedemptions() {
+        if (!BlackwoodMembersState.redemptions.length) {
+            return `
+                <article class="circle-empty-card circle-redemptions-empty">
+                    <p>No rewards claimed yet.</p>
+                    <p>When you unlock a Circle reward, your request and discount code will appear here.</p>
+                </article>
+            `;
+        }
+
+        return BlackwoodMembersState.redemptions.map(function (redemption) {
+            const cleanStatus = String(redemption.status || "pending").toLowerCase();
+            const status = capitalise(cleanStatus);
+            const requestedDate = redemption.requested_at
+                ? formatDate(redemption.requested_at)
+                : formatDate(redemption.created_at);
+
+            const pointsCost = Number(redemption.points_cost || 0);
+            const pointsLine = pointsCost > 0
+                ? `${pointsCost} points redeemed.`
+                : "Complimentary reward issued.";
+
+            return `
+                <article class="circle-reward-card circle-redemption-card">
+                    <div class="circle-redemption-card-header">
+                        <p class="circle-post-meta">
+                            ${escapeHtml(requestedDate)}
+                        </p>
+
+                        <span class="circle-reward-badge is-${escapeAttribute(cleanStatus)}">
+                            ${escapeHtml(status)}
+                        </span>
+                    </div>
+
+                    <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+
+                    <p>
+                        ${escapeHtml(pointsLine)}
+                    </p>
+
+                    ${renderRedemptionDeliveryAddress(redemption)}
+
+                    ${redemption.discount_code ? `
+                        <div class="circle-redemption-code">
+                            <span>Discount code</span>
+
+                            <div class="circle-redemption-code-row">
+                                <code>${escapeHtml(redemption.discount_code)}</code>
+
+                                <button
+                                    type="button"
+                                    class="circle-copy-code-button"
+                                    data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
+                                >
+                                    Copy Code
+                                </button>
+                            </div>
+                        </div>
+                    ` : `
+                        <p class="circle-muted-line">
+                            ${escapeHtml(getRedemptionPendingText(redemption))}
+                        </p>
+                    `}
+                </article>
+            `;
+        }).join("");
+    }
 
     function renderPointsHistory() {
         if (!BlackwoodMembersState.points.length) {
@@ -2370,9 +2389,13 @@ function renderRedemptions() {
         });
 
         document.querySelectorAll("[data-copy-discount-code]").forEach(function (button) {
-        button.addEventListener("click", handleCopyDiscountCode);
+            button.addEventListener("click", handleCopyDiscountCode);
         });
-        
+
+        document.querySelectorAll("[data-redemption-address-form]").forEach(function (form) {
+            form.addEventListener("submit", handleRedemptionAddressSubmit);
+        });
+
         bindMemberArcProfile();
         bindBlackwoodBookshelf();
         bindBehindFilesCarousel();
@@ -2408,7 +2431,7 @@ function renderRedemptions() {
         }
 
         const confirmed = window.confirm(
-            `Redeem "${rewardTitle}" for ${pointsCost} points?\n\nYour points will be deducted and the discount code will be issued manually.`
+            `Redeem "${rewardTitle}" for ${pointsCost} points?\n\nYour points will be deducted and the reward will be issued manually. Physical rewards may require a delivery address.`
         );
 
         if (!confirmed) {
@@ -2440,7 +2463,7 @@ function renderRedemptions() {
             await loadMemberDashboard();
 
             setDashboardStatus(
-                "Reward requested. Your discount code will be issued manually.",
+                "Reward requested. It will be issued manually once reviewed.",
                 "is-success"
             );
 
@@ -2461,25 +2484,373 @@ function renderRedemptions() {
     // =========================
 
     function getLatestRedemptionForReward(rewardId, rewardTitle) {
-    const byRewardId = BlackwoodMembersState.redemptions.find(function (redemption) {
-        return Number(redemption.reward_id) === Number(rewardId);
-    });
+        const byRewardId = BlackwoodMembersState.redemptions.find(function (redemption) {
+            return Number(redemption.reward_id) === Number(rewardId);
+        });
 
-    if (byRewardId) {
-        return byRewardId;
+        if (byRewardId) {
+            return byRewardId;
+        }
+
+        return BlackwoodMembersState.redemptions.find(function (redemption) {
+            return lowerClean(redemption.reward_title) === lowerClean(rewardTitle);
+        }) || null;
     }
-
-    return BlackwoodMembersState.redemptions.find(function (redemption) {
-        return lowerClean(redemption.reward_title) === lowerClean(rewardTitle);
-    }) || null;
-}
 
     function isActiveRedemption(redemption) {
         if (!redemption) {
             return false;
         }
 
-        return String(redemption.status || "").toLowerCase() === "pending";
+        const status = String(redemption.status || "").toLowerCase();
+
+        return status === "pending" || status === "issued";
+    }
+
+    function renderRedemptionDeliveryAddress(redemption) {
+        if (!isPhysicalDeliveryReward(redemption)) {
+            return "";
+        }
+
+        const redemptionId = Number(redemption.id || redemption.redemption_id || 0);
+        const status = String(redemption.status || "").toLowerCase();
+        const canCollectAddress = status === "pending" || status === "issued";
+        const addressReceived = hasDeliveryAddress(redemption);
+
+        if (addressReceived) {
+            return `
+                <div class="circle-delivery-summary is-received">
+                    <strong>Delivery address received</strong>
+
+                    <address>
+                        ${formatDeliveryAddress(redemption)}
+                    </address>
+
+                    <p>
+                        This address will only be used to fulfil this Blackwood Circle reward.
+                    </p>
+                </div>
+            `;
+        }
+
+        if (!canCollectAddress || !redemptionId) {
+            return "";
+        }
+
+        return `
+            <form 
+                class="circle-delivery-form" 
+                data-redemption-address-form="${redemptionId}"
+                novalidate
+            >
+                <div class="circle-delivery-heading">
+                    <strong>Delivery address required</strong>
+                    <p>
+                        This reward needs a postal address before it can be fulfilled.
+                        Your address is stored against this reward request only.
+                    </p>
+                </div>
+
+                <div class="circle-delivery-grid">
+                    <label>
+                        Delivery name
+                        <input
+                            type="text"
+                            name="delivery_name"
+                            autocomplete="name"
+                            value="${escapeAttribute(getSuggestedDeliveryName())}"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Address line 1
+                        <input
+                            type="text"
+                            name="delivery_address_line_1"
+                            autocomplete="address-line1"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Address line 2
+                        <input
+                            type="text"
+                            name="delivery_address_line_2"
+                            autocomplete="address-line2"
+                        >
+                    </label>
+
+                    <label>
+                        Town / city
+                        <input
+                            type="text"
+                            name="delivery_city"
+                            autocomplete="address-level2"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        County / region
+                        <input
+                            type="text"
+                            name="delivery_region"
+                            autocomplete="address-level1"
+                        >
+                    </label>
+
+                    <label>
+                        Postcode
+                        <input
+                            type="text"
+                            name="delivery_postcode"
+                            autocomplete="postal-code"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Country
+                        <input
+                            type="text"
+                            name="delivery_country"
+                            autocomplete="country-name"
+                            value="${escapeAttribute(getSuggestedDeliveryCountry())}"
+                            required
+                        >
+                    </label>
+
+                    <label class="circle-delivery-note-field">
+                        Delivery note
+                        <textarea
+                            name="delivery_note"
+                            rows="3"
+                            maxlength="500"
+                            placeholder="Optional delivery note"
+                        ></textarea>
+                    </label>
+                </div>
+
+                <button type="submit" class="circle-button circle-button-primary">
+                    Submit Delivery Address
+                </button>
+
+                <p class="circle-delivery-status" data-redemption-address-status aria-live="polite"></p>
+            </form>
+        `;
+    }
+
+    async function handleRedemptionAddressSubmit(event) {
+        event.preventDefault();
+
+        if (BlackwoodMembersState.isSubmittingDeliveryAddress) {
+            return;
+        }
+
+        const form = event.currentTarget;
+        const redemptionId = Number(form.dataset.redemptionAddressForm || 0);
+        const submitButton = form.querySelector("button[type='submit']");
+
+        const deliveryName = getFormFieldValue(form, "delivery_name");
+        const addressLine1 = getFormFieldValue(form, "delivery_address_line_1");
+        const addressLine2 = getFormFieldValue(form, "delivery_address_line_2");
+        const city = getFormFieldValue(form, "delivery_city");
+        const region = getFormFieldValue(form, "delivery_region");
+        const postcode = getFormFieldValue(form, "delivery_postcode");
+        const country = getFormFieldValue(form, "delivery_country");
+        const deliveryNote = getFormFieldValue(form, "delivery_note");
+
+        if (!redemptionId) {
+            setRedemptionAddressStatus(form, "This reward request could not be found.", "is-error");
+            return;
+        }
+
+        if (!deliveryName) {
+            setRedemptionAddressStatus(form, "Please enter a delivery name.", "is-error");
+            return;
+        }
+
+        if (!addressLine1) {
+            setRedemptionAddressStatus(form, "Please enter address line 1.", "is-error");
+            return;
+        }
+
+        if (!city) {
+            setRedemptionAddressStatus(form, "Please enter a town or city.", "is-error");
+            return;
+        }
+
+        if (!postcode) {
+            setRedemptionAddressStatus(form, "Please enter a postcode.", "is-error");
+            return;
+        }
+
+        if (!country) {
+            setRedemptionAddressStatus(form, "Please enter a country.", "is-error");
+            return;
+        }
+
+        if (deliveryNote.length > 500) {
+            setRedemptionAddressStatus(form, "Delivery note must be 500 characters or fewer.", "is-error");
+            return;
+        }
+
+        const originalButtonText = submitButton ? submitButton.textContent : "";
+
+        BlackwoodMembersState.isSubmittingDeliveryAddress = true;
+
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Saving Address...";
+        }
+
+        setRedemptionAddressStatus(form, "Saving delivery address...", "is-loading");
+
+        try {
+            const { error } = await BlackwoodMembersState.client.rpc(
+                "submit_redemption_delivery_address",
+                {
+                    p_redemption_id: redemptionId,
+                    p_delivery_name: deliveryName,
+                    p_address_line_1: addressLine1,
+                    p_address_line_2: addressLine2,
+                    p_city: city,
+                    p_region: region,
+                    p_postcode: postcode,
+                    p_country: country,
+                    p_delivery_note: deliveryNote
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            setRedemptionAddressStatus(form, "Delivery address received.", "is-success");
+
+            await loadMemberDashboard();
+
+        } catch (error) {
+            console.error("Delivery address submission failed:", error);
+            setRedemptionAddressStatus(form, cleanSupabaseError(error.message), "is-error");
+
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText || "Submit Delivery Address";
+            }
+
+        } finally {
+            BlackwoodMembersState.isSubmittingDeliveryAddress = false;
+        }
+    }
+
+    function isPhysicalDeliveryReward(redemption) {
+        const title = String(redemption && redemption.reward_title ? redemption.reward_title : "")
+            .toLowerCase();
+
+        return (
+            title.includes("bookmark") ||
+            title.includes("archive insert") ||
+            title.includes("collector reward") ||
+            title.includes("limited edition")
+        );
+    }
+
+    function hasDeliveryAddress(redemption) {
+        if (!redemption) {
+            return false;
+        }
+
+        const deliveryStatus = String(redemption.delivery_status || "").toLowerCase();
+
+        if (deliveryStatus === "address_received" || redemption.delivery_submitted_at) {
+            return true;
+        }
+
+        return Boolean(
+            redemption.delivery_name &&
+            redemption.delivery_address_line_1 &&
+            redemption.delivery_city &&
+            redemption.delivery_postcode &&
+            redemption.delivery_country
+        );
+    }
+
+    function formatDeliveryAddress(redemption) {
+        const cityRegionLine = [
+            redemption.delivery_city,
+            redemption.delivery_region
+        ].filter(Boolean).join(", ");
+
+        const lines = [
+            redemption.delivery_name,
+            redemption.delivery_address_line_1,
+            redemption.delivery_address_line_2,
+            cityRegionLine,
+            redemption.delivery_postcode,
+            redemption.delivery_country
+        ].filter(function (line) {
+            return String(line || "").trim();
+        });
+
+        return lines.map(function (line) {
+            return `<span>${escapeHtml(line)}</span>`;
+        }).join("");
+    }
+
+    function getSuggestedDeliveryName() {
+        const member = BlackwoodMembersState.member || {};
+
+        return member.display_name || member.reader_name || "";
+    }
+
+    function getSuggestedDeliveryCountry() {
+        const member = BlackwoodMembersState.member || {};
+
+        return member.country || "";
+    }
+
+    function getFormFieldValue(form, name) {
+        const field = form.querySelector(`[name="${name}"]`);
+
+        return field ? String(field.value || "").trim() : "";
+    }
+
+    function setRedemptionAddressStatus(form, message, className) {
+        const status = form.querySelector("[data-redemption-address-status]");
+
+        if (!status) {
+            return;
+        }
+
+        status.textContent = message || "";
+        status.classList.remove("is-success", "is-error", "is-loading");
+
+        if (className) {
+            status.classList.add(className);
+        }
+    }
+
+    function getRedemptionPendingText(redemption) {
+        const status = String(redemption && redemption.status ? redemption.status : "pending").toLowerCase();
+
+        if (isPhysicalDeliveryReward(redemption)) {
+            if (hasDeliveryAddress(redemption)) {
+                return status === "issued"
+                    ? "Reward issued. Delivery details have been received."
+                    : "Delivery details received. Reward pending manual fulfilment.";
+            }
+
+            return "Reward pending manual fulfilment.";
+        }
+
+        if (status === "issued" && !redemption.discount_code) {
+            return "Reward issued. No discount code is required for this reward.";
+        }
+
+        return "Discount code pending manual issue.";
     }
 
     // =========================
@@ -2632,7 +3003,35 @@ function renderRedemptions() {
         }
 
         if (/already have this reward/i.test(cleaned) || /pending redemption request/i.test(cleaned)) {
-            return "You already have a pending redemption request for this reward.";
+            return "You already have a pending or issued redemption for this reward.";
+        }
+
+        if (/delivery name is required/i.test(cleaned)) {
+            return "Please enter a delivery name.";
+        }
+
+        if (/address line 1 is required/i.test(cleaned)) {
+            return "Please enter address line 1.";
+        }
+
+        if (/town or city is required/i.test(cleaned)) {
+            return "Please enter a town or city.";
+        }
+
+        if (/postcode is required/i.test(cleaned)) {
+            return "Please enter a postcode.";
+        }
+
+        if (/country is required/i.test(cleaned)) {
+            return "Please enter a country.";
+        }
+
+        if (/delivery note is too long/i.test(cleaned)) {
+            return "Delivery note must be 500 characters or fewer.";
+        }
+
+        if (/delivery address cannot be added/i.test(cleaned)) {
+            return "This delivery address cannot be added to that reward.";
         }
 
         if (/reaction is not available/i.test(cleaned) || /not available/i.test(cleaned)) {
@@ -2669,69 +3068,70 @@ function renderRedemptions() {
 
         return text.charAt(0).toUpperCase() + text.slice(1);
     }
+
     async function handleCopyDiscountCode(event) {
-    const button = event.currentTarget;
-    const code = button.getAttribute("data-copy-discount-code") || "";
+        const button = event.currentTarget;
+        const code = button.getAttribute("data-copy-discount-code") || "";
 
-    if (!code) {
-        setDashboardStatus("No discount code was found to copy.", "is-error");
-        return;
+        if (!code) {
+            setDashboardStatus("No discount code was found to copy.", "is-error");
+            return;
+        }
+
+        const originalText = button.textContent;
+
+        try {
+            await copyTextToClipboard(code);
+
+            button.textContent = "Copied";
+            button.classList.add("is-copied");
+
+            setDashboardStatus("Discount code copied to clipboard.", "is-success");
+
+            window.setTimeout(function () {
+                button.textContent = originalText || "Copy Code";
+                button.classList.remove("is-copied");
+            }, 1600);
+
+        } catch (error) {
+            console.warn("Copy discount code failed:", error);
+            setDashboardStatus("The code could not be copied. Please copy it manually.", "is-error");
+        }
     }
 
-    const originalText = button.textContent;
+    async function copyTextToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
 
-    try {
-        await copyTextToClipboard(code);
+        const textarea = document.createElement("textarea");
 
-        button.textContent = "Copied";
-        button.classList.add("is-copied");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "0";
 
-        setDashboardStatus("Discount code copied to clipboard.", "is-success");
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
 
-        window.setTimeout(function () {
-            button.textContent = originalText || "Copy Code";
-            button.classList.remove("is-copied");
-        }, 1600);
+        const copied = document.execCommand("copy");
 
-    } catch (error) {
-        console.warn("Copy discount code failed:", error);
-        setDashboardStatus("The code could not be copied. Please copy it manually.", "is-error");
+        textarea.remove();
+
+        if (!copied) {
+            throw new Error("Copy command failed.");
+        }
     }
-}
 
-async function copyTextToClipboard(text) {
-    if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return;
+    function lowerClean(value) {
+        return String(value || "")
+            .trim()
+            .toLowerCase();
     }
 
-    const textarea = document.createElement("textarea");
-
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.left = "-9999px";
-    textarea.style.top = "0";
-
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-
-    const copied = document.execCommand("copy");
-
-    textarea.remove();
-
-    if (!copied) {
-        throw new Error("Copy command failed.");
-    }
-}
-
-function lowerClean(value) {
-    return String(value || "")
-        .trim()
-        .toLowerCase();
-}
-    
     function looksLikeUrl(value) {
         return /^https?:\/\//i.test(String(value || "").trim());
     }
