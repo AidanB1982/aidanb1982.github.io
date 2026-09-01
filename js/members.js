@@ -13,6 +13,12 @@
 (function () {
     "use strict";
 
+    if (window.__BLACKWOOD_MEMBERS_SCRIPT_LOADED__) {
+        return;
+    }
+
+    window.__BLACKWOOD_MEMBERS_SCRIPT_LOADED__ = true;
+
     const BLACKWOOD_MEMBERS_CONFIG = {
         supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
         supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
@@ -603,9 +609,7 @@
     function renderPasswordUpdateView() {
         updateMemberIntroVisibility(BlackwoodMembersState.session);
 
-        const app = BlackwoodMembersState.app;
-
-        app.innerHTML = `
+        BlackwoodMembersState.app.innerHTML = `
             <section class="circle-auth-shell" aria-labelledby="circle-password-update-title">
                 <div class="circle-auth-intro">
                     <p class="circle-kicker">The Blackwood Circle</p>
@@ -740,7 +744,7 @@
     }
 
     // =========================
-    // DASHBOARD
+    // DASHBOARD LOADING
     // =========================
 
     async function loadMemberDashboard() {
@@ -956,58 +960,14 @@
         }
     }
 
-    function normaliseBehindFilesPosts(posts) {
-        return posts
-            .filter(function (post) {
-                return post && post.published === true;
-            })
-            .map(function (post) {
-                return {
-                    id: String(post.id || createFallbackPostId(post)).trim(),
-                    title: String(post.title || "Untitled File").trim(),
-                    category: String(post.category || "Behind the Files").trim(),
-                    excerpt: String(post.excerpt || "").trim(),
-                    body: String(post.body || "").trim(),
-                    image: String(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage).trim(),
-                    published: post.published === true,
-                    pinned: post.pinned === true,
-                    publishedAt: String(post.publishedAt || "").trim()
-                };
-            })
-            .sort(sortBehindFilesPosts);
-    }
-
-    function sortBehindFilesPosts(a, b) {
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
-
-        return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
-    }
-
-    function createFallbackPostId(post) {
-        const title = String(post && post.title ? post.title : "behind-file")
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "")
-            .slice(0, 48);
-
-        const date = String(post && post.publishedAt ? post.publishedAt : "undated")
-            .replace(/[^0-9]/g, "");
-
-        return `bfa-${date || "undated"}-${title || "file"}`;
-    }
+    // =========================
+    // DASHBOARD RENDER
+    // =========================
 
     function renderDashboard() {
         const app = BlackwoodMembersState.app;
         const member = BlackwoodMembersState.member || {};
-
-        const pointsFromHistory = BlackwoodMembersState.points.reduce(function (total, item) {
-            return total + Number(item.points || 0);
-        }, 0);
-
-        const profilePoints = Number(member.points_total);
-        const pointsTotal = Number.isFinite(profilePoints) ? profilePoints : pointsFromHistory;
+        const pointsTotal = getCurrentPointsTotal();
 
         const displayName = member.display_name || member.reader_name || member.email || "Reader";
         const tier = member.member_tier || "Reader";
@@ -1053,10 +1013,7 @@
                         </p>
                     </div>
 
-                    <a 
-                        href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" 
-                        class="circle-reader-record-button"
-                    >
+                    <a href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" class="circle-reader-record-button">
                         Leave a Reader Record
                     </a>
                 </section>
@@ -1083,16 +1040,13 @@
                     </div>
                 </section>
 
-                <section 
-                    class="circle-section circle-collapsible-section is-collapsed" 
-                    aria-labelledby="circle-points-title"
-                >
+                <section class="circle-section circle-collapsible-section is-collapsed" aria-labelledby="circle-points-title">
                     <div class="circle-section-toggle-header">
                         <h2 id="circle-points-title">Points History</h2>
 
-                        <button 
-                            type="button" 
-                            class="circle-section-toggle-button" 
+                        <button
+                            type="button"
+                            class="circle-section-toggle-button"
                             id="circle-points-history-toggle"
                             aria-expanded="false"
                             aria-controls="circle-points-history-content"
@@ -1101,10 +1055,7 @@
                         </button>
                     </div>
 
-                    <div 
-                        class="circle-collapsible-content" 
-                        id="circle-points-history-content"
-                    >
+                    <div class="circle-collapsible-content" id="circle-points-history-content">
                         <div class="circle-points-list">
                             ${renderPointsHistory()}
                         </div>
@@ -1229,6 +1180,19 @@
                 </div>
             </section>
         `;
+    }
+
+    function getCurrentPointsTotal() {
+        const member = BlackwoodMembersState.member || {};
+        const profilePoints = Number(member.points_total);
+
+        if (Number.isFinite(profilePoints)) {
+            return profilePoints;
+        }
+
+        return BlackwoodMembersState.points.reduce(function (total, item) {
+            return total + Number(item.points || 0);
+        }, 0);
     }
 
     function getArcDashboardSummary(member) {
@@ -1485,8 +1449,8 @@
         }
 
         return `
-            <section 
-                class="circle-section member-arc-profile-section" 
+            <section
+                class="circle-section member-arc-profile-section"
                 id="blackwood-arc-profile-root"
                 aria-label="My ARC Profile"
             >
@@ -1534,8 +1498,8 @@
 
     function renderBookshelfMount() {
         return `
-            <section 
-                class="circle-section blackwood-bookshelf-section" 
+            <section
+                class="circle-section blackwood-bookshelf-section"
                 id="blackwood-bookshelf-root"
                 aria-label="My Blackwood Bookshelf"
             >
@@ -1608,8 +1572,8 @@
         const openAttribute = BlackwoodMembersState.adminRewardDeskOpen ? "open" : "";
 
         return `
-            <section 
-                class="circle-section circle-admin-reward-section" 
+            <section
+                class="circle-section circle-admin-reward-section"
                 id="circle-admin-reward-desk"
                 aria-labelledby="circle-admin-reward-title"
             >
@@ -1641,9 +1605,9 @@
                                 : `
                                     ${renderAdminRewardFilters(counts)}
 
-                                    <p 
-                                        class="circle-admin-reward-status" 
-                                        id="circle-admin-reward-status" 
+                                    <p
+                                        class="circle-admin-reward-status"
+                                        id="circle-admin-reward-status"
                                         aria-live="polite"
                                     ></p>
 
@@ -1710,7 +1674,7 @@
         const cancelledDate = redemption.cancelled_at ? formatDate(redemption.cancelled_at) : "";
 
         return `
-            <article 
+            <article
                 class="circle-admin-reward-card is-${escapeAttribute(status)}"
                 data-admin-redemption-card="${redemptionId}"
             >
@@ -1769,7 +1733,7 @@
 
                 ${renderAdminRewardAddressBlock(redemption)}
 
-                <form 
+                <form
                     class="circle-admin-reward-form"
                     data-admin-redemption-form="${redemptionId}"
                     novalidate
@@ -1929,8 +1893,8 @@
 
         return BLACKWOOD_ADMIN_DELIVERY_STATUS_OPTIONS.map(function (option) {
             return `
-                <option 
-                    value="${escapeAttribute(option.value)}" 
+                <option
+                    value="${escapeAttribute(option.value)}"
                     ${option.value === cleanCurrentValue ? "selected" : ""}
                 >
                     ${escapeHtml(option.label)}
@@ -2261,10 +2225,10 @@
 
     function normaliseAdminRewardRedemption(redemption) {
         return {
-            redemption_id: Number(redemption.redemption_id || 0),
+            redemption_id: Number(redemption.redemption_id || redemption.id || 0),
             member_id: redemption.member_id || "",
-            reader_name: String(redemption.reader_name || "").trim(),
-            reader_email: String(redemption.reader_email || "").trim(),
+            reader_name: String(redemption.reader_name || redemption.display_name || "").trim(),
+            reader_email: String(redemption.reader_email || redemption.email || "").trim(),
             reward_id: Number(redemption.reward_id || 0),
             reward_title: String(redemption.reward_title || "").trim(),
             points_cost: Number(redemption.points_cost || 0),
@@ -2330,15 +2294,7 @@
     }
 
     function isAdminPhysicalDeliveryReward(redemption) {
-        const title = String(redemption && redemption.reward_title ? redemption.reward_title : "")
-            .toLowerCase();
-
-        return (
-            title.includes("bookmark") ||
-            title.includes("archive insert") ||
-            title.includes("collector reward") ||
-            title.includes("limited edition")
-        );
+        return isPhysicalDeliveryReward(redemption);
     }
 
     function hasAdminDeliveryAddress(redemption) {
@@ -2428,6 +2384,48 @@
         });
     }
 
+    function normaliseBehindFilesPosts(posts) {
+        return posts
+            .filter(function (post) {
+                return post && post.published === true;
+            })
+            .map(function (post) {
+                return {
+                    id: String(post.id || createFallbackPostId(post)).trim(),
+                    title: String(post.title || "Untitled File").trim(),
+                    category: String(post.category || "Behind the Files").trim(),
+                    excerpt: String(post.excerpt || "").trim(),
+                    body: String(post.body || "").trim(),
+                    image: String(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage).trim(),
+                    published: post.published === true,
+                    pinned: post.pinned === true,
+                    publishedAt: String(post.publishedAt || "").trim()
+                };
+            })
+            .sort(sortBehindFilesPosts);
+    }
+
+    function sortBehindFilesPosts(a, b) {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+
+        return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+    }
+
+    function createFallbackPostId(post) {
+        const title = String(post && post.title ? post.title : "behind-file")
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 48);
+
+        const date = String(post && post.publishedAt ? post.publishedAt : "undated")
+            .replace(/[^0-9]/g, "");
+
+        return `bfa-${date || "undated"}-${title || "file"}`;
+    }
+
     function renderBehindFilesCarousel() {
         const posts = getBehindFilesForDisplay();
 
@@ -2496,9 +2494,10 @@
                                 type="button"
                                 class="circle-bfa-control"
                                 id="circle-bfa-prev"
+                                aria-label="Earlier dispatch"
                                 ${hasMultiplePosts ? "" : "disabled"}
                             >
-                                Previous
+                                &lt;
                             </button>
 
                             <button
@@ -2513,9 +2512,10 @@
                                 type="button"
                                 class="circle-bfa-control"
                                 id="circle-bfa-next"
+                                aria-label="Later dispatch"
                                 ${hasMultiplePosts ? "" : "disabled"}
                             >
-                                Next
+                                &gt;
                             </button>
                         </div>
 
@@ -2675,33 +2675,13 @@
         const excerpt = document.getElementById("circle-bfa-excerpt");
         const position = document.getElementById("circle-bfa-position");
 
-        if (image) {
-            image.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
-        }
-
-        if (category) {
-            category.textContent = post.category;
-        }
-
-        if (date) {
-            date.textContent = formatBehindFileDate(post.publishedAt);
-        }
-
-        if (pinned) {
-            pinned.hidden = !post.pinned;
-        }
-
-        if (title) {
-            title.textContent = post.title;
-        }
-
-        if (excerpt) {
-            excerpt.textContent = post.excerpt || "Open this file to read the full dispatch.";
-        }
-
-        if (position) {
-            position.textContent = `${BlackwoodMembersState.behindFilesIndex + 1} of ${posts.length}`;
-        }
+        if (image) image.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
+        if (category) category.textContent = post.category;
+        if (date) date.textContent = formatBehindFileDate(post.publishedAt);
+        if (pinned) pinned.hidden = !post.pinned;
+        if (title) title.textContent = post.title;
+        if (excerpt) excerpt.textContent = post.excerpt || "Open this file to read the full dispatch.";
+        if (position) position.textContent = `${BlackwoodMembersState.behindFilesIndex + 1} of ${posts.length}`;
 
         updateBehindFileModalContent(post);
     }
@@ -2752,25 +2732,11 @@
         const modalBody = document.getElementById("circle-bfa-modal-body");
         const reactionsSlot = document.getElementById("circle-bfa-reactions-slot");
 
-        if (modalImage) {
-            modalImage.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
-        }
-
-        if (modalCategory) {
-            modalCategory.textContent = post.category;
-        }
-
-        if (modalDate) {
-            modalDate.textContent = formatBehindFileDate(post.publishedAt);
-        }
-
-        if (modalPinned) {
-            modalPinned.hidden = !post.pinned;
-        }
-
-        if (modalTitle) {
-            modalTitle.textContent = post.title;
-        }
+        if (modalImage) modalImage.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
+        if (modalCategory) modalCategory.textContent = post.category;
+        if (modalDate) modalDate.textContent = formatBehindFileDate(post.publishedAt);
+        if (modalPinned) modalPinned.hidden = !post.pinned;
+        if (modalTitle) modalTitle.textContent = post.title;
 
         if (modalBody) {
             modalBody.innerHTML = formatPlainTextAsHtml(
@@ -2946,91 +2912,6 @@
             const isSameReaction = String(button.dataset.bfaReaction || "") === String(reaction || "");
 
             button.classList.toggle("is-active", isSamePost && isSameReaction);
-        });
-    }
-
-    function applyLocalPointAward(points, reason) {
-        const cleanPoints = Number(points || 0);
-
-        if (!cleanPoints) {
-            return;
-        }
-
-        if (BlackwoodMembersState.member) {
-            BlackwoodMembersState.member.points_total = Number(BlackwoodMembersState.member.points_total || 0) + cleanPoints;
-        }
-
-        BlackwoodMembersState.points.unshift({
-            points: cleanPoints,
-            reason: reason || "Blackwood Circle activity",
-            created_at: new Date().toISOString()
-        });
-
-        const pointsTotal = document.getElementById("circle-points-total");
-        const homePointsTotal = document.getElementById("circle-home-points-total");
-
-        if (pointsTotal) {
-            pointsTotal.textContent = String(Number(pointsTotal.textContent || 0) + cleanPoints);
-        }
-
-        if (homePointsTotal) {
-            homePointsTotal.textContent = String(Number(homePointsTotal.textContent || 0) + cleanPoints);
-        }
-
-        const pointsList = document.querySelector(".circle-points-list");
-
-        if (pointsList) {
-            pointsList.innerHTML = renderPointsHistory();
-        }
-    }
-
-    function normaliseRpcResult(data) {
-        if (!data) {
-            return {};
-        }
-
-        if (typeof data === "string") {
-            try {
-                return JSON.parse(data);
-            } catch (error) {
-                return {};
-            }
-        }
-
-        return data;
-    }
-
-    function clampBehindFilesIndex(index, posts) {
-        if (!Array.isArray(posts) || !posts.length) {
-            return 0;
-        }
-
-        if (index < 0) {
-            return 0;
-        }
-
-        if (index >= posts.length) {
-            return posts.length - 1;
-        }
-
-        return index;
-    }
-
-    function formatBehindFileDate(value) {
-        if (!value) {
-            return "Filed in the archive";
-        }
-
-        const date = new Date(`${value}T12:00:00`);
-
-        if (Number.isNaN(date.getTime())) {
-            return String(value);
-        }
-
-        return date.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
         });
     }
 
@@ -3483,10 +3364,6 @@
         }
     }
 
-    // =========================
-    // REDEMPTION HELPERS
-    // =========================
-
     function getLatestRedemptionForReward(rewardId, rewardTitle) {
         const byRewardId = BlackwoodMembersState.redemptions.find(function (redemption) {
             return Number(redemption.reward_id) === Number(rewardId);
@@ -3542,8 +3419,8 @@
         }
 
         return `
-            <form 
-                class="circle-delivery-form" 
+            <form
+                class="circle-delivery-form"
                 data-redemption-address-form="${redemptionId}"
                 novalidate
             >
@@ -3858,8 +3735,88 @@
     }
 
     // =========================
-    // PASSWORD RESET HELPERS
+    // GENERAL HELPERS
     // =========================
+
+    function applyLocalPointAward(points, reason) {
+        const cleanPoints = Number(points || 0);
+
+        if (!cleanPoints) {
+            return;
+        }
+
+        if (BlackwoodMembersState.member) {
+            BlackwoodMembersState.member.points_total = Number(BlackwoodMembersState.member.points_total || 0) + cleanPoints;
+        }
+
+        BlackwoodMembersState.points.unshift({
+            points: cleanPoints,
+            reason: reason || "Blackwood Circle activity",
+            created_at: new Date().toISOString()
+        });
+
+        const homePointsTotal = document.getElementById("circle-home-points-total");
+
+        if (homePointsTotal) {
+            homePointsTotal.textContent = String(Number(homePointsTotal.textContent || 0) + cleanPoints);
+        }
+
+        const pointsList = document.querySelector(".circle-points-list");
+
+        if (pointsList) {
+            pointsList.innerHTML = renderPointsHistory();
+        }
+    }
+
+    function normaliseRpcResult(data) {
+        if (!data) {
+            return {};
+        }
+
+        if (typeof data === "string") {
+            try {
+                return JSON.parse(data);
+            } catch (error) {
+                return {};
+            }
+        }
+
+        return data;
+    }
+
+    function clampBehindFilesIndex(index, posts) {
+        if (!Array.isArray(posts) || !posts.length) {
+            return 0;
+        }
+
+        if (index < 0) {
+            return 0;
+        }
+
+        if (index >= posts.length) {
+            return posts.length - 1;
+        }
+
+        return index;
+    }
+
+    function formatBehindFileDate(value) {
+        if (!value) {
+            return "Filed in the archive";
+        }
+
+        const date = new Date(`${value}T12:00:00`);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
+
+        return date.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+    }
 
     function getPasswordResetRedirectUrl() {
         return `${window.location.origin}${BLACKWOOD_MEMBERS_CONFIG.membersPagePath}?reset-password=1`;
@@ -3875,10 +3832,6 @@
             hash.includes("type=recovery")
         );
     }
-
-    // =========================
-    // RENDER HELPERS
-    // =========================
 
     function renderLoadingState(message) {
         BlackwoodMembersState.app.innerHTML = `
@@ -3916,7 +3869,7 @@
 
         if (!status) return;
 
-        status.textContent = message;
+        status.textContent = message || "";
         status.classList.remove("is-success", "is-error", "is-loading");
 
         if (className) {
@@ -3929,7 +3882,7 @@
 
         if (!status) return;
 
-        status.textContent = message;
+        status.textContent = message || "";
         status.classList.remove("is-success", "is-error", "is-loading");
 
         if (className) {
@@ -4173,626 +4126,3 @@
         return escapeHtml(value).replace(/`/g, "&#096;");
     }
 })();
-/* =========================
-   PHASE 2D — ADMIN REWARD FULFILMENT DESK
-========================= */
-
-.circle-admin-reward-section {
-    position: relative;
-}
-
-.circle-admin-reward-desk {
-    position: relative;
-    overflow: hidden;
-
-    border: 1px solid rgba(196, 122, 44, 0.28);
-    border-radius: 10px;
-
-    background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.13), transparent 36%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008)),
-        rgba(0, 0, 0, 0.46);
-
-    box-shadow:
-        0 20px 54px rgba(0, 0, 0, 0.34),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
-}
-
-.circle-admin-reward-summary {
-    position: relative;
-
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(180px, auto);
-    gap: 22px;
-    align-items: center;
-
-    padding: clamp(20px, 3vw, 30px);
-
-    cursor: pointer;
-    list-style: none;
-}
-
-.circle-admin-reward-summary::-webkit-details-marker {
-    display: none;
-}
-
-.circle-admin-reward-summary::marker {
-    content: "";
-}
-
-.circle-admin-reward-summary::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.08), transparent 52%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 46%);
-}
-
-.circle-admin-reward-summary > * {
-    position: relative;
-    z-index: 1;
-}
-
-.circle-admin-reward-summary h2 {
-    margin: 0 0 10px;
-
-    color: var(--circle-cream, #f3eadc);
-
-    font-size: clamp(28px, 4vw, 42px);
-    line-height: 1.05;
-    font-weight: 400;
-}
-
-.circle-admin-reward-summary p {
-    max-width: 780px;
-    margin: 0;
-
-    color: rgba(239, 231, 220, 0.66);
-
-    font-size: 14.5px;
-    line-height: 1.65;
-}
-
-.circle-admin-reward-summary-side {
-    display: grid;
-    gap: 7px;
-    justify-items: end;
-
-    text-align: right;
-}
-
-.circle-admin-reward-summary-side span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    min-height: 34px;
-
-    padding: 8px 13px;
-
-    border: 1px solid rgba(196, 122, 44, 0.44);
-    border-radius: 999px;
-
-    background: rgba(0, 0, 0, 0.44);
-    color: rgba(214, 177, 129, 0.95);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    line-height: 1;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.circle-admin-reward-summary-side small {
-    max-width: 230px;
-
-    color: rgba(239, 231, 220, 0.54);
-
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.circle-admin-reward-panel {
-    padding: 0 clamp(16px, 3vw, 30px) clamp(20px, 3vw, 30px);
-
-    border-top: 1px solid rgba(196, 122, 44, 0.16);
-}
-
-/* Filters */
-
-.circle-admin-reward-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-
-    margin: 22px 0 16px;
-}
-
-.circle-admin-reward-filters button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    min-height: 34px;
-
-    padding: 7px 10px;
-
-    border: 1px solid rgba(196, 122, 44, 0.24);
-    border-radius: 999px;
-
-    background: rgba(0, 0, 0, 0.36);
-    color: rgba(239, 231, 220, 0.62);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    line-height: 1;
-    text-transform: uppercase;
-
-    cursor: pointer;
-}
-
-.circle-admin-reward-filters button:hover,
-.circle-admin-reward-filters button:focus-visible {
-    border-color: rgba(214, 177, 129, 0.68);
-    color: #efe7dc;
-    outline: none;
-}
-
-.circle-admin-reward-filters button.is-active {
-    border-color: rgba(214, 177, 129, 0.86);
-    background: rgba(196, 122, 44, 0.14);
-    color: #fff1de;
-}
-
-.circle-admin-reward-filters button strong {
-    display: inline-grid;
-    place-items: center;
-
-    min-width: 22px;
-    height: 22px;
-
-    border-radius: 999px;
-
-    background: rgba(255, 255, 255, 0.07);
-    color: rgba(214, 177, 129, 0.92);
-
-    font-size: 10px;
-}
-
-/* Status */
-
-.circle-admin-reward-status {
-    min-height: 20px;
-    margin: 0 0 16px;
-
-    color: rgba(239, 231, 220, 0.58);
-
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.circle-admin-reward-status.is-success {
-    color: var(--circle-success, #9acb9a);
-}
-
-.circle-admin-reward-status.is-error {
-    color: var(--circle-error, #d97c68);
-}
-
-.circle-admin-reward-status.is-loading {
-    color: rgba(255, 255, 255, 0.78);
-}
-
-/* List / Cards */
-
-.circle-admin-reward-list {
-    display: grid;
-    gap: 16px;
-}
-
-.circle-admin-reward-card {
-    position: relative;
-    overflow: hidden;
-
-    padding: clamp(18px, 3vw, 24px);
-
-    border: 1px solid rgba(196, 122, 44, 0.2);
-    border-radius: 9px;
-
-    background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.08), transparent 34%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.006)),
-        rgba(0, 0, 0, 0.36);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.035),
-        0 16px 40px rgba(0, 0, 0, 0.24);
-}
-
-.circle-admin-reward-card::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 0;
-
-    width: 4px;
-
-    background: rgba(196, 122, 44, 0.38);
-}
-
-.circle-admin-reward-card.is-issued::before {
-    background: rgba(154, 203, 154, 0.58);
-}
-
-.circle-admin-reward-card.is-used::before {
-    background: rgba(130, 160, 190, 0.58);
-}
-
-.circle-admin-reward-card.is-cancelled::before {
-    background: rgba(217, 124, 104, 0.62);
-}
-
-.circle-admin-reward-card-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 18px;
-    align-items: start;
-
-    margin-bottom: 16px;
-}
-
-.circle-admin-reward-card-header h3 {
-    margin: 5px 0 8px;
-
-    color: var(--circle-cream, #f3eadc);
-
-    font-size: clamp(22px, 3vw, 30px);
-    line-height: 1.12;
-    font-weight: 400;
-}
-
-.circle-admin-reward-card-header p {
-    margin: 0;
-
-    color: rgba(239, 231, 220, 0.62);
-
-    font-size: 13.5px;
-    line-height: 1.55;
-}
-
-.circle-admin-reward-badges {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 7px;
-}
-
-.circle-reward-badge.is-delivery {
-    border-color: rgba(214, 177, 129, 0.48);
-    background: rgba(196, 122, 44, 0.12);
-    color: rgba(255, 231, 196, 0.92);
-}
-
-/* Meta */
-
-.circle-admin-reward-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-
-    margin: 0 0 16px;
-}
-
-.circle-admin-reward-meta-grid div {
-    padding: 12px;
-
-    border: 1px solid rgba(196, 122, 44, 0.16);
-    border-radius: 7px;
-
-    background: rgba(0, 0, 0, 0.28);
-}
-
-.circle-admin-reward-meta-grid span {
-    display: block;
-
-    margin: 0 0 6px;
-
-    color: rgba(214, 177, 129, 0.76);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
-
-.circle-admin-reward-meta-grid strong {
-    display: block;
-
-    color: rgba(239, 231, 220, 0.88);
-
-    font-size: 13px;
-    line-height: 1.35;
-    font-weight: 700;
-}
-
-/* Delivery */
-
-.circle-admin-delivery-card {
-    display: grid;
-    gap: 14px;
-
-    margin: 0 0 16px;
-    padding: 15px;
-
-    border: 1px solid rgba(154, 203, 154, 0.24);
-    border-radius: 8px;
-
-    background:
-        linear-gradient(180deg, rgba(154, 203, 154, 0.08), rgba(154, 203, 154, 0.025)),
-        rgba(0, 0, 0, 0.28);
-}
-
-.circle-admin-delivery-card.is-needed {
-    border-color: rgba(217, 124, 104, 0.3);
-    background:
-        linear-gradient(180deg, rgba(217, 124, 104, 0.08), rgba(217, 124, 104, 0.025)),
-        rgba(0, 0, 0, 0.28);
-}
-
-.circle-admin-delivery-card strong {
-    display: block;
-
-    margin: 0 0 9px;
-
-    color: #f3eadc;
-
-    font-size: 16px;
-    line-height: 1.3;
-}
-
-.circle-admin-delivery-card address {
-    display: grid;
-    gap: 4px;
-
-    margin: 0;
-
-    color: rgba(239, 231, 220, 0.76);
-
-    font-size: 14px;
-    line-height: 1.45;
-    font-style: normal;
-}
-
-.circle-admin-delivery-card address span {
-    display: block;
-}
-
-.circle-admin-delivery-card p {
-    margin: 0;
-
-    color: rgba(239, 231, 220, 0.64);
-
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.circle-admin-delivery-card p span {
-    display: block;
-
-    margin: 0 0 5px;
-
-    color: rgba(214, 177, 129, 0.82);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-/* Form */
-
-.circle-admin-reward-form {
-    display: grid;
-    gap: 14px;
-}
-
-.circle-admin-reward-form-grid {
-    display: grid;
-    grid-template-columns: minmax(170px, 0.8fr) minmax(170px, 0.8fr) minmax(240px, 1.4fr);
-    gap: 12px;
-    align-items: stretch;
-}
-
-.circle-admin-reward-form label {
-    display: grid;
-    gap: 8px;
-
-    color: rgba(214, 177, 129, 0.86);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    line-height: 1.2;
-    text-transform: uppercase;
-}
-
-.circle-admin-reward-form input,
-.circle-admin-reward-form select,
-.circle-admin-reward-form textarea {
-    width: 100%;
-    box-sizing: border-box;
-
-    border: 1px solid rgba(196, 122, 44, 0.26);
-    border-radius: 6px;
-
-    background: rgba(0, 0, 0, 0.48);
-    color: #f3eadc;
-
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0;
-    text-transform: none;
-}
-
-.circle-admin-reward-form input,
-.circle-admin-reward-form select {
-    min-height: 42px;
-    padding: 9px 11px;
-}
-
-.circle-admin-reward-form textarea {
-    min-height: 94px;
-    padding: 11px;
-    resize: vertical;
-    line-height: 1.55;
-}
-
-.circle-admin-reward-form input:focus,
-.circle-admin-reward-form select:focus,
-.circle-admin-reward-form textarea:focus {
-    border-color: rgba(214, 177, 129, 0.74);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
-}
-
-.circle-admin-reward-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    align-items: center;
-}
-
-.circle-admin-reward-actions .circle-button {
-    min-height: 38px;
-    padding: 10px 14px;
-    font-size: 9px;
-}
-
-.circle-button.is-danger {
-    border-color: rgba(217, 124, 104, 0.58);
-    color: rgba(255, 210, 202, 0.94);
-}
-
-.circle-button.is-danger:hover,
-.circle-button.is-danger:focus-visible {
-    border-color: rgba(255, 160, 145, 0.86);
-    background: rgba(217, 124, 104, 0.16);
-    color: #ffffff;
-}
-
-.circle-admin-reward-actions .circle-button:disabled,
-.circle-admin-reward-form input:disabled,
-.circle-admin-reward-form select:disabled,
-.circle-admin-reward-form textarea:disabled,
-.circle-admin-reward-filters button:disabled {
-    opacity: 0.48;
-    cursor: not-allowed;
-}
-
-.circle-admin-reward-warning {
-    margin: 0;
-    padding: 11px 13px;
-
-    border: 1px solid rgba(217, 124, 104, 0.28);
-    border-radius: 7px;
-
-    background: rgba(217, 124, 104, 0.08);
-    color: rgba(255, 205, 196, 0.86);
-
-    font-size: 13px;
-    line-height: 1.55;
-}
-
-.circle-admin-reward-error {
-    margin-top: 20px;
-}
-
-/* Autofill */
-
-.circle-admin-reward-form input:-webkit-autofill,
-.circle-admin-reward-form input:-webkit-autofill:hover,
-.circle-admin-reward-form input:-webkit-autofill:focus,
-.circle-admin-reward-form textarea:-webkit-autofill,
-.circle-admin-reward-form textarea:-webkit-autofill:hover,
-.circle-admin-reward-form textarea:-webkit-autofill:focus {
-    -webkit-text-fill-color: #efe7dc;
-    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.82) inset;
-    caret-color: #efe7dc;
-}
-
-/* Responsive */
-
-@media (max-width: 980px) {
-    .circle-admin-reward-summary {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-admin-reward-summary-side {
-        justify-items: start;
-        text-align: left;
-    }
-
-    .circle-admin-reward-card-header {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-admin-reward-badges {
-        justify-content: flex-start;
-    }
-
-    .circle-admin-reward-meta-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .circle-admin-reward-form-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 620px) {
-    .circle-admin-reward-summary {
-        padding: 18px;
-    }
-
-    .circle-admin-reward-panel {
-        padding: 0 14px 18px;
-    }
-
-    .circle-admin-reward-filters {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .circle-admin-reward-filters button {
-        justify-content: space-between;
-    }
-
-    .circle-admin-reward-card {
-        padding: 18px 15px;
-    }
-
-    .circle-admin-reward-meta-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .circle-admin-reward-actions {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .circle-admin-reward-actions .circle-button {
-        width: 100%;
-    }
-}
