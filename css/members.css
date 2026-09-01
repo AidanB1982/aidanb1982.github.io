@@ -2579,3 +2579,146 @@ body.members-page.is-circle-signed-in .circle-section {
         width: 100%;
     }
 }
+/* =========================
+   PHASE 2B — REWARD DELIVERY ADDRESS FORM
+========================= */
+
+.circle-delivery-form,
+.circle-delivery-summary {
+    margin-top: 16px;
+    padding: 15px;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 8px;
+
+    background:
+        linear-gradient(135deg, rgba(196, 122, 44, 0.07), transparent 44%),
+        rgba(0, 0, 0, 0.28);
+}
+
+.circle-delivery-heading {
+    margin-bottom: 14px;
+}
+
+.circle-delivery-heading strong,
+.circle-delivery-summary strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #d6b181;
+
+    font-size: 14px;
+}
+
+.circle-delivery-heading p,
+.circle-delivery-summary p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.6);
+
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.circle-delivery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+
+    margin-bottom: 14px;
+}
+
+.circle-delivery-form label {
+    display: grid;
+    gap: 6px;
+
+    color: #d6b181;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.circle-delivery-form input,
+.circle-delivery-form textarea {
+    box-sizing: border-box;
+
+    width: 100%;
+
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    border-radius: 5px;
+
+    background: rgba(0, 0, 0, 0.42);
+    color: #efe7dc;
+
+    font: inherit;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14px;
+    letter-spacing: normal;
+    line-height: 1.4;
+    text-transform: none;
+
+    padding: 10px 11px;
+}
+
+.circle-delivery-form input:focus,
+.circle-delivery-form textarea:focus {
+    border-color: rgba(214, 177, 129, 0.76);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.12);
+}
+
+.circle-delivery-note-field {
+    grid-column: 1 / -1;
+}
+
+.circle-delivery-status {
+    min-height: 18px;
+    margin: 10px 0 0;
+
+    color: rgba(239, 231, 220, 0.58);
+
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.circle-delivery-status.is-success {
+    color: #bde5c5;
+}
+
+.circle-delivery-status.is-error {
+    color: #ffb1a7;
+}
+
+.circle-delivery-status.is-loading {
+    color: #ffd28a;
+}
+
+.circle-delivery-summary.is-received {
+    border-color: rgba(125, 190, 145, 0.34);
+    background:
+        linear-gradient(135deg, rgba(125, 190, 145, 0.07), transparent 44%),
+        rgba(0, 0, 0, 0.28);
+}
+
+.circle-delivery-summary address {
+    display: grid;
+    gap: 3px;
+
+    margin: 10px 0;
+
+    color: rgba(239, 231, 220, 0.82);
+
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+    .circle-delivery-grid {
+        grid-template-columns: 1fr;
+    }
+}
