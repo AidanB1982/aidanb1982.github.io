@@ -2722,3 +2722,23 @@ body.members-page.is-circle-signed-in .circle-section {
         grid-template-columns: 1fr;
     }
 }
+/* =========================
+   PHASE 2B — DELIVERY FORM AUTOFILL POLISH
+========================= */
+
+.circle-delivery-form input:-webkit-autofill,
+.circle-delivery-form input:-webkit-autofill:hover,
+.circle-delivery-form input:-webkit-autofill:focus,
+.circle-delivery-form textarea:-webkit-autofill,
+.circle-delivery-form textarea:-webkit-autofill:hover,
+.circle-delivery-form textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #efe7dc;
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.82) inset;
+    caret-color: #efe7dc;
+}
+
+@media (max-width: 620px) {
+    .circle-delivery-form button[type="submit"] {
+        width: 100% !important;
+    }
+}
