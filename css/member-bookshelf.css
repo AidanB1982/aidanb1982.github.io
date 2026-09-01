@@ -1,5 +1,7 @@
 /* =========================
    BLACKWOOD MEMBER BOOKSHELF
+   /css/member-bookshelf.css
+   Phase 2C: Drawer + shelf stages + rearrange controls
 ========================= */
 
 .blackwood-bookshelf-section {
@@ -11,53 +13,237 @@
     position: relative;
 }
 
+/* =========================
+   BOOKSHELF DRAWER
+========================= */
+
+.bookshelf-drawer {
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 9px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.11), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+        rgba(0, 0, 0, 0.42);
+
+    box-shadow:
+        0 18px 52px rgba(0, 0, 0, 0.34),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.bookshelf-drawer-summary {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+
+    padding: clamp(18px, 3vw, 28px);
+
+    cursor: pointer;
+    list-style: none;
+}
+
+.bookshelf-drawer-summary::-webkit-details-marker {
+    display: none;
+}
+
+.bookshelf-drawer-summary::marker {
+    content: "";
+}
+
+.bookshelf-drawer-summary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.08), transparent 48%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 42%);
+
+    opacity: 0.8;
+}
+
+.bookshelf-drawer-summary > * {
+    position: relative;
+    z-index: 1;
+}
+
+.bookshelf-drawer-summary:hover,
+.bookshelf-drawer-summary:focus-visible {
+    outline: none;
+}
+
+.bookshelf-drawer-summary:hover .bookshelf-total-pill,
+.bookshelf-drawer-summary:focus-visible .bookshelf-total-pill {
+    border-color: rgba(214, 177, 129, 0.78);
+    color: #efe7dc;
+}
+
+.bookshelf-drawer-title-block h2 {
+    margin: 0 0 9px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(26px, 4vw, 42px);
+    line-height: 1.04;
+    font-weight: 400;
+}
+
+.bookshelf-drawer-title-block p {
+    max-width: 760px;
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.68);
+
+    font-size: 14.5px;
+    line-height: 1.62;
+}
+
+.bookshelf-drawer-summary-side {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.bookshelf-total-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+
+    padding: 7px 11px;
+
+    border: 1px solid rgba(196, 122, 44, 0.38);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.42);
+    color: rgba(214, 177, 129, 0.9);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.bookshelf-drawer-chevrons {
+    position: relative;
+
+    width: 30px;
+    height: 30px;
+
+    border: 1px solid rgba(196, 122, 44, 0.32);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.34);
+}
+
+.bookshelf-drawer-chevrons::before {
+    content: "⌄";
+
+    position: absolute;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    color: rgba(214, 177, 129, 0.9);
+
+    font-size: 18px;
+    line-height: 1;
+
+    transform: translateY(-2px);
+    transition: transform 180ms ease;
+}
+
+.bookshelf-drawer[open] .bookshelf-drawer-chevrons::before {
+    transform: translateY(1px) rotate(180deg);
+}
+
+.bookshelf-drawer-panel {
+    padding: 0 clamp(16px, 3vw, 28px) clamp(18px, 3vw, 28px);
+
+    border-top: 1px solid rgba(196, 122, 44, 0.16);
+}
+
+/* =========================
+   HEADER
+========================= */
+
 .bookshelf-header {
     display: flex;
     justify-content: space-between;
     gap: 24px;
     align-items: flex-start;
-    margin-bottom: 24px;
+
+    margin: 22px 0 20px;
 }
 
 .bookshelf-kicker {
     margin: 0 0 8px;
+
     color: rgba(214, 177, 129, 0.9);
-    font-size: 11px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.22em;
     line-height: 1.2;
     text-transform: uppercase;
 }
 
-.bookshelf-header h2 {
+.bookshelf-header h2,
+.bookshelf-header h3 {
     margin: 0;
+
     color: var(--circle-cream, #f3eadc);
-    font-size: clamp(30px, 4vw, 52px);
-    line-height: 1.02;
+
+    font-size: clamp(24px, 3vw, 34px);
+    line-height: 1.08;
     font-weight: 400;
 }
 
 .bookshelf-header p {
     max-width: 720px;
-    margin: 12px 0 0;
-    color: rgba(239, 231, 220, 0.68);
-    font-size: 15px;
-    line-height: 1.7;
+    margin: 10px 0 0;
+
+    color: rgba(239, 231, 220, 0.66);
+
+    font-size: 14px;
+    line-height: 1.65;
 }
 
 .bookshelf-add-button,
 .bookshelf-modal-button {
+    box-sizing: border-box;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 42px;
-    padding: 12px 17px;
+
+    min-height: 40px;
+
+    padding: 11px 16px;
+
     border: 1px solid rgba(196, 122, 44, 0.72);
     border-radius: 999px;
+
     background:
         linear-gradient(180deg, rgba(196, 122, 44, 0.22), rgba(89, 42, 15, 0.2)),
         rgba(0, 0, 0, 0.45);
+
     color: #fff1de;
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     font-weight: 800;
@@ -66,7 +252,9 @@
     text-align: center;
     text-decoration: none;
     text-transform: uppercase;
+
     cursor: pointer;
+
     transition:
         transform 180ms ease,
         border-color 180ms ease,
@@ -79,10 +267,13 @@
 .bookshelf-modal-button:hover,
 .bookshelf-modal-button:focus-visible {
     transform: translateY(-1px);
+
     border-color: rgba(214, 177, 129, 0.95);
+
     background:
         linear-gradient(180deg, rgba(196, 122, 44, 0.32), rgba(89, 42, 15, 0.26)),
         rgba(0, 0, 0, 0.55);
+
     color: #ffffff;
     outline: none;
 }
@@ -97,88 +288,299 @@
 .bookshelf-status {
     min-height: 20px;
     margin: 0 0 18px;
+
     color: rgba(239, 231, 220, 0.58);
+
     font-size: 13px;
     line-height: 1.5;
 }
 
 .bookshelf-status.is-success {
-    color: var(--circle-success, #9acb9a);
+    color: var(--circle-success, #d6b181);
 }
 
 .bookshelf-status.is-error {
-    color: var(--circle-error, #d97c68);
+    color: var(--circle-error, #ffb1a7);
 }
 
 .bookshelf-status.is-loading {
     color: rgba(255, 255, 255, 0.76);
 }
 
-/* Shelf */
+/* =========================
+   STAGE SUMMARY PILLS
+========================= */
+
+.bookshelf-stage-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin: 0 0 18px;
+}
+
+.bookshelf-stage-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 30px;
+
+    padding: 6px 10px;
+
+    border: 1px solid rgba(196, 122, 44, 0.22);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.32);
+    color: rgba(239, 231, 220, 0.58);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.bookshelf-stage-pill strong {
+    color: rgba(214, 177, 129, 0.88);
+    font-weight: 800;
+}
+
+.bookshelf-stage-pill span {
+    display: inline-grid;
+    place-items: center;
+
+    min-width: 20px;
+    height: 20px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(239, 231, 220, 0.72);
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.bookshelf-stage-pill.has-books {
+    border-color: rgba(196, 122, 44, 0.38);
+    background: rgba(196, 122, 44, 0.07);
+}
+
+.bookshelf-stage-pill.has-books span {
+    background: rgba(196, 122, 44, 0.16);
+    color: #f0cf9a;
+}
+
+/* =========================
+   SHELF BOARD / STAGES
+========================= */
 
 .bookshelf-board {
-    position: relative;
-    padding: 28px 26px 34px;
-    border: 1px solid rgba(196, 122, 44, 0.22);
-    background:
-        radial-gradient(circle at 20% 0%, rgba(196, 122, 44, 0.1), transparent 34%),
-        linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.76));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.04),
-        0 20px 50px rgba(0, 0, 0, 0.34);
-    overflow-x: auto;
+    display: grid;
+    gap: 18px;
 }
 
-.bookshelf-board::after {
+.bookshelf-stage {
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 9px;
+
+    padding: 18px 18px 26px;
+
+    background:
+        radial-gradient(circle at 20% 0%, rgba(196, 122, 44, 0.08), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.006)),
+        rgba(0, 0, 0, 0.35);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.035),
+        0 16px 38px rgba(0, 0, 0, 0.24);
+}
+
+.bookshelf-stage::after {
     content: "";
     position: absolute;
-    left: 22px;
-    right: 22px;
-    bottom: 22px;
-    height: 13px;
-    border-top: 1px solid rgba(214, 177, 129, 0.35);
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+
+    height: 15px;
+
+    border-top: 1px solid rgba(214, 177, 129, 0.33);
+
     background:
         linear-gradient(180deg, rgba(120, 70, 34, 0.44), rgba(35, 17, 8, 0.88));
+
     box-shadow:
-        0 -6px 18px rgba(0, 0, 0, 0.42),
-        0 8px 28px rgba(0, 0, 0, 0.62);
+        0 -6px 18px rgba(0, 0, 0, 0.38),
+        0 8px 28px rgba(0, 0, 0, 0.56);
 }
+
+.bookshelf-stage.is-empty::after {
+    opacity: 0.3;
+}
+
+.bookshelf-stage-header {
+    position: relative;
+    z-index: 2;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+
+    margin-bottom: 16px;
+}
+
+.bookshelf-stage-header h3 {
+    margin: 0 0 5px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1.08;
+    font-weight: 400;
+}
+
+.bookshelf-stage-header p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.58);
+
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.bookshelf-stage-header > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 28px;
+
+    padding: 6px 10px;
+
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.36);
+    color: rgba(214, 177, 129, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.bookshelf-stage-empty {
+    position: relative;
+    z-index: 2;
+
+    padding: 22px 14px 30px;
+
+    border: 1px dashed rgba(196, 122, 44, 0.14);
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.bookshelf-stage-empty p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.42);
+
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* =========================
+   BOOK SPINES
+========================= */
 
 .bookshelf-spine-list {
     position: relative;
     z-index: 2;
+
     display: flex;
     align-items: flex-end;
-    gap: 8px;
-    min-height: 270px;
-    padding: 0 4px 10px;
+    gap: 12px;
+
+    min-height: 360px;
+
+    padding: 18px 4px 4px;
+
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196, 122, 44, 0.5) rgba(255, 255, 255, 0.05);
+}
+
+.bookshelf-spine-list::-webkit-scrollbar {
+    height: 8px;
+}
+
+.bookshelf-spine-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.bookshelf-spine-list::-webkit-scrollbar-thumb {
+    background: rgba(196, 122, 44, 0.42);
+    border-radius: 999px;
 }
 
 .bookshelf-book-slot {
     position: relative;
+
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
     align-items: center;
-    flex: 0 0 auto;
+    justify-content: flex-end;
+
+    width: 112px;
+    min-height: 332px;
 }
 
 .bookshelf-spine-button {
     position: relative;
+
     display: block;
-    width: 68px;
-    height: 248px;
+
+    width: 82px;
+    height: 300px;
+
     padding: 0;
-    border: 1px solid rgba(214, 177, 129, 0.18);
-    border-radius: 4px;
-    background: #080604;
+
+    border: 1px solid rgba(214, 177, 129, 0.2);
+    border-radius: 5px;
+
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 20%),
+        #080604;
+
     box-shadow:
-        inset 9px 0 12px rgba(255, 255, 255, 0.045),
-        inset -12px 0 18px rgba(0, 0, 0, 0.45),
-        8px 14px 24px rgba(0, 0, 0, 0.48);
+        inset 8px 0 12px rgba(255, 255, 255, 0.08),
+        inset -14px 0 22px rgba(0, 0, 0, 0.52),
+        12px 18px 28px rgba(0, 0, 0, 0.58),
+        -3px 0 0 rgba(255, 255, 255, 0.035);
+
     cursor: pointer;
     overflow: hidden;
-    transform: perspective(900px) rotateY(-8deg);
+
+    transform:
+        perspective(900px)
+        rotateY(-10deg)
+        rotateZ(-0.35deg);
+
     transform-origin: bottom center;
+
     transition:
         transform 220ms ease,
         box-shadow 220ms ease,
@@ -186,32 +588,117 @@
         filter 220ms ease;
 }
 
+.bookshelf-spine-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.12),
+            transparent 18%,
+            transparent 72%,
+            rgba(0, 0, 0, 0.42)
+        );
+
+    mix-blend-mode: screen;
+    opacity: 0.38;
+}
+
+.bookshelf-spine-button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -7px;
+    bottom: 0;
+    z-index: 1;
+
+    width: 9px;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(214, 177, 129, 0.16),
+            rgba(40, 20, 10, 0.5)
+        );
+
+    transform: skewY(-3deg);
+    transform-origin: left center;
+}
+
 .bookshelf-spine-button:hover,
 .bookshelf-spine-button:focus-visible {
     border-color: rgba(214, 177, 129, 0.68);
+
     box-shadow:
-        inset 9px 0 12px rgba(255, 255, 255, 0.06),
-        inset -12px 0 18px rgba(0, 0, 0, 0.42),
-        12px 18px 34px rgba(0, 0, 0, 0.62),
-        0 0 22px rgba(196, 122, 44, 0.16);
+        inset 8px 0 12px rgba(255, 255, 255, 0.1),
+        inset -14px 0 22px rgba(0, 0, 0, 0.48),
+        16px 24px 42px rgba(0, 0, 0, 0.72),
+        0 0 28px rgba(196, 122, 44, 0.2);
+
     filter: brightness(1.1) saturate(1.04);
     outline: none;
-    transform: perspective(900px) rotateY(-2deg) translateY(-10px);
+
+    transform:
+        perspective(900px)
+        rotateY(-3deg)
+        rotateZ(0deg)
+        translateY(-12px);
+}
+
+.bookshelf-spine-button.is-owned {
+    border-color: rgba(214, 177, 129, 0.3);
+}
+
+.bookshelf-spine-button.is-read {
+    box-shadow:
+        inset 8px 0 12px rgba(255, 255, 255, 0.08),
+        inset -14px 0 22px rgba(0, 0, 0, 0.52),
+        12px 18px 28px rgba(0, 0, 0, 0.58),
+        0 0 18px rgba(214, 177, 129, 0.08);
+}
+
+.bookshelf-spine-button.is-signed {
+    border-color: rgba(214, 177, 129, 0.48);
+}
+
+.bookshelf-spine-button.is-favourite {
+    border-color: rgba(125, 190, 145, 0.56);
+    box-shadow:
+        inset 8px 0 12px rgba(255, 255, 255, 0.09),
+        inset -14px 0 22px rgba(0, 0, 0, 0.48),
+        12px 18px 28px rgba(0, 0, 0, 0.58),
+        0 0 24px rgba(125, 190, 145, 0.12);
 }
 
 .bookshelf-spine-button img {
     display: block;
+
     width: 100%;
     height: 100%;
-    object-fit: cover;
+
+    object-fit: contain !important;
+    object-position: center center !important;
+
+    background: #080604;
 }
 
 .bookshelf-spine-fallback {
     display: none;
+
     padding: 16px 6px;
+
     color: #f3eadc;
+
     writing-mode: vertical-rl;
     text-orientation: mixed;
+
     font-size: 13px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -225,42 +712,121 @@
     display: block;
 }
 
+/* Hidden visually, but left in JS safely */
 .bookshelf-spine-badges {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 4px;
-    max-width: 82px;
-    min-height: 19px;
-    margin-top: 8px;
+    display: none !important;
 }
 
-.bookshelf-spine-badges span {
-    display: inline-flex;
-    align-items: center;
-    min-height: 17px;
-    padding: 3px 5px;
-    border: 1px solid rgba(196, 122, 44, 0.24);
-    border-radius: 999px;
-    color: rgba(214, 177, 129, 0.82);
-    background: rgba(0, 0, 0, 0.38);
+/* =========================
+   QUICK MOVE / REARRANGE CONTROLS
+========================= */
+
+.bookshelf-spine-controls {
+    display: grid;
+    gap: 7px;
+
+    width: 100%;
+    margin-top: 12px;
+}
+
+.bookshelf-spine-controls label {
+    display: grid;
+    gap: 5px;
+}
+
+.bookshelf-spine-controls label > span {
+    color: rgba(214, 177, 129, 0.72);
+
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 8px;
     font-weight: 800;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.13em;
     line-height: 1;
+    text-align: center;
     text-transform: uppercase;
 }
 
+.bookshelf-spine-controls select {
+    width: 100%;
+    min-height: 30px;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 5px;
+
+    background: rgba(0, 0, 0, 0.62);
+    color: rgba(239, 231, 220, 0.78);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    padding: 6px 7px;
+}
+
+.bookshelf-spine-controls select:focus {
+    border-color: rgba(214, 177, 129, 0.72);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
+}
+
+.bookshelf-order-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.bookshelf-order-controls button {
+    min-height: 28px;
+
+    border: 1px solid rgba(196, 122, 44, 0.26);
+    border-radius: 5px;
+
+    background: rgba(0, 0, 0, 0.42);
+    color: rgba(214, 177, 129, 0.76);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.11em;
+    line-height: 1;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.bookshelf-order-controls button:hover,
+.bookshelf-order-controls button:focus-visible {
+    border-color: rgba(214, 177, 129, 0.72);
+    color: #efe7dc;
+    outline: none;
+}
+
+.bookshelf-order-controls button:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
 .bookshelf-empty-card {
     padding: 28px;
+
     border: 1px dashed rgba(196, 122, 44, 0.28);
+    border-radius: 8px;
+
     background: rgba(0, 0, 0, 0.32);
+
     text-align: center;
 }
 
 .bookshelf-empty-card h3 {
     margin: 0 0 10px;
+
     color: var(--circle-cream, #f3eadc);
+
     font-size: 28px;
     font-weight: 400;
 }
@@ -268,34 +834,56 @@
 .bookshelf-empty-card p {
     max-width: 620px;
     margin: 0 auto 18px;
+
     color: rgba(239, 231, 220, 0.66);
+
     line-height: 1.7;
 }
 
-/* Modal */
+.bookshelf-empty-card p:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================
+   MODAL
+========================= */
 
 .bookshelf-modal {
     position: fixed;
     inset: 0;
     z-index: 10000;
+
     display: grid;
     place-items: center;
+
     padding: 24px;
-    background: rgba(0, 0, 0, 0.78);
+
+    background:
+        radial-gradient(circle at top, rgba(196, 122, 44, 0.14), transparent 38%),
+        rgba(0, 0, 0, 0.78);
+
     backdrop-filter: blur(8px);
+
     animation: bookshelfFadeIn 180ms ease both;
 }
 
 .bookshelf-modal-panel {
     position: relative;
+
     width: min(920px, 100%);
     max-height: min(86vh, 860px);
+
     overflow: auto;
+
     border: 1px solid rgba(196, 122, 44, 0.32);
+    border-radius: 10px;
+
     background:
         radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 34%),
         linear-gradient(180deg, rgba(16, 11, 8, 0.98), rgba(5, 4, 3, 0.98));
+
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.72);
+
     animation: bookshelfPanelIn 220ms ease both;
 }
 
@@ -303,19 +891,26 @@
     position: sticky;
     top: 0;
     z-index: 3;
+
     display: block;
+
     width: 100%;
+
     padding: 13px 18px;
+
     border: 0;
     border-bottom: 1px solid rgba(196, 122, 44, 0.18);
+
     background: rgba(0, 0, 0, 0.62);
     color: rgba(214, 177, 129, 0.88);
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.16em;
     text-align: right;
     text-transform: uppercase;
+
     cursor: pointer;
 }
 
@@ -331,7 +926,10 @@
 
 .bookshelf-modal-kicker {
     margin: 0 0 8px;
+
     color: rgba(214, 177, 129, 0.88);
+
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.2em;
@@ -340,7 +938,9 @@
 
 .bookshelf-modal-title {
     margin: 0 0 12px;
+
     color: var(--circle-cream, #f3eadc);
+
     font-size: clamp(30px, 4vw, 48px);
     line-height: 1.04;
     font-weight: 400;
@@ -349,10 +949,16 @@
 .bookshelf-modal-copy {
     max-width: 680px;
     margin: 0 0 24px;
+
     color: rgba(239, 231, 220, 0.66);
+
     font-size: 14px;
     line-height: 1.7;
 }
+
+/* =========================
+   PICKER
+========================= */
 
 .bookshelf-picker-grid {
     display: grid;
@@ -362,15 +968,22 @@
 
 .bookshelf-picker-book {
     display: grid;
-    grid-template-columns: 46px 1fr;
+    grid-template-columns: 46px minmax(0, 1fr);
     gap: 14px;
     align-items: center;
+
     min-height: 120px;
+
     padding: 12px;
+
     border: 1px solid rgba(196, 122, 44, 0.22);
+    border-radius: 8px;
+
     background: rgba(0, 0, 0, 0.34);
     color: inherit;
+
     text-align: left;
+
     cursor: pointer;
 }
 
@@ -384,31 +997,45 @@
 .bookshelf-picker-book img {
     width: 42px;
     height: 96px;
-    object-fit: cover;
+
+    object-fit: contain;
+
     border-radius: 3px;
+
+    background: #080604;
+
     box-shadow: 5px 8px 16px rgba(0, 0, 0, 0.45);
 }
 
 .bookshelf-picker-book strong {
     display: block;
+
     color: #f3eadc;
+
     font-size: 15px;
     line-height: 1.25;
 }
 
 .bookshelf-picker-book span {
     display: block;
-    margin-top: 5px;
+
+    min-width: 0;
+
     color: rgba(214, 177, 129, 0.76);
+
     font-size: 11px;
     letter-spacing: 0.08em;
     line-height: 1.35;
     text-transform: uppercase;
 }
 
+/* =========================
+   RECORD FORM
+========================= */
+
 .bookshelf-record-layout {
     display: grid;
-    grid-template-columns: 110px 1fr;
+    grid-template-columns: 110px minmax(0, 1fr);
     gap: clamp(18px, 4vw, 34px);
     align-items: start;
 }
@@ -416,13 +1043,19 @@
 .bookshelf-record-spine {
     width: 90px;
     height: 320px;
-    object-fit: cover;
+
+    object-fit: contain;
+
     border: 1px solid rgba(214, 177, 129, 0.2);
     border-radius: 4px;
+
+    background: #080604;
+
     box-shadow:
         inset 8px 0 12px rgba(255, 255, 255, 0.06),
         inset -10px 0 16px rgba(0, 0, 0, 0.35),
         12px 18px 34px rgba(0, 0, 0, 0.55);
+
     transform: perspective(900px) rotateY(-6deg);
 }
 
@@ -441,16 +1074,22 @@
 .bookshelf-field {
     display: grid;
     gap: 8px;
+
     color: rgba(239, 231, 220, 0.76);
+
     font-size: 13px;
     line-height: 1.45;
 }
 
 .bookshelf-check {
-    grid-template-columns: 18px 1fr;
+    grid-template-columns: 18px minmax(0, 1fr);
     align-items: start;
+
     padding: 12px;
+
     border: 1px solid rgba(196, 122, 44, 0.16);
+    border-radius: 7px;
+
     background: rgba(0, 0, 0, 0.28);
 }
 
@@ -459,8 +1098,10 @@
     accent-color: #c47a2c;
 }
 
-.bookshelf-field span {
+.bookshelf-field > span {
     color: rgba(214, 177, 129, 0.88);
+
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.16em;
@@ -471,9 +1112,13 @@
 .bookshelf-field textarea {
     width: 100%;
     box-sizing: border-box;
+
     border: 1px solid rgba(196, 122, 44, 0.28);
+    border-radius: 5px;
+
     background: rgba(0, 0, 0, 0.48);
     color: #f3eadc;
+
     font-family: Georgia, "Times New Roman", serif;
     font-size: 15px;
 }
@@ -485,8 +1130,11 @@
 
 .bookshelf-field textarea {
     min-height: 140px;
+
     padding: 12px;
+
     resize: vertical;
+
     line-height: 1.65;
 }
 
@@ -494,6 +1142,7 @@
 .bookshelf-field textarea:focus {
     border-color: rgba(214, 177, 129, 0.72);
     outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
 }
 
 .bookshelf-modal-actions {
@@ -523,17 +1172,42 @@
 .bookshelf-modal-status {
     min-height: 20px;
     margin: 0;
+
     color: rgba(239, 231, 220, 0.58);
+
     font-size: 13px;
 }
 
+.bookshelf-modal-status.is-success {
+    color: var(--circle-success, #d6b181);
+}
+
 .bookshelf-modal-status.is-error {
-    color: var(--circle-error, #d97c68);
+    color: var(--circle-error, #ffb1a7);
 }
 
 .bookshelf-modal-status.is-loading {
     color: rgba(255, 255, 255, 0.76);
 }
+
+/* =========================
+   AUTOFILL POLISH
+========================= */
+
+.bookshelf-field select:-webkit-autofill,
+.bookshelf-field textarea:-webkit-autofill,
+.bookshelf-field select:-webkit-autofill:hover,
+.bookshelf-field textarea:-webkit-autofill:hover,
+.bookshelf-field select:-webkit-autofill:focus,
+.bookshelf-field textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #efe7dc;
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.82) inset;
+    caret-color: #efe7dc;
+}
+
+/* =========================
+   ANIMATION
+========================= */
 
 @keyframes bookshelfFadeIn {
     from {
@@ -557,7 +1231,19 @@
     }
 }
 
-@media (max-width: 820px) {
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+    .bookshelf-drawer-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf-drawer-summary-side {
+        justify-content: space-between;
+    }
+
     .bookshelf-header {
         display: block;
     }
@@ -565,14 +1251,21 @@
     .bookshelf-add-button {
         margin-top: 18px;
     }
+}
 
+@media (max-width: 820px) {
     .bookshelf-spine-list {
-        min-height: 235px;
+        min-height: 330px;
+    }
+
+    .bookshelf-book-slot {
+        width: 100px;
+        min-height: 306px;
     }
 
     .bookshelf-spine-button {
-        width: 58px;
-        height: 212px;
+        width: 70px;
+        height: 260px;
     }
 
     .bookshelf-record-layout {
@@ -589,18 +1282,44 @@
     }
 }
 
-@media (max-width: 560px) {
-    .bookshelf-board {
-        padding: 22px 18px 32px;
+@media (max-width: 620px) {
+    .bookshelf-drawer-panel {
+        padding: 0 14px 18px;
+    }
+
+    .bookshelf-stage {
+        padding: 16px 14px 24px;
+    }
+
+    .bookshelf-stage-header {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf-stage-header > span {
+        width: fit-content;
     }
 
     .bookshelf-spine-list {
-        min-height: 210px;
+        min-height: 300px;
+        gap: 10px;
+    }
+
+    .bookshelf-book-slot {
+        width: 92px;
+        min-height: 282px;
     }
 
     .bookshelf-spine-button {
-        width: 50px;
-        height: 186px;
+        width: 58px;
+        height: 220px;
+    }
+
+    .bookshelf-spine-controls select {
+        font-size: 9.5px;
+    }
+
+    .bookshelf-order-controls {
+        grid-template-columns: 1fr;
     }
 
     .bookshelf-picker-grid {
@@ -614,199 +1333,56 @@
     .bookshelf-modal-inner {
         padding: 20px;
     }
+
+    .bookshelf-modal-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .bookshelf-modal-button {
+        width: 100%;
+    }
 }
+
+@media (max-width: 460px) {
+    .bookshelf-stage-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .bookshelf-stage-pill {
+        justify-content: space-between;
+    }
+
+    .bookshelf-picker-book {
+        grid-template-columns: 38px minmax(0, 1fr);
+    }
+
+    .bookshelf-picker-book img {
+        width: 36px;
+        height: 86px;
+    }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
 
 @media (prefers-reduced-motion: reduce) {
     .bookshelf-spine-button,
     .bookshelf-add-button,
     .bookshelf-modal,
     .bookshelf-modal-panel,
-    .bookshelf-modal-button {
-        animation: none;
-        transition: none;
+    .bookshelf-modal-button,
+    .bookshelf-drawer-chevrons::before {
+        animation: none !important;
+        transition: none !important;
     }
 
     .bookshelf-spine-button,
     .bookshelf-spine-button:hover,
     .bookshelf-spine-button:focus-visible,
     .bookshelf-record-spine {
-        transform: none;
+        transform: none !important;
     }
-}
-/* =========================
-   BOOKSHELF — ACTUAL SPINE POLISH
-========================= */
-
-.bookshelf-spine-list {
-    align-items: flex-end;
-    min-height: 330px;
-    padding-bottom: 0;
-}
-
-.bookshelf-book-slot {
-    justify-content: flex-end;
-    min-height: 300px;
-}
-
-.bookshelf-spine-button {
-    width: 82px;
-    height: 300px;
-    border-radius: 5px;
-    transform:
-        perspective(900px)
-        rotateY(-10deg)
-        rotateZ(-0.35deg);
-
-    box-shadow:
-        inset 8px 0 12px rgba(255, 255, 255, 0.08),
-        inset -14px 0 22px rgba(0, 0, 0, 0.52),
-        12px 18px 28px rgba(0, 0, 0, 0.58),
-        -3px 0 0 rgba(255, 255, 255, 0.035);
-}
-
-.bookshelf-spine-button::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255, 255, 255, 0.12),
-            transparent 18%,
-            transparent 72%,
-            rgba(0, 0, 0, 0.42)
-        );
-    mix-blend-mode: screen;
-    opacity: 0.38;
-}
-
-.bookshelf-spine-button::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: -7px;
-    bottom: 0;
-    width: 9px;
-    z-index: 1;
-    pointer-events: none;
-    background:
-        linear-gradient(
-            180deg,
-            rgba(214, 177, 129, 0.16),
-            rgba(40, 20, 10, 0.5)
-        );
-    transform: skewY(-3deg);
-    transform-origin: left center;
-}
-
-.bookshelf-spine-button:hover,
-.bookshelf-spine-button:focus-visible {
-    transform:
-        perspective(900px)
-        rotateY(-3deg)
-        rotateZ(0deg)
-        translateY(-12px);
-
-    box-shadow:
-        inset 8px 0 12px rgba(255, 255, 255, 0.1),
-        inset -14px 0 22px rgba(0, 0, 0, 0.48),
-        16px 24px 42px rgba(0, 0, 0, 0.72),
-        0 0 28px rgba(196, 122, 44, 0.2);
-}
-
-.bookshelf-spine-button img {
-    object-fit: cover;
-    object-position: center center;
-}
-
-.bookshelf-spine-badges {
-    position: absolute;
-    left: 50%;
-    bottom: -50px;
-    transform: translateX(-50%);
-    width: 110px;
-    margin-top: 0;
-}
-
-.bookshelf-board::after {
-    bottom: 18px;
-    height: 16px;
-}
-
-@media (max-width: 820px) {
-    .bookshelf-spine-list {
-        min-height: 290px;
-    }
-
-    .bookshelf-book-slot {
-        min-height: 270px;
-    }
-
-    .bookshelf-spine-button {
-        width: 70px;
-        height: 260px;
-    }
-
-    .bookshelf-spine-badges {
-        bottom: -46px;
-    }
-}
-
-@media (max-width: 560px) {
-    .bookshelf-spine-list {
-        min-height: 250px;
-    }
-
-    .bookshelf-book-slot {
-        min-height: 232px;
-    }
-
-    .bookshelf-spine-button {
-        width: 58px;
-        height: 220px;
-    }
-
-    .bookshelf-spine-badges {
-        bottom: -42px;
-        width: 96px;
-    }
-}
-/* =========================
-   BOOKSHELF — HIDE SPINE STATUS WORDING
-========================= */
-
-.bookshelf-spine-badges {
-    display: none !important;
-}
-
-.bookshelf-book-slot {
-    min-height: 300px;
-}
-
-.bookshelf-spine-list {
-    padding-bottom: 0;
-}
-/* =========================
-   BOOKSHELF — PREVENT SPINE TOP CROPPING
-========================= */
-
-.bookshelf-spine-button {
-    background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04), transparent 20%),
-        #080604;
-    overflow: hidden;
-}
-
-.bookshelf-spine-button img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain !important;
-    object-position: center center !important;
-    background: #080604;
-}
-
-.bookshelf-spine-list {
-    padding-top: 18px;
 }
