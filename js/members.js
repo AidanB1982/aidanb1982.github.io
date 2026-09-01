@@ -7,6 +7,7 @@
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
 // Phase 2A: Member Home Dashboard summary layer
 // Phase 2B: Rewards polish + delivery address collection
+// Phase 2D: Admin Reward Fulfilment Desk
 // =========================
 
 (function () {
@@ -41,6 +42,64 @@
         }
     ];
 
+    const BLACKWOOD_ADMIN_REWARD_FILTERS = [
+        {
+            id: "all",
+            label: "All"
+        },
+        {
+            id: "pending",
+            label: "Pending"
+        },
+        {
+            id: "address_needed",
+            label: "Address Needed"
+        },
+        {
+            id: "address_received",
+            label: "Address Received"
+        },
+        {
+            id: "issued",
+            label: "Issued"
+        },
+        {
+            id: "used",
+            label: "Used"
+        },
+        {
+            id: "cancelled",
+            label: "Cancelled"
+        }
+    ];
+
+    const BLACKWOOD_ADMIN_DELIVERY_STATUS_OPTIONS = [
+        {
+            value: "",
+            label: "Not set"
+        },
+        {
+            value: "not_required",
+            label: "Not required"
+        },
+        {
+            value: "address_required",
+            label: "Address required"
+        },
+        {
+            value: "address_received",
+            label: "Address received"
+        },
+        {
+            value: "posted",
+            label: "Posted"
+        },
+        {
+            value: "fulfilled",
+            label: "Fulfilled"
+        }
+    ];
+
     const BlackwoodMembersState = {
         app: null,
         client: null,
@@ -54,10 +113,15 @@
         points: [],
         redemptions: [],
         arcAssignments: [],
+        adminRewardRedemptions: [],
+        adminRewardFilter: "all",
+        adminRewardDeskOpen: false,
+        adminRewardLoadError: "",
         activeAuthMode: "signin",
         isRedeeming: false,
         isSubmittingDeliveryAddress: false,
         isReactingToBehindFile: false,
+        isAdminRewardBusy: false,
         isPasswordRecovery: false,
         escapeListenerBound: false
     };
@@ -657,9 +721,14 @@
             BlackwoodMembersState.points = [];
             BlackwoodMembersState.redemptions = [];
             BlackwoodMembersState.arcAssignments = [];
+            BlackwoodMembersState.adminRewardRedemptions = [];
+            BlackwoodMembersState.adminRewardFilter = "all";
+            BlackwoodMembersState.adminRewardDeskOpen = false;
+            BlackwoodMembersState.adminRewardLoadError = "";
             BlackwoodMembersState.isRedeeming = false;
             BlackwoodMembersState.isSubmittingDeliveryAddress = false;
             BlackwoodMembersState.isReactingToBehindFile = false;
+            BlackwoodMembersState.isAdminRewardBusy = false;
 
             updateMemberIntroVisibility(null);
             renderAuthView();
@@ -734,7 +803,10 @@
             if (pointsResult.error) throw pointsResult.error;
             if (redemptionsResult.error) throw redemptionsResult.error;
 
-            BlackwoodMembersState.member = profileResult.data || buildFallbackProfile(user);
+            const memberProfile = profileResult.data || buildFallbackProfile(user);
+            const adminRewardRedemptions = await loadAdminRewardDashboardIfAllowed(memberProfile);
+
+            BlackwoodMembersState.member = memberProfile;
             BlackwoodMembersState.posts = legacyPosts || [];
             BlackwoodMembersState.behindFiles = behindFiles || [];
             BlackwoodMembersState.behindFilesIndex = 0;
@@ -743,6 +815,7 @@
             BlackwoodMembersState.points = pointsResult.data || [];
             BlackwoodMembersState.redemptions = redemptionsResult.data || [];
             BlackwoodMembersState.arcAssignments = arcAssignments || [];
+            BlackwoodMembersState.adminRewardRedemptions = adminRewardRedemptions || [];
 
             renderDashboard();
 
@@ -992,6 +1065,8 @@
 
                 ${renderBookshelfMount()}
 
+                ${renderAdminRewardDesk()}
+
                 ${renderBehindFilesCarousel()}
 
                 <section class="circle-section" aria-labelledby="circle-rewards-title">
@@ -1045,6 +1120,7 @@
         const arcSummary = getArcDashboardSummary(member);
         const rewardSummary = getRewardsDashboardSummary(pointsTotal);
         const redemptionSummary = getRedemptionDashboardSummary();
+        const adminRewardSummary = getAdminRewardDashboardSummary();
         const latestDispatch = getLatestBehindFile();
         const arcHref = isArcMemberProfile(member) ? "#blackwood-arc-profile-root" : "/pages/arc-team.html";
         const arcActionLabel = isArcMemberProfile(member) ? "Open ARC Vault" : "Apply for ARC Team";
@@ -1081,6 +1157,16 @@
                         <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
                             My Bookshelf
                         </a>
+
+                        ${
+                            isAdminProfile(member)
+                                ? `
+                                    <a href="#circle-admin-reward-desk" class="circle-button circle-button-secondary">
+                                        Admin Reward Desk
+                                    </a>
+                                `
+                                : ""
+                        }
                     </div>
                 </div>
 
@@ -1128,6 +1214,18 @@
                         <h3>${escapeHtml(redemptionSummary.headline)}</h3>
                         <p>${escapeHtml(redemptionSummary.detail)}</p>
                     </article>
+
+                    ${
+                        isAdminProfile(member)
+                            ? `
+                                <article class="circle-home-summary-card">
+                                    <span>Admin Rewards</span>
+                                    <h3>${escapeHtml(adminRewardSummary.headline)}</h3>
+                                    <p>${escapeHtml(adminRewardSummary.detail)}</p>
+                                </article>
+                            `
+                            : ""
+                    }
                 </div>
             </section>
         `;
@@ -1310,6 +1408,54 @@
         };
     }
 
+    function getAdminRewardDashboardSummary() {
+        const redemptions = Array.isArray(BlackwoodMembersState.adminRewardRedemptions)
+            ? BlackwoodMembersState.adminRewardRedemptions
+            : [];
+
+        if (BlackwoodMembersState.adminRewardLoadError) {
+            return {
+                headline: "Needs check",
+                detail: "The admin reward desk could not be loaded."
+            };
+        }
+
+        if (!redemptions.length) {
+            return {
+                headline: "Clear",
+                detail: "No reward requests currently need admin attention."
+            };
+        }
+
+        const counts = getAdminRewardFilterCounts(redemptions);
+
+        if (counts.address_received) {
+            return {
+                headline: `${counts.address_received} ready`,
+                detail: "Physical reward address received and waiting fulfilment."
+            };
+        }
+
+        if (counts.address_needed) {
+            return {
+                headline: `${counts.address_needed} address needed`,
+                detail: "Physical rewards are waiting for delivery details."
+            };
+        }
+
+        if (counts.pending) {
+            return {
+                headline: `${counts.pending} pending`,
+                detail: "Reward requests are waiting for review."
+            };
+        }
+
+        return {
+            headline: `${redemptions.length} filed`,
+            detail: "Reward requests are available in the admin desk."
+        };
+    }
+
     function getLatestBehindFile() {
         const posts = getBehindFilesForDisplay();
         const post = posts[0] || null;
@@ -1360,6 +1506,15 @@
             String(member.is_arc_member || "").toLowerCase() === "true";
     }
 
+    function isAdminProfile(member) {
+        if (!member) {
+            return false;
+        }
+
+        return member.is_admin === true ||
+            String(member.is_admin || "").toLowerCase() === "true";
+    }
+
     function bindMemberArcProfile() {
         const root = document.getElementById("blackwood-arc-profile-root");
 
@@ -1402,6 +1557,842 @@
             root,
             client: BlackwoodMembersState.client,
             session: BlackwoodMembersState.session
+        });
+    }
+
+    // =========================
+    // ADMIN REWARD FULFILMENT DESK
+    // =========================
+
+    async function loadAdminRewardDashboardIfAllowed(member) {
+        BlackwoodMembersState.adminRewardLoadError = "";
+
+        if (!isAdminProfile(member)) {
+            return [];
+        }
+
+        try {
+            const { data, error } = await BlackwoodMembersState.client.rpc(
+                "get_member_reward_admin_dashboard"
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            return Array.isArray(data)
+                ? data.map(normaliseAdminRewardRedemption)
+                : [];
+
+        } catch (error) {
+            console.warn("Admin reward dashboard could not be loaded:", error.message || error);
+            BlackwoodMembersState.adminRewardLoadError = cleanSupabaseError(error.message);
+            return [];
+        }
+    }
+
+    function renderAdminRewardDesk() {
+        const member = BlackwoodMembersState.member;
+
+        if (!isAdminProfile(member)) {
+            return "";
+        }
+
+        const redemptions = Array.isArray(BlackwoodMembersState.adminRewardRedemptions)
+            ? BlackwoodMembersState.adminRewardRedemptions
+            : [];
+
+        const filteredRedemptions = getFilteredAdminRewardRedemptions();
+        const counts = getAdminRewardFilterCounts(redemptions);
+        const summary = getAdminRewardDashboardSummary();
+        const openAttribute = BlackwoodMembersState.adminRewardDeskOpen ? "open" : "";
+
+        return `
+            <section 
+                class="circle-section circle-admin-reward-section" 
+                id="circle-admin-reward-desk"
+                aria-labelledby="circle-admin-reward-title"
+            >
+                <details class="circle-admin-reward-desk" data-admin-reward-desk ${openAttribute}>
+                    <summary class="circle-admin-reward-summary">
+                        <div>
+                            <p class="circle-kicker">Admin Only</p>
+                            <h2 id="circle-admin-reward-title">Reward Fulfilment Desk</h2>
+                            <p>
+                                Review reward requests, delivery addresses, discount codes, fulfilment notes,
+                                and status updates from one private admin panel.
+                            </p>
+                        </div>
+
+                        <div class="circle-admin-reward-summary-side">
+                            <span>${escapeHtml(summary.headline)}</span>
+                            <small>${escapeHtml(summary.detail)}</small>
+                        </div>
+                    </summary>
+
+                    <div class="circle-admin-reward-panel">
+                        ${
+                            BlackwoodMembersState.adminRewardLoadError
+                                ? `
+                                    <article class="circle-empty-card circle-admin-reward-error">
+                                        <p>${escapeHtml(BlackwoodMembersState.adminRewardLoadError)}</p>
+                                    </article>
+                                `
+                                : `
+                                    ${renderAdminRewardFilters(counts)}
+
+                                    <p 
+                                        class="circle-admin-reward-status" 
+                                        id="circle-admin-reward-status" 
+                                        aria-live="polite"
+                                    ></p>
+
+                                    ${
+                                        filteredRedemptions.length
+                                            ? `
+                                                <div class="circle-admin-reward-list">
+                                                    ${filteredRedemptions.map(renderAdminRewardCard).join("")}
+                                                </div>
+                                            `
+                                            : `
+                                                <article class="circle-empty-card">
+                                                    <p>No reward requests match this filter.</p>
+                                                </article>
+                                            `
+                                    }
+                                `
+                        }
+                    </div>
+                </details>
+            </section>
+        `;
+    }
+
+    function renderAdminRewardFilters(counts) {
+        return `
+            <div class="circle-admin-reward-filters" aria-label="Admin reward filters">
+                ${BLACKWOOD_ADMIN_REWARD_FILTERS.map(function (filter) {
+                    const isActive = BlackwoodMembersState.adminRewardFilter === filter.id;
+                    const count = counts[filter.id] || 0;
+
+                    return `
+                        <button
+                            type="button"
+                            class="${isActive ? "is-active" : ""}"
+                            data-admin-reward-filter="${escapeAttribute(filter.id)}"
+                            aria-pressed="${isActive ? "true" : "false"}"
+                        >
+                            <span>${escapeHtml(filter.label)}</span>
+                            <strong>${escapeHtml(String(count))}</strong>
+                        </button>
+                    `;
+                }).join("")}
+            </div>
+        `;
+    }
+
+    function renderAdminRewardCard(redemption) {
+        const redemptionId = Number(redemption.redemption_id || 0);
+        const status = normaliseRedemptionStatus(redemption.status);
+        const deliveryStatus = normaliseAdminDeliveryStatus(redemption.delivery_status);
+        const hasAddress = hasAdminDeliveryAddress(redemption);
+        const physicalReward = isAdminPhysicalDeliveryReward(redemption);
+        const needsAddressBeforeIssue = physicalReward &&
+            deliveryStatus === "address_required" &&
+            !hasAddress;
+
+        const requestedDate = redemption.requested_at
+            ? formatDate(redemption.requested_at)
+            : formatDate(redemption.created_at);
+
+        const issuedDate = redemption.issued_at ? formatDate(redemption.issued_at) : "";
+        const usedDate = redemption.used_at ? formatDate(redemption.used_at) : "";
+        const cancelledDate = redemption.cancelled_at ? formatDate(redemption.cancelled_at) : "";
+
+        return `
+            <article 
+                class="circle-admin-reward-card is-${escapeAttribute(status)}"
+                data-admin-redemption-card="${redemptionId}"
+            >
+                <div class="circle-admin-reward-card-header">
+                    <div>
+                        <p class="circle-post-meta">
+                            Request #${escapeHtml(String(redemptionId))} · ${escapeHtml(requestedDate || "Date unknown")}
+                        </p>
+
+                        <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+
+                        <p>
+                            ${escapeHtml(redemption.reader_name || "Unknown reader")}
+                            ${redemption.reader_email ? ` · ${escapeHtml(redemption.reader_email)}` : ""}
+                        </p>
+                    </div>
+
+                    <div class="circle-admin-reward-badges">
+                        <span class="circle-reward-badge is-${escapeAttribute(status)}">
+                            ${escapeHtml(capitalise(status))}
+                        </span>
+
+                        ${
+                            deliveryStatus
+                                ? `
+                                    <span class="circle-reward-badge is-delivery">
+                                        ${escapeHtml(getAdminDeliveryStatusLabel(deliveryStatus))}
+                                    </span>
+                                `
+                                : ""
+                        }
+                    </div>
+                </div>
+
+                <div class="circle-admin-reward-meta-grid">
+                    <div>
+                        <span>Points</span>
+                        <strong>${escapeHtml(String(Number(redemption.points_cost || 0)))}</strong>
+                    </div>
+
+                    <div>
+                        <span>Fulfilment</span>
+                        <strong>${escapeHtml(redemption.fulfilment_state || "Filed")}</strong>
+                    </div>
+
+                    <div>
+                        <span>Issued</span>
+                        <strong>${escapeHtml(issuedDate || "—")}</strong>
+                    </div>
+
+                    <div>
+                        <span>Used / Cancelled</span>
+                        <strong>${escapeHtml(usedDate || cancelledDate || "—")}</strong>
+                    </div>
+                </div>
+
+                ${renderAdminRewardAddressBlock(redemption)}
+
+                <form 
+                    class="circle-admin-reward-form"
+                    data-admin-redemption-form="${redemptionId}"
+                    novalidate
+                >
+                    <div class="circle-admin-reward-form-grid">
+                        <label>
+                            Discount code
+                            <input
+                                type="text"
+                                name="discount_code"
+                                value="${escapeAttribute(redemption.discount_code || "")}"
+                                placeholder="Optional code"
+                            >
+                        </label>
+
+                        <label>
+                            Delivery status
+                            <select name="delivery_status">
+                                ${renderAdminDeliveryStatusOptions(deliveryStatus)}
+                            </select>
+                        </label>
+
+                        <label class="circle-admin-reward-note-field">
+                            Admin note
+                            <textarea
+                                name="admin_note"
+                                rows="3"
+                                maxlength="1000"
+                                placeholder="Private fulfilment note"
+                            >${escapeHtml(redemption.admin_note || "")}</textarea>
+                        </label>
+                    </div>
+
+                    <div class="circle-admin-reward-actions">
+                        <button
+                            type="submit"
+                            class="circle-button circle-button-secondary"
+                            data-admin-redemption-save
+                        >
+                            Save Details
+                        </button>
+
+                        <button
+                            type="button"
+                            class="circle-button circle-button-primary"
+                            data-admin-redemption-action="issued"
+                            data-admin-redemption-id="${redemptionId}"
+                            ${status === "issued" || status === "used" || status === "cancelled" || needsAddressBeforeIssue ? "disabled" : ""}
+                            title="${needsAddressBeforeIssue ? "Delivery address required before issuing this reward." : ""}"
+                        >
+                            Mark Issued
+                        </button>
+
+                        <button
+                            type="button"
+                            class="circle-button circle-button-secondary"
+                            data-admin-redemption-action="used"
+                            data-admin-redemption-id="${redemptionId}"
+                            ${status === "used" || status === "cancelled" ? "disabled" : ""}
+                        >
+                            Mark Used
+                        </button>
+
+                        <button
+                            type="button"
+                            class="circle-button circle-button-secondary is-danger"
+                            data-admin-redemption-action="cancelled"
+                            data-admin-redemption-id="${redemptionId}"
+                            ${status === "used" || status === "cancelled" ? "disabled" : ""}
+                        >
+                            Cancel
+                        </button>
+
+                        ${
+                            hasAddress
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="circle-button circle-button-secondary"
+                                        data-admin-copy-address="${redemptionId}"
+                                    >
+                                        Copy Address
+                                    </button>
+                                `
+                                : ""
+                        }
+
+                        ${
+                            redemption.discount_code
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="circle-button circle-button-secondary"
+                                        data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
+                                    >
+                                        Copy Code
+                                    </button>
+                                `
+                                : ""
+                        }
+                    </div>
+
+                    ${
+                        needsAddressBeforeIssue
+                            ? `
+                                <p class="circle-admin-reward-warning">
+                                    This looks like a physical reward and still needs a delivery address before issuing.
+                                </p>
+                            `
+                            : ""
+                    }
+                </form>
+            </article>
+        `;
+    }
+
+    function renderAdminRewardAddressBlock(redemption) {
+        if (hasAdminDeliveryAddress(redemption)) {
+            return `
+                <div class="circle-admin-delivery-card">
+                    <div>
+                        <strong>Delivery address</strong>
+
+                        <address>
+                            ${formatAdminDeliveryAddressHtml(redemption)}
+                        </address>
+                    </div>
+
+                    ${
+                        redemption.delivery_note
+                            ? `
+                                <p>
+                                    <span>Delivery note</span>
+                                    ${escapeHtml(redemption.delivery_note)}
+                                </p>
+                            `
+                            : ""
+                    }
+                </div>
+            `;
+        }
+
+        if (String(redemption.delivery_status || "").toLowerCase() === "address_required") {
+            return `
+                <div class="circle-admin-delivery-card is-needed">
+                    <strong>Delivery address needed</strong>
+                    <p>The member has not submitted delivery details for this physical reward yet.</p>
+                </div>
+            `;
+        }
+
+        return "";
+    }
+
+    function renderAdminDeliveryStatusOptions(currentValue) {
+        const cleanCurrentValue = normaliseAdminDeliveryStatus(currentValue);
+
+        return BLACKWOOD_ADMIN_DELIVERY_STATUS_OPTIONS.map(function (option) {
+            return `
+                <option 
+                    value="${escapeAttribute(option.value)}" 
+                    ${option.value === cleanCurrentValue ? "selected" : ""}
+                >
+                    ${escapeHtml(option.label)}
+                </option>
+            `;
+        }).join("");
+    }
+
+    function bindAdminRewardDeskEvents() {
+        const desk = document.querySelector("[data-admin-reward-desk]");
+
+        if (desk) {
+            desk.addEventListener("toggle", function () {
+                BlackwoodMembersState.adminRewardDeskOpen = desk.open;
+            });
+        }
+
+        document.querySelectorAll("[data-admin-reward-filter]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                BlackwoodMembersState.adminRewardFilter = normaliseAdminRewardFilter(
+                    button.dataset.adminRewardFilter || "all"
+                );
+
+                BlackwoodMembersState.adminRewardDeskOpen = true;
+                renderAdminRewardDeskInPlace();
+            });
+        });
+
+        document.querySelectorAll("[data-admin-redemption-form]").forEach(function (form) {
+            form.addEventListener("submit", handleAdminRewardSave);
+        });
+
+        document.querySelectorAll("[data-admin-redemption-action]").forEach(function (button) {
+            button.addEventListener("click", handleAdminRewardStatusAction);
+        });
+
+        document.querySelectorAll("[data-admin-copy-address]").forEach(function (button) {
+            button.addEventListener("click", handleAdminCopyAddress);
+        });
+    }
+
+    async function handleAdminRewardSave(event) {
+        event.preventDefault();
+
+        if (BlackwoodMembersState.isAdminRewardBusy) {
+            return;
+        }
+
+        const form = event.currentTarget;
+        const redemptionId = Number(form.dataset.adminRedemptionForm || 0);
+
+        if (!redemptionId) {
+            setAdminRewardStatus("This reward request could not be found.", "is-error");
+            return;
+        }
+
+        const payload = getAdminRewardFormPayload(form, true);
+
+        BlackwoodMembersState.isAdminRewardBusy = true;
+        setAdminRewardStatus("Saving reward details...", "is-loading");
+        setAdminRewardControlsDisabled(true);
+
+        try {
+            const { error } = await BlackwoodMembersState.client.rpc(
+                "admin_update_member_reward_redemption",
+                {
+                    p_redemption_id: redemptionId,
+                    p_status: null,
+                    p_discount_code: payload.discountCode,
+                    p_admin_note: payload.adminNote,
+                    p_delivery_status: payload.deliveryStatus || null
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            await refreshAdminRewardDesk("Reward details saved.", "is-success");
+
+        } catch (error) {
+            console.error("Admin reward save failed:", error);
+            setAdminRewardStatus(cleanSupabaseError(error.message), "is-error");
+            setAdminRewardControlsDisabled(false);
+
+        } finally {
+            BlackwoodMembersState.isAdminRewardBusy = false;
+        }
+    }
+
+    async function handleAdminRewardStatusAction(event) {
+        if (BlackwoodMembersState.isAdminRewardBusy) {
+            return;
+        }
+
+        const button = event.currentTarget;
+        const redemptionId = Number(button.dataset.adminRedemptionId || 0);
+        const action = normaliseRedemptionStatus(button.dataset.adminRedemptionAction || "");
+        const redemption = getAdminRewardRedemptionById(redemptionId);
+
+        if (!redemptionId || !redemption) {
+            setAdminRewardStatus("This reward request could not be found.", "is-error");
+            return;
+        }
+
+        if (!["issued", "used", "cancelled"].includes(action)) {
+            setAdminRewardStatus("That reward action is not available.", "is-error");
+            return;
+        }
+
+        if (action === "cancelled") {
+            const confirmed = window.confirm(
+                `Cancel "${redemption.reward_title || "this reward"}" for ${redemption.reader_name || "this reader"}?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+        }
+
+        const form = document.querySelector(`[data-admin-redemption-form="${redemptionId}"]`);
+        const formPayload = form ? getAdminRewardFormPayload(form, false) : {
+            discountCode: null,
+            adminNote: null,
+            deliveryStatus: null
+        };
+
+        BlackwoodMembersState.isAdminRewardBusy = true;
+        setAdminRewardStatus(`Updating reward to ${action}...`, "is-loading");
+        setAdminRewardControlsDisabled(true);
+
+        try {
+            const { error } = await BlackwoodMembersState.client.rpc(
+                "admin_update_member_reward_redemption",
+                {
+                    p_redemption_id: redemptionId,
+                    p_status: action,
+                    p_discount_code: formPayload.discountCode,
+                    p_admin_note: formPayload.adminNote,
+                    p_delivery_status: formPayload.deliveryStatus
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            await refreshAdminRewardDesk(`Reward marked ${action}.`, "is-success");
+
+        } catch (error) {
+            console.error("Admin reward status update failed:", error);
+            setAdminRewardStatus(cleanSupabaseError(error.message), "is-error");
+            setAdminRewardControlsDisabled(false);
+
+        } finally {
+            BlackwoodMembersState.isAdminRewardBusy = false;
+        }
+    }
+
+    async function handleAdminCopyAddress(event) {
+        const button = event.currentTarget;
+        const redemptionId = Number(button.dataset.adminCopyAddress || 0);
+        const redemption = getAdminRewardRedemptionById(redemptionId);
+
+        if (!redemption || !hasAdminDeliveryAddress(redemption)) {
+            setAdminRewardStatus("No delivery address was found to copy.", "is-error");
+            return;
+        }
+
+        const originalText = button.textContent;
+
+        try {
+            await copyTextToClipboard(formatAdminDeliveryAddressPlain(redemption));
+
+            button.textContent = "Copied";
+            button.classList.add("is-copied");
+
+            setAdminRewardStatus("Delivery address copied to clipboard.", "is-success");
+
+            window.setTimeout(function () {
+                button.textContent = originalText || "Copy Address";
+                button.classList.remove("is-copied");
+            }, 1600);
+
+        } catch (error) {
+            console.warn("Copy address failed:", error);
+            setAdminRewardStatus("The address could not be copied. Please copy it manually.", "is-error");
+        }
+    }
+
+    async function refreshAdminRewardDesk(message, className) {
+        BlackwoodMembersState.adminRewardDeskOpen = true;
+        BlackwoodMembersState.adminRewardRedemptions = await loadAdminRewardDashboardIfAllowed(
+            BlackwoodMembersState.member
+        );
+
+        renderAdminRewardDeskInPlace();
+
+        setAdminRewardStatus(message || "Reward desk refreshed.", className || "is-success");
+    }
+
+    function renderAdminRewardDeskInPlace() {
+        const section = document.getElementById("circle-admin-reward-desk");
+
+        if (!section) {
+            return;
+        }
+
+        section.outerHTML = renderAdminRewardDesk();
+        bindAdminRewardDeskEvents();
+
+        document.querySelectorAll("[data-copy-discount-code]").forEach(function (button) {
+            button.addEventListener("click", handleCopyDiscountCode);
+        });
+    }
+
+    function setAdminRewardStatus(message, className) {
+        const status = document.getElementById("circle-admin-reward-status");
+
+        if (!status) {
+            return;
+        }
+
+        status.textContent = message || "";
+        status.classList.remove("is-success", "is-error", "is-loading");
+
+        if (className) {
+            status.classList.add(className);
+        }
+    }
+
+    function setAdminRewardControlsDisabled(disabled) {
+        document.querySelectorAll(
+            "[data-admin-redemption-form] button, [data-admin-redemption-form] input, [data-admin-redemption-form] select, [data-admin-redemption-form] textarea, [data-admin-reward-filter]"
+        ).forEach(function (element) {
+            element.disabled = disabled;
+        });
+    }
+
+    function getAdminRewardFormPayload(form, allowEmptyValues) {
+        const discountCodeField = form.querySelector('[name="discount_code"]');
+        const adminNoteField = form.querySelector('[name="admin_note"]');
+        const deliveryStatusField = form.querySelector('[name="delivery_status"]');
+
+        const discountCode = discountCodeField
+            ? String(discountCodeField.value || "").trim()
+            : "";
+
+        const adminNote = adminNoteField
+            ? String(adminNoteField.value || "").trim()
+            : "";
+
+        const deliveryStatus = deliveryStatusField
+            ? normaliseAdminDeliveryStatus(deliveryStatusField.value || "")
+            : "";
+
+        return {
+            discountCode: allowEmptyValues ? discountCode : (discountCode || null),
+            adminNote: allowEmptyValues ? adminNote : (adminNote || null),
+            deliveryStatus: deliveryStatus || null
+        };
+    }
+
+    function getFilteredAdminRewardRedemptions() {
+        const redemptions = Array.isArray(BlackwoodMembersState.adminRewardRedemptions)
+            ? BlackwoodMembersState.adminRewardRedemptions
+            : [];
+
+        const filter = normaliseAdminRewardFilter(BlackwoodMembersState.adminRewardFilter);
+
+        if (filter === "all") {
+            return redemptions;
+        }
+
+        return redemptions.filter(function (redemption) {
+            const status = normaliseRedemptionStatus(redemption.status);
+            const deliveryStatus = normaliseAdminDeliveryStatus(redemption.delivery_status);
+
+            if (filter === "pending") {
+                return status === "pending";
+            }
+
+            if (filter === "address_needed") {
+                return deliveryStatus === "address_required";
+            }
+
+            if (filter === "address_received") {
+                return deliveryStatus === "address_received";
+            }
+
+            return status === filter;
+        });
+    }
+
+    function getAdminRewardFilterCounts(redemptions) {
+        const records = Array.isArray(redemptions) ? redemptions : [];
+
+        return records.reduce(function (counts, redemption) {
+            const status = normaliseRedemptionStatus(redemption.status);
+            const deliveryStatus = normaliseAdminDeliveryStatus(redemption.delivery_status);
+
+            counts.all += 1;
+
+            if (status === "pending") counts.pending += 1;
+            if (status === "issued") counts.issued += 1;
+            if (status === "used") counts.used += 1;
+            if (status === "cancelled") counts.cancelled += 1;
+            if (deliveryStatus === "address_required") counts.address_needed += 1;
+            if (deliveryStatus === "address_received") counts.address_received += 1;
+
+            return counts;
+        }, {
+            all: 0,
+            pending: 0,
+            address_needed: 0,
+            address_received: 0,
+            issued: 0,
+            used: 0,
+            cancelled: 0
+        });
+    }
+
+    function getAdminRewardRedemptionById(redemptionId) {
+        return BlackwoodMembersState.adminRewardRedemptions.find(function (redemption) {
+            return Number(redemption.redemption_id || 0) === Number(redemptionId || 0);
+        }) || null;
+    }
+
+    function normaliseAdminRewardRedemption(redemption) {
+        return {
+            redemption_id: Number(redemption.redemption_id || 0),
+            member_id: redemption.member_id || "",
+            reader_name: String(redemption.reader_name || "").trim(),
+            reader_email: String(redemption.reader_email || "").trim(),
+            reward_id: Number(redemption.reward_id || 0),
+            reward_title: String(redemption.reward_title || "").trim(),
+            points_cost: Number(redemption.points_cost || 0),
+            status: normaliseRedemptionStatus(redemption.status),
+            discount_code: String(redemption.discount_code || "").trim(),
+            admin_note: String(redemption.admin_note || "").trim(),
+            requested_at: redemption.requested_at || "",
+            issued_at: redemption.issued_at || "",
+            used_at: redemption.used_at || "",
+            cancelled_at: redemption.cancelled_at || "",
+            created_at: redemption.created_at || "",
+            delivery_status: normaliseAdminDeliveryStatus(redemption.delivery_status),
+            delivery_name: String(redemption.delivery_name || "").trim(),
+            delivery_address_line_1: String(redemption.delivery_address_line_1 || "").trim(),
+            delivery_address_line_2: String(redemption.delivery_address_line_2 || "").trim(),
+            delivery_city: String(redemption.delivery_city || "").trim(),
+            delivery_region: String(redemption.delivery_region || "").trim(),
+            delivery_postcode: String(redemption.delivery_postcode || "").trim(),
+            delivery_country: String(redemption.delivery_country || "").trim(),
+            delivery_note: String(redemption.delivery_note || "").trim(),
+            delivery_submitted_at: redemption.delivery_submitted_at || "",
+            fulfilment_state: String(redemption.fulfilment_state || "").trim()
+        };
+    }
+
+    function normaliseAdminRewardFilter(value) {
+        const cleanValue = String(value || "").trim().toLowerCase();
+
+        const allowed = BLACKWOOD_ADMIN_REWARD_FILTERS.some(function (filter) {
+            return filter.id === cleanValue;
+        });
+
+        return allowed ? cleanValue : "all";
+    }
+
+    function normaliseRedemptionStatus(value) {
+        const cleanValue = String(value || "pending").trim().toLowerCase();
+
+        if (["pending", "issued", "used", "cancelled"].includes(cleanValue)) {
+            return cleanValue;
+        }
+
+        return "pending";
+    }
+
+    function normaliseAdminDeliveryStatus(value) {
+        const cleanValue = String(value || "").trim().toLowerCase();
+
+        if (["not_required", "address_required", "address_received", "posted", "fulfilled"].includes(cleanValue)) {
+            return cleanValue;
+        }
+
+        return "";
+    }
+
+    function getAdminDeliveryStatusLabel(value) {
+        const cleanValue = normaliseAdminDeliveryStatus(value);
+        const option = BLACKWOOD_ADMIN_DELIVERY_STATUS_OPTIONS.find(function (item) {
+            return item.value === cleanValue;
+        });
+
+        return option ? option.label : "Not set";
+    }
+
+    function isAdminPhysicalDeliveryReward(redemption) {
+        const title = String(redemption && redemption.reward_title ? redemption.reward_title : "")
+            .toLowerCase();
+
+        return (
+            title.includes("bookmark") ||
+            title.includes("archive insert") ||
+            title.includes("collector reward") ||
+            title.includes("limited edition")
+        );
+    }
+
+    function hasAdminDeliveryAddress(redemption) {
+        if (!redemption) {
+            return false;
+        }
+
+        return Boolean(
+            redemption.delivery_name &&
+            redemption.delivery_address_line_1 &&
+            redemption.delivery_city &&
+            redemption.delivery_postcode &&
+            redemption.delivery_country
+        );
+    }
+
+    function formatAdminDeliveryAddressHtml(redemption) {
+        return getAdminDeliveryAddressLines(redemption).map(function (line) {
+            return `<span>${escapeHtml(line)}</span>`;
+        }).join("");
+    }
+
+    function formatAdminDeliveryAddressPlain(redemption) {
+        const lines = [
+            redemption.reader_name || "",
+            redemption.reader_email || "",
+            "",
+            ...getAdminDeliveryAddressLines(redemption)
+        ].filter(function (line, index, array) {
+            if (line === "" && array[index - 1] === "") {
+                return false;
+            }
+
+            return String(line || "").trim() || line === "";
+        });
+
+        return lines.join("\n").trim();
+    }
+
+    function getAdminDeliveryAddressLines(redemption) {
+        const cityRegionLine = [
+            redemption.delivery_city,
+            redemption.delivery_region
+        ].filter(Boolean).join(", ");
+
+        return [
+            redemption.delivery_name,
+            redemption.delivery_address_line_1,
+            redemption.delivery_address_line_2,
+            cityRegionLine,
+            redemption.delivery_postcode,
+            redemption.delivery_country
+        ].filter(function (line) {
+            return String(line || "").trim();
         });
     }
 
@@ -2322,43 +3313,44 @@
 
                     ${renderRedemptionDeliveryAddress(redemption)}
 
-                   ${renderRedemptionCodeOrStatus(redemption)}
-                   
+                    ${renderRedemptionCodeOrStatus(redemption)}
                 </article>
             `;
         }).join("");
     }
-function renderRedemptionCodeOrStatus(redemption) {
-    if (redemption.discount_code) {
-        return `
-            <div class="circle-redemption-code">
-                <span>Discount code</span>
 
-                <div class="circle-redemption-code-row">
-                    <code>${escapeHtml(redemption.discount_code)}</code>
+    function renderRedemptionCodeOrStatus(redemption) {
+        if (redemption.discount_code) {
+            return `
+                <div class="circle-redemption-code">
+                    <span>Discount code</span>
 
-                    <button
-                        type="button"
-                        class="circle-copy-code-button"
-                        data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
-                    >
-                        Copy Code
-                    </button>
+                    <div class="circle-redemption-code-row">
+                        <code>${escapeHtml(redemption.discount_code)}</code>
+
+                        <button
+                            type="button"
+                            class="circle-copy-code-button"
+                            data-copy-discount-code="${escapeAttribute(redemption.discount_code)}"
+                        >
+                            Copy Code
+                        </button>
+                    </div>
                 </div>
-            </div>
+            `;
+        }
+
+        if (isPhysicalDeliveryReward(redemption)) {
+            return "";
+        }
+
+        return `
+            <p class="circle-muted-line">
+                ${escapeHtml(getRedemptionPendingText(redemption))}
+            </p>
         `;
     }
 
-    if (isPhysicalDeliveryReward(redemption)) {
-        return "";
-    }
-
-    return `
-        <p class="circle-muted-line">
-            ${escapeHtml(getRedemptionPendingText(redemption))}
-        </p>
-    `;
-}
     function renderPointsHistory() {
         if (!BlackwoodMembersState.points.length) {
             return `
@@ -2409,6 +3401,7 @@ function renderRedemptionCodeOrStatus(redemption) {
 
         bindMemberArcProfile();
         bindBlackwoodBookshelf();
+        bindAdminRewardDeskEvents();
         bindBehindFilesCarousel();
         bindPointsHistoryToggle();
     }
@@ -2955,7 +3948,8 @@ function renderRedemptionCodeOrStatus(redemption) {
             member_status: "active",
             member_tier: "Reader",
             points_total: 0,
-            is_arc_member: false
+            is_arc_member: false,
+            is_admin: false
         };
     }
 
@@ -3003,6 +3997,22 @@ function renderRedemptionCodeOrStatus(redemption) {
 
         if (/user already registered/i.test(cleaned)) {
             return "That email address already has a Blackwood Circle account.";
+        }
+
+        if (/admin access required/i.test(cleaned)) {
+            return "Admin access is required for this action.";
+        }
+
+        if (/reward redemption not found/i.test(cleaned)) {
+            return "That reward redemption could not be found.";
+        }
+
+        if (/invalid redemption status/i.test(cleaned)) {
+            return "That redemption status is not available.";
+        }
+
+        if (/invalid delivery status/i.test(cleaned)) {
+            return "That delivery status is not available.";
         }
 
         if (/not available for redemption/i.test(cleaned)) {
@@ -3086,6 +4096,7 @@ function renderRedemptionCodeOrStatus(redemption) {
 
         if (!code) {
             setDashboardStatus("No discount code was found to copy.", "is-error");
+            setAdminRewardStatus("No discount code was found to copy.", "is-error");
             return;
         }
 
@@ -3098,6 +4109,7 @@ function renderRedemptionCodeOrStatus(redemption) {
             button.classList.add("is-copied");
 
             setDashboardStatus("Discount code copied to clipboard.", "is-success");
+            setAdminRewardStatus("Discount code copied to clipboard.", "is-success");
 
             window.setTimeout(function () {
                 button.textContent = originalText || "Copy Code";
@@ -3107,6 +4119,7 @@ function renderRedemptionCodeOrStatus(redemption) {
         } catch (error) {
             console.warn("Copy discount code failed:", error);
             setDashboardStatus("The code could not be copied. Please copy it manually.", "is-error");
+            setAdminRewardStatus("The code could not be copied. Please copy it manually.", "is-error");
         }
     }
 
@@ -3160,3 +4173,626 @@ function renderRedemptionCodeOrStatus(redemption) {
         return escapeHtml(value).replace(/`/g, "&#096;");
     }
 })();
+/* =========================
+   PHASE 2D — ADMIN REWARD FULFILMENT DESK
+========================= */
+
+.circle-admin-reward-section {
+    position: relative;
+}
+
+.circle-admin-reward-desk {
+    position: relative;
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    border-radius: 10px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.13), transparent 36%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008)),
+        rgba(0, 0, 0, 0.46);
+
+    box-shadow:
+        0 20px 54px rgba(0, 0, 0, 0.34),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+}
+
+.circle-admin-reward-summary {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, auto);
+    gap: 22px;
+    align-items: center;
+
+    padding: clamp(20px, 3vw, 30px);
+
+    cursor: pointer;
+    list-style: none;
+}
+
+.circle-admin-reward-summary::-webkit-details-marker {
+    display: none;
+}
+
+.circle-admin-reward-summary::marker {
+    content: "";
+}
+
+.circle-admin-reward-summary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.08), transparent 52%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 46%);
+}
+
+.circle-admin-reward-summary > * {
+    position: relative;
+    z-index: 1;
+}
+
+.circle-admin-reward-summary h2 {
+    margin: 0 0 10px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.05;
+    font-weight: 400;
+}
+
+.circle-admin-reward-summary p {
+    max-width: 780px;
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.66);
+
+    font-size: 14.5px;
+    line-height: 1.65;
+}
+
+.circle-admin-reward-summary-side {
+    display: grid;
+    gap: 7px;
+    justify-items: end;
+
+    text-align: right;
+}
+
+.circle-admin-reward-summary-side span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+
+    padding: 8px 13px;
+
+    border: 1px solid rgba(196, 122, 44, 0.44);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.44);
+    color: rgba(214, 177, 129, 0.95);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.circle-admin-reward-summary-side small {
+    max-width: 230px;
+
+    color: rgba(239, 231, 220, 0.54);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.circle-admin-reward-panel {
+    padding: 0 clamp(16px, 3vw, 30px) clamp(20px, 3vw, 30px);
+
+    border-top: 1px solid rgba(196, 122, 44, 0.16);
+}
+
+/* Filters */
+
+.circle-admin-reward-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    margin: 22px 0 16px;
+}
+
+.circle-admin-reward-filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 34px;
+
+    padding: 7px 10px;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.36);
+    color: rgba(239, 231, 220, 0.62);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.circle-admin-reward-filters button:hover,
+.circle-admin-reward-filters button:focus-visible {
+    border-color: rgba(214, 177, 129, 0.68);
+    color: #efe7dc;
+    outline: none;
+}
+
+.circle-admin-reward-filters button.is-active {
+    border-color: rgba(214, 177, 129, 0.86);
+    background: rgba(196, 122, 44, 0.14);
+    color: #fff1de;
+}
+
+.circle-admin-reward-filters button strong {
+    display: inline-grid;
+    place-items: center;
+
+    min-width: 22px;
+    height: 22px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(214, 177, 129, 0.92);
+
+    font-size: 10px;
+}
+
+/* Status */
+
+.circle-admin-reward-status {
+    min-height: 20px;
+    margin: 0 0 16px;
+
+    color: rgba(239, 231, 220, 0.58);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.circle-admin-reward-status.is-success {
+    color: var(--circle-success, #9acb9a);
+}
+
+.circle-admin-reward-status.is-error {
+    color: var(--circle-error, #d97c68);
+}
+
+.circle-admin-reward-status.is-loading {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* List / Cards */
+
+.circle-admin-reward-list {
+    display: grid;
+    gap: 16px;
+}
+
+.circle-admin-reward-card {
+    position: relative;
+    overflow: hidden;
+
+    padding: clamp(18px, 3vw, 24px);
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 9px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.08), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.006)),
+        rgba(0, 0, 0, 0.36);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.035),
+        0 16px 40px rgba(0, 0, 0, 0.24);
+}
+
+.circle-admin-reward-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+
+    width: 4px;
+
+    background: rgba(196, 122, 44, 0.38);
+}
+
+.circle-admin-reward-card.is-issued::before {
+    background: rgba(154, 203, 154, 0.58);
+}
+
+.circle-admin-reward-card.is-used::before {
+    background: rgba(130, 160, 190, 0.58);
+}
+
+.circle-admin-reward-card.is-cancelled::before {
+    background: rgba(217, 124, 104, 0.62);
+}
+
+.circle-admin-reward-card-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: start;
+
+    margin-bottom: 16px;
+}
+
+.circle-admin-reward-card-header h3 {
+    margin: 5px 0 8px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.12;
+    font-weight: 400;
+}
+
+.circle-admin-reward-card-header p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.62);
+
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.circle-admin-reward-badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.circle-reward-badge.is-delivery {
+    border-color: rgba(214, 177, 129, 0.48);
+    background: rgba(196, 122, 44, 0.12);
+    color: rgba(255, 231, 196, 0.92);
+}
+
+/* Meta */
+
+.circle-admin-reward-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+
+    margin: 0 0 16px;
+}
+
+.circle-admin-reward-meta-grid div {
+    padding: 12px;
+
+    border: 1px solid rgba(196, 122, 44, 0.16);
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.28);
+}
+
+.circle-admin-reward-meta-grid span {
+    display: block;
+
+    margin: 0 0 6px;
+
+    color: rgba(214, 177, 129, 0.76);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.circle-admin-reward-meta-grid strong {
+    display: block;
+
+    color: rgba(239, 231, 220, 0.88);
+
+    font-size: 13px;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+/* Delivery */
+
+.circle-admin-delivery-card {
+    display: grid;
+    gap: 14px;
+
+    margin: 0 0 16px;
+    padding: 15px;
+
+    border: 1px solid rgba(154, 203, 154, 0.24);
+    border-radius: 8px;
+
+    background:
+        linear-gradient(180deg, rgba(154, 203, 154, 0.08), rgba(154, 203, 154, 0.025)),
+        rgba(0, 0, 0, 0.28);
+}
+
+.circle-admin-delivery-card.is-needed {
+    border-color: rgba(217, 124, 104, 0.3);
+    background:
+        linear-gradient(180deg, rgba(217, 124, 104, 0.08), rgba(217, 124, 104, 0.025)),
+        rgba(0, 0, 0, 0.28);
+}
+
+.circle-admin-delivery-card strong {
+    display: block;
+
+    margin: 0 0 9px;
+
+    color: #f3eadc;
+
+    font-size: 16px;
+    line-height: 1.3;
+}
+
+.circle-admin-delivery-card address {
+    display: grid;
+    gap: 4px;
+
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.76);
+
+    font-size: 14px;
+    line-height: 1.45;
+    font-style: normal;
+}
+
+.circle-admin-delivery-card address span {
+    display: block;
+}
+
+.circle-admin-delivery-card p {
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.64);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.circle-admin-delivery-card p span {
+    display: block;
+
+    margin: 0 0 5px;
+
+    color: rgba(214, 177, 129, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+/* Form */
+
+.circle-admin-reward-form {
+    display: grid;
+    gap: 14px;
+}
+
+.circle-admin-reward-form-grid {
+    display: grid;
+    grid-template-columns: minmax(170px, 0.8fr) minmax(170px, 0.8fr) minmax(240px, 1.4fr);
+    gap: 12px;
+    align-items: stretch;
+}
+
+.circle-admin-reward-form label {
+    display: grid;
+    gap: 8px;
+
+    color: rgba(214, 177, 129, 0.86);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.circle-admin-reward-form input,
+.circle-admin-reward-form select,
+.circle-admin-reward-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    border: 1px solid rgba(196, 122, 44, 0.26);
+    border-radius: 6px;
+
+    background: rgba(0, 0, 0, 0.48);
+    color: #f3eadc;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.circle-admin-reward-form input,
+.circle-admin-reward-form select {
+    min-height: 42px;
+    padding: 9px 11px;
+}
+
+.circle-admin-reward-form textarea {
+    min-height: 94px;
+    padding: 11px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.circle-admin-reward-form input:focus,
+.circle-admin-reward-form select:focus,
+.circle-admin-reward-form textarea:focus {
+    border-color: rgba(214, 177, 129, 0.74);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(196, 122, 44, 0.1);
+}
+
+.circle-admin-reward-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    align-items: center;
+}
+
+.circle-admin-reward-actions .circle-button {
+    min-height: 38px;
+    padding: 10px 14px;
+    font-size: 9px;
+}
+
+.circle-button.is-danger {
+    border-color: rgba(217, 124, 104, 0.58);
+    color: rgba(255, 210, 202, 0.94);
+}
+
+.circle-button.is-danger:hover,
+.circle-button.is-danger:focus-visible {
+    border-color: rgba(255, 160, 145, 0.86);
+    background: rgba(217, 124, 104, 0.16);
+    color: #ffffff;
+}
+
+.circle-admin-reward-actions .circle-button:disabled,
+.circle-admin-reward-form input:disabled,
+.circle-admin-reward-form select:disabled,
+.circle-admin-reward-form textarea:disabled,
+.circle-admin-reward-filters button:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+
+.circle-admin-reward-warning {
+    margin: 0;
+    padding: 11px 13px;
+
+    border: 1px solid rgba(217, 124, 104, 0.28);
+    border-radius: 7px;
+
+    background: rgba(217, 124, 104, 0.08);
+    color: rgba(255, 205, 196, 0.86);
+
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.circle-admin-reward-error {
+    margin-top: 20px;
+}
+
+/* Autofill */
+
+.circle-admin-reward-form input:-webkit-autofill,
+.circle-admin-reward-form input:-webkit-autofill:hover,
+.circle-admin-reward-form input:-webkit-autofill:focus,
+.circle-admin-reward-form textarea:-webkit-autofill,
+.circle-admin-reward-form textarea:-webkit-autofill:hover,
+.circle-admin-reward-form textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #efe7dc;
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.82) inset;
+    caret-color: #efe7dc;
+}
+
+/* Responsive */
+
+@media (max-width: 980px) {
+    .circle-admin-reward-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-admin-reward-summary-side {
+        justify-items: start;
+        text-align: left;
+    }
+
+    .circle-admin-reward-card-header {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-admin-reward-badges {
+        justify-content: flex-start;
+    }
+
+    .circle-admin-reward-meta-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .circle-admin-reward-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .circle-admin-reward-summary {
+        padding: 18px;
+    }
+
+    .circle-admin-reward-panel {
+        padding: 0 14px 18px;
+    }
+
+    .circle-admin-reward-filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .circle-admin-reward-filters button {
+        justify-content: space-between;
+    }
+
+    .circle-admin-reward-card {
+        padding: 18px 15px;
+    }
+
+    .circle-admin-reward-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .circle-admin-reward-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .circle-admin-reward-actions .circle-button {
+        width: 100%;
+    }
+}
