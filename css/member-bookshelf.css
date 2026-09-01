@@ -1386,3 +1386,95 @@
         transform: none !important;
     }
 }
+/* =========================
+   PHASE 2C — BOOKSHELF DRAG AND DROP
+========================= */
+
+.bookshelf-book-slot[draggable="true"] {
+    cursor: grab;
+}
+
+.bookshelf-book-slot[draggable="true"] .bookshelf-spine-button {
+    cursor: grab;
+}
+
+body.is-bookshelf-dragging,
+body.is-bookshelf-dragging * {
+    cursor: grabbing !important;
+}
+
+.bookshelf-book-slot.is-dragging {
+    opacity: 0.36;
+    transform: scale(0.96);
+}
+
+.bookshelf-stage.is-drag-over {
+    border-color: rgba(214, 177, 129, 0.68);
+    background:
+        radial-gradient(circle at 20% 0%, rgba(214, 177, 129, 0.12), transparent 34%),
+        linear-gradient(180deg, rgba(196, 122, 44, 0.08), rgba(255, 255, 255, 0.01)),
+        rgba(0, 0, 0, 0.42);
+    box-shadow:
+        inset 0 0 0 1px rgba(214, 177, 129, 0.06),
+        0 18px 48px rgba(0, 0, 0, 0.32),
+        0 0 26px rgba(196, 122, 44, 0.1);
+}
+
+.bookshelf-stage.is-drag-over .bookshelf-stage-header > span {
+    border-color: rgba(214, 177, 129, 0.72);
+    color: #efe7dc;
+}
+
+.bookshelf-stage-empty {
+    transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        color 180ms ease;
+}
+
+.bookshelf-stage.is-drag-over .bookshelf-stage-empty {
+    border-color: rgba(214, 177, 129, 0.46);
+    background: rgba(196, 122, 44, 0.08);
+}
+
+.bookshelf-book-slot.is-drop-before::before,
+.bookshelf-book-slot.is-drop-after::after {
+    content: "";
+
+    position: absolute;
+    top: 24px;
+    bottom: 58px;
+    z-index: 6;
+
+    width: 3px;
+
+    border-radius: 999px;
+
+    background: linear-gradient(180deg, #efe7dc, #c47a2c);
+
+    box-shadow:
+        0 0 12px rgba(214, 177, 129, 0.52),
+        0 0 24px rgba(196, 122, 44, 0.24);
+
+    pointer-events: none;
+}
+
+.bookshelf-book-slot.is-drop-before::before {
+    left: -7px;
+}
+
+.bookshelf-book-slot.is-drop-after::after {
+    right: -7px;
+}
+
+.bookshelf-spine-controls select,
+.bookshelf-order-controls button {
+    cursor: pointer;
+}
+
+@media (max-width: 760px) {
+    .bookshelf-book-slot[draggable="true"],
+    .bookshelf-book-slot[draggable="true"] .bookshelf-spine-button {
+        cursor: pointer;
+    }
+}
