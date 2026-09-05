@@ -238,53 +238,71 @@
     };
 
     window.initBlackwoodBookshelf = async function initBlackwoodBookshelf(options) {
-        const root = options && options.root
-            ? options.root
-            : document.getElementById(BLACKWOOD_BOOKSHELF_CONFIG.rootId);
+    const root = options && options.root
+        ? options.root
+        : document.getElementById(BLACKWOOD_BOOKSHELF_CONFIG.rootId);
 
-        if (!root) {
-            console.warn("Blackwood Bookshelf: root element not found.");
-            return;
-        }
+    if (!root) {
+        console.warn("Blackwood Bookshelf: root element not found.");
+        return;
+    }
 
-        BlackwoodBookshelfState.root = root;
-        BlackwoodBookshelfState.client = options ? options.client : null;
-        BlackwoodBookshelfState.session = options ? options.session : null;
-        BlackwoodBookshelfState.member = options ? options.member || null : null;
-        BlackwoodBookshelfState.pointsTotal = Number(options && options.pointsTotal ? options.pointsTotal : 0);
+    BlackwoodBookshelfState.root = root;
+    BlackwoodBookshelfState.client = options ? options.client : null;
+    BlackwoodBookshelfState.session = options ? options.session : null;
+    BlackwoodBookshelfState.member = options ? options.member || null : null;
+    BlackwoodBookshelfState.pointsTotal = Number(options && options.pointsTotal ? options.pointsTotal : 0);
 
-        BlackwoodBookshelfState.modalMode = "closed";
-        BlackwoodBookshelfState.activeBookId = "";
-        BlackwoodBookshelfState.statusMessage = "";
-        BlackwoodBookshelfState.statusType = "";
-        BlackwoodBookshelfState.customisationStatusMessage = "";
-        BlackwoodBookshelfState.customisationStatusType = "";
-        BlackwoodBookshelfState.customisationFilter = "all";
+    BlackwoodBookshelfState.modalMode = "closed";
+    BlackwoodBookshelfState.activeBookId = "";
+    BlackwoodBookshelfState.statusMessage = "";
+    BlackwoodBookshelfState.statusType = "";
+    BlackwoodBookshelfState.customisationStatusMessage = "";
+    BlackwoodBookshelfState.customisationStatusType = "";
+    BlackwoodBookshelfState.customisationFilter = "all";
+    BlackwoodBookshelfState.customisationSaveMode = "local";
+    BlackwoodBookshelfState.customisationStorageTable = "";
 
-        ensureBookshelfEscapeListener();
+    ensureBookshelfEscapeListener();
 
-        if (!BlackwoodBookshelfState.client || !getCurrentUserId()) {
-            renderBookshelfUnavailable();
-            return;
-        }
+    if (!BlackwoodBookshelfState.client || !getCurrentUserId()) {
+        renderBookshelfUnavailable();
+        return;
+    }
 
-        renderBookshelfLoading();
+    renderBookshelfLoading();
+
+    try {
+        await withBookshelfTimeout(
+            loadBookshelfRecords(),
+            8000,
+            "Bookshelf records timed out."
+        );
+
+        BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
+            loadLocalShelfCustomisationSelections()
+        );
 
         try {
-            await Promise.all([
-                loadBookshelfRecords(),
-                loadShelfCustomisationItems()
-            ]);
-
-            await loadShelfCustomisationRecord();
-
-            renderBookshelf();
-
-        } catch (error) {
-            console.error("Blackwood Bookshelf failed:", error);
-            renderBookshelfError("Your Blackwood Bookshelf could not be opened. Please refresh and try again.");
+            await withBookshelfTimeout(
+                loadShelfCustomisationItems(),
+                3000,
+                "Shelf customisation items timed out."
+            );
+        } catch (customisationError) {
+            console.warn("Shelf customisation skipped:", customisationError);
+            BlackwoodBookshelfState.customisationItems = [];
+            BlackwoodBookshelfState.customisationItemsLoaded = false;
+            BlackwoodBookshelfState.customisationItemsError = "";
         }
-    };
+
+        renderBookshelf();
+
+    } catch (error) {
+        console.error("Blackwood Bookshelf failed:", error);
+        renderBookshelfError("Your Blackwood Bookshelf could not be opened. Please refresh and try again.");
+    }
+};
 
     async function loadBookshelfRecords() {
         const userId = getCurrentUserId();
@@ -348,14 +366,13 @@
     }
 
     async function loadShelfCustomisationRecord() {
-        const userId = getCurrentUserId();
-        const localSelections = loadLocalShelfCustomisationSelections();
+    BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
+        loadLocalShelfCustomisationSelections()
+    );
 
-        BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(localSelections);
-
-        if (!userId || !BlackwoodBookshelfState.client) {
-            return;
-        }
+    BlackwoodBookshelfState.customisationStorageTable = "";
+    BlackwoodBookshelfState.customisationSaveMode = "local";
+}
 
         for (const tableName of BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames) {
             try {
@@ -2032,16 +2049,18 @@ function renderShelfStageCustomisationDecorations() {
     }
 
     async function saveShelfCustomisationSelections() {
-        const selections = normaliseCustomisationSelections(BlackwoodBookshelfState.customisationSelections);
+    const selections = normaliseCustomisationSelections(
+        BlackwoodBookshelfState.customisationSelections
+    );
 
-        BlackwoodBookshelfState.customisationSelections = selections;
+    BlackwoodBookshelfState.customisationSelections = selections;
+    BlackwoodBookshelfState.customisationSaveMode = "local";
+    BlackwoodBookshelfState.customisationStorageTable = "";
 
-        saveLocalShelfCustomisationSelections();
+    saveLocalShelfCustomisationSelections();
 
-        if (!BlackwoodBookshelfState.client || !getCurrentUserId()) {
-            BlackwoodBookshelfState.customisationSaveMode = "local";
-            return "local";
-        }
+    return "local";
+}
 
         const tableCandidates = BlackwoodBookshelfState.customisationStorageTable
             ? [
