@@ -355,7 +355,7 @@
     async function loadShelfCustomisationItems() {
         BlackwoodBookshelfState.customisationItemsError = "";
 
-        const response = await fetch(`${BLACKWOOD_BOOKSHELF_CONFIG.customisationItemsPath}?v=20260910`);
+        const response = await fetch(`${BLACKWOOD_BOOKSHELF_CONFIG.customisationItemsPath}?v=20260911`);
 
         if (!response.ok) {
             throw new Error("Shelf customisation items could not be loaded.");
