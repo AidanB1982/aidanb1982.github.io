@@ -1,1 +1,292 @@
-to be updated
+{
+  "version": "2026-09-05",
+  "categories": [
+    {
+      "id": "background",
+      "label": "Shelf Backgrounds",
+      "slot": "background_id"
+    },
+    {
+      "id": "bookend",
+      "label": "Bookends",
+      "slot": "bookend_id"
+    },
+    {
+      "id": "charm",
+      "label": "Recovered Charms",
+      "slot": "charm_id"
+    },
+    {
+      "id": "object",
+      "label": "Shelf Objects",
+      "slot": "object_id"
+    },
+    {
+      "id": "nameplate",
+      "label": "Nameplates",
+      "slot": "nameplate_id"
+    },
+    {
+      "id": "lighting",
+      "label": "Lighting",
+      "slot": "lighting_id"
+    }
+  ],
+  "items": [
+    {
+      "id": "archive-default",
+      "category": "background",
+      "name": "Default Archive Shelf",
+      "description": "The original Blackwood shelf surface issued to every Circle member.",
+      "rarity": "foundation",
+      "unlockType": "automatic",
+      "unlockLabel": "Issued when you join The Circle.",
+      "pointsCost": 0
+    },
+    {
+      "id": "dark-oak",
+      "category": "background",
+      "name": "Dark Oak Shelf",
+      "description": "A deeper timber finish for readers building a serious Blackwood collection.",
+      "rarity": "common",
+      "unlockType": "achievement",
+      "unlockLabel": "Add 3 books to your Blackwood Bookshelf.",
+      "pointsCost": 0
+    },
+    {
+      "id": "charcoal-archive-wall",
+      "category": "background",
+      "name": "Charcoal Archive Wall",
+      "description": "A muted archive wall, smoke-dark and paper-worn.",
+      "rarity": "common",
+      "unlockType": "points",
+      "unlockLabel": "Available for 20 Circle points.",
+      "pointsCost": 20
+    },
+    {
+      "id": "misted-window",
+      "category": "background",
+      "name": "Misted Window",
+      "description": "A cold pane behind the shelf, rain-blurred and half-lit.",
+      "rarity": "uncommon",
+      "unlockType": "points",
+      "unlockLabel": "Available for 35 Circle points.",
+      "pointsCost": 35
+    },
+    {
+      "id": "storm-archive",
+      "category": "background",
+      "name": "Storm Archive",
+      "description": "A blue-black shelf atmosphere with weather pressing at the glass.",
+      "rarity": "uncommon",
+      "unlockType": "achievement",
+      "unlockLabel": "Submit your first Reader Record.",
+      "pointsCost": 0
+    },
+
+    {
+      "id": "plain-brass",
+      "category": "bookend",
+      "name": "Plain Brass Bookends",
+      "description": "Simple brass supports from the Blackwood archive desk.",
+      "rarity": "foundation",
+      "unlockType": "automatic",
+      "unlockLabel": "Issued when you join The Circle.",
+      "pointsCost": 0
+    },
+    {
+      "id": "bothy-lanterns",
+      "category": "bookend",
+      "name": "Bothy Lanterns",
+      "description": "Twin lanterns for shelves that have spent too long in the hills.",
+      "rarity": "uncommon",
+      "unlockType": "achievement",
+      "unlockLabel": "Add The Black Bothy to your shelf.",
+      "pointsCost": 0
+    },
+    {
+      "id": "raven-bookends",
+      "category": "bookend",
+      "name": "Raven Bookends",
+      "description": "Dark silhouettes keeping watch from either side of the shelf.",
+      "rarity": "common",
+      "unlockType": "points",
+      "unlockLabel": "Available for 25 Circle points.",
+      "pointsCost": 25
+    },
+    {
+      "id": "chapel-stone",
+      "category": "bookend",
+      "name": "Chapel Stone Bookends",
+      "description": "Weathered chapel fragments recovered from a crossing point.",
+      "rarity": "rare",
+      "unlockType": "achievement",
+      "unlockLabel": "Add The Crossing to your shelf.",
+      "pointsCost": 0
+    },
+
+    {
+      "id": "none",
+      "category": "charm",
+      "name": "No Charm",
+      "description": "Leave this part of the shelf unmarked.",
+      "rarity": "foundation",
+      "unlockType": "automatic",
+      "unlockLabel": "Always available.",
+      "pointsCost": 0
+    },
+    {
+      "id": "wax-seal",
+      "category": "charm",
+      "name": "Wax Seal",
+      "description": "A small red seal attached to the shelf edge.",
+      "rarity": "common",
+      "unlockType": "achievement",
+      "unlockLabel": "React to your first Behind the Files dispatch.",
+      "pointsCost": 0
+    },
+    {
+      "id": "archive-key",
+      "category": "charm",
+      "name": "Archive Key",
+      "description": "An old key issued to readers who return to the record.",
+      "rarity": "uncommon",
+      "unlockType": "points",
+      "unlockLabel": "Available for 30 Circle points.",
+      "pointsCost": 30
+    },
+    {
+      "id": "red-cord-tag",
+      "category": "charm",
+      "name": "Red Cord Tag",
+      "description": "A restricted-file tag tied with red cord.",
+      "rarity": "uncommon",
+      "unlockType": "points",
+      "unlockLabel": "Available for 35 Circle points.",
+      "pointsCost": 35
+    },
+
+    {
+      "id": "none",
+      "category": "object",
+      "name": "No Object",
+      "description": "Keep the shelf surface clear.",
+      "rarity": "foundation",
+      "unlockType": "automatic",
+      "unlockLabel": "Always available.",
+      "pointsCost": 0
+    },
+    {
+      "id": "field-note",
+      "category": "object",
+      "name": "Field Note",
+      "description": "A folded reader note placed beside the shelf.",
+      "rarity": "common",
+      "unlockType": "achievement",
+      "unlockLabel": "Add a note to any book on your shelf.",
+      "pointsCost": 0
+    },
+    {
+      "id": "sealed-file",
+      "category": "object",
+      "name": "Sealed File",
+      "description": "A closed Blackwood file with no public label.",
+      "rarity": "uncommon",
+      "unlockType": "points",
+      "unlockLabel": "Available for 40 Circle points.",
+      "pointsCost": 40
+    },
+    {
+      "id": "old-radio",
+      "category": "object",
+      "name": "Old Radio",
+      "description": "A quiet set waiting for a signal from the dark.",
+      "rarity": "rare",
+      "unlockType": "achievement",
+      "unlockLabel": "Add Holdfast to your shelf.",
+      "pointsCost": 0
+    },
+
+    {
+      "id": "reader-record",
+      "category": "nameplate",
+      "name": "Reader Record",
+      "description": "The standard plate for every Blackwood Circle shelf.",
+      "rarity": "foundation",
+      "unlockType": "automatic",
+      "unlockLabel": "Issued when you join The Circle.",
+      "pointsCost": 0
+    },
+    {
+      "id": "archive-member",
+      "category": "nameplate",
+      "name": "Archive Member",
+      "description": "A quieter plate for readers who spend time in the files.",
+      "rarity": "common",
+      "unlockType": "points",
+      "unlockLabel": "Available for 15 Circle points.",
+      "pointsCost": 15
+    },
+    {
+      "id": "circle-member",
+      "category": "nameplate",
+      "name": "Circle Member",
+      "description": "A formal Circle nameplate for the private shelf.",
+      "rarity": "common",
+      "unlockType": "points",
+      "unlockLabel": "Available for 15 Circle points.",
+      "pointsCost": 15
+    },
+    {
+      "id": "issued-shelf",
+      "category": "nameplate",
+      "name": "Issued Shelf",
+      "description": "A restricted-issue plate for active reader records.",
+      "rarity": "uncommon",
+      "unlockType": "achievement",
+      "unlockLabel": "Submit your first Reader Record.",
+      "pointsCost": 0
+    },
+
+    {
+      "id": "warm-lamp",
+      "category": "lighting",
+      "name": "Warm Lamp",
+      "description": "A low amber glow from the desk.",
+      "rarity": "foundation",
+      "unlockType": "automatic",
+      "unlockLabel": "Issued when you join The Circle.",
+      "pointsCost": 0
+    },
+    {
+      "id": "cold-archive",
+      "category": "lighting",
+      "name": "Cold Archive",
+      "description": "A pale institutional light across the shelf.",
+      "rarity": "common",
+      "unlockType": "points",
+      "unlockLabel": "Available for 20 Circle points.",
+      "pointsCost": 20
+    },
+    {
+      "id": "candle-tone",
+      "category": "lighting",
+      "name": "Candle Tone",
+      "description": "A softer light, old and uneven.",
+      "rarity": "uncommon",
+      "unlockType": "points",
+      "unlockLabel": "Available for 30 Circle points.",
+      "pointsCost": 30
+    },
+    {
+      "id": "storm-blue",
+      "category": "lighting",
+      "name": "Storm Blue",
+      "description": "A cold blue cast from weather outside the archive.",
+      "rarity": "uncommon",
+      "unlockType": "achievement",
+      "unlockLabel": "Add 5 books to your Blackwood Bookshelf.",
+      "pointsCost": 0
+    }
+  ]
+}
