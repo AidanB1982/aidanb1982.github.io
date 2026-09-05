@@ -3609,3 +3609,220 @@
         return escapeHtml(value).replace(/`/g, "&#096;");
     }
 })();
+// =========================
+// PHASE 2E HOTFIX — CUSTOMISATION FILTER CONTROLLER
+// Safe delegated filter layer for shelf customisation
+// =========================
+
+(function () {
+    "use strict";
+
+    const FILTER_BUTTON_SELECTOR = ".bookshelf-customisation-filters button";
+    const ITEM_SELECTOR = ".bookshelf-customisation-item";
+    const GRID_SELECTOR = ".bookshelf-customisation-grid";
+    const STATUS_SELECTOR = ".bookshelf-customisation-status";
+
+    let activeFilter = "all";
+
+    document.addEventListener("click", function (event) {
+        const filterButton = event.target.closest(FILTER_BUTTON_SELECTOR);
+
+        if (!filterButton) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        activeFilter = getFilterFromButton(filterButton);
+
+        applyShelfCustomisationFilter(activeFilter, filterButton);
+
+        window.setTimeout(function () {
+            filterButton.blur();
+        }, 80);
+    }, true);
+
+    const observer = new MutationObserver(function () {
+        const grid = document.querySelector(GRID_SELECTOR);
+
+        if (!grid) {
+            return;
+        }
+
+        applyShelfCustomisationFilter(activeFilter, null);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        applyShelfCustomisationFilter(activeFilter, null);
+    });
+
+    function applyShelfCustomisationFilter(filter, clickedButton) {
+        const cleanFilter = normaliseFilter(filter);
+        const buttons = Array.from(document.querySelectorAll(FILTER_BUTTON_SELECTOR));
+        const items = Array.from(document.querySelectorAll(ITEM_SELECTOR));
+
+        if (!items.length) {
+            return;
+        }
+
+        buttons.forEach(function (button) {
+            const buttonFilter = getFilterFromButton(button);
+            const isActive = buttonFilter === cleanFilter;
+
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("aria-pressed", isActive ? "true" : "false");
+
+            if (!button.getAttribute("type")) {
+                button.setAttribute("type", "button");
+            }
+        });
+
+        let visibleCount = 0;
+
+        items.forEach(function (item) {
+            const itemCategory = getItemCategory(item);
+            const isLocked = item.classList.contains("is-locked") ||
+                /locked/i.test(item.textContent || "");
+
+            let shouldShow = cleanFilter === "all";
+
+            if (cleanFilter === "locked") {
+                shouldShow = isLocked;
+            } else if (cleanFilter !== "all") {
+                shouldShow = itemCategory === cleanFilter;
+            }
+
+            item.hidden = !shouldShow;
+            item.classList.toggle("is-filter-hidden", !shouldShow);
+
+            if (shouldShow) {
+                visibleCount += 1;
+            }
+        });
+
+        updateCustomisationStatus(cleanFilter, visibleCount);
+
+        if (clickedButton) {
+            clickedButton.classList.add("is-active");
+        }
+    }
+
+    function updateCustomisationStatus(filter, count) {
+        const status = document.querySelector(STATUS_SELECTOR);
+
+        if (!status) {
+            return;
+        }
+
+        const label = getFilterLabel(filter);
+        const itemWord = count === 1 ? "item" : "items";
+
+        status.textContent = filter === "all"
+            ? `${count} issued shelf items available.`
+            : `${count} ${label.toLowerCase()} ${itemWord} shown.`;
+
+        status.classList.remove("is-error", "is-loading");
+        status.classList.add("is-success");
+    }
+
+    function getFilterFromButton(button) {
+        const dataset = button.dataset || {};
+
+        return normaliseFilter(
+            dataset.bookshelfCustomisationFilter ||
+            dataset.bookshelfCustomFilter ||
+            dataset.customisationFilter ||
+            dataset.shelfCustomisationFilter ||
+            dataset.filter ||
+            getFilterFromText(button.textContent || "")
+        );
+    }
+
+    function getItemCategory(item) {
+        const dataset = item.dataset || {};
+
+        const datasetCategory = dataset.bookshelfCustomisationCategory ||
+            dataset.bookshelfCustomCategory ||
+            dataset.customisationCategory ||
+            dataset.category ||
+            dataset.type;
+
+        if (datasetCategory) {
+            return normaliseFilter(datasetCategory);
+        }
+
+        const kicker = item.querySelector(".bookshelf-customisation-item-kicker");
+
+        if (kicker && kicker.textContent) {
+            return normaliseFilter(kicker.textContent);
+        }
+
+        return getFilterFromText(item.textContent || "");
+    }
+
+    function getFilterFromText(text) {
+        const cleanText = String(text || "").toLowerCase();
+
+        if (cleanText.includes("background")) return "background";
+        if (cleanText.includes("bookend")) return "bookends";
+        if (cleanText.includes("charm")) return "charm";
+        if (cleanText.includes("object")) return "object";
+        if (cleanText.includes("nameplate")) return "nameplate";
+        if (cleanText.includes("lighting")) return "lighting";
+        if (cleanText.includes("locked")) return "locked";
+
+        return "all";
+    }
+
+    function normaliseFilter(value) {
+        const cleanValue = String(value || "all")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "_")
+            .replace(/-/g, "_");
+
+        if (cleanValue === "backgrounds") return "background";
+        if (cleanValue === "background") return "background";
+
+        if (cleanValue === "bookend") return "bookends";
+        if (cleanValue === "bookends") return "bookends";
+
+        if (cleanValue === "charms") return "charm";
+        if (cleanValue === "charm") return "charm";
+
+        if (cleanValue === "objects") return "object";
+        if (cleanValue === "object") return "object";
+
+        if (cleanValue === "nameplates") return "nameplate";
+        if (cleanValue === "nameplate") return "nameplate";
+
+        if (cleanValue === "lights") return "lighting";
+        if (cleanValue === "light") return "lighting";
+        if (cleanValue === "lighting") return "lighting";
+
+        if (cleanValue === "locked") return "locked";
+
+        return "all";
+    }
+
+    function getFilterLabel(filter) {
+        const labels = {
+            all: "All",
+            background: "Background",
+            bookends: "Bookends",
+            charm: "Charm",
+            object: "Object",
+            nameplate: "Nameplate",
+            lighting: "Lighting",
+            locked: "Locked"
+        };
+
+        return labels[filter] || "All";
+    }
+})();
