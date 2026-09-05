@@ -47,7 +47,7 @@
       "pointsRequired": 0,
       "is_default": true,
       "is_free": true,
-      "image": "/assets/ArchiveDefaultShelf.jpg",
+      "image": "/assets/bg-default-archive-shelf.png",
       "sort_order": 10
     },
     {
@@ -63,7 +63,7 @@
       "pointsCost": 0,
       "pointsRequired": 0,
       "booksRequired": 3,
-      "image": "/assets/DarkOakShelf.jpg",
+      "image": "/assets/bg-dark-oak-shelf.png",
       "sort_order": 20
     },
     {
@@ -78,7 +78,7 @@
       "unlockText": "Available for 20 Circle points.",
       "pointsCost": 20,
       "pointsRequired": 20,
-      "image": "/assets/CharcoalArchiveWall.jpg",
+      "image": "/assets/bg-charcoal-archive-wall.png",
       "sort_order": 30
     },
     {
@@ -93,7 +93,7 @@
       "unlockText": "Available for 35 Circle points.",
       "pointsCost": 35,
       "pointsRequired": 35,
-      "image": "/assets/MistedWindow.jpg",
+      "image": "/assets/bg-misted-window.png",
       "sort_order": 40
     },
     {
@@ -108,9 +108,10 @@
       "unlockText": "Submit your first Reader Record.",
       "pointsCost": 0,
       "pointsRequired": 0,
-      "image": "/assets/StormArchive.jpg",
+      "image": "/assets/bg-storm-archive.png",
       "sort_order": 50
     },
+
     {
       "id": "plain-brass",
       "category": "bookend",
@@ -125,7 +126,7 @@
       "pointsRequired": 0,
       "is_default": true,
       "is_free": true,
-      "image": "/assets/PlainBrassBookends.png",
+      "image": "/assets/bookends-plain-brass.png",
       "sort_order": 60
     },
     {
@@ -141,7 +142,7 @@
       "pointsCost": 0,
       "pointsRequired": 0,
       "requiredBookId": "the-black-bothy",
-      "image": "/assets/BothyLanterns.png",
+      "image": "/assets/bookends-bothy-lanterns.png",
       "sort_order": 70
     },
     {
@@ -156,7 +157,7 @@
       "unlockText": "Available for 25 Circle points.",
       "pointsCost": 25,
       "pointsRequired": 25,
-      "image": "/assets/RavenBookends.png",
+      "image": "/assets/bookends-raven.png",
       "sort_order": 80
     },
     {
@@ -172,9 +173,10 @@
       "pointsCost": 0,
       "pointsRequired": 0,
       "requiredBookId": "the-crossing",
-      "image": "/assets/ChapelStoneBookends.png",
+      "image": "/assets/bookends-chapel-stone.png",
       "sort_order": 90
     },
+
     {
       "id": "none",
       "category": "charm",
@@ -204,7 +206,7 @@
       "unlockText": "React to your first Behind the Files dispatch.",
       "pointsCost": 0,
       "pointsRequired": 0,
-      "image": "/assets/WaxSeal.png",
+      "image": "/assets/charm-wax-seal.png",
       "sort_order": 110
     },
     {
@@ -219,7 +221,7 @@
       "unlockText": "Available for 30 Circle points.",
       "pointsCost": 30,
       "pointsRequired": 30,
-      "image": "/assets/ArchiveKey.png",
+      "image": "/assets/charm-archive-key.png",
       "sort_order": 120
     },
     {
@@ -234,9 +236,10 @@
       "unlockText": "Available for 35 Circle points.",
       "pointsCost": 35,
       "pointsRequired": 35,
-      "image": "/assets/RedCordTag.png",
+      "image": "/assets/charm-red-cord-tag.png",
       "sort_order": 130
     },
+
     {
       "id": "none",
       "category": "object",
@@ -266,7 +269,7 @@
       "unlockText": "Add a note to any book on your shelf.",
       "pointsCost": 0,
       "pointsRequired": 0,
-      "image": "/assets/FieldNote.png",
+      "image": "/assets/object-field-note.png",
       "sort_order": 150
     },
     {
@@ -281,7 +284,7 @@
       "unlockText": "Available for 40 Circle points.",
       "pointsCost": 40,
       "pointsRequired": 40,
-      "image": "/assets/SealedFile.png",
+      "image": "/assets/object-sealed-file.png",
       "sort_order": 160
     },
     {
@@ -297,9 +300,10 @@
       "pointsCost": 0,
       "pointsRequired": 0,
       "requiredBookId": "holdfast",
-      "image": "/assets/OldRadio.png",
+      "image": "/assets/object-old-radio.png",
       "sort_order": 170
     },
+
     {
       "id": "reader-record",
       "category": "nameplate",
@@ -314,7 +318,7 @@
       "pointsRequired": 0,
       "is_default": true,
       "is_free": true,
-      "image": "/assets/ReaderRecordNameplate.png",
+      "image": "/assets/nameplate-reader-record.png",
       "sort_order": 180
     },
     {
@@ -329,7 +333,7 @@
       "unlockText": "Available for 15 Circle points.",
       "pointsCost": 15,
       "pointsRequired": 15,
-      "image": "/assets/ArchiveMemberNameplate.png",
+      "image": "/assets/nameplate-archive-member.png",
       "sort_order": 190
     },
     {
@@ -344,7 +348,7 @@
       "unlockText": "Available for 15 Circle points.",
       "pointsCost": 15,
       "pointsRequired": 15,
-      "image": "/assets/CircleMemberNameplate.png",
+      "image": "/assets/nameplate-circle-member.png",
       "sort_order": 200
     },
     {
@@ -359,9 +363,10 @@
       "unlockText": "Submit your first Reader Record.",
       "pointsCost": 0,
       "pointsRequired": 0,
-      "image": "/assets/IssuedShelfNameplate.png",
+      "image": "/assets/nameplate-issued-shelf.png",
       "sort_order": 210
     },
+
     {
       "id": "warm-lamp",
       "category": "lighting",
@@ -376,7 +381,7 @@
       "pointsRequired": 0,
       "is_default": true,
       "is_free": true,
-      "image": "/assets/WarmLampLighting.jpg",
+      "image": "/assets/light-warm-lamp.png",
       "sort_order": 220
     },
     {
@@ -391,7 +396,7 @@
       "unlockText": "Available for 20 Circle points.",
       "pointsCost": 20,
       "pointsRequired": 20,
-      "image": "/assets/ColdArchiveLighting.jpg",
+      "image": "/assets/light-cold-archive.png",
       "sort_order": 230
     },
     {
@@ -406,7 +411,7 @@
       "unlockText": "Available for 30 Circle points.",
       "pointsCost": 30,
       "pointsRequired": 30,
-      "image": "/assets/CandleToneLighting.jpg",
+      "image": "/assets/light-candle-tone.png",
       "sort_order": 240
     },
     {
@@ -422,7 +427,7 @@
       "pointsCost": 0,
       "pointsRequired": 0,
       "booksRequired": 5,
-      "image": "/assets/StormBlueLighting.jpg",
+      "image": "/assets/light-storm-blue.png",
       "sort_order": 250
     }
   ]
