@@ -629,33 +629,51 @@
     }
 
     function renderShelfCustomisationItem(item) {
-        const slot = getCustomisationSlotById(item.category);
-        const unlockInfo = getShelfCustomisationUnlockInfo(item);
-        const isSelected = BlackwoodBookshelfState.customisationSelections[item.category] === item.id;
-        const isIssued = unlockInfo.unlocked;
-        const label = isSelected ? "Applied" : isIssued ? "Issued" : "Locked";
+    const slot = getCustomisationSlotById(item.category);
+    const unlockInfo = getShelfCustomisationUnlockInfo(item);
+    const isSelected = BlackwoodBookshelfState.customisationSelections[item.category] === item.id;
+    const isIssued = unlockInfo.unlocked;
+    const label = isSelected ? "Applied" : isIssued ? "Issued" : "Locked";
+    const imageSrc = getCustomisationImageSrc(item);
 
-        return `
-            <button
-                type="button"
-                class="bookshelf-customisation-item ${isSelected ? "is-selected" : ""} ${isIssued ? "is-issued" : "is-locked"}"
-                data-bookshelf-customisation-item="${escapeAttribute(item.id)}"
-                data-bookshelf-customisation-slot="${escapeAttribute(item.category)}"
-                ${isIssued && !BlackwoodBookshelfState.isSavingCustomisation ? "" : "disabled"}
-                title="${escapeAttribute(unlockInfo.reason)}"
-            >
-                <span class="bookshelf-customisation-item-kicker">
-                    ✦ ${escapeHtml(slot ? slot.shortLabel : "Object")}
-                </span>
+    return `
+        <button
+            type="button"
+            class="bookshelf-customisation-item ${isSelected ? "is-selected" : ""} ${isIssued ? "is-issued" : "is-locked"}"
+            data-bookshelf-customisation-item="${escapeAttribute(item.id)}"
+            data-bookshelf-customisation-slot="${escapeAttribute(item.category)}"
+            ${isIssued && !BlackwoodBookshelfState.isSavingCustomisation ? "" : "disabled"}
+            title="${escapeAttribute(unlockInfo.reason)}"
+        >
+            <span class="bookshelf-customisation-item-image-wrap ${imageSrc ? "has-image" : "is-empty"}">
+                ${
+                    imageSrc
+                        ? `
+                            <img
+                                src="${escapeAttribute(imageSrc)}"
+                                alt=""
+                                loading="lazy"
+                                data-bookshelf-decoration-image
+                            >
+                        `
+                        : `
+                            <span>${escapeHtml(slot ? slot.shortLabel : "Object")}</span>
+                        `
+                }
+            </span>
 
-                <strong>${escapeHtml(item.title)}</strong>
+            <span class="bookshelf-customisation-item-kicker">
+                ✦ ${escapeHtml(slot ? slot.shortLabel : "Object")}
+            </span>
 
-                <small>${escapeHtml(item.description)}</small>
+            <strong>${escapeHtml(item.title)}</strong>
 
-                <em>${escapeHtml(label)}${unlockInfo.reason ? ` · ${escapeHtml(unlockInfo.reason)}` : ""}</em>
-            </button>
-        `;
-    }
+            <small>${escapeHtml(item.description)}</small>
+
+            <em>${escapeHtml(label)}${unlockInfo.reason ? ` · ${escapeHtml(unlockInfo.reason)}` : ""}</em>
+        </button>
+    `;
+}
 
     function renderShelfBoard(shelfItems) {
         return `
@@ -728,76 +746,80 @@
     }
 
     function renderShelfStageCustomisationDecorations() {
-        const selectedItems = getSelectedCustomisationItems();
+    const selectedItems = getSelectedCustomisationItems();
 
-        const bookends = selectedItems.bookends || null;
-        const charm = selectedItems.charm || null;
-        const object = selectedItems.object || null;
-        const nameplate = selectedItems.nameplate || null;
-        const lighting = selectedItems.lighting || null;
+    const bookends = selectedItems.bookends || null;
+    const charm = selectedItems.charm || null;
+    const object = selectedItems.object || null;
+    const nameplate = selectedItems.nameplate || null;
+    const lighting = selectedItems.lighting || null;
 
-        if (!bookends && !charm && !object && !nameplate && !lighting) {
-            return "";
-        }
-
-        return `
-            <div class="bookshelf-stage-customisation" aria-hidden="true">
-                ${
-                    lighting
-                        ? `
-                            <span class="bookshelf-stage-lighting">
-                                ${escapeHtml(getShortCustomisationTitle(lighting, "Light"))}
-                            </span>
-                        `
-                        : ""
-                }
-
-                ${
-                    bookends
-                        ? `
-                            <span class="bookshelf-stage-bookend is-left">
-                                ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
-                            </span>
-
-                            <span class="bookshelf-stage-bookend is-right">
-                                ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
-                            </span>
-                        `
-                        : ""
-                }
-
-                ${
-                    charm
-                        ? `
-                            <span class="bookshelf-stage-charm">
-                                ${escapeHtml(getShortCustomisationTitle(charm, "Charm"))}
-                            </span>
-                        `
-                        : ""
-                }
-
-                ${
-                    object
-                        ? `
-                            <span class="bookshelf-stage-object">
-                                ${escapeHtml(getShortCustomisationTitle(object, "Object"))}
-                            </span>
-                        `
-                        : ""
-                }
-
-                ${
-                    nameplate
-                        ? `
-                            <span class="bookshelf-stage-nameplate">
-                                ${escapeHtml(getShortCustomisationTitle(nameplate, "Reader Shelf"))}
-                            </span>
-                        `
-                        : ""
-                }
-            </div>
-        `;
+    if (!bookends && !charm && !object && !nameplate && !lighting) {
+        return "";
     }
+
+    return `
+        <div class="bookshelf-stage-customisation" aria-hidden="true">
+            ${
+                lighting
+                    ? renderShelfDecorationImage(
+                        "bookshelf-stage-lighting",
+                        lighting,
+                        "Light"
+                    )
+                    : ""
+            }
+
+            ${
+                bookends
+                    ? `
+                        ${renderShelfDecorationImage(
+                            "bookshelf-stage-bookend is-left",
+                            bookends,
+                            "Bookend"
+                        )}
+
+                        ${renderShelfDecorationImage(
+                            "bookshelf-stage-bookend is-right",
+                            bookends,
+                            "Bookend"
+                        )}
+                    `
+                    : ""
+            }
+
+            ${
+                charm
+                    ? renderShelfDecorationImage(
+                        "bookshelf-stage-charm",
+                        charm,
+                        "Charm"
+                    )
+                    : ""
+            }
+
+            ${
+                object
+                    ? renderShelfDecorationImage(
+                        "bookshelf-stage-object",
+                        object,
+                        "Object"
+                    )
+                    : ""
+            }
+
+            ${
+                nameplate
+                    ? renderShelfDecorationImage(
+                        "bookshelf-stage-nameplate",
+                        nameplate,
+                        "Reader Shelf"
+                    )
+                    : ""
+            }
+        </div>
+    `;
+}
 
     function renderShelfSpine(book, record, index, stageLength) {
         const badges = [];
@@ -1496,18 +1518,22 @@
     }
 
     function bindBookshelfImageFallbacks() {
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-spine-image]").forEach(function (image) {
+    BlackwoodBookshelfState.root
+        .querySelectorAll("[data-bookshelf-spine-image], [data-bookshelf-decoration-image]")
+        .forEach(function (image) {
             image.addEventListener("error", function () {
-                const button = image.closest(".bookshelf-spine-button");
+                const wrapper = image.closest(
+                    ".bookshelf-spine-button, .bookshelf-customisation-item-image-wrap, .bookshelf-stage-decoration"
+                );
 
-                if (button) {
-                    button.classList.add("is-image-missing");
+                if (wrapper) {
+                    wrapper.classList.add("is-image-missing");
                 }
 
                 image.hidden = true;
             });
         });
-    }
+}
 
     function ensureBookshelfEscapeListener() {
         if (BlackwoodBookshelfState.escapeListenerBound) {
@@ -2202,71 +2228,73 @@
     }
 
     function normaliseCustomisationItem(rawItem, index) {
-        if (!rawItem || typeof rawItem !== "object") {
-            return null;
-        }
-
-        const category = normaliseCustomisationSlot(
-            rawItem.category ||
-            rawItem.type ||
-            rawItem.slot ||
-            rawItem.group ||
-            ""
-        );
-
-        if (!category) {
-            return null;
-        }
-
-        const title = String(
-            rawItem.title ||
-            rawItem.name ||
-            rawItem.label ||
-            `${category} ${index + 1}`
-        ).trim();
-
-        const id = String(
-            rawItem.id ||
-            rawItem.slug ||
-            createSlug(`${category}-${title}`)
-        ).trim();
-
-        const pointsRequired = Number(
-            rawItem.points_required ??
-            rawItem.pointsRequired ??
-            rawItem.required_points ??
-            rawItem.requiredPoints ??
-            rawItem.points ??
-            rawItem.cost ??
-            0
-        );
-
-        const booksRequired = Number(
-            rawItem.books_required ??
-            rawItem.booksRequired ??
-            rawItem.required_books ??
-            rawItem.requiredBooks ??
-            0
-        );
-
-        return {
-            id,
-            category,
-            title,
-            description: String(rawItem.description || rawItem.copy || rawItem.summary || "").trim(),
-            pointsRequired: Number.isFinite(pointsRequired) ? pointsRequired : 0,
-            booksRequired: Number.isFinite(booksRequired) ? booksRequired : 0,
-            requiredBookId: String(rawItem.required_book_id || rawItem.requiredBookId || rawItem.book_id || rawItem.bookId || "").trim(),
-            requiredReadBookId: String(rawItem.required_read_book_id || rawItem.requiredReadBookId || "").trim(),
-            requiredStage: normaliseShelfStatus(rawItem.required_stage || rawItem.requiredStage || ""),
-            unlockText: String(rawItem.unlock_text || rawItem.unlockText || rawItem.unlock || rawItem.requirement || "").trim(),
-            isDefault: rawItem.is_default === true || rawItem.default === true || rawItem.isDefault === true,
-            isFree: rawItem.is_free === true || rawItem.free === true || rawItem.isFree === true,
-            isIssued: rawItem.issued === true || rawItem.unlocked === true || rawItem.is_unlocked === true,
-            sortOrder: Number(rawItem.sort_order || rawItem.sortOrder || rawItem.order || index + 1),
-            rarity: String(rawItem.rarity || "").trim()
-        };
+    if (!rawItem || typeof rawItem !== "object") {
+        return null;
     }
+
+    const category = normaliseCustomisationSlot(
+        rawItem.category ||
+        rawItem.type ||
+        rawItem.slot ||
+        rawItem.group ||
+        ""
+    );
+
+    if (!category) {
+        return null;
+    }
+
+    const title = String(
+        rawItem.title ||
+        rawItem.name ||
+        rawItem.label ||
+        `${category} ${index + 1}`
+    ).trim();
+
+    const id = String(
+        rawItem.id ||
+        rawItem.slug ||
+        createSlug(`${category}-${title}`)
+    ).trim();
+
+    const pointsRequired = Number(
+        rawItem.points_required ??
+        rawItem.pointsRequired ??
+        rawItem.pointsCost ??
+        rawItem.required_points ??
+        rawItem.requiredPoints ??
+        rawItem.points ??
+        rawItem.cost ??
+        0
+    );
+
+    const booksRequired = Number(
+        rawItem.books_required ??
+        rawItem.booksRequired ??
+        rawItem.required_books ??
+        rawItem.requiredBooks ??
+        0
+    );
+
+    return {
+        id,
+        category,
+        title,
+        description: String(rawItem.description || rawItem.copy || rawItem.summary || "").trim(),
+        image: String(rawItem.image || rawItem.image_url || rawItem.imageUrl || rawItem.asset || rawItem.src || "").trim(),
+        pointsRequired: Number.isFinite(pointsRequired) ? pointsRequired : 0,
+        booksRequired: Number.isFinite(booksRequired) ? booksRequired : 0,
+        requiredBookId: String(rawItem.required_book_id || rawItem.requiredBookId || rawItem.book_id || rawItem.bookId || "").trim(),
+        requiredReadBookId: String(rawItem.required_read_book_id || rawItem.requiredReadBookId || "").trim(),
+        requiredStage: normaliseShelfStatus(rawItem.required_stage || rawItem.requiredStage || ""),
+        unlockText: String(rawItem.unlock_text || rawItem.unlockText || rawItem.unlockLabel || rawItem.unlock || rawItem.requirement || "").trim(),
+        isDefault: rawItem.is_default === true || rawItem.default === true || rawItem.isDefault === true,
+        isFree: rawItem.is_free === true || rawItem.free === true || rawItem.isFree === true,
+        isIssued: rawItem.issued === true || rawItem.unlocked === true || rawItem.is_unlocked === true,
+        sortOrder: Number(rawItem.sort_order || rawItem.sortOrder || rawItem.order || index + 1),
+        rarity: String(rawItem.rarity || "").trim()
+    };
+}
 
     function sortCustomisationItems(a, b) {
         const aSlotOrder = getCustomisationSlotOrder(a.category);
@@ -2573,38 +2601,97 @@
     }
 
     function renderShelfCustomisationVisualStyle() {
-        const selections = getSelectedCustomisationItems();
-        const backgroundText = lowerClean(selections.background ? `${selections.background.id} ${selections.background.title}` : "");
-        const lightingText = lowerClean(selections.lighting ? `${selections.lighting.id} ${selections.lighting.title}` : "");
+    const selections = getSelectedCustomisationItems();
 
-        let baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.11), transparent 34%), linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), rgba(0, 0, 0, 0.42)";
-        let baseShadow = "inset 0 0 0 1px rgba(255, 255, 255, 0.018), 0 18px 52px rgba(0, 0, 0, 0.34)";
+    const background = selections.background || null;
+    const lighting = selections.lighting || null;
 
-        if (backgroundText.includes("charcoal")) {
-            baseBackground = "radial-gradient(circle at top left, rgba(120, 120, 120, 0.12), transparent 34%), linear-gradient(180deg, rgba(32, 31, 29, 0.88), rgba(5, 4, 3, 0.96))";
-        } else if (backgroundText.includes("oak") || backgroundText.includes("wood")) {
-            baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.18), transparent 34%), linear-gradient(180deg, rgba(64, 34, 16, 0.88), rgba(12, 6, 3, 0.96))";
-        } else if (backgroundText.includes("green") || backgroundText.includes("archive")) {
-            baseBackground = "radial-gradient(circle at top left, rgba(120, 150, 102, 0.14), transparent 34%), linear-gradient(180deg, rgba(18, 36, 27, 0.88), rgba(3, 6, 5, 0.96))";
-        } else if (backgroundText.includes("window") || backgroundText.includes("mist")) {
-            baseBackground = "radial-gradient(circle at 74% 8%, rgba(180, 190, 190, 0.13), transparent 30%), linear-gradient(180deg, rgba(19, 23, 26, 0.9), rgba(3, 4, 5, 0.97))";
-        } else if (backgroundText.includes("stone") || backgroundText.includes("chapel")) {
-            baseBackground = "radial-gradient(circle at top left, rgba(160, 150, 130, 0.13), transparent 34%), linear-gradient(180deg, rgba(37, 34, 30, 0.9), rgba(7, 6, 5, 0.97))";
-        } else if (backgroundText.includes("storm") || backgroundText.includes("blue")) {
-            baseBackground = "radial-gradient(circle at top right, rgba(98, 122, 152, 0.16), transparent 35%), linear-gradient(180deg, rgba(8, 13, 22, 0.92), rgba(2, 3, 6, 0.98))";
-        }
+    const backgroundImage = getCustomisationImageSrc(background);
+    const lightingImage = getCustomisationImageSrc(lighting);
 
-        if (lightingText.includes("warm") || lightingText.includes("lamp") || lightingText.includes("candle")) {
-            baseShadow = "inset 0 0 70px rgba(196, 122, 44, 0.16), 0 0 34px rgba(196, 122, 44, 0.1), 0 18px 52px rgba(0, 0, 0, 0.34)";
-        } else if (lightingText.includes("cold") || lightingText.includes("blue")) {
-            baseShadow = "inset 0 0 70px rgba(120, 150, 190, 0.12), 0 0 34px rgba(120, 150, 190, 0.08), 0 18px 52px rgba(0, 0, 0, 0.34)";
-        } else if (lightingText.includes("storm")) {
-            baseShadow = "inset 0 0 80px rgba(100, 120, 160, 0.16), 0 0 36px rgba(80, 100, 140, 0.1), 0 18px 52px rgba(0, 0, 0, 0.34)";
-        }
+    const backgroundText = lowerClean(background ? `${background.id} ${background.title}` : "");
+    const lightingText = lowerClean(lighting ? `${lighting.id} ${lighting.title}` : "");
 
-        return `background: ${baseBackground}; box-shadow: ${baseShadow};`;
+    let baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.11), transparent 34%), linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), rgba(0, 0, 0, 0.42)";
+    let baseShadow = "inset 0 0 0 1px rgba(255, 255, 255, 0.018), 0 18px 52px rgba(0, 0, 0, 0.34)";
+    let customProperties = "";
+
+    if (backgroundImage) {
+        baseBackground = `
+            linear-gradient(180deg, rgba(8, 5, 3, 0.24), rgba(4, 2, 1, 0.76)),
+            radial-gradient(circle at top left, rgba(196, 122, 44, 0.14), transparent 34%),
+            url("${escapeCssUrl(backgroundImage)}") center center / cover no-repeat
+        `.replace(/\s+/g, " ").trim();
+
+        customProperties += ` --bookshelf-background-image: url("${escapeCssUrl(backgroundImage)}");`;
+    } else if (backgroundText.includes("charcoal")) {
+        baseBackground = "radial-gradient(circle at top left, rgba(120, 120, 120, 0.12), transparent 34%), linear-gradient(180deg, rgba(32, 31, 29, 0.88), rgba(5, 4, 3, 0.96))";
+    } else if (backgroundText.includes("oak") || backgroundText.includes("wood")) {
+        baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.18), transparent 34%), linear-gradient(180deg, rgba(64, 34, 16, 0.88), rgba(12, 6, 3, 0.96))";
+    } else if (backgroundText.includes("green") || backgroundText.includes("archive")) {
+        baseBackground = "radial-gradient(circle at top left, rgba(120, 150, 102, 0.14), transparent 34%), linear-gradient(180deg, rgba(18, 36, 27, 0.88), rgba(3, 6, 5, 0.96))";
+    } else if (backgroundText.includes("window") || backgroundText.includes("mist")) {
+        baseBackground = "radial-gradient(circle at 74% 8%, rgba(180, 190, 190, 0.13), transparent 30%), linear-gradient(180deg, rgba(19, 23, 26, 0.9), rgba(3, 4, 5, 0.97))";
+    } else if (backgroundText.includes("stone") || backgroundText.includes("chapel")) {
+        baseBackground = "radial-gradient(circle at top left, rgba(160, 150, 130, 0.13), transparent 34%), linear-gradient(180deg, rgba(37, 34, 30, 0.9), rgba(7, 6, 5, 0.97))";
+    } else if (backgroundText.includes("storm") || backgroundText.includes("blue")) {
+        baseBackground = "radial-gradient(circle at top right, rgba(98, 122, 152, 0.16), transparent 35%), linear-gradient(180deg, rgba(8, 13, 22, 0.92), rgba(2, 3, 6, 0.98))";
     }
 
+    if (lightingImage) {
+        customProperties += ` --bookshelf-lighting-image: url("${escapeCssUrl(lightingImage)}");`;
+    }
+
+    if (lightingText.includes("warm") || lightingText.includes("lamp") || lightingText.includes("candle")) {
+        baseShadow = "inset 0 0 70px rgba(196, 122, 44, 0.16), 0 0 34px rgba(196, 122, 44, 0.1), 0 18px 52px rgba(0, 0, 0, 0.34)";
+    } else if (lightingText.includes("cold") || lightingText.includes("blue")) {
+        baseShadow = "inset 0 0 70px rgba(120, 150, 190, 0.12), 0 0 34px rgba(120, 150, 190, 0.08), 0 18px 52px rgba(0, 0, 0, 0.34)";
+    } else if (lightingText.includes("storm")) {
+        baseShadow = "inset 0 0 80px rgba(100, 120, 160, 0.16), 0 0 36px rgba(80, 100, 140, 0.1), 0 18px 52px rgba(0, 0, 0, 0.34)";
+    }
+
+    return `background: ${baseBackground}; box-shadow: ${baseShadow};${customProperties}`;
+}
+function getCustomisationImageSrc(item) {
+    if (!item || !item.image) {
+        return "";
+    }
+
+    return String(item.image || "").trim();
+}
+
+function renderShelfDecorationImage(className, item, fallback) {
+    const imageSrc = getCustomisationImageSrc(item);
+    const label = getShortCustomisationTitle(item, fallback);
+
+    return `
+        <span class="bookshelf-stage-decoration ${escapeAttribute(className)} ${imageSrc ? "has-image" : "has-text"}">
+            ${
+                imageSrc
+                    ? `
+                        <img
+                            src="${escapeAttribute(imageSrc)}"
+                            alt=""
+                            loading="lazy"
+                            data-bookshelf-decoration-image
+                        >
+                    `
+                    : escapeHtml(label)
+            }
+        </span>
+    `;
+}
+
+function escapeCssUrl(value) {
+    return String(value || "")
+        .trim()
+        .replace(/\\/g, "/")
+        .replace(/"/g, "%22")
+        .replace(/'/g, "%27")
+        .replace(/\n/g, "")
+        .replace(/\r/g, "");
+}
+    
     function setBookshelfStatus(message, className) {
         BlackwoodBookshelfState.statusMessage = message || "";
         BlackwoodBookshelfState.statusType = className || "";
