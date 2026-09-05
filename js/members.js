@@ -164,22 +164,26 @@
             );
 
             BlackwoodMembersState.client.auth.onAuthStateChange(function (event, session) {
-                BlackwoodMembersState.session = session || null;
-                updateMemberIntroVisibility(BlackwoodMembersState.session);
+    BlackwoodMembersState.session = session || null;
+    updateMemberIntroVisibility(BlackwoodMembersState.session);
 
-                if (event === "PASSWORD_RECOVERY" || (session && isPasswordResetRoute())) {
-                    BlackwoodMembersState.isPasswordRecovery = true;
-                    renderPasswordUpdateView();
-                    return;
-                }
+    if (event === "INITIAL_SESSION") {
+        return;
+    }
 
-                if (BlackwoodMembersState.session) {
-                    loadMemberDashboard();
-                    return;
-                }
+    if (event === "PASSWORD_RECOVERY" || (session && isPasswordResetRoute())) {
+        BlackwoodMembersState.isPasswordRecovery = true;
+        renderPasswordUpdateView();
+        return;
+    }
 
-                renderAuthView();
-            });
+    if (BlackwoodMembersState.session) {
+        loadMemberDashboard();
+        return;
+    }
+
+    renderAuthView();
+});
 
             const { data, error } = await BlackwoodMembersState.client.auth.getSession();
 
