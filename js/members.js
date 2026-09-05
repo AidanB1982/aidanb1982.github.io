@@ -1515,20 +1515,47 @@
     }
 
     function bindBlackwoodBookshelf() {
-        const root = document.getElementById("blackwood-bookshelf-root");
+    const root = document.getElementById("blackwood-bookshelf-root");
 
-        if (!root || typeof window.initBlackwoodBookshelf !== "function") {
-            return;
-        }
+    if (!root) {
+        return;
+    }
 
+    if (typeof window.initBlackwoodBookshelf !== "function") {
+        root.innerHTML = `
+            <div class="blackwood-bookshelf">
+                <div class="bookshelf-empty-card">
+                    <p class="bookshelf-kicker">My Blackwood Bookshelf</p>
+                    <h3>Bookshelf unavailable</h3>
+                    <p>The bookshelf script could not be loaded. Please refresh the page.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    try {
         window.initBlackwoodBookshelf({
             root,
             client: BlackwoodMembersState.client,
             session: BlackwoodMembersState.session,
             member: BlackwoodMembersState.member,
             pointsTotal: getCurrentPointsTotal()
-            });
+        });
+    } catch (error) {
+        console.error("Blackwood Bookshelf bind failed:", error);
+
+        root.innerHTML = `
+            <div class="blackwood-bookshelf">
+                <div class="bookshelf-empty-card">
+                    <p class="bookshelf-kicker">My Blackwood Bookshelf</p>
+                    <h3>Bookshelf error</h3>
+                    <p>Your bookshelf could not be opened. Please refresh and try again.</p>
+                </div>
+            </div>
+        `;
     }
+}
 
     // =========================
     // ADMIN REWARD FULFILMENT DESK
