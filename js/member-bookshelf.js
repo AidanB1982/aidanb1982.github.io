@@ -219,6 +219,7 @@
         customisationStatusType: "",
         customisationSaveMode: "local",
         isSavingCustomisation: false,
+        isCustomisationOpen: false,
 
         modalMode: "closed",
         activeBookId: "",
@@ -494,35 +495,49 @@
     }
 
     function renderShelfCustomisationPanel(shelfItems) {
-        const items = BlackwoodBookshelfState.customisationItems;
+    const items = BlackwoodBookshelfState.customisationItems;
 
-        if (!items.length) {
-            return "";
-        }
+    if (!items.length) {
+        return "";
+    }
 
-        const pointsTotal = getCustomisationPointsTotal();
-        const filedCount = shelfItems.length;
-        const issuedCount = getIssuedCustomisationItems().length;
-        const selectedItems = getSelectedCustomisationItems();
+    const pointsTotal = getCustomisationPointsTotal();
+    const filedCount = shelfItems.length;
+    const issuedCount = getIssuedCustomisationItems().length;
+    const selectedItems = getSelectedCustomisationItems();
 
-        return `
-            <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
-                <div class="bookshelf-customisation-header">
-                    <div>
-                        <p class="bookshelf-kicker">Issued Objects</p>
-                        <h3 id="bookshelf-customisation-title">Customise Your Shelf</h3>
-                        <p>
-                            Change the atmosphere of your private Blackwood shelf with backgrounds, bookends,
-                            charms, objects, nameplates, and lighting earned through reader activity.
-                        </p>
-                    </div>
+    return `
+        <details
+            class="bookshelf-customisation-panel bookshelf-customisation-drawer"
+            data-bookshelf-customisation-drawer
+            ${BlackwoodBookshelfState.isCustomisationOpen ? "open" : ""}
+        >
+            <summary class="bookshelf-customisation-summary">
+                <div>
+                    <p class="bookshelf-kicker">Issued Objects</p>
 
-                    <div class="bookshelf-customisation-meta">
-                        <strong>${issuedCount} / ${items.length}</strong>
-                        <span>issued</span>
-                    </div>
+                    <h3 id="bookshelf-customisation-title">
+                        Customise Your Shelf
+                    </h3>
+
+                    <p>
+                        Backgrounds, bookends, charms, objects, nameplates, and lighting.
+                    </p>
                 </div>
 
+                <div class="bookshelf-customisation-summary-side">
+                    <span class="bookshelf-customisation-meta">
+                        <strong>${issuedCount} / ${items.length}</strong>
+                        <span>issued</span>
+                    </span>
+
+                    <span class="bookshelf-customisation-toggle-text">
+                        Open
+                    </span>
+                </div>
+            </summary>
+
+            <div class="bookshelf-customisation-inner">
                 <div class="bookshelf-customisation-record">
                     <p>
                         ${filedCount} ${filedCount === 1 ? "spine" : "spines"} filed · ${pointsTotal} Circle points
@@ -566,9 +581,10 @@
                         Reset Display
                     </button>
                 </div>
-            </section>
-        `;
-    }
+            </div>
+        </details>
+    `;
+}
 
     function renderShelfCustomisationFilters() {
         const counts = getCustomisationCategoryCounts();
@@ -1158,7 +1174,13 @@
                 BlackwoodBookshelfState.isDrawerOpen = drawer.open;
             });
         }
+        const customisationDrawer = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-customisation-drawer]");
 
+        if (customisationDrawer) {
+            customisationDrawer.addEventListener("toggle", function () {
+                BlackwoodBookshelfState.isCustomisationOpen = customisationDrawer.open;
+            });
+        }
         BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-add]").forEach(function (button) {
             button.addEventListener("click", openBookPickerModal);
         });
