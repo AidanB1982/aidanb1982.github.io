@@ -2,7 +2,7 @@
 // BLACKWOOD MEMBER BOOKSHELF
 // Private shelf records powered by Supabase
 // Phase 2C: Collapsible shelf drawer + shelf stages + rearrange controls
-// Phase 2E: Shelf customisation, filters, unlock checks + safe local/Supabase save
+// Phase 2E SAFE: Shelf customisation, filters, unlock checks + local save
 // =========================
 
 (function () {
@@ -11,12 +11,7 @@
     const BLACKWOOD_BOOKSHELF_CONFIG = {
         rootId: "blackwood-bookshelf-root",
         tableName: "member_book_shelf",
-        customisationItemsPath: "/data/shelf-customisation-items.json",
-        customisationTableNames: [
-            "member_shelf_customisations",
-            "member_shelf_customisation",
-            "member_bookshelf_customisations"
-        ]
+        customisationItemsPath: "/data/shelf-customisation-items.json"
     };
 
     const BLACKWOOD_BOOKSHELF_STAGES = [
@@ -222,7 +217,6 @@
         customisationFilter: "all",
         customisationStatusMessage: "",
         customisationStatusType: "",
-        customisationStorageTable: "",
         customisationSaveMode: "local",
         isSavingCustomisation: false,
 
@@ -238,71 +232,90 @@
     };
 
     window.initBlackwoodBookshelf = async function initBlackwoodBookshelf(options) {
-    const root = options && options.root
-        ? options.root
-        : document.getElementById(BLACKWOOD_BOOKSHELF_CONFIG.rootId);
+        const root = options && options.root
+            ? options.root
+            : document.getElementById(BLACKWOOD_BOOKSHELF_CONFIG.rootId);
 
-    if (!root) {
-        console.warn("Blackwood Bookshelf: root element not found.");
-        return;
-    }
+        if (!root) {
+            console.warn("Blackwood Bookshelf: root element not found.");
+            return;
+        }
 
-    BlackwoodBookshelfState.root = root;
-    BlackwoodBookshelfState.client = options ? options.client : null;
-    BlackwoodBookshelfState.session = options ? options.session : null;
-    BlackwoodBookshelfState.member = options ? options.member || null : null;
-    BlackwoodBookshelfState.pointsTotal = Number(options && options.pointsTotal ? options.pointsTotal : 0);
+        BlackwoodBookshelfState.root = root;
+        BlackwoodBookshelfState.client = options ? options.client : null;
+        BlackwoodBookshelfState.session = options ? options.session : null;
+        BlackwoodBookshelfState.member = options ? options.member || null : null;
+        BlackwoodBookshelfState.pointsTotal = Number(options && options.pointsTotal ? options.pointsTotal : 0);
 
-    BlackwoodBookshelfState.modalMode = "closed";
-    BlackwoodBookshelfState.activeBookId = "";
-    BlackwoodBookshelfState.statusMessage = "";
-    BlackwoodBookshelfState.statusType = "";
-    BlackwoodBookshelfState.customisationStatusMessage = "";
-    BlackwoodBookshelfState.customisationStatusType = "";
-    BlackwoodBookshelfState.customisationFilter = "all";
-    BlackwoodBookshelfState.customisationSaveMode = "local";
-    BlackwoodBookshelfState.customisationStorageTable = "";
+        BlackwoodBookshelfState.modalMode = "closed";
+        BlackwoodBookshelfState.activeBookId = "";
+        BlackwoodBookshelfState.statusMessage = "";
+        BlackwoodBookshelfState.statusType = "";
+        BlackwoodBookshelfState.customisationStatusMessage = "";
+        BlackwoodBookshelfState.customisationStatusType = "";
+        BlackwoodBookshelfState.customisationFilter = "all";
+        BlackwoodBookshelfState.customisationSaveMode = "local";
+        BlackwoodBookshelfState.isSavingCustomisation = false;
 
-    ensureBookshelfEscapeListener();
+        ensureBookshelfEscapeListener();
 
-    if (!BlackwoodBookshelfState.client || !getCurrentUserId()) {
-        renderBookshelfUnavailable();
-        return;
-    }
+        if (!BlackwoodBookshelfState.client || !getCurrentUserId()) {
+            renderBookshelfUnavailable();
+            return;
+        }
 
-    renderBookshelfLoading();
-
-    try {
-        await withBookshelfTimeout(
-            loadBookshelfRecords(),
-            8000,
-            "Bookshelf records timed out."
-        );
-
-        BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
-            loadLocalShelfCustomisationSelections()
-        );
+        renderBookshelfLoading();
 
         try {
             await withBookshelfTimeout(
-                loadShelfCustomisationItems(),
-                3000,
-                "Shelf customisation items timed out."
+                loadBookshelfRecords(),
+                8000,
+                "Bookshelf records timed out."
             );
-        } catch (customisationError) {
-            console.warn("Shelf customisation skipped:", customisationError);
-            BlackwoodBookshelfState.customisationItems = [];
-            BlackwoodBookshelfState.customisationItemsLoaded = false;
-            BlackwoodBookshelfState.customisationItemsError = "";
+
+            BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
+                loadLocalShelfCustomisationSelections()
+            );
+
+            try {
+                await withBookshelfTimeout(
+                    loadShelfCustomisationItems(),
+                    3000,
+                    "Shelf customisation items timed out."
+                );
+            } catch (customisationError) {
+                console.warn("Shelf customisation skipped:", customisationError);
+                BlackwoodBookshelfState.customisationItems = [];
+                BlackwoodBookshelfState.customisationItemsLoaded = false;
+                BlackwoodBookshelfState.customisationItemsError = "";
+            }
+
+            renderBookshelf();
+
+        } catch (error) {
+            console.error("Blackwood Bookshelf failed:", error);
+            renderBookshelfError("Your Blackwood Bookshelf could not be opened. Please refresh and try again.");
         }
+    };
 
-        renderBookshelf();
+    function withBookshelfTimeout(promise, milliseconds, message) {
+        let timeoutId = null;
 
-    } catch (error) {
-        console.error("Blackwood Bookshelf failed:", error);
-        renderBookshelfError("Your Blackwood Bookshelf could not be opened. Please refresh and try again.");
+        const timeoutPromise = new Promise(function (_resolve, reject) {
+            timeoutId = window.setTimeout(function () {
+                reject(new Error(message || "Bookshelf request timed out."));
+            }, milliseconds);
+        });
+
+        return Promise.race([
+            promise,
+            timeoutPromise
+        ]).finally(function () {
+            if (timeoutId) {
+                window.clearTimeout(timeoutId);
+            }
+        });
     }
-};
 
     async function loadBookshelfRecords() {
         const userId = getCurrentUserId();
@@ -322,8 +335,6 @@
             .order("created_at", { ascending: true });
 
         if (result.error && /shelf_status|shelf_position/i.test(String(result.error.message || ""))) {
-            console.warn("Bookshelf stage columns unavailable, using legacy shelf order:", result.error.message);
-
             result = await BlackwoodBookshelfState.client
                 .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
                 .select("*")
@@ -344,65 +355,17 @@
     async function loadShelfCustomisationItems() {
         BlackwoodBookshelfState.customisationItemsError = "";
 
-        try {
-            const response = await fetch(`${BLACKWOOD_BOOKSHELF_CONFIG.customisationItemsPath}?cache=${Date.now()}`);
+        const response = await fetch(`${BLACKWOOD_BOOKSHELF_CONFIG.customisationItemsPath}?v=20260910`);
 
-            if (!response.ok) {
-                throw new Error("Shelf customisation items could not be loaded.");
-            }
-
-            const data = await response.json();
-            const items = extractCustomisationItemsFromData(data);
-
-            BlackwoodBookshelfState.customisationItems = items;
-            BlackwoodBookshelfState.customisationItemsLoaded = true;
-
-        } catch (error) {
-            console.warn("Shelf customisation JSON could not be loaded:", error);
-            BlackwoodBookshelfState.customisationItems = [];
-            BlackwoodBookshelfState.customisationItemsLoaded = false;
-            BlackwoodBookshelfState.customisationItemsError = "Shelf customisation items could not be loaded.";
-        }
-    }
-
-    async function loadShelfCustomisationRecord() {
-    BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
-        loadLocalShelfCustomisationSelections()
-    );
-
-    BlackwoodBookshelfState.customisationStorageTable = "";
-    BlackwoodBookshelfState.customisationSaveMode = "local";
-}
-
-        for (const tableName of BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames) {
-            try {
-                const { data, error } = await BlackwoodBookshelfState.client
-                    .from(tableName)
-                    .select("*")
-                    .eq("member_id", userId)
-                    .maybeSingle();
-
-                if (error) {
-                    continue;
-                }
-
-                BlackwoodBookshelfState.customisationStorageTable = tableName;
-                BlackwoodBookshelfState.customisationSaveMode = "supabase";
-
-                if (data) {
-                    BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
-                        getRemoteShelfCustomisationSelections(data)
-                    );
-                }
-
-                return;
-
-            } catch (error) {
-                console.warn(`Shelf customisation table check failed for ${tableName}:`, error);
-            }
+        if (!response.ok) {
+            throw new Error("Shelf customisation items could not be loaded.");
         }
 
-        BlackwoodBookshelfState.customisationSaveMode = "local";
+        const data = await response.json();
+        const items = extractCustomisationItemsFromData(data);
+
+        BlackwoodBookshelfState.customisationItems = items;
+        BlackwoodBookshelfState.customisationItemsLoaded = true;
     }
 
     function renderBookshelfLoading() {
@@ -445,14 +408,14 @@
         const shelfItems = getShelfItems();
         const totalBooks = shelfItems.length;
         const totalLabel = totalBooks === 1 ? "1 Book" : `${totalBooks} Books`;
-        
+
         BlackwoodBookshelfState.root.innerHTML = `
             <div class="blackwood-bookshelf">
-            <details
-                class="bookshelf-drawer ${escapeAttribute(getShelfCustomisationClassNames())}"
-                data-bookshelf-drawer
-                ${BlackwoodBookshelfState.isDrawerOpen ? "open" : ""}
-            >
+                <details
+                    class="bookshelf-drawer ${escapeAttribute(getShelfCustomisationClassNames())}"
+                    data-bookshelf-drawer
+                    ${BlackwoodBookshelfState.isDrawerOpen ? "open" : ""}
+                >
                     <summary class="bookshelf-drawer-summary">
                         <div class="bookshelf-drawer-title-block">
                             <p class="bookshelf-kicker">Private Reader Shelf</p>
@@ -532,38 +495,15 @@
 
     function renderShelfCustomisationPanel(shelfItems) {
         const items = BlackwoodBookshelfState.customisationItems;
+
+        if (!items.length) {
+            return "";
+        }
+
         const pointsTotal = getCustomisationPointsTotal();
         const filedCount = shelfItems.length;
         const issuedCount = getIssuedCustomisationItems().length;
         const selectedItems = getSelectedCustomisationItems();
-
-        if (BlackwoodBookshelfState.customisationItemsError) {
-            return `
-                <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
-                    <div class="bookshelf-customisation-header">
-                        <div>
-                            <p class="bookshelf-kicker">Issued Objects</p>
-                            <h3 id="bookshelf-customisation-title">Customise Your Shelf</h3>
-                            <p>${escapeHtml(BlackwoodBookshelfState.customisationItemsError)}</p>
-                        </div>
-                    </div>
-                </section>
-            `;
-        }
-
-        if (!items.length) {
-            return `
-                <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
-                    <div class="bookshelf-customisation-header">
-                        <div>
-                            <p class="bookshelf-kicker">Issued Objects</p>
-                            <h3 id="bookshelf-customisation-title">Customise Your Shelf</h3>
-                            <p>Shelf customisation items are waiting to be filed in the archive.</p>
-                        </div>
-                    </div>
-                </section>
-            `;
-        }
 
         return `
             <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
@@ -602,8 +542,6 @@
                     </div>
                 </div>
 
-                ${renderShelfCustomisationDisplayPreview(selectedItems)}
-
                 ${renderShelfCustomisationFilters()}
 
                 <p
@@ -629,44 +567,6 @@
                     </button>
                 </div>
             </section>
-        `;
-    }
-
-    function renderShelfCustomisationDisplayPreview(selectedItems) {
-        const background = selectedItems.background;
-        const bookends = selectedItems.bookends;
-        const charm = selectedItems.charm;
-        const object = selectedItems.object;
-        const nameplate = selectedItems.nameplate;
-        const lighting = selectedItems.lighting;
-
-        return `
-            <div class="bookshelf-customisation-preview" aria-label="Shelf customisation preview">
-                <div class="bookshelf-customisation-preview-light"></div>
-
-                <div class="bookshelf-customisation-preview-row">
-                    <span class="bookshelf-customisation-preview-bookend">
-                        ${escapeHtml(bookends ? bookends.title : "Bookend")}
-                    </span>
-
-                    <span class="bookshelf-customisation-preview-object">
-                        ${escapeHtml(object ? object.title : "Object")}
-                    </span>
-
-                    <span class="bookshelf-customisation-preview-charm">
-                        ${escapeHtml(charm ? charm.title : "Charm")}
-                    </span>
-                </div>
-
-                <div class="bookshelf-customisation-preview-plate">
-                    ${escapeHtml(nameplate ? nameplate.title : "Reader Shelf")}
-                </div>
-
-                <p>
-                    ${escapeHtml(background ? background.title : "Default Archive Shelf")}
-                    ${lighting ? ` · ${escapeHtml(lighting.title)}` : ""}
-                </p>
-            </div>
         `;
     }
 
@@ -772,128 +672,133 @@
     }
 
     function renderShelfStage(stage, stageItems) {
-    const count = stageItems.length;
-    const countLabel = count === 1 ? "1 book" : `${count} books`;
-    const visualStyle = renderShelfCustomisationVisualStyle();
-    const customisationClasses = getShelfCustomisationClassNames();
-    const customisationDecorations = renderShelfStageCustomisationDecorations();
+        const count = stageItems.length;
+        const countLabel = count === 1 ? "1 book" : `${count} books`;
+        const visualStyle = renderShelfCustomisationVisualStyle();
+        const customisationClasses = getShelfCustomisationClassNames();
 
-    return `
-        <section
-            class="bookshelf-stage ${count ? "has-books" : "is-empty"} ${escapeAttribute(customisationClasses)}"
-            data-bookshelf-stage="${escapeAttribute(stage.id)}"
-            data-bookshelf-drop-stage="${escapeAttribute(stage.id)}"
-            aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
-            ${visualStyle ? `style="${escapeAttribute(visualStyle)}"` : ""}
-        >
-            ${customisationDecorations}
+        return `
+            <section
+                class="bookshelf-stage ${count ? "has-books" : "is-empty"}"
+                data-bookshelf-stage="${escapeAttribute(stage.id)}"
+                data-bookshelf-drop-stage="${escapeAttribute(stage.id)}"
+                aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
+            >
+                <div class="bookshelf-stage-header">
+                    <div>
+                        <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
+                            ${escapeHtml(stage.label)}
+                        </h3>
+                        <p>${escapeHtml(stage.description)}</p>
+                    </div>
 
-            <div class="bookshelf-stage-header">
-                <div>
-                    <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
-                        ${escapeHtml(stage.label)}
-                    </h3>
-                    <p>${escapeHtml(stage.description)}</p>
+                    <span>${escapeHtml(countLabel)}</span>
                 </div>
 
-                <span>${escapeHtml(countLabel)}</span>
-            </div>
+                <div
+                    class="bookshelf-stage-display ${escapeAttribute(customisationClasses)}"
+                    ${visualStyle ? `style="${escapeAttribute(visualStyle)}"` : ""}
+                >
+                    ${renderShelfStageCustomisationDecorations()}
 
-            ${
-                count
-                    ? `
-                        <div
-                            class="bookshelf-spine-list bookshelf-stage-spine-list"
-                            data-bookshelf-drop-list="${escapeAttribute(stage.id)}"
-                        >
-                            ${stageItems.map(function (item, index) {
-                                return renderShelfSpine(item.book, item.record, index, stageItems.length);
-                            }).join("")}
-                        </div>
-                    `
-                    : `
-                        <div
-                            class="bookshelf-stage-empty"
-                            data-bookshelf-empty-drop="${escapeAttribute(stage.id)}"
-                        >
-                            <p>No books on this shelf yet. Drop a book here to file it.</p>
-                        </div>
-                    `
-            }
-        </section>
-    `;
-}
-function renderShelfStageCustomisationDecorations() {
-    const selectedItems = getSelectedCustomisationItems();
-
-    const bookends = selectedItems.bookends || null;
-    const charm = selectedItems.charm || null;
-    const object = selectedItems.object || null;
-    const nameplate = selectedItems.nameplate || null;
-    const lighting = selectedItems.lighting || null;
-
-    if (!bookends && !charm && !object && !nameplate && !lighting) {
-        return "";
+                    ${
+                        count
+                            ? `
+                                <div
+                                    class="bookshelf-spine-list bookshelf-stage-spine-list"
+                                    data-bookshelf-drop-list="${escapeAttribute(stage.id)}"
+                                >
+                                    ${stageItems.map(function (item, index) {
+                                        return renderShelfSpine(item.book, item.record, index, stageItems.length);
+                                    }).join("")}
+                                </div>
+                            `
+                            : `
+                                <div
+                                    class="bookshelf-stage-empty"
+                                    data-bookshelf-empty-drop="${escapeAttribute(stage.id)}"
+                                >
+                                    <p>No books on this shelf yet. Drop a book here to file it.</p>
+                                </div>
+                            `
+                    }
+                </div>
+            </section>
+        `;
     }
 
-    return `
-        <div class="bookshelf-stage-customisation" aria-hidden="true">
-            ${
-                lighting
-                    ? `
-                        <span class="bookshelf-stage-lighting">
-                            ${escapeHtml(getShortCustomisationTitle(lighting, "Light"))}
-                        </span>
-                    `
-                    : ""
-            }
+    function renderShelfStageCustomisationDecorations() {
+        const selectedItems = getSelectedCustomisationItems();
 
-            ${
-                bookends
-                    ? `
-                        <span class="bookshelf-stage-bookend is-left">
-                            ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
-                        </span>
+        const bookends = selectedItems.bookends || null;
+        const charm = selectedItems.charm || null;
+        const object = selectedItems.object || null;
+        const nameplate = selectedItems.nameplate || null;
+        const lighting = selectedItems.lighting || null;
 
-                        <span class="bookshelf-stage-bookend is-right">
-                            ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
-                        </span>
-                    `
-                    : ""
-            }
+        if (!bookends && !charm && !object && !nameplate && !lighting) {
+            return "";
+        }
 
-            ${
-                charm
-                    ? `
-                        <span class="bookshelf-stage-charm">
-                            ${escapeHtml(getShortCustomisationTitle(charm, "Charm"))}
-                        </span>
-                    `
-                    : ""
-            }
+        return `
+            <div class="bookshelf-stage-customisation" aria-hidden="true">
+                ${
+                    lighting
+                        ? `
+                            <span class="bookshelf-stage-lighting">
+                                ${escapeHtml(getShortCustomisationTitle(lighting, "Light"))}
+                            </span>
+                        `
+                        : ""
+                }
 
-            ${
-                object
-                    ? `
-                        <span class="bookshelf-stage-object">
-                            ${escapeHtml(getShortCustomisationTitle(object, "Object"))}
-                        </span>
-                    `
-                    : ""
-            }
+                ${
+                    bookends
+                        ? `
+                            <span class="bookshelf-stage-bookend is-left">
+                                ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
+                            </span>
 
-            ${
-                nameplate
-                    ? `
-                        <span class="bookshelf-stage-nameplate">
-                            ${escapeHtml(getShortCustomisationTitle(nameplate, "Reader Shelf"))}
-                        </span>
-                    `
-                    : ""
-            }
-        </div>
-    `;
-}
+                            <span class="bookshelf-stage-bookend is-right">
+                                ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
+                            </span>
+                        `
+                        : ""
+                }
+
+                ${
+                    charm
+                        ? `
+                            <span class="bookshelf-stage-charm">
+                                ${escapeHtml(getShortCustomisationTitle(charm, "Charm"))}
+                            </span>
+                        `
+                        : ""
+                }
+
+                ${
+                    object
+                        ? `
+                            <span class="bookshelf-stage-object">
+                                ${escapeHtml(getShortCustomisationTitle(object, "Object"))}
+                            </span>
+                        `
+                        : ""
+                }
+
+                ${
+                    nameplate
+                        ? `
+                            <span class="bookshelf-stage-nameplate">
+                                ${escapeHtml(getShortCustomisationTitle(nameplate, "Reader Shelf"))}
+                            </span>
+                        `
+                        : ""
+                }
+            </div>
+        `;
+    }
+
     function renderShelfSpine(book, record, index, stageLength) {
         const badges = [];
         const stage = getShelfStageById(record.shelf_status);
@@ -1474,7 +1379,6 @@ function renderShelfStageCustomisationDecorations() {
             }
 
             await saveShelfStageOrderForDrag(targetItems, cleanTargetStage);
-
             await loadBookshelfRecords();
 
             BlackwoodBookshelfState.isDrawerOpen = true;
@@ -1521,7 +1425,6 @@ function renderShelfStageCustomisationDecorations() {
         });
 
         const results = await Promise.all(updates);
-
         const failedResult = results.find(function (result) {
             return result && result.error;
         });
@@ -1549,11 +1452,9 @@ function renderShelfStageCustomisationDecorations() {
 
             dropAfter = event.clientX > midpoint;
 
-            if (dropAfter) {
-                beforeBookId = getNextBookIdAfter(slotBookId, stageId);
-            } else {
-                beforeBookId = slotBookId;
-            }
+            beforeBookId = dropAfter
+                ? getNextBookIdAfter(slotBookId, stageId)
+                : slotBookId;
         }
 
         return {
@@ -1591,7 +1492,6 @@ function renderShelfStageCustomisationDecorations() {
     function resetBookshelfDragState() {
         BlackwoodBookshelfState.draggingBookId = "";
         BlackwoodBookshelfState.draggingFromStageId = "";
-
         document.body.classList.remove("is-bookshelf-dragging");
     }
 
@@ -1899,7 +1799,6 @@ function renderShelfStageCustomisationDecorations() {
 
         try {
             await saveShelfStageOrder(reorderedItems);
-
             await loadBookshelfRecords();
 
             BlackwoodBookshelfState.isDrawerOpen = true;
@@ -1925,14 +1824,14 @@ function renderShelfStageCustomisationDecorations() {
             throw new Error("Sign in required.");
         }
 
-        const updates = stageItems.map(function (item, index) {
-            const position = (index + 1) * 10;
+        const now = new Date().toISOString();
 
+        const updates = stageItems.map(function (item, index) {
             return BlackwoodBookshelfState.client
                 .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
                 .update({
-                    shelf_position: position,
-                    updated_at: new Date().toISOString()
+                    shelf_position: (index + 1) * 10,
+                    updated_at: now
                 })
                 .eq("member_id", userId)
                 .eq("book_id", item.record.book_id);
@@ -1982,34 +1881,13 @@ function renderShelfStageCustomisationDecorations() {
         }
 
         BlackwoodBookshelfState.customisationSelections[slotId] = item.id;
-        BlackwoodBookshelfState.isSavingCustomisation = true;
+        BlackwoodBookshelfState.customisationSaveMode = "local";
+        BlackwoodBookshelfState.customisationStatusMessage = `${item.title} applied and saved locally on this device.`;
+        BlackwoodBookshelfState.customisationStatusType = "is-success";
         BlackwoodBookshelfState.isDrawerOpen = true;
-        BlackwoodBookshelfState.customisationStatusMessage = `Applying ${item.title}...`;
-        BlackwoodBookshelfState.customisationStatusType = "is-loading";
 
+        saveShelfCustomisationSelections();
         renderBookshelf();
-
-        try {
-            const savedMode = await saveShelfCustomisationSelections();
-
-            BlackwoodBookshelfState.customisationStatusMessage = savedMode === "supabase"
-                ? `${item.title} applied and saved to your Circle record.`
-                : `${item.title} applied and saved locally on this device.`;
-
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-        } catch (error) {
-            console.error("Shelf customisation save failed:", error);
-
-            saveLocalShelfCustomisationSelections();
-
-            BlackwoodBookshelfState.customisationStatusMessage = `${item.title} applied and saved locally on this device.`;
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-        } finally {
-            BlackwoodBookshelfState.isSavingCustomisation = false;
-            renderBookshelf();
-        }
     }
 
     async function handleShelfCustomisationReset() {
@@ -2018,83 +1896,31 @@ function renderShelfStageCustomisationDecorations() {
         }
 
         BlackwoodBookshelfState.customisationSelections = createDefaultCustomisationSelections();
-        BlackwoodBookshelfState.isSavingCustomisation = true;
+        BlackwoodBookshelfState.customisationSaveMode = "local";
+        BlackwoodBookshelfState.customisationStatusMessage = "Shelf display reset and saved locally on this device.";
+        BlackwoodBookshelfState.customisationStatusType = "is-success";
         BlackwoodBookshelfState.isDrawerOpen = true;
-        BlackwoodBookshelfState.customisationStatusMessage = "Resetting shelf display...";
-        BlackwoodBookshelfState.customisationStatusType = "is-loading";
 
+        saveShelfCustomisationSelections();
         renderBookshelf();
-
-        try {
-            const savedMode = await saveShelfCustomisationSelections();
-
-            BlackwoodBookshelfState.customisationStatusMessage = savedMode === "supabase"
-                ? "Shelf display reset and saved to your Circle record."
-                : "Shelf display reset and saved locally on this device.";
-
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-        } catch (error) {
-            console.error("Shelf customisation reset failed:", error);
-
-            saveLocalShelfCustomisationSelections();
-
-            BlackwoodBookshelfState.customisationStatusMessage = "Shelf display reset and saved locally on this device.";
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-        } finally {
-            BlackwoodBookshelfState.isSavingCustomisation = false;
-            renderBookshelf();
-        }
     }
 
-    async function saveShelfCustomisationSelections() {
-    const selections = normaliseCustomisationSelections(
-        BlackwoodBookshelfState.customisationSelections
-    );
+    function saveShelfCustomisationSelections() {
+        const selections = normaliseCustomisationSelections(
+            BlackwoodBookshelfState.customisationSelections
+        );
 
-    BlackwoodBookshelfState.customisationSelections = selections;
-    BlackwoodBookshelfState.customisationSaveMode = "local";
-    BlackwoodBookshelfState.customisationStorageTable = "";
+        BlackwoodBookshelfState.customisationSelections = selections;
 
-    saveLocalShelfCustomisationSelections();
-
-    return "local";
-}
-
-        const tableCandidates = BlackwoodBookshelfState.customisationStorageTable
-            ? [
-                BlackwoodBookshelfState.customisationStorageTable,
-                ...BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames.filter(function (tableName) {
-                    return tableName !== BlackwoodBookshelfState.customisationStorageTable;
-                })
-            ]
-            : BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames;
-
-        for (const tableName of tableCandidates) {
-            const payloads = buildRemoteShelfCustomisationPayloads(selections);
-
-            for (const payload of payloads) {
-                try {
-                    const { error } = await BlackwoodBookshelfState.client
-                        .from(tableName)
-                        .upsert(payload, {
-                            onConflict: "member_id"
-                        });
-
-                    if (!error) {
-                        BlackwoodBookshelfState.customisationStorageTable = tableName;
-                        BlackwoodBookshelfState.customisationSaveMode = "supabase";
-                        return "supabase";
-                    }
-
-                } catch (error) {
-                    console.warn(`Shelf customisation save failed for ${tableName}:`, error);
-                }
-            }
+        try {
+            window.localStorage.setItem(
+                getLocalShelfCustomisationKey(),
+                JSON.stringify(selections)
+            );
+        } catch (error) {
+            console.warn("Local shelf customisation could not be saved:", error);
         }
 
-        BlackwoodBookshelfState.customisationSaveMode = "local";
         return "local";
     }
 
@@ -2558,13 +2384,6 @@ function renderShelfStageCustomisationDecorations() {
             }
         }
 
-        if (item.pointsRequired > 0 || item.booksRequired > 0 || item.requiredBookId || item.requiredReadBookId) {
-            return {
-                unlocked: true,
-                reason: "Issued"
-            };
-        }
-
         return {
             unlocked: true,
             reason: item.unlockText || "Issued"
@@ -2613,7 +2432,7 @@ function renderShelfStageCustomisationDecorations() {
             .replace(/\s+/g, "_")
             .replace(/-/g, "_");
 
-        if (["background", "shelf_background", "shelf_wall", "wall"].includes(cleanValue)) {
+        if (["background", "backgrounds", "shelf_background", "shelf_backgrounds", "shelf_wall", "wall"].includes(cleanValue)) {
             return "background";
         }
 
@@ -2707,45 +2526,6 @@ function renderShelfStageCustomisationDecorations() {
         return cleanSelections;
     }
 
-    function getRemoteShelfCustomisationSelections(row) {
-        return {
-            background: row.background_id || row.shelf_background_id || row.selected_background_id || row.background || "",
-            bookends: row.bookends_id || row.bookend_id || row.selected_bookends_id || row.bookends || "",
-            charm: row.charm_id || row.selected_charm_id || row.charm || "",
-            object: row.object_id || row.shelf_object_id || row.selected_object_id || row.object || "",
-            nameplate: row.nameplate_id || row.selected_nameplate_id || row.nameplate || "",
-            lighting: row.lighting_id || row.light_id || row.selected_lighting_id || row.lighting || ""
-        };
-    }
-
-    function buildRemoteShelfCustomisationPayloads(selections) {
-        const userId = getCurrentUserId();
-        const now = new Date().toISOString();
-
-        return [
-            {
-                member_id: userId,
-                background_id: selections.background || null,
-                bookends_id: selections.bookends || null,
-                charm_id: selections.charm || null,
-                object_id: selections.object || null,
-                nameplate_id: selections.nameplate || null,
-                lighting_id: selections.lighting || null,
-                updated_at: now
-            },
-            {
-                member_id: userId,
-                shelf_background_id: selections.background || null,
-                bookend_id: selections.bookends || null,
-                charm_id: selections.charm || null,
-                shelf_object_id: selections.object || null,
-                nameplate_id: selections.nameplate || null,
-                light_id: selections.lighting || null,
-                updated_at: now
-            }
-        ];
-    }
-
     function getLocalShelfCustomisationKey() {
         return `blackwood:shelf-customisation:${getCurrentUserId() || "guest"}`;
     }
@@ -2763,17 +2543,6 @@ function renderShelfStageCustomisationDecorations() {
         } catch (error) {
             console.warn("Local shelf customisation could not be read:", error);
             return createEmptyCustomisationSelections();
-        }
-    }
-
-    function saveLocalShelfCustomisationSelections() {
-        try {
-            window.localStorage.setItem(
-                getLocalShelfCustomisationKey(),
-                JSON.stringify(normaliseCustomisationSelections(BlackwoodBookshelfState.customisationSelections))
-            );
-        } catch (error) {
-            console.warn("Local shelf customisation could not be saved:", error);
         }
     }
 
@@ -2809,7 +2578,7 @@ function renderShelfStageCustomisationDecorations() {
         const lightingText = lowerClean(selections.lighting ? `${selections.lighting.id} ${selections.lighting.title}` : "");
 
         let baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.11), transparent 34%), linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), rgba(0, 0, 0, 0.42)";
-        let baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255, 255, 255, 0.018)";
+        let baseShadow = "inset 0 0 0 1px rgba(255, 255, 255, 0.018), 0 18px 52px rgba(0, 0, 0, 0.34)";
 
         if (backgroundText.includes("charcoal")) {
             baseBackground = "radial-gradient(circle at top left, rgba(120, 120, 120, 0.12), transparent 34%), linear-gradient(180deg, rgba(32, 31, 29, 0.88), rgba(5, 4, 3, 0.96))";
@@ -2823,16 +2592,14 @@ function renderShelfStageCustomisationDecorations() {
             baseBackground = "radial-gradient(circle at top left, rgba(160, 150, 130, 0.13), transparent 34%), linear-gradient(180deg, rgba(37, 34, 30, 0.9), rgba(7, 6, 5, 0.97))";
         } else if (backgroundText.includes("storm") || backgroundText.includes("blue")) {
             baseBackground = "radial-gradient(circle at top right, rgba(98, 122, 152, 0.16), transparent 35%), linear-gradient(180deg, rgba(8, 13, 22, 0.92), rgba(2, 3, 6, 0.98))";
-        } else if (backgroundText.includes("parchment")) {
-            baseBackground = "radial-gradient(circle at top left, rgba(214, 177, 129, 0.16), transparent 34%), linear-gradient(180deg, rgba(70, 50, 31, 0.72), rgba(9, 6, 4, 0.95))";
         }
 
         if (lightingText.includes("warm") || lightingText.includes("lamp") || lightingText.includes("candle")) {
-            baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 70px rgba(196, 122, 44, 0.12), 0 0 34px rgba(196, 122, 44, 0.08)";
+            baseShadow = "inset 0 0 70px rgba(196, 122, 44, 0.16), 0 0 34px rgba(196, 122, 44, 0.1), 0 18px 52px rgba(0, 0, 0, 0.34)";
         } else if (lightingText.includes("cold") || lightingText.includes("blue")) {
-            baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 70px rgba(120, 150, 190, 0.1), 0 0 34px rgba(120, 150, 190, 0.06)";
+            baseShadow = "inset 0 0 70px rgba(120, 150, 190, 0.12), 0 0 34px rgba(120, 150, 190, 0.08), 0 18px 52px rgba(0, 0, 0, 0.34)";
         } else if (lightingText.includes("storm")) {
-            baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 80px rgba(100, 120, 160, 0.13), 0 0 36px rgba(80, 100, 140, 0.08)";
+            baseShadow = "inset 0 0 80px rgba(100, 120, 160, 0.16), 0 0 36px rgba(80, 100, 140, 0.1), 0 18px 52px rgba(0, 0, 0, 0.34)";
         }
 
         return `background: ${baseBackground}; box-shadow: ${baseShadow};`;
@@ -2901,19 +2668,50 @@ function renderShelfStageCustomisationDecorations() {
         return cleaned;
     }
 
-    function bindBlackwoodBookshelf() {
-    const root = document.getElementById("blackwood-bookshelf-root");
-
-    if (!root || typeof window.initBlackwoodBookshelf !== "function") {
-        return;
+    function createSlug(value) {
+        return String(value || "")
+            .trim()
+            .toLowerCase()
+            .replace(/&/g, "and")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 80);
     }
 
-    window.initBlackwoodBookshelf({
-        root,
-        client: BlackwoodMembersState.client,
-        session: BlackwoodMembersState.session,
-        member: BlackwoodMembersState.member,
-        pointsTotal: getCurrentPointsTotal()
-    });
-}
+    function getShortCustomisationTitle(item, fallback) {
+        const title = String(item && item.title ? item.title : fallback || "")
+            .replace(/^Background\s+/i, "")
+            .replace(/^Bookends\s+/i, "")
+            .replace(/^Bookend\s+/i, "")
+            .replace(/^Charm\s+/i, "")
+            .replace(/^Object\s+/i, "")
+            .replace(/^Nameplate\s+/i, "")
+            .replace(/^Lighting\s+/i, "")
+            .trim();
+
+        if (!title) {
+            return fallback || "";
+        }
+
+        return title.length > 22 ? `${title.slice(0, 19)}...` : title;
+    }
+
+    function lowerClean(value) {
+        return String(value || "")
+            .trim()
+            .toLowerCase();
+    }
+
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttribute(value) {
+        return escapeHtml(value).replace(/`/g, "&#096;");
+    }
 })();
