@@ -428,16 +428,14 @@
         const shelfItems = getShelfItems();
         const totalBooks = shelfItems.length;
         const totalLabel = totalBooks === 1 ? "1 Book" : `${totalBooks} Books`;
-        const visualStyle = renderShelfCustomisationVisualStyle();
-
+        
         BlackwoodBookshelfState.root.innerHTML = `
             <div class="blackwood-bookshelf">
-                <details
-                    class="bookshelf-drawer ${escapeAttribute(getShelfCustomisationClassNames())}"
-                    data-bookshelf-drawer
-                    ${visualStyle ? `style="${escapeAttribute(visualStyle)}"` : ""}
-                    ${BlackwoodBookshelfState.isDrawerOpen ? "open" : ""}
-                >
+            <details
+                class="bookshelf-drawer ${escapeAttribute(getShelfCustomisationClassNames())}"
+                data-bookshelf-drawer
+                ${BlackwoodBookshelfState.isDrawerOpen ? "open" : ""}
+            >
                     <summary class="bookshelf-drawer-summary">
                         <div class="bookshelf-drawer-title-block">
                             <p class="bookshelf-kicker">Private Reader Shelf</p>
@@ -757,52 +755,128 @@
     }
 
     function renderShelfStage(stage, stageItems) {
-        const count = stageItems.length;
-        const countLabel = count === 1 ? "1 book" : `${count} books`;
+    const count = stageItems.length;
+    const countLabel = count === 1 ? "1 book" : `${count} books`;
+    const visualStyle = renderShelfCustomisationVisualStyle();
+    const customisationClasses = getShelfCustomisationClassNames();
+    const customisationDecorations = renderShelfStageCustomisationDecorations();
 
-        return `
-            <section
-                class="bookshelf-stage ${count ? "has-books" : "is-empty"}"
-                data-bookshelf-stage="${escapeAttribute(stage.id)}"
-                data-bookshelf-drop-stage="${escapeAttribute(stage.id)}"
-                aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
-            >
-                <div class="bookshelf-stage-header">
-                    <div>
-                        <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
-                            ${escapeHtml(stage.label)}
-                        </h3>
-                        <p>${escapeHtml(stage.description)}</p>
-                    </div>
+    return `
+        <section
+            class="bookshelf-stage ${count ? "has-books" : "is-empty"} ${escapeAttribute(customisationClasses)}"
+            data-bookshelf-stage="${escapeAttribute(stage.id)}"
+            data-bookshelf-drop-stage="${escapeAttribute(stage.id)}"
+            aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
+            ${visualStyle ? `style="${escapeAttribute(visualStyle)}"` : ""}
+        >
+            ${customisationDecorations}
 
-                    <span>${escapeHtml(countLabel)}</span>
+            <div class="bookshelf-stage-header">
+                <div>
+                    <h3 id="bookshelf-stage-${escapeAttribute(stage.id)}">
+                        ${escapeHtml(stage.label)}
+                    </h3>
+                    <p>${escapeHtml(stage.description)}</p>
                 </div>
 
-                ${
-                    count
-                        ? `
-                            <div
-                                class="bookshelf-spine-list bookshelf-stage-spine-list"
-                                data-bookshelf-drop-list="${escapeAttribute(stage.id)}"
-                            >
-                                ${stageItems.map(function (item, index) {
-                                    return renderShelfSpine(item.book, item.record, index, stageItems.length);
-                                }).join("")}
-                            </div>
-                        `
-                        : `
-                            <div
-                                class="bookshelf-stage-empty"
-                                data-bookshelf-empty-drop="${escapeAttribute(stage.id)}"
-                            >
-                                <p>No books on this shelf yet. Drop a book here to file it.</p>
-                            </div>
-                        `
-                }
-            </section>
-        `;
+                <span>${escapeHtml(countLabel)}</span>
+            </div>
+
+            ${
+                count
+                    ? `
+                        <div
+                            class="bookshelf-spine-list bookshelf-stage-spine-list"
+                            data-bookshelf-drop-list="${escapeAttribute(stage.id)}"
+                        >
+                            ${stageItems.map(function (item, index) {
+                                return renderShelfSpine(item.book, item.record, index, stageItems.length);
+                            }).join("")}
+                        </div>
+                    `
+                    : `
+                        <div
+                            class="bookshelf-stage-empty"
+                            data-bookshelf-empty-drop="${escapeAttribute(stage.id)}"
+                        >
+                            <p>No books on this shelf yet. Drop a book here to file it.</p>
+                        </div>
+                    `
+            }
+        </section>
+    `;
+}
+function renderShelfStageCustomisationDecorations() {
+    const selectedItems = getSelectedCustomisationItems();
+
+    const bookends = selectedItems.bookends || null;
+    const charm = selectedItems.charm || null;
+    const object = selectedItems.object || null;
+    const nameplate = selectedItems.nameplate || null;
+    const lighting = selectedItems.lighting || null;
+
+    if (!bookends && !charm && !object && !nameplate && !lighting) {
+        return "";
     }
 
+    return `
+        <div class="bookshelf-stage-customisation" aria-hidden="true">
+            ${
+                lighting
+                    ? `
+                        <span class="bookshelf-stage-lighting">
+                            ${escapeHtml(getShortCustomisationTitle(lighting, "Light"))}
+                        </span>
+                    `
+                    : ""
+            }
+
+            ${
+                bookends
+                    ? `
+                        <span class="bookshelf-stage-bookend is-left">
+                            ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
+                        </span>
+
+                        <span class="bookshelf-stage-bookend is-right">
+                            ${escapeHtml(getShortCustomisationTitle(bookends, "Bookend"))}
+                        </span>
+                    `
+                    : ""
+            }
+
+            ${
+                charm
+                    ? `
+                        <span class="bookshelf-stage-charm">
+                            ${escapeHtml(getShortCustomisationTitle(charm, "Charm"))}
+                        </span>
+                    `
+                    : ""
+            }
+
+            ${
+                object
+                    ? `
+                        <span class="bookshelf-stage-object">
+                            ${escapeHtml(getShortCustomisationTitle(object, "Object"))}
+                        </span>
+                    `
+                    : ""
+            }
+
+            ${
+                nameplate
+                    ? `
+                        <span class="bookshelf-stage-nameplate">
+                            ${escapeHtml(getShortCustomisationTitle(nameplate, "Reader Shelf"))}
+                        </span>
+                    `
+                    : ""
+            }
+        </div>
+    `;
+}
     function renderShelfSpine(book, record, index, stageLength) {
         const badges = [];
         const stage = getShelfStageById(record.shelf_status);
@@ -2808,32 +2882,19 @@
         return cleaned;
     }
 
-    function createSlug(value) {
-        return String(value || "")
-            .trim()
-            .toLowerCase()
-            .replace(/&/g, "and")
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "")
-            .slice(0, 80);
+    function bindBlackwoodBookshelf() {
+    const root = document.getElementById("blackwood-bookshelf-root");
+
+    if (!root || typeof window.initBlackwoodBookshelf !== "function") {
+        return;
     }
 
-    function lowerClean(value) {
-        return String(value || "")
-            .trim()
-            .toLowerCase();
-    }
-
-    function escapeHtml(value) {
-        return String(value || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function escapeAttribute(value) {
-        return escapeHtml(value).replace(/`/g, "&#096;");
-    }
+    window.initBlackwoodBookshelf({
+        root,
+        client: BlackwoodMembersState.client,
+        session: BlackwoodMembersState.session,
+        member: BlackwoodMembersState.member,
+        pointsTotal: getCurrentPointsTotal()
+    });
+}
 })();
