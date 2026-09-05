@@ -1814,3 +1814,111 @@
 .bookshelf-spine-button.is-favourite {
     border: 0;
 }
+/* =========================
+   CUSTOMISATION COLLAPSIBLE DRAWER
+========================= */
+
+.bookshelf-customisation-drawer {
+    padding: 0;
+}
+
+.bookshelf-customisation-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+
+    padding: 18px 20px;
+
+    list-style: none;
+    cursor: pointer;
+}
+
+.bookshelf-customisation-summary::-webkit-details-marker {
+    display: none;
+}
+
+.bookshelf-customisation-summary::marker {
+    content: "";
+}
+
+.bookshelf-customisation-summary h3 {
+    margin: 0 0 6px;
+
+    color: var(--bookshelf-cream);
+
+    font-size: clamp(23px, 3vw, 32px);
+    line-height: 1.08;
+    font-weight: 400;
+}
+
+.bookshelf-customisation-summary p {
+    margin: 0;
+
+    color: var(--bookshelf-muted);
+
+    font-size: 13.5px;
+    line-height: 1.55;
+}
+
+.bookshelf-customisation-summary-side {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bookshelf-customisation-toggle-text {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+    padding: 8px 13px;
+
+    border: 1px solid rgba(213, 173, 114, 0.48);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.36);
+    color: var(--bookshelf-gold);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.bookshelf-customisation-drawer[open] .bookshelf-customisation-toggle-text {
+    color: var(--bookshelf-cream);
+}
+
+.bookshelf-customisation-drawer[open] .bookshelf-customisation-toggle-text {
+    font-size: 0;
+}
+
+.bookshelf-customisation-drawer[open] .bookshelf-customisation-toggle-text::after {
+    content: "Close";
+
+    font-size: 9px;
+}
+
+.bookshelf-customisation-inner {
+    padding: 0 20px 20px;
+
+    border-top: 1px solid rgba(179, 106, 33, 0.18);
+}
+
+.bookshelf-customisation-inner .bookshelf-customisation-record {
+    padding-top: 16px;
+}
+
+@media (max-width: 760px) {
+    .bookshelf-customisation-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf-customisation-summary-side {
+        justify-content: space-between;
+    }
+}
