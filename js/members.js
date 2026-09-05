@@ -1520,8 +1520,10 @@
         window.initBlackwoodBookshelf({
             root,
             client: BlackwoodMembersState.client,
-            session: BlackwoodMembersState.session
-        });
+            session: BlackwoodMembersState.session,
+            member: BlackwoodMembersState.member,
+            pointsTotal: getCurrentPointsTotal()
+            });
     }
 
     // =========================
