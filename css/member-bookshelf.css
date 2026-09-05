@@ -2133,3 +2133,333 @@
         justify-content: center;
     }
 }
+/* =========================
+   PHASE 2E — IMAGE-BASED SHELF OBJECTS
+   Paste at the very bottom of member-bookshelf.css
+========================= */
+
+/* Image thumbnails inside the customisation cards */
+
+.bookshelf-customisation-item {
+    grid-template-rows: auto auto auto 1fr auto;
+}
+
+.bookshelf-customisation-item-image-wrap {
+    position: relative;
+    overflow: hidden;
+
+    display: grid;
+    place-items: center;
+
+    width: 100%;
+    min-height: 118px;
+    aspect-ratio: 16 / 10;
+    margin-bottom: 6px;
+
+    border: 1px solid rgba(213, 173, 114, 0.22);
+    border-radius: 9px;
+
+    background:
+        radial-gradient(circle at center, rgba(213, 173, 114, 0.13), transparent 58%),
+        rgba(0, 0, 0, 0.34);
+}
+
+.bookshelf-customisation-item-image-wrap img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    object-position: center;
+
+    filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.5));
+}
+
+.bookshelf-customisation-item-image-wrap.is-empty span,
+.bookshelf-customisation-item-image-wrap.is-image-missing span {
+    color: rgba(241, 234, 223, 0.58);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.bookshelf-customisation-item.is-locked .bookshelf-customisation-item-image-wrap img {
+    filter:
+        grayscale(1)
+        brightness(0.58)
+        drop-shadow(0 14px 18px rgba(0, 0, 0, 0.5));
+}
+
+/* The visual shelf area where the background image appears */
+
+.bookshelf-stage-display {
+    position: relative;
+    overflow: hidden;
+
+    min-height: 360px;
+    margin-top: 16px;
+    padding: 20px 24px 78px;
+
+    border: 1px solid rgba(213, 173, 114, 0.14);
+    border-radius: 10px;
+
+    background-color: rgba(0, 0, 0, 0.34);
+
+    box-shadow:
+        inset 0 0 70px rgba(0, 0, 0, 0.54),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Shelf ledge */
+
+.bookshelf-stage-display::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 40px;
+    z-index: 4;
+
+    height: 18px;
+
+    border-radius: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(54, 25, 9, 0.96),
+            rgba(151, 82, 27, 0.76),
+            rgba(49, 22, 8, 0.96)
+        );
+
+    box-shadow:
+        0 -10px 35px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 214, 154, 0.18),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.52);
+
+    pointer-events: none;
+}
+
+/* Disable the old pseudo shelf, because the new display wrapper handles it */
+
+.bookshelf-stage {
+    min-height: auto;
+}
+
+.bookshelf-stage::before,
+.bookshelf-stage::after {
+    display: none;
+}
+
+/* Books stay above the background */
+
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list {
+    position: relative;
+    z-index: 6;
+
+    min-height: 288px;
+    padding: 12px 96px 58px;
+}
+
+/* Shared image decoration layer */
+
+.bookshelf-stage-customisation {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+
+    pointer-events: none;
+}
+
+.bookshelf-stage-decoration {
+    position: absolute;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    letter-spacing: 0 !important;
+    writing-mode: horizontal-tb !important;
+
+    pointer-events: none;
+}
+
+.bookshelf-stage-decoration img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    object-position: center;
+
+    filter:
+        drop-shadow(0 16px 20px rgba(0, 0, 0, 0.55))
+        drop-shadow(0 0 8px rgba(213, 173, 114, 0.08));
+}
+
+/* Lighting */
+
+.bookshelf-stage-decoration.bookshelf-stage-lighting {
+    top: -20px;
+    left: 50%;
+    z-index: 1;
+
+    width: min(520px, 82%);
+    height: 250px;
+
+    opacity: 0.72;
+
+    transform: translateX(-50%);
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-lighting img {
+    object-fit: cover;
+    mix-blend-mode: screen;
+}
+
+/* Bookends */
+
+.bookshelf-stage-decoration.bookshelf-stage-bookend {
+    bottom: 48px;
+    z-index: 8;
+
+    width: 90px;
+    height: 170px;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-bookend.is-left {
+    left: 16px;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-bookend.is-right {
+    right: 16px;
+    transform: scaleX(-1);
+}
+
+/* Charm */
+
+.bookshelf-stage-decoration.bookshelf-stage-charm {
+    top: 22px;
+    right: 110px;
+    z-index: 9;
+
+    width: 82px;
+    height: 82px;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-charm::before {
+    content: "";
+    position: absolute;
+    top: -44px;
+    left: 50%;
+
+    width: 1px;
+    height: 50px;
+
+    background: rgba(213, 173, 114, 0.34);
+
+    transform: translateX(-50%);
+}
+
+/* Shelf object */
+
+.bookshelf-stage-decoration.bookshelf-stage-object {
+    right: 110px;
+    bottom: 50px;
+    z-index: 10;
+
+    width: 130px;
+    height: 96px;
+}
+
+/* Nameplate */
+
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    left: 50%;
+    bottom: 20px;
+    z-index: 11;
+
+    width: min(300px, 48%);
+    height: 66px;
+
+    transform: translateX(-50%);
+}
+
+/* Text fallback only if an image path breaks */
+
+.bookshelf-stage-decoration.has-text,
+.bookshelf-stage-decoration.is-image-missing {
+    min-width: 78px;
+    min-height: 38px;
+    padding: 8px 12px;
+
+    border: 1px solid rgba(213, 173, 114, 0.34) !important;
+    border-radius: 7px;
+
+    background: rgba(0, 0, 0, 0.48) !important;
+    color: rgba(241, 234, 223, 0.72) !important;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px !important;
+    font-weight: 900;
+    letter-spacing: 0.12em !important;
+    line-height: 1.2;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+    .bookshelf-stage-display {
+        min-height: 320px;
+        padding: 16px 12px 70px;
+    }
+
+    .bookshelf-stage-display .bookshelf-spine-list,
+    .bookshelf-stage-display .bookshelf-stage-spine-list {
+        padding-inline: 8px;
+        padding-bottom: 60px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-bookend {
+        display: none;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-object {
+        right: 18px;
+        bottom: 50px;
+
+        width: 82px;
+        height: 66px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-charm {
+        top: 16px;
+        right: 22px;
+
+        width: 58px;
+        height: 58px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-nameplate {
+        width: min(220px, 62%);
+        height: 52px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-lighting {
+        width: 92%;
+        height: 180px;
+    }
+}
