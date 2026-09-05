@@ -3382,3 +3382,19 @@
 .bookshelf-spine-controls {
     top: calc(100% + 38px);
 }
+/* Give the controls proper room beneath the shelf */
+.bookshelf-stage-display {
+    min-height: 445px;
+    padding-bottom: 132px;
+}
+
+.bookshelf-spine-controls {
+    top: calc(100% + 30px);
+}
+
+/* Keep the front nameplate centred on the fascia */
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    bottom: 68px;
+    width: min(180px, 28%);
+    height: 36px;
+}
