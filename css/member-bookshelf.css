@@ -3398,3 +3398,18 @@
     width: min(180px, 28%);
     height: 36px;
 }
+/* =========================================================
+   FINAL MICRO-TUNE
+   Tighter books + slightly higher nameplate
+========================================================= */
+
+/* Bring books closer together */
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list {
+    gap: 18px;
+}
+
+/* Nudge the plate upward so it sits more convincingly on the fascia */
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    bottom: 74px;
+}
