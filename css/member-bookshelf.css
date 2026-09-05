@@ -3453,3 +3453,18 @@
     width: min(154px, 23%);
     height: 30px;
 }
+/* =========================================================
+   SHELF ALIGNMENT CORRECTION
+   Restore slot spacing + return final book to natural position
+========================================================= */
+
+/* Restore the spacing needed by the controls below */
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list {
+    gap: 18px;
+}
+
+/* Remove the special last-book nudge */
+.bookshelf-stage-display .bookshelf-book-slot:last-child {
+    transform: none;
+}
