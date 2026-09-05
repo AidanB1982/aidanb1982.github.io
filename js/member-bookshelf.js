@@ -2,7 +2,7 @@
 // BLACKWOOD MEMBER BOOKSHELF
 // Private shelf records powered by Supabase
 // Phase 2C: Collapsible shelf drawer + shelf stages + rearrange controls
-// Phase 2E: Shelf customisation powered by /data/shelf-customisation-items.json
+// Phase 2E: Shelf customisation, filters, unlock checks + safe local/Supabase save
 // =========================
 
 (function () {
@@ -14,10 +14,9 @@
         customisationItemsPath: "/data/shelf-customisation-items.json",
         customisationTableNames: [
             "member_shelf_customisations",
-            "member_bookshelf_customisations",
-            "member_book_shelf_customisations"
-        ],
-        customisationLocalStoragePrefix: "blackwood-bookshelf-customisation:"
+            "member_shelf_customisation",
+            "member_bookshelf_customisations"
+        ]
     };
 
     const BLACKWOOD_BOOKSHELF_STAGES = [
@@ -64,60 +63,37 @@
             id: "background",
             label: "Shelf Background",
             shortLabel: "Background",
-            description: "Change the wall, panel, or archive surface behind your shelf.",
-            optional: false
+            emptyLabel: "Not selected"
         },
         {
             id: "bookends",
             label: "Bookends",
             shortLabel: "Bookends",
-            description: "Add objects that hold the shelf at either side.",
-            optional: true
+            emptyLabel: "Not selected"
         },
         {
             id: "charm",
             label: "Charm",
             shortLabel: "Charm",
-            description: "Hang a recovered object from the archive shelf.",
-            optional: true
+            emptyLabel: "Not selected"
         },
         {
             id: "object",
             label: "Shelf Object",
             shortLabel: "Object",
-            description: "Place a small archive object near the shelf.",
-            optional: true
+            emptyLabel: "Not selected"
         },
         {
             id: "nameplate",
             label: "Nameplate",
             shortLabel: "Nameplate",
-            description: "Choose the label fixed to your private shelf.",
-            optional: true
+            emptyLabel: "Not selected"
         },
         {
             id: "lighting",
             label: "Lighting",
             shortLabel: "Lighting",
-            description: "Adjust the mood and atmosphere around your shelf.",
-            optional: false
-        }
-    ];
-
-    const BLACKWOOD_BOOKSHELF_CUSTOMISATION_FILTERS = [
-        {
-            id: "all",
-            label: "All"
-        },
-        ...BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.map(function (slot) {
-            return {
-                id: slot.id,
-                label: slot.shortLabel
-            };
-        }),
-        {
-            id: "locked",
-            label: "Locked"
+            emptyLabel: "Not selected"
         }
     ];
 
@@ -234,22 +210,27 @@
         root: null,
         client: null,
         session: null,
-        memberProfile: null,
+        member: null,
+        pointsTotal: 0,
+
         shelfRecords: [],
+
         customisationItems: [],
-        customisationRecord: createDefaultCustomisationRecord(),
+        customisationItemsLoaded: false,
+        customisationItemsError: "",
+        customisationSelections: createEmptyCustomisationSelections(),
         customisationFilter: "all",
-        customisationPanelOpen: false,
         customisationStatusMessage: "",
         customisationStatusType: "",
-        customisationLoadError: "",
-        currentCustomisationTableName: "",
+        customisationStorageTable: "",
+        customisationSaveMode: "local",
+        isSavingCustomisation: false,
+
         modalMode: "closed",
         activeBookId: "",
         statusMessage: "",
         statusType: "",
         isBusy: false,
-        isCustomisationBusy: false,
         isDrawerOpen: false,
         draggingBookId: "",
         draggingFromStageId: "",
@@ -269,15 +250,16 @@
         BlackwoodBookshelfState.root = root;
         BlackwoodBookshelfState.client = options ? options.client : null;
         BlackwoodBookshelfState.session = options ? options.session : null;
-        BlackwoodBookshelfState.memberProfile = null;
+        BlackwoodBookshelfState.member = options ? options.member || null : null;
+        BlackwoodBookshelfState.pointsTotal = Number(options && options.pointsTotal ? options.pointsTotal : 0);
+
         BlackwoodBookshelfState.modalMode = "closed";
         BlackwoodBookshelfState.activeBookId = "";
         BlackwoodBookshelfState.statusMessage = "";
         BlackwoodBookshelfState.statusType = "";
         BlackwoodBookshelfState.customisationStatusMessage = "";
         BlackwoodBookshelfState.customisationStatusType = "";
-        BlackwoodBookshelfState.customisationLoadError = "";
-        BlackwoodBookshelfState.isCustomisationBusy = false;
+        BlackwoodBookshelfState.customisationFilter = "all";
 
         ensureBookshelfEscapeListener();
 
@@ -291,12 +273,10 @@
         try {
             await Promise.all([
                 loadBookshelfRecords(),
-                loadBookshelfMemberProfile(),
-                loadBookshelfCustomisationItems()
+                loadShelfCustomisationItems()
             ]);
 
-            await loadBookshelfCustomisationRecord();
-            applyDefaultCustomisationSelections();
+            await loadShelfCustomisationRecord();
 
             renderBookshelf();
 
@@ -305,10 +285,6 @@
             renderBookshelfError("Your Blackwood Bookshelf could not be opened. Please refresh and try again.");
         }
     };
-
-    // =========================
-    // DATA LOADING
-    // =========================
 
     async function loadBookshelfRecords() {
         const userId = getCurrentUserId();
@@ -347,76 +323,41 @@
             : [];
     }
 
-    async function loadBookshelfMemberProfile() {
-        const userId = getCurrentUserId();
-
-        if (!userId) {
-            BlackwoodBookshelfState.memberProfile = null;
-            return;
-        }
+    async function loadShelfCustomisationItems() {
+        BlackwoodBookshelfState.customisationItemsError = "";
 
         try {
-            const { data, error } = await BlackwoodBookshelfState.client
-                .from("member_profiles")
-                .select("id,email,display_name,reader_name,member_tier,member_status,points_total")
-                .eq("id", userId)
-                .maybeSingle();
-
-            if (error) {
-                console.warn("Bookshelf member profile could not be loaded:", error.message);
-                BlackwoodBookshelfState.memberProfile = null;
-                return;
-            }
-
-            BlackwoodBookshelfState.memberProfile = data || null;
-
-        } catch (error) {
-            console.warn("Bookshelf member profile query failed:", error);
-            BlackwoodBookshelfState.memberProfile = null;
-        }
-    }
-
-    async function loadBookshelfCustomisationItems() {
-        BlackwoodBookshelfState.customisationLoadError = "";
-
-        try {
-            const response = await fetch(
-                `${BLACKWOOD_BOOKSHELF_CONFIG.customisationItemsPath}?cache=${Date.now()}`
-            );
+            const response = await fetch(`${BLACKWOOD_BOOKSHELF_CONFIG.customisationItemsPath}?cache=${Date.now()}`);
 
             if (!response.ok) {
                 throw new Error("Shelf customisation items could not be loaded.");
             }
 
             const data = await response.json();
-            const rawItems = flattenCustomisationItems(data);
+            const items = extractCustomisationItemsFromData(data);
 
-            BlackwoodBookshelfState.customisationItems = rawItems
-                .map(normaliseCustomisationItem)
-                .filter(function (item) {
-                    return item.id && item.slot;
-                })
-                .sort(sortCustomisationItems);
+            BlackwoodBookshelfState.customisationItems = items;
+            BlackwoodBookshelfState.customisationItemsLoaded = true;
 
         } catch (error) {
             console.warn("Shelf customisation JSON could not be loaded:", error);
             BlackwoodBookshelfState.customisationItems = [];
-            BlackwoodBookshelfState.customisationLoadError = "Shelf customisation items could not be loaded.";
+            BlackwoodBookshelfState.customisationItemsLoaded = false;
+            BlackwoodBookshelfState.customisationItemsError = "Shelf customisation items could not be loaded.";
         }
     }
 
-    async function loadBookshelfCustomisationRecord() {
+    async function loadShelfCustomisationRecord() {
         const userId = getCurrentUserId();
+        const localSelections = loadLocalShelfCustomisationSelections();
 
-        BlackwoodBookshelfState.customisationRecord = createDefaultCustomisationRecord();
+        BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(localSelections);
 
-        if (!userId) {
+        if (!userId || !BlackwoodBookshelfState.client) {
             return;
         }
 
-        const tableNames = getCustomisationTableNamesForQuery();
-
-        for (const tableName of tableNames) {
+        for (const tableName of BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames) {
             try {
                 const { data, error } = await BlackwoodBookshelfState.client
                     .from(tableName)
@@ -425,47 +366,27 @@
                     .maybeSingle();
 
                 if (error) {
-                    if (isLikelyMissingDbStructureError(error.message)) {
-                        continue;
-                    }
-
-                    console.warn(`Bookshelf customisation table "${tableName}" could not be loaded:`, error.message);
                     continue;
                 }
 
-                BlackwoodBookshelfState.currentCustomisationTableName = tableName;
+                BlackwoodBookshelfState.customisationStorageTable = tableName;
+                BlackwoodBookshelfState.customisationSaveMode = "supabase";
 
                 if (data) {
-                    BlackwoodBookshelfState.customisationRecord = normaliseCustomisationRecord(data);
-                    saveCustomisationToLocalStorage(BlackwoodBookshelfState.customisationRecord);
-                    return;
+                    BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
+                        getRemoteShelfCustomisationSelections(data)
+                    );
                 }
 
-                const localRecord = loadCustomisationFromLocalStorage();
-
-                if (localRecord) {
-                    BlackwoodBookshelfState.customisationRecord = localRecord;
-                    return;
-                }
-
-                BlackwoodBookshelfState.customisationRecord = createDefaultCustomisationRecord();
                 return;
 
             } catch (error) {
-                console.warn(`Bookshelf customisation query failed for "${tableName}":`, error);
+                console.warn(`Shelf customisation table check failed for ${tableName}:`, error);
             }
         }
 
-        const localRecord = loadCustomisationFromLocalStorage();
-
-        if (localRecord) {
-            BlackwoodBookshelfState.customisationRecord = localRecord;
-        }
+        BlackwoodBookshelfState.customisationSaveMode = "local";
     }
-
-    // =========================
-    // BASE RENDER STATES
-    // =========================
 
     function renderBookshelfLoading() {
         BlackwoodBookshelfState.root.innerHTML = `
@@ -503,25 +424,18 @@
         `;
     }
 
-    // =========================
-    // BOOKSHELF RENDER
-    // =========================
-
     function renderBookshelf() {
         const shelfItems = getShelfItems();
         const totalBooks = shelfItems.length;
         const totalLabel = totalBooks === 1 ? "1 Book" : `${totalBooks} Books`;
-        const customisationSummary = getBookshelfCustomisationSummary();
+        const visualStyle = renderShelfCustomisationVisualStyle();
 
         BlackwoodBookshelfState.root.innerHTML = `
-            <div 
-                class="blackwood-bookshelf ${escapeAttribute(getBookshelfCustomisationClassNames())}"
-                ${getBookshelfCustomisationDataAttributes()}
-                style="${escapeAttribute(getBookshelfCustomisationStyle())}"
-            >
-                <details 
-                    class="bookshelf-drawer" 
+            <div class="blackwood-bookshelf">
+                <details
+                    class="bookshelf-drawer ${escapeAttribute(getShelfCustomisationClassNames())}"
                     data-bookshelf-drawer
+                    ${visualStyle ? `style="${escapeAttribute(visualStyle)}"` : ""}
                     ${BlackwoodBookshelfState.isDrawerOpen ? "open" : ""}
                 >
                     <summary class="bookshelf-drawer-summary">
@@ -535,9 +449,6 @@
 
                         <div class="bookshelf-drawer-summary-side">
                             <span class="bookshelf-total-pill">${escapeHtml(totalLabel)}</span>
-                            <span class="bookshelf-total-pill bookshelf-customisation-pill">
-                                ${escapeHtml(customisationSummary)}
-                            </span>
                             <span class="bookshelf-drawer-chevrons" aria-hidden="true"></span>
                         </div>
                     </summary>
@@ -548,8 +459,7 @@
                                 <p class="bookshelf-kicker">Shelf Stages</p>
                                 <h3>Your private reading board</h3>
                                 <p>
-                                    Move books between shelves, mark owned or signed editions, rearrange titles,
-                                    and customise the shelf with recovered archive objects.
+                                    Move books between shelves, mark owned or signed editions, and rearrange titles inside each stage.
                                 </p>
                             </div>
 
@@ -560,11 +470,11 @@
 
                         ${renderBookshelfStageSummary(shelfItems)}
 
-                        ${renderBookshelfCustomisationPanel()}
+                        ${renderShelfCustomisationPanel(shelfItems)}
 
-                        <p 
-                            class="bookshelf-status ${escapeAttribute(BlackwoodBookshelfState.statusType)}" 
-                            id="blackwood-bookshelf-status" 
+                        <p
+                            class="bookshelf-status ${escapeAttribute(BlackwoodBookshelfState.statusType)}"
+                            id="blackwood-bookshelf-status"
                             aria-live="polite"
                         >
                             ${escapeHtml(BlackwoodBookshelfState.statusMessage)}
@@ -605,24 +515,243 @@
         `;
     }
 
+    function renderShelfCustomisationPanel(shelfItems) {
+        const items = BlackwoodBookshelfState.customisationItems;
+        const pointsTotal = getCustomisationPointsTotal();
+        const filedCount = shelfItems.length;
+        const issuedCount = getIssuedCustomisationItems().length;
+        const selectedItems = getSelectedCustomisationItems();
+
+        if (BlackwoodBookshelfState.customisationItemsError) {
+            return `
+                <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
+                    <div class="bookshelf-customisation-header">
+                        <div>
+                            <p class="bookshelf-kicker">Issued Objects</p>
+                            <h3 id="bookshelf-customisation-title">Customise Your Shelf</h3>
+                            <p>${escapeHtml(BlackwoodBookshelfState.customisationItemsError)}</p>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        if (!items.length) {
+            return `
+                <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
+                    <div class="bookshelf-customisation-header">
+                        <div>
+                            <p class="bookshelf-kicker">Issued Objects</p>
+                            <h3 id="bookshelf-customisation-title">Customise Your Shelf</h3>
+                            <p>Shelf customisation items are waiting to be filed in the archive.</p>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        return `
+            <section class="bookshelf-customisation-panel" aria-labelledby="bookshelf-customisation-title">
+                <div class="bookshelf-customisation-header">
+                    <div>
+                        <p class="bookshelf-kicker">Issued Objects</p>
+                        <h3 id="bookshelf-customisation-title">Customise Your Shelf</h3>
+                        <p>
+                            Change the atmosphere of your private Blackwood shelf with backgrounds, bookends,
+                            charms, objects, nameplates, and lighting earned through reader activity.
+                        </p>
+                    </div>
+
+                    <div class="bookshelf-customisation-meta">
+                        <strong>${issuedCount} / ${items.length}</strong>
+                        <span>issued</span>
+                    </div>
+                </div>
+
+                <div class="bookshelf-customisation-record">
+                    <p>
+                        ${filedCount} ${filedCount === 1 ? "spine" : "spines"} filed · ${pointsTotal} Circle points
+                    </p>
+
+                    <div class="bookshelf-customisation-selected-grid">
+                        ${BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.map(function (slot) {
+                            const selectedItem = selectedItems[slot.id] || null;
+
+                            return `
+                                <div>
+                                    <span>${escapeHtml(slot.label)}</span>
+                                    <strong>${escapeHtml(selectedItem ? selectedItem.title : slot.emptyLabel)}</strong>
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>
+
+                ${renderShelfCustomisationDisplayPreview(selectedItems)}
+
+                ${renderShelfCustomisationFilters()}
+
+                <p
+                    class="bookshelf-customisation-status ${escapeAttribute(BlackwoodBookshelfState.customisationStatusType)}"
+                    id="bookshelf-customisation-status"
+                    aria-live="polite"
+                >
+                    ${escapeHtml(BlackwoodBookshelfState.customisationStatusMessage)}
+                </p>
+
+                <div class="bookshelf-customisation-grid">
+                    ${renderShelfCustomisationItems()}
+                </div>
+
+                <div class="bookshelf-customisation-actions">
+                    <button
+                        type="button"
+                        class="bookshelf-modal-button"
+                        data-bookshelf-customisation-reset
+                        ${BlackwoodBookshelfState.isSavingCustomisation ? "disabled" : ""}
+                    >
+                        Reset Display
+                    </button>
+                </div>
+            </section>
+        `;
+    }
+
+    function renderShelfCustomisationDisplayPreview(selectedItems) {
+        const background = selectedItems.background;
+        const bookends = selectedItems.bookends;
+        const charm = selectedItems.charm;
+        const object = selectedItems.object;
+        const nameplate = selectedItems.nameplate;
+        const lighting = selectedItems.lighting;
+
+        return `
+            <div class="bookshelf-customisation-preview" aria-label="Shelf customisation preview">
+                <div class="bookshelf-customisation-preview-light"></div>
+
+                <div class="bookshelf-customisation-preview-row">
+                    <span class="bookshelf-customisation-preview-bookend">
+                        ${escapeHtml(bookends ? bookends.title : "Bookend")}
+                    </span>
+
+                    <span class="bookshelf-customisation-preview-object">
+                        ${escapeHtml(object ? object.title : "Object")}
+                    </span>
+
+                    <span class="bookshelf-customisation-preview-charm">
+                        ${escapeHtml(charm ? charm.title : "Charm")}
+                    </span>
+                </div>
+
+                <div class="bookshelf-customisation-preview-plate">
+                    ${escapeHtml(nameplate ? nameplate.title : "Reader Shelf")}
+                </div>
+
+                <p>
+                    ${escapeHtml(background ? background.title : "Default Archive Shelf")}
+                    ${lighting ? ` · ${escapeHtml(lighting.title)}` : ""}
+                </p>
+            </div>
+        `;
+    }
+
+    function renderShelfCustomisationFilters() {
+        const counts = getCustomisationCategoryCounts();
+        const filters = [
+            {
+                id: "all",
+                label: "All",
+                count: BlackwoodBookshelfState.customisationItems.length
+            },
+            ...BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.map(function (slot) {
+                return {
+                    id: slot.id,
+                    label: slot.shortLabel,
+                    count: counts[slot.id] || 0
+                };
+            }),
+            {
+                id: "locked",
+                label: "Locked",
+                count: getLockedCustomisationItems().length
+            }
+        ];
+
+        return `
+            <div class="bookshelf-customisation-filters" aria-label="Shelf customisation filters">
+                ${filters.map(function (filter) {
+                    const isActive = BlackwoodBookshelfState.customisationFilter === filter.id;
+
+                    return `
+                        <button
+                            type="button"
+                            class="${isActive ? "is-active" : ""}"
+                            data-bookshelf-customisation-filter="${escapeAttribute(filter.id)}"
+                            aria-pressed="${isActive ? "true" : "false"}"
+                        >
+                            <span>${escapeHtml(filter.label)}</span>
+                            <strong>${escapeHtml(String(filter.count))}</strong>
+                        </button>
+                    `;
+                }).join("")}
+            </div>
+        `;
+    }
+
+    function renderShelfCustomisationItems() {
+        const filteredItems = getFilteredCustomisationItems();
+
+        if (!filteredItems.length) {
+            return `
+                <article class="bookshelf-empty-card">
+                    <h3>No issued objects match this filter.</h3>
+                    <p>Choose another category to view available shelf customisations.</p>
+                </article>
+            `;
+        }
+
+        return filteredItems.map(renderShelfCustomisationItem).join("");
+    }
+
+    function renderShelfCustomisationItem(item) {
+        const slot = getCustomisationSlotById(item.category);
+        const unlockInfo = getShelfCustomisationUnlockInfo(item);
+        const isSelected = BlackwoodBookshelfState.customisationSelections[item.category] === item.id;
+        const isIssued = unlockInfo.unlocked;
+        const label = isSelected ? "Applied" : isIssued ? "Issued" : "Locked";
+
+        return `
+            <button
+                type="button"
+                class="bookshelf-customisation-item ${isSelected ? "is-selected" : ""} ${isIssued ? "is-issued" : "is-locked"}"
+                data-bookshelf-customisation-item="${escapeAttribute(item.id)}"
+                data-bookshelf-customisation-slot="${escapeAttribute(item.category)}"
+                ${isIssued && !BlackwoodBookshelfState.isSavingCustomisation ? "" : "disabled"}
+                title="${escapeAttribute(unlockInfo.reason)}"
+            >
+                <span class="bookshelf-customisation-item-kicker">
+                    ✦ ${escapeHtml(slot ? slot.shortLabel : "Object")}
+                </span>
+
+                <strong>${escapeHtml(item.title)}</strong>
+
+                <small>${escapeHtml(item.description)}</small>
+
+                <em>${escapeHtml(label)}${unlockInfo.reason ? ` · ${escapeHtml(unlockInfo.reason)}` : ""}</em>
+            </button>
+        `;
+    }
+
     function renderShelfBoard(shelfItems) {
         return `
-            <div 
-                class="bookshelf-display-shell ${escapeAttribute(getBookshelfCustomisationClassNames())}"
-                ${getBookshelfCustomisationDataAttributes()}
-                style="${escapeAttribute(getBookshelfCustomisationStyle())}"
-            >
-                ${renderBookshelfDisplayDecor()}
+            <div class="bookshelf-board" aria-label="Your Blackwood book shelves">
+                ${BLACKWOOD_BOOKSHELF_STAGES.map(function (stage) {
+                    const stageItems = shelfItems.filter(function (item) {
+                        return item.record.shelf_status === stage.id;
+                    });
 
-                <div class="bookshelf-board" aria-label="Your Blackwood book shelves">
-                    ${BLACKWOOD_BOOKSHELF_STAGES.map(function (stage) {
-                        const stageItems = shelfItems.filter(function (item) {
-                            return item.record.shelf_status === stage.id;
-                        });
-
-                        return renderShelfStage(stage, stageItems);
-                    }).join("")}
-                </div>
+                    return renderShelfStage(stage, stageItems);
+                }).join("")}
             </div>
         `;
     }
@@ -632,8 +761,8 @@
         const countLabel = count === 1 ? "1 book" : `${count} books`;
 
         return `
-            <section 
-                class="bookshelf-stage ${count ? "has-books" : "is-empty"}" 
+            <section
+                class="bookshelf-stage ${count ? "has-books" : "is-empty"}"
                 data-bookshelf-stage="${escapeAttribute(stage.id)}"
                 data-bookshelf-drop-stage="${escapeAttribute(stage.id)}"
                 aria-labelledby="bookshelf-stage-${escapeAttribute(stage.id)}"
@@ -652,7 +781,7 @@
                 ${
                     count
                         ? `
-                            <div 
+                            <div
                                 class="bookshelf-spine-list bookshelf-stage-spine-list"
                                 data-bookshelf-drop-list="${escapeAttribute(stage.id)}"
                             >
@@ -662,7 +791,7 @@
                             </div>
                         `
                         : `
-                            <div 
+                            <div
                                 class="bookshelf-stage-empty"
                                 data-bookshelf-empty-drop="${escapeAttribute(stage.id)}"
                             >
@@ -690,7 +819,7 @@
         if (record.wants_signed) badges.push("Wants Signed");
 
         return `
-            <div 
+            <div
                 class="bookshelf-book-slot"
                 draggable="true"
                 data-bookshelf-drag-book="${escapeAttribute(book.id)}"
@@ -725,7 +854,7 @@
                     <label>
                         <span>Move to</span>
 
-                        <select 
+                        <select
                             data-bookshelf-stage-select
                             data-bookshelf-book-id="${escapeAttribute(book.id)}"
                             aria-label="Move ${escapeAttribute(book.title)} to another shelf"
@@ -778,284 +907,6 @@
             </div>
         `;
     }
-
-    // =========================
-    // CUSTOMISATION RENDER
-    // =========================
-
-    function renderBookshelfCustomisationPanel() {
-        const items = Array.isArray(BlackwoodBookshelfState.customisationItems)
-            ? BlackwoodBookshelfState.customisationItems
-            : [];
-
-        if (!items.length && !BlackwoodBookshelfState.customisationLoadError) {
-            return "";
-        }
-
-        const metrics = getBookshelfCustomisationMetrics();
-        const unlockedIds = getUnlockedCustomisationItemIds();
-        const unlockedCount = items.filter(function (item) {
-            return unlockedIds.has(item.id);
-        }).length;
-
-        const totalCount = items.length;
-        const filteredItems = getCustomisationItemsForDisplay();
-        const openAttribute = BlackwoodBookshelfState.customisationPanelOpen ? "open" : "";
-
-        return `
-            <details 
-                class="bookshelf-customiser" 
-                data-bookshelf-customiser
-                ${openAttribute}
-            >
-                <summary class="bookshelf-customiser-summary">
-                    <div>
-                        <p class="bookshelf-kicker">Issued Shelf Additions</p>
-                        <h3>Customise Your Shelf</h3>
-                        <p>
-                            Change the atmosphere of your private Blackwood shelf with backgrounds,
-                            bookends, charms, objects, nameplates, and lighting earned through reader activity.
-                        </p>
-                    </div>
-
-                    <div class="bookshelf-customiser-summary-side">
-                        <span>${escapeHtml(String(unlockedCount))} / ${escapeHtml(String(totalCount))} issued</span>
-                        <small>${escapeHtml(getBookshelfCustomisationMetricSummary(metrics))}</small>
-                    </div>
-                </summary>
-
-                <div class="bookshelf-customiser-panel">
-                    ${
-                        BlackwoodBookshelfState.customisationLoadError
-                            ? `
-                                <div class="bookshelf-empty-card">
-                                    <p>${escapeHtml(BlackwoodBookshelfState.customisationLoadError)}</p>
-                                </div>
-                            `
-                            : `
-                                ${renderBookshelfCustomisationCurrentSelections()}
-
-                                ${renderBookshelfCustomisationFilters()}
-
-                                <p 
-                                    class="bookshelf-customisation-status ${escapeAttribute(BlackwoodBookshelfState.customisationStatusType)}"
-                                    id="bookshelf-customisation-status"
-                                    aria-live="polite"
-                                >
-                                    ${escapeHtml(BlackwoodBookshelfState.customisationStatusMessage)}
-                                </p>
-
-                                ${
-                                    filteredItems.length
-                                        ? `
-                                            <div class="bookshelf-customisation-grid">
-                                                ${filteredItems.map(renderBookshelfCustomisationItem).join("")}
-                                            </div>
-                                        `
-                                        : `
-                                            <div class="bookshelf-empty-card">
-                                                <p>No shelf additions match this filter yet.</p>
-                                            </div>
-                                        `
-                                }
-
-                                <div class="bookshelf-customisation-actions">
-                                    <button 
-                                        type="button" 
-                                        class="bookshelf-modal-button"
-                                        data-bookshelf-customisation-reset
-                                        ${BlackwoodBookshelfState.isCustomisationBusy ? "disabled" : ""}
-                                    >
-                                        Reset Display
-                                    </button>
-                                </div>
-                            `
-                    }
-                </div>
-            </details>
-        `;
-    }
-
-    function renderBookshelfCustomisationCurrentSelections() {
-        const selections = getNormalisedCustomisationSelections();
-
-        return `
-            <div class="bookshelf-customisation-current" aria-label="Current shelf display">
-                ${BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.map(function (slot) {
-                    const item = selections[slot.id]
-                        ? getCustomisationItemById(selections[slot.id])
-                        : null;
-
-                    return `
-                        <article class="bookshelf-customisation-current-card">
-                            <span>${escapeHtml(slot.label)}</span>
-
-                            <strong>
-                                ${escapeHtml(item ? item.title : "Not selected")}
-                            </strong>
-
-                            ${
-                                slot.optional && item
-                                    ? `
-                                        <button 
-                                            type="button"
-                                            data-bookshelf-customisation-clear="${escapeAttribute(slot.id)}"
-                                            ${BlackwoodBookshelfState.isCustomisationBusy ? "disabled" : ""}
-                                        >
-                                            Clear
-                                        </button>
-                                    `
-                                    : ""
-                            }
-                        </article>
-                    `;
-                }).join("")}
-            </div>
-        `;
-    }
-
-    function renderBookshelfCustomisationFilters() {
-        const counts = getCustomisationFilterCounts();
-
-        return `
-            <div class="bookshelf-customisation-filters" aria-label="Shelf customisation filters">
-                ${BLACKWOOD_BOOKSHELF_CUSTOMISATION_FILTERS.map(function (filter) {
-                    const isActive = BlackwoodBookshelfState.customisationFilter === filter.id;
-
-                    return `
-                        <button
-                            type="button"
-                            class="${isActive ? "is-active" : ""}"
-                            data-bookshelf-customisation-filter="${escapeAttribute(filter.id)}"
-                            aria-pressed="${isActive ? "true" : "false"}"
-                            ${BlackwoodBookshelfState.isCustomisationBusy ? "disabled" : ""}
-                        >
-                            <span>${escapeHtml(filter.label)}</span>
-                            <strong>${escapeHtml(String(counts[filter.id] || 0))}</strong>
-                        </button>
-                    `;
-                }).join("")}
-            </div>
-        `;
-    }
-
-    function renderBookshelfCustomisationItem(item) {
-        const slot = getCustomisationSlotById(item.slot);
-        const unlockedIds = getUnlockedCustomisationItemIds();
-        const isUnlocked = unlockedIds.has(item.id);
-        const isSelected = isCustomisationItemSelected(item);
-        const label = isUnlocked ? "Issued" : getCustomisationLockedReason(item);
-
-        return `
-            <button
-                type="button"
-                class="bookshelf-customisation-item ${isUnlocked ? "is-unlocked" : "is-locked"} ${isSelected ? "is-selected" : ""}"
-                data-bookshelf-customisation-select="${escapeAttribute(item.id)}"
-                ${isUnlocked && !BlackwoodBookshelfState.isCustomisationBusy ? "" : "disabled"}
-                aria-pressed="${isSelected ? "true" : "false"}"
-            >
-                <span class="bookshelf-customisation-item-preview ${escapeAttribute(item.className)}" aria-hidden="true">
-                    ${
-                        item.image
-                            ? `
-                                <img 
-                                    src="${escapeAttribute(item.image)}" 
-                                    alt=""
-                                    loading="lazy"
-                                    data-bookshelf-customisation-image
-                                >
-                            `
-                            : `
-                                <span>${escapeHtml(item.symbol || "✦")}</span>
-                            `
-                    }
-                </span>
-
-                <span class="bookshelf-customisation-item-copy">
-                    <span class="bookshelf-customisation-item-kicker">
-                        ${escapeHtml(slot ? slot.shortLabel : "Shelf")}
-                    </span>
-
-                    <strong>${escapeHtml(item.title)}</strong>
-
-                    <small>${escapeHtml(item.description || "A recovered shelf addition.")}</small>
-
-                    <em>${escapeHtml(label)}</em>
-                </span>
-            </button>
-        `;
-    }
-
-    function renderBookshelfDisplayDecor() {
-        const bookends = getSelectedCustomisationItemBySlot("bookends");
-        const charm = getSelectedCustomisationItemBySlot("charm");
-        const object = getSelectedCustomisationItemBySlot("object");
-        const nameplate = getSelectedCustomisationItemBySlot("nameplate");
-        const lighting = getSelectedCustomisationItemBySlot("lighting");
-
-        if (!bookends && !charm && !object && !nameplate && !lighting) {
-            return "";
-        }
-
-        return `
-            <div class="bookshelf-customisation-decor" aria-hidden="true">
-                ${
-                    lighting
-                        ? `
-                            <div class="bookshelf-customisation-lighting ${escapeAttribute(lighting.className)}">
-                                <span>${escapeHtml(lighting.symbol || "")}</span>
-                            </div>
-                        `
-                        : ""
-                }
-
-                ${
-                    nameplate
-                        ? `
-                            <div class="bookshelf-customisation-nameplate ${escapeAttribute(nameplate.className)}">
-                                <span>${escapeHtml(nameplate.title)}</span>
-                            </div>
-                        `
-                        : ""
-                }
-
-                ${
-                    bookends
-                        ? `
-                            <div class="bookshelf-customisation-bookends ${escapeAttribute(bookends.className)}">
-                                <span class="bookshelf-customisation-bookend is-left">${escapeHtml(bookends.symbol || "")}</span>
-                                <span class="bookshelf-customisation-bookend is-right">${escapeHtml(bookends.symbol || "")}</span>
-                            </div>
-                        `
-                        : ""
-                }
-
-                ${
-                    charm
-                        ? `
-                            <div class="bookshelf-customisation-charm ${escapeAttribute(charm.className)}">
-                                <span>${escapeHtml(charm.symbol || "✦")}</span>
-                            </div>
-                        `
-                        : ""
-                }
-
-                ${
-                    object
-                        ? `
-                            <div class="bookshelf-customisation-object ${escapeAttribute(object.className)}">
-                                <span>${escapeHtml(object.symbol || "▣")}</span>
-                            </div>
-                        `
-                        : ""
-                }
-            </div>
-        `;
-    }
-
-    // =========================
-    // MODALS
-    // =========================
 
     function renderBookshelfModal() {
         if (BlackwoodBookshelfState.modalMode === "picker") {
@@ -1174,8 +1025,8 @@
                                     ${escapeHtml(book.author)}. Keep a private record for this title.
                                 </p>
 
-                                <form 
-                                    class="bookshelf-record-form" 
+                                <form
+                                    class="bookshelf-record-form"
                                     data-bookshelf-record-form
                                     data-bookshelf-book-id="${escapeAttribute(book.id)}"
                                 >
@@ -1236,8 +1087,8 @@
                                     <label class="bookshelf-field">
                                         <span>Private shelf note</span>
 
-                                        <textarea 
-                                            name="notes" 
+                                        <textarea
+                                            name="notes"
                                             maxlength="2000"
                                             placeholder="Add private notes, thoughts, memories, edition details, or anything you want to keep with this book."
                                         >${escapeHtml(record.notes)}</textarea>
@@ -1281,10 +1132,6 @@
         }).join("");
     }
 
-    // =========================
-    // EVENT BINDING
-    // =========================
-
     function bindBookshelfEvents() {
         const drawer = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-drawer]");
 
@@ -1322,7 +1169,20 @@
             button.addEventListener("click", handleMoveShelfRecord);
         });
 
-        bindBookshelfCustomisationEvents();
+        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-filter]").forEach(function (button) {
+            button.addEventListener("click", handleShelfCustomisationFilter);
+        });
+
+        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-item]").forEach(function (button) {
+            button.addEventListener("click", handleShelfCustomisationApply);
+        });
+
+        const resetCustomisationButton = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-customisation-reset]");
+
+        if (resetCustomisationButton) {
+            resetCustomisationButton.addEventListener("click", handleShelfCustomisationReset);
+        }
+
         bindBookshelfDragAndDrop();
 
         const modal = BlackwoodBookshelfState.root.querySelector(".bookshelf-modal");
@@ -1348,41 +1208,6 @@
         }
     }
 
-    function bindBookshelfCustomisationEvents() {
-        const customiser = BlackwoodBookshelfState.root.querySelector("[data-bookshelf-customiser]");
-
-        if (customiser) {
-            customiser.addEventListener("toggle", function () {
-                BlackwoodBookshelfState.customisationPanelOpen = customiser.open;
-            });
-        }
-
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-filter]").forEach(function (button) {
-            button.addEventListener("click", function () {
-                BlackwoodBookshelfState.customisationFilter = normaliseCustomisationFilter(
-                    button.dataset.bookshelfCustomisationFilter || "all"
-                );
-
-                BlackwoodBookshelfState.customisationPanelOpen = true;
-                BlackwoodBookshelfState.isDrawerOpen = true;
-
-                renderBookshelf();
-            });
-        });
-
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-select]").forEach(function (button) {
-            button.addEventListener("click", handleCustomisationItemSelect);
-        });
-
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-clear]").forEach(function (button) {
-            button.addEventListener("click", handleCustomisationSlotClear);
-        });
-
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-reset]").forEach(function (button) {
-            button.addEventListener("click", handleCustomisationReset);
-        });
-    }
-
     function bindBookshelfDragAndDrop() {
         BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-drag-book]").forEach(function (slot) {
             slot.addEventListener("dragstart", handleBookshelfDragStart);
@@ -1397,6 +1222,288 @@
         });
     }
 
+    function handleBookshelfDragStart(event) {
+        if (BlackwoodBookshelfState.isBusy) {
+            event.preventDefault();
+            return;
+        }
+
+        const interactiveElement = event.target.closest(
+            "select, input, textarea, .bookshelf-order-controls button"
+        );
+
+        if (interactiveElement) {
+            event.preventDefault();
+            return;
+        }
+
+        const slot = event.currentTarget;
+        const bookId = slot.dataset.bookshelfDragBook || "";
+        const record = getRecordByBookId(bookId);
+
+        if (!bookId || !record) {
+            event.preventDefault();
+            return;
+        }
+
+        BlackwoodBookshelfState.draggingBookId = bookId;
+        BlackwoodBookshelfState.draggingFromStageId = record.shelf_status || "want_to_read";
+
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", bookId);
+        }
+
+        window.setTimeout(function () {
+            slot.classList.add("is-dragging");
+            document.body.classList.add("is-bookshelf-dragging");
+        }, 0);
+    }
+
+    function handleBookshelfDragOver(event) {
+        const draggingBookId = BlackwoodBookshelfState.draggingBookId;
+
+        if (!draggingBookId) {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = "move";
+        }
+
+        clearBookshelfDropIndicators();
+
+        const dropInfo = getBookshelfDropInfo(event);
+
+        if (dropInfo.stageElement) {
+            dropInfo.stageElement.classList.add("is-drag-over");
+        }
+
+        if (dropInfo.slotElement && dropInfo.slotElement.dataset.bookshelfDragBook !== draggingBookId) {
+            dropInfo.slotElement.classList.add(dropInfo.dropAfter ? "is-drop-after" : "is-drop-before");
+        }
+    }
+
+    function handleBookshelfDragLeave(event) {
+        const stage = event.currentTarget;
+
+        if (!stage || stage.contains(event.relatedTarget)) {
+            return;
+        }
+
+        stage.classList.remove("is-drag-over");
+
+        stage.querySelectorAll(".is-drop-before, .is-drop-after").forEach(function (element) {
+            element.classList.remove("is-drop-before", "is-drop-after");
+        });
+    }
+
+    async function handleBookshelfDrop(event) {
+        const draggedBookId = event.dataTransfer
+            ? event.dataTransfer.getData("text/plain") || BlackwoodBookshelfState.draggingBookId
+            : BlackwoodBookshelfState.draggingBookId;
+
+        if (!draggedBookId) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const dropInfo = getBookshelfDropInfo(event);
+
+        clearBookshelfDropIndicators();
+
+        if (!dropInfo.stageId) {
+            resetBookshelfDragState();
+            return;
+        }
+
+        await moveShelfRecordByDrag(draggedBookId, dropInfo.stageId, dropInfo.beforeBookId);
+    }
+
+    function handleBookshelfDragEnd() {
+        clearBookshelfDropIndicators();
+        resetBookshelfDragState();
+    }
+
+    async function moveShelfRecordByDrag(bookId, targetStageId, beforeBookId) {
+        if (BlackwoodBookshelfState.isBusy) {
+            return;
+        }
+
+        const book = getBookById(bookId);
+        const record = getRecordByBookId(bookId);
+        const cleanTargetStage = normaliseShelfStatus(targetStageId);
+
+        if (!book || !record) {
+            setBookshelfStatus("That book could not be moved.", "is-error");
+            return;
+        }
+
+        const currentStage = normaliseShelfStatus(record.shelf_status);
+
+        let targetItems = getShelfItemsForStage(cleanTargetStage).filter(function (item) {
+            return item.record.book_id !== bookId;
+        });
+
+        const movedItem = {
+            book,
+            record: {
+                ...record,
+                shelf_status: cleanTargetStage
+            }
+        };
+
+        const insertIndex = beforeBookId
+            ? targetItems.findIndex(function (item) {
+                return item.record.book_id === beforeBookId;
+            })
+            : -1;
+
+        if (insertIndex >= 0) {
+            targetItems.splice(insertIndex, 0, movedItem);
+        } else {
+            targetItems.push(movedItem);
+        }
+
+        const sourceItems = currentStage === cleanTargetStage
+            ? []
+            : getShelfItemsForStage(currentStage).filter(function (item) {
+                return item.record.book_id !== bookId;
+            });
+
+        BlackwoodBookshelfState.isBusy = true;
+        setBookshelfStatus(`Moving ${book.title}...`, "is-loading");
+
+        try {
+            if (sourceItems.length) {
+                await saveShelfStageOrderForDrag(sourceItems, currentStage);
+            }
+
+            await saveShelfStageOrderForDrag(targetItems, cleanTargetStage);
+
+            await loadBookshelfRecords();
+
+            BlackwoodBookshelfState.isDrawerOpen = true;
+            BlackwoodBookshelfState.statusMessage = `${book.title} moved to ${getShelfStageLabel(cleanTargetStage)}.`;
+            BlackwoodBookshelfState.statusType = "is-success";
+
+            renderBookshelf();
+
+        } catch (error) {
+            console.error("Bookshelf drag move failed:", error);
+            setBookshelfStatus(cleanBookshelfError(error.message), "is-error");
+
+        } finally {
+            BlackwoodBookshelfState.isBusy = false;
+            resetBookshelfDragState();
+        }
+    }
+
+    async function saveShelfStageOrderForDrag(stageItems, stageId) {
+        const userId = getCurrentUserId();
+        const cleanStageId = normaliseShelfStatus(stageId);
+        const now = new Date().toISOString();
+
+        if (!userId) {
+            throw new Error("Sign in required.");
+        }
+
+        const updates = stageItems.map(function (item, index) {
+            const payload = {
+                shelf_status: cleanStageId,
+                shelf_position: (index + 1) * 10,
+                updated_at: now
+            };
+
+            if (cleanStageId === "favourite") {
+                payload.is_favourite = true;
+            }
+
+            return BlackwoodBookshelfState.client
+                .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
+                .update(payload)
+                .eq("member_id", userId)
+                .eq("book_id", item.record.book_id);
+        });
+
+        const results = await Promise.all(updates);
+
+        const failedResult = results.find(function (result) {
+            return result && result.error;
+        });
+
+        if (failedResult && failedResult.error) {
+            throw failedResult.error;
+        }
+    }
+
+    function getBookshelfDropInfo(event) {
+        const stageElement = event.target.closest("[data-bookshelf-drop-stage]");
+        const slotElement = event.target.closest("[data-bookshelf-drop-before]");
+
+        const stageId = stageElement
+            ? normaliseShelfStatus(stageElement.dataset.bookshelfDropStage || "")
+            : "";
+
+        let beforeBookId = "";
+        let dropAfter = false;
+
+        if (slotElement && stageId) {
+            const slotBookId = slotElement.dataset.bookshelfDropBefore || "";
+            const rect = slotElement.getBoundingClientRect();
+            const midpoint = rect.left + rect.width / 2;
+
+            dropAfter = event.clientX > midpoint;
+
+            if (dropAfter) {
+                beforeBookId = getNextBookIdAfter(slotBookId, stageId);
+            } else {
+                beforeBookId = slotBookId;
+            }
+        }
+
+        return {
+            stageElement,
+            slotElement,
+            stageId,
+            beforeBookId,
+            dropAfter
+        };
+    }
+
+    function getNextBookIdAfter(bookId, stageId) {
+        const items = getShelfItemsForStage(stageId);
+        const currentIndex = items.findIndex(function (item) {
+            return item.record.book_id === bookId;
+        });
+
+        if (currentIndex < 0 || currentIndex >= items.length - 1) {
+            return "";
+        }
+
+        return items[currentIndex + 1].record.book_id;
+    }
+
+    function clearBookshelfDropIndicators() {
+        if (!BlackwoodBookshelfState.root) {
+            return;
+        }
+
+        BlackwoodBookshelfState.root.querySelectorAll(".is-drag-over, .is-drop-before, .is-drop-after, .is-dragging").forEach(function (element) {
+            element.classList.remove("is-drag-over", "is-drop-before", "is-drop-after", "is-dragging");
+        });
+    }
+
+    function resetBookshelfDragState() {
+        BlackwoodBookshelfState.draggingBookId = "";
+        BlackwoodBookshelfState.draggingFromStageId = "";
+
+        document.body.classList.remove("is-bookshelf-dragging");
+    }
+
     function bindBookshelfImageFallbacks() {
         BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-spine-image]").forEach(function (image) {
             image.addEventListener("error", function () {
@@ -1404,18 +1511,6 @@
 
                 if (button) {
                     button.classList.add("is-image-missing");
-                }
-
-                image.hidden = true;
-            });
-        });
-
-        BlackwoodBookshelfState.root.querySelectorAll("[data-bookshelf-customisation-image]").forEach(function (image) {
-            image.addEventListener("error", function () {
-                const preview = image.closest(".bookshelf-customisation-item-preview");
-
-                if (preview) {
-                    preview.classList.add("is-image-missing");
                 }
 
                 image.hidden = true;
@@ -1436,268 +1531,6 @@
 
         BlackwoodBookshelfState.escapeListenerBound = true;
     }
-
-    // =========================
-    // CUSTOMISATION ACTIONS
-    // =========================
-
-    async function handleCustomisationItemSelect(event) {
-        if (BlackwoodBookshelfState.isCustomisationBusy) {
-            return;
-        }
-
-        const button = event.currentTarget;
-        const itemId = button.dataset.bookshelfCustomisationSelect || "";
-        const item = getCustomisationItemById(itemId);
-        const unlockedIds = getUnlockedCustomisationItemIds();
-
-        if (!item) {
-            setBookshelfCustomisationStatus("That shelf addition could not be found.", "is-error");
-            return;
-        }
-
-        if (!unlockedIds.has(item.id)) {
-            setBookshelfCustomisationStatus(getCustomisationLockedReason(item), "is-error");
-            return;
-        }
-
-        BlackwoodBookshelfState.isCustomisationBusy = true;
-        BlackwoodBookshelfState.customisationPanelOpen = true;
-        BlackwoodBookshelfState.isDrawerOpen = true;
-
-        setBookshelfCustomisationStatus(`Filing ${item.title} on your shelf...`, "is-loading");
-
-        const record = normaliseCustomisationRecord(BlackwoodBookshelfState.customisationRecord);
-        record.selections[item.slot] = item.id;
-        record.unlockedItemIds = uniqueStrings([
-            ...record.unlockedItemIds,
-            item.id
-        ]);
-        record.updated_at = new Date().toISOString();
-
-        BlackwoodBookshelfState.customisationRecord = record;
-
-        try {
-            const result = await saveBookshelfCustomisationRecord();
-
-            BlackwoodBookshelfState.customisationStatusMessage = result.savedLocally
-                ? `${item.title} applied and saved locally on this device.`
-                : `${item.title} applied to your shelf.`;
-
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-            renderBookshelf();
-
-        } catch (error) {
-            console.error("Shelf customisation save failed:", error);
-            setBookshelfCustomisationStatus(cleanBookshelfError(error.message), "is-error");
-
-        } finally {
-            BlackwoodBookshelfState.isCustomisationBusy = false;
-        }
-    }
-
-    async function handleCustomisationSlotClear(event) {
-        if (BlackwoodBookshelfState.isCustomisationBusy) {
-            return;
-        }
-
-        const button = event.currentTarget;
-        const slotId = normaliseCustomisationSlot(button.dataset.bookshelfCustomisationClear || "");
-        const slot = getCustomisationSlotById(slotId);
-
-        if (!slot || !slot.optional) {
-            setBookshelfCustomisationStatus("That shelf slot cannot be cleared.", "is-error");
-            return;
-        }
-
-        BlackwoodBookshelfState.isCustomisationBusy = true;
-        BlackwoodBookshelfState.customisationPanelOpen = true;
-        BlackwoodBookshelfState.isDrawerOpen = true;
-
-        setBookshelfCustomisationStatus(`Clearing ${slot.shortLabel.toLowerCase()}...`, "is-loading");
-
-        const record = normaliseCustomisationRecord(BlackwoodBookshelfState.customisationRecord);
-        delete record.selections[slot.id];
-        record.updated_at = new Date().toISOString();
-
-        BlackwoodBookshelfState.customisationRecord = record;
-
-        try {
-            const result = await saveBookshelfCustomisationRecord();
-
-            BlackwoodBookshelfState.customisationStatusMessage = result.savedLocally
-                ? `${slot.label} cleared and saved locally on this device.`
-                : `${slot.label} cleared.`;
-
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-            renderBookshelf();
-
-        } catch (error) {
-            console.error("Shelf customisation clear failed:", error);
-            setBookshelfCustomisationStatus(cleanBookshelfError(error.message), "is-error");
-
-        } finally {
-            BlackwoodBookshelfState.isCustomisationBusy = false;
-        }
-    }
-
-    async function handleCustomisationReset() {
-        if (BlackwoodBookshelfState.isCustomisationBusy) {
-            return;
-        }
-
-        const confirmed = window.confirm("Reset your shelf display to its default issued style?");
-
-        if (!confirmed) {
-            return;
-        }
-
-        BlackwoodBookshelfState.isCustomisationBusy = true;
-        BlackwoodBookshelfState.customisationPanelOpen = true;
-        BlackwoodBookshelfState.isDrawerOpen = true;
-
-        setBookshelfCustomisationStatus("Resetting shelf display...", "is-loading");
-
-        const record = normaliseCustomisationRecord(BlackwoodBookshelfState.customisationRecord);
-        record.selections = {};
-        record.updated_at = new Date().toISOString();
-
-        BlackwoodBookshelfState.customisationRecord = record;
-        applyDefaultCustomisationSelections();
-
-        try {
-            const result = await saveBookshelfCustomisationRecord();
-
-            BlackwoodBookshelfState.customisationStatusMessage = result.savedLocally
-                ? "Shelf display reset and saved locally on this device."
-                : "Shelf display reset.";
-
-            BlackwoodBookshelfState.customisationStatusType = "is-success";
-
-            renderBookshelf();
-
-        } catch (error) {
-            console.error("Shelf customisation reset failed:", error);
-            setBookshelfCustomisationStatus(cleanBookshelfError(error.message), "is-error");
-
-        } finally {
-            BlackwoodBookshelfState.isCustomisationBusy = false;
-        }
-    }
-
-    async function saveBookshelfCustomisationRecord() {
-        const userId = getCurrentUserId();
-        const record = normaliseCustomisationRecord(BlackwoodBookshelfState.customisationRecord);
-
-        record.member_id = userId;
-        record.updated_at = record.updated_at || new Date().toISOString();
-
-        BlackwoodBookshelfState.customisationRecord = record;
-        saveCustomisationToLocalStorage(record);
-
-        if (!BlackwoodBookshelfState.client || !userId) {
-            return {
-                savedLocally: true
-            };
-        }
-
-        const tableNames = getCustomisationTableNamesForQuery();
-        const payloads = buildCustomisationPayloads(userId, record);
-        const errors = [];
-
-        for (const tableName of tableNames) {
-            for (const payload of payloads) {
-                try {
-                    const result = await writeCustomisationPayloadToTable(tableName, payload);
-
-                    if (!result.error) {
-                        BlackwoodBookshelfState.currentCustomisationTableName = tableName;
-
-                        return {
-                            savedLocally: false,
-                            tableName
-                        };
-                    }
-
-                    errors.push(result.error);
-
-                    if (!isLikelyMissingDbStructureError(result.error.message)) {
-                        console.warn("Shelf customisation save warning:", result.error.message);
-                    }
-
-                } catch (error) {
-                    errors.push(error);
-                }
-            }
-        }
-
-        const hardError = errors.find(function (error) {
-            return error && !isLikelyMissingDbStructureError(error.message);
-        });
-
-        if (hardError) {
-            throw hardError;
-        }
-
-        return {
-            savedLocally: true
-        };
-    }
-
-    async function writeCustomisationPayloadToTable(tableName, payload) {
-        const userId = getCurrentUserId();
-
-        const upsertResult = await BlackwoodBookshelfState.client
-            .from(tableName)
-            .upsert(payload, {
-                onConflict: "member_id"
-            })
-            .select("*")
-            .maybeSingle();
-
-        if (!upsertResult.error) {
-            return upsertResult;
-        }
-
-        if (!/unique|constraint|conflict/i.test(String(upsertResult.error.message || ""))) {
-            return upsertResult;
-        }
-
-        const updatePayload = {
-            ...payload
-        };
-
-        delete updatePayload.member_id;
-
-        const updateResult = await BlackwoodBookshelfState.client
-            .from(tableName)
-            .update(updatePayload)
-            .eq("member_id", userId)
-            .select("*");
-
-        if (updateResult.error) {
-            return updateResult;
-        }
-
-        if (Array.isArray(updateResult.data) && updateResult.data.length) {
-            return {
-                data: updateResult.data[0],
-                error: null
-            };
-        }
-
-        return BlackwoodBookshelfState.client
-            .from(tableName)
-            .insert(payload)
-            .select("*")
-            .maybeSingle();
-    }
-
-    // =========================
-    // BOOK RECORD ACTIONS
-    // =========================
 
     function openBookPickerModal() {
         BlackwoodBookshelfState.isDrawerOpen = true;
@@ -2024,295 +1857,171 @@
         }
     }
 
-    // =========================
-    // DRAG AND DROP
-    // =========================
+    function handleShelfCustomisationFilter(event) {
+        const button = event.currentTarget;
+        const filter = normaliseCustomisationFilter(button.dataset.bookshelfCustomisationFilter || "all");
 
-    function handleBookshelfDragStart(event) {
-        if (BlackwoodBookshelfState.isBusy) {
-            event.preventDefault();
-            return;
-        }
+        BlackwoodBookshelfState.customisationFilter = filter;
+        BlackwoodBookshelfState.isDrawerOpen = true;
 
-        const interactiveElement = event.target.closest(
-            "select, input, textarea, .bookshelf-order-controls button"
-        );
-
-        if (interactiveElement) {
-            event.preventDefault();
-            return;
-        }
-
-        const slot = event.currentTarget;
-        const bookId = slot.dataset.bookshelfDragBook || "";
-        const record = getRecordByBookId(bookId);
-
-        if (!bookId || !record) {
-            event.preventDefault();
-            return;
-        }
-
-        BlackwoodBookshelfState.draggingBookId = bookId;
-        BlackwoodBookshelfState.draggingFromStageId = record.shelf_status || "want_to_read";
-
-        if (event.dataTransfer) {
-            event.dataTransfer.effectAllowed = "move";
-            event.dataTransfer.setData("text/plain", bookId);
-        }
-
-        window.setTimeout(function () {
-            slot.classList.add("is-dragging");
-            document.body.classList.add("is-bookshelf-dragging");
-        }, 0);
+        renderBookshelf();
     }
 
-    function handleBookshelfDragOver(event) {
-        const draggingBookId = BlackwoodBookshelfState.draggingBookId;
+    async function handleShelfCustomisationApply(event) {
+        const button = event.currentTarget;
 
-        if (!draggingBookId) {
+        if (BlackwoodBookshelfState.isSavingCustomisation) {
             return;
         }
 
-        event.preventDefault();
+        const itemId = button.dataset.bookshelfCustomisationItem || "";
+        const slotId = normaliseCustomisationSlot(button.dataset.bookshelfCustomisationSlot || "");
+        const item = getCustomisationItemById(itemId);
 
-        if (event.dataTransfer) {
-            event.dataTransfer.dropEffect = "move";
-        }
-
-        clearBookshelfDropIndicators();
-
-        const dropInfo = getBookshelfDropInfo(event);
-
-        if (dropInfo.stageElement) {
-            dropInfo.stageElement.classList.add("is-drag-over");
-        }
-
-        if (dropInfo.slotElement && dropInfo.slotElement.dataset.bookshelfDragBook !== draggingBookId) {
-            dropInfo.slotElement.classList.add(dropInfo.dropAfter ? "is-drop-after" : "is-drop-before");
-        }
-    }
-
-    function handleBookshelfDragLeave(event) {
-        const stage = event.currentTarget;
-
-        if (!stage || stage.contains(event.relatedTarget)) {
+        if (!item || !slotId) {
+            setCustomisationStatus("That shelf object could not be found.", "is-error");
             return;
         }
 
-        stage.classList.remove("is-drag-over");
+        const unlockInfo = getShelfCustomisationUnlockInfo(item);
 
-        stage.querySelectorAll(".is-drop-before, .is-drop-after").forEach(function (element) {
-            element.classList.remove("is-drop-before", "is-drop-after");
-        });
-    }
-
-    async function handleBookshelfDrop(event) {
-        const draggedBookId = event.dataTransfer
-            ? event.dataTransfer.getData("text/plain") || BlackwoodBookshelfState.draggingBookId
-            : BlackwoodBookshelfState.draggingBookId;
-
-        if (!draggedBookId) {
+        if (!unlockInfo.unlocked) {
+            setCustomisationStatus(unlockInfo.reason || "That object is still locked.", "is-error");
             return;
         }
 
-        event.preventDefault();
+        BlackwoodBookshelfState.customisationSelections[slotId] = item.id;
+        BlackwoodBookshelfState.isSavingCustomisation = true;
+        BlackwoodBookshelfState.isDrawerOpen = true;
+        BlackwoodBookshelfState.customisationStatusMessage = `Applying ${item.title}...`;
+        BlackwoodBookshelfState.customisationStatusType = "is-loading";
 
-        const dropInfo = getBookshelfDropInfo(event);
-
-        clearBookshelfDropIndicators();
-
-        if (!dropInfo.stageId) {
-            resetBookshelfDragState();
-            return;
-        }
-
-        await moveShelfRecordByDrag(draggedBookId, dropInfo.stageId, dropInfo.beforeBookId);
-    }
-
-    function handleBookshelfDragEnd() {
-        clearBookshelfDropIndicators();
-        resetBookshelfDragState();
-    }
-
-    async function moveShelfRecordByDrag(bookId, targetStageId, beforeBookId) {
-        if (BlackwoodBookshelfState.isBusy) {
-            return;
-        }
-
-        const book = getBookById(bookId);
-        const record = getRecordByBookId(bookId);
-        const cleanTargetStage = normaliseShelfStatus(targetStageId);
-
-        if (!book || !record) {
-            setBookshelfStatus("That book could not be moved.", "is-error");
-            return;
-        }
-
-        const currentStage = normaliseShelfStatus(record.shelf_status);
-
-        const targetItems = getShelfItemsForStage(cleanTargetStage).filter(function (item) {
-            return item.record.book_id !== bookId;
-        });
-
-        const movedItem = {
-            book,
-            record: {
-                ...record,
-                shelf_status: cleanTargetStage
-            }
-        };
-
-        const insertIndex = beforeBookId
-            ? targetItems.findIndex(function (item) {
-                return item.record.book_id === beforeBookId;
-            })
-            : -1;
-
-        if (insertIndex >= 0) {
-            targetItems.splice(insertIndex, 0, movedItem);
-        } else {
-            targetItems.push(movedItem);
-        }
-
-        const sourceItems = currentStage === cleanTargetStage
-            ? []
-            : getShelfItemsForStage(currentStage).filter(function (item) {
-                return item.record.book_id !== bookId;
-            });
-
-        BlackwoodBookshelfState.isBusy = true;
-        setBookshelfStatus(`Moving ${book.title}...`, "is-loading");
+        renderBookshelf();
 
         try {
-            if (sourceItems.length) {
-                await saveShelfStageOrderForDrag(sourceItems, currentStage);
-            }
+            const savedMode = await saveShelfCustomisationSelections();
 
-            await saveShelfStageOrderForDrag(targetItems, cleanTargetStage);
+            BlackwoodBookshelfState.customisationStatusMessage = savedMode === "supabase"
+                ? `${item.title} applied and saved to your Circle record.`
+                : `${item.title} applied and saved locally on this device.`;
 
-            await loadBookshelfRecords();
-
-            BlackwoodBookshelfState.isDrawerOpen = true;
-            BlackwoodBookshelfState.statusMessage = `${book.title} moved to ${getShelfStageLabel(cleanTargetStage)}.`;
-            BlackwoodBookshelfState.statusType = "is-success";
-
-            renderBookshelf();
+            BlackwoodBookshelfState.customisationStatusType = "is-success";
 
         } catch (error) {
-            console.error("Bookshelf drag move failed:", error);
-            setBookshelfStatus(cleanBookshelfError(error.message), "is-error");
+            console.error("Shelf customisation save failed:", error);
+
+            saveLocalShelfCustomisationSelections();
+
+            BlackwoodBookshelfState.customisationStatusMessage = `${item.title} applied and saved locally on this device.`;
+            BlackwoodBookshelfState.customisationStatusType = "is-success";
 
         } finally {
-            BlackwoodBookshelfState.isBusy = false;
-            resetBookshelfDragState();
+            BlackwoodBookshelfState.isSavingCustomisation = false;
+            renderBookshelf();
         }
     }
 
-    async function saveShelfStageOrderForDrag(stageItems, stageId) {
-        const userId = getCurrentUserId();
-        const cleanStageId = normaliseShelfStatus(stageId);
-        const now = new Date().toISOString();
-
-        if (!userId) {
-            throw new Error("Sign in required.");
-        }
-
-        const updates = stageItems.map(function (item, index) {
-            const payload = {
-                shelf_status: cleanStageId,
-                shelf_position: (index + 1) * 10,
-                updated_at: now
-            };
-
-            if (cleanStageId === "favourite") {
-                payload.is_favourite = true;
-            }
-
-            return BlackwoodBookshelfState.client
-                .from(BLACKWOOD_BOOKSHELF_CONFIG.tableName)
-                .update(payload)
-                .eq("member_id", userId)
-                .eq("book_id", item.record.book_id);
-        });
-
-        const results = await Promise.all(updates);
-
-        const failedResult = results.find(function (result) {
-            return result && result.error;
-        });
-
-        if (failedResult && failedResult.error) {
-            throw failedResult.error;
-        }
-    }
-
-    function getBookshelfDropInfo(event) {
-        const stageElement = event.target.closest("[data-bookshelf-drop-stage]");
-        const slotElement = event.target.closest("[data-bookshelf-drop-before]");
-
-        const stageId = stageElement
-            ? normaliseShelfStatus(stageElement.dataset.bookshelfDropStage || "")
-            : "";
-
-        let beforeBookId = "";
-        let dropAfter = false;
-
-        if (slotElement && stageId) {
-            const slotBookId = slotElement.dataset.bookshelfDropBefore || "";
-            const rect = slotElement.getBoundingClientRect();
-            const midpoint = rect.left + rect.width / 2;
-
-            dropAfter = event.clientX > midpoint;
-
-            if (dropAfter) {
-                beforeBookId = getNextBookIdAfter(slotBookId, stageId);
-            } else {
-                beforeBookId = slotBookId;
-            }
-        }
-
-        return {
-            stageElement,
-            slotElement,
-            stageId,
-            beforeBookId,
-            dropAfter
-        };
-    }
-
-    function getNextBookIdAfter(bookId, stageId) {
-        const items = getShelfItemsForStage(stageId);
-        const currentIndex = items.findIndex(function (item) {
-            return item.record.book_id === bookId;
-        });
-
-        if (currentIndex < 0 || currentIndex >= items.length - 1) {
-            return "";
-        }
-
-        return items[currentIndex + 1].record.book_id;
-    }
-
-    function clearBookshelfDropIndicators() {
-        if (!BlackwoodBookshelfState.root) {
+    async function handleShelfCustomisationReset() {
+        if (BlackwoodBookshelfState.isSavingCustomisation) {
             return;
         }
 
-        BlackwoodBookshelfState.root.querySelectorAll(".is-drag-over, .is-drop-before, .is-drop-after, .is-dragging").forEach(function (element) {
-            element.classList.remove("is-drag-over", "is-drop-before", "is-drop-after", "is-dragging");
-        });
+        BlackwoodBookshelfState.customisationSelections = createDefaultCustomisationSelections();
+        BlackwoodBookshelfState.isSavingCustomisation = true;
+        BlackwoodBookshelfState.isDrawerOpen = true;
+        BlackwoodBookshelfState.customisationStatusMessage = "Resetting shelf display...";
+        BlackwoodBookshelfState.customisationStatusType = "is-loading";
+
+        renderBookshelf();
+
+        try {
+            const savedMode = await saveShelfCustomisationSelections();
+
+            BlackwoodBookshelfState.customisationStatusMessage = savedMode === "supabase"
+                ? "Shelf display reset and saved to your Circle record."
+                : "Shelf display reset and saved locally on this device.";
+
+            BlackwoodBookshelfState.customisationStatusType = "is-success";
+
+        } catch (error) {
+            console.error("Shelf customisation reset failed:", error);
+
+            saveLocalShelfCustomisationSelections();
+
+            BlackwoodBookshelfState.customisationStatusMessage = "Shelf display reset and saved locally on this device.";
+            BlackwoodBookshelfState.customisationStatusType = "is-success";
+
+        } finally {
+            BlackwoodBookshelfState.isSavingCustomisation = false;
+            renderBookshelf();
+        }
     }
 
-    function resetBookshelfDragState() {
-        BlackwoodBookshelfState.draggingBookId = "";
-        BlackwoodBookshelfState.draggingFromStageId = "";
+    async function saveShelfCustomisationSelections() {
+        const selections = normaliseCustomisationSelections(BlackwoodBookshelfState.customisationSelections);
 
-        document.body.classList.remove("is-bookshelf-dragging");
+        BlackwoodBookshelfState.customisationSelections = selections;
+
+        saveLocalShelfCustomisationSelections();
+
+        if (!BlackwoodBookshelfState.client || !getCurrentUserId()) {
+            BlackwoodBookshelfState.customisationSaveMode = "local";
+            return "local";
+        }
+
+        const tableCandidates = BlackwoodBookshelfState.customisationStorageTable
+            ? [
+                BlackwoodBookshelfState.customisationStorageTable,
+                ...BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames.filter(function (tableName) {
+                    return tableName !== BlackwoodBookshelfState.customisationStorageTable;
+                })
+            ]
+            : BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames;
+
+        for (const tableName of tableCandidates) {
+            const payloads = buildRemoteShelfCustomisationPayloads(selections);
+
+            for (const payload of payloads) {
+                try {
+                    const { error } = await BlackwoodBookshelfState.client
+                        .from(tableName)
+                        .upsert(payload, {
+                            onConflict: "member_id"
+                        });
+
+                    if (!error) {
+                        BlackwoodBookshelfState.customisationStorageTable = tableName;
+                        BlackwoodBookshelfState.customisationSaveMode = "supabase";
+                        return "supabase";
+                    }
+
+                } catch (error) {
+                    console.warn(`Shelf customisation save failed for ${tableName}:`, error);
+                }
+            }
+        }
+
+        BlackwoodBookshelfState.customisationSaveMode = "local";
+        return "local";
     }
 
-    // =========================
-    // SHELF DATA HELPERS
-    // =========================
+    function setCustomisationStatus(message, className) {
+        BlackwoodBookshelfState.customisationStatusMessage = message || "";
+        BlackwoodBookshelfState.customisationStatusType = className || "";
+
+        const status = document.getElementById("bookshelf-customisation-status");
+
+        if (!status) {
+            return;
+        }
+
+        status.textContent = BlackwoodBookshelfState.customisationStatusMessage;
+        status.classList.remove("is-success", "is-error", "is-loading");
+
+        if (BlackwoodBookshelfState.customisationStatusType) {
+            status.classList.add(BlackwoodBookshelfState.customisationStatusType);
+        }
+    }
 
     function getShelfItems() {
         return BlackwoodBookshelfState.shelfRecords
@@ -2518,714 +2227,271 @@
         return allowed ? cleanValue : "want_to_read";
     }
 
-    // =========================
-    // CUSTOMISATION DATA HELPERS
-    // =========================
+    function extractCustomisationItemsFromData(data) {
+        const rawItems = [];
 
-    function flattenCustomisationItems(data) {
         if (Array.isArray(data)) {
-            return data;
+            rawItems.push(...data);
         }
 
-        if (!data || typeof data !== "object") {
-            return [];
+        if (data && Array.isArray(data.items)) {
+            rawItems.push(...data.items);
         }
 
-        if (Array.isArray(data.items)) {
-            return data.items;
+        if (data && Array.isArray(data.customisationItems)) {
+            rawItems.push(...data.customisationItems);
         }
 
-        if (Array.isArray(data.customisationItems)) {
-            return data.customisationItems;
+        if (data && Array.isArray(data.shelfCustomisationItems)) {
+            rawItems.push(...data.shelfCustomisationItems);
         }
 
-        if (Array.isArray(data.shelfItems)) {
-            return data.shelfItems;
-        }
-
-        const groupedItems = [];
-
-        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
-            const possibleKeys = getCustomisationSlotKeys(slot.id);
-
-            possibleKeys.forEach(function (key) {
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+            Object.keys(data).forEach(function (key) {
                 if (Array.isArray(data[key])) {
                     data[key].forEach(function (item) {
-                        groupedItems.push({
+                        rawItems.push({
                             ...item,
-                            slot: item.slot || slot.id
-                        });
-                    });
-                }
-            });
-        });
-
-        if (Array.isArray(data.categories)) {
-            data.categories.forEach(function (category) {
-                const slot = normaliseCustomisationSlot(category.slot || category.id || category.type || "");
-
-                if (Array.isArray(category.items)) {
-                    category.items.forEach(function (item) {
-                        groupedItems.push({
-                            ...item,
-                            slot: item.slot || slot
+                            category: item.category || item.type || item.slot || key
                         });
                     });
                 }
             });
         }
 
-        return groupedItems;
+        const seen = new Set();
+
+        return rawItems
+            .map(function (item, index) {
+                return normaliseCustomisationItem(item, index);
+            })
+            .filter(function (item) {
+                if (!item || !item.id || !item.category) {
+                    return false;
+                }
+
+                const key = `${item.category}:${item.id}`;
+
+                if (seen.has(key)) {
+                    return false;
+                }
+
+                seen.add(key);
+                return true;
+            })
+            .sort(sortCustomisationItems);
     }
 
     function normaliseCustomisationItem(rawItem, index) {
-        const raw = rawItem && typeof rawItem === "object" ? rawItem : {};
-        const slot = normaliseCustomisationSlot(raw.slot || raw.type || raw.category || raw.kind || "");
-        const title = String(raw.title || raw.label || raw.name || "Shelf Addition").trim();
-        const id = createSlug(String(raw.id || raw.slug || `${slot}-${title}-${index || 0}`));
+        if (!rawItem || typeof rawItem !== "object") {
+            return null;
+        }
+
+        const category = normaliseCustomisationSlot(
+            rawItem.category ||
+            rawItem.type ||
+            rawItem.slot ||
+            rawItem.group ||
+            ""
+        );
+
+        if (!category) {
+            return null;
+        }
+
+        const title = String(
+            rawItem.title ||
+            rawItem.name ||
+            rawItem.label ||
+            `${category} ${index + 1}`
+        ).trim();
+
+        const id = String(
+            rawItem.id ||
+            rawItem.slug ||
+            createSlug(`${category}-${title}`)
+        ).trim();
 
         const pointsRequired = Number(
-            raw.points_required ||
-            raw.pointsRequired ||
-            raw.required_points ||
-            raw.requiredPoints ||
-            raw.unlock_points ||
-            raw.unlockPoints ||
+            rawItem.points_required ??
+            rawItem.pointsRequired ??
+            rawItem.required_points ??
+            rawItem.requiredPoints ??
+            rawItem.points ??
+            rawItem.cost ??
             0
         );
 
-        const purchaseCost = Number(
-            raw.purchase_cost ||
-            raw.purchaseCost ||
-            raw.points_cost ||
-            raw.pointsCost ||
-            raw.cost ||
+        const booksRequired = Number(
+            rawItem.books_required ??
+            rawItem.booksRequired ??
+            rawItem.required_books ??
+            rawItem.requiredBooks ??
             0
         );
 
         return {
             id,
-            slot,
+            category,
             title,
-            description: String(raw.description || raw.copy || raw.note || raw.unlock_description || "").trim(),
-            symbol: String(raw.symbol || raw.icon || raw.glyph || "").trim(),
-            image: String(raw.image || raw.image_url || raw.imageUrl || raw.preview || "").trim(),
-            className: String(raw.className || raw.class || raw.cssClass || raw.themeClass || `bookshelf-custom-${slot}-${id}`).trim(),
-            rarity: String(raw.rarity || raw.issue || "standard").trim(),
-            defaultSelected: raw.default === true || raw.defaultSelected === true || raw.is_default === true,
-            isDefault: raw.default === true || raw.isDefault === true || raw.is_default === true,
-            isFree: raw.free === true || raw.is_free === true,
-            pointsRequired: Number.isFinite(pointsRequired) ? Math.max(0, pointsRequired) : 0,
-            purchaseCost: Number.isFinite(purchaseCost) ? Math.max(0, purchaseCost) : 0,
-            requires: normaliseCustomisationRequirements(raw),
-            unlockText: String(raw.unlockText || raw.unlock_text || raw.lockedText || raw.locked_text || "").trim(),
-            sortOrder: Number(raw.order || raw.sortOrder || raw.sort_order || raw.defaultOrder || 1000),
-            cssVars: normaliseCssVars(raw.cssVars || raw.css_vars || raw.variables || {}),
-            background: String(raw.background || raw.backgroundColor || raw.background_color || "").trim(),
-            accent: String(raw.accent || raw.accentColor || raw.accent_color || "").trim(),
-            glow: String(raw.glow || raw.glowColor || raw.glow_color || "").trim()
+            description: String(rawItem.description || rawItem.copy || rawItem.summary || "").trim(),
+            pointsRequired: Number.isFinite(pointsRequired) ? pointsRequired : 0,
+            booksRequired: Number.isFinite(booksRequired) ? booksRequired : 0,
+            requiredBookId: String(rawItem.required_book_id || rawItem.requiredBookId || rawItem.book_id || rawItem.bookId || "").trim(),
+            requiredReadBookId: String(rawItem.required_read_book_id || rawItem.requiredReadBookId || "").trim(),
+            requiredStage: normaliseShelfStatus(rawItem.required_stage || rawItem.requiredStage || ""),
+            unlockText: String(rawItem.unlock_text || rawItem.unlockText || rawItem.unlock || rawItem.requirement || "").trim(),
+            isDefault: rawItem.is_default === true || rawItem.default === true || rawItem.isDefault === true,
+            isFree: rawItem.is_free === true || rawItem.free === true || rawItem.isFree === true,
+            isIssued: rawItem.issued === true || rawItem.unlocked === true || rawItem.is_unlocked === true,
+            sortOrder: Number(rawItem.sort_order || rawItem.sortOrder || rawItem.order || index + 1),
+            rarity: String(rawItem.rarity || "").trim()
         };
-    }
-
-    function normaliseCustomisationRequirements(raw) {
-        const unlock = raw.unlock && typeof raw.unlock === "object" ? raw.unlock : {};
-        const requires = raw.requires && typeof raw.requires === "object" ? raw.requires : {};
-        const achievement = raw.achievement && typeof raw.achievement === "object" ? raw.achievement : {};
-
-        return {
-            points: Number(
-                requires.points ||
-                unlock.points ||
-                unlock.points_required ||
-                raw.points_required ||
-                raw.pointsRequired ||
-                0
-            ),
-            ownedBooks: Number(
-                requires.ownedBooks ||
-                requires.owned_books ||
-                unlock.ownedBooks ||
-                unlock.owned_books ||
-                raw.ownedBooksRequired ||
-                raw.owned_books_required ||
-                0
-            ),
-            readBooks: Number(
-                requires.readBooks ||
-                requires.read_books ||
-                unlock.readBooks ||
-                unlock.read_books ||
-                raw.readBooksRequired ||
-                raw.read_books_required ||
-                0
-            ),
-            reviewedBooks: Number(
-                requires.reviewedBooks ||
-                requires.reviewed_books ||
-                unlock.reviewedBooks ||
-                unlock.reviewed_books ||
-                raw.reviewedBooksRequired ||
-                raw.reviewed_books_required ||
-                0
-            ),
-            favouriteBooks: Number(
-                requires.favouriteBooks ||
-                requires.favoriteBooks ||
-                requires.favourite_books ||
-                requires.favorite_books ||
-                unlock.favouriteBooks ||
-                unlock.favoriteBooks ||
-                raw.favouriteBooksRequired ||
-                raw.favoriteBooksRequired ||
-                0
-            ),
-            arcBooks: Number(
-                requires.arcBooks ||
-                requires.arc_books ||
-                unlock.arcBooks ||
-                unlock.arc_books ||
-                raw.arcBooksRequired ||
-                raw.arc_books_required ||
-                0
-            ),
-            signedBooks: Number(
-                requires.signedBooks ||
-                requires.signed_books ||
-                unlock.signedBooks ||
-                unlock.signed_books ||
-                raw.signedBooksRequired ||
-                raw.signed_books_required ||
-                0
-            ),
-            bookId: String(
-                requires.bookId ||
-                requires.book_id ||
-                unlock.bookId ||
-                unlock.book_id ||
-                achievement.bookId ||
-                achievement.book_id ||
-                raw.requiresBookId ||
-                raw.requires_book_id ||
-                ""
-            ).trim(),
-            readBookId: String(
-                requires.readBookId ||
-                requires.read_book_id ||
-                unlock.readBookId ||
-                unlock.read_book_id ||
-                achievement.readBookId ||
-                achievement.read_book_id ||
-                raw.requiresReadBookId ||
-                raw.requires_read_book_id ||
-                ""
-            ).trim(),
-            stage: normaliseShelfStatus(
-                requires.stage ||
-                requires.shelf_status ||
-                unlock.stage ||
-                unlock.shelf_status ||
-                raw.requiresStage ||
-                ""
-            ),
-            stageCount: Number(
-                requires.stageCount ||
-                requires.stage_count ||
-                unlock.stageCount ||
-                unlock.stage_count ||
-                raw.requiresStageCount ||
-                raw.requires_stage_count ||
-                0
-            )
-        };
-    }
-
-    function normaliseCssVars(rawVars) {
-        const vars = {};
-
-        if (!rawVars || typeof rawVars !== "object" || Array.isArray(rawVars)) {
-            return vars;
-        }
-
-        Object.keys(rawVars).forEach(function (key) {
-            const cleanKey = String(key || "").trim();
-
-            if (!/^--[a-z0-9-]+$/i.test(cleanKey)) {
-                return;
-            }
-
-            vars[cleanKey] = String(rawVars[key] || "").trim();
-        });
-
-        return vars;
     }
 
     function sortCustomisationItems(a, b) {
-        const aSlotOrder = getCustomisationSlotOrder(a.slot);
-        const bSlotOrder = getCustomisationSlotOrder(b.slot);
+        const aSlotOrder = getCustomisationSlotOrder(a.category);
+        const bSlotOrder = getCustomisationSlotOrder(b.category);
 
         if (aSlotOrder !== bSlotOrder) {
             return aSlotOrder - bSlotOrder;
         }
 
-        if (Number(a.sortOrder || 1000) !== Number(b.sortOrder || 1000)) {
-            return Number(a.sortOrder || 1000) - Number(b.sortOrder || 1000);
+        if (a.sortOrder !== b.sortOrder) {
+            return a.sortOrder - b.sortOrder;
         }
 
-        return String(a.title).localeCompare(String(b.title));
+        return a.title.localeCompare(b.title);
     }
 
-    function getCustomisationItemsForDisplay() {
+    function getFilteredCustomisationItems() {
         const filter = normaliseCustomisationFilter(BlackwoodBookshelfState.customisationFilter);
-        const items = Array.isArray(BlackwoodBookshelfState.customisationItems)
-            ? BlackwoodBookshelfState.customisationItems
-            : [];
 
         if (filter === "all") {
-            return items;
+            return BlackwoodBookshelfState.customisationItems;
         }
 
         if (filter === "locked") {
-            const unlockedIds = getUnlockedCustomisationItemIds();
-
-            return items.filter(function (item) {
-                return !unlockedIds.has(item.id);
-            });
+            return getLockedCustomisationItems();
         }
 
-        return items.filter(function (item) {
-            return item.slot === filter;
+        return BlackwoodBookshelfState.customisationItems.filter(function (item) {
+            return item.category === filter;
         });
     }
 
-    function getCustomisationFilterCounts() {
-        const items = Array.isArray(BlackwoodBookshelfState.customisationItems)
-            ? BlackwoodBookshelfState.customisationItems
-            : [];
+    function getIssuedCustomisationItems() {
+        return BlackwoodBookshelfState.customisationItems.filter(function (item) {
+            return getShelfCustomisationUnlockInfo(item).unlocked;
+        });
+    }
 
-        const unlockedIds = getUnlockedCustomisationItemIds();
+    function getLockedCustomisationItems() {
+        return BlackwoodBookshelfState.customisationItems.filter(function (item) {
+            return !getShelfCustomisationUnlockInfo(item).unlocked;
+        });
+    }
 
-        return items.reduce(function (counts, item) {
-            counts.all += 1;
-            counts[item.slot] = (counts[item.slot] || 0) + 1;
-
-            if (!unlockedIds.has(item.id)) {
-                counts.locked += 1;
-            }
-
+    function getCustomisationCategoryCounts() {
+        return BlackwoodBookshelfState.customisationItems.reduce(function (counts, item) {
+            counts[item.category] = (counts[item.category] || 0) + 1;
             return counts;
-        }, {
-            all: 0,
-            background: 0,
-            bookends: 0,
-            charm: 0,
-            object: 0,
-            nameplate: 0,
-            lighting: 0,
-            locked: 0
-        });
+        }, {});
     }
 
-    function createDefaultCustomisationRecord() {
-        return {
-            member_id: "",
-            selections: {},
-            unlockedItemIds: [],
-            updated_at: ""
-        };
-    }
+    function getShelfCustomisationUnlockInfo(item) {
+        const pointsTotal = getCustomisationPointsTotal();
+        const filedCount = getShelfItems().length;
 
-    function normaliseCustomisationRecord(record) {
-        const source = record && typeof record === "object"
-            ? record
-            : createDefaultCustomisationRecord();
-
-        const selectedItems = parseMaybeJson(source.selected_items || source.selectedItems || {});
-        const unlockedItems = parseMaybeJson(
-            source.unlocked_items ||
-            source.unlocked_item_ids ||
-            source.unlockedItemIds ||
-            []
-        );
-
-        const selections = {
-            ...normaliseCustomisationSelectionMap(selectedItems)
-        };
-
-        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
-            const flatValue = source[`selected_${slot.id}_id`] ||
-                source[`${slot.id}_id`] ||
-                source[slot.id];
-
-            if (flatValue) {
-                selections[slot.id] = String(flatValue).trim();
-            }
-        });
-
-        return {
-            member_id: String(source.member_id || getCurrentUserId() || "").trim(),
-            selections,
-            unlockedItemIds: uniqueStrings(Array.isArray(unlockedItems) ? unlockedItems : []),
-            updated_at: source.updated_at || ""
-        };
-    }
-
-    function normaliseCustomisationSelectionMap(rawSelections) {
-        const selections = {};
-
-        if (!rawSelections || typeof rawSelections !== "object" || Array.isArray(rawSelections)) {
-            return selections;
+        if (!item) {
+            return {
+                unlocked: false,
+                reason: "Object unavailable."
+            };
         }
 
-        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
-            const value = rawSelections[slot.id] ||
-                rawSelections[`${slot.id}_id`] ||
-                rawSelections[`selected_${slot.id}_id`];
+        if (item.isDefault || item.isFree || item.isIssued) {
+            return {
+                unlocked: true,
+                reason: "Issued"
+            };
+        }
 
-            if (value) {
-                selections[slot.id] = String(value).trim();
+        if (item.pointsRequired > 0 && pointsTotal < item.pointsRequired) {
+            return {
+                unlocked: false,
+                reason: `${item.pointsRequired - pointsTotal} more points needed`
+            };
+        }
+
+        if (item.booksRequired > 0 && filedCount < item.booksRequired) {
+            return {
+                unlocked: false,
+                reason: `${item.booksRequired - filedCount} more spines needed`
+            };
+        }
+
+        if (item.requiredBookId && !getRecordByBookId(item.requiredBookId)) {
+            const book = getBookById(item.requiredBookId);
+
+            return {
+                unlocked: false,
+                reason: book ? `File ${book.title}` : "Required book not filed"
+            };
+        }
+
+        if (item.requiredReadBookId) {
+            const record = getRecordByBookId(item.requiredReadBookId);
+            const book = getBookById(item.requiredReadBookId);
+
+            if (!record || !record.has_read) {
+                return {
+                    unlocked: false,
+                    reason: book ? `Read ${book.title}` : "Required book not read"
+                };
             }
-        });
+        }
 
-        return selections;
-    }
-
-    function buildCustomisationPayloads(userId, record) {
-        const selections = getNormalisedCustomisationSelections(record);
-        const unlockedItemIds = uniqueStrings(record.unlockedItemIds || []);
-        const now = record.updated_at || new Date().toISOString();
-
-        const flatPayload = {
-            member_id: userId,
-            selected_background_id: selections.background || null,
-            selected_bookends_id: selections.bookends || null,
-            selected_charm_id: selections.charm || null,
-            selected_object_id: selections.object || null,
-            selected_nameplate_id: selections.nameplate || null,
-            selected_lighting_id: selections.lighting || null,
-            updated_at: now
-        };
-
-        const jsonPayload = {
-            member_id: userId,
-            selected_items: selections,
-            unlocked_items: unlockedItemIds,
-            updated_at: now
-        };
-
-        const jsonPayloadAlternative = {
-            member_id: userId,
-            selected_items: selections,
-            unlocked_item_ids: unlockedItemIds,
-            updated_at: now
-        };
-
-        return [
-            {
-                ...flatPayload,
-                selected_items: selections,
-                unlocked_items: unlockedItemIds
-            },
-            {
-                ...flatPayload,
-                selected_items: selections,
-                unlocked_item_ids: unlockedItemIds
-            },
-            jsonPayload,
-            jsonPayloadAlternative,
-            flatPayload
-        ];
-    }
-
-    function applyDefaultCustomisationSelections() {
-        const record = normaliseCustomisationRecord(BlackwoodBookshelfState.customisationRecord);
-        const unlockedIds = getUnlockedCustomisationItemIds(record);
-        const selections = {
-            ...record.selections
-        };
-
-        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
-            if (selections[slot.id]) {
-                return;
-            }
-
-            const defaultItem = BlackwoodBookshelfState.customisationItems.find(function (item) {
-                return item.slot === slot.id &&
-                    unlockedIds.has(item.id) &&
-                    (item.defaultSelected || item.isDefault);
+        if (item.requiredStage && item.requiredStage !== "want_to_read") {
+            const hasStageItem = getShelfItems().some(function (shelfItem) {
+                return shelfItem.record.shelf_status === item.requiredStage;
             });
 
-            if (defaultItem) {
-                selections[slot.id] = defaultItem.id;
-            }
-        });
-
-        record.selections = selections;
-        BlackwoodBookshelfState.customisationRecord = record;
-    }
-
-    function getUnlockedCustomisationItemIds(recordOverride) {
-        const record = normaliseCustomisationRecord(recordOverride || BlackwoodBookshelfState.customisationRecord);
-        const metrics = getBookshelfCustomisationMetrics();
-        const selectedIds = Object.values(record.selections || {}).filter(Boolean);
-        const storedIds = Array.isArray(record.unlockedItemIds) ? record.unlockedItemIds : [];
-        const unlockedIds = new Set(uniqueStrings([
-            ...selectedIds,
-            ...storedIds
-        ]));
-
-        BlackwoodBookshelfState.customisationItems.forEach(function (item) {
-            if (isCustomisationItemAutomaticallyUnlocked(item, metrics)) {
-                unlockedIds.add(item.id);
-            }
-        });
-
-        return unlockedIds;
-    }
-
-    function isCustomisationItemAutomaticallyUnlocked(item, metrics) {
-        if (!item) {
-            return false;
-        }
-
-        if (item.isDefault || item.isFree || item.defaultSelected) {
-            return true;
-        }
-
-        const hasAnyRequirement = hasCustomisationRequirement(item);
-
-        if (!hasAnyRequirement) {
-            return true;
-        }
-
-        if (item.pointsRequired > 0 && metrics.points < item.pointsRequired) {
-            return false;
-        }
-
-        const requires = item.requires || {};
-
-        if (Number(requires.points || 0) > 0 && metrics.points < Number(requires.points || 0)) {
-            return false;
-        }
-
-        if (Number(requires.ownedBooks || 0) > 0 && metrics.ownedBooks < Number(requires.ownedBooks || 0)) {
-            return false;
-        }
-
-        if (Number(requires.readBooks || 0) > 0 && metrics.readBooks < Number(requires.readBooks || 0)) {
-            return false;
-        }
-
-        if (Number(requires.reviewedBooks || 0) > 0 && metrics.reviewedBooks < Number(requires.reviewedBooks || 0)) {
-            return false;
-        }
-
-        if (Number(requires.favouriteBooks || 0) > 0 && metrics.favouriteBooks < Number(requires.favouriteBooks || 0)) {
-            return false;
-        }
-
-        if (Number(requires.arcBooks || 0) > 0 && metrics.arcBooks < Number(requires.arcBooks || 0)) {
-            return false;
-        }
-
-        if (Number(requires.signedBooks || 0) > 0 && metrics.signedBooks < Number(requires.signedBooks || 0)) {
-            return false;
-        }
-
-        if (requires.bookId && !hasBookOnShelf(requires.bookId)) {
-            return false;
-        }
-
-        if (requires.readBookId && !hasReadBookOnShelf(requires.readBookId)) {
-            return false;
-        }
-
-        if (requires.stage && Number(requires.stageCount || 0) > 0) {
-            const count = getShelfItemsForStage(requires.stage).length;
-
-            if (count < Number(requires.stageCount || 0)) {
-                return false;
+            if (!hasStageItem) {
+                return {
+                    unlocked: false,
+                    reason: `File a book as ${getShelfStageLabel(item.requiredStage)}`
+                };
             }
         }
 
-        return true;
-    }
-
-    function hasCustomisationRequirement(item) {
-        const requires = item.requires || {};
-
-        return item.pointsRequired > 0 ||
-            item.purchaseCost > 0 ||
-            Number(requires.points || 0) > 0 ||
-            Number(requires.ownedBooks || 0) > 0 ||
-            Number(requires.readBooks || 0) > 0 ||
-            Number(requires.reviewedBooks || 0) > 0 ||
-            Number(requires.favouriteBooks || 0) > 0 ||
-            Number(requires.arcBooks || 0) > 0 ||
-            Number(requires.signedBooks || 0) > 0 ||
-            Boolean(requires.bookId) ||
-            Boolean(requires.readBookId) ||
-            Boolean(requires.stage && Number(requires.stageCount || 0) > 0);
-    }
-
-    function getBookshelfCustomisationMetrics() {
-        const shelfItems = getShelfItems();
-        const points = getBookshelfPointsTotal();
+        if (item.pointsRequired > 0 || item.booksRequired > 0 || item.requiredBookId || item.requiredReadBookId) {
+            return {
+                unlocked: true,
+                reason: "Issued"
+            };
+        }
 
         return {
-            points,
-            totalBooks: shelfItems.length,
-            ownedBooks: shelfItems.filter(function (item) {
-                return item.record.owned === true;
-            }).length,
-            readBooks: shelfItems.filter(function (item) {
-                return item.record.has_read === true ||
-                    ["read", "reviewed", "favourite"].includes(item.record.shelf_status);
-            }).length,
-            reviewedBooks: shelfItems.filter(function (item) {
-                return item.record.shelf_status === "reviewed";
-            }).length,
-            favouriteBooks: shelfItems.filter(function (item) {
-                return item.record.is_favourite === true ||
-                    item.record.shelf_status === "favourite";
-            }).length,
-            arcBooks: shelfItems.filter(function (item) {
-                return item.record.is_arc === true;
-            }).length,
-            signedBooks: shelfItems.filter(function (item) {
-                return item.record.is_signed === true;
-            }).length
-        };
-    }
-
-    function getBookshelfPointsTotal() {
-        const profile = BlackwoodBookshelfState.memberProfile || {};
-        const points = Number(profile.points_total || 0);
-
-        return Number.isFinite(points) ? points : 0;
-    }
-
-    function getBookshelfCustomisationMetricSummary(metrics) {
-        const bookLabel = metrics.totalBooks === 1 ? "1 spine filed" : `${metrics.totalBooks} spines filed`;
-
-        return `${bookLabel} · ${metrics.points} Circle points`;
-    }
-
-    function getBookshelfCustomisationSummary() {
-        const items = Array.isArray(BlackwoodBookshelfState.customisationItems)
-            ? BlackwoodBookshelfState.customisationItems
-            : [];
-
-        if (!items.length) {
-            return "Shelf Display";
-        }
-
-        const unlockedIds = getUnlockedCustomisationItemIds();
-        const unlockedCount = items.filter(function (item) {
-            return unlockedIds.has(item.id);
-        }).length;
-
-        return `${unlockedCount} Issued`;
-    }
-
-    function getCustomisationLockedReason(item) {
-        if (!item) {
-            return "Locked";
-        }
-
-        if (item.unlockText) {
-            return item.unlockText;
-        }
-
-        const requirements = [];
-        const requires = item.requires || {};
-
-        if (item.pointsRequired > 0) {
-            requirements.push(`${item.pointsRequired} Circle points`);
-        }
-
-        if (Number(requires.points || 0) > 0) {
-            requirements.push(`${Number(requires.points)} Circle points`);
-        }
-
-        if (Number(requires.ownedBooks || 0) > 0) {
-            requirements.push(`own ${Number(requires.ownedBooks)} book${Number(requires.ownedBooks) === 1 ? "" : "s"}`);
-        }
-
-        if (Number(requires.readBooks || 0) > 0) {
-            requirements.push(`read ${Number(requires.readBooks)} book${Number(requires.readBooks) === 1 ? "" : "s"}`);
-        }
-
-        if (Number(requires.reviewedBooks || 0) > 0) {
-            requirements.push(`review ${Number(requires.reviewedBooks)} book${Number(requires.reviewedBooks) === 1 ? "" : "s"}`);
-        }
-
-        if (Number(requires.favouriteBooks || 0) > 0) {
-            requirements.push(`favourite ${Number(requires.favouriteBooks)} book${Number(requires.favouriteBooks) === 1 ? "" : "s"}`);
-        }
-
-        if (Number(requires.arcBooks || 0) > 0) {
-            requirements.push(`file ${Number(requires.arcBooks)} ARC book${Number(requires.arcBooks) === 1 ? "" : "s"}`);
-        }
-
-        if (Number(requires.signedBooks || 0) > 0) {
-            requirements.push(`own ${Number(requires.signedBooks)} signed book${Number(requires.signedBooks) === 1 ? "" : "s"}`);
-        }
-
-        if (requires.bookId) {
-            const book = getBookById(requires.bookId);
-            requirements.push(`add ${book ? book.title : requires.bookId}`);
-        }
-
-        if (requires.readBookId) {
-            const book = getBookById(requires.readBookId);
-            requirements.push(`read ${book ? book.title : requires.readBookId}`);
-        }
-
-        if (requirements.length) {
-            return `Issued after you ${requirements.join(", ")}.`;
-        }
-
-        return "Locked";
-    }
-
-    function getNormalisedCustomisationSelections(recordOverride) {
-        const record = normaliseCustomisationRecord(recordOverride || BlackwoodBookshelfState.customisationRecord);
-
-        return {
-            ...record.selections
+            unlocked: true,
+            reason: item.unlockText || "Issued"
         };
     }
 
     function getSelectedCustomisationItems() {
-        const selections = getNormalisedCustomisationSelections();
+        const selectedItems = {};
 
-        return Object.keys(selections)
-            .map(function (slotId) {
-                return getCustomisationItemById(selections[slotId]);
-            })
-            .filter(Boolean);
-    }
+        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
+            const selectedId = BlackwoodBookshelfState.customisationSelections[slot.id] || "";
+            selectedItems[slot.id] = selectedId ? getCustomisationItemById(selectedId) : null;
+        });
 
-    function getSelectedCustomisationItemBySlot(slotId) {
-        const cleanSlotId = normaliseCustomisationSlot(slotId);
-        const selections = getNormalisedCustomisationSelections();
-
-        return selections[cleanSlotId]
-            ? getCustomisationItemById(selections[cleanSlotId])
-            : null;
-    }
-
-    function isCustomisationItemSelected(item) {
-        const selections = getNormalisedCustomisationSelections();
-
-        return selections[item.slot] === item.id;
+        return selectedItems;
     }
 
     function getCustomisationItemById(itemId) {
-        const cleanItemId = String(itemId || "").trim();
-
         return BlackwoodBookshelfState.customisationItems.find(function (item) {
-            return item.id === cleanItemId;
+            return item.id === itemId;
         }) || null;
     }
 
@@ -3250,14 +2516,15 @@
         const cleanValue = String(value || "")
             .trim()
             .toLowerCase()
+            .replace(/&/g, "and")
             .replace(/\s+/g, "_")
             .replace(/-/g, "_");
 
-        if (["background", "backgrounds", "shelf_background", "shelf_wall", "wall"].includes(cleanValue)) {
+        if (["background", "shelf_background", "shelf_wall", "wall"].includes(cleanValue)) {
             return "background";
         }
 
-        if (["bookend", "bookends", "book_end", "book_ends"].includes(cleanValue)) {
+        if (["bookend", "bookends", "shelf_bookends"].includes(cleanValue)) {
             return "bookends";
         }
 
@@ -3265,181 +2532,218 @@
             return "charm";
         }
 
-        if (["object", "objects", "desk_object", "desk_objects", "shelf_object", "shelf_objects", "prop", "props"].includes(cleanValue)) {
+        if (["object", "objects", "shelf_object", "shelf_objects", "desk_object", "desk_objects"].includes(cleanValue)) {
             return "object";
         }
 
-        if (["nameplate", "nameplates", "label", "labels", "plate", "plates"].includes(cleanValue)) {
+        if (["nameplate", "nameplates", "label", "labels", "plate"].includes(cleanValue)) {
             return "nameplate";
         }
 
-        if (["lighting", "light", "lights", "atmosphere", "mood"].includes(cleanValue)) {
+        if (["lighting", "light", "lights", "atmosphere"].includes(cleanValue)) {
             return "lighting";
         }
 
-        const allowed = BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.some(function (slot) {
-            return slot.id === cleanValue;
-        });
-
-        return allowed ? cleanValue : "";
+        return "";
     }
 
     function normaliseCustomisationFilter(value) {
-        const cleanValue = String(value || "")
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "_")
-            .replace(/-/g, "_");
+        const cleanValue = String(value || "").trim().toLowerCase();
 
-        const allowed = BLACKWOOD_BOOKSHELF_CUSTOMISATION_FILTERS.some(function (filter) {
-            return filter.id === cleanValue;
-        });
+        if (cleanValue === "all" || cleanValue === "locked") {
+            return cleanValue;
+        }
 
-        return allowed ? cleanValue : "all";
+        return normaliseCustomisationSlot(cleanValue) || "all";
     }
 
-    function getCustomisationSlotKeys(slotId) {
-        if (slotId === "background") {
-            return ["background", "backgrounds", "shelf_backgrounds", "shelfBackgrounds"];
-        }
-
-        if (slotId === "bookends") {
-            return ["bookends", "book_ends", "bookEnds"];
-        }
-
-        if (slotId === "charm") {
-            return ["charms", "charm", "hanging_objects", "hangingObjects"];
-        }
-
-        if (slotId === "object") {
-            return ["objects", "object", "desk_objects", "deskObjects", "shelf_objects", "shelfObjects"];
-        }
-
-        if (slotId === "nameplate") {
-            return ["nameplates", "nameplate", "labels", "plates"];
-        }
-
-        if (slotId === "lighting") {
-            return ["lighting", "lights", "atmosphere"];
-        }
-
-        return [slotId];
+    function createEmptyCustomisationSelections() {
+        return {
+            background: "",
+            bookends: "",
+            charm: "",
+            object: "",
+            nameplate: "",
+            lighting: ""
+        };
     }
 
-    function getBookshelfCustomisationClassNames() {
-        const classes = [];
+    function createDefaultCustomisationSelections() {
+        const selections = createEmptyCustomisationSelections();
 
-        getSelectedCustomisationItems().forEach(function (item) {
-            classes.push(`has-custom-${item.slot}`);
-            classes.push(`has-custom-${item.slot}-${item.id}`);
+        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
+            const defaultItem = findDefaultCustomisationItem(slot.id);
 
-            if (item.className) {
-                classes.push(item.className);
+            if (defaultItem) {
+                selections[slot.id] = defaultItem.id;
             }
         });
 
-        return uniqueStrings(classes).join(" ");
+        return selections;
     }
 
-    function getBookshelfCustomisationDataAttributes() {
-        const selections = getNormalisedCustomisationSelections();
-
-        return BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.map(function (slot) {
-            const value = selections[slot.id] || "";
-
-            return `data-bookshelf-custom-${escapeAttribute(slot.id)}="${escapeAttribute(value)}"`;
-        }).join(" ");
-    }
-
-    function getBookshelfCustomisationStyle() {
-        const declarations = [];
-
-        getSelectedCustomisationItems().forEach(function (item) {
-            if (item.slot === "background" && item.image) {
-                declarations.push(`--bookshelf-custom-background-image: url('${safeCssUrl(item.image)}')`);
-            }
-
-            if (item.background) {
-                declarations.push(`--bookshelf-custom-background: ${safeCssValue(item.background)}`);
-            }
-
-            if (item.accent) {
-                declarations.push(`--bookshelf-custom-accent: ${safeCssValue(item.accent)}`);
-            }
-
-            if (item.glow) {
-                declarations.push(`--bookshelf-custom-glow: ${safeCssValue(item.glow)}`);
-            }
-
-            Object.keys(item.cssVars || {}).forEach(function (key) {
-                declarations.push(`${key}: ${safeCssValue(item.cssVars[key])}`);
-            });
+    function findDefaultCustomisationItem(slotId) {
+        const cleanSlotId = normaliseCustomisationSlot(slotId);
+        const slotItems = BlackwoodBookshelfState.customisationItems.filter(function (item) {
+            return item.category === cleanSlotId;
         });
 
-        return declarations.length ? `${declarations.join("; ")};` : "";
+        return slotItems.find(function (item) {
+            return item.isDefault;
+        }) || slotItems.find(function (item) {
+            const text = lowerClean(`${item.id} ${item.title}`);
+            return text.includes("default") || text.includes("no_") || text.includes("no ") || text.includes("plain");
+        }) || null;
     }
 
-    function hasBookOnShelf(bookId) {
-        const cleanBookId = String(bookId || "").trim();
+    function normaliseCustomisationSelections(selections) {
+        const cleanSelections = createEmptyCustomisationSelections();
+        const source = selections && typeof selections === "object" ? selections : {};
 
-        return BlackwoodBookshelfState.shelfRecords.some(function (record) {
-            return record.book_id === cleanBookId;
+        BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.forEach(function (slot) {
+            const value = String(
+                source[slot.id] ||
+                source[`${slot.id}_id`] ||
+                source[`shelf_${slot.id}_id`] ||
+                ""
+            ).trim();
+
+            cleanSelections[slot.id] = value;
         });
+
+        return cleanSelections;
     }
 
-    function hasReadBookOnShelf(bookId) {
-        const cleanBookId = String(bookId || "").trim();
-
-        return BlackwoodBookshelfState.shelfRecords.some(function (record) {
-            return record.book_id === cleanBookId &&
-                (
-                    record.has_read === true ||
-                    ["read", "reviewed", "favourite"].includes(record.shelf_status)
-                );
-        });
+    function getRemoteShelfCustomisationSelections(row) {
+        return {
+            background: row.background_id || row.shelf_background_id || row.selected_background_id || row.background || "",
+            bookends: row.bookends_id || row.bookend_id || row.selected_bookends_id || row.bookends || "",
+            charm: row.charm_id || row.selected_charm_id || row.charm || "",
+            object: row.object_id || row.shelf_object_id || row.selected_object_id || row.object || "",
+            nameplate: row.nameplate_id || row.selected_nameplate_id || row.nameplate || "",
+            lighting: row.lighting_id || row.light_id || row.selected_lighting_id || row.lighting || ""
+        };
     }
 
-    function getCustomisationTableNamesForQuery() {
-        return uniqueStrings([
-            BlackwoodBookshelfState.currentCustomisationTableName,
-            ...BLACKWOOD_BOOKSHELF_CONFIG.customisationTableNames
-        ].filter(Boolean));
+    function buildRemoteShelfCustomisationPayloads(selections) {
+        const userId = getCurrentUserId();
+        const now = new Date().toISOString();
+
+        return [
+            {
+                member_id: userId,
+                background_id: selections.background || null,
+                bookends_id: selections.bookends || null,
+                charm_id: selections.charm || null,
+                object_id: selections.object || null,
+                nameplate_id: selections.nameplate || null,
+                lighting_id: selections.lighting || null,
+                updated_at: now
+            },
+            {
+                member_id: userId,
+                shelf_background_id: selections.background || null,
+                bookend_id: selections.bookends || null,
+                charm_id: selections.charm || null,
+                shelf_object_id: selections.object || null,
+                nameplate_id: selections.nameplate || null,
+                light_id: selections.lighting || null,
+                updated_at: now
+            }
+        ];
     }
 
-    function getCustomisationStorageKey() {
-        return `${BLACKWOOD_BOOKSHELF_CONFIG.customisationLocalStoragePrefix}${getCurrentUserId() || "anonymous"}`;
+    function getLocalShelfCustomisationKey() {
+        return `blackwood:shelf-customisation:${getCurrentUserId() || "guest"}`;
     }
 
-    function loadCustomisationFromLocalStorage() {
+    function loadLocalShelfCustomisationSelections() {
         try {
-            const stored = window.localStorage.getItem(getCustomisationStorageKey());
+            const rawValue = window.localStorage.getItem(getLocalShelfCustomisationKey());
 
-            if (!stored) {
-                return null;
+            if (!rawValue) {
+                return createEmptyCustomisationSelections();
             }
 
-            return normaliseCustomisationRecord(JSON.parse(stored));
+            return normaliseCustomisationSelections(JSON.parse(rawValue));
 
         } catch (error) {
-            console.warn("Bookshelf customisation local storage could not be loaded:", error);
-            return null;
+            console.warn("Local shelf customisation could not be read:", error);
+            return createEmptyCustomisationSelections();
         }
     }
 
-    function saveCustomisationToLocalStorage(record) {
+    function saveLocalShelfCustomisationSelections() {
         try {
             window.localStorage.setItem(
-                getCustomisationStorageKey(),
-                JSON.stringify(normaliseCustomisationRecord(record))
+                getLocalShelfCustomisationKey(),
+                JSON.stringify(normaliseCustomisationSelections(BlackwoodBookshelfState.customisationSelections))
             );
         } catch (error) {
-            console.warn("Bookshelf customisation local storage could not be saved:", error);
+            console.warn("Local shelf customisation could not be saved:", error);
         }
     }
 
-    // =========================
-    // STATUS HELPERS
-    // =========================
+    function getCustomisationPointsTotal() {
+        const explicitPoints = Number(BlackwoodBookshelfState.pointsTotal);
+
+        if (Number.isFinite(explicitPoints) && explicitPoints > 0) {
+            return explicitPoints;
+        }
+
+        const memberPoints = Number(BlackwoodBookshelfState.member && BlackwoodBookshelfState.member.points_total);
+
+        return Number.isFinite(memberPoints) ? memberPoints : 0;
+    }
+
+    function getShelfCustomisationClassNames() {
+        const selections = getSelectedCustomisationItems();
+
+        return BLACKWOOD_BOOKSHELF_CUSTOMISATION_SLOTS.map(function (slot) {
+            const item = selections[slot.id];
+
+            if (!item) {
+                return "";
+            }
+
+            return `has-${slot.id}-${createSlug(item.id)}`;
+        }).filter(Boolean).join(" ");
+    }
+
+    function renderShelfCustomisationVisualStyle() {
+        const selections = getSelectedCustomisationItems();
+        const backgroundText = lowerClean(selections.background ? `${selections.background.id} ${selections.background.title}` : "");
+        const lightingText = lowerClean(selections.lighting ? `${selections.lighting.id} ${selections.lighting.title}` : "");
+
+        let baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.11), transparent 34%), linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)), rgba(0, 0, 0, 0.42)";
+        let baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255, 255, 255, 0.018)";
+
+        if (backgroundText.includes("charcoal")) {
+            baseBackground = "radial-gradient(circle at top left, rgba(120, 120, 120, 0.12), transparent 34%), linear-gradient(180deg, rgba(32, 31, 29, 0.88), rgba(5, 4, 3, 0.96))";
+        } else if (backgroundText.includes("oak") || backgroundText.includes("wood")) {
+            baseBackground = "radial-gradient(circle at top left, rgba(196, 122, 44, 0.18), transparent 34%), linear-gradient(180deg, rgba(64, 34, 16, 0.88), rgba(12, 6, 3, 0.96))";
+        } else if (backgroundText.includes("green") || backgroundText.includes("archive")) {
+            baseBackground = "radial-gradient(circle at top left, rgba(120, 150, 102, 0.14), transparent 34%), linear-gradient(180deg, rgba(18, 36, 27, 0.88), rgba(3, 6, 5, 0.96))";
+        } else if (backgroundText.includes("window") || backgroundText.includes("mist")) {
+            baseBackground = "radial-gradient(circle at 74% 8%, rgba(180, 190, 190, 0.13), transparent 30%), linear-gradient(180deg, rgba(19, 23, 26, 0.9), rgba(3, 4, 5, 0.97))";
+        } else if (backgroundText.includes("stone") || backgroundText.includes("chapel")) {
+            baseBackground = "radial-gradient(circle at top left, rgba(160, 150, 130, 0.13), transparent 34%), linear-gradient(180deg, rgba(37, 34, 30, 0.9), rgba(7, 6, 5, 0.97))";
+        } else if (backgroundText.includes("storm") || backgroundText.includes("blue")) {
+            baseBackground = "radial-gradient(circle at top right, rgba(98, 122, 152, 0.16), transparent 35%), linear-gradient(180deg, rgba(8, 13, 22, 0.92), rgba(2, 3, 6, 0.98))";
+        } else if (backgroundText.includes("parchment")) {
+            baseBackground = "radial-gradient(circle at top left, rgba(214, 177, 129, 0.16), transparent 34%), linear-gradient(180deg, rgba(70, 50, 31, 0.72), rgba(9, 6, 4, 0.95))";
+        }
+
+        if (lightingText.includes("warm") || lightingText.includes("lamp") || lightingText.includes("candle")) {
+            baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 70px rgba(196, 122, 44, 0.12), 0 0 34px rgba(196, 122, 44, 0.08)";
+        } else if (lightingText.includes("cold") || lightingText.includes("blue")) {
+            baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 70px rgba(120, 150, 190, 0.1), 0 0 34px rgba(120, 150, 190, 0.06)";
+        } else if (lightingText.includes("storm")) {
+            baseShadow = "0 18px 52px rgba(0, 0, 0, 0.34), inset 0 0 80px rgba(100, 120, 160, 0.13), 0 0 36px rgba(80, 100, 140, 0.08)";
+        }
+
+        return `background: ${baseBackground}; box-shadow: ${baseShadow};`;
+    }
 
     function setBookshelfStatus(message, className) {
         BlackwoodBookshelfState.statusMessage = message || "";
@@ -3459,24 +2763,6 @@
         }
     }
 
-    function setBookshelfCustomisationStatus(message, className) {
-        BlackwoodBookshelfState.customisationStatusMessage = message || "";
-        BlackwoodBookshelfState.customisationStatusType = className || "";
-
-        const status = document.getElementById("bookshelf-customisation-status");
-
-        if (!status) {
-            return;
-        }
-
-        status.textContent = BlackwoodBookshelfState.customisationStatusMessage;
-        status.classList.remove("is-success", "is-error", "is-loading");
-
-        if (BlackwoodBookshelfState.customisationStatusType) {
-            status.classList.add(BlackwoodBookshelfState.customisationStatusType);
-        }
-    }
-
     function setBookshelfModalStatus(message, className) {
         const status = document.getElementById("bookshelf-modal-status");
 
@@ -3491,10 +2777,6 @@
             status.classList.add(className);
         }
     }
-
-    // =========================
-    // GENERAL HELPERS
-    // =========================
 
     function getCurrentUserId() {
         return BlackwoodBookshelfState.session &&
@@ -3523,52 +2805,7 @@
             return "Bookshelf stage fields are missing in Supabase. Please run the Phase 2C bookshelf SQL first.";
         }
 
-        if (/customisation|customization|selected_items|unlocked_items|selected_background_id|selected_lighting_id/i.test(cleaned)) {
-            return "Shelf customisation fields could not be saved. The display has been kept locally on this device.";
-        }
-
         return cleaned;
-    }
-
-    function isLikelyMissingDbStructureError(message) {
-        const cleaned = String(message || "");
-
-        return /does not exist|schema cache|column|relation|table|selected_items|unlocked_items|selected_background_id|selected_lighting_id|selected_bookends_id|selected_charm_id|selected_object_id|selected_nameplate_id/i.test(cleaned);
-    }
-
-    function parseMaybeJson(value) {
-        if (!value) {
-            return Array.isArray(value) ? [] : {};
-        }
-
-        if (typeof value === "object") {
-            return value;
-        }
-
-        if (typeof value === "string") {
-            try {
-                return JSON.parse(value);
-            } catch (error) {
-                return value
-                    .split(",")
-                    .map(function (item) {
-                        return item.trim();
-                    })
-                    .filter(Boolean);
-            }
-        }
-
-        return {};
-    }
-
-    function uniqueStrings(values) {
-        return Array.from(new Set(
-            values
-                .map(function (value) {
-                    return String(value || "").trim();
-                })
-                .filter(Boolean)
-        ));
     }
 
     function createSlug(value) {
@@ -3581,19 +2818,10 @@
             .slice(0, 80);
     }
 
-    function safeCssUrl(value) {
+    function lowerClean(value) {
         return String(value || "")
-            .replace(/\\/g, "")
-            .replace(/'/g, "\\'")
-            .replace(/"/g, "")
-            .replace(/[<>]/g, "");
-    }
-
-    function safeCssValue(value) {
-        return String(value || "")
-            .replace(/[<>]/g, "")
-            .replace(/"/g, "'")
-            .trim();
+            .trim()
+            .toLowerCase();
     }
 
     function escapeHtml(value) {
@@ -3607,75 +2835,5 @@
 
     function escapeAttribute(value) {
         return escapeHtml(value).replace(/`/g, "&#096;");
-    }
-})();
-
-        const kicker = item.querySelector(".bookshelf-customisation-item-kicker");
-
-        if (kicker && kicker.textContent) {
-            return normaliseFilter(kicker.textContent);
-        }
-
-        return getFilterFromText(item.textContent || "");
-    }
-
-    function getFilterFromText(text) {
-        const cleanText = String(text || "").toLowerCase();
-
-        if (cleanText.includes("background")) return "background";
-        if (cleanText.includes("bookend")) return "bookends";
-        if (cleanText.includes("charm")) return "charm";
-        if (cleanText.includes("object")) return "object";
-        if (cleanText.includes("nameplate")) return "nameplate";
-        if (cleanText.includes("lighting")) return "lighting";
-        if (cleanText.includes("locked")) return "locked";
-
-        return "all";
-    }
-
-    function normaliseFilter(value) {
-        const cleanValue = String(value || "all")
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, "_")
-            .replace(/-/g, "_");
-
-        if (cleanValue === "backgrounds") return "background";
-        if (cleanValue === "background") return "background";
-
-        if (cleanValue === "bookend") return "bookends";
-        if (cleanValue === "bookends") return "bookends";
-
-        if (cleanValue === "charms") return "charm";
-        if (cleanValue === "charm") return "charm";
-
-        if (cleanValue === "objects") return "object";
-        if (cleanValue === "object") return "object";
-
-        if (cleanValue === "nameplates") return "nameplate";
-        if (cleanValue === "nameplate") return "nameplate";
-
-        if (cleanValue === "lights") return "lighting";
-        if (cleanValue === "light") return "lighting";
-        if (cleanValue === "lighting") return "lighting";
-
-        if (cleanValue === "locked") return "locked";
-
-        return "all";
-    }
-
-    function getFilterLabel(filter) {
-        const labels = {
-            all: "All",
-            background: "Background",
-            bookends: "Bookends",
-            charm: "Charm",
-            object: "Object",
-            nameplate: "Nameplate",
-            lighting: "Lighting",
-            locked: "Locked"
-        };
-
-        return labels[filter] || "All";
     }
 })();
