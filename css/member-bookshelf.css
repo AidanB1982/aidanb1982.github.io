@@ -3430,3 +3430,26 @@
     width: min(164px, 25%);
     height: 32px;
 }
+/* =========================================================
+   LAST SHELF MICRO-TUNE
+   Tighter row + final book left + nameplate higher
+========================================================= */
+
+/* Tighten spacing across the whole row */
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list {
+    gap: 12px;
+}
+
+/* Pull the final book properly back into the row */
+.bookshelf-stage-display .bookshelf-book-slot:last-child {
+    transform: translateX(-22px);
+}
+
+/* Lift and slightly shrink the nameplate */
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    bottom: 88px;
+
+    width: min(154px, 23%);
+    height: 30px;
+}
