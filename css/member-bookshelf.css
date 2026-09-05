@@ -2128,3 +2128,191 @@
         height: 56px;
     }
 }
+/* =========================
+   SHELF RECOVERY TUNE
+   Books back on shelf + cleaner spines + forward nameplate
+========================= */
+
+/* Give the scene enough vertical room, but anchor the shelf line properly */
+.bookshelf-stage-display {
+    min-height: 430px;
+    padding: 14px 24px 116px;
+}
+
+/* This is the physical wooden ledge the books should sit on */
+.bookshelf-stage-display::after {
+    bottom: 116px;
+    z-index: 18;
+}
+
+/* Push the book row down so the spines sit on the shelf ledge */
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list {
+    align-items: flex-end;
+
+    min-height: 390px;
+    padding: 0 102px;
+    gap: 26px;
+}
+
+/* Keep each book as a spine object, not a floating UI card */
+.bookshelf-book-slot {
+    width: 84px;
+}
+
+.bookshelf-spine-button {
+    width: 72px;
+    height: 236px;
+
+    overflow: hidden;
+
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.bookshelf-spine-button img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 4px;
+
+    object-fit: cover;
+    object-position: center;
+
+    filter:
+        drop-shadow(0 14px 16px rgba(0, 0, 0, 0.56))
+        saturate(0.96)
+        brightness(0.98);
+}
+
+.bookshelf-spine-button:hover,
+.bookshelf-spine-button:focus-visible {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    outline: 1px solid rgba(213, 173, 114, 0.38);
+    outline-offset: 4px;
+
+    transform: translateY(-3px);
+}
+
+/* Controls sit just below the book spine, below the shelf ledge */
+.bookshelf-spine-controls {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    z-index: 55;
+
+    width: 88px;
+
+    transform: translateX(-50%);
+}
+
+/* Nameplate comes right to the front and sits below the shelf */
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    left: 50%;
+    bottom: 16px;
+    z-index: 70;
+
+    width: min(260px, 42%);
+    height: 56px;
+
+    opacity: 1;
+
+    transform: translateX(-50%);
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-nameplate img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(0 16px 18px rgba(0, 0, 0, 0.78))
+        drop-shadow(0 0 8px rgba(213, 173, 114, 0.16))
+        saturate(1)
+        brightness(1.05);
+}
+
+/* Decorative objects sit on the same ledge as the books */
+.bookshelf-stage-decoration.bookshelf-stage-bookend {
+    bottom: 116px;
+    z-index: 20;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-object {
+    bottom: 118px;
+    z-index: 22;
+}
+
+/* Light: no harsh cut-off, softer and wider */
+.bookshelf-stage-decoration.bookshelf-stage-lighting {
+    top: -38px;
+    left: 50%;
+    z-index: 4;
+
+    width: min(760px, 108%);
+    height: 320px;
+
+    opacity: 0.28;
+    mix-blend-mode: screen;
+
+    transform: translateX(-50%);
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-lighting img {
+    object-fit: cover;
+    object-position: center top;
+    mix-blend-mode: screen;
+
+    filter:
+        brightness(1.12)
+        contrast(1.02)
+        saturate(0.88);
+}
+
+@media (max-width: 760px) {
+    .bookshelf-stage-display {
+        min-height: 390px;
+        padding: 12px 12px 104px;
+    }
+
+    .bookshelf-stage-display::after {
+        bottom: 104px;
+    }
+
+    .bookshelf-stage-display .bookshelf-spine-list,
+    .bookshelf-stage-display .bookshelf-stage-spine-list {
+        min-height: 340px;
+        padding-inline: 8px;
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .bookshelf-book-slot {
+        width: 78px;
+    }
+
+    .bookshelf-spine-button {
+        width: 64px;
+        height: 212px;
+    }
+
+    .bookshelf-spine-controls {
+        width: 78px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-nameplate {
+        bottom: 14px;
+        width: min(210px, 64%);
+        height: 46px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-object {
+        bottom: 106px;
+    }
+}
