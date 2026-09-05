@@ -1478,3 +1478,809 @@ body.is-bookshelf-dragging * {
         cursor: pointer;
     }
 }
+/* =========================
+   PHASE 2E — BOOKSHELF CUSTOMISATION
+========================= */
+
+.blackwood-bookshelf {
+    --bookshelf-custom-background: rgba(0, 0, 0, 0.34);
+    --bookshelf-custom-accent: rgba(196, 122, 44, 0.45);
+    --bookshelf-custom-glow: rgba(196, 122, 44, 0.16);
+    --bookshelf-custom-background-image: none;
+}
+
+.bookshelf-display-shell {
+    position: relative;
+    overflow: hidden;
+
+    margin-top: 18px;
+    padding: 18px;
+
+    border: 1px solid rgba(196, 122, 44, 0.22);
+    border-radius: 10px;
+
+    background:
+        radial-gradient(circle at 14% 4%, var(--bookshelf-custom-glow), transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.006)),
+        var(--bookshelf-custom-background),
+        rgba(0, 0, 0, 0.34);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.035),
+        0 20px 50px rgba(0, 0, 0, 0.28);
+}
+
+.bookshelf-display-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background-image: var(--bookshelf-custom-background-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    opacity: 0.18;
+    mix-blend-mode: screen;
+}
+
+.bookshelf-display-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(circle at 50% 0%, rgba(214, 177, 129, 0.08), transparent 36%),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.32), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.34));
+}
+
+.bookshelf-display-shell .bookshelf-board {
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================
+   CUSTOMISER DRAWER
+========================= */
+
+.bookshelf-customiser {
+    position: relative;
+    overflow: hidden;
+
+    margin: 20px 0 20px;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 9px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.026), rgba(255, 255, 255, 0.006)),
+        rgba(0, 0, 0, 0.34);
+}
+
+.bookshelf-customiser-summary {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(170px, auto);
+    gap: 18px;
+    align-items: center;
+
+    padding: clamp(18px, 3vw, 26px);
+
+    cursor: pointer;
+    list-style: none;
+}
+
+.bookshelf-customiser-summary::-webkit-details-marker {
+    display: none;
+}
+
+.bookshelf-customiser-summary::marker {
+    content: "";
+}
+
+.bookshelf-customiser-summary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(90deg, rgba(196, 122, 44, 0.08), transparent 52%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 46%);
+}
+
+.bookshelf-customiser-summary > * {
+    position: relative;
+    z-index: 1;
+}
+
+.bookshelf-customiser-summary h3 {
+    margin: 0 0 9px;
+
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: clamp(24px, 3.5vw, 38px);
+    line-height: 1.05;
+    font-weight: 400;
+}
+
+.bookshelf-customiser-summary p {
+    max-width: 800px;
+    margin: 0;
+
+    color: rgba(239, 231, 220, 0.66);
+
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.bookshelf-customiser-summary-side {
+    display: grid;
+    gap: 7px;
+    justify-items: end;
+
+    text-align: right;
+}
+
+.bookshelf-customiser-summary-side span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 32px;
+
+    padding: 7px 11px;
+
+    border: 1px solid rgba(196, 122, 44, 0.38);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.42);
+    color: rgba(214, 177, 129, 0.94);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.bookshelf-customiser-summary-side small {
+    max-width: 220px;
+
+    color: rgba(239, 231, 220, 0.52);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.bookshelf-customiser-panel {
+    padding: 0 clamp(14px, 3vw, 26px) clamp(18px, 3vw, 26px);
+
+    border-top: 1px solid rgba(196, 122, 44, 0.16);
+}
+
+/* =========================
+   CURRENT SELECTIONS
+========================= */
+
+.bookshelf-customisation-current {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+
+    margin: 18px 0;
+}
+
+.bookshelf-customisation-current-card {
+    min-height: 76px;
+
+    padding: 13px;
+
+    border: 1px solid rgba(196, 122, 44, 0.18);
+    border-radius: 8px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.07), transparent 42%),
+        rgba(0, 0, 0, 0.3);
+}
+
+.bookshelf-customisation-current-card > span {
+    display: block;
+
+    margin: 0 0 7px;
+
+    color: rgba(214, 177, 129, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.bookshelf-customisation-current-card strong {
+    display: block;
+
+    color: rgba(239, 231, 220, 0.9);
+
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 700;
+}
+
+.bookshelf-customisation-current-card button {
+    margin-top: 10px;
+
+    min-height: 28px;
+
+    padding: 7px 9px;
+
+    border: 1px solid rgba(196, 122, 44, 0.28);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.35);
+    color: rgba(239, 231, 220, 0.72);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.bookshelf-customisation-current-card button:hover,
+.bookshelf-customisation-current-card button:focus-visible {
+    border-color: rgba(214, 177, 129, 0.72);
+    color: #ffffff;
+    outline: none;
+}
+
+/* =========================
+   CUSTOMISATION FILTERS
+========================= */
+
+.bookshelf-customisation-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin: 0 0 14px;
+}
+
+.bookshelf-customisation-filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 32px;
+
+    padding: 7px 10px;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.34);
+    color: rgba(239, 231, 220, 0.62);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+
+    cursor: pointer;
+}
+
+.bookshelf-customisation-filters button:hover,
+.bookshelf-customisation-filters button:focus-visible,
+.bookshelf-customisation-filters button.is-active {
+    border-color: rgba(214, 177, 129, 0.78);
+    background: rgba(196, 122, 44, 0.12);
+    color: #fff1de;
+    outline: none;
+}
+
+.bookshelf-customisation-filters button strong {
+    display: inline-grid;
+    place-items: center;
+
+    min-width: 20px;
+    height: 20px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(214, 177, 129, 0.92);
+
+    font-size: 10px;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.bookshelf-customisation-status {
+    min-height: 20px;
+    margin: 0 0 14px;
+
+    color: rgba(239, 231, 220, 0.58);
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.bookshelf-customisation-status.is-success {
+    color: var(--circle-success, #9acb9a);
+}
+
+.bookshelf-customisation-status.is-error {
+    color: var(--circle-error, #d97c68);
+}
+
+.bookshelf-customisation-status.is-loading {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* =========================
+   CUSTOMISATION ITEM GRID
+========================= */
+
+.bookshelf-customisation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+}
+
+.bookshelf-customisation-item {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 13px;
+    align-items: center;
+
+    min-height: 104px;
+
+    padding: 12px;
+
+    border: 1px solid rgba(196, 122, 44, 0.2);
+    border-radius: 8px;
+
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.07), transparent 40%),
+        rgba(0, 0, 0, 0.3);
+
+    color: inherit;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease,
+        opacity 180ms ease;
+}
+
+.bookshelf-customisation-item:hover,
+.bookshelf-customisation-item:focus-visible {
+    transform: translateY(-1px);
+
+    border-color: rgba(214, 177, 129, 0.68);
+    background:
+        radial-gradient(circle at top left, rgba(196, 122, 44, 0.12), transparent 40%),
+        rgba(0, 0, 0, 0.4);
+
+    outline: none;
+}
+
+.bookshelf-customisation-item.is-selected {
+    border-color: rgba(154, 203, 154, 0.54);
+    background:
+        radial-gradient(circle at top left, rgba(154, 203, 154, 0.1), transparent 40%),
+        rgba(0, 0, 0, 0.38);
+}
+
+.bookshelf-customisation-item.is-locked {
+    opacity: 0.48;
+    cursor: not-allowed;
+    filter: grayscale(0.55);
+}
+
+.bookshelf-customisation-item:disabled {
+    cursor: not-allowed;
+}
+
+.bookshelf-customisation-item-preview {
+    position: relative;
+
+    display: grid;
+    place-items: center;
+
+    width: 58px;
+    height: 72px;
+
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.24);
+    border-radius: 7px;
+
+    background:
+        radial-gradient(circle at 30% 20%, rgba(214, 177, 129, 0.16), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.22)),
+        rgba(0, 0, 0, 0.38);
+
+    color: rgba(214, 177, 129, 0.86);
+
+    font-size: 24px;
+    line-height: 1;
+}
+
+.bookshelf-customisation-item-preview img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.bookshelf-customisation-item-preview.is-image-missing img {
+    display: none;
+}
+
+.bookshelf-customisation-item-copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.bookshelf-customisation-item-kicker {
+    color: rgba(214, 177, 129, 0.76);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.bookshelf-customisation-item-copy strong {
+    color: var(--circle-cream, #f3eadc);
+
+    font-size: 15px;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+.bookshelf-customisation-item-copy small {
+    color: rgba(239, 231, 220, 0.58);
+
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.bookshelf-customisation-item-copy em {
+    margin-top: 3px;
+
+    color: rgba(154, 203, 154, 0.82);
+
+    font-size: 11px;
+    line-height: 1.35;
+    font-style: italic;
+}
+
+.bookshelf-customisation-item.is-locked .bookshelf-customisation-item-copy em {
+    color: rgba(239, 231, 220, 0.58);
+}
+
+/* =========================
+   CUSTOMISATION DISPLAY OBJECTS
+========================= */
+
+.bookshelf-customisation-decor {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+
+    pointer-events: none;
+}
+
+.bookshelf-customisation-lighting {
+    position: absolute;
+    inset: 0;
+
+    background:
+        radial-gradient(circle at 20% 4%, var(--bookshelf-custom-glow), transparent 28%),
+        radial-gradient(circle at 78% 8%, rgba(214, 177, 129, 0.07), transparent 24%);
+
+    opacity: 0.9;
+}
+
+.bookshelf-customisation-lighting span {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+
+    color: rgba(214, 177, 129, 0.42);
+
+    font-size: 24px;
+}
+
+.bookshelf-customisation-nameplate {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    max-width: min(420px, calc(100% - 48px));
+
+    padding: 8px 14px;
+
+    border: 1px solid rgba(214, 177, 129, 0.38);
+    border-radius: 999px;
+
+    background:
+        linear-gradient(180deg, rgba(80, 45, 20, 0.72), rgba(20, 10, 5, 0.82));
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 8px 24px rgba(0, 0, 0, 0.34);
+}
+
+.bookshelf-customisation-nameplate span {
+    display: block;
+
+    overflow: hidden;
+
+    color: rgba(239, 231, 220, 0.82);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.bookshelf-customisation-bookends {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 34px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.bookshelf-customisation-bookend {
+    display: grid;
+    place-items: center;
+
+    width: 42px;
+    height: 66px;
+
+    border: 1px solid rgba(214, 177, 129, 0.22);
+    border-radius: 7px 7px 3px 3px;
+
+    background:
+        linear-gradient(180deg, rgba(214, 177, 129, 0.12), rgba(30, 18, 10, 0.82)),
+        rgba(0, 0, 0, 0.45);
+
+    color: rgba(214, 177, 129, 0.58);
+
+    font-size: 22px;
+
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.42);
+}
+
+.bookshelf-customisation-charm {
+    position: absolute;
+    top: 52px;
+    right: clamp(28px, 7vw, 80px);
+
+    color: rgba(214, 177, 129, 0.74);
+
+    font-size: 25px;
+
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.45));
+}
+
+.bookshelf-customisation-charm::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 78%;
+
+    width: 1px;
+    height: 46px;
+
+    background: rgba(214, 177, 129, 0.26);
+}
+
+.bookshelf-customisation-object {
+    position: absolute;
+    right: clamp(28px, 6vw, 74px);
+    bottom: 42px;
+
+    display: grid;
+    place-items: center;
+
+    min-width: 48px;
+    min-height: 34px;
+
+    padding: 7px 10px;
+
+    border: 1px solid rgba(214, 177, 129, 0.2);
+    border-radius: 6px;
+
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.36)),
+        rgba(0, 0, 0, 0.44);
+
+    color: rgba(214, 177, 129, 0.66);
+
+    font-size: 22px;
+
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.36);
+}
+
+.bookshelf-customisation-actions {
+    display: flex;
+    justify-content: flex-start;
+
+    margin-top: 16px;
+}
+
+/* =========================
+   BUILT-IN THEME HINTS
+========================= */
+
+.has-custom-background-default-archive-shelf,
+.has-custom-background-charcoal-archive-wall {
+    --bookshelf-custom-background:
+        linear-gradient(180deg, rgba(35, 28, 22, 0.76), rgba(7, 5, 4, 0.84));
+}
+
+.has-custom-background-dark-oak-shelf {
+    --bookshelf-custom-background:
+        linear-gradient(90deg, rgba(62, 35, 18, 0.66), rgba(15, 8, 4, 0.9));
+    --bookshelf-custom-accent: rgba(155, 94, 42, 0.55);
+}
+
+.has-custom-background-misted-window {
+    --bookshelf-custom-background:
+        linear-gradient(180deg, rgba(35, 44, 48, 0.58), rgba(8, 9, 9, 0.88));
+    --bookshelf-custom-glow: rgba(143, 168, 200, 0.12);
+}
+
+.has-custom-background-archive-green,
+.has-custom-background-archive-green-wall {
+    --bookshelf-custom-background:
+        linear-gradient(180deg, rgba(18, 47, 36, 0.58), rgba(5, 8, 6, 0.9));
+    --bookshelf-custom-glow: rgba(125, 190, 145, 0.11);
+}
+
+.has-custom-background-storm-archive {
+    --bookshelf-custom-background:
+        linear-gradient(180deg, rgba(19, 25, 36, 0.68), rgba(4, 5, 8, 0.92));
+    --bookshelf-custom-glow: rgba(143, 168, 200, 0.16);
+}
+
+.has-custom-lighting-warm-lamp {
+    --bookshelf-custom-glow: rgba(214, 153, 78, 0.22);
+}
+
+.has-custom-lighting-candle-tone {
+    --bookshelf-custom-glow: rgba(224, 139, 72, 0.18);
+}
+
+.has-custom-lighting-cold-archive,
+.has-custom-lighting-cold-archive-light {
+    --bookshelf-custom-glow: rgba(143, 168, 200, 0.14);
+}
+
+.has-custom-lighting-storm-blue {
+    --bookshelf-custom-glow: rgba(95, 128, 170, 0.16);
+}
+
+/* =========================
+   CUSTOMISATION RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+    .bookshelf-customiser-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf-customiser-summary-side {
+        justify-items: start;
+        text-align: left;
+    }
+
+    .bookshelf-customisation-current {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bookshelf-customisation-nameplate {
+        top: 10px;
+    }
+}
+
+@media (max-width: 620px) {
+    .bookshelf-display-shell {
+        padding: 12px;
+    }
+
+    .bookshelf-customisation-current,
+    .bookshelf-customisation-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf-customisation-filters {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .bookshelf-customisation-filters button {
+        justify-content: space-between;
+    }
+
+    .bookshelf-customisation-bookends {
+        display: none;
+    }
+
+    .bookshelf-customisation-nameplate {
+        position: relative;
+        top: auto;
+        left: auto;
+
+        display: inline-flex;
+
+        margin: 0 0 12px 12px;
+
+        transform: none;
+    }
+
+    .bookshelf-customisation-charm {
+        top: 42px;
+        right: 22px;
+    }
+
+    .bookshelf-customisation-object {
+        right: 18px;
+        bottom: 34px;
+        opacity: 0.72;
+    }
+}
+
+@media (max-width: 460px) {
+    .bookshelf-customisation-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .bookshelf-customisation-item {
+        grid-template-columns: 48px minmax(0, 1fr);
+    }
+
+    .bookshelf-customisation-item-preview {
+        width: 48px;
+        height: 62px;
+    }
+}
