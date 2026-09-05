@@ -3348,3 +3348,37 @@
         border-radius: 3px 5px 5px 3px;
     }
 }
+/* Give the shelf a proper wooden front fascia */
+.bookshelf-stage-display::after {
+    height: 24px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #8a461b 0%,
+            #6b3212 18%,
+            #4b210b 72%,
+            #291006 100%
+        );
+
+    box-shadow:
+        0 -2px 0 rgba(220, 151, 82, 0.18),
+        0 3px 0 rgba(0, 0, 0, 0.72),
+        0 12px 20px rgba(0, 0, 0, 0.56),
+        inset 0 1px 0 rgba(255, 218, 170, 0.16),
+        inset 0 -3px 5px rgba(0, 0, 0, 0.42);
+}
+
+/* Smaller plate, centred on the shelf fascia */
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    bottom: 66px;
+    z-index: 40;
+
+    width: min(180px, 28%);
+    height: 36px;
+}
+
+/* Give the controls some breathing room beneath the shelf */
+.bookshelf-spine-controls {
+    top: calc(100% + 38px);
+}
