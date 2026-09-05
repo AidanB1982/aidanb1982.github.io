@@ -1922,3 +1922,209 @@
         justify-content: space-between;
     }
 }
+/* =========================
+   FINAL SHELF FINE TUNE
+   Light bloom + cleaner spines + forward nameplate
+========================= */
+
+/* 1) IMPORTANT:
+   Let child decoration layers stack properly.
+   The old z-index on the parent is trapping the nameplate behind the shelf.
+*/
+.bookshelf-stage-customisation {
+    z-index: auto;
+    pointer-events: none;
+}
+
+/* 2) LIGHTING:
+   Bring the light further into view and soften it so it does not look cut off.
+*/
+.bookshelf-stage-display {
+    overflow: hidden;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-lighting {
+    top: -28px;
+    left: 50%;
+    z-index: 2;
+
+    width: min(760px, 108%);
+    height: 300px;
+
+    opacity: 0.34;
+    transform: translateX(-50%);
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-lighting img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    mix-blend-mode: screen;
+
+    filter:
+        brightness(1.15)
+        contrast(1.02)
+        saturate(0.88);
+}
+
+/* 3) BOOKS:
+   Remove the “button box” feeling so the spine art feels cleaner.
+*/
+.bookshelf-spine-button {
+    overflow: visible;
+
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.bookshelf-spine-button:hover,
+.bookshelf-spine-button:focus-visible {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translateY(-2px);
+}
+
+.bookshelf-spine-button img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+}
+
+/* Keep owned / read / favourite states subtle without reintroducing a full box */
+.bookshelf-spine-button.is-owned img,
+.bookshelf-spine-button.is-read img,
+.bookshelf-spine-button.is-favourite img,
+.bookshelf-spine-button.is-signed img {
+    filter:
+        drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5))
+        drop-shadow(0 0 6px rgba(213, 173, 114, 0.10));
+}
+
+/* 4) HELP THE SPINES SIT LOWER / FEEL RESTED ON THE SHELF */
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list {
+    align-items: end;
+    padding: 14px 96px 64px;
+}
+
+.bookshelf-book-slot {
+    width: 82px;
+    gap: 6px;
+}
+
+.bookshelf-spine-button {
+    width: 68px;
+    height: 232px;
+    margin-bottom: -2px;
+}
+
+/* 5) NAMEPLATE:
+   Pull it visually forward so it sits over the front shelf ledge.
+*/
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    left: 50%;
+    bottom: 10px;
+    z-index: 20;
+
+    width: min(252px, 42%);
+    height: 56px;
+
+    opacity: 0.98;
+    transform: translateX(-50%);
+}
+
+.bookshelf-stage-display::after {
+    z-index: 8;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-nameplate img {
+    filter:
+        drop-shadow(0 12px 16px rgba(0, 0, 0, 0.56))
+        drop-shadow(0 0 4px rgba(213, 173, 114, 0.08));
+}
+
+/* 6) BOOKENDS / OBJECTS:
+   Slightly calmer placement so they support rather than compete.
+*/
+.bookshelf-stage-decoration.bookshelf-stage-bookend {
+    bottom: 42px;
+    width: 72px;
+    height: 132px;
+    opacity: 0.88;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-object {
+    right: 124px;
+    bottom: 46px;
+    width: 100px;
+    height: 72px;
+    opacity: 0.92;
+}
+
+.bookshelf-stage-decoration.bookshelf-stage-charm {
+    top: 24px;
+    right: 124px;
+    width: 52px;
+    height: 68px;
+    opacity: 0.92;
+}
+
+/* 7) Keep books above the shelf atmosphere, but below the front nameplate */
+.bookshelf-stage-display .bookshelf-spine-list,
+.bookshelf-stage-display .bookshelf-stage-spine-list,
+.bookshelf-book-slot,
+.bookshelf-spine-controls {
+    position: relative;
+    z-index: 12;
+}
+
+/* Tablet / mobile tidy */
+@media (max-width: 760px) {
+    .bookshelf-stage-decoration.bookshelf-stage-lighting {
+        top: -18px;
+        width: 108%;
+        height: 220px;
+        opacity: 0.30;
+    }
+
+    .bookshelf-stage-display .bookshelf-spine-list,
+    .bookshelf-stage-display .bookshelf-stage-spine-list {
+        padding: 10px 10px 62px;
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .bookshelf-book-slot {
+        width: 78px;
+    }
+
+    .bookshelf-spine-button {
+        width: 64px;
+        height: 214px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-nameplate {
+        bottom: 12px;
+        width: min(210px, 64%);
+        height: 48px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-object {
+        right: 18px;
+        width: 76px;
+        height: 56px;
+    }
+
+    .bookshelf-stage-decoration.bookshelf-stage-charm {
+        right: 18px;
+        width: 42px;
+        height: 56px;
+    }
+}
