@@ -3413,3 +3413,20 @@
 .bookshelf-stage-decoration.bookshelf-stage-nameplate {
     bottom: 74px;
 }
+/* =========================================================
+   FINAL SHELF MICRO-TUNE
+   Nudge final book + smaller/higher nameplate
+========================================================= */
+
+/* Move only the last book slightly left */
+.bookshelf-stage-display .bookshelf-book-slot:last-child {
+    transform: translateX(-8px);
+}
+
+/* Make the nameplate a little smaller and lift it */
+.bookshelf-stage-decoration.bookshelf-stage-nameplate {
+    bottom: 80px;
+
+    width: min(164px, 25%);
+    height: 32px;
+}
