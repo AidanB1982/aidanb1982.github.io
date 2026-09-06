@@ -1983,11 +1983,6 @@ body.is-bfa-modal-open {
    beneath the site header.
 --------------------------------------------------------- */
 
-.members-page.is-circle-signed-in #blackwood-circle-app {
-    padding-top: clamp(px, 6vw, 78px);
-}
-
-
 /* ---------------------------------------------------------
    2. DASHBOARD RHYTHM
 --------------------------------------------------------- */
@@ -2291,140 +2286,7 @@ body.is-bfa-modal-open {
 
 
 /* ---------------------------------------------------------
-   15. COLLAPSIBLE PANEL VISUALS
-   These styles are ready for the HTML/JS pass next.
---------------------------------------------------------- */
-
-.circle-premium-disclosure {
-    overflow: hidden;
-
-    border: 1px solid rgba(196, 122, 44, 0.22);
-    border-radius: 14px;
-
-    background:
-        radial-gradient(
-            circle at top left,
-            rgba(196, 122, 44, 0.08),
-            transparent 36%
-        ),
-        rgba(0, 0, 0, 0.42);
-
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.025),
-        0 18px 42px rgba(0, 0, 0, 0.26);
-}
-
-.circle-premium-disclosure-toggle {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 20px;
-    align-items: center;
-
-    width: 100%;
-    padding: 22px 24px;
-
-    border: 0;
-    background: transparent;
-    color: inherit;
-
-    text-align: left;
-    cursor: pointer;
-}
-
-.circle-premium-disclosure-heading {
-    display: grid;
-    gap: 5px;
-}
-
-.circle-premium-disclosure-heading small {
-    color: rgba(214, 177, 129, 0.76);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 8.5px;
-    font-weight: 800;
-    letter-spacing: 0.17em;
-    text-transform: uppercase;
-}
-
-.circle-premium-disclosure-title {
-    color: var(--circle-cream);
-
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(24px, 2.8vw, 34px);
-    font-weight: 400;
-    line-height: 1.05;
-}
-
-.circle-premium-disclosure-summary {
-    margin-top: 2px;
-
-    color: var(--circle-muted-soft);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.circle-premium-disclosure-side {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.circle-premium-disclosure-count {
-    display: inline-flex;
-    align-items: center;
-    min-height: 30px;
-    padding: 7px 11px;
-
-    border: 1px solid rgba(196, 122, 44, 0.36);
-    border-radius: 999px;
-
-    background: rgba(0, 0, 0, 0.34);
-    color: rgba(214, 177, 129, 0.92);
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 8.5px;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.circle-premium-disclosure-chevron {
-    display: grid;
-    place-items: center;
-
-    width: 34px;
-    height: 34px;
-
-    border: 1px solid rgba(196, 122, 44, 0.4);
-    border-radius: 50%;
-
-    color: var(--circle-gold);
-
-    transition:
-        transform 180ms ease,
-        border-color 180ms ease,
-        background 180ms ease;
-}
-
-.circle-premium-disclosure-toggle:hover
-.circle-premium-disclosure-chevron,
-.circle-premium-disclosure-toggle:focus-visible
-.circle-premium-disclosure-chevron {
-    border-color: rgba(214, 177, 129, 0.78);
-    background: rgba(196, 122, 44, 0.09);
-}
-
-.circle-premium-disclosure.is-open
-.circle-premium-disclosure-chevron {
-    transform: rotate(180deg);
-}
-
-.circle-premium-disclosure-body {
-    padding: 0 24px 24px;
-}
-
-
+   
 /* ---------------------------------------------------------
    16. MOBILE PREMIUM SCALE
 --------------------------------------------------------- */
@@ -2659,4 +2521,272 @@ body.is-bfa-modal-open {
 .circle-home-dashboard {
     padding-top: clamp(34px, 4vw, 42px);
     padding-bottom: clamp(32px, 4vw, 40px);
+}
+/* =========================================================
+   BLACKWOOD CIRCLE — PREMIUM DISCLOSURE FINAL PASS
+   ========================================================= */
+
+.circle-premium-disclosure {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(196, 122, 44, 0.20);
+    border-radius: 10px;
+
+    background:
+        radial-gradient(
+            circle at 14% 0%,
+            rgba(196, 122, 44, 0.07),
+            transparent 34%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.014),
+            rgba(255,255,255,0.002)
+        ),
+        rgba(0, 0, 0, 0.40);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.02),
+        0 16px 38px rgba(0,0,0,0.24);
+
+    transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.circle-premium-disclosure.is-open {
+    border-color: rgba(196, 122, 44, 0.30);
+
+    background:
+        radial-gradient(
+            circle at 14% 0%,
+            rgba(196, 122, 44, 0.10),
+            transparent 34%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.018),
+            rgba(255,255,255,0.003)
+        ),
+        rgba(0, 0, 0, 0.44);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.026),
+        0 18px 42px rgba(0,0,0,0.27);
+}
+
+.circle-premium-disclosure-toggle {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 20px;
+    align-items: center;
+
+    width: 100%;
+    padding: 20px 22px;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.circle-premium-disclosure-toggle::after {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 0;
+
+    height: 1px;
+
+    background: rgba(196, 122, 44, 0);
+    transition: background 180ms ease;
+}
+
+.circle-premium-disclosure.is-open
+.circle-premium-disclosure-toggle::after {
+    background: rgba(196, 122, 44, 0.14);
+}
+
+.circle-premium-disclosure-toggle:hover,
+.circle-premium-disclosure-toggle:focus-visible {
+    outline: none;
+}
+
+.circle-premium-disclosure-heading {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+}
+
+.circle-premium-disclosure-heading small {
+    color: rgba(214, 177, 129, 0.72);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.17em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.circle-premium-disclosure-title {
+    color: var(--circle-cream);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(23px, 2.4vw, 31px);
+    font-weight: 400;
+    line-height: 1.05;
+}
+
+.circle-premium-disclosure-summary {
+    max-width: 760px;
+    margin-top: 1px;
+
+    color: rgba(239, 231, 220, 0.50);
+    font-size: 11.5px;
+    line-height: 1.45;
+}
+
+.circle-premium-disclosure-side {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.circle-premium-disclosure-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 29px;
+    padding: 6px 10px;
+
+    border: 1px solid rgba(196, 122, 44, 0.30);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.28);
+    color: rgba(214, 177, 129, 0.86);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.circle-premium-disclosure-chevron {
+    display: grid;
+    place-items: center;
+
+    width: 32px;
+    height: 32px;
+
+    border: 1px solid rgba(196, 122, 44, 0.34);
+    border-radius: 50%;
+
+    background: rgba(0, 0, 0, 0.24);
+    color: rgba(214, 177, 129, 0.88);
+
+    font-size: 13px;
+    line-height: 1;
+
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease,
+        color 180ms ease;
+}
+
+.circle-premium-disclosure-toggle:hover
+.circle-premium-disclosure-chevron,
+.circle-premium-disclosure-toggle:focus-visible
+.circle-premium-disclosure-chevron {
+    border-color: rgba(214, 177, 129, 0.66);
+    background: rgba(196, 122, 44, 0.08);
+    color: #fff1de;
+}
+
+.circle-premium-disclosure.is-open
+.circle-premium-disclosure-chevron {
+    transform: rotate(180deg);
+}
+
+.circle-premium-disclosure-body {
+    padding: 22px;
+}
+
+.circle-premium-disclosure-body[hidden] {
+    display: none !important;
+}
+
+/* Remove extra top spacing inside disclosure bodies */
+.circle-premium-disclosure-body > :first-child {
+    margin-top: 0;
+}
+
+/* Slightly tighten known content areas when nested */
+.circle-premium-disclosure-body .circle-reward-list,
+.circle-premium-disclosure-body .circle-points-list {
+    margin-top: 0;
+}
+
+/* Scroll targets should not sit underneath the site header */
+#circle-panel-behindFiles,
+#circle-panel-rewards,
+#circle-panel-redemptions,
+#circle-panel-points {
+    scroll-margin-top: 130px;
+}
+
+@media (max-width: 700px) {
+    .circle-premium-disclosure-toggle {
+        grid-template-columns: 1fr;
+        gap: 13px;
+        padding: 18px;
+    }
+
+    .circle-premium-disclosure-toggle::after {
+        left: 18px;
+        right: 18px;
+    }
+
+    .circle-premium-disclosure-title {
+        font-size: clamp(22px, 7vw, 29px);
+    }
+
+    .circle-premium-disclosure-summary {
+        font-size: 11px;
+    }
+
+    .circle-premium-disclosure-side {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .circle-premium-disclosure-body {
+        padding: 18px;
+    }
+
+    #circle-panel-behindFiles,
+    #circle-panel-rewards,
+    #circle-panel-redemptions,
+    #circle-panel-points {
+        scroll-margin-top: 92px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .circle-premium-disclosure,
+    .circle-premium-disclosure-chevron,
+    .circle-premium-disclosure-toggle::after {
+        transition: none;
+    }
 }
