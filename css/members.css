@@ -1971,3 +1971,510 @@ body.is-bfa-modal-open {
         transform: none;
     }
 }
+/* =========================================================
+   BLACKWOOD CIRCLE — PREMIUM UI PASS
+   Typography + spacing + panel refinement
+   Keep below all existing Circle CSS
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. PAGE POSITION
+   Give the signed-in Circle a little more breathing room
+   beneath the site header.
+--------------------------------------------------------- */
+
+.members-page.is-circle-signed-in #blackwood-circle-app {
+    padding-top: clamp(54px, 6vw, 78px);
+}
+
+
+/* ---------------------------------------------------------
+   2. DASHBOARD RHYTHM
+--------------------------------------------------------- */
+
+.circle-dashboard {
+    gap: 20px;
+}
+
+.circle-dashboard-hero,
+.circle-home-dashboard,
+.circle-section,
+.circle-reader-record-cta {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.025),
+        0 18px 46px rgba(0, 0, 0, 0.28);
+}
+
+
+/* ---------------------------------------------------------
+   3. MAIN WELCOME HERO
+   Considerably smaller and more editorial.
+--------------------------------------------------------- */
+
+.circle-dashboard-hero {
+    padding: clamp(30px, 4vw, 46px);
+}
+
+.circle-dashboard-hero h1 {
+    margin: 10px 0 12px;
+
+    font-size: clamp(38px, 4.8vw, 58px);
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+}
+
+.circle-dashboard-hero p {
+    max-width: 720px;
+
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+
+/* ---------------------------------------------------------
+   4. YOUR CIRCLE
+--------------------------------------------------------- */
+
+.circle-home-dashboard {
+    padding: clamp(26px, 3.5vw, 34px);
+}
+
+.circle-home-main {
+    gap: 28px;
+    margin-bottom: 20px;
+}
+
+.circle-home-main h2 {
+    margin: 6px 0 8px;
+
+    font-size: clamp(30px, 3.6vw, 42px);
+    line-height: 1;
+    letter-spacing: -0.018em;
+}
+
+.circle-home-main p {
+    max-width: 680px;
+
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+
+/* ---------------------------------------------------------
+   5. HOME ACTION BUTTONS
+   More compact, less dashboard-heavy.
+--------------------------------------------------------- */
+
+.circle-home-actions {
+    gap: 7px;
+    max-width: 410px;
+}
+
+.circle-home-actions .circle-button {
+    min-height: 38px;
+    padding: 10px 15px;
+
+    font-size: 8.5px;
+    letter-spacing: 0.14em;
+}
+
+
+/* ---------------------------------------------------------
+   6. STAT CARDS
+--------------------------------------------------------- */
+
+.circle-dashboard-grid,
+.circle-home-stat-grid {
+    gap: 12px;
+}
+
+.circle-stat-card,
+.circle-home-summary-card {
+    padding: 16px 17px;
+}
+
+.circle-stat-card strong {
+    margin: 7px 0 5px;
+
+    font-size: clamp(22px, 2.7vw, 31px);
+    line-height: 1.02;
+}
+
+.circle-stat-card small {
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.circle-home-summary-grid {
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.circle-home-summary-card span {
+    margin-bottom: 7px;
+
+    font-size: 8.5px;
+}
+
+.circle-home-summary-card h3 {
+    margin-bottom: 6px;
+
+    font-size: 20px;
+    line-height: 1.12;
+}
+
+.circle-home-summary-card p {
+    font-size: 12.5px;
+    line-height: 1.55;
+}
+
+
+/* ---------------------------------------------------------
+   7. GENERAL SECTION SCALE
+--------------------------------------------------------- */
+
+.circle-section {
+    padding: clamp(24px, 3.2vw, 32px);
+}
+
+.circle-section > h2,
+.circle-section-toggle-header h2 {
+    font-size: clamp(28px, 3.3vw, 40px);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+}
+
+
+/* ---------------------------------------------------------
+   8. READER RECORD CTA
+--------------------------------------------------------- */
+
+.circle-reader-record-cta {
+    padding: clamp(22px, 3vw, 28px);
+}
+
+.circle-reader-record-cta h2 {
+    margin-bottom: 6px;
+
+    font-size: clamp(27px, 3.2vw, 38px);
+}
+
+.circle-reader-record-cta p {
+    max-width: 690px;
+
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+
+/* ---------------------------------------------------------
+   9. BEHIND THE FILES
+--------------------------------------------------------- */
+
+.circle-bfa-section-heading {
+    margin-bottom: 17px;
+}
+
+.circle-bfa-section-heading h2 {
+    margin: 6px 0 8px;
+
+    font-size: clamp(30px, 3.7vw, 44px);
+}
+
+.circle-bfa-section-heading p {
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+.circle-bfa-content h3 {
+    font-size: clamp(26px, 3.3vw, 38px);
+}
+
+.circle-bfa-excerpt {
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+
+
+/* ---------------------------------------------------------
+   10. REWARD CARDS
+--------------------------------------------------------- */
+
+.circle-reward-card {
+    padding: 20px;
+}
+
+.circle-reward-card h3 {
+    font-size: clamp(20px, 2.4vw, 27px);
+    line-height: 1.12;
+}
+
+.circle-reward-card p {
+    font-size: 13px;
+    line-height: 1.58;
+}
+
+.circle-reward-card small {
+    font-size: 11px;
+}
+
+
+/* ---------------------------------------------------------
+   11. ADMIN REWARD DESK
+--------------------------------------------------------- */
+
+.circle-admin-reward-summary {
+    padding: clamp(20px, 2.8vw, 26px);
+}
+
+.circle-admin-reward-summary h2 {
+    margin-bottom: 7px;
+
+    font-size: clamp(27px, 3.2vw, 37px);
+}
+
+.circle-admin-reward-summary p {
+    font-size: 13px;
+    line-height: 1.58;
+}
+
+.circle-admin-reward-card-header h3 {
+    font-size: clamp(20px, 2.4vw, 27px);
+}
+
+
+/* ---------------------------------------------------------
+   12. LABELS / KICKERS
+   Keep them crisp but quieter.
+--------------------------------------------------------- */
+
+.circle-kicker,
+.circle-post-meta,
+.circle-reward-status,
+.circle-stat-label {
+    font-size: 9px;
+    letter-spacing: 0.17em;
+}
+
+
+/* ---------------------------------------------------------
+   13. BUTTON REFINEMENT
+   Slightly smaller everywhere.
+--------------------------------------------------------- */
+
+.circle-button,
+.circle-reader-record-button {
+    min-height: 39px;
+    padding: 10px 15px;
+
+    font-size: 9px;
+    letter-spacing: 0.14em;
+}
+
+
+/* ---------------------------------------------------------
+   14. PREMIUM PANEL EDGES
+--------------------------------------------------------- */
+
+.circle-dashboard-hero,
+.circle-home-dashboard,
+.circle-section,
+.circle-reader-record-cta {
+    border-color: rgba(196, 122, 44, 0.20);
+}
+
+.circle-stat-card,
+.circle-home-summary-card,
+.circle-reward-card {
+    border-color: rgba(196, 122, 44, 0.16);
+}
+
+
+/* ---------------------------------------------------------
+   15. COLLAPSIBLE PANEL VISUALS
+   These styles are ready for the HTML/JS pass next.
+--------------------------------------------------------- */
+
+.circle-premium-disclosure {
+    overflow: hidden;
+
+    border: 1px solid rgba(196, 122, 44, 0.22);
+    border-radius: 14px;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(196, 122, 44, 0.08),
+            transparent 36%
+        ),
+        rgba(0, 0, 0, 0.42);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.025),
+        0 18px 42px rgba(0, 0, 0, 0.26);
+}
+
+.circle-premium-disclosure-toggle {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 20px;
+    align-items: center;
+
+    width: 100%;
+    padding: 22px 24px;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    text-align: left;
+    cursor: pointer;
+}
+
+.circle-premium-disclosure-heading {
+    display: grid;
+    gap: 5px;
+}
+
+.circle-premium-disclosure-heading small {
+    color: rgba(214, 177, 129, 0.76);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+}
+
+.circle-premium-disclosure-title {
+    color: var(--circle-cream);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(24px, 2.8vw, 34px);
+    font-weight: 400;
+    line-height: 1.05;
+}
+
+.circle-premium-disclosure-summary {
+    margin-top: 2px;
+
+    color: var(--circle-muted-soft);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.circle-premium-disclosure-side {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.circle-premium-disclosure-count {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 7px 11px;
+
+    border: 1px solid rgba(196, 122, 44, 0.36);
+    border-radius: 999px;
+
+    background: rgba(0, 0, 0, 0.34);
+    color: rgba(214, 177, 129, 0.92);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.circle-premium-disclosure-chevron {
+    display: grid;
+    place-items: center;
+
+    width: 34px;
+    height: 34px;
+
+    border: 1px solid rgba(196, 122, 44, 0.4);
+    border-radius: 50%;
+
+    color: var(--circle-gold);
+
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        background 180ms ease;
+}
+
+.circle-premium-disclosure-toggle:hover
+.circle-premium-disclosure-chevron,
+.circle-premium-disclosure-toggle:focus-visible
+.circle-premium-disclosure-chevron {
+    border-color: rgba(214, 177, 129, 0.78);
+    background: rgba(196, 122, 44, 0.09);
+}
+
+.circle-premium-disclosure.is-open
+.circle-premium-disclosure-chevron {
+    transform: rotate(180deg);
+}
+
+.circle-premium-disclosure-body {
+    padding: 0 24px 24px;
+}
+
+
+/* ---------------------------------------------------------
+   16. MOBILE PREMIUM SCALE
+--------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .members-page.is-circle-signed-in #blackwood-circle-app {
+        padding-top: 42px;
+    }
+
+    .circle-dashboard-hero h1 {
+        font-size: clamp(36px, 11vw, 48px);
+    }
+
+    .circle-home-main h2 {
+        font-size: clamp(29px, 9vw, 38px);
+    }
+
+    .circle-section > h2,
+    .circle-section-toggle-header h2 {
+        font-size: clamp(27px, 8vw, 36px);
+    }
+
+    .circle-home-actions {
+        max-width: none;
+    }
+
+    .circle-premium-disclosure-toggle {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 19px;
+    }
+
+    .circle-premium-disclosure-side {
+        justify-content: space-between;
+    }
+
+    .circle-premium-disclosure-body {
+        padding: 0 19px 19px;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   17. REDUCED MOTION
+--------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .circle-premium-disclosure-chevron {
+        transition: none;
+    }
+}
