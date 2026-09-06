@@ -107,30 +107,38 @@
     ];
 
     const BlackwoodMembersState = {
-        app: null,
-        client: null,
-        session: null,
-        member: null,
-        posts: [],
-        behindFiles: [],
-        behindFilesIndex: 0,
-        postReactions: [],
-        rewards: [],
-        points: [],
-        redemptions: [],
-        arcAssignments: [],
-        adminRewardRedemptions: [],
-        adminRewardFilter: "all",
-        adminRewardDeskOpen: false,
-        adminRewardLoadError: "",
-        activeAuthMode: "signin",
-        isRedeeming: false,
-        isSubmittingDeliveryAddress: false,
-        isReactingToBehindFile: false,
-        isAdminRewardBusy: false,
-        isPasswordRecovery: false,
-        escapeListenerBound: false
-    };
+    app: null,
+    client: null,
+    session: null,
+    member: null,
+    posts: [],
+    behindFiles: [],
+    behindFilesIndex: 0,
+    postReactions: [],
+    rewards: [],
+    points: [],
+    redemptions: [],
+    arcAssignments: [],
+    adminRewardRedemptions: [],
+    adminRewardFilter: "all",
+    adminRewardDeskOpen: false,
+    adminRewardLoadError: "",
+
+    premiumDisclosures: {
+        behindFiles: true,
+        rewards: false,
+        redemptions: false,
+        points: false
+    },
+
+    activeAuthMode: "signin",
+    isRedeeming: false,
+    isSubmittingDeliveryAddress: false,
+    isReactingToBehindFile: false,
+    isAdminRewardBusy: false,
+    isPasswordRecovery: false,
+    escapeListenerBound: false
+};
 
     document.addEventListener("DOMContentLoaded", function () {
         initBlackwoodMembersArea();
@@ -1030,45 +1038,15 @@
 
                 ${renderBehindFilesCarousel()}
 
-                <section class="circle-section" aria-labelledby="circle-rewards-title">
-                    <h2 id="circle-rewards-title">Rewards</h2>
-                    <div class="circle-reward-list">
-                        ${renderRewards(pointsTotal)}
-                    </div>
-                </section>
+                ${renderRewardsDisclosure(pointsTotal)}
 
-                <section class="circle-section" aria-labelledby="circle-redemptions-title">
-                    <h2 id="circle-redemptions-title">Redemptions</h2>
-                    <div class="circle-reward-list">
-                        ${renderRedemptions()}
-                    </div>
-                </section>
-
-                <section class="circle-section circle-collapsible-section is-collapsed" aria-labelledby="circle-points-title">
-                    <div class="circle-section-toggle-header">
-                        <h2 id="circle-points-title">Points History</h2>
-
-                        <button
-                            type="button"
-                            class="circle-section-toggle-button"
-                            id="circle-points-history-toggle"
-                            aria-expanded="false"
-                            aria-controls="circle-points-history-content"
-                        >
-                            Show history
-                        </button>
-                    </div>
-
-                    <div class="circle-collapsible-content" id="circle-points-history-content">
-                        <div class="circle-points-list">
-                            ${renderPointsHistory()}
-                        </div>
-                    </div>
-                </section>
-            </section>
+                ${renderRedemptionsDisclosure()}
+                
+                ${renderPointsDisclosure(pointsTotal)}
+        </section>
         `;
 
-        bindDashboardEvents();
+       bindDashboardEvents();
     }
 
     function renderMemberHomeDashboard(member, pointsTotal, summary) {
@@ -1101,13 +1079,13 @@
                             ${escapeHtml(arcActionLabel)}
                         </a>
 
-                        <a href="#circle-rewards-title" class="circle-button circle-button-secondary">
-                            View Rewards
+                        <a href="#circle-panel-rewards" class="circle-button circle-button-secondary">
+                        View Rewards
                         </a>
-
-                        <a href="#circle-posts-title" class="circle-button circle-button-secondary">
-                            Latest Dispatch
-                        </a>
+                    
+                       <a href="#circle-panel-behindFiles" class="circle-button circle-button-secondary">
+                        Latest Dispatch
+                       </a>
 
                         <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
                             My Bookshelf
@@ -2384,7 +2362,129 @@
             return String(line || "").trim();
         });
     }
+    // =========================
+// PREMIUM DISCLOSURE PANELS
+// =========================
 
+function renderPremiumDisclosure(options) {
+    const panelId = String(options.panelId || "").trim();
+    const title = String(options.title || "").trim();
+    const kicker = String(options.kicker || "").trim();
+    const summary = String(options.summary || "").trim();
+    const countLabel = String(options.countLabel || "").trim();
+    const bodyHtml = String(options.bodyHtml || "");
+    const isOpen = options.isOpen === true;
+
+    const contentId = `${panelId}-content`;
+
+    return `
+        <section
+    id="circle-panel-${escapeAttribute(panelId)}"
+    class="circle-premium-disclosure ${isOpen ? "is-open" : ""}"
+    data-premium-disclosure="${escapeAttribute(panelId)}"
+>
+            <button
+                type="button"
+                class="circle-premium-disclosure-toggle"
+                data-premium-disclosure-toggle="${escapeAttribute(panelId)}"
+                aria-expanded="${isOpen ? "true" : "false"}"
+                aria-controls="${escapeAttribute(contentId)}"
+            >
+                <span class="circle-premium-disclosure-heading">
+                    ${
+                        kicker
+                            ? `<small>${escapeHtml(kicker)}</small>`
+                            : ""
+                    }
+
+                    <span class="circle-premium-disclosure-title">
+                        ${escapeHtml(title)}
+                    </span>
+
+                    ${
+                        summary
+                            ? `
+                                <span class="circle-premium-disclosure-summary">
+                                    ${escapeHtml(summary)}
+                                </span>
+                            `
+                            : ""
+                    }
+                </span>
+
+                <span class="circle-premium-disclosure-side">
+                    ${
+                        countLabel
+                            ? `
+                                <span class="circle-premium-disclosure-count">
+                                    ${escapeHtml(countLabel)}
+                                </span>
+                            `
+                            : ""
+                    }
+
+                    <span
+                        class="circle-premium-disclosure-chevron"
+                        aria-hidden="true"
+                    >
+                        ↓
+                    </span>
+                </span>
+            </button>
+
+            <div
+                class="circle-premium-disclosure-body"
+                id="${escapeAttribute(contentId)}"
+                ${isOpen ? "" : "hidden"}
+            >
+                ${bodyHtml}
+            </div>
+        </section>
+    `;
+}
+
+function bindPremiumDisclosurePanels() {
+    document.querySelectorAll("[data-premium-disclosure-toggle]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const panelId = button.dataset.premiumDisclosureToggle || "";
+
+            if (!panelId) {
+                return;
+            }
+
+            const panel = document.querySelector(
+                `[data-premium-disclosure="${panelId}"]`
+            );
+
+            if (!panel) {
+                return;
+            }
+
+            const body = panel.querySelector(".circle-premium-disclosure-body");
+
+            if (!body) {
+                return;
+            }
+
+            const isOpen = !panel.classList.contains("is-open");
+
+            panel.classList.toggle("is-open", isOpen);
+            body.hidden = !isOpen;
+
+            button.setAttribute("aria-expanded", String(isOpen));
+
+            if (
+                BlackwoodMembersState.premiumDisclosures &&
+                Object.prototype.hasOwnProperty.call(
+                    BlackwoodMembersState.premiumDisclosures,
+                    panelId
+                )
+            ) {
+                BlackwoodMembersState.premiumDisclosures[panelId] = isOpen;
+            }
+        });
+    });
+}
     // =========================
     // BEHIND THE FILES CAROUSEL
     // =========================
@@ -2460,25 +2560,23 @@
     }
 
     function renderBehindFilesCarousel() {
-        const posts = getBehindFilesForDisplay();
+    const posts = getBehindFilesForDisplay();
 
-        if (!posts.length) {
-            return `
-                <section class="circle-section circle-bfa-section" aria-labelledby="circle-posts-title">
-                    <div class="circle-bfa-section-heading">
-                        <p class="circle-kicker">Private Dispatches</p>
-                        <h2 id="circle-posts-title">Behind the Files</h2>
-                        <p>
-                            Weekly dispatches, production notes, release progress, and private Blackwood updates will appear here.
-                        </p>
-                    </div>
-
-                    <article class="circle-empty-card">
-                        <p>No Behind the Files updates have been filed yet.</p>
-                    </article>
-                </section>
-            `;
-        }
+    if (!posts.length) {
+        return renderPremiumDisclosure({
+            panelId: "behindFiles",
+            kicker: "Private Dispatches",
+            title: "Behind the Files",
+            summary: "Private Blackwood dispatches will appear here once filed.",
+            countLabel: "0 files",
+            isOpen: BlackwoodMembersState.premiumDisclosures.behindFiles,
+            bodyHtml: `
+                <article class="circle-empty-card">
+                    <p>No Behind the Files updates have been filed yet.</p>
+                </article>
+            `
+        });
+    }
 
         BlackwoodMembersState.behindFilesIndex = clampBehindFilesIndex(
             BlackwoodMembersState.behindFilesIndex,
@@ -2488,18 +2586,17 @@
         const post = posts[BlackwoodMembersState.behindFilesIndex];
         const hasMultiplePosts = posts.length > 1;
 
-        return `
-            <section class="circle-section circle-bfa-section" aria-labelledby="circle-posts-title">
-                <div class="circle-bfa-section-heading">
-                    <p class="circle-kicker">Private Dispatches</p>
-                    <h2 id="circle-posts-title">Behind the Files</h2>
-                    <p>
-                        Weekly notes, production fragments, ARC notices, release progress,
-                        and private updates from the Blackwood desk.
-                    </p>
-                </div>
+        const latestDate = formatBehindFileDate(post.publishedAt);
 
-                <article class="circle-bfa-carousel" id="circle-bfa-carousel">
+return renderPremiumDisclosure({
+    panelId: "behindFiles",
+    kicker: "Private Dispatches",
+    title: "Behind the Files",
+    summary: `${posts.length} private dispatch${posts.length === 1 ? "" : "es"} · Latest ${latestDate}`,
+    countLabel: `${posts.length} filed`,
+    isOpen: BlackwoodMembersState.premiumDisclosures.behindFiles,
+    bodyHtml: `
+        <article class="circle-bfa-carousel" id="circle-bfa-carousel">
                     <div class="circle-bfa-image-wrap">
                         <img
                             id="circle-bfa-image"
@@ -2601,9 +2698,9 @@
                         </div>
                     </div>
                 </div>
-            </section>
-        `;
-    }
+    `
+});
+}
 
     function bindBehindFilesCarousel() {
         const posts = getBehindFilesForDisplay();
@@ -2952,6 +3049,70 @@
     // REWARDS / REDEMPTIONS / POINTS
     // =========================
 
+    function renderRewardsDisclosure(pointsTotal) {
+    const rewardSummary = getRewardsDashboardSummary(pointsTotal);
+
+    const unlockedCount = BlackwoodMembersState.rewards.filter(function (reward) {
+        return pointsTotal >= Number(reward.points_required || 0);
+    }).length;
+
+    return renderPremiumDisclosure({
+        panelId: "rewards",
+        kicker: "Circle Rewards",
+        title: "Rewards",
+        summary: `${rewardSummary.headline} · ${rewardSummary.detail}`,
+        countLabel: `${unlockedCount} unlocked`,
+        isOpen: BlackwoodMembersState.premiumDisclosures.rewards,
+        bodyHtml: `
+            <div class="circle-reward-list">
+                ${renderRewards(pointsTotal)}
+            </div>
+        `
+    });
+}
+
+function renderRedemptionsDisclosure() {
+    const summary = getRedemptionDashboardSummary();
+    const redemptionCount = BlackwoodMembersState.redemptions.length;
+
+    return renderPremiumDisclosure({
+        panelId: "redemptions",
+        kicker: "Reward Archive",
+        title: "Redemptions",
+        summary: `${summary.headline} · ${summary.detail}`,
+        countLabel: redemptionCount === 1
+            ? "1 filed"
+            : `${redemptionCount} filed`,
+        isOpen: BlackwoodMembersState.premiumDisclosures.redemptions,
+        bodyHtml: `
+            <div class="circle-reward-list">
+                ${renderRedemptions()}
+            </div>
+        `
+    });
+}
+
+function renderPointsDisclosure(pointsTotal) {
+    const entryCount = BlackwoodMembersState.points.length;
+
+    return renderPremiumDisclosure({
+        panelId: "points",
+        kicker: "Reader Record",
+        title: "Points History",
+        summary: `${pointsTotal} Circle points currently filed`,
+        countLabel: entryCount === 1
+            ? "1 entry"
+            : `${entryCount} entries`,
+        isOpen: BlackwoodMembersState.premiumDisclosures.points,
+        bodyHtml: `
+            <div class="circle-points-list">
+                ${renderPointsHistory()}
+            </div>
+        `
+    });
+}
+
+  
     function renderRewards(pointsTotal) {
         if (!BlackwoodMembersState.rewards.length) {
             return `
@@ -3317,25 +3478,10 @@
         bindBlackwoodBookshelf();
         bindAdminRewardDeskEvents();
         bindBehindFilesCarousel();
-        bindPointsHistoryToggle();
-    }
+        bindPremiumDisclosurePanels();
+     }
 
-    function bindPointsHistoryToggle() {
-        const button = document.getElementById("circle-points-history-toggle");
-        const section = button ? button.closest(".circle-collapsible-section") : null;
-
-        if (!section || !button) {
-            return;
-        }
-
-        button.addEventListener("click", function () {
-            const isCollapsed = section.classList.toggle("is-collapsed");
-            const isOpen = !isCollapsed;
-
-            button.textContent = isOpen ? "Hide history" : "Show history";
-            button.setAttribute("aria-expanded", String(isOpen));
-        });
-    }
+    
 
     async function handleRewardRedemption(event) {
         const button = event.currentTarget;
