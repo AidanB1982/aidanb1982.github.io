@@ -1079,13 +1079,21 @@
                             ${escapeHtml(arcActionLabel)}
                         </a>
 
-                        <a href="#circle-panel-rewards" class="circle-button circle-button-secondary">
-                        View Rewards
+                        <a
+                            href="#circle-panel-rewards"
+                            class="circle-button circle-button-secondary"
+                            data-circle-open-panel="rewards"
+                        >
+                            View Rewards
                         </a>
-                    
-                       <a href="#circle-panel-behindFiles" class="circle-button circle-button-secondary">
-                        Latest Dispatch
-                       </a>
+                        
+                        <a
+                            href="#circle-panel-behindFiles"
+                            class="circle-button circle-button-secondary"
+                            data-circle-open-panel="behindFiles"
+                        >
+                            Latest Dispatch
+                        </a>
 
                         <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
                             My Bookshelf
@@ -2485,6 +2493,64 @@ function bindPremiumDisclosurePanels() {
         });
     });
 }
+
+function bindPremiumDisclosureShortcuts() {
+    document.querySelectorAll("[data-circle-open-panel]").forEach(function (link) {
+        link.addEventListener("click", function (event) {
+            const panelId = link.dataset.circleOpenPanel || "";
+
+            if (!panelId) {
+                return;
+            }
+
+            const panel = document.querySelector(
+                `[data-premium-disclosure="${panelId}"]`
+            );
+
+            if (!panel) {
+                return;
+            }
+
+            const button = panel.querySelector(
+                "[data-premium-disclosure-toggle]"
+            );
+
+            const body = panel.querySelector(
+                ".circle-premium-disclosure-body"
+            );
+
+            if (!button || !body) {
+                return;
+            }
+
+            event.preventDefault();
+
+            panel.classList.add("is-open");
+            body.hidden = false;
+            button.setAttribute("aria-expanded", "true");
+
+            if (
+                BlackwoodMembersState.premiumDisclosures &&
+                Object.prototype.hasOwnProperty.call(
+                    BlackwoodMembersState.premiumDisclosures,
+                    panelId
+                )
+            ) {
+                BlackwoodMembersState.premiumDisclosures[panelId] = true;
+            }
+
+            const prefersReducedMotion = window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches;
+
+            panel.scrollIntoView({
+                behavior: prefersReducedMotion ? "auto" : "smooth",
+                block: "start"
+            });
+        });
+    });
+}
+    
     // =========================
     // BEHIND THE FILES CAROUSEL
     // =========================
@@ -3451,35 +3517,36 @@ function renderPointsDisclosure(pointsTotal) {
     }
 
     function bindDashboardEvents() {
-        const signOutButton = document.getElementById("circle-sign-out");
-        const refreshButton = document.getElementById("circle-refresh-dashboard");
-
-        if (signOutButton) {
-            signOutButton.addEventListener("click", handleMemberSignOut);
-        }
-
-        if (refreshButton) {
-            refreshButton.addEventListener("click", loadMemberDashboard);
-        }
-
-        document.querySelectorAll("[data-redeem-reward-id]").forEach(function (button) {
-            button.addEventListener("click", handleRewardRedemption);
-        });
-
-        document.querySelectorAll("[data-copy-discount-code]").forEach(function (button) {
-            button.addEventListener("click", handleCopyDiscountCode);
-        });
-
-        document.querySelectorAll("[data-redemption-address-form]").forEach(function (form) {
-            form.addEventListener("submit", handleRedemptionAddressSubmit);
-        });
-
-        bindMemberArcProfile();
-        bindBlackwoodBookshelf();
-        bindAdminRewardDeskEvents();
-        bindBehindFilesCarousel();
-        bindPremiumDisclosurePanels();
-     }
+                const signOutButton = document.getElementById("circle-sign-out");
+                const refreshButton = document.getElementById("circle-refresh-dashboard");
+            
+                if (signOutButton) {
+                    signOutButton.addEventListener("click", handleMemberSignOut);
+                }
+            
+                if (refreshButton) {
+                    refreshButton.addEventListener("click", loadMemberDashboard);
+                }
+            
+                document.querySelectorAll("[data-redeem-reward-id]").forEach(function (button) {
+                    button.addEventListener("click", handleRewardRedemption);
+                });
+            
+                document.querySelectorAll("[data-copy-discount-code]").forEach(function (button) {
+                    button.addEventListener("click", handleCopyDiscountCode);
+                });
+            
+                document.querySelectorAll("[data-redemption-address-form]").forEach(function (form) {
+                    form.addEventListener("submit", handleRedemptionAddressSubmit);
+                });
+            
+                bindMemberArcProfile();
+                bindBlackwoodBookshelf();
+                bindAdminRewardDeskEvents();
+                bindBehindFilesCarousel();
+                bindPremiumDisclosurePanels();
+                bindPremiumDisclosureShortcuts();
+    }
 
     
 
