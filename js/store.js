@@ -441,30 +441,77 @@
     }
 
     function loadShopifySdk() {
-        return new Promise((resolve, reject) => {
-            if (window.ShopifyBuy && window.ShopifyBuy.UI) {
+    return new Promise((resolve, reject) => {
+        if (window.ShopifyBuy && window.ShopifyBuy.UI) {
+            resolve();
+            return;
+        }
+
+        const existingScript = document.querySelector(
+            `script[src="${SHOPIFY_SDK_URL}"]`
+        );
+
+        if (existingScript) {
+            if (existingScript.dataset.shopifyLoaded === "true") {
                 resolve();
                 return;
             }
 
-            const existingScript = document.querySelector(`script[src="${SHOPIFY_SDK_URL}"]`);
+            existingScript.addEventListener("load", function () {
+                existingScript.dataset.shopifyLoaded = "true";
 
-            if (existingScript) {
-                existingScript.addEventListener("load", resolve);
-                existingScript.addEventListener("error", reject);
-                return;
+                if (window.ShopifyBuy && window.ShopifyBuy.UI) {
+                    resolve();
+                } else {
+                    reject(
+                        new Error(
+                            "Shopify Buy Button SDK loaded but ShopifyBuy.UI was unavailable."
+                        )
+                    );
+                }
+            });
+
+            existingScript.addEventListener("error", function () {
+                reject(
+                    new Error(
+                        "Shopify Buy Button SDK failed to load."
+                    )
+                );
+            });
+
+            return;
+        }
+
+        const script = document.createElement("script");
+
+        script.async = true;
+        script.src = SHOPIFY_SDK_URL;
+
+        script.onload = function () {
+            script.dataset.shopifyLoaded = "true";
+
+            if (window.ShopifyBuy && window.ShopifyBuy.UI) {
+                resolve();
+            } else {
+                reject(
+                    new Error(
+                        "Shopify Buy Button SDK loaded but ShopifyBuy.UI was unavailable."
+                    )
+                );
             }
+        };
 
-            const script = document.createElement("script");
+        script.onerror = function () {
+            reject(
+                new Error(
+                    "Shopify Buy Button SDK failed to load."
+                )
+            );
+        };
 
-            script.async = true;
-            script.src = SHOPIFY_SDK_URL;
-            script.onload = resolve;
-            script.onerror = reject;
-
-            document.head.appendChild(script);
-        });
-    }
+        document.head.appendChild(script);
+    });
+}
 
     function initShopify() {
         return new Promise((resolve, reject) => {
@@ -728,14 +775,18 @@
         return `blackwood-shopify-product-${productId}`;
     }
 
-    function showStoreError() {
-        const status = document.querySelector("#blackwood-store-status");
+    function showStoreError(error) {
+    console.error("Blackwood Store error:", error);
 
-        if (status) {
-            status.textContent = "The Direct Editions Desk could not connect to checkout. Please refresh the page.";
-            status.classList.add("is-error");
-        }
+    const status = document.querySelector("#blackwood-store-status");
+
+    if (status) {
+        status.textContent =
+            "The Direct Editions Desk could not connect to checkout. Please refresh the page.";
+
+        status.classList.add("is-error");
     }
+}
 
     if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initBlackwoodStore);
