@@ -157,55 +157,21 @@
 
         try {
             const [titlesResult, entriesResult] = await Promise.all([
-                BlackwoodArchiveState.client
-                    .from("archive_titles")
-                    .select(`
-                        id,
-                        archive_code,
-                        slug,
-                        title,
-                        subtitle,
-                        author_name,
-                        synopsis,
-                        backstory,
-                        series_name,
-                        series_position,
-                        publication_date,
-                        publication_status,
-                        isbn_paperback,
-                        isbn_hardback,
-                        isbn_ebook,
-                        cover_image_path,
-                        public_visible,
-                        circle_extended_access
-                    `)
-                    .eq("public_visible", true)
-                    .order("publication_date", {
-                        ascending: false,
-                        nullsFirst: false
-                    }),
+    BlackwoodArchiveState.client
+        .from("archive_titles")
+        .select("*")
+        .eq("public_visible", true)
+        .order("id", {
+            ascending: true
+        }),
 
-                BlackwoodArchiveState.client
-                    .from("archive_entries")
-                    .select(`
-                        id,
-                        title_id,
-                        entry_code,
-                        entry_type,
-                        title,
-                        summary,
-                        body,
-                        media_path,
-                        media_alt,
-                        access_level,
-                        entry_status,
-                        sort_order,
-                        occurred_at
-                    `)
-                    .order("sort_order", {
-                        ascending: true
-                    })
-            ]);
+    BlackwoodArchiveState.client
+        .from("archive_entries")
+        .select("*")
+        .order("sort_order", {
+            ascending: true
+        })
+]);
 
             if (titlesResult.error) {
                 throw titlesResult.error;
