@@ -162,6 +162,14 @@
             BlackwoodArchiveState.session.user
         );
 
+        const restrictedCount =
+    getRestrictedCountForTitle(title.id);
+
+const displayedRecordCount =
+    isCircleSession
+        ? entries.length
+        : publicEntries.length;
+        
         const titlesSource = isCircleSession
             ? "archive_titles"
             : "archive_public_titles";
@@ -360,10 +368,9 @@
                             </h3>
                         </div>
 
-                        <span>
-                            ${escapeHtml(
-                                formatRecordCount(entries.length)
-                            )}
+                        <span>${escapeHtml(
+    formatRecordCount(displayedRecordCount)
+)}
                         </span>
                     </div>
 
@@ -386,7 +393,7 @@
                                 ? circleEntries
                                     .map(renderArchiveEntry)
                                     .join("")
-                                : renderRestrictedNotice(title)
+                                : renderRestrictedNotice(title, restrictedCount)
                         }
                     </div>
                 </section>
@@ -601,42 +608,52 @@
         `;
     }
 
-    function renderRestrictedNotice(title) {
-        if (title.circle_extended_access !== true) {
-            return "";
-        }
-
-        return `
-            <aside class="archive-restricted-notice">
-                <div class="archive-restricted-mark" aria-hidden="true">
-                    BW
-                </div>
-
-                <div>
-                    <p class="archive-kicker">
-                        Restricted Material
-                    </p>
-
-                    <h4>
-                        Additional records held
-                    </h4>
-
-                    <p>
-                        Selected material associated with this publication
-                        is held under Blackwood Circle access.
-                    </p>
-
-                    <a
-                        href="${escapeAttribute(
-                            BLACKWOOD_ARCHIVE_CONFIG.membersPagePath
-                        )}"
-                    >
-                        Blackwood Circle access
-                    </a>
-                </div>
-            </aside>
-        `;
+    function renderRestrictedNotice(title, restrictedCount) {
+    if (
+        title.circle_extended_access !== true ||
+        Number(restrictedCount) < 1
+    ) {
+        return "";
     }
+
+    const count = Number(restrictedCount);
+
+    const recordText =
+        count === 1
+            ? "1 additional record held"
+            : `${count} additional records held`;
+
+    return `
+        <aside class="archive-restricted-notice">
+            <div class="archive-restricted-mark" aria-hidden="true">
+                BW
+            </div>
+
+            <div>
+                <p class="archive-kicker">
+                    Restricted Material
+                </p>
+
+                <h4>
+                    ${escapeHtml(recordText)}
+                </h4>
+
+                <p>
+                    Selected material associated with this publication
+                    is held under Blackwood Circle access.
+                </p>
+
+                <a
+                    href="${escapeAttribute(
+                        BLACKWOOD_ARCHIVE_CONFIG.membersPagePath
+                    )}"
+                >
+                    Blackwood Circle access
+                </a>
+            </div>
+        </aside>
+    `;
+}
 
     // =========================
     // HELPERS
