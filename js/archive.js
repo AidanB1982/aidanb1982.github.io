@@ -21,13 +21,13 @@
     };
 
     const BlackwoodArchiveState = {
-    app: null,
-    client: null,
-    session: null,
-    titles: [],
-    entries: [],
-    restrictedCounts: []
-};
+        app: null,
+        client: null,
+        session: null,
+        titles: [],
+        entries: [],
+        restrictedCounts: []
+    };
 
     document.addEventListener("DOMContentLoaded", function () {
         initBlackwoodArchive();
@@ -37,7 +37,9 @@
         const app = document.getElementById("blackwood-archive-app");
 
         if (!app) {
-            console.warn("Blackwood Archive: #blackwood-archive-app not found.");
+            console.warn(
+                "Blackwood Archive: #blackwood-archive-app not found."
+            );
             return;
         }
 
@@ -48,17 +50,18 @@
         try {
             await loadSupabaseLibrary();
 
-            BlackwoodArchiveState.client = window.supabase.createClient(
-                BLACKWOOD_ARCHIVE_CONFIG.supabaseUrl,
-                BLACKWOOD_ARCHIVE_CONFIG.supabaseKey,
-                {
-                    auth: {
-                        persistSession: true,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: true
+            BlackwoodArchiveState.client =
+                window.supabase.createClient(
+                    BLACKWOOD_ARCHIVE_CONFIG.supabaseUrl,
+                    BLACKWOOD_ARCHIVE_CONFIG.supabaseKey,
+                    {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true,
+                            detectSessionInUrl: true
+                        }
                     }
-                }
-            );
+                );
 
             const { data, error } =
                 await BlackwoodArchiveState.client.auth.getSession();
@@ -67,12 +70,16 @@
                 throw error;
             }
 
-            BlackwoodArchiveState.session = data.session || null;
+            BlackwoodArchiveState.session =
+                data.session || null;
 
             await loadArchive();
 
         } catch (error) {
-            console.error("Blackwood Archive initialisation failed:", error);
+            console.error(
+                "Blackwood Archive initialisation failed:",
+                error
+            );
 
             renderErrorState(
                 "The Archive could not be opened. Please refresh and try again."
@@ -94,9 +101,10 @@
                 return;
             }
 
-            const existingScript = document.querySelector(
-                "script[data-blackwood-supabase]"
-            );
+            const existingScript =
+                document.querySelector(
+                    "script[data-blackwood-supabase]"
+                );
 
             if (existingScript) {
                 existingScript.addEventListener(
@@ -111,7 +119,9 @@
                     "error",
                     function () {
                         reject(
-                            new Error("Supabase could not be loaded.")
+                            new Error(
+                                "Supabase could not be loaded."
+                            )
                         );
                     },
                     { once: true }
@@ -120,9 +130,12 @@
                 return;
             }
 
-            const script = document.createElement("script");
+            const script =
+                document.createElement("script");
 
-            script.src = BLACKWOOD_ARCHIVE_CONFIG.supabaseCdn;
+            script.src =
+                BLACKWOOD_ARCHIVE_CONFIG.supabaseCdn;
+
             script.async = true;
             script.defer = true;
             script.dataset.blackwoodSupabase = "true";
@@ -130,7 +143,8 @@
             script.onload = function () {
                 if (
                     window.supabase &&
-                    typeof window.supabase.createClient === "function"
+                    typeof window.supabase.createClient ===
+                        "function"
                 ) {
                     resolve();
                     return;
@@ -145,7 +159,9 @@
 
             script.onerror = function () {
                 reject(
-                    new Error("Supabase could not be loaded.")
+                    new Error(
+                        "Supabase could not be loaded."
+                    )
                 );
             };
 
@@ -154,110 +170,139 @@
     }
 
     async function loadArchive() {
-    renderLoadingState();
+        renderLoadingState();
 
-    try {
-        const isCircleSession = Boolean(
-            BlackwoodArchiveState.session &&
-            BlackwoodArchiveState.session.user
-        );
+        try {
+            const isCircleSession = Boolean(
+                BlackwoodArchiveState.session &&
+                BlackwoodArchiveState.session.user
+            );
 
-        const restrictedCount =
-    getRestrictedCountForTitle(title.id);
+            /*
+             * Signed-in Circle members read from the main
+             * Archive tables.
+             *
+             * Signed-out visitors read from the public-safe
+             * Archive sources.
+             */
+            const titlesSource =
+                isCircleSession
+                    ? "archive_titles"
+                    : "archive_public_titles";
 
-const displayedRecordCount =
-    isCircleSession
-        ? entries.length
-        : publicEntries.length;
-        
-        const titlesSource = isCircleSession
-            ? "archive_titles"
-            : "archive_public_titles";
+            const entriesSource =
+                isCircleSession
+                    ? "archive_entries"
+                    : "archive_public_entries";
 
-        const entriesSource = isCircleSession
-            ? "archive_entries"
-            : "archive_public_entries";
+            let titlesQuery =
+                BlackwoodArchiveState.client
+                    .from(titlesSource)
+                    .select("*");
 
-        let titlesQuery = BlackwoodArchiveState.client
-            .from(titlesSource)
-            .select("*");
+            if (isCircleSession) {
+                titlesQuery =
+                    titlesQuery.eq(
+                        "public_visible",
+                        true
+                    );
+            }
 
-        if (isCircleSession) {
-            titlesQuery = titlesQuery.eq("public_visible", true);
+            titlesQuery =
+                titlesQuery.order(
+                    "id",
+                    {
+                        ascending: true
+                    }
+                );
+
+            const entriesQuery =
+                BlackwoodArchiveState.client
+                    .from(entriesSource)
+                    .select("*")
+                    .order(
+                        "sort_order",
+                        {
+                            ascending: true
+                        }
+                    );
+
+            const [
+                titlesResult,
+                entriesResult,
+                restrictedCountsResult
+            ] = await Promise.all([
+                titlesQuery,
+
+                entriesQuery,
+
+                BlackwoodArchiveState.client
+                    .rpc(
+                        "get_archive_restricted_counts"
+                    )
+            ]);
+
+            if (titlesResult.error) {
+                throw titlesResult.error;
+            }
+
+            if (entriesResult.error) {
+                throw entriesResult.error;
+            }
+
+            if (restrictedCountsResult.error) {
+                throw restrictedCountsResult.error;
+            }
+
+            BlackwoodArchiveState.titles =
+                Array.isArray(titlesResult.data)
+                    ? titlesResult.data
+                    : [];
+
+            BlackwoodArchiveState.entries =
+                Array.isArray(entriesResult.data)
+                    ? entriesResult.data
+                    : [];
+
+            BlackwoodArchiveState.restrictedCounts =
+                Array.isArray(
+                    restrictedCountsResult.data
+                )
+                    ? restrictedCountsResult.data
+                    : [];
+
+            renderArchive();
+
+        } catch (error) {
+            console.error(
+                "Blackwood Archive query failed:",
+                error
+            );
+
+            renderErrorState(
+                "Publication records could not be retrieved."
+            );
         }
-
-        const [titlesResult, entriesResult, restrictedCountsResult] =
-    await Promise.all([
-        BlackwoodArchiveState.client
-            .from("archive_titles")
-            .select("*")
-            .eq("public_visible", true)
-            .order("id", {
-                ascending: true
-            }),
-
-        BlackwoodArchiveState.client
-            .from("archive_entries")
-            .select("*")
-            .order("sort_order", {
-                ascending: true
-            }),
-
-        BlackwoodArchiveState.client
-            .rpc("get_archive_restricted_counts")
-    ]);
-        
-        if (titlesResult.error) {
-            throw titlesResult.error;
-        }
-
-        if (restrictedCountsResult.error) {
-    throw restrictedCountsResult.error;
-}
-
-        if (entriesResult.error) {
-            throw entriesResult.error;
-        }
-
-        BlackwoodArchiveState.titles =
-            Array.isArray(titlesResult.data)
-                ? titlesResult.data
-                : [];
-
-        BlackwoodArchiveState.entries =
-            Array.isArray(entriesResult.data)
-                ? entriesResult.data
-                : [];
-
-        BlackwoodArchiveState.restrictedCounts =
-    Array.isArray(restrictedCountsResult.data)
-        ? restrictedCountsResult.data
-        : [];
-
-        renderArchive();
-
-    } catch (error) {
-        console.error("Blackwood Archive query failed:", error);
-
-        renderErrorState(
-            "Publication records could not be retrieved."
-        );
     }
-}
 
     // =========================
     // ARCHIVE RENDERING
     // =========================
 
     function renderArchive() {
-        const titles = BlackwoodArchiveState.titles;
+        const titles =
+            BlackwoodArchiveState.titles;
 
         if (!titles.length) {
             BlackwoodArchiveState.app.innerHTML = `
                 <section class="archive-empty">
-                    <p class="archive-kicker">Archive Index</p>
+                    <p class="archive-kicker">
+                        Archive Index
+                    </p>
 
-                    <h2>No records filed</h2>
+                    <h2>
+                        No records filed
+                    </h2>
 
                     <p>
                         No public Blackwood publication records are
@@ -274,49 +319,72 @@ const displayedRecordCount =
                 class="archive-catalogue"
                 aria-label="Blackwood publication archive"
             >
-                ${titles.map(renderArchiveTitle).join("")}
+                ${titles
+                    .map(renderArchiveTitle)
+                    .join("")}
             </section>
         `;
     }
 
     function renderArchiveTitle(title) {
-        const entries = getEntriesForTitle(title.id);
+        const entries =
+            getEntriesForTitle(title.id);
 
-        const publicEntries = entries.filter(function (entry) {
-            return entry.access_level === "public";
-        });
+        const publicEntries =
+            entries.filter(function (entry) {
+                return entry.access_level === "public";
+            });
 
-        const circleEntries = entries.filter(function (entry) {
-            return entry.access_level === "circle";
-        });
+        const circleEntries =
+            entries.filter(function (entry) {
+                return entry.access_level === "circle";
+            });
 
         const isCircleSession = Boolean(
             BlackwoodArchiveState.session &&
             BlackwoodArchiveState.session.user
         );
 
+        const restrictedCount =
+            getRestrictedCountForTitle(title.id);
+
+        const displayedRecordCount =
+            isCircleSession
+                ? entries.length
+                : publicEntries.length;
+
         return `
             <article
                 class="archive-record"
                 id="${escapeAttribute(title.slug)}"
-                data-archive-code="${escapeAttribute(title.archive_code)}"
+                data-archive-code="${escapeAttribute(
+                    title.archive_code
+                )}"
             >
                 <header class="archive-record-header">
                     <div class="archive-record-reference">
-                        <span>Archive Record</span>
+                        <span>
+                            Archive Record
+                        </span>
 
                         <strong>
-                            ${escapeHtml(title.archive_code)}
+                            ${escapeHtml(
+                                title.archive_code
+                            )}
                         </strong>
                     </div>
 
                     <span
                         class="archive-status is-${escapeAttribute(
-                            normaliseStatusClass(title.publication_status)
+                            normaliseStatusClass(
+                                title.publication_status
+                            )
                         )}"
                     >
                         ${escapeHtml(
-                            formatStatus(title.publication_status)
+                            formatStatus(
+                                title.publication_status
+                            )
                         )}
                     </span>
                 </header>
@@ -337,14 +405,18 @@ const displayedRecordCount =
                             title.subtitle
                                 ? `
                                     <p class="archive-record-subtitle">
-                                        ${escapeHtml(title.subtitle)}
+                                        ${escapeHtml(
+                                            title.subtitle
+                                        )}
                                     </p>
                                 `
                                 : ""
                         }
 
                         <p class="archive-record-author">
-                            ${escapeHtml(title.author_name)}
+                            ${escapeHtml(
+                                title.author_name
+                            )}
                         </p>
 
                         ${renderSynopsis(title)}
@@ -355,7 +427,9 @@ const displayedRecordCount =
 
                 <section
                     class="archive-associated-records"
-                    aria-labelledby="archive-associated-${Number(title.id)}"
+                    aria-labelledby="archive-associated-${Number(
+                        title.id
+                    )}"
                 >
                     <div class="archive-associated-heading">
                         <div>
@@ -363,14 +437,21 @@ const displayedRecordCount =
                                 Filed Material
                             </p>
 
-                            <h3 id="archive-associated-${Number(title.id)}">
+                            <h3
+                                id="archive-associated-${Number(
+                                    title.id
+                                )}"
+                            >
                                 Associated Records
                             </h3>
                         </div>
 
-                        <span>${escapeHtml(
-    formatRecordCount(displayedRecordCount)
-)}
+                        <span>
+                            ${escapeHtml(
+                                formatRecordCount(
+                                    displayedRecordCount
+                                )
+                            )}
                         </span>
                     </div>
 
@@ -378,7 +459,9 @@ const displayedRecordCount =
                         ${
                             publicEntries.length
                                 ? publicEntries
-                                    .map(renderArchiveEntry)
+                                    .map(
+                                        renderArchiveEntry
+                                    )
                                     .join("")
                                 : `
                                     <p class="archive-muted">
@@ -391,9 +474,14 @@ const displayedRecordCount =
                         ${
                             isCircleSession
                                 ? circleEntries
-                                    .map(renderArchiveEntry)
+                                    .map(
+                                        renderArchiveEntry
+                                    )
                                     .join("")
-                                : renderRestrictedNotice(title, restrictedCount)
+                                : renderRestrictedNotice(
+                                    title,
+                                    restrictedCount
+                                )
                         }
                     </div>
                 </section>
@@ -409,7 +497,9 @@ const displayedRecordCount =
                     aria-hidden="true"
                 >
                     <span>
-                        ${escapeHtml(title.archive_code)}
+                        ${escapeHtml(
+                            title.archive_code
+                        )}
                     </span>
 
                     <strong>
@@ -422,7 +512,9 @@ const displayedRecordCount =
         return `
             <figure class="archive-cover">
                 <img
-                    src="${escapeAttribute(title.cover_image_path)}"
+                    src="${escapeAttribute(
+                        title.cover_image_path
+                    )}"
                     alt="${escapeAttribute(
                         `${title.title} by ${title.author_name}`
                     )}"
@@ -439,7 +531,9 @@ const displayedRecordCount =
 
         return `
             <div class="archive-synopsis">
-                ${formatPlainTextAsHtml(title.synopsis)}
+                ${formatPlainTextAsHtml(
+                    title.synopsis
+                )}
             </div>
         `;
     }
@@ -449,25 +543,32 @@ const displayedRecordCount =
 
         metadata.push({
             label: "Status",
-            value: formatStatus(title.publication_status)
+            value: formatStatus(
+                title.publication_status
+            )
         });
 
         if (title.publication_date) {
             metadata.push({
                 label: "Published",
-                value: formatDate(title.publication_date)
+                value: formatDate(
+                    title.publication_date
+                )
             });
         }
 
         if (title.series_name) {
             const seriesPosition =
                 Number(title.series_position) > 0
-                    ? ` · Book ${Number(title.series_position)}`
+                    ? ` · Book ${Number(
+                        title.series_position
+                    )}`
                     : "";
 
             metadata.push({
                 label: "Series",
-                value: `${title.series_name}${seriesPosition}`
+                value:
+                    `${title.series_name}${seriesPosition}`
             });
         }
 
@@ -494,14 +595,25 @@ const displayedRecordCount =
 
         return `
             <dl class="archive-metadata">
-                ${metadata.map(function (item) {
-                    return `
-                        <div>
-                            <dt>${escapeHtml(item.label)}</dt>
-                            <dd>${escapeHtml(item.value)}</dd>
-                        </div>
-                    `;
-                }).join("")}
+                ${metadata
+                    .map(function (item) {
+                        return `
+                            <div>
+                                <dt>
+                                    ${escapeHtml(
+                                        item.label
+                                    )}
+                                </dt>
+
+                                <dd>
+                                    ${escapeHtml(
+                                        item.value
+                                    )}
+                                </dd>
+                            </div>
+                        `;
+                    })
+                    .join("")}
             </dl>
         `;
     }
@@ -510,17 +622,25 @@ const displayedRecordCount =
         return `
             <article
                 class="archive-entry is-${escapeAttribute(
-                    normaliseStatusClass(entry.entry_status)
+                    normaliseStatusClass(
+                        entry.entry_status
+                    )
                 )}"
             >
                 <div class="archive-entry-reference">
                     <span>
-                        ${escapeHtml(getEntryReference(entry.entry_code))}
+                        ${escapeHtml(
+                            getEntryReference(
+                                entry.entry_code
+                            )
+                        )}
                     </span>
 
                     <strong>
                         ${escapeHtml(
-                            formatStatus(entry.entry_status)
+                            formatStatus(
+                                entry.entry_status
+                            )
                         )}
                     </strong>
                 </div>
@@ -528,7 +648,9 @@ const displayedRecordCount =
                 <div class="archive-entry-copy">
                     <p class="archive-entry-type">
                         ${escapeHtml(
-                            formatEntryType(entry.entry_type)
+                            formatEntryType(
+                                entry.entry_type
+                            )
                         )}
                     </p>
 
@@ -540,7 +662,9 @@ const displayedRecordCount =
                         entry.summary
                             ? `
                                 <p>
-                                    ${escapeHtml(entry.summary)}
+                                    ${escapeHtml(
+                                        entry.summary
+                                    )}
                                 </p>
                             `
                             : ""
@@ -550,7 +674,9 @@ const displayedRecordCount =
                         entry.body
                             ? `
                                 <div class="archive-entry-body">
-                                    ${formatPlainTextAsHtml(entry.body)}
+                                    ${formatPlainTextAsHtml(
+                                        entry.body
+                                    )}
                                 </div>
                             `
                             : ""
@@ -571,8 +697,12 @@ const displayedRecordCount =
             return `
                 <figure class="archive-entry-media">
                     <img
-                        src="${escapeAttribute(entry.media_path)}"
-                        alt="${escapeAttribute(entry.media_alt || "")}"
+                        src="${escapeAttribute(
+                            entry.media_path
+                        )}"
+                        alt="${escapeAttribute(
+                            entry.media_alt || ""
+                        )}"
                         loading="lazy"
                     >
                 </figure>
@@ -586,9 +716,14 @@ const displayedRecordCount =
                         Archive audio filed.
                     </p>
 
-                    <audio controls preload="none">
+                    <audio
+                        controls
+                        preload="none"
+                    >
                         <source
-                            src="${escapeAttribute(entry.media_path)}"
+                            src="${escapeAttribute(
+                                entry.media_path
+                            )}"
                         >
                     </audio>
                 </div>
@@ -598,7 +733,9 @@ const displayedRecordCount =
         return `
             <p class="archive-file-link">
                 <a
-                    href="${escapeAttribute(entry.media_path)}"
+                    href="${escapeAttribute(
+                        entry.media_path
+                    )}"
                     target="_blank"
                     rel="noopener"
                 >
@@ -608,71 +745,103 @@ const displayedRecordCount =
         `;
     }
 
-    function renderRestrictedNotice(title, restrictedCount) {
-    if (
-        title.circle_extended_access !== true ||
-        Number(restrictedCount) < 1
+    function renderRestrictedNotice(
+        title,
+        restrictedCount
     ) {
-        return "";
-    }
+        if (
+            title.circle_extended_access !== true ||
+            Number(restrictedCount) < 1
+        ) {
+            return "";
+        }
 
-    const count = Number(restrictedCount);
+        const count =
+            Number(restrictedCount);
 
-    const recordText =
-        count === 1
-            ? "1 additional record held"
-            : `${count} additional records held`;
+        const recordText =
+            count === 1
+                ? "1 additional record held"
+                : `${count} additional records held`;
 
-    return `
-        <aside class="archive-restricted-notice">
-            <div class="archive-restricted-mark" aria-hidden="true">
-                BW
-            </div>
-
-            <div>
-                <p class="archive-kicker">
-                    Restricted Material
-                </p>
-
-                <h4>
-                    ${escapeHtml(recordText)}
-                </h4>
-
-                <p>
-                    Selected material associated with this publication
-                    is held under Blackwood Circle access.
-                </p>
-
-                <a
-                    href="${escapeAttribute(
-                        BLACKWOOD_ARCHIVE_CONFIG.membersPagePath
-                    )}"
+        return `
+            <aside class="archive-restricted-notice">
+                <div
+                    class="archive-restricted-mark"
+                    aria-hidden="true"
                 >
-                    Blackwood Circle access
-                </a>
-            </div>
-        </aside>
-    `;
-}
+                    BW
+                </div>
+
+                <div>
+                    <p class="archive-kicker">
+                        Restricted Material
+                    </p>
+
+                    <h4>
+                        ${escapeHtml(recordText)}
+                    </h4>
+
+                    <p>
+                        Selected material associated with this
+                        publication is held under Blackwood
+                        Circle access.
+                    </p>
+
+                    <a
+                        href="${escapeAttribute(
+                            BLACKWOOD_ARCHIVE_CONFIG
+                                .membersPagePath
+                        )}"
+                    >
+                        Blackwood Circle access
+                    </a>
+                </div>
+            </aside>
+        `;
+    }
 
     // =========================
     // HELPERS
     // =========================
 
     function getEntriesForTitle(titleId) {
-        return BlackwoodArchiveState.entries.filter(function (entry) {
-            return Number(entry.title_id) === Number(titleId);
-        });
+        return BlackwoodArchiveState.entries
+            .filter(function (entry) {
+                return (
+                    Number(entry.title_id) ===
+                    Number(titleId)
+                );
+            });
+    }
+
+    function getRestrictedCountForTitle(titleId) {
+        const record =
+            BlackwoodArchiveState.restrictedCounts
+                .find(function (item) {
+                    return (
+                        Number(item.title_id) ===
+                        Number(titleId)
+                    );
+                });
+
+        return record
+            ? Number(
+                record.restricted_count || 0
+            )
+            : 0;
     }
 
     function getEntryReference(entryCode) {
-        const code = String(entryCode || "");
+        const code =
+            String(entryCode || "");
 
         if (!code) {
             return "UNFILED";
         }
 
-        const parts = code.split("/");
+        const parts =
+            code.split("/");
 
         return parts.length > 1
             ? parts[parts.length - 1]
@@ -680,7 +849,8 @@ const displayedRecordCount =
     }
 
     function formatRecordCount(count) {
-        const cleanCount = Number(count || 0);
+        const cleanCount =
+            Number(count || 0);
 
         return cleanCount === 1
             ? "1 record"
@@ -688,27 +858,35 @@ const displayedRecordCount =
     }
 
     function formatEntryType(value) {
-        const cleanValue = String(value || "record")
-            .trim()
-            .replace(/_/g, " ");
+        const cleanValue =
+            String(value || "record")
+                .trim()
+                .replace(/_/g, " ");
 
-        return cleanValue.replace(/\b\w/g, function (character) {
-            return character.toUpperCase();
-        });
+        return cleanValue.replace(
+            /\b\w/g,
+            function (character) {
+                return character.toUpperCase();
+            }
+        );
     }
 
     function formatStatus(value) {
-        const cleanValue = String(value || "")
-            .trim()
-            .replace(/_/g, " ");
+        const cleanValue =
+            String(value || "")
+                .trim()
+                .replace(/_/g, " ");
 
         if (!cleanValue) {
             return "Filed";
         }
 
-        return cleanValue.replace(/\b\w/g, function (character) {
-            return character.toUpperCase();
-        });
+        return cleanValue.replace(
+            /\b\w/g,
+            function (character) {
+                return character.toUpperCase();
+            }
+        );
     }
 
     function normaliseStatusClass(value) {
@@ -724,21 +902,26 @@ const displayedRecordCount =
             return "";
         }
 
-        const date = new Date(`${value}T12:00:00`);
+        const date =
+            new Date(`${value}T12:00:00`);
 
         if (Number.isNaN(date.getTime())) {
             return String(value);
         }
 
-        return date.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-        });
+        return date.toLocaleDateString(
+            "en-GB",
+            {
+                day: "2-digit",
+                month: "long",
+                year: "numeric"
+            }
+        );
     }
 
     function formatPlainTextAsHtml(value) {
-        const text = escapeHtml(value || "");
+        const text =
+            escapeHtml(value || "");
 
         if (!text) {
             return "";
@@ -747,10 +930,21 @@ const displayedRecordCount =
         return text
             .split(/\n{2,}/)
             .map(function (paragraph) {
-                return `<p>${paragraph.replace(/\n/g, "<br>")}</p>`;
+                return `
+                    <p>
+                        ${paragraph.replace(
+                            /\n/g,
+                            "<br>"
+                        )}
+                    </p>
+                `;
             })
             .join("");
     }
+
+    // =========================
+    // STATES
+    // =========================
 
     function renderLoadingState() {
         if (!BlackwoodArchiveState.app) {
@@ -796,6 +990,10 @@ const displayedRecordCount =
         `;
     }
 
+    // =========================
+    // ESCAPING
+    // =========================
+
     function escapeHtml(value) {
         return String(value || "")
             .replace(/&/g, "&amp;")
@@ -809,4 +1007,5 @@ const displayedRecordCount =
         return escapeHtml(value)
             .replace(/`/g, "&#096;");
     }
+
 })();
