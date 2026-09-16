@@ -746,60 +746,57 @@
     }
 
     function renderRestrictedNotice(
-        title,
-        restrictedCount
-    ) {
-        if (
-            title.circle_extended_access !== true ||
-            Number(restrictedCount) < 1
-        ) {
-            return "";
-        }
+    title,
+    restrictedCount
+) {
+    const count =
+        Number(restrictedCount || 0);
 
-        const count =
-            Number(restrictedCount);
-
-        const recordText =
-            count === 1
-                ? "1 additional record held"
-                : `${count} additional records held`;
-
-        return `
-            <aside class="archive-restricted-notice">
-                <div
-                    class="archive-restricted-mark"
-                    aria-hidden="true"
-                >
-                    BW
-                </div>
-
-                <div>
-                    <p class="archive-kicker">
-                        Restricted Material
-                    </p>
-
-                    <h4>
-                        ${escapeHtml(recordText)}
-                    </h4>
-
-                    <p>
-                        Selected material associated with this
-                        publication is held under Blackwood
-                        Circle access.
-                    </p>
-
-                    <a
-                        href="${escapeAttribute(
-                            BLACKWOOD_ARCHIVE_CONFIG
-                                .membersPagePath
-                        )}"
-                    >
-                        Blackwood Circle access
-                    </a>
-                </div>
-            </aside>
-        `;
+    if (count < 1) {
+        return "";
     }
+
+    const recordText =
+        count === 1
+            ? "1 additional record held"
+            : `${count} additional records held`;
+
+    return `
+        <aside class="archive-restricted-notice">
+            <div
+                class="archive-restricted-mark"
+                aria-hidden="true"
+            >
+                BW
+            </div>
+
+            <div>
+                <p class="archive-kicker">
+                    Restricted Material
+                </p>
+
+                <h4>
+                    ${escapeHtml(recordText)}
+                </h4>
+
+                <p>
+                    Selected material associated with this
+                    publication is held under Blackwood
+                    Circle access.
+                </p>
+
+                <a
+                    href="${escapeAttribute(
+                        BLACKWOOD_ARCHIVE_CONFIG
+                            .membersPagePath
+                    )}"
+                >
+                    Blackwood Circle access
+                </a>
+            </div>
+        </aside>
+    `;
+}
 
     // =========================
     // HELPERS
