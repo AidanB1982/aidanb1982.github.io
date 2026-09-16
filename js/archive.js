@@ -153,54 +153,71 @@
     }
 
     async function loadArchive() {
-        renderLoadingState();
+    renderLoadingState();
 
-        try {
-            const [titlesResult, entriesResult] = await Promise.all([
-    BlackwoodArchiveState.client
-        .from("archive_titles")
-        .select("*")
-        .eq("public_visible", true)
-        .order("id", {
-            ascending: true
-        }),
+    try {
+        const isCircleSession = Boolean(
+            BlackwoodArchiveState.session &&
+            BlackwoodArchiveState.session.user
+        );
 
-    BlackwoodArchiveState.client
-        .from("archive_entries")
-        .select("*")
-        .order("sort_order", {
-            ascending: true
-        })
-]);
+        const titlesSource = isCircleSession
+            ? "archive_titles"
+            : "archive_public_titles";
 
-            if (titlesResult.error) {
-                throw titlesResult.error;
-            }
+        const entriesSource = isCircleSession
+            ? "archive_entries"
+            : "archive_public_entries";
 
-            if (entriesResult.error) {
-                throw entriesResult.error;
-            }
+        let titlesQuery = BlackwoodArchiveState.client
+            .from(titlesSource)
+            .select("*");
 
-            BlackwoodArchiveState.titles =
-                Array.isArray(titlesResult.data)
-                    ? titlesResult.data
-                    : [];
-
-            BlackwoodArchiveState.entries =
-                Array.isArray(entriesResult.data)
-                    ? entriesResult.data
-                    : [];
-
-            renderArchive();
-
-        } catch (error) {
-            console.error("Blackwood Archive query failed:", error);
-
-            renderErrorState(
-                "Publication records could not be retrieved."
-            );
+        if (isCircleSession) {
+            titlesQuery = titlesQuery.eq("public_visible", true);
         }
+
+        const [titlesResult, entriesResult] = await Promise.all([
+            titlesQuery.order("id", {
+                ascending: true
+            }),
+
+            BlackwoodArchiveState.client
+                .from(entriesSource)
+                .select("*")
+                .order("sort_order", {
+                    ascending: true
+                })
+        ]);
+
+        if (titlesResult.error) {
+            throw titlesResult.error;
+        }
+
+        if (entriesResult.error) {
+            throw entriesResult.error;
+        }
+
+        BlackwoodArchiveState.titles =
+            Array.isArray(titlesResult.data)
+                ? titlesResult.data
+                : [];
+
+        BlackwoodArchiveState.entries =
+            Array.isArray(entriesResult.data)
+                ? entriesResult.data
+                : [];
+
+        renderArchive();
+
+    } catch (error) {
+        console.error("Blackwood Archive query failed:", error);
+
+        renderErrorState(
+            "Publication records could not be retrieved."
+        );
     }
+}
 
     // =========================
     // ARCHIVE RENDERING
