@@ -21,12 +21,13 @@
     };
 
     const BlackwoodArchiveState = {
-        app: null,
-        client: null,
-        session: null,
-        titles: [],
-        entries: []
-    };
+    app: null,
+    client: null,
+    session: null,
+    titles: [],
+    entries: [],
+    restrictedCounts: []
+};
 
     document.addEventListener("DOMContentLoaded", function () {
         initBlackwoodArchive();
@@ -177,22 +178,34 @@
             titlesQuery = titlesQuery.eq("public_visible", true);
         }
 
-        const [titlesResult, entriesResult] = await Promise.all([
-            titlesQuery.order("id", {
+        const [titlesResult, entriesResult, restrictedCountsResult] =
+    await Promise.all([
+        BlackwoodArchiveState.client
+            .from("archive_titles")
+            .select("*")
+            .eq("public_visible", true)
+            .order("id", {
                 ascending: true
             }),
 
-            BlackwoodArchiveState.client
-                .from(entriesSource)
-                .select("*")
-                .order("sort_order", {
-                    ascending: true
-                })
-        ]);
+        BlackwoodArchiveState.client
+            .from("archive_entries")
+            .select("*")
+            .order("sort_order", {
+                ascending: true
+            }),
 
+        BlackwoodArchiveState.client
+            .rpc("get_archive_restricted_counts")
+    ]);
+        
         if (titlesResult.error) {
             throw titlesResult.error;
         }
+
+        if (restrictedCountsResult.error) {
+    throw restrictedCountsResult.error;
+}
 
         if (entriesResult.error) {
             throw entriesResult.error;
@@ -207,6 +220,11 @@
             Array.isArray(entriesResult.data)
                 ? entriesResult.data
                 : [];
+
+        BlackwoodArchiveState.restrictedCounts =
+    Array.isArray(restrictedCountsResult.data)
+        ? restrictedCountsResult.data
+        : [];
 
         renderArchive();
 
