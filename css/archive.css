@@ -1253,8 +1253,11 @@ body.archive-case-is-open {
     position: relative;
     z-index: 2;
 
-    width: min(1040px, 100%);
+    width: min(1040px, calc(100vw - 48px));
+    max-width: 100%;
     max-height: calc(100vh - 28px);
+
+    box-sizing: border-box;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -1279,6 +1282,15 @@ body.archive-case-is-open {
     transition:
         transform 260ms
         cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.archive-case-folder,
+.archive-case-paper,
+.archive-master-record,
+.archive-case-records {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .archive-case-modal.is-visible
