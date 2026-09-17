@@ -19,90 +19,255 @@
     </title>
 
     <!-- Main Blackwood site styles -->
-<link
-    rel="stylesheet"
-    href="/css/header.css?v=20260815"
->
+    <link
+        rel="stylesheet"
+        href="/css/header.css?v=20260815"
+    >
 
-<link
-    rel="stylesheet"
-    href="/css/styles.css?v=20260815"
->
+    <link
+        rel="stylesheet"
+        href="/css/styles.css?v=20260815"
+    >
 
-<!-- Archive styles -->
-<link
-    rel="stylesheet"
-    href="/css/archive.css?v=20260917-4"
->
+    <!-- Archive room styles -->
+    <link
+        rel="stylesheet"
+        href="/css/archive.css?v=20260917-5"
+    >
 </head>
 
 
 <body class="archive-page">
 
     <!-- =========================
-         ARCHIVE HERO
+         BLACKWOOD ARCHIVE ROOM
          ========================= -->
 
-    <header class="archive-hero">
+    <main
+        id="blackwood-archive-room"
+        class="archive-room"
+    >
+
+        <!-- =========================
+             ROOM BACKGROUND
+             ========================= -->
 
         <div
-            class="archive-hero-overlay"
+            class="archive-room-background"
             aria-hidden="true"
         ></div>
 
-        <div class="archive-hero-content">
-
-            <p class="archive-kicker">
-                Blackwood Publishing
-            </p>
-
-            <h1>
-                The Archive
-            </h1>
-
-            <p class="archive-hero-intro">
-                Permanent publication records and associated
-                material from the Blackwood files.
-            </p>
-
-            <p class="archive-hero-note">
-                Some records are held under restricted access.
-            </p>
-
-        </div>
-
-    </header>
-
-
-    <main>
 
         <!-- =========================
-             ARCHIVE INTRO
+             ATMOSPHERIC LIGHTING
              ========================= -->
 
-        <section class="archive-index-intro">
+        <div
+            class="archive-room-moonlight"
+            aria-hidden="true"
+        ></div>
 
-            <div class="archive-index-intro-inner">
+        <div
+            class="archive-room-lamplight"
+            aria-hidden="true"
+        ></div>
 
-                <div>
+        <div
+            class="archive-room-vignette"
+            aria-hidden="true"
+        ></div>
 
-                    <p class="archive-kicker">
-                        Catalogue
-                    </p>
 
-                    <h2>
-                        Publication Records
-                    </h2>
+        <!-- =========================
+             HOME
+             ========================= -->
+
+        <a
+            class="archive-home-link"
+            href="/"
+            aria-label="Return to Blackwood Publishing home"
+            title="Return to Blackwood Publishing"
+        >
+            <span aria-hidden="true">
+                &#8962;
+            </span>
+        </a>
+
+
+        <!-- =========================
+             CORKBOARD
+             Future Archive newsboard
+             ========================= -->
+
+        <aside
+            class="archive-newsboard"
+            aria-label="Blackwood Archive newsboard"
+        >
+
+            <div
+                class="archive-newsboard-frame"
+                aria-hidden="true"
+            >
+
+                <div class="archive-newsboard-surface">
+
+                    <div class="archive-newsboard-pin archive-newsboard-pin-left"></div>
+
+                    <div class="archive-newsboard-pin archive-newsboard-pin-right"></div>
+
+                    <div class="archive-newsboard-paper">
+
+                        <span class="archive-newsboard-stamp">
+                            Blackwood Archive
+                        </span>
+
+                        <strong>
+                            Filed Notices
+                        </strong>
+
+                        <small>
+                            Further material pending.
+                        </small>
+
+                    </div>
 
                 </div>
 
-                <p>
-                    The Blackwood Archive preserves the permanent
-                    record of works published by Blackwood
-                    Publishing, together with selected material
-                    associated with their development, production
-                    and history.
-                </p>
+            </div>
+
+        </aside>
+
+
+        <!-- =========================
+             DESK SCENE
+             ========================= -->
+
+        <section
+            class="archive-desk-scene"
+            aria-label="Blackwood Archive desk"
+        >
+
+            <!-- =========================
+                 DESK
+                 ========================= -->
+
+            <div
+                class="archive-desk"
+                aria-hidden="true"
+            >
+
+                <div class="archive-desk-surface"></div>
+
+                <div class="archive-desk-edge"></div>
+
+                <div class="archive-desk-front"></div>
+
+            </div>
+
+
+            <!-- =========================
+                 ARCHIVE CABINET POSITION
+                 ========================= -->
+
+            <div class="archive-cabinet-position">
+
+                <div
+                    class="archive-cabinet-plaque"
+                    aria-hidden="true"
+                >
+                    <span>
+                        Blackwood Archive
+                    </span>
+
+                    <small>
+                        Publication Files
+                    </small>
+                </div>
+
+
+                <!-- =========================
+                     ARCHIVE APPLICATION
+
+                     archive.js will continue
+                     rendering publication data
+                     into this element.
+                     ========================= -->
+
+                <section
+                    id="blackwood-archive-app"
+                    class="archive-app"
+                    aria-live="polite"
+                >
+
+                    <section class="archive-loading">
+
+                        <span
+                            class="archive-loading-mark"
+                            aria-hidden="true"
+                        ></span>
+
+                        <p>
+                            Opening the files...
+                        </p>
+
+                    </section>
+
+                </section>
+
+            </div>
+
+
+            <!-- =========================
+                 DESK LAMP
+                 ========================= -->
+
+            <div class="archive-lamp-position">
+
+                <button
+                    id="archive-lamp-toggle"
+                    class="archive-lamp"
+                    type="button"
+                    aria-label="Turn archive lamp off"
+                    aria-pressed="true"
+                    title="Switch off the lamp"
+                >
+
+                    <span
+                        class="archive-lamp-shade"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span
+                        class="archive-lamp-bulb"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span
+                        class="archive-lamp-arm archive-lamp-arm-upper"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span
+                        class="archive-lamp-joint"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span
+                        class="archive-lamp-arm archive-lamp-arm-lower"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span
+                        class="archive-lamp-base"
+                        aria-hidden="true"
+                    ></span>
+
+                    <span
+                        class="archive-lamp-switch"
+                        aria-hidden="true"
+                    ></span>
+
+                </button>
 
             </div>
 
@@ -110,32 +275,31 @@
 
 
         <!-- =========================
-             ARCHIVE APPLICATION
+             DARK-ROOM MESSAGE
+
+             Hidden while the lamp is on.
+             We'll replace this with an
+             actual chosen book phrase.
              ========================= -->
 
-        <section
-            id="blackwood-archive-app"
-            class="archive-app"
-            aria-live="polite"
+        <div
+            class="archive-dark-message"
+            aria-hidden="true"
         >
+            <span>
+                Something was written here.
+            </span>
+        </div>
 
-            <section class="archive-loading">
 
-                <p class="archive-kicker">
-                    Archive Index
-                </p>
+        <!-- =========================
+             MOBILE ATMOSPHERE
+             ========================= -->
 
-                <h2>
-                    Opening the files...
-                </h2>
-
-                <p>
-                    Publication records are being retrieved.
-                </p>
-
-            </section>
-
-        </section>
+        <div
+            class="archive-room-grain"
+            aria-hidden="true"
+        ></div>
 
     </main>
 
