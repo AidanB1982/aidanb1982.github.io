@@ -1,5 +1,6 @@
 // =========================
 // BLACKWOOD ARCHIVE
+// Interactive Archive Room
 // Publication Cabinet + Master Case Files
 // Circle-Aware Archive Access
 // Powered by Supabase
@@ -14,32 +15,77 @@
 
     window.__BLACKWOOD_ARCHIVE_SCRIPT_LOADED__ = true;
 
+
+    // =========================
+    // CONFIGURATION
+    // =========================
+
     const BLACKWOOD_ARCHIVE_CONFIG = {
-        supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
-        supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
-        supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-        membersPagePath: "/pages/members.html"
+        supabaseUrl:
+            "https://bmnlynjldlnxfvunqbqq.supabase.co",
+
+        supabaseKey:
+            "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
+
+        supabaseCdn:
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
+
+        membersPagePath:
+            "/pages/members.html",
+
+        lampStorageKey:
+            "blackwood-archive-lamp-state"
     };
+
+
+    // =========================
+    // STATE
+    // =========================
 
     const BlackwoodArchiveState = {
         app: null,
+        room: null,
+        background: null,
+        newsboard: null,
+        cabinetPosition: null,
+        lampPosition: null,
+        lampToggle: null,
+
         client: null,
         session: null,
+
         titles: [],
         entries: [],
         restrictedCounts: [],
+
         activeTitleId: null,
         activeDrawer: null,
+
         modal: null,
         lastFocusedElement: null,
+
         openTimer: null,
-        closeTimer: null
+        closeTimer: null,
+
+        lampIsOn: true,
+
+        pointerFrame: null,
+        pointerX: 0,
+        pointerY: 0,
+
+        reducedMotionQuery: null
     };
+
+
+    // =========================
+    // START
+    // =========================
 
     document.addEventListener(
         "DOMContentLoaded",
         initBlackwoodArchive
     );
+
 
     // =========================
     // INITIALISATION
@@ -55,10 +101,14 @@
             console.warn(
                 "Blackwood Archive: #blackwood-archive-app not found."
             );
+
             return;
         }
 
-        BlackwoodArchiveState.app = app;
+        BlackwoodArchiveState.app =
+            app;
+
+        initialiseArchiveRoom();
 
         renderLoadingState();
 
@@ -78,8 +128,12 @@
                     }
                 );
 
-            const { data, error } =
-                await BlackwoodArchiveState.client
+            const {
+                data,
+                error
+            } =
+                await BlackwoodArchiveState
+                    .client
                     .auth
                     .getSession();
 
@@ -104,6 +158,535 @@
         }
     }
 
+
+    // =========================
+    // ARCHIVE ROOM
+    // =========================
+
+    function initialiseArchiveRoom() {
+        BlackwoodArchiveState.room =
+            document.getElementById(
+                "blackwood-archive-room"
+            );
+
+        BlackwoodArchiveState.background =
+            document.querySelector(
+                ".archive-room-background"
+            );
+
+        BlackwoodArchiveState.newsboard =
+            document.querySelector(
+                ".archive-newsboard"
+            );
+
+        BlackwoodArchiveState.cabinetPosition =
+            document.querySelector(
+                ".archive-cabinet-position"
+            );
+
+        BlackwoodArchiveState.lampPosition =
+            document.querySelector(
+                ".archive-lamp-position"
+            );
+
+        BlackwoodArchiveState.lampToggle =
+            document.getElementById(
+                "archive-lamp-toggle"
+            );
+
+        initialiseReducedMotion();
+
+        initialiseArchiveLamp();
+
+        initialiseRoomParallax();
+    }
+
+
+    // =========================
+    // REDUCED MOTION
+    // =========================
+
+    function initialiseReducedMotion() {
+        if (!window.matchMedia) {
+            return;
+        }
+
+        BlackwoodArchiveState.reducedMotionQuery =
+            window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            );
+
+        const query =
+            BlackwoodArchiveState
+                .reducedMotionQuery;
+
+        if (
+            typeof query.addEventListener ===
+            "function"
+        ) {
+            query.addEventListener(
+                "change",
+                handleReducedMotionChange
+            );
+
+            return;
+        }
+
+        if (
+            typeof query.addListener ===
+            "function"
+        ) {
+            query.addListener(
+                handleReducedMotionChange
+            );
+        }
+    }
+
+    function handleReducedMotionChange() {
+        if (prefersReducedMotion()) {
+            resetRoomParallax();
+        }
+    }
+
+
+    // =========================
+    // DESK LAMP
+    // =========================
+
+    function initialiseArchiveLamp() {
+        const room =
+            BlackwoodArchiveState.room;
+
+        const lampToggle =
+            BlackwoodArchiveState
+                .lampToggle;
+
+        if (
+            !room ||
+            !lampToggle
+        ) {
+            return;
+        }
+
+        const savedState =
+            readSavedLampState();
+
+        BlackwoodArchiveState.lampIsOn =
+            savedState !== "off";
+
+        applyLampState(
+            BlackwoodArchiveState
+                .lampIsOn,
+            false
+        );
+
+        lampToggle.addEventListener(
+            "click",
+            toggleArchiveLamp
+        );
+    }
+
+    function toggleArchiveLamp() {
+        const nextState =
+            !BlackwoodArchiveState
+                .lampIsOn;
+
+        applyLampState(
+            nextState,
+            true
+        );
+    }
+
+    function applyLampState(
+        lampIsOn,
+        saveState
+    ) {
+        const room =
+            BlackwoodArchiveState.room;
+
+        const lampToggle =
+            BlackwoodArchiveState
+                .lampToggle;
+
+        if (
+            !room ||
+            !lampToggle
+        ) {
+            return;
+        }
+
+        BlackwoodArchiveState.lampIsOn =
+            Boolean(
+                lampIsOn
+            );
+
+        room.classList.toggle(
+            "is-lamp-off",
+            !BlackwoodArchiveState
+                .lampIsOn
+        );
+
+        lampToggle.setAttribute(
+            "aria-pressed",
+            BlackwoodArchiveState
+                .lampIsOn
+                ? "true"
+                : "false"
+        );
+
+        if (
+            BlackwoodArchiveState
+                .lampIsOn
+        ) {
+            lampToggle.setAttribute(
+                "aria-label",
+                "Turn archive lamp off"
+            );
+
+            lampToggle.setAttribute(
+                "title",
+                "Switch off the lamp"
+            );
+
+        } else {
+            lampToggle.setAttribute(
+                "aria-label",
+                "Turn archive lamp on"
+            );
+
+            lampToggle.setAttribute(
+                "title",
+                "Switch on the lamp"
+            );
+        }
+
+        if (saveState) {
+            saveLampState(
+                BlackwoodArchiveState
+                    .lampIsOn
+                    ? "on"
+                    : "off"
+            );
+        }
+    }
+
+    function readSavedLampState() {
+        try {
+            const saved =
+                window.localStorage
+                    .getItem(
+                        BLACKWOOD_ARCHIVE_CONFIG
+                            .lampStorageKey
+                    );
+
+            if (
+                saved === "on" ||
+                saved === "off"
+            ) {
+                return saved;
+            }
+
+        } catch (error) {
+            /*
+             * localStorage can be unavailable
+             * in some privacy modes.
+             *
+             * The Archive simply defaults
+             * to lamp-on in that case.
+             */
+        }
+
+        return null;
+    }
+
+    function saveLampState(value) {
+        try {
+            window.localStorage.setItem(
+                BLACKWOOD_ARCHIVE_CONFIG
+                    .lampStorageKey,
+                value
+            );
+
+        } catch (error) {
+            /*
+             * Lamp state persistence is
+             * optional. Failure here must
+             * never prevent the room from
+             * functioning.
+             */
+        }
+    }
+
+
+    // =========================
+    // ROOM PARALLAX
+    // =========================
+
+    function initialiseRoomParallax() {
+        const room =
+            BlackwoodArchiveState.room;
+
+        if (!room) {
+            return;
+        }
+
+        room.addEventListener(
+            "pointermove",
+            handleRoomPointerMove,
+            {
+                passive: true
+            }
+        );
+
+        room.addEventListener(
+            "pointerleave",
+            resetRoomParallax
+        );
+
+        window.addEventListener(
+            "blur",
+            resetRoomParallax
+        );
+    }
+
+    function handleRoomPointerMove(
+        event
+    ) {
+        if (
+            prefersReducedMotion() ||
+            !isFinePointer()
+        ) {
+            return;
+        }
+
+        const room =
+            BlackwoodArchiveState.room;
+
+        if (!room) {
+            return;
+        }
+
+        const rect =
+            room.getBoundingClientRect();
+
+        if (
+            !rect.width ||
+            !rect.height
+        ) {
+            return;
+        }
+
+        const x =
+            (
+                event.clientX -
+                rect.left
+            ) /
+            rect.width;
+
+        const y =
+            (
+                event.clientY -
+                rect.top
+            ) /
+            rect.height;
+
+        BlackwoodArchiveState.pointerX =
+            clamp(
+                (x - 0.5) * 2,
+                -1,
+                1
+            );
+
+        BlackwoodArchiveState.pointerY =
+            clamp(
+                (y - 0.5) * 2,
+                -1,
+                1
+            );
+
+        requestParallaxFrame();
+    }
+
+    function requestParallaxFrame() {
+        if (
+            BlackwoodArchiveState
+                .pointerFrame
+        ) {
+            return;
+        }
+
+        BlackwoodArchiveState.pointerFrame =
+            window.requestAnimationFrame(
+                applyRoomParallax
+            );
+    }
+
+    function applyRoomParallax() {
+        BlackwoodArchiveState.pointerFrame =
+            null;
+
+        if (
+            prefersReducedMotion() ||
+            !isFinePointer()
+        ) {
+            resetRoomParallax();
+            return;
+        }
+
+        const x =
+            BlackwoodArchiveState.pointerX;
+
+        const y =
+            BlackwoodArchiveState.pointerY;
+
+        const background =
+            BlackwoodArchiveState
+                .background;
+
+        const newsboard =
+            BlackwoodArchiveState
+                .newsboard;
+
+        const cabinet =
+            BlackwoodArchiveState
+                .cabinetPosition;
+
+        const lamp =
+            BlackwoodArchiveState
+                .lampPosition;
+
+        /*
+         * Keep this intentionally tiny.
+         *
+         * The Archive should feel like a
+         * physical room with depth, not a
+         * theme-park ride.
+         */
+
+        if (background) {
+            background.style.transform =
+                `translate3d(${(
+                    x * -3
+                ).toFixed(2)}px, ${(
+                    y * -2
+                ).toFixed(2)}px, 0) scale(1.025)`;
+        }
+
+        if (newsboard) {
+            newsboard.style.marginLeft =
+                `${(
+                    x * -2
+                ).toFixed(2)}px`;
+
+            newsboard.style.marginTop =
+                `${(
+                    y * -1.5
+                ).toFixed(2)}px`;
+        }
+
+        if (cabinet) {
+            cabinet.style.marginLeft =
+                `${(
+                    x * 3
+                ).toFixed(2)}px`;
+
+            cabinet.style.marginBottom =
+                `${(
+                    y * 1.5
+                ).toFixed(2)}px`;
+        }
+
+        if (lamp) {
+            lamp.style.marginRight =
+                `${(
+                    x * 4
+                ).toFixed(2)}px`;
+
+            lamp.style.marginBottom =
+                `${(
+                    y * 2
+                ).toFixed(2)}px`;
+        }
+    }
+
+    function resetRoomParallax() {
+        BlackwoodArchiveState.pointerX =
+            0;
+
+        BlackwoodArchiveState.pointerY =
+            0;
+
+        if (
+            BlackwoodArchiveState
+                .pointerFrame
+        ) {
+            window.cancelAnimationFrame(
+                BlackwoodArchiveState
+                    .pointerFrame
+            );
+
+            BlackwoodArchiveState
+                .pointerFrame =
+                null;
+        }
+
+        const background =
+            BlackwoodArchiveState
+                .background;
+
+        const newsboard =
+            BlackwoodArchiveState
+                .newsboard;
+
+        const cabinet =
+            BlackwoodArchiveState
+                .cabinetPosition;
+
+        const lamp =
+            BlackwoodArchiveState
+                .lampPosition;
+
+        if (background) {
+            background.style.transform =
+                "scale(1.025)";
+        }
+
+        if (newsboard) {
+            newsboard.style.marginLeft =
+                "";
+
+            newsboard.style.marginTop =
+                "";
+        }
+
+        if (cabinet) {
+            cabinet.style.marginLeft =
+                "";
+
+            cabinet.style.marginBottom =
+                "";
+        }
+
+        if (lamp) {
+            lamp.style.marginRight =
+                "";
+
+            lamp.style.marginBottom =
+                "";
+        }
+    }
+
+    function isFinePointer() {
+        if (!window.matchMedia) {
+            return true;
+        }
+
+        return window.matchMedia(
+            "(hover: hover) and (pointer: fine)"
+        ).matches;
+    }
+
+
     // =========================
     // SUPABASE
     // =========================
@@ -113,7 +696,8 @@
             function (resolve, reject) {
                 if (
                     window.supabase &&
-                    typeof window.supabase.createClient ===
+                    typeof window.supabase
+                        .createClient ===
                         "function"
                 ) {
                     resolve();
@@ -131,7 +715,9 @@
                         function () {
                             resolve();
                         },
-                        { once: true }
+                        {
+                            once: true
+                        }
                     );
 
                     existingScript.addEventListener(
@@ -143,14 +729,18 @@
                                 )
                             );
                         },
-                        { once: true }
+                        {
+                            once: true
+                        }
                     );
 
                     return;
                 }
 
                 const script =
-                    document.createElement("script");
+                    document.createElement(
+                        "script"
+                    );
 
                 script.src =
                     BLACKWOOD_ARCHIVE_CONFIG
@@ -162,31 +752,34 @@
                 script.dataset.blackwoodSupabase =
                     "true";
 
-                script.onload = function () {
-                    if (
-                        window.supabase &&
-                        typeof window.supabase
-                            .createClient ===
-                            "function"
-                    ) {
-                        resolve();
-                        return;
-                    }
+                script.onload =
+                    function () {
+                        if (
+                            window.supabase &&
+                            typeof window
+                                .supabase
+                                .createClient ===
+                                "function"
+                        ) {
+                            resolve();
+                            return;
+                        }
 
-                    reject(
-                        new Error(
-                            "Supabase loaded, but createClient was unavailable."
-                        )
-                    );
-                };
+                        reject(
+                            new Error(
+                                "Supabase loaded, but createClient was unavailable."
+                            )
+                        );
+                    };
 
-                script.onerror = function () {
-                    reject(
-                        new Error(
-                            "Supabase could not be loaded."
-                        )
-                    );
-                };
+                script.onerror =
+                    function () {
+                        reject(
+                            new Error(
+                                "Supabase could not be loaded."
+                            )
+                        );
+                    };
 
                 document.head.appendChild(
                     script
@@ -194,6 +787,11 @@
             }
         );
     }
+
+
+    // =========================
+    // LOAD ARCHIVE DATA
+    // =========================
 
     async function loadArchive() {
         renderLoadingState();
@@ -203,13 +801,16 @@
                 isSignedInCircleMember();
 
             /*
-             * Signed-in members use the main Archive
-             * tables and therefore receive only the
-             * records allowed by authenticated RLS.
+             * Signed-in members use the main
+             * Archive tables.
              *
-             * Signed-out visitors use the public-safe
-             * Archive sources.
+             * RLS determines which records
+             * they are permitted to receive.
+             *
+             * Signed-out visitors use the
+             * public-safe Archive sources.
              */
+
             const titlesSource =
                 isCircleSession
                     ? "archive_titles"
@@ -221,8 +822,11 @@
                     : "archive_public_entries";
 
             let titlesQuery =
-                BlackwoodArchiveState.client
-                    .from(titlesSource)
+                BlackwoodArchiveState
+                    .client
+                    .from(
+                        titlesSource
+                    )
                     .select("*");
 
             if (isCircleSession) {
@@ -242,8 +846,11 @@
                 );
 
             const entriesQuery =
-                BlackwoodArchiveState.client
-                    .from(entriesSource)
+                BlackwoodArchiveState
+                    .client
+                    .from(
+                        entriesSource
+                    )
                     .select("*")
                     .order(
                         "sort_order",
@@ -256,16 +863,18 @@
                 titlesResult,
                 entriesResult,
                 restrictedCountsResult
-            ] = await Promise.all([
-                titlesQuery,
+            ] =
+                await Promise.all([
+                    titlesQuery,
 
-                entriesQuery,
+                    entriesQuery,
 
-                BlackwoodArchiveState.client
-                    .rpc(
-                        "get_archive_restricted_counts"
-                    )
-            ]);
+                    BlackwoodArchiveState
+                        .client
+                        .rpc(
+                            "get_archive_restricted_counts"
+                        )
+                ]);
 
             if (titlesResult.error) {
                 throw titlesResult.error;
@@ -275,7 +884,9 @@
                 throw entriesResult.error;
             }
 
-            if (restrictedCountsResult.error) {
+            if (
+                restrictedCountsResult.error
+            ) {
                 throw restrictedCountsResult.error;
             }
 
@@ -293,7 +904,8 @@
                     ? entriesResult.data
                     : [];
 
-            BlackwoodArchiveState.restrictedCounts =
+            BlackwoodArchiveState
+                .restrictedCounts =
                 Array.isArray(
                     restrictedCountsResult.data
                 )
@@ -314,6 +926,7 @@
         }
     }
 
+
     // =========================
     // MAIN ARCHIVE
     // =========================
@@ -323,78 +936,64 @@
             BlackwoodArchiveState.titles;
 
         removeExistingModal();
+
         clearTimers();
+
         closeActiveDrawer();
 
         if (!titles.length) {
-            BlackwoodArchiveState.app.innerHTML = `
-                <section class="archive-empty">
-                    <p class="archive-kicker">
-                        Archive Index
-                    </p>
-
-                    <h2>
-                        No records filed
-                    </h2>
-
-                    <p>
-                        No public Blackwood publication
-                        records are currently available.
-                    </p>
-                </section>
-            `;
+            BlackwoodArchiveState
+                .app
+                .innerHTML = `
+                    <section class="archive-empty">
+                        <p>
+                            No publication records
+                            are currently filed.
+                        </p>
+                    </section>
+                `;
 
             return;
         }
 
-        BlackwoodArchiveState.app.innerHTML = `
-            <section
-                class="archive-catalogue archive-publication-catalogue"
-                aria-label="Blackwood publication archive"
-            >
-                <div class="archive-associated-heading archive-cabinet-heading">
-                    <div>
-                        <p class="archive-kicker">
-                            Filed Publications
-                        </p>
+        /*
+         * The Archive room itself now provides
+         * the context.
+         *
+         * We therefore render only the physical
+         * publication cabinet here rather than
+         * conventional webpage headings,
+         * catalogue introductions or explanatory
+         * copy.
+         */
 
-                        <h2>
-                            Archive Cabinet
-                        </h2>
-
-                        <p class="archive-cabinet-intro">
-                            Each drawer contains the permanent
-                            Blackwood Archive record for a
-                            publication and its associated filed
-                            material.
-                        </p>
-                    </div>
-
-                    <span>
-                        ${escapeHtml(
-                            formatPublicationCount(
-                                titles.length
-                            )
-                        )}
-                    </span>
-                </div>
-
-                ${renderPublicationCabinet(titles)}
-            </section>
-        `;
+        BlackwoodArchiveState
+            .app
+            .innerHTML =
+            renderPublicationCabinet(
+                titles
+            );
 
         bindArchiveCabinet();
     }
+
 
     // =========================
     // PUBLICATION CABINET
     // =========================
 
-    function renderPublicationCabinet(titles) {
+    function renderPublicationCabinet(
+        titles
+    ) {
         return `
             <div
                 class="archive-cabinet archive-publication-cabinet"
                 data-archive-publication-cabinet
+                aria-label="${escapeAttribute(
+                    `Blackwood Archive publication cabinet. ${formatPublicationCount(
+                        titles.length
+                    )} filed.`
+                )}"
             >
                 <div
                     class="archive-cabinet-top"
@@ -403,7 +1002,9 @@
 
                 <div class="archive-cabinet-body">
                     ${titles
-                        .map(renderPublicationDrawer)
+                        .map(
+                            renderPublicationDrawer
+                        )
                         .join("")}
                 </div>
 
@@ -415,7 +1016,14 @@
         `;
     }
 
-    function renderPublicationDrawer(title) {
+
+    // =========================
+    // PUBLICATION DRAWER
+    // =========================
+
+    function renderPublicationDrawer(
+        title
+    ) {
         const status =
             formatStatus(
                 title.publication_status
@@ -427,7 +1035,9 @@
             );
 
         const seriesText =
-            getSeriesLabel(title);
+            getSeriesLabel(
+                title
+            );
 
         return `
             <div
@@ -455,6 +1065,7 @@
                     </span>
 
                     <span class="archive-drawer-label">
+
                         <span class="archive-drawer-reference">
                             ${escapeHtml(
                                 title.archive_code
@@ -473,6 +1084,7 @@
                                 title.author_name
                             )}
                         </span>
+
                     </span>
 
                     <span
@@ -480,20 +1092,30 @@
                             statusClass
                         )}"
                     >
-                        ${escapeHtml(status)}
+                        ${escapeHtml(
+                            status
+                        )}
                     </span>
                 </button>
             </div>
         `;
     }
 
+
+    // =========================
+    // CABINET EVENTS
+    // =========================
+
     function bindArchiveCabinet() {
-        if (!BlackwoodArchiveState.app) {
+        if (
+            !BlackwoodArchiveState.app
+        ) {
             return;
         }
 
         const drawers =
-            BlackwoodArchiveState.app
+            BlackwoodArchiveState
+                .app
                 .querySelectorAll(
                     ".archive-publication-drawer[data-archive-title-id]"
                 );
@@ -505,7 +1127,8 @@
                     function () {
                         const titleId =
                             Number(
-                                drawer.dataset
+                                drawer
+                                    .dataset
                                     .archiveTitleId
                             );
 
@@ -519,31 +1142,43 @@
         );
     }
 
+
+    // =========================
+    // OPEN DRAWER
+    // =========================
+
     function openPublicationDrawer(
         drawer,
         titleId
     ) {
         const title =
-            getTitleById(titleId);
+            getTitleById(
+                titleId
+            );
 
         if (!title) {
             console.warn(
                 "Blackwood Archive: title not found.",
                 titleId
             );
+
             return;
         }
 
         clearTimers();
+
         closeActiveDrawer();
 
-        BlackwoodArchiveState.activeDrawer =
+        BlackwoodArchiveState
+            .activeDrawer =
             drawer;
 
-        BlackwoodArchiveState.activeTitleId =
+        BlackwoodArchiveState
+            .activeTitleId =
             titleId;
 
-        BlackwoodArchiveState.lastFocusedElement =
+        BlackwoodArchiveState
+            .lastFocusedElement =
             drawer;
 
         drawer.classList.add(
@@ -571,7 +1206,8 @@
                 ? 0
                 : 260;
 
-        BlackwoodArchiveState.openTimer =
+        BlackwoodArchiveState
+            .openTimer =
             window.setTimeout(
                 function () {
                     if (
@@ -589,6 +1225,11 @@
                 delay
             );
     }
+
+
+    // =========================
+    // CLOSE DRAWER
+    // =========================
 
     function closeActiveDrawer() {
         const drawer =
@@ -617,22 +1258,29 @@
             }
         }
 
-        BlackwoodArchiveState.activeDrawer =
+        BlackwoodArchiveState
+            .activeDrawer =
             null;
 
-        BlackwoodArchiveState.activeTitleId =
+        BlackwoodArchiveState
+            .activeTitleId =
             null;
     }
+
 
     // =========================
     // MASTER CASE FILE
     // =========================
 
-    function openPublicationCaseFile(title) {
+    function openPublicationCaseFile(
+        title
+    ) {
         removeExistingModal();
 
         const modal =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         modal.className =
             "archive-case-modal";
@@ -656,7 +1304,9 @@
             "archive-case-is-open"
         );
 
-        bindCaseFileModal(modal);
+        bindCaseFileModal(
+            modal
+        );
 
         window.requestAnimationFrame(
             function () {
@@ -676,22 +1326,33 @@
         }
     }
 
-    function renderPublicationCaseFile(title) {
+
+    // =========================
+    // MASTER CASE CONTENT
+    // =========================
+
+    function renderPublicationCaseFile(
+        title
+    ) {
         const entries =
             getEntriesForTitle(
                 title.id
             )
                 .slice()
-                .sort(function (a, b) {
-                    return (
-                        Number(
-                            a.sort_order || 0
-                        ) -
-                        Number(
-                            b.sort_order || 0
-                        )
-                    );
-                });
+                .sort(
+                    function (a, b) {
+                        return (
+                            Number(
+                                a.sort_order ||
+                                0
+                            ) -
+                            Number(
+                                b.sort_order ||
+                                0
+                            )
+                        );
+                    }
+                );
 
         const isCircleSession =
             isSignedInCircleMember();
@@ -755,6 +1416,7 @@
                         class="archive-case-paper archive-master-case-paper"
                     >
                         <header class="archive-case-header">
+
                             <div class="archive-case-reference">
                                 <span>
                                     ${escapeHtml(
@@ -776,11 +1438,13 @@
                                     status
                                 )}
                             </span>
+
                         </header>
 
                         <div class="archive-master-record">
 
                             <div class="archive-master-record-copy">
+
                                 <p class="archive-case-kicker">
                                     Blackwood Archive
                                 </p>
@@ -828,6 +1492,7 @@
                                         `
                                         : ""
                                 }
+
                             </div>
 
                             ${renderMasterCaseCover(
@@ -843,6 +1508,7 @@
                             )}"
                         >
                             <div class="archive-case-records-heading">
+
                                 <div>
                                     <p class="archive-case-kicker">
                                         Filed Material
@@ -861,17 +1527,17 @@
                                     ${escapeHtml(
                                         formatRecordCount(
                                             getDisplayedRecordCount(
-                                                title.id,
                                                 entries,
-                                                restrictedCount,
                                                 isCircleSession
                                             )
                                         )
                                     )}
                                 </span>
+
                             </div>
 
                             <div class="archive-case-record-list">
+
                                 ${
                                     entries.length
                                         ? entries
@@ -897,10 +1563,12 @@
                                         )
                                         : ""
                                 }
+
                             </div>
                         </section>
 
                         <footer class="archive-case-footer">
+
                             <span>
                                 Blackwood Publishing Archive
                             </span>
@@ -910,6 +1578,7 @@
                                     title.archive_code
                                 )}
                             </span>
+
                         </footer>
                     </div>
                 </div>
@@ -917,12 +1586,17 @@
         `;
     }
 
+
     // =========================
-    // MASTER PUBLICATION RECORD
+    // MASTER CASE COVER
     // =========================
 
-    function renderMasterCaseCover(title) {
-        if (!title.cover_image_path) {
+    function renderMasterCaseCover(
+        title
+    ) {
+        if (
+            !title.cover_image_path
+        ) {
             return `
                 <div class="archive-master-evidence">
                     <div
@@ -935,6 +1609,7 @@
                         ></span>
 
                         <div class="archive-polaroid-placeholder">
+
                             <span>
                                 ${escapeHtml(
                                     title.archive_code
@@ -944,11 +1619,13 @@
                             <strong>
                                 Blackwood
                             </strong>
+
                         </div>
 
                         <div class="archive-polaroid-caption">
                             Publication reference
                         </div>
+
                     </div>
                 </div>
             `;
@@ -956,6 +1633,7 @@
 
         return `
             <div class="archive-master-evidence">
+
                 <figure class="archive-master-cover archive-polaroid">
 
                     <span
@@ -964,6 +1642,7 @@
                     ></span>
 
                     <div class="archive-polaroid-image">
+
                         <img
                             src="${escapeAttribute(
                                 title.cover_image_path
@@ -972,9 +1651,11 @@
                                 `${title.title} by ${title.author_name}`
                             )}"
                         >
+
                     </div>
 
                     <figcaption class="archive-polaroid-caption">
+
                         <span>
                             ${escapeHtml(
                                 title.archive_code
@@ -984,12 +1665,19 @@
                         <strong>
                             Publication reference
                         </strong>
+
                     </figcaption>
 
                 </figure>
+
             </div>
         `;
     }
+
+
+    // =========================
+    // PUBLICATION METADATA
+    // =========================
 
     function renderMasterPublicationMetadata(
         title
@@ -1053,33 +1741,38 @@
         return `
             <dl class="archive-case-details archive-master-details">
                 ${metadata
-                    .map(function (item) {
-                        return `
-                            <div>
-                                <dt>
-                                    ${escapeHtml(
-                                        item.label
-                                    )}
-                                </dt>
+                    .map(
+                        function (item) {
+                            return `
+                                <div>
+                                    <dt>
+                                        ${escapeHtml(
+                                            item.label
+                                        )}
+                                    </dt>
 
-                                <dd>
-                                    ${escapeHtml(
-                                        item.value
-                                    )}
-                                </dd>
-                            </div>
-                        `;
-                    })
+                                    <dd>
+                                        ${escapeHtml(
+                                            item.value
+                                        )}
+                                    </dd>
+                                </div>
+                            `;
+                        }
+                    )
                     .join("")}
             </dl>
         `;
     }
 
+
     // =========================
-    // FILED RECORDS INSIDE CASE
+    // FILED RECORDS
     // =========================
 
-    function renderCaseRecord(entry) {
+    function renderCaseRecord(
+        entry
+    ) {
         const reference =
             getEntryReference(
                 entry.entry_code
@@ -1102,7 +1795,9 @@
                 )}"
             >
                 <header class="archive-case-record-header">
+
                     <div class="archive-case-record-reference">
+
                         <span>
                             ${escapeHtml(
                                 reference
@@ -1116,6 +1811,7 @@
                                 )
                             )}
                         </small>
+
                     </div>
 
                     <span
@@ -1127,9 +1823,11 @@
                             status
                         )}
                     </span>
+
                 </header>
 
                 <div class="archive-case-record-content">
+
                     <h4>
                         ${escapeHtml(
                             entry.title
@@ -1163,12 +1861,20 @@
                     ${renderCaseFileMedia(
                         entry
                     )}
+
                 </div>
             </article>
         `;
     }
 
-    function renderCaseFileMedia(entry) {
+
+    // =========================
+    // FILED MEDIA
+    // =========================
+
+    function renderCaseFileMedia(
+        entry
+    ) {
         if (!entry.media_path) {
             return renderMissingCaseMaterial(
                 entry
@@ -1184,6 +1890,7 @@
                     class="archive-case-media archive-case-photograph"
                 >
                     <div class="archive-case-photo-mount">
+
                         <img
                             src="${escapeAttribute(
                                 entry.media_path
@@ -1194,6 +1901,7 @@
                             )}"
                             loading="lazy"
                         >
+
                     </div>
 
                     ${
@@ -1207,6 +1915,7 @@
                             `
                             : ""
                     }
+
                 </figure>
             `;
         }
@@ -1217,6 +1926,7 @@
         ) {
             return `
                 <section class="archive-case-audio">
+
                     <p class="archive-case-audio-label">
                         Archive Audio
                     </p>
@@ -1231,12 +1941,14 @@
                             )}"
                         >
                     </audio>
+
                 </section>
             `;
         }
 
         return `
             <div class="archive-case-file-link">
+
                 <a
                     href="${escapeAttribute(
                         entry.media_path
@@ -1246,31 +1958,42 @@
                 >
                     Open filed material
                 </a>
+
             </div>
         `;
     }
+
+
+    // =========================
+    // MISSING MATERIAL
+    // =========================
 
     function renderMissingCaseMaterial(
         entry
     ) {
         const status =
             String(
-                entry.entry_status || ""
+                entry.entry_status ||
+                ""
             )
                 .trim()
                 .toLowerCase();
 
-        if (status !== "missing") {
+        if (
+            status !== "missing"
+        ) {
             return "";
         }
 
         return `
             <div class="archive-case-missing">
+
                 <span aria-hidden="true">
                     BW
                 </span>
 
                 <div>
+
                     <p>
                         Archive Material
                     </p>
@@ -1283,10 +2006,13 @@
                         No filed material is currently
                         attached to this record.
                     </small>
+
                 </div>
+
             </div>
         `;
     }
+
 
     // =========================
     // PUBLIC RESTRICTED NOTICE
@@ -1298,7 +2024,8 @@
     ) {
         const count =
             Number(
-                restrictedCount || 0
+                restrictedCount ||
+                0
             );
 
         if (count < 1) {
@@ -1311,18 +2038,27 @@
                 : `${count} additional records are held`;
 
         /*
-         * IMPORTANT:
+         * PUBLIC SAFETY:
          *
-         * This public notice uses only:
+         * This notice uses only:
+         *
          * - the public title
-         * - the safe aggregate count
+         * - the safe aggregate restricted count
          *
-         * It never receives or renders restricted
-         * entry IDs, codes, types, titles, summaries,
-         * body text or media paths.
+         * It does NOT receive or expose restricted:
+         *
+         * - entry IDs
+         * - entry codes
+         * - entry types
+         * - titles
+         * - summaries
+         * - body text
+         * - media paths
          */
+
         return `
             <aside class="archive-case-restricted-message">
+
                 <div
                     class="archive-case-restricted-mark"
                     aria-hidden="true"
@@ -1331,6 +2067,7 @@
                 </div>
 
                 <div>
+
                     <p class="archive-case-kicker">
                         Restricted Material
                     </p>
@@ -1357,16 +2094,21 @@
                     >
                         Blackwood Circle access
                     </a>
+
                 </div>
+
             </aside>
         `;
     }
+
 
     // =========================
     // MODAL EVENTS
     // =========================
 
-    function bindCaseFileModal(modal) {
+    function bindCaseFileModal(
+        modal
+    ) {
         const closeControls =
             modal.querySelectorAll(
                 "[data-archive-case-close]"
@@ -1391,9 +2133,12 @@
         );
     }
 
-    function handleModalKeydown(event) {
+    function handleModalKeydown(
+        event
+    ) {
         if (
-            event.key === "Escape"
+            event.key ===
+            "Escape"
         ) {
             event.preventDefault();
 
@@ -1406,13 +2151,15 @@
 
         if (
             event.key !== "Tab" ||
-            !BlackwoodArchiveState.modal
+            !BlackwoodArchiveState
+                .modal
         ) {
             return;
         }
 
         const focusable =
-            BlackwoodArchiveState.modal
+            BlackwoodArchiveState
+                .modal
                 .querySelectorAll(
                     'button:not([disabled]), a[href], audio[controls], [tabindex]:not([tabindex="-1"])'
                 );
@@ -1423,8 +2170,10 @@
             ).filter(
                 function (element) {
                     return (
-                        element.offsetWidth > 0 ||
-                        element.offsetHeight > 0
+                        element.offsetWidth >
+                            0 ||
+                        element.offsetHeight >
+                            0
                     );
                 }
             );
@@ -1447,7 +2196,9 @@
                 first
         ) {
             event.preventDefault();
+
             last.focus();
+
             return;
         }
 
@@ -1457,9 +2208,15 @@
                 last
         ) {
             event.preventDefault();
+
             first.focus();
         }
     }
+
+
+    // =========================
+    // CLOSE CASE FILE
+    // =========================
 
     function closeCaseFile(
         restoreFocus
@@ -1512,7 +2269,8 @@
 
         clearCloseTimer();
 
-        BlackwoodArchiveState.closeTimer =
+        BlackwoodArchiveState
+            .closeTimer =
             window.setTimeout(
                 function () {
                     if (
@@ -1558,6 +2316,11 @@
             );
     }
 
+
+    // =========================
+    // REMOVE EXISTING MODAL
+    // =========================
+
     function removeExistingModal() {
         clearCloseTimer();
 
@@ -1582,7 +2345,14 @@
         );
     }
 
-    function stopModalAudio(modal) {
+
+    // =========================
+    // STOP CASE AUDIO
+    // =========================
+
+    function stopModalAudio(
+        modal
+    ) {
         const audioElements =
             modal.querySelectorAll(
                 "audio"
@@ -1595,16 +2365,19 @@
 
                     audio.currentTime =
                         0;
+
                 } catch (error) {
                     /*
-                     * Some browsers will not allow
-                     * currentTime to be changed before
-                     * media metadata has loaded.
+                     * Some browsers do not
+                     * allow currentTime to be
+                     * changed before metadata
+                     * has loaded.
                      */
                 }
             }
         );
     }
+
 
     // =========================
     // DATA HELPERS
@@ -1612,7 +2385,8 @@
 
     function isSignedInCircleMember() {
         return Boolean(
-            BlackwoodArchiveState.session &&
+            BlackwoodArchiveState
+                .session &&
             BlackwoodArchiveState
                 .session.user
         );
@@ -1640,20 +2414,23 @@
     function getTitleById(
         titleId
     ) {
-        return BlackwoodArchiveState
-            .titles
-            .find(
-                function (title) {
-                    return (
-                        Number(
-                            title.id
-                        ) ===
-                        Number(
-                            titleId
-                        )
-                    );
-                }
-            ) || null;
+        return (
+            BlackwoodArchiveState
+                .titles
+                .find(
+                    function (title) {
+                        return (
+                            Number(
+                                title.id
+                            ) ===
+                            Number(
+                                titleId
+                            )
+                        );
+                    }
+                ) ||
+            null
+        );
     }
 
     function getRestrictedCountForTitle(
@@ -1684,20 +2461,23 @@
     }
 
     function getDisplayedRecordCount(
-        titleId,
         entries,
-        restrictedCount,
         isCircleSession
     ) {
         /*
          * Signed-in:
-         * Count the records actually returned by RLS.
+         * Count records actually returned
+         * by authenticated RLS.
          *
          * Signed-out:
-         * Keep the public record count public-safe.
-         * The restricted aggregate is represented
-         * separately by the restricted notice.
+         * Count only records actually
+         * returned by the public-safe view.
+         *
+         * The restricted aggregate remains
+         * separate and is represented by
+         * the restricted notice.
          */
+
         if (isCircleSession) {
             return entries.length;
         }
@@ -1705,7 +2485,9 @@
         return entries.length;
     }
 
-    function getSeriesLabel(title) {
+    function getSeriesLabel(
+        title
+    ) {
         if (!title.series_name) {
             return "";
         }
@@ -1731,7 +2513,8 @@
     ) {
         const code =
             String(
-                entryCode || ""
+                entryCode ||
+                ""
             );
 
         if (!code) {
@@ -1748,6 +2531,7 @@
             : code;
     }
 
+
     // =========================
     // FORMATTERS
     // =========================
@@ -1757,7 +2541,8 @@
     ) {
         const cleanCount =
             Number(
-                count || 0
+                count ||
+                0
             );
 
         return cleanCount === 1
@@ -1770,7 +2555,8 @@
     ) {
         const cleanCount =
             Number(
-                count || 0
+                count ||
+                0
             );
 
         return cleanCount === 1
@@ -1783,7 +2569,8 @@
     ) {
         const cleanValue =
             String(
-                value || "record"
+                value ||
+                "record"
             )
                 .trim()
                 .replace(
@@ -1805,7 +2592,8 @@
     ) {
         const cleanValue =
             String(
-                value || ""
+                value ||
+                ""
             )
                 .trim()
                 .replace(
@@ -1830,7 +2618,8 @@
         value
     ) {
         return String(
-            value || "filed"
+            value ||
+            "filed"
         )
             .trim()
             .toLowerCase()
@@ -1844,7 +2633,9 @@
             );
     }
 
-    function formatDate(value) {
+    function formatDate(
+        value
+    ) {
         if (!value) {
             return "";
         }
@@ -1859,7 +2650,9 @@
                 date.getTime()
             )
         ) {
-            return String(value);
+            return String(
+                value
+            );
         }
 
         return date.toLocaleDateString(
@@ -1877,7 +2670,8 @@
     ) {
         const text =
             escapeHtml(
-                value || ""
+                value ||
+                ""
             );
 
         if (!text) {
@@ -1903,11 +2697,23 @@
             .join("");
     }
 
+
     // =========================
-    // TIMING
+    // MOTION HELPERS
     // =========================
 
     function prefersReducedMotion() {
+        if (
+            BlackwoodArchiveState
+                .reducedMotionQuery
+        ) {
+            return Boolean(
+                BlackwoodArchiveState
+                    .reducedMotionQuery
+                    .matches
+            );
+        }
+
         return Boolean(
             window.matchMedia &&
             window.matchMedia(
@@ -1915,6 +2721,25 @@
             ).matches
         );
     }
+
+    function clamp(
+        value,
+        minimum,
+        maximum
+    ) {
+        return Math.min(
+            maximum,
+            Math.max(
+                minimum,
+                value
+            )
+        );
+    }
+
+
+    // =========================
+    // TIMERS
+    // =========================
 
     function clearOpenTimer() {
         if (
@@ -1950,11 +2775,13 @@
 
     function clearTimers() {
         clearOpenTimer();
+
         clearCloseTimer();
     }
 
+
     // =========================
-    // STATES
+    // LOADING STATE
     // =========================
 
     function renderLoadingState() {
@@ -1964,22 +2791,28 @@
             return;
         }
 
-        BlackwoodArchiveState.app.innerHTML = `
-            <section class="archive-loading">
-                <p class="archive-kicker">
-                    Archive Index
-                </p>
+        BlackwoodArchiveState
+            .app
+            .innerHTML = `
+                <section class="archive-loading">
 
-                <h2>
-                    Opening the files...
-                </h2>
+                    <span
+                        class="archive-loading-mark"
+                        aria-hidden="true"
+                    ></span>
 
-                <p>
-                    Publication records are being retrieved.
-                </p>
-            </section>
-        `;
+                    <p>
+                        Opening the files...
+                    </p>
+
+                </section>
+            `;
     }
+
+
+    // =========================
+    // ERROR STATE
+    // =========================
 
     function renderErrorState(
         message
@@ -1990,32 +2823,36 @@
             return;
         }
 
-        BlackwoodArchiveState.app.innerHTML = `
-            <section class="archive-error">
-                <p class="archive-kicker">
-                    Archive Index
-                </p>
+        BlackwoodArchiveState
+            .app
+            .innerHTML = `
+                <section class="archive-error">
 
-                <h2>
-                    Record unavailable
-                </h2>
+                    <p>
+                        Record unavailable
+                    </p>
 
-                <p>
-                    ${escapeHtml(
-                        message
-                    )}
-                </p>
-            </section>
-        `;
+                    <p>
+                        ${escapeHtml(
+                            message
+                        )}
+                    </p>
+
+                </section>
+            `;
     }
+
 
     // =========================
     // ESCAPING
     // =========================
 
-    function escapeHtml(value) {
+    function escapeHtml(
+        value
+    ) {
         return String(
-            value || ""
+            value ||
+            ""
         )
             .replace(
                 /&/g,
