@@ -1,7 +1,7 @@
 // =========================
 // BLACKWOOD ARCHIVE
-// Public Catalogue + Circle-Aware Archive Access
-// Cabinet + Case File System
+// Publication Cabinet + Master Case Files
+// Circle-Aware Archive Access
 // Powered by Supabase
 // =========================
 
@@ -28,15 +28,18 @@
         titles: [],
         entries: [],
         restrictedCounts: [],
-        activeEntryId: null,
+        activeTitleId: null,
         activeDrawer: null,
         modal: null,
-        lastFocusedElement: null
+        lastFocusedElement: null,
+        openTimer: null,
+        closeTimer: null
     };
 
-    document.addEventListener("DOMContentLoaded", function () {
-        initBlackwoodArchive();
-    });
+    document.addEventListener(
+        "DOMContentLoaded",
+        initBlackwoodArchive
+    );
 
     // =========================
     // INITIALISATION
@@ -76,7 +79,9 @@
                 );
 
             const { data, error } =
-                await BlackwoodArchiveState.client.auth.getSession();
+                await BlackwoodArchiveState.client
+                    .auth
+                    .getSession();
 
             if (error) {
                 throw error;
@@ -104,55 +109,8 @@
     // =========================
 
     function loadSupabaseLibrary() {
-        return new Promise(function (resolve, reject) {
-            if (
-                window.supabase &&
-                typeof window.supabase.createClient === "function"
-            ) {
-                resolve();
-                return;
-            }
-
-            const existingScript =
-                document.querySelector(
-                    "script[data-blackwood-supabase]"
-                );
-
-            if (existingScript) {
-                existingScript.addEventListener(
-                    "load",
-                    function () {
-                        resolve();
-                    },
-                    { once: true }
-                );
-
-                existingScript.addEventListener(
-                    "error",
-                    function () {
-                        reject(
-                            new Error(
-                                "Supabase could not be loaded."
-                            )
-                        );
-                    },
-                    { once: true }
-                );
-
-                return;
-            }
-
-            const script =
-                document.createElement("script");
-
-            script.src =
-                BLACKWOOD_ARCHIVE_CONFIG.supabaseCdn;
-
-            script.async = true;
-            script.defer = true;
-            script.dataset.blackwoodSupabase = "true";
-
-            script.onload = function () {
+        return new Promise(
+            function (resolve, reject) {
                 if (
                     window.supabase &&
                     typeof window.supabase.createClient ===
@@ -162,23 +120,79 @@
                     return;
                 }
 
-                reject(
-                    new Error(
-                        "Supabase loaded, but createClient was unavailable."
-                    )
-                );
-            };
+                const existingScript =
+                    document.querySelector(
+                        "script[data-blackwood-supabase]"
+                    );
 
-            script.onerror = function () {
-                reject(
-                    new Error(
-                        "Supabase could not be loaded."
-                    )
-                );
-            };
+                if (existingScript) {
+                    existingScript.addEventListener(
+                        "load",
+                        function () {
+                            resolve();
+                        },
+                        { once: true }
+                    );
 
-            document.head.appendChild(script);
-        });
+                    existingScript.addEventListener(
+                        "error",
+                        function () {
+                            reject(
+                                new Error(
+                                    "Supabase could not be loaded."
+                                )
+                            );
+                        },
+                        { once: true }
+                    );
+
+                    return;
+                }
+
+                const script =
+                    document.createElement("script");
+
+                script.src =
+                    BLACKWOOD_ARCHIVE_CONFIG
+                        .supabaseCdn;
+
+                script.async = true;
+                script.defer = true;
+
+                script.dataset.blackwoodSupabase =
+                    "true";
+
+                script.onload = function () {
+                    if (
+                        window.supabase &&
+                        typeof window.supabase
+                            .createClient ===
+                            "function"
+                    ) {
+                        resolve();
+                        return;
+                    }
+
+                    reject(
+                        new Error(
+                            "Supabase loaded, but createClient was unavailable."
+                        )
+                    );
+                };
+
+                script.onerror = function () {
+                    reject(
+                        new Error(
+                            "Supabase could not be loaded."
+                        )
+                    );
+                };
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
     }
 
     async function loadArchive() {
@@ -189,11 +203,12 @@
                 isSignedInCircleMember();
 
             /*
-             * Signed-in Circle members read from the main
-             * Archive tables.
+             * Signed-in members use the main Archive
+             * tables and therefore receive only the
+             * records allowed by authenticated RLS.
              *
-             * Signed-out visitors read only from the
-             * public-safe Archive sources.
+             * Signed-out visitors use the public-safe
+             * Archive sources.
              */
             const titlesSource =
                 isCircleSession
@@ -265,12 +280,16 @@
             }
 
             BlackwoodArchiveState.titles =
-                Array.isArray(titlesResult.data)
+                Array.isArray(
+                    titlesResult.data
+                )
                     ? titlesResult.data
                     : [];
 
             BlackwoodArchiveState.entries =
-                Array.isArray(entriesResult.data)
+                Array.isArray(
+                    entriesResult.data
+                )
                     ? entriesResult.data
                     : [];
 
@@ -296,14 +315,16 @@
     }
 
     // =========================
-    // ARCHIVE RENDERING
+    // MAIN ARCHIVE
     // =========================
 
     function renderArchive() {
         const titles =
             BlackwoodArchiveState.titles;
 
-        closeCaseFile(false);
+        removeExistingModal();
+        clearTimers();
+        closeActiveDrawer();
 
         if (!titles.length) {
             BlackwoodArchiveState.app.innerHTML = `
@@ -317,8 +338,8 @@
                     </h2>
 
                     <p>
-                        No public Blackwood publication records are
-                        currently available.
+                        No public Blackwood publication
+                        records are currently available.
                     </p>
                 </section>
             `;
@@ -328,132 +349,581 @@
 
         BlackwoodArchiveState.app.innerHTML = `
             <section
-                class="archive-catalogue"
+                class="archive-catalogue archive-publication-catalogue"
                 aria-label="Blackwood publication archive"
             >
-                ${titles
-                    .map(renderArchiveTitle)
-                    .join("")}
+                <div class="archive-associated-heading archive-cabinet-heading">
+                    <div>
+                        <p class="archive-kicker">
+                            Filed Publications
+                        </p>
+
+                        <h2>
+                            Archive Cabinet
+                        </h2>
+
+                        <p class="archive-cabinet-intro">
+                            Each drawer contains the permanent
+                            Blackwood Archive record for a
+                            publication and its associated filed
+                            material.
+                        </p>
+                    </div>
+
+                    <span>
+                        ${escapeHtml(
+                            formatPublicationCount(
+                                titles.length
+                            )
+                        )}
+                    </span>
+                </div>
+
+                ${renderPublicationCabinet(titles)}
             </section>
         `;
 
-        bindArchiveCabinets();
+        bindArchiveCabinet();
     }
 
-    function renderArchiveTitle(title) {
+    // =========================
+    // PUBLICATION CABINET
+    // =========================
+
+    function renderPublicationCabinet(titles) {
+        return `
+            <div
+                class="archive-cabinet archive-publication-cabinet"
+                data-archive-publication-cabinet
+            >
+                <div
+                    class="archive-cabinet-top"
+                    aria-hidden="true"
+                ></div>
+
+                <div class="archive-cabinet-body">
+                    ${titles
+                        .map(renderPublicationDrawer)
+                        .join("")}
+                </div>
+
+                <div
+                    class="archive-cabinet-base"
+                    aria-hidden="true"
+                ></div>
+            </div>
+        `;
+    }
+
+    function renderPublicationDrawer(title) {
+        const status =
+            formatStatus(
+                title.publication_status
+            );
+
+        const statusClass =
+            normaliseStatusClass(
+                title.publication_status
+            );
+
+        const seriesText =
+            getSeriesLabel(title);
+
+        return `
+            <div
+                class="archive-drawer-shell archive-publication-drawer-shell is-${escapeAttribute(
+                    statusClass
+                )}"
+            >
+                <button
+                    class="archive-drawer archive-publication-drawer"
+                    type="button"
+                    data-archive-title-id="${Number(
+                        title.id
+                    )}"
+                    aria-haspopup="dialog"
+                    aria-expanded="false"
+                    aria-label="${escapeAttribute(
+                        `Open archive case file for ${title.title}`
+                    )}"
+                >
+                    <span
+                        class="archive-drawer-pull"
+                        aria-hidden="true"
+                    >
+                        <span></span>
+                    </span>
+
+                    <span class="archive-drawer-label">
+                        <span class="archive-drawer-reference">
+                            ${escapeHtml(
+                                title.archive_code
+                            )}
+                        </span>
+
+                        <span class="archive-drawer-title">
+                            ${escapeHtml(
+                                title.title
+                            )}
+                        </span>
+
+                        <span class="archive-drawer-book">
+                            ${escapeHtml(
+                                seriesText ||
+                                title.author_name
+                            )}
+                        </span>
+                    </span>
+
+                    <span
+                        class="archive-drawer-status is-${escapeAttribute(
+                            statusClass
+                        )}"
+                    >
+                        ${escapeHtml(status)}
+                    </span>
+                </button>
+            </div>
+        `;
+    }
+
+    function bindArchiveCabinet() {
+        if (!BlackwoodArchiveState.app) {
+            return;
+        }
+
+        const drawers =
+            BlackwoodArchiveState.app
+                .querySelectorAll(
+                    ".archive-publication-drawer[data-archive-title-id]"
+                );
+
+        drawers.forEach(
+            function (drawer) {
+                drawer.addEventListener(
+                    "click",
+                    function () {
+                        const titleId =
+                            Number(
+                                drawer.dataset
+                                    .archiveTitleId
+                            );
+
+                        openPublicationDrawer(
+                            drawer,
+                            titleId
+                        );
+                    }
+                );
+            }
+        );
+    }
+
+    function openPublicationDrawer(
+        drawer,
+        titleId
+    ) {
+        const title =
+            getTitleById(titleId);
+
+        if (!title) {
+            console.warn(
+                "Blackwood Archive: title not found.",
+                titleId
+            );
+            return;
+        }
+
+        clearTimers();
+        closeActiveDrawer();
+
+        BlackwoodArchiveState.activeDrawer =
+            drawer;
+
+        BlackwoodArchiveState.activeTitleId =
+            titleId;
+
+        BlackwoodArchiveState.lastFocusedElement =
+            drawer;
+
+        drawer.classList.add(
+            "is-open"
+        );
+
+        drawer.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        const shell =
+            drawer.closest(
+                ".archive-drawer-shell"
+            );
+
+        if (shell) {
+            shell.classList.add(
+                "is-open"
+            );
+        }
+
+        const delay =
+            prefersReducedMotion()
+                ? 0
+                : 260;
+
+        BlackwoodArchiveState.openTimer =
+            window.setTimeout(
+                function () {
+                    if (
+                        BlackwoodArchiveState
+                            .activeTitleId !==
+                        titleId
+                    ) {
+                        return;
+                    }
+
+                    openPublicationCaseFile(
+                        title
+                    );
+                },
+                delay
+            );
+    }
+
+    function closeActiveDrawer() {
+        const drawer =
+            BlackwoodArchiveState
+                .activeDrawer;
+
+        if (drawer) {
+            drawer.classList.remove(
+                "is-open"
+            );
+
+            drawer.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+            const shell =
+                drawer.closest(
+                    ".archive-drawer-shell"
+                );
+
+            if (shell) {
+                shell.classList.remove(
+                    "is-open"
+                );
+            }
+        }
+
+        BlackwoodArchiveState.activeDrawer =
+            null;
+
+        BlackwoodArchiveState.activeTitleId =
+            null;
+    }
+
+    // =========================
+    // MASTER CASE FILE
+    // =========================
+
+    function openPublicationCaseFile(title) {
+        removeExistingModal();
+
+        const modal =
+            document.createElement("div");
+
+        modal.className =
+            "archive-case-modal";
+
+        modal.dataset.archiveCaseModal =
+            "true";
+
+        modal.innerHTML =
+            renderPublicationCaseFile(
+                title
+            );
+
+        document.body.appendChild(
+            modal
+        );
+
+        BlackwoodArchiveState.modal =
+            modal;
+
+        document.body.classList.add(
+            "archive-case-is-open"
+        );
+
+        bindCaseFileModal(modal);
+
+        window.requestAnimationFrame(
+            function () {
+                modal.classList.add(
+                    "is-visible"
+                );
+            }
+        );
+
+        const closeButton =
+            modal.querySelector(
+                ".archive-case-close"
+            );
+
+        if (closeButton) {
+            closeButton.focus();
+        }
+    }
+
+    function renderPublicationCaseFile(title) {
         const entries =
-            getEntriesForTitle(title.id);
-
-        const publicEntries =
-            entries.filter(function (entry) {
-                return entry.access_level === "public";
-            });
-
-        const circleEntries =
-            entries.filter(function (entry) {
-                return entry.access_level === "circle";
-            });
+            getEntriesForTitle(
+                title.id
+            )
+                .slice()
+                .sort(function (a, b) {
+                    return (
+                        Number(
+                            a.sort_order || 0
+                        ) -
+                        Number(
+                            b.sort_order || 0
+                        )
+                    );
+                });
 
         const isCircleSession =
             isSignedInCircleMember();
 
         const restrictedCount =
-            getRestrictedCountForTitle(title.id);
+            getRestrictedCountForTitle(
+                title.id
+            );
 
-        const displayedRecordCount =
-            isCircleSession
-                ? entries.length
-                : publicEntries.length;
+        const status =
+            formatStatus(
+                title.publication_status
+            );
+
+        const statusClass =
+            normaliseStatusClass(
+                title.publication_status
+            );
 
         return `
-            <article
-                class="archive-record"
-                id="${escapeAttribute(title.slug)}"
-                data-archive-code="${escapeAttribute(
-                    title.archive_code
+            <div
+                class="archive-case-backdrop"
+                data-archive-case-close
+                aria-hidden="true"
+            ></div>
+
+            <section
+                class="archive-case-window archive-master-case-window"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="archive-master-case-title-${Number(
+                    title.id
                 )}"
             >
-                <header class="archive-record-header">
-                    <div class="archive-record-reference">
-                        <span>
-                            Archive Record
-                        </span>
+                <button
+                    class="archive-case-close"
+                    type="button"
+                    data-archive-case-close
+                    aria-label="${escapeAttribute(
+                        `Close ${title.title} archive case file`
+                    )}"
+                >
+                    <span aria-hidden="true">
+                        ×
+                    </span>
+                </button>
 
-                        <strong>
-                            ${escapeHtml(
-                                title.archive_code
-                            )}
-                        </strong>
-                    </div>
-
-                    <span
-                        class="archive-status is-${escapeAttribute(
-                            normaliseStatusClass(
-                                title.publication_status
-                            )
-                        )}"
+                <div
+                    class="archive-case-folder archive-master-case-folder"
+                >
+                    <div
+                        class="archive-case-folder-tab"
+                        aria-hidden="true"
                     >
                         ${escapeHtml(
-                            formatStatus(
-                                title.publication_status
-                            )
+                            title.archive_code
                         )}
-                    </span>
-                </header>
+                    </div>
 
-                <div class="archive-record-main">
-                    ${renderCover(title)}
+                    <div
+                        class="archive-case-paper archive-master-case-paper"
+                    >
+                        <header class="archive-case-header">
+                            <div class="archive-case-reference">
+                                <span>
+                                    ${escapeHtml(
+                                        title.archive_code
+                                    )}
+                                </span>
 
-                    <div class="archive-record-copy">
-                        <p class="archive-kicker">
-                            Publication Record
-                        </p>
+                                <strong>
+                                    Permanent Publication Record
+                                </strong>
+                            </div>
 
-                        <h2>
-                            ${escapeHtml(title.title)}
-                        </h2>
+                            <span
+                                class="archive-case-status is-${escapeAttribute(
+                                    statusClass
+                                )}"
+                            >
+                                ${escapeHtml(
+                                    status
+                                )}
+                            </span>
+                        </header>
 
-                        ${
-                            title.subtitle
-                                ? `
-                                    <p class="archive-record-subtitle">
-                                        ${escapeHtml(
-                                            title.subtitle
-                                        )}
-                                    </p>
-                                `
-                                : ""
-                        }
-
-                        <p class="archive-record-author">
-                            ${escapeHtml(
-                                title.author_name
+                        <div class="archive-master-record">
+                            ${renderMasterCaseCover(
+                                title
                             )}
-                        </p>
 
-                        ${renderSynopsis(title)}
+                            <div class="archive-master-record-copy">
+                                <p class="archive-case-kicker">
+                                    Blackwood Archive
+                                </p>
 
-                        ${renderPublicationMetadata(title)}
+                                <h2
+                                    id="archive-master-case-title-${Number(
+                                        title.id
+                                    )}"
+                                >
+                                    ${escapeHtml(
+                                        title.title
+                                    )}
+                                </h2>
+
+                                ${
+                                    title.subtitle
+                                        ? `
+                                            <p class="archive-master-subtitle">
+                                                ${escapeHtml(
+                                                    title.subtitle
+                                                )}
+                                            </p>
+                                        `
+                                        : ""
+                                }
+
+                                <p class="archive-case-book">
+                                    ${escapeHtml(
+                                        title.author_name
+                                    )}
+                                </p>
+
+                                ${renderMasterPublicationMetadata(
+                                    title
+                                )}
+
+                                ${
+                                    title.synopsis
+                                        ? `
+                                            <div class="archive-case-summary archive-master-synopsis">
+                                                ${formatPlainTextAsHtml(
+                                                    title.synopsis
+                                                )}
+                                            </div>
+                                        `
+                                        : ""
+                                }
+                            </div>
+                        </div>
+
+                        <section
+                            class="archive-case-records"
+                            aria-labelledby="archive-filed-records-${Number(
+                                title.id
+                            )}"
+                        >
+                            <div class="archive-case-records-heading">
+                                <div>
+                                    <p class="archive-case-kicker">
+                                        Filed Material
+                                    </p>
+
+                                    <h3
+                                        id="archive-filed-records-${Number(
+                                            title.id
+                                        )}"
+                                    >
+                                        Associated Records
+                                    </h3>
+                                </div>
+
+                                <span>
+                                    ${escapeHtml(
+                                        formatRecordCount(
+                                            getDisplayedRecordCount(
+                                                title.id,
+                                                entries,
+                                                restrictedCount,
+                                                isCircleSession
+                                            )
+                                        )
+                                    )}
+                                </span>
+                            </div>
+
+                            <div class="archive-case-record-list">
+                                ${
+                                    entries.length
+                                        ? entries
+                                            .map(
+                                                renderCaseRecord
+                                            )
+                                            .join("")
+                                        : `
+                                            <p class="archive-case-empty">
+                                                No public associated
+                                                records are currently
+                                                filed.
+                                            </p>
+                                        `
+                                }
+
+                                ${
+                                    !isCircleSession &&
+                                    restrictedCount > 0
+                                        ? renderCaseRestrictedNotice(
+                                            title,
+                                            restrictedCount
+                                        )
+                                        : ""
+                                }
+                            </div>
+                        </section>
+
+                        <footer class="archive-case-footer">
+                            <span>
+                                Blackwood Publishing Archive
+                            </span>
+
+                            <span>
+                                ${escapeHtml(
+                                    title.archive_code
+                                )}
+                            </span>
+                        </footer>
                     </div>
                 </div>
-
-                ${renderArchiveCabinet(
-                    title,
-                    publicEntries,
-                    circleEntries,
-                    restrictedCount,
-                    displayedRecordCount,
-                    isCircleSession
-                )}
-            </article>
+            </section>
         `;
     }
 
-    function renderCover(title) {
+    // =========================
+    // MASTER PUBLICATION RECORD
+    // =========================
+
+    function renderMasterCaseCover(title) {
         if (!title.cover_image_path) {
             return `
                 <div
-                    class="archive-cover archive-cover-placeholder"
+                    class="archive-master-cover archive-cover-placeholder"
                     aria-hidden="true"
                 >
                     <span>
@@ -470,7 +940,7 @@
         }
 
         return `
-            <figure class="archive-cover">
+            <figure class="archive-master-cover">
                 <img
                     src="${escapeAttribute(
                         title.cover_image_path
@@ -478,28 +948,20 @@
                     alt="${escapeAttribute(
                         `${title.title} by ${title.author_name}`
                     )}"
-                    loading="lazy"
                 >
             </figure>
         `;
     }
 
-    function renderSynopsis(title) {
-        if (!title.synopsis) {
-            return "";
-        }
-
-        return `
-            <div class="archive-synopsis">
-                ${formatPlainTextAsHtml(
-                    title.synopsis
-                )}
-            </div>
-        `;
-    }
-
-    function renderPublicationMetadata(title) {
+    function renderMasterPublicationMetadata(
+        title
+    ) {
         const metadata = [];
+
+        metadata.push({
+            label: "Archive",
+            value: title.archive_code
+        });
 
         metadata.push({
             label: "Status",
@@ -507,6 +969,15 @@
                 title.publication_status
             )
         });
+
+        if (title.series_name) {
+            metadata.push({
+                label: "Series",
+                value: getSeriesLabel(
+                    title
+                )
+            });
+        }
 
         if (title.publication_date) {
             metadata.push({
@@ -517,44 +988,32 @@
             });
         }
 
-        if (title.series_name) {
-            const seriesPosition =
-                Number(title.series_position) > 0
-                    ? ` · Book ${Number(
-                        title.series_position
-                    )}`
-                    : "";
-
-            metadata.push({
-                label: "Series",
-                value:
-                    `${title.series_name}${seriesPosition}`
-            });
-        }
-
         if (title.isbn_paperback) {
             metadata.push({
                 label: "Paperback ISBN",
-                value: title.isbn_paperback
+                value:
+                    title.isbn_paperback
             });
         }
 
         if (title.isbn_hardback) {
             metadata.push({
                 label: "Hardback ISBN",
-                value: title.isbn_hardback
+                value:
+                    title.isbn_hardback
             });
         }
 
         if (title.isbn_ebook) {
             metadata.push({
                 label: "eBook ISBN",
-                value: title.isbn_ebook
+                value:
+                    title.isbn_ebook
             });
         }
 
         return `
-            <dl class="archive-metadata">
+            <dl class="archive-case-details archive-master-details">
                 ${metadata
                     .map(function (item) {
                         return `
@@ -579,139 +1038,13 @@
     }
 
     // =========================
-    // ARCHIVE CABINET
+    // FILED RECORDS INSIDE CASE
     // =========================
 
-    function renderArchiveCabinet(
-        title,
-        publicEntries,
-        circleEntries,
-        restrictedCount,
-        displayedRecordCount,
-        isCircleSession
-    ) {
-        const visibleEntries =
-            isCircleSession
-                ? publicEntries.concat(circleEntries)
-                : publicEntries;
-
-        const sortedEntries =
-            visibleEntries
-                .slice()
-                .sort(function (a, b) {
-                    return (
-                        Number(a.sort_order || 0) -
-                        Number(b.sort_order || 0)
-                    );
-                });
-
-        const hasRestrictedDrawer =
-            !isCircleSession &&
-            Number(restrictedCount || 0) > 0;
-
-        const hasAnyDrawer =
-            sortedEntries.length > 0 ||
-            hasRestrictedDrawer;
-
-        return `
-            <section
-                class="archive-associated-records archive-cabinet-section"
-                aria-labelledby="archive-associated-${Number(
-                    title.id
-                )}"
-            >
-                <div class="archive-associated-heading">
-                    <div>
-                        <p class="archive-kicker">
-                            Filed Material
-                        </p>
-
-                        <h3
-                            id="archive-associated-${Number(
-                                title.id
-                            )}"
-                        >
-                            Associated Records
-                        </h3>
-
-                        <p class="archive-cabinet-intro">
-                            Additional material associated with this
-                            publication, held in the Blackwood Archive.
-                            Open a drawer to view the file.
-                        </p>
-                    </div>
-
-                    <span>
-                        ${escapeHtml(
-                            formatRecordCount(
-                                displayedRecordCount
-                            )
-                        )}
-                    </span>
-                </div>
-
-                ${
-                    hasAnyDrawer
-                        ? `
-                            <div
-                                class="archive-cabinet"
-                                data-archive-cabinet="${Number(
-                                    title.id
-                                )}"
-                            >
-                                <div
-                                    class="archive-cabinet-top"
-                                    aria-hidden="true"
-                                ></div>
-
-                                <div class="archive-cabinet-body">
-                                    ${sortedEntries
-                                        .map(function (entry) {
-                                            return renderArchiveDrawer(
-                                                entry,
-                                                title
-                                            );
-                                        })
-                                        .join("")}
-
-                                    ${
-                                        hasRestrictedDrawer
-                                            ? renderRestrictedDrawer(
-                                                title,
-                                                restrictedCount
-                                            )
-                                            : ""
-                                    }
-                                </div>
-
-                                <div
-                                    class="archive-cabinet-base"
-                                    aria-hidden="true"
-                                ></div>
-                            </div>
-                        `
-                        : `
-                            <p class="archive-muted">
-                                No associated records are currently filed.
-                            </p>
-                        `
-                }
-            </section>
-        `;
-    }
-
-    function renderArchiveDrawer(entry, title) {
-        const entryId =
-            Number(entry.id);
-
+    function renderCaseRecord(entry) {
         const reference =
             getEntryReference(
                 entry.entry_code
-            );
-
-        const type =
-            formatEntryType(
-                entry.entry_type
             );
 
         const status =
@@ -725,674 +1058,75 @@
             );
 
         return `
-            <div
-                class="archive-drawer-shell is-${escapeAttribute(
+            <article
+                class="archive-case-record is-${escapeAttribute(
                     statusClass
                 )}"
             >
-                <button
-                    class="archive-drawer"
-                    type="button"
-                    data-archive-entry-id="${entryId}"
-                    aria-haspopup="dialog"
-                    aria-expanded="false"
-                    aria-label="${escapeAttribute(
-                        `Open ${reference} ${type}`
-                    )}"
-                >
-                    <span
-                        class="archive-drawer-pull"
-                        aria-hidden="true"
-                    >
-                        <span></span>
-                    </span>
-
-                    <span class="archive-drawer-label">
-                        <span class="archive-drawer-reference">
-                            ${escapeHtml(reference)}
-                        </span>
-
-                        <span class="archive-drawer-title">
+                <header class="archive-case-record-header">
+                    <div class="archive-case-record-reference">
+                        <span>
                             ${escapeHtml(
-                                getDrawerLabel(entry)
+                                reference
                             )}
                         </span>
 
-                        <span class="archive-drawer-book">
-                            ${escapeHtml(title.title)}
-                        </span>
-                    </span>
+                        <small>
+                            ${escapeHtml(
+                                formatEntryType(
+                                    entry.entry_type
+                                )
+                            )}
+                        </small>
+                    </div>
 
                     <span
-                        class="archive-drawer-status is-${escapeAttribute(
+                        class="archive-case-record-status is-${escapeAttribute(
                             statusClass
                         )}"
                     >
-                        ${escapeHtml(status)}
-                    </span>
-                </button>
-            </div>
-        `;
-    }
-
-    function renderRestrictedDrawer(
-        title,
-        restrictedCount
-    ) {
-        const count =
-            Number(restrictedCount || 0);
-
-        if (count < 1) {
-            return "";
-        }
-
-        const recordText =
-            count === 1
-                ? "1 additional record held"
-                : `${count} additional records held`;
-
-        return `
-            <div
-                class="archive-drawer-shell archive-drawer-shell-restricted"
-            >
-                <button
-                    class="archive-drawer archive-drawer-restricted"
-                    type="button"
-                    data-archive-restricted-title-id="${Number(
-                        title.id
-                    )}"
-                    aria-haspopup="dialog"
-                    aria-expanded="false"
-                    aria-label="Open restricted files notice"
-                >
-                    <span
-                        class="archive-drawer-pull"
-                        aria-hidden="true"
-                    >
-                        <span></span>
-                    </span>
-
-                    <span class="archive-drawer-label">
-                        <span class="archive-drawer-reference">
-                            Restricted
-                        </span>
-
-                        <span class="archive-drawer-title">
-                            Restricted Files
-                        </span>
-
-                        <span class="archive-drawer-book">
-                            ${escapeHtml(recordText)}
-                        </span>
-                    </span>
-
-                    <span class="archive-drawer-status is-restricted">
-                        Circle
-                    </span>
-                </button>
-            </div>
-        `;
-    }
-
-    function getDrawerLabel(entry) {
-        const type =
-            String(entry.entry_type || "")
-                .toLowerCase();
-
-        const labels = {
-            history: "Publication Record",
-            photograph: "Photographic Record",
-            manuscript: "Manuscript File",
-            deleted_material: "Deleted Material",
-            author_note: "Author Note",
-            production_note: "Production Note",
-            edition: "Edition Record",
-            audio: "Audio Record",
-            document: "Document File",
-            other: "Archive Record"
-        };
-
-        return labels[type] ||
-            formatEntryType(type);
-    }
-
-    // =========================
-    // CABINET EVENTS
-    // =========================
-
-    function bindArchiveCabinets() {
-        if (!BlackwoodArchiveState.app) {
-            return;
-        }
-
-        const drawers =
-            BlackwoodArchiveState.app
-                .querySelectorAll(
-                    ".archive-drawer[data-archive-entry-id]"
-                );
-
-        drawers.forEach(function (drawer) {
-            drawer.addEventListener(
-                "click",
-                function () {
-                    const entryId =
-                        Number(
-                            drawer.dataset.archiveEntryId
-                        );
-
-                    openArchiveDrawer(
-                        drawer,
-                        entryId
-                    );
-                }
-            );
-        });
-
-        const restrictedDrawers =
-            BlackwoodArchiveState.app
-                .querySelectorAll(
-                    ".archive-drawer[data-archive-restricted-title-id]"
-                );
-
-        restrictedDrawers.forEach(function (drawer) {
-            drawer.addEventListener(
-                "click",
-                function () {
-                    const titleId =
-                        Number(
-                            drawer.dataset
-                                .archiveRestrictedTitleId
-                        );
-
-                    openRestrictedDrawer(
-                        drawer,
-                        titleId
-                    );
-                }
-            );
-        });
-    }
-
-    function openArchiveDrawer(
-        drawer,
-        entryId
-    ) {
-        const entry =
-            getEntryById(entryId);
-
-        if (!entry) {
-            console.warn(
-                "Blackwood Archive: entry not found.",
-                entryId
-            );
-            return;
-        }
-
-        closeActiveDrawer();
-
-        BlackwoodArchiveState.activeDrawer =
-            drawer;
-
-        BlackwoodArchiveState.activeEntryId =
-            entryId;
-
-        BlackwoodArchiveState.lastFocusedElement =
-            drawer;
-
-        drawer.classList.add("is-open");
-        drawer.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-        const shell =
-            drawer.closest(
-                ".archive-drawer-shell"
-            );
-
-        if (shell) {
-            shell.classList.add("is-open");
-        }
-
-        /*
-         * The short delay allows the drawer movement
-         * to begin before the case file appears.
-         */
-        window.setTimeout(
-            function () {
-                if (
-                    BlackwoodArchiveState.activeEntryId !==
-                    entryId
-                ) {
-                    return;
-                }
-
-                openCaseFile(entry);
-            },
-            260
-        );
-    }
-
-    function openRestrictedDrawer(
-        drawer,
-        titleId
-    ) {
-        const title =
-            getTitleById(titleId);
-
-        if (!title) {
-            return;
-        }
-
-        closeActiveDrawer();
-
-        BlackwoodArchiveState.activeDrawer =
-            drawer;
-
-        BlackwoodArchiveState.activeEntryId =
-            null;
-
-        BlackwoodArchiveState.lastFocusedElement =
-            drawer;
-
-        drawer.classList.add("is-open");
-        drawer.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-        const shell =
-            drawer.closest(
-                ".archive-drawer-shell"
-            );
-
-        if (shell) {
-            shell.classList.add("is-open");
-        }
-
-        window.setTimeout(
-            function () {
-                if (
-                    BlackwoodArchiveState.activeDrawer !==
-                    drawer
-                ) {
-                    return;
-                }
-
-                openRestrictedCaseFile(
-                    title
-                );
-            },
-            260
-        );
-    }
-
-    function closeActiveDrawer() {
-        const drawer =
-            BlackwoodArchiveState.activeDrawer;
-
-        if (!drawer) {
-            return;
-        }
-
-        drawer.classList.remove("is-open");
-
-        drawer.setAttribute(
-            "aria-expanded",
-            "false"
-        );
-
-        const shell =
-            drawer.closest(
-                ".archive-drawer-shell"
-            );
-
-        if (shell) {
-            shell.classList.remove("is-open");
-        }
-
-        BlackwoodArchiveState.activeDrawer =
-            null;
-
-        BlackwoodArchiveState.activeEntryId =
-            null;
-    }
-
-    // =========================
-    // CASE FILE MODAL
-    // =========================
-
-    function openCaseFile(entry) {
-        const title =
-            getTitleById(
-                entry.title_id
-            );
-
-        if (!title) {
-            return;
-        }
-
-        removeExistingModal();
-
-        const modal =
-            document.createElement("div");
-
-        modal.className =
-            "archive-case-modal";
-
-        modal.dataset.archiveCaseModal =
-            "true";
-
-        modal.innerHTML =
-            renderCaseFileModal(
-                entry,
-                title
-            );
-
-        document.body.appendChild(modal);
-
-        BlackwoodArchiveState.modal =
-            modal;
-
-        document.body.classList.add(
-            "archive-case-is-open"
-        );
-
-        bindCaseFileModal(modal);
-
-        window.requestAnimationFrame(
-            function () {
-                modal.classList.add(
-                    "is-visible"
-                );
-            }
-        );
-
-        const closeButton =
-            modal.querySelector(
-                ".archive-case-close"
-            );
-
-        if (closeButton) {
-            closeButton.focus();
-        }
-    }
-
-    function openRestrictedCaseFile(title) {
-        const restrictedCount =
-            getRestrictedCountForTitle(
-                title.id
-            );
-
-        removeExistingModal();
-
-        const modal =
-            document.createElement("div");
-
-        modal.className =
-            "archive-case-modal";
-
-        modal.dataset.archiveCaseModal =
-            "true";
-
-        modal.innerHTML =
-            renderRestrictedCaseFileModal(
-                title,
-                restrictedCount
-            );
-
-        document.body.appendChild(modal);
-
-        BlackwoodArchiveState.modal =
-            modal;
-
-        document.body.classList.add(
-            "archive-case-is-open"
-        );
-
-        bindCaseFileModal(modal);
-
-        window.requestAnimationFrame(
-            function () {
-                modal.classList.add(
-                    "is-visible"
-                );
-            }
-        );
-
-        const closeButton =
-            modal.querySelector(
-                ".archive-case-close"
-            );
-
-        if (closeButton) {
-            closeButton.focus();
-        }
-    }
-
-    function renderCaseFileModal(
-        entry,
-        title
-    ) {
-        const reference =
-            getEntryReference(
-                entry.entry_code
-            );
-
-        const status =
-            formatStatus(
-                entry.entry_status
-            );
-
-        const statusClass =
-            normaliseStatusClass(
-                entry.entry_status
-            );
-
-        return `
-            <div
-                class="archive-case-backdrop"
-                data-archive-case-close
-                aria-hidden="true"
-            ></div>
-
-            <section
-                class="archive-case-window"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="archive-case-title-${Number(
-                    entry.id
-                )}"
-            >
-                <button
-                    class="archive-case-close"
-                    type="button"
-                    data-archive-case-close
-                    aria-label="Close archive case file"
-                >
-                    <span aria-hidden="true">
-                        ×
-                    </span>
-                </button>
-
-                <div
-                    class="archive-case-folder"
-                >
-                    <div
-                        class="archive-case-folder-tab"
-                        aria-hidden="true"
-                    >
-                        BLACKWOOD ARCHIVE
-                    </div>
-
-                    <div class="archive-case-paper">
-                        <header class="archive-case-header">
-                            <div class="archive-case-reference">
-                                <span>
-                                    ${escapeHtml(
-                                        title.archive_code
-                                    )}
-                                    /
-                                    ${escapeHtml(
-                                        reference
-                                    )}
-                                </span>
-
-                                <strong>
-                                    Case File
-                                </strong>
-                            </div>
-
-                            <span
-                                class="archive-case-status is-${escapeAttribute(
-                                    statusClass
-                                )}"
-                            >
-                                ${escapeHtml(
-                                    status
-                                )}
-                            </span>
-                        </header>
-
-                        <div class="archive-case-heading">
-                            <p class="archive-case-kicker">
-                                ${escapeHtml(
-                                    formatEntryType(
-                                        entry.entry_type
-                                    )
-                                )}
-                            </p>
-
-                            <h2
-                                id="archive-case-title-${Number(
-                                    entry.id
-                                )}"
-                            >
-                                ${escapeHtml(
-                                    entry.title
-                                )}
-                            </h2>
-
-                            <p class="archive-case-book">
-                                ${escapeHtml(
-                                    title.title
-                                )}
-                            </p>
-                        </div>
-
-                        ${renderCaseFileDetails(
-                            entry,
-                            title
+                        ${escapeHtml(
+                            status
                         )}
+                    </span>
+                </header>
 
-                        ${
-                            entry.summary
-                                ? `
-                                    <div class="archive-case-summary">
-                                        <p>
-                                            ${escapeHtml(
-                                                entry.summary
-                                            )}
-                                        </p>
-                                    </div>
-                                `
-                                : ""
-                        }
+                <div class="archive-case-record-content">
+                    <h4>
+                        ${escapeHtml(
+                            entry.title
+                        )}
+                    </h4>
 
-                        ${
-                            entry.body
-                                ? `
-                                    <div class="archive-case-body">
-                                        ${formatPlainTextAsHtml(
-                                            entry.body
-                                        )}
-                                    </div>
-                                `
-                                : ""
-                        }
+                    ${
+                        entry.summary
+                            ? `
+                                <p class="archive-case-record-summary">
+                                    ${escapeHtml(
+                                        entry.summary
+                                    )}
+                                </p>
+                            `
+                            : ""
+                    }
 
-                        ${renderCaseFileMedia(entry)}
+                    ${
+                        entry.body
+                            ? `
+                                <div class="archive-case-record-body">
+                                    ${formatPlainTextAsHtml(
+                                        entry.body
+                                    )}
+                                </div>
+                            `
+                            : ""
+                    }
 
-                        <footer class="archive-case-footer">
-                            <span>
-                                Blackwood Publishing Archive
-                            </span>
-
-                            <span>
-                                ${escapeHtml(
-                                    entry.entry_code
-                                )}
-                            </span>
-                        </footer>
-                    </div>
+                    ${renderCaseFileMedia(
+                        entry
+                    )}
                 </div>
-            </section>
-        `;
-    }
-
-    function renderCaseFileDetails(
-        entry,
-        title
-    ) {
-        const details = [];
-
-        details.push({
-            label: "Archive",
-            value: title.archive_code
-        });
-
-        details.push({
-            label: "Reference",
-            value: getEntryReference(
-                entry.entry_code
-            )
-        });
-
-        details.push({
-            label: "Classification",
-            value: formatEntryType(
-                entry.entry_type
-            )
-        });
-
-        details.push({
-            label: "Status",
-            value: formatStatus(
-                entry.entry_status
-            )
-        });
-
-        if (entry.occurred_at) {
-            details.push({
-                label: "Record Date",
-                value: formatDate(
-                    entry.occurred_at
-                )
-            });
-        }
-
-        return `
-            <dl class="archive-case-details">
-                ${details
-                    .map(function (detail) {
-                        return `
-                            <div>
-                                <dt>
-                                    ${escapeHtml(
-                                        detail.label
-                                    )}
-                                </dt>
-
-                                <dd>
-                                    ${escapeHtml(
-                                        detail.value
-                                    )}
-                                </dd>
-                            </div>
-                        `;
-                    })
-                    .join("")}
-            </dl>
+            </article>
         `;
     }
 
@@ -1403,17 +1137,24 @@
             );
         }
 
-        if (entry.entry_type === "photograph") {
+        if (
+            entry.entry_type ===
+            "photograph"
+        ) {
             return `
-                <figure class="archive-case-media archive-case-photograph">
+                <figure
+                    class="archive-case-media archive-case-photograph"
+                >
                     <div class="archive-case-photo-mount">
                         <img
                             src="${escapeAttribute(
                                 entry.media_path
                             )}"
                             alt="${escapeAttribute(
-                                entry.media_alt || ""
+                                entry.media_alt ||
+                                ""
                             )}"
+                            loading="lazy"
                         >
                     </div>
 
@@ -1432,7 +1173,10 @@
             `;
         }
 
-        if (entry.entry_type === "audio") {
+        if (
+            entry.entry_type ===
+            "audio"
+        ) {
             return `
                 <section class="archive-case-audio">
                     <p class="archive-case-audio-label">
@@ -1468,11 +1212,15 @@
         `;
     }
 
-    function renderMissingCaseMaterial(entry) {
+    function renderMissingCaseMaterial(
+        entry
+    ) {
         const status =
             String(
                 entry.entry_status || ""
-            ).toLowerCase();
+            )
+                .trim()
+                .toLowerCase();
 
         if (status !== "missing") {
             return "";
@@ -1502,136 +1250,77 @@
         `;
     }
 
-    function renderRestrictedCaseFileModal(
+    // =========================
+    // PUBLIC RESTRICTED NOTICE
+    // =========================
+
+    function renderCaseRestrictedNotice(
         title,
         restrictedCount
     ) {
         const count =
-            Number(restrictedCount || 0);
+            Number(
+                restrictedCount || 0
+            );
+
+        if (count < 1) {
+            return "";
+        }
 
         const recordText =
             count === 1
                 ? "1 additional record is held"
                 : `${count} additional records are held`;
 
+        /*
+         * IMPORTANT:
+         *
+         * This public notice uses only:
+         * - the public title
+         * - the safe aggregate count
+         *
+         * It never receives or renders restricted
+         * entry IDs, codes, types, titles, summaries,
+         * body text or media paths.
+         */
         return `
-            <div
-                class="archive-case-backdrop"
-                data-archive-case-close
-                aria-hidden="true"
-            ></div>
-
-            <section
-                class="archive-case-window archive-case-window-restricted"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="archive-restricted-case-title-${Number(
-                    title.id
-                )}"
-            >
-                <button
-                    class="archive-case-close"
-                    type="button"
-                    data-archive-case-close
-                    aria-label="Close restricted archive notice"
+            <aside class="archive-case-restricted-message">
+                <div
+                    class="archive-case-restricted-mark"
+                    aria-hidden="true"
                 >
-                    <span aria-hidden="true">
-                        ×
-                    </span>
-                </button>
-
-                <div class="archive-case-folder">
-                    <div
-                        class="archive-case-folder-tab"
-                        aria-hidden="true"
-                    >
-                        RESTRICTED FILE
-                    </div>
-
-                    <div class="archive-case-paper">
-                        <header class="archive-case-header">
-                            <div class="archive-case-reference">
-                                <span>
-                                    ${escapeHtml(
-                                        title.archive_code
-                                    )}
-                                </span>
-
-                                <strong>
-                                    Restricted Material
-                                </strong>
-                            </div>
-
-                            <span
-                                class="archive-case-status is-restricted"
-                            >
-                                Restricted
-                            </span>
-                        </header>
-
-                        <div class="archive-case-heading">
-                            <p class="archive-case-kicker">
-                                Blackwood Circle
-                            </p>
-
-                            <h2
-                                id="archive-restricted-case-title-${Number(
-                                    title.id
-                                )}"
-                            >
-                                Restricted Files
-                            </h2>
-
-                            <p class="archive-case-book">
-                                ${escapeHtml(
-                                    title.title
-                                )}
-                            </p>
-                        </div>
-
-                        <div class="archive-case-restricted-message">
-                            <div
-                                class="archive-case-restricted-mark"
-                                aria-hidden="true"
-                            >
-                                BW
-                            </div>
-
-                            <p>
-                                ${escapeHtml(
-                                    recordText
-                                )} in the Blackwood Archive
-                                under Circle access.
-                            </p>
-
-                            <p>
-                                File references and classifications
-                                remain sealed until authorised access
-                                is established.
-                            </p>
-
-                            <a
-                                href="${escapeAttribute(
-                                    BLACKWOOD_ARCHIVE_CONFIG
-                                        .membersPagePath
-                                )}"
-                            >
-                                Blackwood Circle access
-                            </a>
-                        </div>
-
-                        <footer class="archive-case-footer">
-                            <span>
-                                Blackwood Publishing Archive
-                            </span>
-
-                            <span>
-                                Restricted
-                            </span>
-                        </footer>
-                    </div>
+                    BW
                 </div>
-            </section>
+
+                <div>
+                    <p class="archive-case-kicker">
+                        Restricted Material
+                    </p>
+
+                    <h4>
+                        ${escapeHtml(
+                            recordText
+                        )}
+                    </h4>
+
+                    <p>
+                        Selected material associated with
+                        ${escapeHtml(
+                            title.title
+                        )} is held under Blackwood Circle
+                        access.
+                    </p>
+
+                    <a
+                        href="${escapeAttribute(
+                            BLACKWOOD_ARCHIVE_CONFIG
+                                .membersPagePath
+                        )}"
+                    >
+                        Blackwood Circle access
+                    </a>
+                </div>
+            </aside>
         `;
     }
 
@@ -1650,7 +1339,9 @@
                 control.addEventListener(
                     "click",
                     function () {
-                        closeCaseFile(true);
+                        closeCaseFile(
+                            true
+                        );
                     }
                 );
             }
@@ -1667,7 +1358,11 @@
             event.key === "Escape"
         ) {
             event.preventDefault();
-            closeCaseFile(true);
+
+            closeCaseFile(
+                true
+            );
+
             return;
         }
 
@@ -1685,13 +1380,16 @@
                 );
 
         const items =
-            Array.from(focusable)
-                .filter(function (element) {
+            Array.from(
+                focusable
+            ).filter(
+                function (element) {
                     return (
                         element.offsetWidth > 0 ||
                         element.offsetHeight > 0
                     );
-                });
+                }
+            );
 
         if (!items.length) {
             return;
@@ -1701,11 +1399,14 @@
             items[0];
 
         const last =
-            items[items.length - 1];
+            items[
+                items.length - 1
+            ];
 
         if (
             event.shiftKey &&
-            document.activeElement === first
+            document.activeElement ===
+                first
         ) {
             event.preventDefault();
             last.focus();
@@ -1714,7 +1415,8 @@
 
         if (
             !event.shiftKey &&
-            document.activeElement === last
+            document.activeElement ===
+                last
         ) {
             event.preventDefault();
             first.focus();
@@ -1724,15 +1426,38 @@
     function closeCaseFile(
         restoreFocus
     ) {
+        clearOpenTimer();
+
         const modal =
             BlackwoodArchiveState.modal;
 
+        const focusTarget =
+            BlackwoodArchiveState
+                .lastFocusedElement;
+
         if (!modal) {
             closeActiveDrawer();
+
+            if (
+                restoreFocus &&
+                focusTarget &&
+                document.contains(
+                    focusTarget
+                )
+            ) {
+                focusTarget.focus();
+            }
+
+            BlackwoodArchiveState
+                .lastFocusedElement =
+                null;
+
             return;
         }
 
-        stopModalAudio(modal);
+        stopModalAudio(
+            modal
+        );
 
         modal.classList.remove(
             "is-visible"
@@ -1742,61 +1467,74 @@
             "archive-case-is-open"
         );
 
-        const focusTarget =
-            BlackwoodArchiveState
-                .lastFocusedElement;
+        const delay =
+            prefersReducedMotion()
+                ? 0
+                : 220;
 
-        window.setTimeout(
-            function () {
-                if (
-                    modal.parentNode
-                ) {
-                    modal.parentNode.removeChild(
+        clearCloseTimer();
+
+        BlackwoodArchiveState.closeTimer =
+            window.setTimeout(
+                function () {
+                    if (
+                        modal.parentNode
+                    ) {
+                        modal.parentNode
+                            .removeChild(
+                                modal
+                            );
+                    }
+
+                    if (
+                        BlackwoodArchiveState
+                            .modal ===
                         modal
-                    );
-                }
+                    ) {
+                        BlackwoodArchiveState
+                            .modal =
+                            null;
+                    }
 
-                if (
-                    BlackwoodArchiveState.modal ===
-                    modal
-                ) {
-                    BlackwoodArchiveState.modal =
+                    closeActiveDrawer();
+
+                    if (
+                        restoreFocus &&
+                        focusTarget &&
+                        document.contains(
+                            focusTarget
+                        )
+                    ) {
+                        focusTarget.focus();
+                    }
+
+                    BlackwoodArchiveState
+                        .lastFocusedElement =
                         null;
-                }
 
-                closeActiveDrawer();
-
-                if (
-                    restoreFocus &&
-                    focusTarget &&
-                    document.contains(
-                        focusTarget
-                    )
-                ) {
-                    focusTarget.focus();
-                }
-
-                BlackwoodArchiveState
-                    .lastFocusedElement =
+                    BlackwoodArchiveState
+                        .closeTimer =
                         null;
-            },
-            220
-        );
+                },
+                delay
+            );
     }
 
     function removeExistingModal() {
+        clearCloseTimer();
+
         const existing =
             document.querySelector(
                 "[data-archive-case-modal]"
             );
 
-        if (!existing) {
-            return;
+        if (existing) {
+            stopModalAudio(
+                existing
+            );
+
+            existing.remove();
         }
-
-        stopModalAudio(existing);
-
-        existing.remove();
 
         BlackwoodArchiveState.modal =
             null;
@@ -1816,12 +1554,14 @@
             function (audio) {
                 try {
                     audio.pause();
-                    audio.currentTime = 0;
+
+                    audio.currentTime =
+                        0;
                 } catch (error) {
                     /*
-                     * Nothing needs to happen here.
-                     * Some browsers may not allow currentTime
-                     * changes before media metadata is loaded.
+                     * Some browsers will not allow
+                     * currentTime to be changed before
+                     * media metadata has loaded.
                      */
                 }
             }
@@ -1829,66 +1569,132 @@
     }
 
     // =========================
-    // HELPERS
+    // DATA HELPERS
     // =========================
 
     function isSignedInCircleMember() {
         return Boolean(
             BlackwoodArchiveState.session &&
-            BlackwoodArchiveState.session.user
+            BlackwoodArchiveState
+                .session.user
         );
     }
 
-    function getEntriesForTitle(titleId) {
-        return BlackwoodArchiveState.entries
-            .filter(function (entry) {
-                return (
-                    Number(entry.title_id) ===
-                    Number(titleId)
-                );
-            });
-    }
-
-    function getEntryById(entryId) {
-        return BlackwoodArchiveState.entries
-            .find(function (entry) {
-                return (
-                    Number(entry.id) ===
-                    Number(entryId)
-                );
-            }) || null;
-    }
-
-    function getTitleById(titleId) {
-        return BlackwoodArchiveState.titles
-            .find(function (title) {
-                return (
-                    Number(title.id) ===
-                    Number(titleId)
-                );
-            }) || null;
-    }
-
-    function getRestrictedCountForTitle(titleId) {
-        const record =
-            BlackwoodArchiveState.restrictedCounts
-                .find(function (item) {
+    function getEntriesForTitle(
+        titleId
+    ) {
+        return BlackwoodArchiveState
+            .entries
+            .filter(
+                function (entry) {
                     return (
-                        Number(item.title_id) ===
-                        Number(titleId)
+                        Number(
+                            entry.title_id
+                        ) ===
+                        Number(
+                            titleId
+                        )
                     );
-                });
+                }
+            );
+    }
+
+    function getTitleById(
+        titleId
+    ) {
+        return BlackwoodArchiveState
+            .titles
+            .find(
+                function (title) {
+                    return (
+                        Number(
+                            title.id
+                        ) ===
+                        Number(
+                            titleId
+                        )
+                    );
+                }
+            ) || null;
+    }
+
+    function getRestrictedCountForTitle(
+        titleId
+    ) {
+        const record =
+            BlackwoodArchiveState
+                .restrictedCounts
+                .find(
+                    function (item) {
+                        return (
+                            Number(
+                                item.title_id
+                            ) ===
+                            Number(
+                                titleId
+                            )
+                        );
+                    }
+                );
 
         return record
             ? Number(
-                record.restricted_count || 0
+                record.restricted_count ||
+                0
             )
             : 0;
     }
 
-    function getEntryReference(entryCode) {
+    function getDisplayedRecordCount(
+        titleId,
+        entries,
+        restrictedCount,
+        isCircleSession
+    ) {
+        /*
+         * Signed-in:
+         * Count the records actually returned by RLS.
+         *
+         * Signed-out:
+         * Keep the public record count public-safe.
+         * The restricted aggregate is represented
+         * separately by the restricted notice.
+         */
+        if (isCircleSession) {
+            return entries.length;
+        }
+
+        return entries.length;
+    }
+
+    function getSeriesLabel(title) {
+        if (!title.series_name) {
+            return "";
+        }
+
+        if (
+            Number(
+                title.series_position
+            ) > 0
+        ) {
+            return (
+                `${title.series_name} · ` +
+                `Book ${Number(
+                    title.series_position
+                )}`
+            );
+        }
+
+        return title.series_name;
+    }
+
+    function getEntryReference(
+        entryCode
+    ) {
         const code =
-            String(entryCode || "");
+            String(
+                entryCode || ""
+            );
 
         if (!code) {
             return "UNFILED";
@@ -1898,38 +1704,76 @@
             code.split("/");
 
         return parts.length > 1
-            ? parts[parts.length - 1]
+            ? parts[
+                parts.length - 1
+            ]
             : code;
     }
 
-    function formatRecordCount(count) {
+    // =========================
+    // FORMATTERS
+    // =========================
+
+    function formatPublicationCount(
+        count
+    ) {
         const cleanCount =
-            Number(count || 0);
+            Number(
+                count || 0
+            );
+
+        return cleanCount === 1
+            ? "1 publication"
+            : `${cleanCount} publications`;
+    }
+
+    function formatRecordCount(
+        count
+    ) {
+        const cleanCount =
+            Number(
+                count || 0
+            );
 
         return cleanCount === 1
             ? "1 record"
             : `${cleanCount} records`;
     }
 
-    function formatEntryType(value) {
+    function formatEntryType(
+        value
+    ) {
         const cleanValue =
-            String(value || "record")
+            String(
+                value || "record"
+            )
                 .trim()
-                .replace(/_/g, " ");
+                .replace(
+                    /_/g,
+                    " "
+                );
 
         return cleanValue.replace(
             /\b\w/g,
             function (character) {
-                return character.toUpperCase();
+                return character
+                    .toUpperCase();
             }
         );
     }
 
-    function formatStatus(value) {
+    function formatStatus(
+        value
+    ) {
         const cleanValue =
-            String(value || "")
+            String(
+                value || ""
+            )
                 .trim()
-                .replace(/_/g, " ");
+                .replace(
+                    /_/g,
+                    " "
+                );
 
         if (!cleanValue) {
             return "Filed";
@@ -1938,17 +1782,28 @@
         return cleanValue.replace(
             /\b\w/g,
             function (character) {
-                return character.toUpperCase();
+                return character
+                    .toUpperCase();
             }
         );
     }
 
-    function normaliseStatusClass(value) {
-        return String(value || "filed")
+    function normaliseStatusClass(
+        value
+    ) {
+        return String(
+            value || "filed"
+        )
             .trim()
             .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "");
+            .replace(
+                /[^a-z0-9]+/g,
+                "-"
+            )
+            .replace(
+                /^-+|-+$/g,
+                ""
+            );
     }
 
     function formatDate(value) {
@@ -1979,27 +1834,85 @@
         );
     }
 
-    function formatPlainTextAsHtml(value) {
+    function formatPlainTextAsHtml(
+        value
+    ) {
         const text =
-            escapeHtml(value || "");
+            escapeHtml(
+                value || ""
+            );
 
         if (!text) {
             return "";
         }
 
         return text
-            .split(/\n{2,}/)
-            .map(function (paragraph) {
-                return `
-                    <p>
-                        ${paragraph.replace(
-                            /\n/g,
-                            "<br>"
-                        )}
-                    </p>
-                `;
-            })
+            .split(
+                /\n{2,}/
+            )
+            .map(
+                function (paragraph) {
+                    return `
+                        <p>
+                            ${paragraph.replace(
+                                /\n/g,
+                                "<br>"
+                            )}
+                        </p>
+                    `;
+                }
+            )
             .join("");
+    }
+
+    // =========================
+    // TIMING
+    // =========================
+
+    function prefersReducedMotion() {
+        return Boolean(
+            window.matchMedia &&
+            window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches
+        );
+    }
+
+    function clearOpenTimer() {
+        if (
+            BlackwoodArchiveState
+                .openTimer
+        ) {
+            window.clearTimeout(
+                BlackwoodArchiveState
+                    .openTimer
+            );
+
+            BlackwoodArchiveState
+                .openTimer =
+                null;
+        }
+    }
+
+    function clearCloseTimer() {
+        if (
+            BlackwoodArchiveState
+                .closeTimer
+        ) {
+            window.clearTimeout(
+                BlackwoodArchiveState
+                    .closeTimer
+            );
+
+            BlackwoodArchiveState
+                .closeTimer =
+                null;
+        }
+    }
+
+    function clearTimers() {
+        clearOpenTimer();
+        clearCloseTimer();
     }
 
     // =========================
@@ -2007,7 +1920,9 @@
     // =========================
 
     function renderLoadingState() {
-        if (!BlackwoodArchiveState.app) {
+        if (
+            !BlackwoodArchiveState.app
+        ) {
             return;
         }
 
@@ -2028,8 +1943,12 @@
         `;
     }
 
-    function renderErrorState(message) {
-        if (!BlackwoodArchiveState.app) {
+    function renderErrorState(
+        message
+    ) {
+        if (
+            !BlackwoodArchiveState.app
+        ) {
             return;
         }
 
@@ -2044,7 +1963,9 @@
                 </h2>
 
                 <p>
-                    ${escapeHtml(message)}
+                    ${escapeHtml(
+                        message
+                    )}
                 </p>
             </section>
         `;
@@ -2055,17 +1976,40 @@
     // =========================
 
     function escapeHtml(value) {
-        return String(value || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+        return String(
+            value || ""
+        )
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
     }
 
-    function escapeAttribute(value) {
-        return escapeHtml(value)
-            .replace(/`/g, "&#096;");
+    function escapeAttribute(
+        value
+    ) {
+        return escapeHtml(
+            value
+        ).replace(
+            /`/g,
+            "&#096;"
+        );
     }
 
 })();
