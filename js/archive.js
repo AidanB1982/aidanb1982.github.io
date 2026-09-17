@@ -779,9 +779,6 @@
                         </header>
 
                         <div class="archive-master-record">
-                            ${renderMasterCaseCover(
-                                title
-                            )}
 
                             <div class="archive-master-record-copy">
                                 <p class="archive-case-kicker">
@@ -832,6 +829,11 @@
                                         : ""
                                 }
                             </div>
+
+                            ${renderMasterCaseCover(
+                                title
+                            )}
+
                         </div>
 
                         <section
@@ -922,34 +924,70 @@
     function renderMasterCaseCover(title) {
         if (!title.cover_image_path) {
             return `
-                <div
-                    class="archive-master-cover archive-cover-placeholder"
-                    aria-hidden="true"
-                >
-                    <span>
-                        ${escapeHtml(
-                            title.archive_code
-                        )}
-                    </span>
+                <div class="archive-master-evidence">
+                    <div
+                        class="archive-master-cover archive-polaroid archive-cover-placeholder"
+                        aria-hidden="true"
+                    >
+                        <span
+                            class="archive-paperclip"
+                            aria-hidden="true"
+                        ></span>
 
-                    <strong>
-                        Blackwood
-                    </strong>
+                        <div class="archive-polaroid-placeholder">
+                            <span>
+                                ${escapeHtml(
+                                    title.archive_code
+                                )}
+                            </span>
+
+                            <strong>
+                                Blackwood
+                            </strong>
+                        </div>
+
+                        <div class="archive-polaroid-caption">
+                            Publication reference
+                        </div>
+                    </div>
                 </div>
             `;
         }
 
         return `
-            <figure class="archive-master-cover">
-                <img
-                    src="${escapeAttribute(
-                        title.cover_image_path
-                    )}"
-                    alt="${escapeAttribute(
-                        `${title.title} by ${title.author_name}`
-                    )}"
-                >
-            </figure>
+            <div class="archive-master-evidence">
+                <figure class="archive-master-cover archive-polaroid">
+
+                    <span
+                        class="archive-paperclip"
+                        aria-hidden="true"
+                    ></span>
+
+                    <div class="archive-polaroid-image">
+                        <img
+                            src="${escapeAttribute(
+                                title.cover_image_path
+                            )}"
+                            alt="${escapeAttribute(
+                                `${title.title} by ${title.author_name}`
+                            )}"
+                        >
+                    </div>
+
+                    <figcaption class="archive-polaroid-caption">
+                        <span>
+                            ${escapeHtml(
+                                title.archive_code
+                            )}
+                        </span>
+
+                        <strong>
+                            Publication reference
+                        </strong>
+                    </figcaption>
+
+                </figure>
+            </div>
         `;
     }
 
