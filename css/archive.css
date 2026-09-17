@@ -1832,8 +1832,19 @@ body.archive-case-is-open {
    ========================= */
 
 .archive-case-paper img {
-    max-width: 100%;
+    display: block;
+
+    width: auto;
+    max-width: min(100%, 360px);
+
     height: auto;
+    max-height: 520px;
+
+    margin:
+        24px
+        auto;
+
+    object-fit: contain;
 }
 
 .archive-case-paper
