@@ -1,11 +1,11 @@
 // =========================
-// BLACKWOOD CIRCLE MEMBERS
-// Supabase Auth + Member Dashboard + Rewards Redemption + Password Reset
+// BLACKWOOD ARCHIVISTS
+// Supabase Auth + Private Archive Dashboard + Rewards Redemption + Password Reset
 // Behind the Files carousel powered by /data/BFA.json
 // Behind the Files reactions powered by Supabase
 // ARC Profile powered by /js/member-arc-profile.js
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
-// Phase 2A: Member Home Dashboard summary layer
+// Phase 2A: Archivist Home Dashboard summary layer
 // Phase 2B: Rewards polish + delivery address collection
 // Phase 2D: Admin Reward Fulfilment Desk
 // =========================
@@ -148,13 +148,13 @@
         const app = document.getElementById("blackwood-circle-app");
 
         if (!app) {
-            console.warn("Blackwood Circle: #blackwood-circle-app not found.");
+            console.warn("Blackwood Archivists: #blackwood-circle-app not found.");
             return;
         }
 
         BlackwoodMembersState.app = app;
 
-        renderLoadingState("Opening the Blackwood Circle...");
+        renderLoadingState("Opening the Private Archive...");
 
         try {
             await loadSupabaseLibrary();
@@ -216,9 +216,9 @@
             renderAuthView();
 
         } catch (error) {
-            console.error("Blackwood Circle initialisation failed:", error);
-            updateMemberIntroVisibility(null);
-            renderErrorState("The Blackwood Circle could not be opened. Please refresh and try again.");
+            console.error("Blackwood Archivists initialisation failed:", error);
+updateMemberIntroVisibility(null);
+renderErrorState("The Private Archive could not be opened. Please refresh and try again.");
         }
     }
 
@@ -294,153 +294,153 @@
     // =========================
 
     function renderAuthView() {
-        updateMemberIntroVisibility(null);
+    updateMemberIntroVisibility(null);
 
-        const app = BlackwoodMembersState.app;
+    const app = BlackwoodMembersState.app;
 
-        app.innerHTML = `
-            <section class="circle-auth-shell" aria-labelledby="circle-auth-title">
-                <div class="circle-auth-intro">
-                    <p class="circle-kicker">The Blackwood Circle</p>
-                    <h1 id="circle-auth-title">Member Access</h1>
+    app.innerHTML = `
+        <section class="circle-auth-shell" aria-labelledby="circle-auth-title">
+            <div class="circle-auth-intro">
+                <p class="circle-kicker">The Archivists</p>
+                <h1 id="circle-auth-title">Archivist Access</h1>
+                <p>
+                Your Reader Record, private notes, Archive Rewards,
+                and Blackwood dispatches are gathered here.
+            </p>
+            </div>
+
+            <div class="circle-auth-card">
+                <div class="circle-auth-tabs" role="tablist" aria-label="Archivist access options">
+                    <button
+                        type="button"
+                        class="circle-auth-tab ${BlackwoodMembersState.activeAuthMode === "signin" ? "is-active" : ""}"
+                        data-auth-mode="signin"
+                    >
+                        Sign in
+                    </button>
+
+                    <button
+                        type="button"
+                        class="circle-auth-tab ${BlackwoodMembersState.activeAuthMode === "signup" ? "is-active" : ""}"
+                        data-auth-mode="signup"
+                    >
+                        Become an Archivist
+                    </button>
+                </div>
+
+                <form
+                    id="circle-sign-in-form"
+                    class="circle-auth-form"
+                    ${BlackwoodMembersState.activeAuthMode === "signin" ? "" : "hidden"}
+                    novalidate
+                >
+                    <label>
+                        Email address
+                        <input
+                            type="email"
+                            id="circle-sign-in-email"
+                            autocomplete="email"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Password
+                        <input
+                            type="password"
+                            id="circle-sign-in-password"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </label>
+
+                    <button type="submit" class="circle-button circle-button-primary">
+                        Enter the Private Archive
+                    </button>
+
+                    <button type="button" class="circle-button circle-button-secondary" id="circle-forgot-password-button">
+                        Forgotten your password?
+                    </button>
+                </form>
+
+                <form
+                    id="circle-sign-up-form"
+                    class="circle-auth-form"
+                    ${BlackwoodMembersState.activeAuthMode === "signup" ? "" : "hidden"}
+                    novalidate
+                >
+                    <label>
+                        Display name
+                        <input
+                            type="text"
+                            id="circle-sign-up-name"
+                            autocomplete="name"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Email address
+                        <input
+                            type="email"
+                            id="circle-sign-up-email"
+                            autocomplete="email"
+                            required
+                        >
+                    </label>
+
+                    <label>
+                        Password
+                        <input
+                            type="password"
+                            id="circle-sign-up-password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                    </label>
+
+                    <button type="submit" class="circle-button circle-button-primary">
+                        Create Reader Record
+                    </button>
+                </form>
+
+                <form
+                    id="circle-password-reset-request-form"
+                    class="circle-auth-form"
+                    ${BlackwoodMembersState.activeAuthMode === "reset" ? "" : "hidden"}
+                    novalidate
+                >
                     <p>
-                        Sign in to view your reader record, private Blackwood notes,
-                        rewards, points, and members-only dispatches.
+                        Enter the email address attached to your Archivist account and we’ll send you a secure password reset link.
                     </p>
-                </div>
 
-                <div class="circle-auth-card">
-                    <div class="circle-auth-tabs" role="tablist" aria-label="Member access options">
-                        <button
-                            type="button"
-                            class="circle-auth-tab ${BlackwoodMembersState.activeAuthMode === "signin" ? "is-active" : ""}"
-                            data-auth-mode="signin"
+                    <label>
+                        Email address
+                        <input
+                            type="email"
+                            id="circle-password-reset-email"
+                            autocomplete="email"
+                            required
                         >
-                            Sign in
-                        </button>
+                    </label>
 
-                        <button
-                            type="button"
-                            class="circle-auth-tab ${BlackwoodMembersState.activeAuthMode === "signup" ? "is-active" : ""}"
-                            data-auth-mode="signup"
-                        >
-                            Join the Circle
-                        </button>
-                    </div>
+                    <button type="submit" class="circle-button circle-button-primary">
+                        Send Reset Link
+                    </button>
 
-                    <form
-                        id="circle-sign-in-form"
-                        class="circle-auth-form"
-                        ${BlackwoodMembersState.activeAuthMode === "signin" ? "" : "hidden"}
-                        novalidate
-                    >
-                        <label>
-                            Email address
-                            <input
-                                type="email"
-                                id="circle-sign-in-email"
-                                autocomplete="email"
-                                required
-                            >
-                        </label>
+                    <button type="button" class="circle-button circle-button-secondary" id="circle-back-to-signin-button">
+                        Back to Sign In
+                    </button>
+                </form>
 
-                        <label>
-                            Password
-                            <input
-                                type="password"
-                                id="circle-sign-in-password"
-                                autocomplete="current-password"
-                                required
-                            >
-                        </label>
+                <p class="circle-auth-status" id="circle-auth-status" aria-live="polite"></p>
+            </div>
+        </section>
+    `;
 
-                        <button type="submit" class="circle-button circle-button-primary">
-                            Enter the Circle
-                        </button>
-
-                        <button type="button" class="circle-button circle-button-secondary" id="circle-forgot-password-button">
-                            Forgotten your password?
-                        </button>
-                    </form>
-
-                    <form
-                        id="circle-sign-up-form"
-                        class="circle-auth-form"
-                        ${BlackwoodMembersState.activeAuthMode === "signup" ? "" : "hidden"}
-                        novalidate
-                    >
-                        <label>
-                            Display name
-                            <input
-                                type="text"
-                                id="circle-sign-up-name"
-                                autocomplete="name"
-                                required
-                            >
-                        </label>
-
-                        <label>
-                            Email address
-                            <input
-                                type="email"
-                                id="circle-sign-up-email"
-                                autocomplete="email"
-                                required
-                            >
-                        </label>
-
-                        <label>
-                            Password
-                            <input
-                                type="password"
-                                id="circle-sign-up-password"
-                                autocomplete="new-password"
-                                minlength="8"
-                                required
-                            >
-                        </label>
-
-                        <button type="submit" class="circle-button circle-button-primary">
-                            Create Member Record
-                        </button>
-                    </form>
-
-                    <form
-                        id="circle-password-reset-request-form"
-                        class="circle-auth-form"
-                        ${BlackwoodMembersState.activeAuthMode === "reset" ? "" : "hidden"}
-                        novalidate
-                    >
-                        <p>
-                            Enter your Blackwood Circle email address and we’ll send you a secure password reset link.
-                        </p>
-
-                        <label>
-                            Email address
-                            <input
-                                type="email"
-                                id="circle-password-reset-email"
-                                autocomplete="email"
-                                required
-                            >
-                        </label>
-
-                        <button type="submit" class="circle-button circle-button-primary">
-                            Send Reset Link
-                        </button>
-
-                        <button type="button" class="circle-button circle-button-secondary" id="circle-back-to-signin-button">
-                            Back to Sign In
-                        </button>
-                    </form>
-
-                    <p class="circle-auth-status" id="circle-auth-status" aria-live="polite"></p>
-                </div>
-            </section>
-        `;
-
-        bindAuthEvents();
-    }
+    bindAuthEvents();
+}
 
     function bindAuthEvents() {
         document.querySelectorAll("[data-auth-mode]").forEach(function (button) {
@@ -499,7 +499,7 @@
             return;
         }
 
-        setAuthStatus("Checking your member record...", "is-loading");
+        setAuthStatus("Checking your Reader Record...", "is-loading");
 
         try {
             const { data, error } = await BlackwoodMembersState.client.auth.signInWithPassword({
@@ -522,7 +522,7 @@
             await loadMemberDashboard();
 
         } catch (error) {
-            console.error("Blackwood Circle sign in failed:", error);
+            console.error("Archivist sign in failed:", error);
             setAuthStatus(cleanSupabaseError(error.message), "is-error");
         }
     }
@@ -549,7 +549,7 @@
             return;
         }
 
-        setAuthStatus("Creating your Blackwood member record...", "is-loading");
+        setAuthStatus("Creating your Reader Record...", "is-loading");
 
         try {
             const { data, error } = await BlackwoodMembersState.client.auth.signUp({
@@ -581,7 +581,7 @@
             );
 
         } catch (error) {
-            console.error("Blackwood Circle sign up failed:", error);
+            console.error("Archivist sign up failed:", error);
             setAuthStatus(cleanSupabaseError(error.message), "is-error");
         }
     }
@@ -608,7 +608,7 @@
             }
 
             setAuthStatus(
-                "Check your inbox. If that email has a Blackwood Circle account, a reset link has been sent.",
+                "Check your inbox. If that email has an Archivist account, a reset link has been sent.",
                 "is-success"
             );
 
@@ -619,58 +619,58 @@
     }
 
     function renderPasswordUpdateView() {
-        updateMemberIntroVisibility(BlackwoodMembersState.session);
+    updateMemberIntroVisibility(BlackwoodMembersState.session);
 
-        BlackwoodMembersState.app.innerHTML = `
-            <section class="circle-auth-shell" aria-labelledby="circle-password-update-title">
-                <div class="circle-auth-intro">
-                    <p class="circle-kicker">The Blackwood Circle</p>
-                    <h1 id="circle-password-update-title">Set a New Password</h1>
-                    <p>
-                        Choose a new password for your Blackwood Circle account.
-                    </p>
-                </div>
+    BlackwoodMembersState.app.innerHTML = `
+        <section class="circle-auth-shell" aria-labelledby="circle-password-update-title">
+            <div class="circle-auth-intro">
+                <p class="circle-kicker">The Archivists</p>
+                <h1 id="circle-password-update-title">Set a New Password</h1>
+                <p>
+                    Choose a new password for your Archivist account.
+                </p>
+            </div>
 
-                <div class="circle-auth-card">
-                    <form id="circle-password-update-form" class="circle-auth-form" novalidate>
-                        <label>
-                            New password
-                            <input
-                                type="password"
-                                id="circle-new-password"
-                                autocomplete="new-password"
-                                minlength="8"
-                                required
-                            >
-                        </label>
+            <div class="circle-auth-card">
+                <form id="circle-password-update-form" class="circle-auth-form" novalidate>
+                    <label>
+                        New password
+                        <input
+                            type="password"
+                            id="circle-new-password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                    </label>
 
-                        <label>
-                            Confirm new password
-                            <input
-                                type="password"
-                                id="circle-confirm-new-password"
-                                autocomplete="new-password"
-                                minlength="8"
-                                required
-                            >
-                        </label>
+                    <label>
+                        Confirm new password
+                        <input
+                            type="password"
+                            id="circle-confirm-new-password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                    </label>
 
-                        <button type="submit" class="circle-button circle-button-primary">
-                            Update Password
-                        </button>
-                    </form>
+                    <button type="submit" class="circle-button circle-button-primary">
+                        Update Password
+                    </button>
+                </form>
 
-                    <p class="circle-auth-status" id="circle-auth-status" aria-live="polite"></p>
-                </div>
-            </section>
-        `;
+                <p class="circle-auth-status" id="circle-auth-status" aria-live="polite"></p>
+            </div>
+        </section>
+    `;
 
-        const form = document.getElementById("circle-password-update-form");
+    const form = document.getElementById("circle-password-update-form");
 
-        if (form) {
-            form.addEventListener("submit", handlePasswordUpdate);
-        }
+    if (form) {
+        form.addEventListener("submit", handlePasswordUpdate);
     }
+}
 
     async function handlePasswordUpdate(event) {
         event.preventDefault();
@@ -707,7 +707,7 @@
                 BLACKWOOD_MEMBERS_CONFIG.membersPagePath
             );
 
-            setAuthStatus("Password updated. Opening your member record...", "is-success");
+            setAuthStatus("Password updated. Opening your Reader Record...", "is-success");
 
             await loadMemberDashboard();
 
@@ -750,7 +750,7 @@
             renderAuthView();
 
         } catch (error) {
-            console.error("Blackwood Circle sign out failed:", error);
+            console.error("Blackwood Archivist sign out failed:", error);
             setDashboardStatus("Sign out failed. Please try again.", "is-error");
         }
     }
@@ -836,8 +836,8 @@
             renderDashboard();
 
         } catch (error) {
-            console.error("Blackwood Circle dashboard failed:", error);
-            renderErrorState("Your member record could not be loaded. Please refresh and try again.");
+            console.error("Blackwood Archivist dashboard failed:", error);
+            renderErrorState("Your Reader Record could not be loaded. Please refresh and try again.");
         }
     }
 
@@ -977,200 +977,200 @@
     // =========================
 
     function renderDashboard() {
-        const app = BlackwoodMembersState.app;
-        const member = BlackwoodMembersState.member || {};
-        const pointsTotal = getCurrentPointsTotal();
+    const app = BlackwoodMembersState.app;
+    const member = BlackwoodMembersState.member || {};
+    const pointsTotal = getCurrentPointsTotal();
 
-        const displayName = member.display_name || member.reader_name || member.email || "Reader";
-        const tier = member.member_tier || "Reader";
-        const status = member.member_status || "active";
-        const arcLabel = isArcMemberProfile(member) ? "ARC Team Member" : "Circle Member";
+    const displayName = member.display_name || member.reader_name || member.email || "Reader";
+    const tier = member.member_tier || "Reader";
+    const status = member.member_status || "active";
+    const arcLabel = isArcMemberProfile(member) ? "ARC Team Member" : "Archivist";
 
-        app.innerHTML = `
-            <section class="circle-dashboard" id="circle-dashboard">
-                <div class="circle-dashboard-hero">
-                    <p class="circle-kicker">The Blackwood Circle</p>
-                    <h1>Welcome back, ${escapeHtml(displayName)}</h1>
+    app.innerHTML = `
+        <section class="circle-dashboard" id="circle-dashboard">
+            <div class="circle-dashboard-hero">
+                <p class="circle-kicker">The Archivists</p>
+                <h1>Welcome back, ${escapeHtml(displayName)}</h1>
+                <p>
+                    Your Reader Record, private notes, rewards,
+                    and Blackwood dispatches are gathered here.
+                </p>
+            </div>
+
+            ${renderMemberHomeDashboard(member, pointsTotal, {
+                displayName,
+                tier,
+                status,
+                arcLabel
+            })}
+
+            <div class="circle-dashboard-actions">
+                <button type="button" class="circle-button circle-button-primary" id="circle-refresh-dashboard">
+                    Refresh Record
+                </button>
+
+                <button type="button" class="circle-button circle-button-secondary" id="circle-sign-out">
+                    Sign Out
+                </button>
+
+                <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
+            </div>
+
+            <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
+                <div>
+                    <h2 id="circle-reader-record-cta-title">Leave a Reader Record</h2>
                     <p>
-                        Your private reader record, behind-the-scenes notes, rewards,
-                        and Blackwood dispatches are gathered here.
+                        Finished a Blackwood title? Submit a Reader Record, share your review,
+                        and earn Archive Points when your record is approved.
                     </p>
                 </div>
 
-                ${renderMemberHomeDashboard(member, pointsTotal, {
-                    displayName,
-                    tier,
-                    status,
-                    arcLabel
-                })}
+                <a href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" class="circle-reader-record-button">
+                    Leave a Reader Record
+                </a>
+            </section>
 
-                <div class="circle-dashboard-actions">
-                    <button type="button" class="circle-button circle-button-primary" id="circle-refresh-dashboard">
-                        Refresh Record
-                    </button>
+            ${renderArcProfileMount()}
 
-                    <button type="button" class="circle-button circle-button-secondary" id="circle-sign-out">
-                        Sign Out
-                    </button>
+            ${renderBookshelfMount()}
 
-                    <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
-                </div>
+            ${renderAdminRewardDesk()}
 
-                <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
-                    <div>
-                        <h2 id="circle-reader-record-cta-title">Leave a Reader Record</h2>
-                        <p>
-                            Finished a Blackwood title? Submit a reader record, share your review,
-                            and earn Circle points when your record is approved.
-                        </p>
-                    </div>
+            ${renderBehindFilesCarousel()}
 
-                    <a href="${BLACKWOOD_MEMBERS_CONFIG.readerRecordsPagePath}" class="circle-reader-record-button">
-                        Leave a Reader Record
-                    </a>
-                </section>
+            ${renderRewardsDisclosure(pointsTotal)}
 
-                ${renderArcProfileMount()}
-
-                ${renderBookshelfMount()}
-
-                ${renderAdminRewardDesk()}
-
-                ${renderBehindFilesCarousel()}
-
-                ${renderRewardsDisclosure(pointsTotal)}
-
-                ${renderRedemptionsDisclosure()}
-                
-                ${renderPointsDisclosure(pointsTotal)}
+            ${renderRedemptionsDisclosure()}
+            
+            ${renderPointsDisclosure(pointsTotal)}
         </section>
-        `;
+    `;
 
-       bindDashboardEvents();
-    }
+    bindDashboardEvents();
+}
 
     function renderMemberHomeDashboard(member, pointsTotal, summary) {
-        const arcSummary = getArcDashboardSummary(member);
-        const rewardSummary = getRewardsDashboardSummary(pointsTotal);
-        const redemptionSummary = getRedemptionDashboardSummary();
-        const adminRewardSummary = getAdminRewardDashboardSummary();
-        const latestDispatch = getLatestBehindFile();
-        const arcHref = isArcMemberProfile(member) ? "#blackwood-arc-profile-root" : "/pages/arc-team.html";
-        const arcActionLabel = isArcMemberProfile(member) ? "Open ARC Vault" : "Apply for ARC Team";
+    const arcSummary = getArcDashboardSummary(member);
+    const rewardSummary = getRewardsDashboardSummary(pointsTotal);
+    const redemptionSummary = getRedemptionDashboardSummary();
+    const adminRewardSummary = getAdminRewardDashboardSummary();
+    const latestDispatch = getLatestBehindFile();
+    const arcHref = isArcMemberProfile(member) ? "#blackwood-arc-profile-root" : "/pages/arc-team.html";
+    const arcActionLabel = isArcMemberProfile(member) ? "Open ARC Vault" : "Apply for ARC Team";
 
-        return `
-            <section class="circle-home-dashboard" aria-labelledby="circle-home-dashboard-title">
-                <div class="circle-home-main">
-                    <div>
-                        <p class="circle-kicker">Member Home</p>
+    return `
+        <section class="circle-home-dashboard" aria-labelledby="circle-home-dashboard-title">
+            <div class="circle-home-main">
+                <div>
+                    <p class="circle-kicker">Private Archive</p>
 
-                        <h2 id="circle-home-dashboard-title">
-                            Your Circle
-                        </h2>
+                    <h2 id="circle-home-dashboard-title">
+                        Your Reader Record
+                    </h2>
 
-                        <p>
-                            A quick view of your points, ARC access, rewards, private dispatches,
-                            and Blackwood reader activity.
-                        </p>
-                    </div>
-
-                    <div class="circle-home-actions">
-                        <a href="${escapeAttribute(arcHref)}" class="circle-button circle-button-primary">
-                            ${escapeHtml(arcActionLabel)}
-                        </a>
-
-                        <a
-                            href="#circle-panel-rewards"
-                            class="circle-button circle-button-secondary"
-                            data-circle-open-panel="rewards"
-                        >
-                            View Rewards
-                        </a>
-                        
-                        <a
-                            href="#circle-panel-behindFiles"
-                            class="circle-button circle-button-secondary"
-                            data-circle-open-panel="behindFiles"
-                        >
-                            Latest Dispatch
-                        </a>
-
-                        <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
-                            My Bookshelf
-                        </a>
-
-                        ${
-                            isAdminProfile(member)
-                                ? `
-                                    <a href="#circle-admin-reward-desk" class="circle-button circle-button-secondary">
-                                        Admin Reward Desk
-                                    </a>
-                                `
-                                : ""
-                        }
-                    </div>
+                    <p>
+                        A quick view of your Archive Points, ARC access, rewards,
+                        private dispatches, and Blackwood reading activity.
+                    </p>
                 </div>
 
-                <div class="circle-dashboard-grid circle-home-stat-grid">
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Points</span>
-                        <strong id="circle-home-points-total">${escapeHtml(String(pointsTotal))}</strong>
-                        <small>Current Circle total</small>
-                    </article>
+                <div class="circle-home-actions">
+                    <a href="${escapeAttribute(arcHref)}" class="circle-button circle-button-primary">
+                        ${escapeHtml(arcActionLabel)}
+                    </a>
 
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Member Tier</span>
-                        <strong>${escapeHtml(summary.tier)}</strong>
-                        <small>${escapeHtml(capitalise(summary.status))}</small>
-                    </article>
+                    <a
+                        href="#circle-panel-rewards"
+                        class="circle-button circle-button-secondary"
+                        data-circle-open-panel="rewards"
+                    >
+                        View Rewards
+                    </a>
+                    
+                    <a
+                        href="#circle-panel-behindFiles"
+                        class="circle-button circle-button-secondary"
+                        data-circle-open-panel="behindFiles"
+                    >
+                        Latest Dispatch
+                    </a>
 
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Access</span>
-                        <strong>${escapeHtml(summary.arcLabel)}</strong>
-                        <small>${escapeHtml(arcSummary.shortLine)}</small>
-                    </article>
-
-                    <article class="circle-stat-card">
-                        <span class="circle-stat-label">Rewards</span>
-                        <strong>${escapeHtml(rewardSummary.headline)}</strong>
-                        <small>${escapeHtml(rewardSummary.detail)}</small>
-                    </article>
-                </div>
-
-                <div class="circle-home-summary-grid">
-                    <article class="circle-home-summary-card">
-                        <span>ARC Desk</span>
-                        <h3>${escapeHtml(arcSummary.headline)}</h3>
-                        <p>${escapeHtml(arcSummary.detail)}</p>
-                    </article>
-
-                    <article class="circle-home-summary-card">
-                        <span>Latest Dispatch</span>
-                        <h3>${escapeHtml(latestDispatch.title)}</h3>
-                        <p>${escapeHtml(latestDispatch.detail)}</p>
-                    </article>
-
-                    <article class="circle-home-summary-card">
-                        <span>Reward Desk</span>
-                        <h3>${escapeHtml(redemptionSummary.headline)}</h3>
-                        <p>${escapeHtml(redemptionSummary.detail)}</p>
-                    </article>
+                    <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
+                        My Bookshelf
+                    </a>
 
                     ${
                         isAdminProfile(member)
                             ? `
-                                <article class="circle-home-summary-card">
-                                    <span>Admin Rewards</span>
-                                    <h3>${escapeHtml(adminRewardSummary.headline)}</h3>
-                                    <p>${escapeHtml(adminRewardSummary.detail)}</p>
-                                </article>
+                                <a href="#circle-admin-reward-desk" class="circle-button circle-button-secondary">
+                                    Admin Reward Desk
+                                </a>
                             `
                             : ""
                     }
                 </div>
-            </section>
-        `;
-    }
+            </div>
+
+            <div class="circle-dashboard-grid circle-home-stat-grid">
+                <article class="circle-stat-card">
+                    <span class="circle-stat-label">Archive Points</span>
+                    <strong id="circle-home-points-total">${escapeHtml(String(pointsTotal))}</strong>
+                    <small>Current points total</small>
+                </article>
+
+                <article class="circle-stat-card">
+                    <span class="circle-stat-label">Reader Tier</span>
+                    <strong>${escapeHtml(summary.tier)}</strong>
+                    <small>${escapeHtml(capitalise(summary.status))}</small>
+                </article>
+
+                <article class="circle-stat-card">
+                    <span class="circle-stat-label">Access</span>
+                    <strong>${escapeHtml(summary.arcLabel)}</strong>
+                    <small>${escapeHtml(arcSummary.shortLine)}</small>
+                </article>
+
+                <article class="circle-stat-card">
+                    <span class="circle-stat-label">Rewards</span>
+                    <strong>${escapeHtml(rewardSummary.headline)}</strong>
+                    <small>${escapeHtml(rewardSummary.detail)}</small>
+                </article>
+            </div>
+
+            <div class="circle-home-summary-grid">
+                <article class="circle-home-summary-card">
+                    <span>ARC Desk</span>
+                    <h3>${escapeHtml(arcSummary.headline)}</h3>
+                    <p>${escapeHtml(arcSummary.detail)}</p>
+                </article>
+
+                <article class="circle-home-summary-card">
+                    <span>Latest Dispatch</span>
+                    <h3>${escapeHtml(latestDispatch.title)}</h3>
+                    <p>${escapeHtml(latestDispatch.detail)}</p>
+                </article>
+
+                <article class="circle-home-summary-card">
+                    <span>Reward Desk</span>
+                    <h3>${escapeHtml(redemptionSummary.headline)}</h3>
+                    <p>${escapeHtml(redemptionSummary.detail)}</p>
+                </article>
+
+                ${
+                    isAdminProfile(member)
+                        ? `
+                            <article class="circle-home-summary-card">
+                                <span>Admin Rewards</span>
+                                <h3>${escapeHtml(adminRewardSummary.headline)}</h3>
+                                <p>${escapeHtml(adminRewardSummary.detail)}</p>
+                            </article>
+                        `
+                        : ""
+                }
+            </div>
+        </section>
+    `;
+}
 
     function getCurrentPointsTotal() {
         const member = BlackwoodMembersState.member || {};
@@ -1214,8 +1214,8 @@
         if (!isArcMember) {
             return {
                 headline: "Not enrolled",
-                shortLine: "Standard Circle access",
-                detail: "ARC Team access has not been enabled for this member record yet."
+                shortLine: "Archivist access",
+                detail: "ARC Team access has not been enabled for this Reader Record yet."
             };
         }
 
@@ -1223,7 +1223,7 @@
             return {
                 headline: "ARC Team ready",
                 shortLine: "No active ARC files",
-                detail: "You are marked as an ARC Team member. New assignments will appear when issued."
+                detail: "You are approved for the ARC Team. New assignments will appear here when issued."
             };
         }
 
@@ -1266,7 +1266,7 @@
         if (!rewards.length) {
             return {
                 headline: "None filed",
-                detail: "Rewards will appear once they are added to the Circle."
+                detail: "Rewards will appear here once they are filed."
             };
         }
 
@@ -1703,7 +1703,7 @@
                             Request #${escapeHtml(String(redemptionId))} · ${escapeHtml(requestedDate || "Date unknown")}
                         </p>
 
-                        <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+                        <h3>${escapeHtml(redemption.reward_title || "Blackwood Archive reward")}</h3>
 
                         <p>
                             ${escapeHtml(redemption.reader_name || "Unknown reader")}
@@ -1899,7 +1899,7 @@
             return `
                 <div class="circle-admin-delivery-card is-needed">
                     <strong>Delivery address needed</strong>
-                    <p>The member has not submitted delivery details for this physical reward yet.</p>
+                   <p>The Archivist has not submitted delivery details for this physical reward yet.</p>
                 </div>
             `;
         }
@@ -2959,7 +2959,7 @@ return renderPremiumDisclosure({
                         ${
                             hasReacted
                                 ? "Your reaction has been filed. You can change it, but points are only awarded once per file."
-                                : "File a reaction and receive +5 Circle points. One points award per file."
+                                : "File a reaction and receive +5 Archive points. One points award per file."
                         }
                     </p>
                 </div>
@@ -3124,7 +3124,7 @@ return renderPremiumDisclosure({
 
     return renderPremiumDisclosure({
         panelId: "rewards",
-        kicker: "Circle Rewards",
+        kicker: "Archive Rewards",
         title: "Rewards",
         summary: `${rewardSummary.headline} · ${rewardSummary.detail}`,
         countLabel: `${unlockedCount} unlocked`,
@@ -3165,7 +3165,7 @@ function renderPointsDisclosure(pointsTotal) {
         panelId: "points",
         kicker: "Reader Record",
         title: "Points History",
-        summary: `${pointsTotal} Circle points currently filed`,
+        summary: `${pointsTotal} Archive points currently filed`,
         countLabel: entryCount === 1
             ? "1 entry"
             : `${entryCount} entries`,
@@ -3209,7 +3209,7 @@ function renderPointsDisclosure(pointsTotal) {
                 <article class="circle-reward-card ${unlocked ? "is-unlocked" : "is-locked"} ${isRedeemable ? "is-redeemable" : "is-milestone"}">
                     <div class="circle-reward-card-header">
                         <p class="circle-reward-status">
-                            ${escapeHtml(isRedeemable ? "Redeemable Reward" : "Circle Milestone")}
+                            ${escapeHtml(isRedeemable ? "Redeemable Reward" : "Archive Milestone")}
                         </p>
 
                         <span class="circle-reward-badge ${escapeAttribute(rewardStatus.className)}">
@@ -3311,7 +3311,7 @@ function renderPointsDisclosure(pointsTotal) {
         }
 
         if (unlocked && !isRedeemable) {
-            note = "Milestone reached on your Circle record.";
+            note = "Milestone reached on your Reader Record.";
         }
 
         return `
@@ -3354,7 +3354,7 @@ function renderPointsDisclosure(pointsTotal) {
 
                     ${latestRedemption.discount_code ? `
                         <div class="circle-redemption-code">
-                            <span>Your Circle code</span>
+                            <span>Your reward code</span>
 
                             <div class="circle-redemption-code-row">
                                 <code>${escapeHtml(latestRedemption.discount_code)}</code>
@@ -3417,7 +3417,7 @@ function renderPointsDisclosure(pointsTotal) {
             return `
                 <article class="circle-empty-card circle-redemptions-empty">
                     <p>No rewards claimed yet.</p>
-                    <p>When you unlock a Circle reward, your request and discount code will appear here.</p>
+                    <p>When you unlock an Archive Reward, your request and discount code will appear here.</p>
                 </article>
             `;
         }
@@ -3446,7 +3446,7 @@ function renderPointsDisclosure(pointsTotal) {
                         </span>
                     </div>
 
-                    <h3>${escapeHtml(redemption.reward_title || "Blackwood Circle reward")}</h3>
+                    <h3>${escapeHtml(redemption.reward_title || "Blackwood reward")}</h3>
 
                     <p>
                         ${escapeHtml(pointsLine)}
@@ -3509,7 +3509,7 @@ function renderPointsDisclosure(pointsTotal) {
             return `
                 <article class="circle-points-card">
                     <strong>${prefix}${points} points</strong>
-                    <p>${escapeHtml(point.reason || "Blackwood Circle activity")}</p>
+                    <p>${escapeHtml(point.reason || "Blackwood Archive activity")}</p>
                     <small>${escapeHtml(formatDate(point.created_at))}</small>
                 </article>
             `;
@@ -3654,7 +3654,7 @@ function renderPointsDisclosure(pointsTotal) {
                     </address>
 
                     <p>
-                        This address will only be used to fulfil this Blackwood Circle reward.
+                        This address will only be used to fulfil this Blackwood reward.
                     </p>
                 </div>
             `;
@@ -3997,7 +3997,7 @@ function renderPointsDisclosure(pointsTotal) {
 
         BlackwoodMembersState.points.unshift({
             points: cleanPoints,
-            reason: reason || "Blackwood Circle activity",
+            reason: reason || "Blackwood reader activity",
             created_at: new Date().toISOString()
         });
 
@@ -4048,7 +4048,7 @@ function renderPointsDisclosure(pointsTotal) {
 
     function formatBehindFileDate(value) {
         if (!value) {
-            return "Filed in the archive";
+            return "Filed in the Archive";
         }
 
         const date = new Date(`${value}T12:00:00`);
@@ -4079,36 +4079,36 @@ function renderPointsDisclosure(pointsTotal) {
         );
     }
 
-    function renderLoadingState(message) {
-        BlackwoodMembersState.app.innerHTML = `
-            <section class="circle-loading">
-                <p class="circle-kicker">The Blackwood Circle</p>
-                <h1>${escapeHtml(message)}</h1>
-                <p>Your member record is being retrieved.</p>
-            </section>
-        `;
+   function renderLoadingState(message) {
+    BlackwoodMembersState.app.innerHTML = `
+        <section class="circle-loading">
+            <p class="circle-kicker">The Archivists</p>
+            <h1>${escapeHtml(message)}</h1>
+            <p>Your Reader Record is being retrieved.</p>
+        </section>
+    `;
+}
+
+function renderErrorState(message) {
+    BlackwoodMembersState.app.innerHTML = `
+        <section class="circle-error">
+            <p class="circle-kicker">The Archivists</p>
+            <h1>Something went wrong</h1>
+            <p>${escapeHtml(message)}</p>
+            <button type="button" class="circle-button circle-button-primary" id="circle-reload-page">
+                Refresh Page
+            </button>
+        </section>
+    `;
+
+    const reloadButton = document.getElementById("circle-reload-page");
+
+    if (reloadButton) {
+        reloadButton.addEventListener("click", function () {
+            window.location.reload();
+        });
     }
-
-    function renderErrorState(message) {
-        BlackwoodMembersState.app.innerHTML = `
-            <section class="circle-error">
-                <p class="circle-kicker">The Blackwood Circle</p>
-                <h1>Something went wrong</h1>
-                <p>${escapeHtml(message)}</p>
-                <button type="button" class="circle-button circle-button-primary" id="circle-reload-page">
-                    Refresh Page
-                </button>
-            </section>
-        `;
-
-        const reloadButton = document.getElementById("circle-reload-page");
-
-        if (reloadButton) {
-            reloadButton.addEventListener("click", function () {
-                window.location.reload();
-            });
-        }
-    }
+}
 
     function setAuthStatus(message, className) {
         const status = document.getElementById("circle-auth-status");
@@ -4195,7 +4195,7 @@ function renderPointsDisclosure(pointsTotal) {
         }
 
         if (/user already registered/i.test(cleaned)) {
-            return "That email address already has a Blackwood Circle account.";
+            return "That email address already has an Archivist account.";
         }
 
         if (/admin access required/i.test(cleaned)) {
