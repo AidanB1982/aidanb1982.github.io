@@ -21,7 +21,7 @@
 
     <meta
         name="description"
-        content="Read free recovered archive fragments from Blackwood Publishing, including The Third Night and The Gåtestein Log, companion pieces to The Archive Files."
+        content="Read free recovered fragments from the Blackwood Archive, including The Third Night and The Gåtestein Log, companion pieces to The Archive Files."
     >
 
     <link rel="stylesheet" href="/css/header.css?v=20260720">
@@ -41,12 +41,12 @@
     <div class="about-hero-overlay"></div>
 
     <div class="about-hero-content fade-in">
-        <p class="about-intro-line">Welcome Archivist to the</p>
+        <p class="about-intro-line">Open Records from the</p>
 
         <h1>Recovered Files</h1>
 
         <p class="recovered-files-hero-subline">
-            Open-access fragments from the Blackwood archive.
+            Open-access fragments from the Blackwood Archive.
         </p>
     </div>
 
@@ -60,7 +60,7 @@
         <p class="recovered-files-kicker">Recovered Records</p>
 
         <h2 id="recovered-files-title">
-            Not every record enters the archive intact.
+            Not every record enters the Archive intact.
         </h2>
 
         <p class="recovered-files-quote">
@@ -99,7 +99,11 @@
                     data-file-url="/pages/the-third-night.html"
                     aria-label="Open The Third Night"
                 >
-                    <img src="/assets/TheThirdNight.png" loading="lazy" alt="The Third Night recovered file cover">
+                    <img
+                        src="/assets/TheThirdNight.png"
+                        loading="lazy"
+                        alt="The Third Night recovered file cover"
+                    >
                 </button>
 
                 <div class="recovered-file-card-copy">
@@ -117,7 +121,7 @@
                     </p>
 
                     <p class="recovered-file-reading-note">
-                        Read this if you want another account from the Black Bothy archive
+                        Read this if you want another account from the Black Bothy record
                         before, after, or alongside Book One.
                     </p>
 
@@ -157,7 +161,11 @@
                     data-file-url="/pages/gatestein-log.html"
                     aria-label="Open The Gåtestein Log"
                 >
-                    <img src="/assets/Gatestein.jpg" loading="lazy" alt="The Gåtestein Log recovered file cover">
+                    <img
+                        src="/assets/Gatestein.jpg"
+                        loading="lazy"
+                        alt="The Gåtestein Log recovered file cover"
+                    >
                 </button>
 
                 <div class="recovered-file-card-copy">
@@ -177,7 +185,7 @@
 
                     <p class="recovered-file-reading-note">
                         Read this recovered fragment before continuing into Book Two
-                        of The Archive Files.
+                        of <em>The Archive Files</em>.
                     </p>
 
                     <div class="recovered-file-actions">
@@ -210,7 +218,7 @@
 
     </section>
 
-    <!-- ARCHIVE SIGNUP BRIDGE -->
+    <!-- ARCHIVIST SIGNUP BRIDGE -->
     <section class="recovered-files-join fade-in">
 
         <p class="recovered-files-kicker">Further Openings</p>
@@ -220,12 +228,12 @@
         </h2>
 
         <p>
-            Join the Blackwood Archive for new records, fragments, release notices,
-            and field notes.
+            Become an Archivist for new records, fragments, release notices,
+            and dispatches from Blackwood.
         </p>
 
-        <a href="#footer-placeholder" class="button copper">
-            Join the Archive
+        <a href="/pages/members.html" class="button copper">
+            Become an Archivist
         </a>
 
     </section>
@@ -244,7 +252,7 @@
         </a>
 
         <a href="/pages/reading-lists.html" class="recovered-files-route-card">
-            <span>More Shelves</span>
+            <span>Curated Reading</span>
             <strong>Reading Lists</strong>
         </a>
 
@@ -296,7 +304,7 @@
             <div class="archive-reader-page-frame">
 
                 <div class="archive-reader-page" id="archive-reader-page">
-                    <p>Opening archive file…</p>
+                    <p>Opening Archive file…</p>
                 </div>
 
             </div>
@@ -407,7 +415,7 @@ window.addEventListener("load", async () => {
 
         readerPages = [];
         currentPageIndex = 0;
-        pageOutput.innerHTML = "<p>Opening archive file…</p>";
+        pageOutput.innerHTML = "<p>Opening Archive file…</p>";
         titleOutput.textContent = "Loading file…";
         subtitleOutput.textContent = "Please wait.";
         progressOutput.textContent = "Page 1 of 1";
@@ -441,8 +449,13 @@ window.addEventListener("load", async () => {
 
         isTurning = true;
 
-        const exitClass = direction === "back" ? "is-turning-back-out" : "is-turning-forward-out";
-        const enterClass = direction === "back" ? "is-turning-back-in" : "is-turning-forward-in";
+        const exitClass = direction === "back"
+            ? "is-turning-back-out"
+            : "is-turning-forward-out";
+
+        const enterClass = direction === "back"
+            ? "is-turning-back-in"
+            : "is-turning-forward-in";
 
         pageOutput.classList.remove(
             "is-turning-forward-out",
@@ -456,7 +469,8 @@ window.addEventListener("load", async () => {
         window.setTimeout(() => {
             pageOutput.innerHTML = readerPages[currentPageIndex].innerHTML;
 
-            progressOutput.textContent = `Page ${currentPageIndex + 1} of ${readerPages.length}`;
+            progressOutput.textContent =
+                `Page ${currentPageIndex + 1} of ${readerPages.length}`;
 
             pageOutput.classList.remove(exitClass);
             pageOutput.classList.add(enterClass);
@@ -472,12 +486,14 @@ window.addEventListener("load", async () => {
 
     function nextPage() {
         if (currentPageIndex >= readerPages.length - 1) return;
+
         currentPageIndex += 1;
         renderPage("forward");
     }
 
     function previousPage() {
         if (currentPageIndex <= 0) return;
+
         currentPageIndex -= 1;
         renderPage("back");
     }
@@ -487,7 +503,7 @@ window.addEventListener("load", async () => {
 
         openModal();
 
-        pageOutput.innerHTML = "<p>Opening archive file…</p>";
+        pageOutput.innerHTML = "<p>Opening Archive file…</p>";
         titleOutput.textContent = "Opening file…";
         subtitleOutput.textContent = "Recovering manuscript pages.";
         progressOutput.textContent = "Loading";
@@ -512,7 +528,9 @@ window.addEventListener("load", async () => {
                 throw new Error("No manuscript section found.");
             }
 
-            const pages = Array.from(manuscript.querySelectorAll(".reader-page"));
+            const pages = Array.from(
+                manuscript.querySelectorAll(".reader-page")
+            );
 
             if (!pages.length) {
                 throw new Error("No reader pages found.");
@@ -521,11 +539,22 @@ window.addEventListener("load", async () => {
             readerPages = pages;
             currentPageIndex = 0;
 
-            const fileTitle = cleanText(manuscript.dataset.fileTitle) || "Recovered File";
-            const fileSubtitle = cleanText(manuscript.dataset.fileSubtitle) || "Recovered archive fragment";
-            const relatedUrl = cleanText(manuscript.dataset.relatedUrl);
-            const relatedCta = cleanText(manuscript.dataset.relatedCta);
-            const relatedTitle = cleanText(manuscript.dataset.relatedTitle);
+            const fileTitle =
+                cleanText(manuscript.dataset.fileTitle) ||
+                "Recovered File";
+
+            const fileSubtitle =
+                cleanText(manuscript.dataset.fileSubtitle) ||
+                "Recovered Archive fragment";
+
+            const relatedUrl =
+                cleanText(manuscript.dataset.relatedUrl);
+
+            const relatedCta =
+                cleanText(manuscript.dataset.relatedCta);
+
+            const relatedTitle =
+                cleanText(manuscript.dataset.relatedTitle);
 
             titleOutput.textContent = fileTitle;
             subtitleOutput.textContent = fileSubtitle;
@@ -540,21 +569,26 @@ window.addEventListener("load", async () => {
             }
 
             pageOutput.innerHTML = readerPages[0].innerHTML;
-            progressOutput.textContent = `Page 1 of ${readerPages.length}`;
+            progressOutput.textContent =
+                `Page 1 of ${readerPages.length}`;
+
             updateControls();
 
         } catch (error) {
             titleOutput.textContent = "File unavailable";
-            subtitleOutput.textContent = "The archive could not open this record.";
+            subtitleOutput.textContent =
+                "The Archive could not open this record.";
+
             pageOutput.innerHTML = `
                 <p>
                     This recovered file could not be opened. Please try again,
-                    or open the file directly from its archive page.
+                    or open the file directly from its Archive page.
                 </p>
                 <p>
                     <a href="${fileUrl}" class="button copper">Open Direct Page</a>
                 </p>
             `;
+
             progressOutput.textContent = "Error";
             updateControls();
         }
@@ -583,12 +617,14 @@ window.addEventListener("load", async () => {
     });
 
     document.addEventListener("keydown", (event) => {
-        const isOpen = modal.getAttribute("aria-hidden") === "false";
+        const isOpen =
+            modal.getAttribute("aria-hidden") === "false";
 
         if (!isOpen) return;
 
         const key = event.key.toLowerCase();
-        const isModifier = event.ctrlKey || event.metaKey;
+        const isModifier =
+            event.ctrlKey || event.metaKey;
 
         if (event.key === "Escape") {
             event.preventDefault();
@@ -608,7 +644,10 @@ window.addEventListener("load", async () => {
             return;
         }
 
-        if (isModifier && ["c", "x", "p", "s", "u", "a"].includes(key)) {
+        if (
+            isModifier &&
+            ["c", "x", "p", "s", "u", "a"].includes(key)
+        ) {
             event.preventDefault();
         }
     });
