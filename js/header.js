@@ -169,7 +169,7 @@
 
         const originalButtonText = submitButton
             ? submitButton.textContent.trim()
-            : "Join the Archive";
+            : "Become an Archivist";
 
         let hasSubmitted = false;
         let fallbackTimer = null;
@@ -203,7 +203,7 @@
             window.clearTimeout(fallbackTimer);
 
             setStatus(
-                "Thank you. Check your inbox to confirm your place in the Archive.",
+                "Thank you. Check your inbox to confirm your place among the Archivists.",
                 "is-success"
             );
 
@@ -406,7 +406,7 @@
                 <div class="blackwood-dropdown" role="menu" aria-label="Community">
                     <a href="/pages/arc-team.html" role="menuitem">ARC Team</a>
                     <a href="/pages/CommunitySpotlight.html" role="menuitem">Community Spotlight</a>
-                    <a href="/pages/members.html" role="menuitem">The Blackwood Circle</a>
+                    <a href="/pages/members.html" role="menuitem">The Archivists</a>
                 </div>
             </div>
         `;
