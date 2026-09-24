@@ -9796,3 +9796,87 @@ body.appearances-page .appearance-action-secondary:focus-visible {
         grid-template-columns: 1fr;
     }
 }
+/* =========================================================
+   FRIENDS OF THE ARCHIVE
+   ========================================================= */
+
+.archive-partners {
+    width: min(1100px, calc(100% - 40px));
+    margin: 110px auto 0;
+    text-align: center;
+}
+
+.archive-partners-label {
+    margin: 0 0 22px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(199, 151, 91, 0.82);
+}
+
+.archive-partner-banner {
+    display: block;
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+    line-height: 0;
+    text-decoration: none;
+    border: 1px solid rgba(199, 151, 91, 0.18);
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.28),
+        0 0 0 1px rgba(255, 255, 255, 0.025);
+    overflow: hidden;
+    transition:
+        transform 220ms ease,
+        border-color 220ms ease,
+        box-shadow 220ms ease;
+}
+
+.archive-partner-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.archive-partner-banner:hover,
+.archive-partner-banner:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(199, 151, 91, 0.42);
+    box-shadow:
+        0 22px 52px rgba(0, 0, 0, 0.34),
+        0 0 0 1px rgba(199, 151, 91, 0.06);
+}
+
+.archive-partner-banner:focus-visible {
+    outline: 2px solid rgba(199, 151, 91, 0.7);
+    outline-offset: 5px;
+}
+
+@media (max-width: 760px) {
+
+    .archive-partners {
+        width: calc(100% - 28px);
+        margin-top: 80px;
+    }
+
+    .archive-partners-label {
+        margin-bottom: 16px;
+        font-size: 0.66rem;
+        letter-spacing: 0.18em;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .archive-partner-banner {
+        transition: none;
+    }
+
+    .archive-partner-banner:hover,
+    .archive-partner-banner:focus-visible {
+        transform: none;
+    }
+
+}
