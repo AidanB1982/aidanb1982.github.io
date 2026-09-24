@@ -21,7 +21,7 @@
                     <a href="/pages/holdfast.html">New Releases</a>
                     <a href="/pages/reading-lists.html">Reading Lists</a>
                     <a href="/pages/arc-team.html">ARC Team</a>
-                    <a href="/pages/members.html">The Blackwood Circle</a>
+                    <a href="/pages/members.html">The Archivists</a>
                     <a href="/pages/contact.html">Contact</a>
                 </div>
 
@@ -29,13 +29,12 @@
                     <p class="footer-heading">Authors / Imprints</p>
                     <a href="/pages/author.html">Aidan Blackwood</a>
                     <a href="/pages/miren-vale.html">Miren Vale</a>
-                    
                 </div>
 
                 <div class="footer-col">
                     <p class="footer-heading">Reader Areas</p>
                     <a href="/pages/reader-records.html">Reader Records</a>
-                    <a href="/pages/members.html">The Blackwood Circle</a>
+                    <a href="/pages/members.html">The Archivists</a>
                     <a href="/pages/arc-team.html">ARC Team</a>
                     <a href="/pages/resources.html">Resources</a>
                 </div>
@@ -52,19 +51,19 @@
 
         </div>
 
-        <!-- BLACKWOOD CIRCLE SIGNUP -->
+        <!-- THE ARCHIVISTS SIGNUP -->
         <section class="footer-archive-signup" aria-labelledby="footer-circle-title">
 
             <p class="footer-archive-kicker">
-                The Blackwood Circle
+                The Archivists
             </p>
 
             <h2 id="footer-circle-title">
-                Join the Blackwood Circle
+                Become an Archivist
             </h2>
 
             <p>
-                Create your reader record inside the archive.
+                Create your Reader Record inside the Blackwood Archive.
             </p>
 
             <p>
@@ -73,7 +72,7 @@
             </p>
 
             <p>
-                Some records are only kept inside the Circle.
+                Some records are reserved for Archivist Access.
             </p>
 
             <form
@@ -84,11 +83,11 @@
                 accept-charset="utf-8"
                 autocomplete="on"
                 onsubmit="
-                    document.getElementById('footer-archive-status').textContent = 'Opening the Circle...';
-                    this.querySelector('[data-footer-submit]').textContent = 'Entering...';
+                    document.getElementById('footer-archive-status').textContent = 'Opening your Reader Record...';
+                    this.querySelector('[data-footer-submit]').textContent = 'Filing...';
                     window.setTimeout(() => {
-                        document.getElementById('footer-archive-status').textContent = 'Thank you. Check your inbox to confirm your place inside the Circle.';
-                        this.querySelector('[data-footer-submit]').textContent = 'Entered';
+                        document.getElementById('footer-archive-status').textContent = 'Thank you. Check your inbox to confirm your place among the Archivists.';
+                        this.querySelector('[data-footer-submit]').textContent = 'Filed';
                         this.reset();
                     }, 1200);
                 "
@@ -119,7 +118,7 @@
                 >
 
                 <button type="submit" data-footer-submit>
-                    Enter the Circle
+                    Become an Archivist
                 </button>
             </form>
 
