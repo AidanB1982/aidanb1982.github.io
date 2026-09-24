@@ -8,7 +8,158 @@
 
         function gtag() {
             dataLayer.push(arguments);
+        }<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
         }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Community Spotlight | Blackwood Publishing</title>
+
+    <meta
+        name="description"
+        content="Community Spotlight showcasing readers, creators, and features from Blackwood Publishing."
+    >
+
+    <link rel="stylesheet" href="/css/header.css?v=20260716">
+    <link rel="stylesheet" href="/css/styles.css?v=20260716">
+</head>
+
+<body class="sub-page community-page community-spotlight-page">
+
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<!-- HEADER -->
+<div id="header-placeholder"></div>
+
+<!-- HERO -->
+<section class="community-hero community-spotlight-hero">
+
+    <div class="community-hero-content fade-in">
+
+        <p class="about-intro-line">
+            Community
+        </p>
+
+        <h1>
+            Community Spotlight
+        </h1>
+
+        <p>
+            Stories shared beyond the page. Fragments of readers, places, and moments
+            that continue long after the final line.
+        </p>
+
+    </div>
+
+</section>
+
+<main id="main-content" class="community-spotlight-wrap">
+
+    <section class="community-spotlight-intro fade-in">
+
+        <p class="community-spotlight-kicker">
+            Shared Fragments
+        </p>
+
+        <h2>
+            What remains is what is shared.
+        </h2>
+
+        <p class="community-spotlight-quote">
+            “The Archive does not end at the final page.”
+        </p>
+
+        <p>
+            Reader posts, creator features, fragments, reactions, and moments from the wider
+            Blackwood community appear here as they surface.
+        </p>
+
+    </section>
+
+    <!-- CTA -->
+    <section class="community-spotlight-cta fade-in">
+
+        <p>
+            Share your own fragment using
+            <button type="button" id="hashtag">#aidanblackwood</button>
+        </p>
+
+    </section>
+
+    <!-- TAGGBOX -->
+    <section class="taggbox-wrapper fade-in" aria-label="Community posts">
+
+        <div
+            class="taggbox"
+            data-widget-id="323222"
+            data-website="1">
+        </div>
+
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<div id="footer-placeholder"></div>
+
+<!-- JS -->
+<script src="/js/header.js?v=20260812" defer></script>
+<script src="https://widget.taggbox.com/embed.min.js" defer></script>
+
+<script>
+window.addEventListener("load", async () => {
+
+    if (typeof loadHeader !== "function") {
+        console.error("Header failed to load");
+        return;
+    }
+
+    await loadHeader("simple");
+
+    if (typeof loadFooter === "function") {
+        await loadFooter();
+    }
+
+    if (typeof initFadeIn === "function") {
+        initFadeIn();
+    }
+
+    const hashtag = document.getElementById("hashtag");
+
+    if (hashtag) {
+        hashtag.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText("#aidanblackwood");
+                hashtag.textContent = "Copied ✓";
+
+                setTimeout(() => {
+                    hashtag.textContent = "#aidanblackwood";
+                }, 2000);
+            } catch (error) {
+                hashtag.textContent = "#aidanblackwood";
+            }
+        });
+    }
+
+});
+</script>
+
+</body>
+</html>
 
         gtag("js", new Date());
         gtag("config", "G-1WN8PBHBW4");
