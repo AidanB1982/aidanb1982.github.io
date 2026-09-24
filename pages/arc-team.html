@@ -62,6 +62,39 @@
     line-height: 1.75;
 }
 
+/* ARCHIVIST / ARC ACCESS NOTE */
+.arc-archivist-note {
+    margin: 0 0 38px;
+    padding: 22px 24px;
+    border-left: 2px solid rgba(196, 122, 44, 0.72);
+    background: rgba(196, 122, 44, 0.07);
+}
+
+.arc-archivist-note strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #d6b181;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+}
+
+.arc-archivist-note p {
+    margin: 0 0 10px;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.arc-archivist-note p:last-child {
+    margin-bottom: 0;
+}
+
+.arc-archivist-note a {
+    color: #d6b181;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .arc-form {
     display: grid;
     gap: 22px;
@@ -215,13 +248,40 @@
 
         <p class="arc-kicker">ARC Team Applications</p>
 
-        <h2 id="arc-team-title">Request Access to Future ARC Opportunities</h2>
+        <h2 id="arc-team-title">
+            Request Access to Future ARC Opportunities
+        </h2>
 
         <p class="arc-intro">
             The Blackwood ARC Team is for readers who are interested in receiving selected
             advance reader copies in exchange for honest reviews. Places may be limited by
             title, format, location, and review timing.
         </p>
+
+        <!-- ARCHIVIST ACCESS -->
+        <aside class="arc-archivist-note" aria-label="Archivist ARC access">
+
+            <strong>
+                ARC Files are held inside the Private Archive.
+            </strong>
+
+            <p>
+                Approved ARC readers can access assigned advance copies directly through
+                the Blackwood Publishing website using their Archivist account.
+            </p>
+
+            <p>
+                ARC Team membership is separately approved. Becoming an Archivist does not
+                automatically grant ARC access, but an Archivist account is used to open
+                any ARC files assigned to you.
+            </p>
+
+            <p>
+                Not yet an Archivist?
+                <a href="/pages/members.html">Become an Archivist</a>.
+            </p>
+
+        </aside>
 
         <form class="arc-form" id="arc-team-form" novalidate>
 
@@ -382,7 +442,10 @@
                     maxlength="1600"
                     placeholder="A short note is enough."
                 ></textarea>
-                <small>Maximum 1,600 characters.</small>
+
+                <small>
+                    Maximum 1,600 characters.
+                </small>
             </div>
 
             <div class="arc-checkboxes">
@@ -395,6 +458,7 @@
                         value="Yes"
                         required
                     >
+
                     <label for="arc-consent">
                         I agree to be contacted by Blackwood Publishing about ARC opportunities. *
                     </label>
@@ -408,6 +472,7 @@
                         value="Yes"
                         required
                     >
+
                     <label for="arc-privacy">
                         I understand my details will be used for ARC and review communication only,
                         and will not be displayed publicly. *
@@ -417,6 +482,7 @@
             </div>
 
             <div class="arc-actions">
+
                 <button type="submit" class="button copper" id="arc-team-submit">
                     Apply to Join the ARC Team
                 </button>
@@ -424,6 +490,7 @@
                 <p class="arc-status" id="arc-team-status" aria-live="polite">
                     Required fields are marked with an asterisk.
                 </p>
+
             </div>
 
         </form>
