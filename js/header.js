@@ -31,7 +31,7 @@
             const headerType = getHeaderTypeForCurrentPage();
             await loadHeader(headerType);
         } else {
-            safeInit(initBlackwoodCircleAccess, "Blackwood Circle access");
+            safeInit(initBlackwoodCircleAccess, "Archivist access");
             safeInit(initScrollFade, "scroll fade");
             safeInit(initEntity, "entity");
             safeInit(initFadeIn, "fade in");
