@@ -1,7 +1,7 @@
 // =========================
 // BLACKWOOD GLOBAL HEADER JS
 // Loads shared header/footer, dropdown nav, page effects,
-// footer signup, and Blackwood Circle access.
+// footer signup, and Archivist access.
 // =========================
 
 (function () {
@@ -91,7 +91,7 @@
                 initFooterArchiveSignup(footerContainer);
             }
 
-            safeInit(initBlackwoodCircleAccess, "Blackwood Circle access");
+            safeInit(initBlackwoodCircleAccess, "Archivist access");
             safeInit(initScrollFade, "scroll fade");
             safeInit(initEntity, "entity");
             safeInit(initFadeIn, "fade in");
@@ -103,7 +103,7 @@
         } catch (error) {
             console.error("Layout load failed:", error);
 
-            safeInit(initBlackwoodCircleAccess, "Blackwood Circle access");
+            safeInit(initBlackwoodCircleAccess, "Archivist access");
             safeInit(initFadeIn, "fade in fallback");
         }
     }
@@ -121,7 +121,7 @@
     }
 
     // =========================
-    // FOOTER ARCHIVE SIGNUP
+    // FOOTER ARCHIVIST SIGNUP
     // =========================
 
     function initFooterArchiveSignup(footerContainer) {
@@ -150,7 +150,9 @@
 
         status.setAttribute("aria-live", "polite");
 
-        let iframe = footerContainer.querySelector('iframe[name="footer-mailerlite-frame"]');
+        let iframe = footerContainer.querySelector(
+            'iframe[name="footer-mailerlite-frame"]'
+        );
 
         if (!iframe) {
             iframe = document.createElement("iframe");
@@ -177,7 +179,11 @@
 
         function setStatus(message, type) {
             status.textContent = message;
-            status.classList.remove("is-success", "is-error", "is-loading");
+            status.classList.remove(
+                "is-success",
+                "is-error",
+                "is-loading"
+            );
 
             if (type) {
                 status.classList.add(type);
@@ -220,7 +226,10 @@
             if (!emailInput || !emailInput.checkValidity()) {
                 event.preventDefault();
 
-                setStatus("Please enter a valid email address.", "is-error");
+                setStatus(
+                    "Please enter a valid email address.",
+                    "is-error"
+                );
 
                 if (emailInput) {
                     emailInput.focus();
@@ -231,7 +240,10 @@
 
             hasSubmitted = true;
 
-            setStatus("Filing your request...", "is-loading");
+            setStatus(
+                "Filing your request...",
+                "is-loading"
+            );
 
             if (submitButton) {
                 submitButton.disabled = true;
@@ -284,7 +296,9 @@
             headerContainer.querySelector(".nav-links");
 
         if (!existingNav) {
-            console.warn("Blackwood nav not found. Dropdown nav was not injected.");
+            console.warn(
+                "Blackwood nav not found. Dropdown nav was not injected."
+            );
             return;
         }
 
@@ -294,7 +308,9 @@
         existingNav.innerHTML = `
             <a href="/" class="blackwood-nav-link">Home</a>
 
-            <a href="/pages/start-here.html" class="blackwood-nav-link">Start Here</a>
+            <a href="/pages/start-here.html" class="blackwood-nav-link">
+                Start Here
+            </a>
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
@@ -307,15 +323,24 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown blackwood-dropdown-releases" role="menu" aria-label="New releases">
+                <div
+                    class="blackwood-dropdown blackwood-dropdown-releases"
+                    role="menu"
+                    aria-label="New releases"
+                >
                     <a
                         href="/pages/holdfast.html"
                         role="menuitem"
                         class="blackwood-dropdown-feature"
                         aria-label="Holdfast, Book Four of The Archive Files"
                     >
-                        <span class="blackwood-dropdown-title">HOLDFAST</span>
-                        <span class="blackwood-dropdown-subtitle">Book Four of The Archive Files</span>
+                        <span class="blackwood-dropdown-title">
+                            HOLDFAST
+                        </span>
+
+                        <span class="blackwood-dropdown-subtitle">
+                            Book Four of The Archive Files
+                        </span>
                     </a>
 
                     <a
@@ -324,8 +349,13 @@
                         class="blackwood-dropdown-feature"
                         aria-label="The Crossing, a dark literary fantasy by Miren Vale"
                     >
-                        <span class="blackwood-dropdown-title">THE CROSSING</span>
-                        <span class="blackwood-dropdown-subtitle">A dark literary fantasy by Miren Vale</span>
+                        <span class="blackwood-dropdown-title">
+                            THE CROSSING
+                        </span>
+
+                        <span class="blackwood-dropdown-subtitle">
+                            A dark literary fantasy by Miren Vale
+                        </span>
                     </a>
                 </div>
             </div>
@@ -341,17 +371,40 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu" aria-label="The Books">
-                    <a href="/pages/publications.html" role="menuitem">All Publications</a>
-                    <a href="/pages/archive-files.html" role="menuitem">The Archive Files</a>
-                    <a href="/pages/cursed-bothies.html" role="menuitem">The Cursed Bothies</a>
-                    <a href="/pages/hard-silence.html" role="menuitem">Hard Silence</a>
-                    <a href="/pages/standalone.html" role="menuitem">Independent Works</a>
-                    <a href="/pages/LimitedEditions.html" role="menuitem">Limited Editions</a>
+                <div
+                    class="blackwood-dropdown"
+                    role="menu"
+                    aria-label="The Books"
+                >
+                    <a href="/pages/publications.html" role="menuitem">
+                        All Publications
+                    </a>
+
+                    <a href="/pages/archive-files.html" role="menuitem">
+                        The Archive Files
+                    </a>
+
+                    <a href="/pages/cursed-bothies.html" role="menuitem">
+                        The Cursed Bothies
+                    </a>
+
+                    <a href="/pages/hard-silence.html" role="menuitem">
+                        Hard Silence
+                    </a>
+
+                    <a href="/pages/standalone.html" role="menuitem">
+                        Independent Works
+                    </a>
+
+                    <a href="/pages/LimitedEditions.html" role="menuitem">
+                        Limited Editions
+                    </a>
                 </div>
             </div>
 
-            <a href="/pages/store.html" class="blackwood-nav-link">Store</a>
+            <a href="/pages/store.html" class="blackwood-nav-link">
+                Store
+            </a>
 
             <div class="blackwood-nav-item has-dropdown">
                 <button
@@ -364,11 +417,26 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu" aria-label="Reading">
-                    <a href="/pages/reading-lists.html" role="menuitem">Recommended Reads</a>
-                    <a href="/pages/editors-picks.html" role="menuitem">Editor Picks</a>
-                    <a href="/pages/recovered-files.html" role="menuitem">Short Reads</a>
-                    <a href="/pages/reader-records.html" role="menuitem">Reader Records</a>
+                <div
+                    class="blackwood-dropdown"
+                    role="menu"
+                    aria-label="Reading"
+                >
+                    <a href="/pages/reading-lists.html" role="menuitem">
+                        Recommended Reads
+                    </a>
+
+                    <a href="/pages/editors-picks.html" role="menuitem">
+                        Editor Picks
+                    </a>
+
+                    <a href="/pages/recovered-files.html" role="menuitem">
+                        Short Reads
+                    </a>
+
+                    <a href="/pages/reader-records.html" role="menuitem">
+                        Reader Records
+                    </a>
                 </div>
             </div>
 
@@ -383,12 +451,30 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu" aria-label="About">
-                    <a href="/pages/author.html" role="menuitem">Aidan Blackwood</a>
-                    <a href="/pages/miren-vale.html" role="menuitem">Miren Vale</a>
-                    <a href="/pages/appearances.html" role="menuitem">Appearances</a>
-                    <a href="/pages/about.html" role="menuitem">About Blackwood</a>
-                    <a href="/pages/contact.html" role="menuitem">Contact</a>
+                <div
+                    class="blackwood-dropdown"
+                    role="menu"
+                    aria-label="About"
+                >
+                    <a href="/pages/author.html" role="menuitem">
+                        Aidan Blackwood
+                    </a>
+
+                    <a href="/pages/miren-vale.html" role="menuitem">
+                        Miren Vale
+                    </a>
+
+                    <a href="/pages/appearances.html" role="menuitem">
+                        Appearances
+                    </a>
+
+                    <a href="/pages/about.html" role="menuitem">
+                        About Blackwood
+                    </a>
+
+                    <a href="/pages/contact.html" role="menuitem">
+                        Contact
+                    </a>
                 </div>
             </div>
 
@@ -403,31 +489,51 @@
                     <span class="dropdown-mark" aria-hidden="true">▾</span>
                 </button>
 
-                <div class="blackwood-dropdown" role="menu" aria-label="Community">
-                    <a href="/pages/arc-team.html" role="menuitem">ARC Team</a>
-                    <a href="/pages/CommunitySpotlight.html" role="menuitem">Community Spotlight</a>
-                    <a href="/pages/members.html" role="menuitem">The Archivists</a>
+                <div
+                    class="blackwood-dropdown"
+                    role="menu"
+                    aria-label="Community"
+                >
+                    <a href="/pages/arc-team.html" role="menuitem">
+                        ARC Team
+                    </a>
+
+                    <a href="/pages/CommunitySpotlight.html" role="menuitem">
+                        Community Spotlight
+                    </a>
+
+                    <a href="/pages/members.html" role="menuitem">
+                        The Archivists
+                    </a>
                 </div>
             </div>
         `;
 
-        const dropdownItems = existingNav.querySelectorAll(".has-dropdown");
+        const dropdownItems =
+            existingNav.querySelectorAll(".has-dropdown");
 
         function closeAllDropdowns() {
             dropdownItems.forEach(item => {
-                const button = item.querySelector(".blackwood-dropdown-toggle");
+                const button =
+                    item.querySelector(".blackwood-dropdown-toggle");
 
                 item.classList.remove("is-open");
 
                 if (button) {
-                    button.setAttribute("aria-expanded", "false");
+                    button.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
                 }
             });
         }
 
         dropdownItems.forEach(item => {
-            const button = item.querySelector(".blackwood-dropdown-toggle");
-            const dropdown = item.querySelector(".blackwood-dropdown");
+            const button =
+                item.querySelector(".blackwood-dropdown-toggle");
+
+            const dropdown =
+                item.querySelector(".blackwood-dropdown");
 
             if (!button || !dropdown) return;
 
@@ -435,18 +541,31 @@
                 event.preventDefault();
                 event.stopPropagation();
 
-                const isOpen = item.classList.contains("is-open");
+                const isOpen =
+                    item.classList.contains("is-open");
 
                 closeAllDropdowns();
 
-                item.classList.toggle("is-open", !isOpen);
-                button.setAttribute("aria-expanded", String(!isOpen));
+                item.classList.toggle(
+                    "is-open",
+                    !isOpen
+                );
+
+                button.setAttribute(
+                    "aria-expanded",
+                    String(!isOpen)
+                );
             });
 
             button.addEventListener("keydown", event => {
                 if (event.key === "Escape") {
                     item.classList.remove("is-open");
-                    button.setAttribute("aria-expanded", "false");
+
+                    button.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
                     button.focus();
                 }
 
@@ -456,9 +575,14 @@
                     closeAllDropdowns();
 
                     item.classList.add("is-open");
-                    button.setAttribute("aria-expanded", "true");
 
-                    const firstDropdownLink = dropdown.querySelector("a");
+                    button.setAttribute(
+                        "aria-expanded",
+                        "true"
+                    );
+
+                    const firstDropdownLink =
+                        dropdown.querySelector("a");
 
                     if (firstDropdownLink) {
                         firstDropdownLink.focus();
@@ -469,13 +593,21 @@
             dropdown.addEventListener("keydown", event => {
                 if (event.key === "Escape") {
                     item.classList.remove("is-open");
-                    button.setAttribute("aria-expanded", "false");
+
+                    button.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
                     button.focus();
                 }
             });
         });
 
-        document.addEventListener("click", closeAllDropdowns);
+        document.addEventListener(
+            "click",
+            closeAllDropdowns
+        );
 
         existingNav.addEventListener("click", event => {
             event.stopPropagation();
@@ -496,21 +628,35 @@
         let currentY = 50;
 
         function updateMouse(event) {
-            mouseX = (event.clientX / window.innerWidth) * 100;
-            mouseY = (event.clientY / window.innerHeight) * 100;
+            mouseX =
+                (event.clientX / window.innerWidth) * 100;
+
+            mouseY =
+                (event.clientY / window.innerHeight) * 100;
         }
 
         function animate() {
             currentX += (mouseX - currentX) * 0.08;
             currentY += (mouseY - currentY) * 0.08;
 
-            root.style.setProperty("--mouse-x", `${currentX}%`);
-            root.style.setProperty("--mouse-y", `${currentY}%`);
+            root.style.setProperty(
+                "--mouse-x",
+                `${currentX}%`
+            );
+
+            root.style.setProperty(
+                "--mouse-y",
+                `${currentY}%`
+            );
 
             requestAnimationFrame(animate);
         }
 
-        window.addEventListener("mousemove", updateMouse);
+        window.addEventListener(
+            "mousemove",
+            updateMouse
+        );
+
         animate();
     }
 
@@ -522,38 +668,74 @@
         let ticking = false;
 
         function update() {
-            const featured = document.querySelector(".featured");
-            const hero = document.querySelector(".hero");
-            const works = document.querySelector(".works");
+            const featured =
+                document.querySelector(".featured");
+
+            const hero =
+                document.querySelector(".hero");
+
+            const works =
+                document.querySelector(".works");
 
             let progress = 0;
 
             if (featured) {
-                const rect = featured.getBoundingClientRect();
+                const rect =
+                    featured.getBoundingClientRect();
 
-                const start = window.innerHeight * 0.9;
-                const end = window.innerHeight * 0.3;
+                const start =
+                    window.innerHeight * 0.9;
 
-                progress = (start - rect.top) / (start - end);
-                progress = Math.max(0, Math.min(1, progress));
+                const end =
+                    window.innerHeight * 0.3;
 
-                featured.style.setProperty("--fadeIn", progress);
+                progress =
+                    (start - rect.top) /
+                    (start - end);
+
+                progress =
+                    Math.max(
+                        0,
+                        Math.min(1, progress)
+                    );
+
+                featured.style.setProperty(
+                    "--fadeIn",
+                    progress
+                );
             }
 
             if (hero) {
-                hero.style.setProperty("--fadeOut", progress * 0.8);
+                hero.style.setProperty(
+                    "--fadeOut",
+                    progress * 0.8
+                );
             }
 
             if (works) {
-                const rect = works.getBoundingClientRect();
+                const rect =
+                    works.getBoundingClientRect();
 
-                const start = window.innerHeight * 1.1;
-                const end = window.innerHeight * 0.5;
+                const start =
+                    window.innerHeight * 1.1;
 
-                let fade = (start - rect.top) / (start - end);
-                fade = Math.max(0, Math.min(1, fade));
+                const end =
+                    window.innerHeight * 0.5;
 
-                works.style.setProperty("--sectionFade", fade);
+                let fade =
+                    (start - rect.top) /
+                    (start - end);
+
+                fade =
+                    Math.max(
+                        0,
+                        Math.min(1, fade)
+                    );
+
+                works.style.setProperty(
+                    "--sectionFade",
+                    fade
+                );
             }
 
             ticking = false;
@@ -574,22 +756,26 @@
     // =========================
 
     function initEntity() {
-        const entity = document.querySelector(".entity");
+        const entity =
+            document.querySelector(".entity");
 
         if (!entity) return;
 
         function triggerEntity() {
-            const delay = Math.random() * 9000 + 3000;
+            const delay =
+                Math.random() * 9000 + 3000;
 
             setTimeout(() => {
                 entity.classList.add("active");
 
-                const visibleTime = Math.random() * 3000 + 2000;
+                const visibleTime =
+                    Math.random() * 3000 + 2000;
 
                 setTimeout(() => {
                     entity.classList.remove("active");
                     triggerEntity();
                 }, visibleTime);
+
             }, delay);
         }
 
@@ -601,23 +787,34 @@
     // =========================
 
     function initFadeIn() {
-        const elements = document.querySelectorAll(".fade-in, .work");
+        const elements =
+            document.querySelectorAll(
+                ".fade-in, .work"
+            );
 
         if (!elements.length) return;
 
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add("visible");
-                    observer.unobserve(entry.target);
-                }
+        const observer =
+            new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add(
+                            "visible"
+                        );
+
+                        observer.unobserve(
+                            entry.target
+                        );
+                    }
+                });
+            }, {
+                threshold: 0.2
             });
-        }, {
-            threshold: 0.2
-        });
 
         elements.forEach((element, index) => {
-            element.style.transitionDelay = `${index * 120}ms`;
+            element.style.transitionDelay =
+                `${index * 120}ms`;
+
             observer.observe(element);
         });
     }
@@ -627,19 +824,38 @@
     // =========================
 
     function initSpotlight() {
-        const works = document.querySelector(".works");
+        const works =
+            document.querySelector(".works");
 
         if (!works) return;
 
-        works.addEventListener("mousemove", event => {
-            const rect = works.getBoundingClientRect();
+        works.addEventListener(
+            "mousemove",
+            event => {
+                const rect =
+                    works.getBoundingClientRect();
 
-            const x = ((event.clientX - rect.left) / rect.width) * 100;
-            const y = ((event.clientY - rect.top) / rect.height) * 100;
+                const x =
+                    ((event.clientX - rect.left) /
+                        rect.width) *
+                    100;
 
-            works.style.setProperty("--mouse-x", `${x}%`);
-            works.style.setProperty("--mouse-y", `${y}%`);
-        });
+                const y =
+                    ((event.clientY - rect.top) /
+                        rect.height) *
+                    100;
+
+                works.style.setProperty(
+                    "--mouse-x",
+                    `${x}%`
+                );
+
+                works.style.setProperty(
+                    "--mouse-y",
+                    `${y}%`
+                );
+            }
+        );
     }
 
     // =========================
@@ -666,9 +882,15 @@
             document.getElementById("q4")
         ];
 
-        const watcher = document.getElementById("quote-watcher");
+        const watcher =
+            document.getElementById("quote-watcher");
 
-        if (fragments.some(element => !element) || !watcher) return;
+        if (
+            fragments.some(element => !element) ||
+            !watcher
+        ) {
+            return;
+        }
 
         function renderText(element, text) {
             element.innerHTML = "";
@@ -676,21 +898,35 @@
             const words = text.split(" ");
 
             words.forEach((word, index) => {
-                const span = document.createElement("span");
+                const span =
+                    document.createElement("span");
 
-                const clean = word.toLowerCase().replace(/[.?]/g, "");
-                const emphasisWords = ["remember", "alone", "wrong", "watches", "empty", "back"];
+                const clean =
+                    word
+                        .toLowerCase()
+                        .replace(/[.?]/g, "");
 
-                span.className = emphasisWords.includes(clean)
-                    ? "word emphasis"
-                    : "word";
+                const emphasisWords = [
+                    "remember",
+                    "alone",
+                    "wrong",
+                    "watches",
+                    "empty",
+                    "back"
+                ];
+
+                span.className =
+                    emphasisWords.includes(clean)
+                        ? "word emphasis"
+                        : "word";
 
                 if (Math.random() < 0.35) {
                     span.classList.add("distort");
                 }
 
                 span.textContent = `${word} `;
-                span.style.animationDelay = `${index * 0.2}s`;
+                span.style.animationDelay =
+                    `${index * 0.2}s`;
 
                 element.appendChild(span);
             });
@@ -702,33 +938,65 @@
             let index;
 
             do {
-                index = Math.floor(Math.random() * fragments.length);
+                index =
+                    Math.floor(
+                        Math.random() *
+                        fragments.length
+                    );
             } while (index === lastIndex);
 
             lastIndex = index;
 
-            const element = fragments[index];
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            const element =
+                fragments[index];
 
-            const side = Math.random() < 0.5 ? "left" : "right";
-            const top = Math.random() * 70 + 10;
-            const offset = Math.random() * 10 + 5;
+            const quote =
+                quotes[
+                    Math.floor(
+                        Math.random() *
+                        quotes.length
+                    )
+                ];
+
+            const side =
+                Math.random() < 0.5
+                    ? "left"
+                    : "right";
+
+            const top =
+                Math.random() * 70 + 10;
+
+            const offset =
+                Math.random() * 10 + 5;
 
             if (side === "left") {
-                element.style.left = `${offset}%`;
-                element.style.right = "auto";
+                element.style.left =
+                    `${offset}%`;
+
+                element.style.right =
+                    "auto";
             } else {
-                element.style.right = `${offset}%`;
-                element.style.left = "auto";
+                element.style.right =
+                    `${offset}%`;
+
+                element.style.left =
+                    "auto";
             }
 
-            element.style.top = `${top}%`;
+            element.style.top =
+                `${top}%`;
 
-            const rotation = (Math.random() - 0.5) * 6;
-            element.style.setProperty("--rot", `${rotation}deg`);
+            const rotation =
+                (Math.random() - 0.5) * 6;
+
+            element.style.setProperty(
+                "--rot",
+                `${rotation}deg`
+            );
 
             element.style.animationDuration =
-                `${18 + Math.random() * 6}s, ${10 + Math.random() * 6}s`;
+                `${18 + Math.random() * 6}s, ` +
+                `${10 + Math.random() * 6}s`;
 
             renderText(element, quote);
         }
@@ -736,46 +1004,94 @@
         function loopFragments() {
             updateFragment();
 
-            const next = Math.random() * 2000 + 1500;
-            setTimeout(loopFragments, next);
+            const next =
+                Math.random() * 2000 + 1500;
+
+            setTimeout(
+                loopFragments,
+                next
+            );
         }
 
         function triggerWatcher() {
-            const text = quotes[Math.floor(Math.random() * quotes.length)];
-            renderText(watcher, text);
+            const text =
+                quotes[
+                    Math.floor(
+                        Math.random() *
+                        quotes.length
+                    )
+                ];
+
+            renderText(
+                watcher,
+                text
+            );
 
             watcher.style.opacity = 1;
 
             function move(event) {
-                const x = (event.clientX / window.innerWidth - 0.5) * 40;
-                const y = (event.clientY / window.innerHeight - 0.5) * 40;
+                const x =
+                    (
+                        event.clientX /
+                        window.innerWidth -
+                        0.5
+                    ) * 40;
+
+                const y =
+                    (
+                        event.clientY /
+                        window.innerHeight -
+                        0.5
+                    ) * 40;
 
                 watcher.style.transform =
                     `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
             }
 
-            document.addEventListener("mousemove", move);
+            document.addEventListener(
+                "mousemove",
+                move
+            );
 
-            const glitchInterval = setInterval(() => {
-                watcher.classList.add("glitch");
+            const glitchInterval =
+                setInterval(() => {
+                    watcher.classList.add(
+                        "glitch"
+                    );
 
-                setTimeout(() => {
-                    watcher.classList.remove("glitch");
-                }, 120);
-            }, Math.random() * 2000 + 1000);
+                    setTimeout(() => {
+                        watcher.classList.remove(
+                            "glitch"
+                        );
+                    }, 120);
+
+                }, Math.random() * 2000 + 1000);
 
             setTimeout(() => {
-                watcher.classList.add("decay");
+                watcher.classList.add(
+                    "decay"
+                );
 
                 setTimeout(() => {
-                    watcher.classList.remove("decay");
+                    watcher.classList.remove(
+                        "decay"
+                    );
                 }, 700);
+
             }, Math.random() * 2500 + 1500);
 
             setTimeout(() => {
                 watcher.style.opacity = 0;
-                document.removeEventListener("mousemove", move);
-                clearInterval(glitchInterval);
+
+                document.removeEventListener(
+                    "mousemove",
+                    move
+                );
+
+                clearInterval(
+                    glitchInterval
+                );
+
             }, 4000);
         }
 
@@ -796,94 +1112,178 @@
     // =========================
 
     function initReviewRotator() {
-        const containers = document.querySelectorAll(".review-snippet");
+        const containers =
+            document.querySelectorAll(
+                ".review-snippet"
+            );
 
         if (!containers.length) return;
 
         const reviews = {
             corrour: [
-                { text: "This book didn’t just tell a story. It gave me feelings I cannot shake.", source: "Reader Review" },
-                { text: "Slow, insidious unraveling that never lets you feel safe.", source: "Reader Review" },
-                { text: "The landscape feels alive. Watching. Waiting.", source: "Reader Review" },
-                { text: "It gets into your bones like the cold.", source: "Reader Review" }
+                {
+                    text: "This book didn’t just tell a story. It gave me feelings I cannot shake.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "Slow, insidious unraveling that never lets you feel safe.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "The landscape feels alive. Watching. Waiting.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "It gets into your bones like the cold.",
+                    source: "Reader Review"
+                }
             ],
 
             archive: [
-                { text: "Creepy, atmospheric read. I finished one and started the next immediately.", source: "Reader Review" },
-                { text: "It gets under your skin. No cheap scares, just a steady unraveling.", source: "Reader Review" },
-                { text: "A gripping, slow-burn descent that’s impossible to put down.", source: "Reader Review" },
-                { text: "Atmosphere so vivid it pulls you straight into the cold, silent landscape.", source: "Reader Review" }
+                {
+                    text: "Creepy, atmospheric read. I finished one and started the next immediately.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "It gets under your skin. No cheap scares, just a steady unraveling.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "A gripping, slow-burn descent that’s impossible to put down.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "Atmosphere so vivid it pulls you straight into the cold, silent landscape.",
+                    source: "Reader Review"
+                }
             ],
 
             "hard-silence": [
-                { text: "A gripping thriller — raw, brutal and unflinching.", source: "Reader Review" },
-                { text: "Very dark and menacing, but addictive in its own way.", source: "Reader Review" },
-                { text: "A brutal, tension-filled thriller that grips from the first page to the last.", source: "Reader Review" },
-                { text: "Dark, violent, and relentlessly suspenseful.", source: "Reader Review" }
+                {
+                    text: "A gripping thriller — raw, brutal and unflinching.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "Very dark and menacing, but addictive in its own way.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "A brutal, tension-filled thriller that grips from the first page to the last.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "Dark, violent, and relentlessly suspenseful.",
+                    source: "Reader Review"
+                }
             ],
 
             standalone: [
-                { text: "Quietly unsettling and deeply personal.", source: "Reader Review" },
-                { text: "Lingers long after the final page.", source: "Reader Review" },
-                { text: "A haunting gothic nightmare where the house itself feels alive.", source: "Reader Review" },
-                { text: "Slow-burning dread that builds into something truly disturbing.", source: "Reader Review" }
+                {
+                    text: "Quietly unsettling and deeply personal.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "Lingers long after the final page.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "A haunting gothic nightmare where the house itself feels alive.",
+                    source: "Reader Review"
+                },
+                {
+                    text: "Slow-burning dread that builds into something truly disturbing.",
+                    source: "Reader Review"
+                }
             ]
         };
 
         containers.forEach(container => {
-            if (container.classList.contains("static-review")) return;
+            if (
+                container.classList.contains(
+                    "static-review"
+                )
+            ) {
+                return;
+            }
 
-            const book = container.dataset.book;
+            const book =
+                container.dataset.book;
 
-            const activeReviews = reviews[book] || [
-                {
-                    text: "Each book feels like a place you shouldn’t have found.",
-                    source: "Reader Review"
-                }
-            ];
+            const activeReviews =
+                reviews[book] || [
+                    {
+                        text: "Each book feels like a place you shouldn’t have found.",
+                        source: "Reader Review"
+                    }
+                ];
 
             let index = 0;
 
             function showReview(reviewIndex) {
-                const review = activeReviews[reviewIndex];
+                const review =
+                    activeReviews[reviewIndex];
 
                 container.style.opacity = 0;
 
                 setTimeout(() => {
                     container.innerHTML = `
                         <p>"${review.text}"</p>
-                        <span class="quote-source">— ${review.source}</span>
+                        <span class="quote-source">
+                            — ${review.source}
+                        </span>
                     `;
 
                     container.style.opacity = 1;
+
                 }, 300);
             }
 
             function rotate() {
-                index = (index + 1) % activeReviews.length;
+                index =
+                    (index + 1) %
+                    activeReviews.length;
+
                 showReview(index);
             }
 
             showReview(index);
 
             if (activeReviews.length > 1) {
-                setInterval(rotate, 5000);
+                setInterval(
+                    rotate,
+                    5000
+                );
             }
         });
     }
 
-        // =========================
-    // BLACKWOOD CIRCLE ACCESS
-    // Smart top-right member access link
-    // Signed out: The Circle
-    // Signed in: My Circle · points
+    // =========================
+    // ARCHIVIST ACCESS
+    // Smart top-right reader access link
+    //
+    // Signed out:
+    // The Archivists
+    //
+    // Signed in:
+    // My Archive · points
+    //
+    // Internal Circle names are deliberately retained
+    // so existing CSS, Supabase and integration hooks
+    // continue to work unchanged.
     // =========================
 
     const CIRCLE_ACCESS_CONFIG = {
-        supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
-        supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
-        membersPageUrl: "/pages/members.html",
-        supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+        supabaseUrl:
+            "https://bmnlynjldlnxfvunqbqq.supabase.co",
+
+        supabaseKey:
+            "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
+
+        membersPageUrl:
+            "/pages/members.html",
+
+        supabaseCdn:
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     };
 
     let circleClient = null;
@@ -895,102 +1295,182 @@
 
         circleAccessStarted = true;
 
-        const circleLink = getOrCreateCircleAccessLink();
+        const circleLink =
+            getOrCreateCircleAccessLink();
 
         renderCircleSignedOut(circleLink);
-        startCircleSessionWatcher(circleLink);
+
+        startCircleSessionWatcher(
+            circleLink
+        );
     }
 
     function getOrCreateCircleAccessLink() {
-        const existingLink = document.querySelector(".blackwood-circle-access");
+        const existingLink =
+            document.querySelector(
+                ".blackwood-circle-access"
+            );
 
         if (existingLink) {
             return existingLink;
         }
 
-        const circleLink = document.createElement("a");
-        circleLink.className = "blackwood-circle-access";
-        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
-        circleLink.setAttribute("aria-label", "Open The Blackwood Circle member area");
+        const circleLink =
+            document.createElement("a");
 
-        document.body.appendChild(circleLink);
+        circleLink.className =
+            "blackwood-circle-access";
+
+        circleLink.href =
+            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+
+        circleLink.setAttribute(
+            "aria-label",
+            "Open The Archivists reader area"
+        );
+
+        document.body.appendChild(
+            circleLink
+        );
 
         return circleLink;
     }
 
-    async function startCircleSessionWatcher(circleLink) {
+    async function startCircleSessionWatcher(
+        circleLink
+    ) {
         try {
             await loadCircleSupabaseLibrary();
 
-            circleClient = window.supabase.createClient(
-                CIRCLE_ACCESS_CONFIG.supabaseUrl,
-                CIRCLE_ACCESS_CONFIG.supabaseKey,
-                {
-                    auth: {
-                        persistSession: true,
-                        autoRefreshToken: true,
-                        detectSessionInUrl: true
+            circleClient =
+                window.supabase.createClient(
+                    CIRCLE_ACCESS_CONFIG.supabaseUrl,
+                    CIRCLE_ACCESS_CONFIG.supabaseKey,
+                    {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true,
+                            detectSessionInUrl: true
+                        }
                     }
+                );
+
+            const {
+                data,
+                error
+            } =
+                await circleClient.auth.getSession();
+
+            if (error) {
+                throw error;
+            }
+
+            await updateCircleAccessFromSession(
+                circleLink,
+                data.session || null
+            );
+
+            circleClient.auth.onAuthStateChange(
+                (_event, session) => {
+                    updateCircleAccessFromSession(
+                        circleLink,
+                        session || null
+                    );
                 }
             );
 
-            const { data, error } = await circleClient.auth.getSession();
-
-            if (error) {
-                throw error;
-            }
-
-            await updateCircleAccessFromSession(circleLink, data.session || null);
-
-            circleClient.auth.onAuthStateChange((_event, session) => {
-                updateCircleAccessFromSession(circleLink, session || null);
-            });
-
-            window.addEventListener("focus", () => {
-                refreshCircleAccess(circleLink);
-            });
+            window.addEventListener(
+                "focus",
+                () => {
+                    refreshCircleAccess(
+                        circleLink
+                    );
+                }
+            );
 
         } catch (error) {
-            console.warn("Blackwood Circle access could not check member session:", error);
-            renderCircleSignedOut(circleLink);
+            console.warn(
+                "Archivist access could not check reader session:",
+                error
+            );
+
+            renderCircleSignedOut(
+                circleLink
+            );
         }
     }
 
-    async function refreshCircleAccess(circleLink) {
+    async function refreshCircleAccess(
+        circleLink
+    ) {
         if (!circleClient) return;
 
         try {
-            const { data, error } = await circleClient.auth.getSession();
+            const {
+                data,
+                error
+            } =
+                await circleClient.auth.getSession();
 
             if (error) {
                 throw error;
             }
 
-            await updateCircleAccessFromSession(circleLink, data.session || null);
+            await updateCircleAccessFromSession(
+                circleLink,
+                data.session || null
+            );
 
         } catch (error) {
-            console.warn("Blackwood Circle access refresh failed:", error);
+            console.warn(
+                "Archivist access refresh failed:",
+                error
+            );
         }
     }
 
-    async function updateCircleAccessFromSession(circleLink, session) {
-        const currentRefreshId = ++circleRefreshId;
+    async function updateCircleAccessFromSession(
+        circleLink,
+        session
+    ) {
+        const currentRefreshId =
+            ++circleRefreshId;
 
-        if (!session || !session.user) {
-            renderCircleSignedOut(circleLink);
+        if (
+            !session ||
+            !session.user
+        ) {
+            renderCircleSignedOut(
+                circleLink
+            );
+
             return;
         }
 
-        renderCircleLoading(circleLink);
+        renderCircleLoading(
+            circleLink
+        );
 
         try {
-            const { data, error } = await circleClient
-                .from("member_profiles")
-                .select("display_name, reader_name, points_total, member_tier")
-                .eq("id", session.user.id)
-                .maybeSingle();
+            const {
+                data,
+                error
+            } =
+                await circleClient
+                    .from("member_profiles")
+                    .select(
+                        "display_name, reader_name, points_total, member_tier"
+                    )
+                    .eq(
+                        "id",
+                        session.user.id
+                    )
+                    .maybeSingle();
 
-            if (currentRefreshId !== circleRefreshId) {
+            if (
+                currentRefreshId !==
+                circleRefreshId
+            ) {
                 return;
             }
 
@@ -998,91 +1478,223 @@
                 throw error;
             }
 
-            renderCircleSignedIn(circleLink, data || {});
+            renderCircleSignedIn(
+                circleLink,
+                data || {}
+            );
 
         } catch (error) {
-            console.warn("Blackwood Circle profile check failed:", error);
+            console.warn(
+                "Archivist profile check failed:",
+                error
+            );
 
-            if (currentRefreshId === circleRefreshId) {
-                renderCircleSignedIn(circleLink, {});
+            if (
+                currentRefreshId ===
+                circleRefreshId
+            ) {
+                renderCircleSignedIn(
+                    circleLink,
+                    {}
+                );
             }
         }
     }
 
-    function renderCircleSignedOut(circleLink) {
-        circleLink.classList.remove("is-signed-in", "is-loading");
-        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
-        circleLink.setAttribute("aria-label", "Open The Blackwood Circle member area");
-        circleLink.title = "The Blackwood Circle";
+    function renderCircleSignedOut(
+        circleLink
+    ) {
+        circleLink.classList.remove(
+            "is-signed-in",
+            "is-loading"
+        );
+
+        circleLink.href =
+            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+
+        circleLink.setAttribute(
+            "aria-label",
+            "Open The Archivists reader area"
+        );
+
+        circleLink.title =
+            "The Archivists";
 
         circleLink.innerHTML = `
-            <span class="blackwood-circle-access-mark" aria-hidden="true">◎</span>
-            <span class="blackwood-circle-access-text">The Circle</span>
+            <span
+                class="blackwood-circle-access-mark"
+                aria-hidden="true"
+            >◎</span>
+
+            <span
+                class="blackwood-circle-access-text"
+            >The Archivists</span>
         `;
     }
 
-    function renderCircleLoading(circleLink) {
-        circleLink.classList.add("is-loading");
-        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
-        circleLink.setAttribute("aria-label", "Opening your Blackwood Circle member record");
+    function renderCircleLoading(
+        circleLink
+    ) {
+        circleLink.classList.add(
+            "is-loading"
+        );
+
+        circleLink.href =
+            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+
+        circleLink.setAttribute(
+            "aria-label",
+            "Opening your Private Archive"
+        );
 
         circleLink.innerHTML = `
-            <span class="blackwood-circle-access-mark" aria-hidden="true">◎</span>
-            <span class="blackwood-circle-access-text">Checking...</span>
+            <span
+                class="blackwood-circle-access-mark"
+                aria-hidden="true"
+            >◎</span>
+
+            <span
+                class="blackwood-circle-access-text"
+            >Checking...</span>
         `;
     }
 
-    function renderCircleSignedIn(circleLink, profile) {
-        const points = Number(profile.points_total || 0);
-        const pointsLabel = points === 1 ? "1 pt" : `${points} pts`;
+    function renderCircleSignedIn(
+        circleLink,
+        profile
+    ) {
+        const points =
+            Number(
+                profile.points_total || 0
+            );
 
-        circleLink.classList.remove("is-loading");
-        circleLink.classList.add("is-signed-in");
-        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
-        circleLink.setAttribute("aria-label", `Open your Blackwood Circle member area. ${pointsLabel}.`);
-        circleLink.title = `My Circle · ${pointsLabel}`;
+        const pointsLabel =
+            points === 1
+                ? "1 pt"
+                : `${points} pts`;
+
+        circleLink.classList.remove(
+            "is-loading"
+        );
+
+        circleLink.classList.add(
+            "is-signed-in"
+        );
+
+        circleLink.href =
+            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+
+        circleLink.setAttribute(
+            "aria-label",
+            `Open your Private Archive. ${pointsLabel} in Archive Points.`
+        );
+
+        circleLink.title =
+            `My Archive · ${pointsLabel}`;
 
         circleLink.innerHTML = `
-            <span class="blackwood-circle-access-mark" aria-hidden="true">◎</span>
-            <span class="blackwood-circle-access-text">My Circle</span>
-            <span class="blackwood-circle-access-points">${pointsLabel}</span>
+            <span
+                class="blackwood-circle-access-mark"
+                aria-hidden="true"
+            >◎</span>
+
+            <span
+                class="blackwood-circle-access-text"
+            >My Archive</span>
+
+            <span
+                class="blackwood-circle-access-points"
+            >${pointsLabel}</span>
         `;
     }
 
     function loadCircleSupabaseLibrary() {
-        return new Promise((resolve, reject) => {
-            if (window.supabase && typeof window.supabase.createClient === "function") {
-                resolve();
-                return;
-            }
+        return new Promise(
+            (resolve, reject) => {
 
-            const existingScript = document.querySelector("script[data-blackwood-supabase]");
-
-            if (existingScript) {
-                existingScript.addEventListener("load", () => resolve(), { once: true });
-                existingScript.addEventListener("error", () => reject(new Error("Supabase could not be loaded.")), { once: true });
-                return;
-            }
-
-            const script = document.createElement("script");
-            script.src = CIRCLE_ACCESS_CONFIG.supabaseCdn;
-            script.async = true;
-            script.defer = true;
-            script.dataset.blackwoodSupabase = "true";
-
-            script.onload = () => {
-                if (window.supabase && typeof window.supabase.createClient === "function") {
+                if (
+                    window.supabase &&
+                    typeof window.supabase.createClient ===
+                        "function"
+                ) {
                     resolve();
-                } else {
-                    reject(new Error("Supabase loaded, but createClient was unavailable."));
+                    return;
                 }
-            };
 
-            script.onerror = () => {
-                reject(new Error("Supabase could not be loaded."));
-            };
+                const existingScript =
+                    document.querySelector(
+                        "script[data-blackwood-supabase]"
+                    );
 
-            document.head.appendChild(script);
-        });
+                if (existingScript) {
+                    existingScript.addEventListener(
+                        "load",
+                        () => resolve(),
+                        {
+                            once: true
+                        }
+                    );
+
+                    existingScript.addEventListener(
+                        "error",
+                        () =>
+                            reject(
+                                new Error(
+                                    "Supabase could not be loaded."
+                                )
+                            ),
+                        {
+                            once: true
+                        }
+                    );
+
+                    return;
+                }
+
+                const script =
+                    document.createElement(
+                        "script"
+                    );
+
+                script.src =
+                    CIRCLE_ACCESS_CONFIG.supabaseCdn;
+
+                script.async = true;
+                script.defer = true;
+
+                script.dataset.blackwoodSupabase =
+                    "true";
+
+                script.onload = () => {
+                    if (
+                        window.supabase &&
+                        typeof window.supabase
+                            .createClient ===
+                            "function"
+                    ) {
+                        resolve();
+                    } else {
+                        reject(
+                            new Error(
+                                "Supabase loaded, but createClient was unavailable."
+                            )
+                        );
+                    }
+                };
+
+                script.onerror = () => {
+                    reject(
+                        new Error(
+                            "Supabase could not be loaded."
+                        )
+                    );
+                };
+
+                document.head.appendChild(
+                    script
+                );
+            }
+        );
     }
+
 })();
