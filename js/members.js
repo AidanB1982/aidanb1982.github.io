@@ -842,46 +842,51 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
     }
 
     async function loadMemberArcAssignmentsForDashboard(memberId) {
-        if (!memberId) {
-            return [];
-        }
+    if (!memberId) {
+        return [];
+    }
 
-        try {
-            const { data, error } = await BlackwoodMembersState.client
-                .from("arc_file_assignments")
-                .select(`
-                    id,
-                    member_id,
-                    arc_file_id,
-                    application_id,
-                    status,
-                    review_due_date,
-                    review_link,
-                    download_count,
-                    last_downloaded_at,
-                    created_at,
-                    arc_files (
-                        title,
-                        slug,
-                        author_name
-                    )
-                `)
-                .eq("member_id", memberId)
-                .eq("status", "active")
-                .order("created_at", { ascending: false });
+    try {
+        const { data, error } = await BlackwoodMembersState.client
+            .from("arc_file_assignments")
+            .select(`
+                id,
+                member_id,
+                arc_file_id,
+                application_id,
+                status,
+                review_due_date,
+                review_link,
+                download_count,
+                last_downloaded_at,
+                created_at,
+                arc_files (
+                    title,
+                    slug,
+                    author_name,
+                    is_active
+                )
+            `)
+            .eq("member_id", memberId)
+            .eq("status", "active")
+            .order("created_at", { ascending: false });
 
-            if (error) {
-                console.warn("ARC assignments with file details could not be loaded:", error.message);
-                return loadMemberArcAssignmentsFallback(memberId);
-            }
+        if (error) {
+            console.warn(
+                "ARC assignments with file details could not be loaded:",
+                error.message
+            );
 
-            return Array.isArray(data) ? data : [];
-
-        } catch (error) {
-            console.warn("ARC assignments query failed:", error);
             return loadMemberArcAssignmentsFallback(memberId);
         }
+
+        return Array.isArray(data) ? data : [];
+
+    } catch (error) {
+        console.warn("ARC assignments query failed:", error);
+        return loadMemberArcAssignmentsFallback(memberId);
     }
+}
 
     async function loadMemberArcAssignmentsFallback(memberId) {
         try {
