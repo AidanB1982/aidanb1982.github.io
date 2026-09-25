@@ -62,7 +62,87 @@
     line-height: 1.75;
 }
 
-/* ARCHIVIST / ARC ACCESS NOTE */
+
+/* ============================================================
+   CURRENT ARC OPPORTUNITY
+   ============================================================ */
+
+.arc-current-release {
+    margin: 0 0 34px;
+    padding: 26px 28px;
+    border: 1px solid rgba(196, 122, 44, 0.32);
+    background:
+        linear-gradient(
+            135deg,
+            rgba(196, 122, 44, 0.10),
+            rgba(255, 255, 255, 0.025)
+        );
+    border-radius: 6px;
+}
+
+.arc-current-release-label {
+    margin: 0 0 8px;
+    color: #c47a2c;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.arc-current-release h3 {
+    margin: 0 0 12px;
+    color: #f2f2f2;
+    font-size: clamp(24px, 4vw, 32px);
+    line-height: 1.15;
+}
+
+.arc-current-release > p:not(.arc-current-release-label) {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.arc-current-release-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: 22px 0;
+    border: 1px solid rgba(196, 122, 44, 0.18);
+    background: rgba(196, 122, 44, 0.18);
+}
+
+.arc-current-release-details div {
+    padding: 16px;
+    background: rgba(5, 5, 5, 0.88);
+}
+
+.arc-current-release-details dt {
+    margin: 0 0 6px;
+    color: rgba(255, 255, 255, 0.42);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.arc-current-release-details dd {
+    margin: 0;
+    color: #d6b181;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.arc-current-release-note {
+    padding-top: 18px;
+    border-top: 1px solid rgba(196, 122, 44, 0.16);
+}
+
+
+/* ============================================================
+   ARCHIVIST / ARC ACCESS NOTE
+   ============================================================ */
+
 .arc-archivist-note {
     margin: 0 0 38px;
     padding: 22px 24px;
@@ -94,6 +174,11 @@
     text-decoration: underline;
     text-underline-offset: 3px;
 }
+
+
+/* ============================================================
+   APPLICATION FORM
+   ============================================================ */
 
 .arc-form {
     display: grid;
@@ -203,8 +288,17 @@
     overflow: hidden;
 }
 
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
 @media (max-width: 760px) {
     .arc-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .arc-current-release-details {
         grid-template-columns: 1fr;
     }
 
@@ -222,31 +316,56 @@
 
 <div id="header-placeholder"></div>
 
+
+<!-- ==========================================================
+     HERO
+     ========================================================== -->
+
 <section class="about-hero">
 
     <div class="about-hero-overlay"></div>
 
     <div class="about-hero-content fade-in">
-        <p class="about-intro-line">Advance Reader Copies</p>
 
-        <h1>Join the ARC Team</h1>
+        <p class="about-intro-line">
+            Advance Reader Copies
+        </p>
+
+        <h1>
+            Join the ARC Team
+        </h1>
 
         <p class="about-intro-line">
             Early readers. Honest reviews. Records filed before release.
         </p>
 
-        <p class="about-intro-line" style="opacity:0.55; font-size:14px;">
-            Apply to be considered for future Blackwood Publishing advance reader opportunities.
+        <p
+            class="about-intro-line"
+            style="opacity:0.55; font-size:14px;"
+        >
+            Apply to be considered for future Blackwood Publishing
+            advance reader opportunities.
         </p>
+
     </div>
 
 </section>
 
+
+<!-- ==========================================================
+     ARC TEAM
+     ========================================================== -->
+
 <main id="main-content" class="arc-team-wrap">
 
-    <section class="arc-team-panel fade-in" aria-labelledby="arc-team-title">
+    <section
+        class="arc-team-panel fade-in"
+        aria-labelledby="arc-team-title"
+    >
 
-        <p class="arc-kicker">ARC Team Applications</p>
+        <p class="arc-kicker">
+            ARC Team Applications
+        </p>
 
         <h2 id="arc-team-title">
             Request Access to Future ARC Opportunities
@@ -258,8 +377,80 @@
             title, format, location, and review timing.
         </p>
 
-        <!-- ARCHIVIST ACCESS -->
-        <aside class="arc-archivist-note" aria-label="Archivist ARC access">
+
+        <!-- ==================================================
+             CURRENT ARC OPPORTUNITY
+             ================================================== -->
+
+        <aside
+            class="arc-current-release"
+            aria-label="Current ARC opportunity"
+        >
+
+            <p class="arc-current-release-label">
+                Current ARC Opportunity
+            </p>
+
+            <h3>
+                Gualachulain
+            </h3>
+
+            <p>
+                Applications are now being considered for the
+                <strong>Gualachulain</strong> Advance Reader Copy
+                by Aidan Blackwood.
+            </p>
+
+            <dl class="arc-current-release-details">
+
+                <div>
+                    <dt>
+                        ARC distribution
+                    </dt>
+
+                    <dd>
+                        17 October 2026 · 9:00am BST
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>
+                        Digital format
+                    </dt>
+
+                    <dd>
+                        Personalised EPUB
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>
+                        Access
+                    </dt>
+
+                    <dd>
+                        Approved ARC Team readers
+                    </dd>
+                </div>
+
+            </dl>
+
+            <p class="arc-current-release-note">
+                Approved readers will receive access through their Private Archive.
+                Each digital ARC is individually prepared for the assigned reader.
+            </p>
+
+        </aside>
+
+
+        <!-- ==================================================
+             ARCHIVIST ACCESS
+             ================================================== -->
+
+        <aside
+            class="arc-archivist-note"
+            aria-label="Archivist ARC access"
+        >
 
             <strong>
                 ARC Files are held inside the Private Archive.
@@ -278,15 +469,32 @@
 
             <p>
                 Not yet an Archivist?
-                <a href="/pages/members.html">Become an Archivist</a>.
+                <a href="/pages/members.html">
+                    Become an Archivist
+                </a>.
             </p>
 
         </aside>
 
-        <form class="arc-form" id="arc-team-form" novalidate>
 
-            <div class="arc-bot-field" aria-hidden="true">
-                <label for="arc-website">Website</label>
+        <!-- ==================================================
+             APPLICATION FORM
+             ================================================== -->
+
+        <form
+            class="arc-form"
+            id="arc-team-form"
+            novalidate
+        >
+
+            <div
+                class="arc-bot-field"
+                aria-hidden="true"
+            >
+                <label for="arc-website">
+                    Website
+                </label>
+
                 <input
                     type="text"
                     id="arc-website"
@@ -297,145 +505,371 @@
                 >
             </div>
 
-            <input type="hidden" name="sourcePage" value="ARC Team Page">
+            <input
+                type="hidden"
+                name="sourcePage"
+                value="ARC Team Page"
+            >
+
 
             <div class="arc-form-grid">
 
                 <div class="arc-field">
-                    <label for="arc-name">Name *</label>
-                    <input type="text" id="arc-name" name="name" autocomplete="name" required>
+
+                    <label for="arc-name">
+                        Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="arc-name"
+                        name="name"
+                        autocomplete="name"
+                        required
+                    >
+
                 </div>
 
-                <div class="arc-field">
-                    <label for="arc-email">Email *</label>
-                    <input type="email" id="arc-email" name="email" autocomplete="email" required>
-                </div>
 
                 <div class="arc-field">
-                    <label for="arc-country">Country</label>
-                    <input type="text" id="arc-country" name="country" autocomplete="country-name">
+
+                    <label for="arc-email">
+                        Email *
+                    </label>
+
+                    <input
+                        type="email"
+                        id="arc-email"
+                        name="email"
+                        autocomplete="email"
+                        required
+                    >
+
                 </div>
 
+
                 <div class="arc-field">
-                    <label for="arc-preferred-format">Preferred format</label>
-                    <select id="arc-preferred-format" name="preferredFormat">
-                        <option value="">Select one</option>
-                        <option value="Digital ARC">Digital ARC</option>
-                        <option value="Paperback ARC">Paperback ARC</option>
-                        <option value="Either">Either</option>
+
+                    <label for="arc-country">
+                        Country
+                    </label>
+
+                    <input
+                        type="text"
+                        id="arc-country"
+                        name="country"
+                        autocomplete="country-name"
+                    >
+
+                </div>
+
+
+                <div class="arc-field">
+
+                    <label for="arc-preferred-format">
+                        Preferred format
+                    </label>
+
+                    <select
+                        id="arc-preferred-format"
+                        name="preferredFormat"
+                    >
+                        <option value="">
+                            Select one
+                        </option>
+
+                        <option value="Digital ARC">
+                            Digital ARC
+                        </option>
+
+                        <option value="Paperback ARC">
+                            Paperback ARC
+                        </option>
+
+                        <option value="Either">
+                            Either
+                        </option>
                     </select>
+
                 </div>
 
-                <div class="arc-field">
-                    <label for="arc-review-timeframe">Usual review timeframe</label>
-                    <select id="arc-review-timeframe" name="reviewTimeframe">
-                        <option value="">Select one</option>
-                        <option value="Within 1 week">Within 1 week</option>
-                        <option value="Within 2 weeks">Within 2 weeks</option>
-                        <option value="Within 1 month">Within 1 month</option>
-                        <option value="Depends on the book">Depends on the book</option>
-                    </select>
-                </div>
 
                 <div class="arc-field">
-                    <label for="arc-deadline">Can you review by a deadline?</label>
-                    <select id="arc-deadline" name="canReviewByDeadline">
-                        <option value="">Select one</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                        <option value="Depends on date">Depends on date</option>
+
+                    <label for="arc-review-timeframe">
+                        Usual review timeframe
+                    </label>
+
+                    <select
+                        id="arc-review-timeframe"
+                        name="reviewTimeframe"
+                    >
+                        <option value="">
+                            Select one
+                        </option>
+
+                        <option value="Within 1 week">
+                            Within 1 week
+                        </option>
+
+                        <option value="Within 2 weeks">
+                            Within 2 weeks
+                        </option>
+
+                        <option value="Within 1 month">
+                            Within 1 month
+                        </option>
+
+                        <option value="Depends on the book">
+                            Depends on the book
+                        </option>
                     </select>
+
+                </div>
+
+
+                <div class="arc-field">
+
+                    <label for="arc-deadline">
+                        Can you review by a deadline?
+                    </label>
+
+                    <select
+                        id="arc-deadline"
+                        name="canReviewByDeadline"
+                    >
+                        <option value="">
+                            Select one
+                        </option>
+
+                        <option value="Yes">
+                            Yes
+                        </option>
+
+                        <option value="No">
+                            No
+                        </option>
+
+                        <option value="Depends on date">
+                            Depends on date
+                        </option>
+                    </select>
+
                 </div>
 
             </div>
 
+
             <div class="arc-field">
-                <label for="arc-preferred-genres">Preferred genres</label>
+
+                <label for="arc-preferred-genres">
+                    Preferred genres
+                </label>
+
                 <input
                     type="text"
                     id="arc-preferred-genres"
                     name="preferredGenres"
                     placeholder="Example: gothic horror, psychological fiction, folk horror, dark fantasy"
                 >
+
             </div>
 
+
             <div class="arc-field">
-                <label for="arc-blackwood-interests">Blackwood interests</label>
+
+                <label for="arc-blackwood-interests">
+                    Blackwood interests
+                </label>
+
                 <input
                     type="text"
                     id="arc-blackwood-interests"
                     name="blackwoodInterests"
                     placeholder="Example: The Archive Files, Miren Vale, Hard Silence, all Blackwood fiction"
                 >
+
             </div>
 
+
             <div class="arc-field">
-                <label for="arc-interested-in">Most interested in</label>
-                <select id="arc-interested-in" name="interestedIn">
-                    <option value="">Select one</option>
-                    <option value="The Archive Files">The Archive Files</option>
-                    <option value="The Cursed Bothies">The Cursed Bothies</option>
-                    <option value="Hard Silence">Hard Silence</option>
-                    <option value="Standalone Horror">Standalone Horror</option>
-                    <option value="Miren Vale">Miren Vale</option>
-                    <option value="All Blackwood Fiction">All Blackwood Fiction</option>
+
+                <label for="arc-interested-in">
+                    Most interested in
+                </label>
+
+                <select
+                    id="arc-interested-in"
+                    name="interestedIn"
+                >
+                    <option value="">
+                        Select one
+                    </option>
+
+                    <option value="The Archive Files">
+                        The Archive Files
+                    </option>
+
+                    <option value="The Cursed Bothies">
+                        The Cursed Bothies
+                    </option>
+
+                    <option value="Hard Silence">
+                        Hard Silence
+                    </option>
+
+                    <option value="Standalone Horror">
+                        Standalone Horror
+                    </option>
+
+                    <option value="Miren Vale">
+                        Miren Vale
+                    </option>
+
+                    <option value="All Blackwood Fiction">
+                        All Blackwood Fiction
+                    </option>
                 </select>
+
             </div>
 
+
             <div class="arc-field">
-                <label for="arc-review-platforms">Where do you usually review books?</label>
+
+                <label for="arc-review-platforms">
+                    Where do you usually review books?
+                </label>
+
                 <textarea
                     id="arc-review-platforms"
                     name="reviewPlatforms"
                     placeholder="Example: Amazon, Goodreads, StoryGraph, BookTok, Instagram, blog, newsletter"
                 ></textarea>
+
             </div>
+
 
             <div class="arc-form-grid">
 
                 <div class="arc-field">
-                    <label for="arc-amazon-profile">Amazon profile link</label>
-                    <input type="url" id="arc-amazon-profile" name="amazonProfile" placeholder="https://">
+
+                    <label for="arc-amazon-profile">
+                        Amazon profile link
+                    </label>
+
+                    <input
+                        type="url"
+                        id="arc-amazon-profile"
+                        name="amazonProfile"
+                        placeholder="https://"
+                    >
+
                 </div>
 
-                <div class="arc-field">
-                    <label for="arc-goodreads-profile">Goodreads profile link</label>
-                    <input type="url" id="arc-goodreads-profile" name="goodreadsProfile" placeholder="https://">
-                </div>
 
                 <div class="arc-field">
-                    <label for="arc-storygraph-profile">StoryGraph profile link</label>
-                    <input type="url" id="arc-storygraph-profile" name="storyGraphProfile" placeholder="https://">
+
+                    <label for="arc-goodreads-profile">
+                        Goodreads profile link
+                    </label>
+
+                    <input
+                        type="url"
+                        id="arc-goodreads-profile"
+                        name="goodreadsProfile"
+                        placeholder="https://"
+                    >
+
                 </div>
 
-                <div class="arc-field">
-                    <label for="arc-instagram">Instagram</label>
-                    <input type="text" id="arc-instagram" name="instagram" placeholder="@username or profile link">
-                </div>
 
                 <div class="arc-field">
-                    <label for="arc-tiktok">TikTok</label>
-                    <input type="text" id="arc-tiktok" name="tiktok" placeholder="@username or profile link">
+
+                    <label for="arc-storygraph-profile">
+                        StoryGraph profile link
+                    </label>
+
+                    <input
+                        type="url"
+                        id="arc-storygraph-profile"
+                        name="storyGraphProfile"
+                        placeholder="https://"
+                    >
+
                 </div>
 
+
                 <div class="arc-field">
-                    <label for="arc-blog-website">Blog / website</label>
-                    <input type="url" id="arc-blog-website" name="blogWebsite" placeholder="https://">
+
+                    <label for="arc-instagram">
+                        Instagram
+                    </label>
+
+                    <input
+                        type="text"
+                        id="arc-instagram"
+                        name="instagram"
+                        placeholder="@username or profile link"
+                    >
+
+                </div>
+
+
+                <div class="arc-field">
+
+                    <label for="arc-tiktok">
+                        TikTok
+                    </label>
+
+                    <input
+                        type="text"
+                        id="arc-tiktok"
+                        name="tiktok"
+                        placeholder="@username or profile link"
+                    >
+
+                </div>
+
+
+                <div class="arc-field">
+
+                    <label for="arc-blog-website">
+                        Blog / website
+                    </label>
+
+                    <input
+                        type="url"
+                        id="arc-blog-website"
+                        name="blogWebsite"
+                        placeholder="https://"
+                    >
+
                 </div>
 
             </div>
 
+
             <div class="arc-field">
-                <label for="arc-previous-experience">Previous ARC experience</label>
+
+                <label for="arc-previous-experience">
+                    Previous ARC experience
+                </label>
+
                 <textarea
                     id="arc-previous-experience"
                     name="previousArcExperience"
                     placeholder="Tell us briefly whether you have reviewed ARCs before, or whether this would be your first time."
                 ></textarea>
+
             </div>
 
+
             <div class="arc-field">
-                <label for="arc-why">Why would you like to join the ARC Team?</label>
+
+                <label for="arc-why">
+                    Why would you like to join the ARC Team?
+                </label>
+
                 <textarea
                     id="arc-why"
                     name="whyJoinArcTeam"
@@ -446,11 +880,14 @@
                 <small>
                     Maximum 1,600 characters.
                 </small>
+
             </div>
+
 
             <div class="arc-checkboxes">
 
                 <div class="arc-checkbox">
+
                     <input
                         type="checkbox"
                         id="arc-consent"
@@ -460,11 +897,15 @@
                     >
 
                     <label for="arc-consent">
-                        I agree to be contacted by Blackwood Publishing about ARC opportunities. *
+                        I agree to be contacted by Blackwood Publishing
+                        about ARC opportunities. *
                     </label>
+
                 </div>
 
+
                 <div class="arc-checkbox">
+
                     <input
                         type="checkbox"
                         id="arc-privacy"
@@ -474,20 +915,30 @@
                     >
 
                     <label for="arc-privacy">
-                        I understand my details will be used for ARC and review communication only,
-                        and will not be displayed publicly. *
+                        I understand my details will be used for ARC and review
+                        communication only, and will not be displayed publicly. *
                     </label>
+
                 </div>
 
             </div>
 
+
             <div class="arc-actions">
 
-                <button type="submit" class="button copper" id="arc-team-submit">
+                <button
+                    type="submit"
+                    class="button copper"
+                    id="arc-team-submit"
+                >
                     Apply to Join the ARC Team
                 </button>
 
-                <p class="arc-status" id="arc-team-status" aria-live="polite">
+                <p
+                    class="arc-status"
+                    id="arc-team-status"
+                    aria-live="polite"
+                >
                     Required fields are marked with an asterisk.
                 </p>
 
@@ -499,11 +950,21 @@
 
 </main>
 
+
 <div style="height:40px;"></div>
+
 <div id="footer-placeholder"></div>
 
-<script src="/js/header.js?v=20260913" defer></script>
-<script src="/js/arc-team.js?v=20260921" defer></script>
+
+<script
+    src="/js/header.js?v=20260913"
+    defer
+></script>
+
+<script
+    src="/js/arc-team.js?v=20260921"
+    defer
+></script>
 
 <script>
 window.addEventListener("load", async () => {
