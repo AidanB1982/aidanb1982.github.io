@@ -728,11 +728,9 @@
                     </h3>
 
                     <p>
-                        Your active ARC assignments are listed below.
-                        Each reader copy is supplied for private review
-                        use only. Where a release is scheduled, your
-                        place remains confirmed here until the download
-                        window opens.
+                        Your ARC assignments and retained records are listed below.
+                        Each reader copy is supplied for private review use only.
+                        Where a release is scheduled, your place remains confirmed here until the download window opens.
                     </p>
 
                     <div class="arc-vault-list">
