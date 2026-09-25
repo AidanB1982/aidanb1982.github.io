@@ -886,50 +886,71 @@
 
                 </div>
 
-                <div class="arc-copyright-box">
+                                ${
+                    releaseState === "closed" ||
+                    releaseState === "inactive"
+                        ? `
+                            <div class="arc-copyright-box">
 
-                    <strong>
-                        ARC copyright agreement
-                    </strong>
+                                <strong>
+                                    ARC record retained
+                                </strong>
 
-                    <label>
-                        <input
-                            type="checkbox"
-                            data-arc-term
-                        >
+                                <p>
+                                    This ARC campaign has closed.
+                                    Your reading history and filed review
+                                    remain preserved in your Private Archive.
+                                </p>
 
-                        I understand this ARC is for my
-                        personal review use only.
-                    </label>
+                            </div>
+                        `
+                        : `
+                            <div class="arc-copyright-box">
 
-                    <label>
-                        <input
-                            type="checkbox"
-                            data-arc-term
-                        >
+                                <strong>
+                                    ARC copyright agreement
+                                </strong>
 
-                        I will not upload, sell, share,
-                        copy, forward, or redistribute
-                        this file.
-                    </label>
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        data-arc-term
+                                    >
 
-                    <label>
-                        <input
-                            type="checkbox"
-                            data-arc-term
-                        >
+                                    I understand this ARC is for my
+                                    personal review use only.
+                                </label>
 
-                        I understand this is an advance/review
-                        copy and may differ from the final
-                        published edition.
-                    </label>
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        data-arc-term
+                                    >
 
-                    <p>
-                        Terms version:
-                        ${escapeHtml(ARC_TERMS_VERSION)}
-                    </p>
+                                    I will not upload, sell, share,
+                                    copy, forward, or redistribute
+                                    this file.
+                                </label>
 
-                </div>
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        data-arc-term
+                                    >
+
+                                    I understand this is an advance/review
+                                    copy and may differ from the final
+                                    published edition.
+                                </label>
+
+                                <p>
+                                    Terms version:
+                                    ${escapeHtml(ARC_TERMS_VERSION)}
+                                </p>
+
+                            </div>
+                        `
+                }
 
                 <div class="arc-current-actions">
 
