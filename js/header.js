@@ -471,7 +471,11 @@
                     <a href="/pages/about.html" role="menuitem">
                         About Blackwood
                     </a>
-
+                    
+                    <a href="/pages/submissions.html" role="menuitem">
+                        Submissions
+                    </a>
+                    
                     <a href="/pages/contact.html" role="menuitem">
                         Contact
                     </a>
