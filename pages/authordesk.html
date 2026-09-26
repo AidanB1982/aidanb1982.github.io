@@ -231,8 +231,9 @@
                     "PASS — NO AUTHOR RECORD VISIBLE\n\n" +
                     "The authenticated account can query the table, " +
                     "but RLS has exposed no Author Record.\n\n" +
-                    "This is the expected result for an authenticated " +
-                    "user who is not a Blackwood author.";
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk record, either because " +
+                    "they are not a Blackwood author or Author Desk access is disabled.";
 
                 authorResult.classList.add("pass");
                 return;
@@ -302,8 +303,9 @@
                     "PASS — NO AUTHOR RELATIONSHIP VISIBLE\n\n" +
                     "The authenticated account can query the table, " +
                     "but RLS has exposed no Author Relationship.\n\n" +
-                    "This is the expected result for an authenticated " +
-                    "user who is not a Blackwood author.";
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk record, either because " +
+                    "they are not a Blackwood author or Author Desk access is disabled.";
 
                 relationshipResult.classList.add("pass");
                 return;
