@@ -1,0 +1,985 @@
+/* ======================================================
+   BLACKWOOD PUBLISHING — MANUSCRIPT SUBMISSIONS
+   ------------------------------------------------------
+   Acquisitions desk / submission window presentation
+   ====================================================== */
+
+
+/* ======================================================
+   PAGE
+   ====================================================== */
+
+.submissions-page {
+    background:
+        radial-gradient(
+            circle at 78% 12%,
+            rgba(128, 76, 28, 0.08),
+            transparent 32rem
+        ),
+        #080a0b;
+
+    color: #d8d4cc;
+}
+
+
+/* ======================================================
+   HERO
+   ====================================================== */
+
+.submissions-hero {
+    position: relative;
+    min-height: 64vh;
+
+    display: flex;
+    align-items: flex-end;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(5, 7, 8, 0.98) 0%,
+            rgba(7, 10, 12, 0.93) 48%,
+            rgba(11, 13, 14, 0.78) 100%
+        ),
+        radial-gradient(
+            circle at 75% 38%,
+            rgba(151, 92, 34, 0.14),
+            transparent 32rem
+        ),
+        #090c0e;
+
+    border-bottom: 1px solid rgba(167, 112, 54, 0.24);
+}
+
+.submissions-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0,
+            transparent 119px,
+            rgba(255, 255, 255, 0.018) 120px
+        );
+
+    pointer-events: none;
+}
+
+.submissions-hero::after {
+    content: "ACQUISITIONS";
+    position: absolute;
+    right: -0.04em;
+    bottom: -0.15em;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(5rem, 14vw, 13rem);
+    font-weight: 700;
+    letter-spacing: -0.06em;
+
+    color: rgba(255, 255, 255, 0.018);
+
+    pointer-events: none;
+    user-select: none;
+}
+
+.submissions-hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            to top,
+            rgba(8, 10, 11, 0.5),
+            transparent 55%
+        );
+
+    pointer-events: none;
+}
+
+.submissions-hero-content {
+    position: relative;
+    z-index: 2;
+
+    width: min(1180px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 8rem 0 5.5rem;
+}
+
+.submissions-eyebrow,
+.submissions-kicker {
+    margin: 0 0 1rem;
+
+    color: #b88a56;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.submissions-hero h1 {
+    max-width: 900px;
+    margin: 0;
+
+    color: #f1ece2;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(3.4rem, 7vw, 6.8rem);
+    font-weight: 400;
+    letter-spacing: -0.045em;
+    line-height: 0.96;
+}
+
+.submissions-hero-line {
+    max-width: 700px;
+    margin: 1.8rem 0 0;
+
+    color: #aaa69f;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    line-height: 1.55;
+}
+
+
+/* ======================================================
+   MAIN WRAPPER
+   ====================================================== */
+
+.submissions-wrap {
+    width: min(1180px, calc(100% - 48px));
+    margin: 0 auto;
+    padding: 5.5rem 0 7rem;
+}
+
+.submissions-wrap h2,
+.submissions-wrap h3 {
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+}
+
+.submissions-wrap h2 {
+    margin: 0;
+
+    color: #eee8dc;
+
+    font-size: clamp(2rem, 4vw, 3.3rem);
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+}
+
+.submissions-wrap h3 {
+    color: #e4dfd5;
+}
+
+.submissions-wrap p {
+    line-height: 1.75;
+}
+
+
+/* ======================================================
+   SUBMISSIONS STATUS
+   ====================================================== */
+
+.submissions-status {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 3rem;
+
+    margin-bottom: 7rem;
+    padding: 3rem;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(19, 23, 25, 0.96),
+            rgba(10, 12, 13, 0.98)
+        );
+
+    border: 1px solid rgba(174, 116, 53, 0.34);
+    border-radius: 3px;
+
+    box-shadow:
+        0 22px 60px rgba(0, 0, 0, 0.25);
+}
+
+.submissions-status::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: 180px;
+    height: 1px;
+
+    background: #a66a2e;
+}
+
+.submissions-status-mark {
+    align-self: start;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 116px;
+    padding: 1.25rem;
+
+    border: 1px solid rgba(173, 109, 46, 0.55);
+
+    color: #c18b52;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+
+    transform: rotate(-1deg);
+}
+
+.submissions-status-copy {
+    max-width: 760px;
+}
+
+.submissions-status-copy h2 {
+    margin-bottom: 1.4rem;
+}
+
+.submissions-status-copy > p:not(.submissions-kicker) {
+    color: #b8b4ad;
+}
+
+.submissions-status-note {
+    margin-top: 1.6rem;
+    padding-top: 1.5rem;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    color: #d0c8bc !important;
+}
+
+
+/* ======================================================
+   INTRODUCTION
+   ====================================================== */
+
+.submissions-intro {
+    max-width: 850px;
+    margin: 0 auto 7rem;
+    padding-left: 2rem;
+
+    border-left: 1px solid rgba(172, 111, 48, 0.45);
+}
+
+.submissions-intro h2 {
+    margin-bottom: 1.6rem;
+}
+
+.submissions-intro > p:not(.submissions-kicker) {
+    color: #aaa69f;
+}
+
+.submissions-lead {
+    color: #d5d0c7 !important;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 1.18rem;
+}
+
+
+/* ======================================================
+   GENERAL SECTIONS
+   ====================================================== */
+
+.submissions-section {
+    margin: 0 0 7rem;
+    padding-top: 4rem;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.submissions-section-heading {
+    max-width: 800px;
+    margin-bottom: 3rem;
+}
+
+.submissions-section-heading h2 {
+    margin-bottom: 1.2rem;
+}
+
+.submissions-section-heading > p:not(.submissions-kicker) {
+    color: #aaa69f;
+}
+
+
+/* ======================================================
+   WHAT WE PUBLISH
+   ====================================================== */
+
+.submissions-copy-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr);
+    gap: 4rem;
+
+    align-items: start;
+}
+
+.submissions-copy-main {
+    color: #aaa69f;
+}
+
+.submissions-copy-main p:first-child {
+    margin-top: 0;
+
+    color: #d8d3ca;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 1.18rem;
+}
+
+.submissions-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    border-top: 1px solid rgba(167, 112, 54, 0.28);
+    border-left: 1px solid rgba(167, 112, 54, 0.28);
+}
+
+.submissions-field-card {
+    min-height: 128px;
+    padding: 1.4rem;
+
+    background: rgba(255, 255, 255, 0.012);
+
+    border-right: 1px solid rgba(167, 112, 54, 0.28);
+    border-bottom: 1px solid rgba(167, 112, 54, 0.28);
+}
+
+.submissions-field-card span {
+    display: block;
+    margin-bottom: 1.7rem;
+
+    color: #8f6a43;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+.submissions-field-card h3 {
+    margin: 0;
+
+    font-size: 1.08rem;
+    font-weight: 400;
+}
+
+.submissions-small-note {
+    max-width: 850px;
+    margin: 2.5rem 0 0;
+
+    color: #817e78;
+
+    font-size: 0.9rem;
+}
+
+
+/* ======================================================
+   ACQUISITION PRINCIPLES
+   ====================================================== */
+
+.submissions-principles {
+    position: relative;
+}
+
+.submissions-principles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+
+    background: rgba(167, 112, 54, 0.24);
+    border: 1px solid rgba(167, 112, 54, 0.24);
+}
+
+.submissions-principle {
+    min-height: 300px;
+    padding: 2rem;
+
+    background:
+        linear-gradient(
+            145deg,
+            #111416,
+            #0b0d0e
+        );
+}
+
+.submissions-principle-number {
+    margin: 0 0 3.5rem;
+
+    color: #a87643;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 1rem;
+}
+
+.submissions-principle h3 {
+    margin: 0 0 1.25rem;
+
+    font-size: 1.45rem;
+    font-weight: 400;
+    line-height: 1.25;
+}
+
+.submissions-principle p:last-child {
+    margin-bottom: 0;
+
+    color: #9e9a93;
+}
+
+
+/* ======================================================
+   ACQUISITION CRITERIA
+   ====================================================== */
+
+.submissions-criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.submissions-criterion {
+    padding: 1.6rem;
+
+    background: rgba(255, 255, 255, 0.018);
+
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 2px;
+}
+
+.submissions-criterion span {
+    display: block;
+
+    color: #bd8953;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.submissions-criterion p {
+    margin: 1rem 0 0;
+
+    color: #9d9992;
+}
+
+
+/* ======================================================
+   READING WINDOW
+   ====================================================== */
+
+.submissions-window {
+    padding: 3rem;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17, 21, 23, 0.96),
+            rgba(9, 11, 12, 0.98)
+        );
+
+    border: 1px solid rgba(170, 111, 49, 0.3);
+}
+
+.submissions-window-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+
+    margin-bottom: 2rem;
+}
+
+.submissions-window-status {
+    flex: 0 0 auto;
+
+    padding: 0.7rem 0.9rem;
+
+    color: #b98a57;
+
+    border: 1px solid rgba(185, 138, 87, 0.42);
+    border-radius: 999px;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.submissions-window-intro {
+    max-width: 780px;
+    margin-bottom: 3rem;
+
+    color: #aaa69f;
+}
+
+.submissions-window-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.submissions-window-grid > div {
+    padding: 2rem;
+
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.submissions-window-grid span {
+    color: #90683f;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+.submissions-window-grid h3 {
+    margin: 1.5rem 0 0.8rem;
+
+    font-size: 1.25rem;
+    font-weight: 400;
+}
+
+.submissions-window-grid p {
+    margin: 0;
+
+    color: #96928b;
+}
+
+
+/* ======================================================
+   ACQUISITION PROCESS
+   ====================================================== */
+
+.submissions-process-line {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+
+    margin-top: 3rem;
+
+    border-top: 1px solid rgba(176, 117, 54, 0.4);
+}
+
+.submissions-process-line > div {
+    position: relative;
+
+    min-height: 145px;
+    padding: 1.7rem 1rem 1rem 0;
+}
+
+.submissions-process-line > div::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 0;
+
+    width: 9px;
+    height: 9px;
+
+    background: #0a0c0d;
+    border: 1px solid #a87038;
+    border-radius: 50%;
+}
+
+.submissions-process-line span {
+    display: block;
+    margin-bottom: 1.4rem;
+
+    color: #90683f;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.submissions-process-line strong {
+    display: block;
+    max-width: 145px;
+
+    color: #d6d0c6;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 0.98rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+
+/* ======================================================
+   CLOSED ACQUISITIONS DESK
+   ====================================================== */
+
+.submissions-desk {
+    position: relative;
+
+    max-width: 860px;
+    margin: 9rem auto 5rem;
+    padding: 4rem;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(17, 20, 21, 0.96),
+            rgba(9, 11, 12, 0.98)
+        );
+
+    border: 1px solid rgba(164, 106, 48, 0.34);
+}
+
+.submissions-desk::before,
+.submissions-desk::after {
+    content: "";
+    position: absolute;
+
+    width: 26px;
+    height: 26px;
+
+    pointer-events: none;
+}
+
+.submissions-desk::before {
+    top: 12px;
+    left: 12px;
+
+    border-top: 1px solid #82572e;
+    border-left: 1px solid #82572e;
+}
+
+.submissions-desk::after {
+    right: 12px;
+    bottom: 12px;
+
+    border-right: 1px solid #82572e;
+    border-bottom: 1px solid #82572e;
+}
+
+.submissions-desk h2 {
+    max-width: 650px;
+    margin: 0 auto 1.5rem;
+}
+
+.submissions-desk > p:not(.submissions-kicker):not(.submissions-desk-signoff) {
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+
+    color: #a7a39c;
+}
+
+.submissions-desk-rule {
+    width: 70px;
+    height: 1px;
+
+    margin: 2.5rem auto;
+
+    background: #8d5d30;
+}
+
+.submissions-desk-signoff {
+    margin-bottom: 0;
+
+    color: #c2b9ac;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 0.9rem;
+    line-height: 1.6 !important;
+}
+
+
+/* ======================================================
+   EXIT LINKS
+   ====================================================== */
+
+.submissions-exit {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    padding-top: 2rem;
+}
+
+
+/* ======================================================
+   RESPONSIVE — TABLET
+   ====================================================== */
+
+@media (max-width: 900px) {
+
+    .submissions-hero {
+        min-height: 54vh;
+    }
+
+    .submissions-status {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .submissions-status-mark {
+        min-height: auto;
+        width: max-content;
+        max-width: 100%;
+    }
+
+    .submissions-copy-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+
+    .submissions-principles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .submissions-principle {
+        min-height: auto;
+    }
+
+    .submissions-principle-number {
+        margin-bottom: 2rem;
+    }
+
+    .submissions-criteria-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .submissions-process-line {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0;
+    }
+
+    .submissions-process-line > div:nth-child(n + 4) {
+        border-top: 1px solid rgba(176, 117, 54, 0.2);
+    }
+
+    .submissions-process-line > div:nth-child(n + 4)::before {
+        top: -5px;
+    }
+
+}
+
+
+/* ======================================================
+   RESPONSIVE — MOBILE
+   ====================================================== */
+
+@media (max-width: 640px) {
+
+    .submissions-hero {
+        min-height: 470px;
+    }
+
+    .submissions-hero-content,
+    .submissions-wrap {
+        width: min(100% - 32px, 1180px);
+    }
+
+    .submissions-hero-content {
+        padding: 7rem 0 3.5rem;
+    }
+
+    .submissions-hero h1 {
+        font-size: clamp(2.8rem, 15vw, 4.2rem);
+    }
+
+    .submissions-hero::after {
+        display: none;
+    }
+
+    .submissions-wrap {
+        padding-top: 3.5rem;
+    }
+
+    .submissions-status {
+        margin-bottom: 5rem;
+        padding: 1.5rem;
+    }
+
+    .submissions-intro {
+        margin-bottom: 5rem;
+        padding-left: 1.25rem;
+    }
+
+    .submissions-section {
+        margin-bottom: 5rem;
+        padding-top: 3rem;
+    }
+
+    .submissions-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .submissions-field-card {
+        min-height: auto;
+    }
+
+    .submissions-criteria-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .submissions-window {
+        padding: 1.5rem;
+    }
+
+    .submissions-window-header {
+        display: block;
+    }
+
+    .submissions-window-status {
+        display: inline-block;
+        margin-top: 1.5rem;
+    }
+
+    .submissions-window-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .submissions-process-line {
+        grid-template-columns: 1fr;
+        border-top: 0;
+        border-left: 1px solid rgba(176, 117, 54, 0.4);
+    }
+
+    .submissions-process-line > div,
+    .submissions-process-line > div:nth-child(n + 4) {
+        min-height: auto;
+        padding: 0 0 2.5rem 1.5rem;
+
+        border-top: 0;
+    }
+
+    .submissions-process-line > div::before,
+    .submissions-process-line > div:nth-child(n + 4)::before {
+        top: 0;
+        left: -5px;
+    }
+
+    .submissions-process-line span {
+        margin-bottom: 0.7rem;
+    }
+
+    .submissions-process-line strong {
+        max-width: none;
+    }
+
+    .submissions-desk {
+        margin-top: 6rem;
+        padding: 3rem 1.5rem;
+    }
+
+    .submissions-exit {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .submissions-exit .button {
+        width: 100%;
+        text-align: center;
+    }
+
+}
+
+
+/* ======================================================
+   REDUCED MOTION
+   ====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .submissions-page *,
+    .submissions-page *::before,
+    .submissions-page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+
+}
