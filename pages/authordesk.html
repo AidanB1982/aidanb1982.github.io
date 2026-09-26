@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Author Desk RLS Test | Blackwood Publishing</title>
+
+    <meta name="robots" content="noindex, nofollow">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background: #161619;
+            color: #f1f1f1;
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        main {
+            width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        p {
+            line-height: 1.65;
+        }
+
+        .test-card {
+            margin-top: 30px;
+            padding: 24px;
+            border: 1px solid rgba(241, 241, 241, 0.18);
+            border-radius: 6px;
+        }
+
+        .test-status {
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            line-height: 1.6;
+        }
+
+        .pass {
+            border-left: 4px solid #5f7d76;
+        }
+
+        .fail {
+            border-left: 4px solid #a95f5f;
+        }
+
+        code {
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+<main>
+    <p>Blackwood Publishing</p>
+
+    <h1>Author Desk RLS Test</h1>
+
+    <p>
+        Temporary development page for verifying authenticated access
+        to <code>public.author_records</code>.
+    </p>
+
+    <section class="test-card">
+        <h2>Authentication</h2>
+        <div id="auth-result" class="test-status">
+            Checking current session...
+        </div>
+    </section>
+
+    <section class="test-card">
+        <h2>Author Record Query</h2>
+        <div id="author-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+(function () {
+    "use strict";
+
+    const SUPABASE_URL =
+        "https://bmnlynjldlnxfvunqbqq.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
+
+    const authResult =
+        document.getElementById("auth-result");
+
+    const authorResult =
+        document.getElementById("author-result");
+
+    const client = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        }
+    );
+
+    runTest();
+
+    async function runTest() {
+        try {
+            const {
+                data: sessionData,
+                error: sessionError
+            } = await client.auth.getSession();
+
+            if (sessionError) {
+                throw sessionError;
+            }
+
+            const session = sessionData.session;
+
+            if (!session || !session.user) {
+                authResult.textContent =
+                    "NO AUTHENTICATED SESSION\n\n" +
+                    "This browser is not currently signed in.";
+
+                authResult.classList.add("pass");
+
+                await testAnonymousQuery();
+                return;
+            }
+
+            authResult.textContent =
+                "AUTHENTICATED\n\n" +
+                "User ID:\n" +
+                session.user.id +
+                "\n\nEmail:\n" +
+                (session.user.email || "(not supplied)");
+
+            authResult.classList.add("pass");
+
+            await testAuthenticatedQuery(session.user.id);
+
+        } catch (error) {
+            console.error(
+                "Author Desk authentication test failed:",
+                error
+            );
+
+            authResult.textContent =
+                "TEST ERROR\n\n" +
+                String(error.message || error);
+
+            authResult.classList.add("fail");
+        }
+    }
+
+    async function testAuthenticatedQuery(userId) {
+        authorResult.textContent =
+            "Querying author_records through authenticated RLS...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("author_records")
+                .select(
+                    "id,publishing_name,email,relationship_status,desk_access_enabled,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected result."
+                );
+            }
+
+            if (data.length === 0) {
+                authorResult.textContent =
+                    "PASS — NO AUTHOR RECORD VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Author Record.\n\n" +
+                    "This is the expected result for an authenticated " +
+                    "user who is not a Blackwood author.";
+
+                authorResult.classList.add("pass");
+                return;
+            }
+
+            if (
+                data.length === 1 &&
+                data[0].id === userId
+            ) {
+                authorResult.textContent =
+                    "PASS — OWN AUTHOR RECORD ONLY\n\n" +
+                    JSON.stringify(data[0], null, 2);
+
+                authorResult.classList.add("pass");
+                return;
+            }
+
+            authorResult.textContent =
+                "FAIL — UNEXPECTED RECORD VISIBILITY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            authorResult.classList.add("fail");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated query failed:",
+                error
+            );
+
+            authorResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            authorResult.classList.add("fail");
+        }
+    }
+
+    async function testAnonymousQuery() {
+        authorResult.textContent =
+            "Querying author_records without an authenticated session...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("author_records")
+                .select(
+                    "id,publishing_name,email,relationship_status,desk_access_enabled,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 0
+            ) {
+                authorResult.textContent =
+                    "PASS — ANONYMOUS ACCESS BLOCKED\n\n" +
+                    "The query returned zero Author Records.";
+
+                authorResult.classList.add("pass");
+                return;
+            }
+
+            authorResult.textContent =
+                "FAIL — ANONYMOUS DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            authorResult.classList.add("fail");
+
+        } catch (error) {
+            /*
+             * A permission error is also an acceptable security result.
+             * The important fact is that no Author Record was exposed.
+             */
+
+            authorResult.textContent =
+                "PASS — ANONYMOUS ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            authorResult.classList.add("pass");
+        }
+    }
+})();
+</script>
+
+</body>
+</html>
