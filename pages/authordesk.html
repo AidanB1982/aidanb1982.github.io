@@ -70,8 +70,9 @@
     <p>
         Temporary development page for verifying authenticated access
         to <code>public.author_records</code>,
-        <code>public.author_relationships</code> and
-        <code>public.book_records</code>.
+        <code>public.author_relationships</code>,
+        <code>public.book_records</code> and
+        <code>public.book_contributors</code>.
     </p>
 
     <section class="test-card">
@@ -105,6 +106,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Book Contributor Query</h2>
+
+        <div id="contributor-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -130,6 +139,9 @@
 
     const bookResult =
         document.getElementById("book-result");
+
+    const contributorResult =
+        document.getElementById("contributor-result");
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -168,6 +180,7 @@
                 await testAnonymousAuthorQuery();
                 await testAnonymousRelationshipQuery();
                 await testAnonymousBookQuery();
+                await testAnonymousContributorQuery();
 
                 return;
             }
@@ -190,6 +203,10 @@
             );
 
             await testAuthenticatedBookQuery();
+
+            await testAuthenticatedContributorQuery(
+                session.user.id
+            );
 
         } catch (error) {
             console.error(
@@ -220,6 +237,12 @@
                 "Authentication test failed.";
 
             bookResult.classList.add("fail");
+
+            contributorResult.textContent =
+                "NOT TESTED\n\n" +
+                "Authentication test failed.";
+
+            contributorResult.classList.add("fail");
         }
     }
 
@@ -449,6 +472,88 @@
         }
     }
 
+    async function testAuthenticatedContributorQuery(userId) {
+        contributorResult.textContent =
+            "Querying book_contributors through authenticated RLS...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("book_contributors")
+                .select(
+                    "id,book_id,author_id,contributor_role,desk_visible,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Book Contributor result."
+                );
+            }
+
+            if (data.length === 0) {
+                contributorResult.textContent =
+                    "PASS — NO CONTRIBUTOR RECORDS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Book Contributor records.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk contributor records.";
+
+                contributorResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedContributor =
+                data.find(function (record) {
+                    return (
+                        record.author_id !== userId ||
+                        typeof record.book_id !== "number" ||
+                        record.desk_visible !== true
+                    );
+                });
+
+            if (unexpectedContributor) {
+                contributorResult.textContent =
+                    "FAIL — UNEXPECTED CONTRIBUTOR VISIBILITY\n\n" +
+                    "A contributor record was returned that does not " +
+                    "belong to the authenticated author or is not Desk-visible.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                contributorResult.classList.add("fail");
+                return;
+            }
+
+            contributorResult.textContent =
+                "PASS — OWN CONTRIBUTOR RECORDS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            contributorResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Book Contributor query failed:",
+                error
+            );
+
+            contributorResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            contributorResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -584,6 +689,52 @@
                 String(error.message || error);
 
             bookResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousContributorQuery() {
+        contributorResult.textContent =
+            "Querying book_contributors without an authenticated session...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("book_contributors")
+                .select(
+                    "id,book_id,author_id,contributor_role,desk_visible,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 0
+            ) {
+                contributorResult.textContent =
+                    "PASS — ANONYMOUS CONTRIBUTOR ACCESS BLOCKED\n\n" +
+                    "The query returned zero Book Contributor records.";
+
+                contributorResult.classList.add("pass");
+                return;
+            }
+
+            contributorResult.textContent =
+                "FAIL — ANONYMOUS CONTRIBUTOR DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            contributorResult.classList.add("fail");
+
+        } catch (error) {
+            contributorResult.textContent =
+                "PASS — ANONYMOUS CONTRIBUTOR ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            contributorResult.classList.add("pass");
         }
     }
 })();
