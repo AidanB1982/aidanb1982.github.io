@@ -1579,3 +1579,27 @@ and what Blackwood has paid.
 Behind that simplicity should be a careful, auditable publishing record.
 
 That record is the foundation of the Blackwood Author Desk.
+---
+
+## Implementation Record
+
+### Migration 001 — Author Records
+
+**Implemented:** 26 September 2026  
+**Status:** Verified
+
+The first Author Desk database object implemented in Supabase is:
+
+`public.author_records`
+
+Its purpose is to establish the authenticated publishing identity used by the Author Desk while keeping that identity separate from the existing Archivist / reader profile.
+
+Current identity structure:
+
+```text
+auth.users
+   ├── member_profiles
+   │      └── Archivist / reader identity
+   │
+   └── author_records
+          └── Author Desk publishing identity
