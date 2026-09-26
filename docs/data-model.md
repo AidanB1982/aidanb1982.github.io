@@ -1603,3 +1603,16 @@ auth.users
    │
    └── author_records
           └── Author Desk publishing identity
+---
+
+## Migration 001B — Author Desk Access Enforcement
+
+**Implemented:** 26 September 2026  
+**Status:** Verified
+
+Migration 001B strengthened the original `author_records` Row Level Security policy so that Author Desk access is controlled by the database rather than only by application behaviour.
+
+The Author Record SELECT policy now requires both:
+
+```text
+auth.uid() = author_records.id
