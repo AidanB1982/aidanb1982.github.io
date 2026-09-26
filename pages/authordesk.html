@@ -69,8 +69,9 @@
 
     <p>
         Temporary development page for verifying authenticated access
-        to <code>public.author_records</code> and
-        <code>public.author_relationships</code>.
+        to <code>public.author_records</code>,
+        <code>public.author_relationships</code> and
+        <code>public.book_records</code>.
     </p>
 
     <section class="test-card">
@@ -89,7 +90,7 @@
         </div>
     </section>
 
-        <section class="test-card">
+    <section class="test-card">
         <h2>Author Relationship Query</h2>
 
         <div id="relationship-result" class="test-status">
@@ -127,6 +128,9 @@
     const relationshipResult =
         document.getElementById("relationship-result");
 
+    const bookResult =
+        document.getElementById("book-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -163,6 +167,7 @@
 
                 await testAnonymousAuthorQuery();
                 await testAnonymousRelationshipQuery();
+                await testAnonymousBookQuery();
 
                 return;
             }
@@ -183,6 +188,8 @@
             await testAuthenticatedRelationshipQuery(
                 session.user.id
             );
+
+            await testAuthenticatedBookQuery();
 
         } catch (error) {
             console.error(
@@ -207,6 +214,12 @@
                 "Authentication test failed.";
 
             relationshipResult.classList.add("fail");
+
+            bookResult.textContent =
+                "NOT TESTED\n\n" +
+                "Authentication test failed.";
+
+            bookResult.classList.add("fail");
         }
     }
 
@@ -354,6 +367,88 @@
         }
     }
 
+    async function testAuthenticatedBookQuery() {
+        bookResult.textContent =
+            "Querying book_records through authenticated RLS...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("book_records")
+                .select(
+                    "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Book Record result."
+                );
+            }
+
+            if (data.length === 0) {
+                bookResult.textContent =
+                    "PASS — NO BOOK RECORDS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Book Records.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk books, either because " +
+                    "they are not a Blackwood author, Author Desk access is " +
+                    "disabled, or no Desk-visible books are assigned.";
+
+                bookResult.classList.add("pass");
+                return;
+            }
+
+            const malformedRecord =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        !record.internal_reference ||
+                        !record.title
+                    );
+                });
+
+            if (malformedRecord) {
+                bookResult.textContent =
+                    "FAIL — UNEXPECTED BOOK RECORD DATA\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                bookResult.classList.add("fail");
+                return;
+            }
+
+            bookResult.textContent =
+                "PASS — ACCESSIBLE BOOK RECORDS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            bookResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Book Record query failed:",
+                error
+            );
+
+            bookResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            bookResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -391,11 +486,6 @@
             authorResult.classList.add("fail");
 
         } catch (error) {
-            /*
-             * A permission error is an acceptable security result.
-             * The important fact is that no Author Record was exposed.
-             */
-
             authorResult.textContent =
                 "PASS — ANONYMOUS ACCESS BLOCKED\n\n" +
                 "Supabase rejected the query:\n" +
@@ -442,17 +532,58 @@
             relationshipResult.classList.add("fail");
 
         } catch (error) {
-            /*
-             * A permission error is an acceptable security result.
-             * The important fact is that no relationship was exposed.
-             */
-
             relationshipResult.textContent =
                 "PASS — ANONYMOUS RELATIONSHIP ACCESS BLOCKED\n\n" +
                 "Supabase rejected the query:\n" +
                 String(error.message || error);
 
             relationshipResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousBookQuery() {
+        bookResult.textContent =
+            "Querying book_records without an authenticated session...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("book_records")
+                .select(
+                    "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 0
+            ) {
+                bookResult.textContent =
+                    "PASS — ANONYMOUS BOOK ACCESS BLOCKED\n\n" +
+                    "The query returned zero Book Records.";
+
+                bookResult.classList.add("pass");
+                return;
+            }
+
+            bookResult.textContent =
+                "FAIL — ANONYMOUS BOOK DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            bookResult.classList.add("fail");
+
+        } catch (error) {
+            bookResult.textContent =
+                "PASS — ANONYMOUS BOOK ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            bookResult.classList.add("pass");
         }
     }
 })();
