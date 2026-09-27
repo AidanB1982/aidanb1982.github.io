@@ -72,8 +72,9 @@
         to <code>public.author_records</code>,
         <code>public.author_relationships</code>,
         <code>public.book_records</code>,
-        <code>public.book_contributors</code> and
-        <code>public.production_events</code>.
+        <code>public.book_contributors</code>,
+        <code>public.production_events</code> and
+        <code>public.book_editions</code>.
     </p>
 
     <section class="test-card">
@@ -123,6 +124,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Book Edition Query</h2>
+
+        <div id="book-edition-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -154,6 +163,9 @@
 
     const productionEventResult =
         document.getElementById("production-event-result");
+
+    const bookEditionResult =
+        document.getElementById("book-edition-result");
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -194,6 +206,7 @@
                 await testAnonymousBookQuery();
                 await testAnonymousContributorQuery();
                 await testAnonymousProductionEventQuery();
+                await testAnonymousBookEditionQuery();
 
                 return;
             }
@@ -222,6 +235,8 @@
             );
 
             await testAuthenticatedProductionEventQuery();
+
+            await testAuthenticatedBookEditionQuery();
 
         } catch (error) {
             console.error(
@@ -264,6 +279,12 @@
                 "Authentication test failed.";
 
             productionEventResult.classList.add("fail");
+
+            bookEditionResult.textContent =
+                "NOT TESTED\n\n" +
+                "Authentication test failed.";
+
+            bookEditionResult.classList.add("fail");
         }
     }
 
@@ -662,6 +683,92 @@
         }
     }
 
+    async function testAuthenticatedBookEditionQuery() {
+        bookEditionResult.textContent =
+            "Querying book_editions through authenticated RLS...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("book_editions")
+                .select(
+                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Book Edition result."
+                );
+            }
+
+            if (data.length === 0) {
+                bookEditionResult.textContent =
+                    "PASS — NO BOOK EDITIONS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Book Editions.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk editions, " +
+                    "Author Desk access is disabled, no Desk-visible book is assigned, " +
+                    "or the relevant editions are not author-visible.";
+
+                bookEditionResult.classList.add("pass");
+                return;
+            }
+
+            const malformedEdition =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.book_id !== "number" ||
+                        !record.edition_reference ||
+                        !record.edition_name ||
+                        !record.format ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (malformedEdition) {
+                bookEditionResult.textContent =
+                    "FAIL — UNEXPECTED BOOK EDITION DATA\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                bookEditionResult.classList.add("fail");
+                return;
+            }
+
+            bookEditionResult.textContent =
+                "PASS — ACCESSIBLE BOOK EDITIONS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            bookEditionResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Book Edition query failed:",
+                error
+            );
+
+            bookEditionResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            bookEditionResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -889,6 +996,52 @@
                 String(error.message || error);
 
             productionEventResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousBookEditionQuery() {
+        bookEditionResult.textContent =
+            "Querying book_editions without an authenticated session...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("book_editions")
+                .select(
+                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 0
+            ) {
+                bookEditionResult.textContent =
+                    "PASS — ANONYMOUS BOOK EDITION ACCESS BLOCKED\n\n" +
+                    "The query returned zero Book Editions.";
+
+                bookEditionResult.classList.add("pass");
+                return;
+            }
+
+            bookEditionResult.textContent =
+                "FAIL — ANONYMOUS BOOK EDITION DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            bookEditionResult.classList.add("fail");
+
+        } catch (error) {
+            bookEditionResult.textContent =
+                "PASS — ANONYMOUS BOOK EDITION ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            bookEditionResult.classList.add("pass");
         }
     }
 })();
