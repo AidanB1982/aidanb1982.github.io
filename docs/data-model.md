@@ -3196,3 +3196,40 @@ Migration 007 establishes the document metadata, ownership, history and
 author-read security foundation on which those workflows can be built.
 
 **Migration 007 is verified.**
+---
+
+### Migration 008 — Agreements
+
+**Implemented:** 27 September 2026  
+**Status:** VERIFIED
+
+Migration 008 introduced:
+
+`public.agreements`
+
+Its purpose is to establish the structured agreement metadata and Author Desk
+access foundation for agreements between Blackwood Publishing and an author.
+
+The Agreement Record does not replace the authoritative signed legal document.
+
+Where a signed agreement exists, the signed document remains authoritative and
+may be linked to the structured Agreement Record through:
+
+`signed_document_id`
+
+Migration 008 does not introduce document signing, private agreement storage,
+agreement execution, browser mutation workflows or permanent production
+agreement data.
+
+Those capabilities remain separate implementation concerns.
+
+The agreement relationship is:
+
+```text
+author_records
+    └── agreements
+            ├── optional book_id
+            │       └── book_records
+            │
+            └── optional signed_document_id
+                    └── documents
