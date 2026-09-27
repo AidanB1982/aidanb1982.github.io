@@ -1580,29 +1580,141 @@ Behind that simplicity should be a careful, auditable publishing record.
 
 That record is the foundation of the Blackwood Author Desk.
 ---
-
 ## Implementation Record
 
-### Migration 001 — Author Records
+The following sections record the database migrations actually implemented for
+the Blackwood Author Desk.
+
+The architectural sections above describe the intended system. This
+Implementation Record describes the database objects and access controls that
+have actually been created and verified.
+
+---
+
+## Migration 001 — Author Records
 
 **Implemented:** 26 September 2026  
 **Status:** Verified
 
-The first Author Desk database object implemented in Supabase is:
+Migration 001 introduced:
 
 `public.author_records`
 
-Its purpose is to establish the authenticated publishing identity used by the Author Desk while keeping that identity separate from the existing Archivist / reader profile.
+Its purpose is to establish the authenticated publishing identity used by the
+Author Desk while keeping that identity separate from the existing Archivist /
+reader profile.
 
-Current identity structure:
+The identity structure is:
 
 ```text
 auth.users
-   ├── member_profiles
-   │      └── Archivist / reader identity
-   │
-   └── author_records
-          └── Author Desk publishing identity
+    ├── member_profiles
+    │       └── Archivist / reader identity
+    │
+    └── author_records
+            └── Author Desk publishing identity
+```
+
+A person may therefore possess both a reader identity and a publishing identity
+without either role automatically granting access to the other.
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `publishing_name`
+- `legal_name`
+- `email`
+- `relationship_status`
+- `desk_access_enabled`
+- `created_at`
+- `updated_at`
+
+The primary key:
+
+`author_records.id`
+
+references:
+
+`auth.users.id`
+
+The relationship uses `ON DELETE RESTRICT`.
+
+The authenticated Supabase user identity is therefore also the root identifier
+for that person's Author Desk publishing identity.
+
+### Security boundary
+
+The existence of a row in `member_profiles` does not establish Author Desk
+access.
+
+Author Desk access begins with an explicit record in:
+
+`public.author_records`
+
+This preserves the separation between:
+
+```text
+Archivist / reader identity
+```
+
+and:
+
+```text
+Blackwood publishing identity
+```
+
+### Author visibility
+
+Row Level Security is enabled on `public.author_records`.
+
+An authenticated author may read only their own Author Record.
+
+The ownership test is based on:
+
+```text
+auth.uid() = author_records.id
+```
+
+The browser does not determine which Author Record belongs to the current user.
+
+### Browser mutation permissions
+
+The initial implementation provides authenticated authors with SELECT access
+only.
+
+No authenticated browser INSERT, UPDATE or DELETE permissions were introduced
+for Author Records.
+
+Author identity and relationship administration therefore remain controlled
+Blackwood data.
+
+### Initial production record
+
+The first Author Record created was for:
+
+```text
+Publishing name:      Aidan Blackwood
+Relationship status: active
+Desk access enabled: true
+```
+
+This record is separate from the existing reader / Archivist profile belonging
+to the same authenticated user.
+
+### Verification
+
+Migration 001 was tested through authenticated Row Level Security.
+
+The acceptance tests confirmed that the authenticated author could read their
+own Author Record while an ordinary authenticated account without the
+corresponding publishing identity could not read that record.
+
+Anonymous access was not granted.
+
+**Migration 001 is verified.**
+
 ---
 
 ## Migration 001B — Author Desk Access Enforcement
@@ -1610,12 +1722,87 @@ auth.users
 **Implemented:** 26 September 2026  
 **Status:** Verified
 
-Migration 001B strengthened the original `author_records` Row Level Security policy so that Author Desk access is controlled by the database rather than only by application behaviour.
+Migration 001B strengthened the original `author_records` Row Level Security
+policy so that Author Desk access is controlled by the database rather than
+only by application behaviour.
 
-The Author Record SELECT policy now requires both:
+The Author Record SELECT policy requires both:
 
 ```text
 auth.uid() = author_records.id
+```
+
+and:
+
+```text
+author_records.desk_access_enabled = true
+```
+
+The resulting rule is conceptually:
+
+```text
+correct authenticated author
+        +
+desk_access_enabled = true
+        =
+Author Record visible
+```
+
+This establishes `desk_access_enabled` as the top-level Author Desk access
+switch.
+
+### Kill-switch behaviour
+
+Where:
+
+```text
+desk_access_enabled = false
+```
+
+the author's authenticated session remains valid, but Author Desk publishing
+data protected by this access path is no longer exposed.
+
+This distinguishes authentication from authorisation.
+
+Authentication answers:
+
+```text
+Who is this user?
+```
+
+The Author Desk access control answers:
+
+```text
+May this user currently access their publishing records?
+```
+
+### Verification
+
+The access switch was tested by temporarily disabling Author Desk access for the
+initial author.
+
+With:
+
+```text
+desk_access_enabled = false
+```
+
+the Author Record was no longer returned to the authenticated author.
+
+After restoring:
+
+```text
+desk_access_enabled = true
+```
+
+the Author Record became visible again.
+
+The final production state was restored with Author Desk access enabled.
+
+**Migration 001B is verified.**
+
+---
+
 ## Migration 002 — Author Relationships
 
 **Implemented:** 26 September 2026  
@@ -1857,15 +2044,6 @@ The initial implementation contains:
 - `created_at`
 - `updated_at`
 
-The initial permitted contributor roles are:
-
-- `author`
-- `co_author`
-- `editor`
-- `translator`
-- `illustrator`
-- `other`
-
 The combination of:
 
 `book_id + author_id + contributor_role`
@@ -1970,7 +2148,6 @@ Contributor
 **Migration 003 is verified.**
 
 ---
----
 
 ## Migration 004 — Production Events
 
@@ -1981,8 +2158,8 @@ Migration 004 introduced:
 
 `public.production_events`
 
-Its purpose is to preserve meaningful production history independently from
-the current production state held on `public.book_records`.
+Its purpose is to preserve meaningful production history independently from the
+current production state held on `public.book_records`.
 
 The architectural distinction is:
 
@@ -1992,6 +2169,155 @@ book_records.production_stage
 
 production_events
         └── historical production record
+```
+
+Changing the current production stage of a Book Record must not erase the
+historical events that led to that state.
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `book_id`
+- `event_type`
+- `from_stage`
+- `to_stage`
+- `event_date`
+- `note`
+- `author_visible`
+- `created_at`
+
+### Controlled event types
+
+The initial permitted event types are:
+
+- `stage_transition`
+- `milestone`
+- `note`
+
+A `stage_transition` requires both `from_stage` and `to_stage`.
+
+The stages must be different.
+
+For `milestone` and `note` events, the stage-transition fields remain null.
+
+This prevents a record from claiming to be a production-stage transition
+without actually describing a transition.
+
+### Current state remains separate
+
+Migration 004 does not automatically update:
+
+`book_records.production_stage`
+
+when a Production Event is inserted.
+
+Likewise, changing the current Book Record stage does not automatically create a
+Production Event.
+
+A future controlled operation may perform both actions within one transaction.
+
+That mechanism was deliberately not invented during Migration 004.
+
+### Author visibility
+
+Row Level Security is enabled on `public.production_events`.
+
+An authenticated author may read a Production Event only where:
+
+1. `production_events.author_visible = true`;
+2. the event belongs to a Book Record connected to the authenticated author
+   through `public.book_contributors`;
+3. the contributor record has `desk_visible = true`; and
+4. the author's `author_records.desk_access_enabled` value is true.
+
+Authentication alone does not grant access to production history.
+
+### Browser mutation permissions
+
+The initial implementation provides authenticated authors with SELECT access
+only.
+
+No authenticated browser INSERT, UPDATE or DELETE permissions were introduced
+for Production Events.
+
+Production history therefore remains controlled Blackwood data.
+
+### Initial production event
+
+The first Production Event created was for:
+
+`BLACKWOOD-BOOK-001 — Gualachulain`
+
+It records:
+
+```text
+Event type:      stage_transition
+From stage:      production
+To stage:        pre_publication
+Event date:      30 July 2026
+Author visible:  true
+Note:            Gualachulain entered pre-publication.
+```
+
+This corresponds with the current Book Record state:
+
+```text
+production_stage = pre_publication
+```
+
+### Verification
+
+Migration 004 was tested through the temporary authenticated Author Desk RLS
+diagnostic page.
+
+The acceptance tests confirmed:
+
+```text
+Aidan Blackwood
+    authenticated author
+    → Gualachulain Production Event visible
+
+Ordinary authenticated non-author account
+    → 0 Production Events visible
+
+Anonymous browser
+    → no Production Event access
+```
+
+The per-record `author_visible` control was also tested.
+
+When the event was temporarily changed to:
+
+```text
+author_visible = false
+```
+
+the authenticated author could no longer read it.
+
+After restoring:
+
+```text
+author_visible = true
+```
+
+the event became visible again.
+
+Final production state:
+
+```text
+Gualachulain
+production → pre_publication
+30 July 2026
+author_visible = true
+```
+
+No `created_by` field was introduced in Migration 004 because the Blackwood
+administrator / staff actor model had not yet been designed.
+
+**Migration 004 is verified.**
+
 ---
 
 ## Migration 005 — Book Editions
@@ -2018,3 +2344,234 @@ book_records
             ├── Audiobook
             ├── Limited Edition
             └── Special Edition
+```
+
+Each Edition Record belongs to one Book Record through:
+
+`book_editions.book_id`
+
+The edition does not duplicate Author Record ownership.
+
+Author access is derived through the existing Author Desk ownership chain:
+
+```text
+auth.users
+    ↓
+author_records
+    ↓
+book_contributors
+    ↓
+book_records
+    ↓
+book_editions
+```
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `book_id`
+- `edition_reference`
+- `edition_name`
+- `format`
+- `isbn`
+- `publication_date`
+- `status`
+- `territory`
+- `language`
+- `list_price`
+- `currency`
+- `author_visible`
+- `created_at`
+- `updated_at`
+
+`edition_reference` is unique.
+
+`isbn` is nullable because not every edition requires or currently has an ISBN.
+
+`publication_date` is nullable because an edition may exist before a publication
+date has been fixed.
+
+### Controlled formats
+
+The initial permitted format values are:
+
+- `paperback`
+- `hardback`
+- `ebook`
+- `audiobook`
+- `limited_edition`
+- `special_edition`
+
+These are enforced by a database CHECK constraint.
+
+### Edition lifecycle
+
+The initial permitted edition statuses are:
+
+- `planned`
+- `preparing`
+- `scheduled`
+- `published`
+- `unavailable`
+- `withdrawn`
+- `archived`
+
+The default status is:
+
+`planned`
+
+These values represent the current lifecycle state of an edition.
+
+Historical edition-state events are not yet implemented.
+
+### Pricing integrity
+
+`list_price` is nullable but, where supplied, must not be negative.
+
+Price and currency are paired:
+
+```text
+list_price = null
+currency   = null
+```
+
+or:
+
+```text
+list_price = value
+currency   = value
+```
+
+The database prevents a list price from existing without a currency and prevents
+a currency from being stored without a corresponding list price.
+
+The Edition Record currently stores the normal list price only.
+
+Temporary promotional pricing is not yet modelled and must not overwrite the
+normal edition list price merely to represent a short-term promotion.
+
+### Author visibility
+
+Row Level Security is enabled on `public.book_editions`.
+
+Authenticated authors may SELECT an edition only where:
+
+1. `book_editions.author_visible = true`;
+2. the edition belongs to a Book Record connected to the authenticated author
+   through `public.book_contributors`;
+3. the relevant contributor record is Desk-visible; and
+4. the author's `author_records.desk_access_enabled` value is true.
+
+Authentication by itself does not grant access to edition records.
+
+The browser does not determine ownership.
+
+### Browser mutation permissions
+
+The initial implementation grants authenticated users SELECT access only.
+
+No authenticated browser INSERT, UPDATE or DELETE permissions were introduced
+for Edition Records.
+
+Edition management remains a controlled Blackwood operation.
+
+### Initial production records
+
+Migration 005 created two Edition Records for:
+
+`BLACKWOOD-BOOK-001 — Gualachulain`
+
+#### Paperback
+
+```text
+Edition reference:  BLACKWOOD-BOOK-001-PB
+Edition name:       Paperback
+Format:             paperback
+ISBN:               9781919555560
+Publication date:   31 October 2026
+Status:             scheduled
+Territory:          Worldwide
+Language:           English
+List price:         GBP 10.99
+Author visible:     true
+```
+
+#### EPUB
+
+```text
+Edition reference:  BLACKWOOD-BOOK-001-EPUB
+Edition name:       EPUB
+Format:             ebook
+ISBN:               none recorded
+Publication date:   31 October 2026
+Status:             scheduled
+Territory:          Worldwide
+Language:           English
+List price:         GBP 1.99
+Author visible:     true
+```
+
+A launch promotional price of GBP 0.99 is known operationally but is deliberately
+not stored as `list_price`.
+
+Promotional pricing requires a separate model if Blackwood later decides that it
+belongs within Author Desk data.
+
+### Verification
+
+Migration 005 was tested through the temporary authenticated Author Desk RLS
+diagnostic page.
+
+The following acceptance tests passed:
+
+```text
+Aidan Blackwood
+    authenticated author
+    → 2 Gualachulain editions visible
+
+Ordinary authenticated non-author account
+    → 0 editions visible
+
+Anonymous browser
+    → permission denied for public.book_editions
+```
+
+The per-record `author_visible` control was also tested.
+
+The EPUB Edition Record was temporarily changed to:
+
+```text
+author_visible = false
+```
+
+The authenticated author then saw exactly one Edition Record:
+
+```text
+Paperback
+```
+
+The EPUB record remained present in the database but was not exposed through
+author RLS.
+
+The EPUB was then restored to:
+
+```text
+author_visible = true
+```
+
+After restoration, the authenticated author again saw exactly two editions.
+
+Final production state:
+
+```text
+Paperback   author_visible = true
+EPUB        author_visible = true
+```
+
+Existing Author Record, Author Relationship, Book Record, Book Contributor and
+Production Event browser tests continued to pass after Migration 005.
+
+**Migration 005 is verified.**
+
