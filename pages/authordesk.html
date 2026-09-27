@@ -74,8 +74,9 @@
         <code>public.book_records</code>,
         <code>public.book_contributors</code>,
         <code>public.production_events</code>,
-        <code>public.book_editions</code> and
-        <code>public.author_actions</code>.
+        <code>public.book_editions</code>,
+        <code>public.author_actions</code> and
+        <code>public.documents</code>.
     </p>
 
     <section class="test-card">
@@ -141,6 +142,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Document Query</h2>
+
+        <div id="document-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -178,6 +187,9 @@
 
     const authorActionResult =
         document.getElementById("author-action-result");
+
+    const documentResult =
+        document.getElementById("document-result");
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -220,6 +232,7 @@
                 await testAnonymousProductionEventQuery();
                 await testAnonymousBookEditionQuery();
                 await testAnonymousAuthorActionQuery();
+                await testAnonymousDocumentQuery();
 
                 return;
             }
@@ -253,6 +266,10 @@
 
             await testAuthenticatedAuthorActionQuery();
 
+            await testAuthenticatedDocumentQuery(
+                session.user.id
+            );
+
         } catch (error) {
             console.error(
                 "Author Desk authentication test failed:",
@@ -266,46 +283,36 @@
             authResult.classList.add("fail");
 
             authorResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             authorResult.classList.add("fail");
 
             relationshipResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             relationshipResult.classList.add("fail");
 
             bookResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             bookResult.classList.add("fail");
 
             contributorResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             contributorResult.classList.add("fail");
 
             productionEventResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             productionEventResult.classList.add("fail");
 
             bookEditionResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             bookEditionResult.classList.add("fail");
 
             authorActionResult.textContent =
-                "NOT TESTED\n\n" +
-                "Authentication test failed.";
-
+                "NOT TESTED\n\nAuthentication test failed.";
             authorActionResult.classList.add("fail");
+
+            documentResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            documentResult.classList.add("fail");
         }
     }
 
@@ -314,10 +321,7 @@
             "Querying author_records through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("author_records")
                 .select(
                     "id,publishing_name,email,relationship_status,desk_access_enabled,created_at"
@@ -386,10 +390,7 @@
             "Querying author_relationships through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("author_relationships")
                 .select(
                     "id,author_id,status,started_on,concluded_on,internal_reference,created_at"
@@ -458,10 +459,7 @@
             "Querying book_records through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("book_records")
                 .select(
                     "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
@@ -540,10 +538,7 @@
             "Querying book_contributors through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("book_contributors")
                 .select(
                     "id,book_id,author_id,contributor_role,desk_visible,created_at"
@@ -622,10 +617,7 @@
             "Querying production_events through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("production_events")
                 .select(
                     "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
@@ -709,10 +701,7 @@
             "Querying book_editions through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("book_editions")
                 .select(
                     "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
@@ -795,10 +784,7 @@
             "Querying author_actions through authenticated RLS...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("author_actions")
                 .select(
                     "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
@@ -875,15 +861,96 @@
         }
     }
 
+    async function testAuthenticatedDocumentQuery(userId) {
+        documentResult.textContent =
+            "Querying documents through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("documents")
+                .select(
+                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Document result."
+                );
+            }
+
+            if (data.length === 0) {
+                documentResult.textContent =
+                    "PASS — NO DOCUMENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Documents.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk documents, " +
+                    "Author Desk access is disabled, no Desk-visible related book is assigned, " +
+                    "or the relevant documents are not author-visible.";
+
+                documentResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedDocument =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        record.author_id !== userId ||
+                        !record.document_type ||
+                        !record.title ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedDocument) {
+                documentResult.textContent =
+                    "FAIL — UNEXPECTED DOCUMENT VISIBILITY OR DATA\n\n" +
+                    "A document was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                documentResult.classList.add("fail");
+                return;
+            }
+
+            documentResult.textContent =
+                "PASS — OWN ACCESSIBLE DOCUMENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            documentResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Document query failed:",
+                error
+            );
+
+            documentResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            documentResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("author_records")
                 .select(
                     "id,publishing_name,email,relationship_status,desk_access_enabled,created_at"
@@ -893,10 +960,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 authorResult.textContent =
                     "PASS — ANONYMOUS ACCESS BLOCKED\n\n" +
                     "The query returned zero Author Records.";
@@ -926,10 +990,7 @@
             "Querying author_relationships without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("author_relationships")
                 .select(
                     "id,author_id,status,started_on,concluded_on,internal_reference,created_at"
@@ -939,10 +1000,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 relationshipResult.textContent =
                     "PASS — ANONYMOUS RELATIONSHIP ACCESS BLOCKED\n\n" +
                     "The query returned zero Author Relationships.";
@@ -972,10 +1030,7 @@
             "Querying book_records without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("book_records")
                 .select(
                     "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
@@ -985,10 +1040,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 bookResult.textContent =
                     "PASS — ANONYMOUS BOOK ACCESS BLOCKED\n\n" +
                     "The query returned zero Book Records.";
@@ -1018,10 +1070,7 @@
             "Querying book_contributors without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("book_contributors")
                 .select(
                     "id,book_id,author_id,contributor_role,desk_visible,created_at"
@@ -1031,10 +1080,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 contributorResult.textContent =
                     "PASS — ANONYMOUS CONTRIBUTOR ACCESS BLOCKED\n\n" +
                     "The query returned zero Book Contributor records.";
@@ -1064,10 +1110,7 @@
             "Querying production_events without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("production_events")
                 .select(
                     "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
@@ -1077,10 +1120,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 productionEventResult.textContent =
                     "PASS — ANONYMOUS PRODUCTION EVENT ACCESS BLOCKED\n\n" +
                     "The query returned zero Production Events.";
@@ -1110,10 +1150,7 @@
             "Querying book_editions without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("book_editions")
                 .select(
                     "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
@@ -1123,10 +1160,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 bookEditionResult.textContent =
                     "PASS — ANONYMOUS BOOK EDITION ACCESS BLOCKED\n\n" +
                     "The query returned zero Book Editions.";
@@ -1156,10 +1190,7 @@
             "Querying author_actions without an authenticated session...";
 
         try {
-            const {
-                data,
-                error
-            } = await client
+            const { data, error } = await client
                 .from("author_actions")
                 .select(
                     "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
@@ -1169,10 +1200,7 @@
                 throw error;
             }
 
-            if (
-                Array.isArray(data) &&
-                data.length === 0
-            ) {
+            if (Array.isArray(data) && data.length === 0) {
                 authorActionResult.textContent =
                     "PASS — ANONYMOUS AUTHOR ACTION ACCESS BLOCKED\n\n" +
                     "The query returned zero Author Actions.";
@@ -1194,6 +1222,46 @@
                 String(error.message || error);
 
             authorActionResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousDocumentQuery() {
+        documentResult.textContent =
+            "Querying documents without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("documents")
+                .select(
+                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                documentResult.textContent =
+                    "PASS — ANONYMOUS DOCUMENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Documents.";
+
+                documentResult.classList.add("pass");
+                return;
+            }
+
+            documentResult.textContent =
+                "FAIL — ANONYMOUS DOCUMENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            documentResult.classList.add("fail");
+
+        } catch (error) {
+            documentResult.textContent =
+                "PASS — ANONYMOUS DOCUMENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            documentResult.classList.add("pass");
         }
     }
 })();
