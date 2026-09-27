@@ -1616,3 +1616,25 @@ The Author Record SELECT policy now requires both:
 
 ```text
 auth.uid() = author_records.id
+---
+
+## Migration 004 — Production Events
+
+**Implemented:** 27 September 2026  
+**Status:** Verified
+
+Migration 004 introduced:
+
+`public.production_events`
+
+Its purpose is to preserve meaningful production history independently from
+the current production state held on `public.book_records`.
+
+The architectural distinction is:
+
+```text
+book_records.production_stage
+        └── current production state
+
+production_events
+        └── historical production record
