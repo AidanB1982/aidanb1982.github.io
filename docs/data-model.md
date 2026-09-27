@@ -2691,3 +2691,508 @@ Migration 006 passed the following checks:
 7. Restoring `author_visible = true` restored the Author Action without affecting upstream Author Desk records.
 
 Migration 006 is therefore verified for the current Author Desk read-only implementation.
+---
+
+### Migration 007 — Documents
+
+**Implemented:** 27 September 2026  
+**Status:** VERIFIED
+
+Migration 007 introduced:
+
+`public.documents`
+
+Its purpose is to establish the metadata, ownership and Author Desk access
+foundation for publishing documents connected to Blackwood's relationship with
+an author.
+
+Migration 007 does not introduce document storage buckets, signed download
+URLs, browser uploads, signature workflows or agreement-specific behaviour.
+
+Those capabilities remain separate implementation concerns.
+
+The document ownership model is:
+
+```text
+author_records
+    └── documents
+            ├── optional book_id
+            │       └── book_records
+            │
+            └── optional edition_id
+                    └── book_editions
+```
+
+Every Document has an explicit `author_id`.
+
+This is deliberate because not every publishing document necessarily belongs to
+a particular Book Record. Some documents may apply to the wider publishing
+relationship with an author.
+
+Where a document is connected to a specific work, `book_id` identifies that
+Book Record.
+
+Where a document is connected to a specific edition, `edition_id` identifies
+that Edition Record.
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `author_id`
+- `book_id`
+- `edition_id`
+- `document_type`
+- `title`
+- `version`
+- `storage_bucket`
+- `storage_path`
+- `mime_type`
+- `author_visible`
+- `requires_signature`
+- `signed_at`
+- `issued_at`
+- `supersedes_document_id`
+- `created_at`
+- `updated_at`
+
+`author_id` references:
+
+`public.author_records.id`
+
+`book_id` optionally references:
+
+`public.book_records.id`
+
+`edition_id` optionally references:
+
+`public.book_editions.id`
+
+`supersedes_document_id` optionally references:
+
+`public.documents.id`
+
+These relationships use `ON DELETE RESTRICT`.
+
+This follows the Author Desk principle that publishing and legal history should
+not disappear through cascading deletion.
+
+### Controlled document types
+
+The initial permitted `document_type` values are:
+
+```text
+publishing_agreement
+agreement_amendment
+royalty_statement
+editorial_file
+proof
+cover_file
+production_file
+rights_document
+author_information
+other
+```
+
+These values are enforced by a database CHECK constraint.
+
+Arbitrary document categories therefore cannot be inserted into the table.
+
+### Author ownership
+
+Every Document requires an explicit:
+
+`author_id`
+
+This prevents document ownership from being inferred solely from a Book Record,
+Edition Record, reader profile or browser-supplied identifier.
+
+A document may exist at author-relationship level without a `book_id`.
+
+A document may also be associated with a Book Record where appropriate.
+
+### Edition relationship
+
+`edition_id` is nullable.
+
+Where an `edition_id` is supplied, the database requires:
+
+```text
+book_id is not null
+```
+
+This prevents an edition-specific document from existing without also being
+associated with a Book Record.
+
+Migration 007 does not attempt to enforce through a simple CHECK constraint
+that the selected Edition Record actually belongs to the selected Book Record.
+
+Likewise, the schema does not attempt to prove through a CHECK constraint that
+every supplied Book Record belongs to the supplied `author_id`.
+
+Those are cross-table consistency rules and are reserved for the trusted
+Blackwood write layer or another controlled database operation.
+
+The Author Desk RLS policy independently verifies the authenticated author's
+Book Contributor relationship before exposing a book-specific document.
+
+### Storage metadata integrity
+
+`storage_bucket` and `storage_path` are nullable.
+
+This allows document metadata to exist before a physical file has been placed
+into private storage.
+
+Where storage information is supplied, the two values must exist together.
+
+The permitted states are therefore:
+
+```text
+storage_bucket = null
+storage_path   = null
+```
+
+or:
+
+```text
+storage_bucket = value
+storage_path   = value
+```
+
+The database rejects a bucket without a path and rejects a path without a
+bucket.
+
+Migration 007 does not create storage buckets or file-delivery infrastructure.
+
+Private storage architecture remains a later implementation stage.
+
+### Document visibility
+
+`author_visible` defaults to:
+
+```text
+true
+```
+
+This provides a per-document Author Desk visibility control.
+
+A document may remain part of Blackwood's publishing record while being hidden
+from the author's current Author Desk view.
+
+The visibility flag does not delete or otherwise alter the document record.
+
+### Signature metadata
+
+Migration 007 introduced:
+
+- `requires_signature`
+- `signed_at`
+
+`requires_signature` defaults to:
+
+```text
+false
+```
+
+These fields provide metadata required for later signature and agreement
+workflows.
+
+Migration 007 does not implement the signing workflow itself.
+
+Signed-document immutability, agreement state and signature authority remain
+future controlled operations.
+
+### Document issuance
+
+`issued_at` is nullable.
+
+This allows the system to distinguish between the existence of a Document
+Record and the later formal issuance of that document where applicable.
+
+No automatic issuance behaviour was introduced in Migration 007.
+
+### Document supersession
+
+`supersedes_document_id` allows a Document Record to identify an earlier
+Document Record that it supersedes.
+
+The field references:
+
+`public.documents.id`
+
+using `ON DELETE RESTRICT`.
+
+A database constraint prevents a document from superseding itself.
+
+This establishes the foundation for document history such as:
+
+```text
+Original document
+        ↓
+Replacement / amendment
+        ↓
+Later replacement / amendment
+```
+
+without silently overwriting the earlier record.
+
+Migration 007 does not yet enforce cross-document rules requiring a superseded
+document to belong to the same author, Book Record or document category.
+
+Those consistency rules are reserved for the trusted write layer or a later
+controlled document workflow.
+
+### Author visibility through Row Level Security
+
+Row Level Security is enabled on:
+
+`public.documents`
+
+Authenticated users receive SELECT capability only.
+
+For a Document to be visible to an authenticated author:
+
+1. `documents.author_visible` must be true;
+2. `documents.author_id` must equal `auth.uid()`;
+3. the corresponding Author Record must have
+   `desk_access_enabled = true`; and
+4. where `book_id` is present, the authenticated author must have a matching
+   `public.book_contributors` record for that Book Record with
+   `desk_visible = true`.
+
+The resulting access path is conceptually:
+
+```text
+authenticated user
+        ↓
+matching author_records identity
+        ↓
+desk_access_enabled = true
+        ↓
+documents.author_id = auth.uid()
+        ↓
+author_visible = true
+        ↓
+if book-specific:
+matching Desk-visible book_contributors record
+        ↓
+Document visible
+```
+
+Authentication alone does not grant document access.
+
+A reader / Archivist account does not grant document access.
+
+Knowledge of a Document ID does not grant document access.
+
+### Browser mutation permissions
+
+The initial implementation grants authenticated users SELECT access only.
+
+No authenticated browser:
+
+- INSERT;
+- UPDATE; or
+- DELETE
+
+capability was introduced for `public.documents`.
+
+Document creation, visibility changes, storage metadata, signature metadata and
+supersession therefore remain controlled Blackwood operations.
+
+### Production data
+
+Migration 007 deliberately created no permanent production Document Record.
+
+A temporary record was created solely for constraint and Row Level Security
+verification:
+
+```text
+id:                4
+author_id:         Aidan Blackwood
+book_id:           BLACKWOOD-BOOK-001
+edition_id:        null
+document_type:     other
+title:             Migration 007 Temporary Test Document
+version:           TEST
+author_visible:    true
+requires_signature:false
+```
+
+The temporary record was deleted after verification.
+
+The final `public.documents` table therefore contained no production Document
+Records at the completion of Migration 007.
+
+Identity values consumed during failed constraint tests and temporary test-data
+creation were not reset.
+
+Gaps in generated identity values are permitted and have no operational
+meaning.
+
+### Constraint verification
+
+Migration 007 passed database-level constraint tests.
+
+The storage metadata constraint rejected a Document containing:
+
+```text
+storage_bucket = value
+storage_path   = null
+```
+
+The edition relationship constraint rejected a Document containing:
+
+```text
+edition_id = value
+book_id    = null
+```
+
+The controlled document-type constraint rejected the deliberately invalid:
+
+```text
+classified_bond_dossier
+```
+
+The supersession constraint rejected an attempt to set:
+
+```text
+document id = 4
+supersedes_document_id = 4
+```
+
+The failed self-supersession UPDATE did not alter the stored Document Record.
+
+### Row Level Security verification
+
+Migration 007 was tested through the temporary authenticated Author Desk RLS
+diagnostic page.
+
+The existing diagnostic page was extended to query all eight implemented Author
+Desk data domains:
+
+```text
+author_records
+author_relationships
+book_records
+book_contributors
+production_events
+book_editions
+author_actions
+documents
+```
+
+The following document-access tests passed.
+
+#### Authenticated author
+
+With the temporary document set to:
+
+```text
+author_visible = true
+```
+
+Aidan Blackwood could read exactly one accessible Document Record.
+
+The record belonged to the authenticated Author Record and to
+`BLACKWOOD-BOOK-001`.
+
+All previously implemented Author Desk RLS tests remained successful.
+
+#### Ordinary authenticated non-author
+
+The ordinary authenticated non-author test account could read:
+
+```text
+0 Documents
+```
+
+The account also continued to receive no Author Record, Author Relationship,
+Book Record, Book Contributor, Production Event, Book Edition or Author Action
+data.
+
+This confirmed that ordinary authentication does not imply Author Desk document
+access.
+
+#### Anonymous browser
+
+Anonymous access to `public.documents` was rejected with:
+
+```text
+permission denied for table documents
+```
+
+The existing Author Desk tables likewise remained unavailable anonymously.
+
+#### Per-document visibility
+
+The temporary Document Record was changed to:
+
+```text
+author_visible = false
+```
+
+After the authenticated author session refreshed, the author could read:
+
+```text
+0 Documents
+```
+
+while the Author Record, Author Relationship, Book Record, Book Contributor,
+Production Event, Book Editions and Author Action remained visible.
+
+This confirmed that the document-level visibility control operates
+independently from the wider Author Desk ownership chain.
+
+The temporary Document Record was then restored to:
+
+```text
+author_visible = true
+```
+
+and became visible to the authenticated author again.
+
+### Cleanup verification
+
+After all constraint and RLS tests were complete, the temporary Document Record
+was deleted.
+
+A final query of:
+
+`public.documents`
+
+returned:
+
+```text
+0 rows
+```
+
+No fabricated agreement, rights document, production file or other permanent
+Document Record was created merely to populate the table.
+
+### Deliberately deferred work
+
+Migration 007 does not implement:
+
+- private storage buckets;
+- signed download URLs;
+- browser uploads;
+- document download authorisation;
+- signature execution;
+- agreement lifecycle behaviour;
+- immutable signed-document enforcement;
+- trusted staff/admin write identity;
+- `created_by`;
+- cross-table validation that an Edition belongs to the supplied Book Record;
+- cross-table validation that a supplied Book Record belongs to the supplied
+  document author;
+- cross-document validation of supersession chains;
+- automatic document activity events.
+
+These remain later implementation concerns.
+
+Migration 007 establishes the document metadata, ownership, history and
+author-read security foundation on which those workflows can be built.
+
+**Migration 007 is verified.**
