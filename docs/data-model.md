@@ -1616,6 +1616,360 @@ The Author Record SELECT policy now requires both:
 
 ```text
 auth.uid() = author_records.id
+## Migration 002 — Author Relationships
+
+**Implemented:** 26 September 2026  
+**Status:** Verified
+
+Migration 002 introduced:
+
+`public.author_relationships`
+
+Its purpose is to represent the publishing relationship between Blackwood and
+an author independently from individual Book Records.
+
+The relationship structure is:
+
+```text
+auth.users
+    ↓
+author_records
+    ↓
+author_relationships
+```
+
+An Author Record establishes the authenticated publishing identity.
+
+An Author Relationship records the operational relationship between that author
+and Blackwood Publishing.
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `author_id`
+- `status`
+- `started_on`
+- `concluded_on`
+- `internal_reference`
+- `created_at`
+- `updated_at`
+
+`author_id` references:
+
+`public.author_records.id`
+
+The relationship uses `ON DELETE RESTRICT`.
+
+This reflects the general Author Desk principle that established publishing
+history should not disappear merely because another record is removed.
+
+### Controlled relationship status
+
+The initial permitted relationship statuses are:
+
+- `prospective`
+- `contracted`
+- `active`
+- `inactive`
+- `concluded`
+
+These values are enforced at database level.
+
+Where both relationship dates exist, the database prevents `concluded_on` from
+being earlier than `started_on`.
+
+### Author visibility
+
+Row Level Security is enabled on `public.author_relationships`.
+
+An authenticated author may SELECT their own Author Relationship only where:
+
+1. `author_relationships.author_id = auth.uid()`; and
+2. the corresponding `author_records.desk_access_enabled` value is true.
+
+Authentication alone does not grant access to an Author Relationship.
+
+The Author Desk access switch therefore applies both to the Author Record and to
+the relationship records beneath it.
+
+### Browser mutation permissions
+
+The initial implementation provides authenticated authors with read access only.
+
+No authenticated browser INSERT, UPDATE or DELETE permissions were introduced
+for Author Relationships.
+
+Relationship status remains controlled by Blackwood.
+
+### Initial production record
+
+The first Author Relationship created was:
+
+```text
+Author:              Aidan Blackwood
+Internal reference:  BLACKWOOD-AUTHOR-001
+Status:              active
+Started on:          not recorded
+Concluded on:        not recorded
+```
+
+No relationship dates were invented where authoritative dates had not yet been
+recorded.
+
+### Verification
+
+Migration 002 was tested through authenticated Row Level Security.
+
+The acceptance tests confirmed:
+
+```text
+Aidan Blackwood
+    authenticated author
+    → own Author Relationship visible
+
+Ordinary authenticated non-author account
+    → 0 Author Relationships visible
+
+Anonymous browser
+    → no Author Relationship access
+```
+
+The Author Desk access kill switch was also tested.
+
+When:
+
+```text
+author_records.desk_access_enabled = false
+```
+
+the authenticated author could no longer read the Author Relationship.
+
+After restoring:
+
+```text
+author_records.desk_access_enabled = true
+```
+
+the Author Relationship became visible again.
+
+Final production state:
+
+```text
+BLACKWOOD-AUTHOR-001
+status = active
+desk access = enabled
+```
+
+**Migration 002 is verified.**
+
+---
+
+## Migration 003 — Book Records and Book Contributors
+
+**Implemented:** 26 September 2026  
+**Status:** Verified
+
+Migration 003 introduced:
+
+`public.book_records`
+
+and:
+
+`public.book_contributors`
+
+Together these tables establish the ownership and visibility path between an
+Author Record and an acquired Book Record.
+
+The implemented relationship is:
+
+```text
+auth.users
+    ↓
+author_records
+    ↓
+book_contributors
+    ↓
+book_records
+```
+
+This deliberately avoids treating the reader / Archivist identity as evidence
+of Book Record ownership.
+
+### Book Records
+
+`public.book_records` represents the continuing operational record of an
+acquired work.
+
+The initial implementation contains:
+
+- `id`
+- `internal_reference`
+- `title`
+- `subtitle`
+- `work_status`
+- `production_stage`
+- `acquired_on`
+- `contracted_on`
+- `created_at`
+- `updated_at`
+
+`internal_reference` is unique.
+
+### Controlled work status
+
+The initial permitted Book Record work statuses are:
+
+- `active`
+- `paused`
+- `archived`
+
+### Controlled production stage
+
+The initial permitted production stages are:
+
+- `contracted`
+- `editorial`
+- `author_revision`
+- `beta_proof`
+- `production`
+- `pre_publication`
+- `published`
+- `in_print`
+
+The current production stage is stored on the Book Record.
+
+Historical production changes are stored separately through
+`public.production_events`, introduced by Migration 004.
+
+### Book Contributors
+
+`public.book_contributors` connects an Author Record to a Book Record.
+
+The initial implementation contains:
+
+- `id`
+- `book_id`
+- `author_id`
+- `contributor_role`
+- `desk_visible`
+- `created_at`
+- `updated_at`
+
+The initial permitted contributor roles are:
+
+- `author`
+- `co_author`
+- `editor`
+- `translator`
+- `illustrator`
+- `other`
+
+The combination of:
+
+`book_id + author_id + contributor_role`
+
+is unique.
+
+This permits a Book Record to support multiple contributors without duplicating
+author ownership fields directly onto the Book Record.
+
+### Author visibility
+
+Row Level Security is enabled on both tables.
+
+An authenticated author may read a Book Record only where a corresponding
+Book Contributor record:
+
+1. belongs to the authenticated author;
+2. references that Book Record;
+3. has `desk_visible = true`; and
+4. belongs to an Author Record whose `desk_access_enabled` value is true.
+
+An authenticated author may read only their own permitted Book Contributor
+records.
+
+Authentication alone does not grant access to Book Records.
+
+### Browser mutation permissions
+
+The initial implementation provides authenticated authors with SELECT access
+only.
+
+No authenticated browser INSERT, UPDATE or DELETE permissions were introduced
+for Book Records or Book Contributor records.
+
+Book ownership, contributor relationships and production state therefore remain
+controlled Blackwood data.
+
+### Initial Book Record
+
+The first production Book Record created was:
+
+```text
+Internal reference:  BLACKWOOD-BOOK-001
+Title:               Gualachulain
+Subtitle:            none recorded
+Work status:         active
+Production stage:    pre_publication
+Acquired on:         not recorded
+Contracted on:       not recorded
+```
+
+No acquisition or contract dates were invented where authoritative dates had
+not yet been recorded.
+
+The initial contributor relationship is:
+
+```text
+Book:              BLACKWOOD-BOOK-001
+Author:            Aidan Blackwood
+Contributor role:  author
+Desk visible:      true
+```
+
+### Verification
+
+Migration 003 was tested through authenticated Row Level Security.
+
+The acceptance tests confirmed:
+
+```text
+Aidan Blackwood
+    authenticated author
+    → Gualachulain Book Record visible
+    → own Book Contributor record visible
+
+Ordinary authenticated non-author account
+    → 0 Book Records visible
+    → 0 Book Contributor records visible
+
+Anonymous browser
+    → no Book Record access
+    → no Book Contributor access
+```
+
+The Book Record and contributor visibility path was also confirmed to respect
+the Author Desk access controls.
+
+Final production state:
+
+```text
+BLACKWOOD-BOOK-001
+    Gualachulain
+    work_status = active
+    production_stage = pre_publication
+
+Contributor
+    Aidan Blackwood
+    contributor_role = author
+    desk_visible = true
+```
+
+**Migration 003 is verified.**
+
+---
 ---
 
 ## Migration 004 — Production Events
@@ -1638,3 +1992,29 @@ book_records.production_stage
 
 production_events
         └── historical production record
+---
+
+## Migration 005 — Book Editions
+
+**Implemented:** 27 September 2026  
+**Status:** Verified
+
+Migration 005 introduced:
+
+`public.book_editions`
+
+Its purpose is to represent individual commercial or publication editions of a
+Book Record without treating the Book Record itself as a single ISBN, format or
+publication instance.
+
+The architectural relationship is:
+
+```text
+book_records
+    └── book_editions
+            ├── Paperback
+            ├── Hardback
+            ├── EPUB
+            ├── Audiobook
+            ├── Limited Edition
+            └── Special Edition
