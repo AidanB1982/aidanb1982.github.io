@@ -3233,3 +3233,565 @@ author_records
             │
             └── optional signed_document_id
                     └── documents
+---
+
+### Migration 009 — Rights
+
+**Implemented:** 27 September 2026  
+**Status:** VERIFIED
+
+Migration 009 introduced:
+
+`public.rights`
+
+Its purpose is to establish the structured rights metadata and Author Desk
+access foundation for rights expressly held by Blackwood Publishing under an
+Agreement.
+
+A Rights Record does not itself create, grant or infer a publishing right.
+
+Every Rights Record must be supported by an Agreement through the mandatory:
+
+`agreement_id`
+
+relationship.
+
+The architectural principle is:
+
+```text
+author_records
+    └── agreements
+            └── rights
+                    └── optional book_id
+```
+
+Rights must not be inferred merely because:
+
+- a Book Record exists;
+- an Edition Record exists;
+- Blackwood has published a particular format;
+- a publication activity has occurred; or
+- an author has Author Desk access.
+
+The signed agreement remains authoritative.
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `agreement_id`
+- `author_id`
+- `book_id`
+- `rights_reference`
+- `right_type`
+- `format_scope`
+- `territory`
+- `language`
+- `exclusivity`
+- `effective_date`
+- `expiry_date`
+- `status`
+- `summary_author`
+- `author_visible`
+- `created_at`
+- `updated_at`
+
+`agreement_id` references:
+
+`public.agreements.id`
+
+and is mandatory.
+
+`author_id` references:
+
+`public.author_records.id`
+
+and is mandatory.
+
+`book_id` optionally references:
+
+`public.book_records.id`
+
+These relationships use `ON DELETE RESTRICT`.
+
+This follows the Author Desk principle that established contractual and rights
+history should not disappear through cascading deletion.
+
+### Explicit agreement dependency
+
+Every Rights Record requires an Agreement.
+
+The database therefore does not permit a standalone Rights Record with no
+agreement relationship.
+
+Conceptually:
+
+```text
+Agreement
+    ↓
+Right held under that Agreement
+```
+
+not:
+
+```text
+Book exists
+    ↓
+therefore Blackwood must hold rights
+```
+
+This distinction is fundamental to the Author Desk rights model.
+
+### Explicit author ownership
+
+Every Rights Record also contains an explicit:
+
+`author_id`
+
+This provides a direct ownership boundary for Row Level Security and prevents
+rights ownership from being inferred from browser-supplied Book Record or
+Agreement identifiers.
+
+The linked Agreement must belong to the same author before the Rights Record is
+exposed through Author Desk RLS.
+
+### Optional Book Record relationship
+
+`book_id` is nullable.
+
+This allows the rights model to support records whose contractual scope may not
+require a Book Record relationship while still permitting book-specific rights
+where appropriate.
+
+Where `book_id` is supplied, Author Desk access additionally requires a
+Desk-visible `book_contributors` relationship for the authenticated author.
+
+Migration 009 does not structurally enforce that the supplied `book_id` matches
+the contractual scope of the linked Agreement.
+
+That is a cross-table consistency rule reserved for the trusted Blackwood write
+layer or another controlled database operation.
+
+### Controlled right types
+
+The initial permitted `right_type` values are:
+
+```text
+publication
+translation
+audio
+adaptation
+serialization
+anthology
+other
+```
+
+These values are enforced by a database CHECK constraint.
+
+They describe the broad category of a recorded right.
+
+They do not establish that Blackwood holds any particular right unless a Rights
+Record supported by the relevant Agreement actually exists.
+
+### Format scope
+
+`format_scope` is nullable free text.
+
+Migration 009 deliberately does not introduce a rigid format taxonomy for
+rights.
+
+The field may later describe the particular format scope supported by the
+underlying Agreement where that information is appropriate for the structured
+Rights Record.
+
+The database must not manufacture format rights from Edition Records.
+
+### Territory and language
+
+`territory` defaults to:
+
+`Worldwide`
+
+`language` defaults to:
+
+`English`
+
+These fields remain text values rather than controlled enums in Migration 009.
+
+Their presence on a Rights Record describes the scope recorded for that right.
+
+The defaults do not themselves establish contractual rights.
+
+Trusted creation of production Rights Records must use the actual Agreement as
+the source of truth.
+
+### Exclusivity
+
+The initial permitted `exclusivity` values are:
+
+```text
+exclusive
+non_exclusive
+```
+
+These values are enforced by a database CHECK constraint.
+
+Exclusivity is mandatory for a Rights Record.
+
+### Rights lifecycle
+
+The initial permitted Rights Record statuses are:
+
+```text
+pending
+active
+expired
+reverted
+terminated
+superseded
+```
+
+The default status is:
+
+`pending`
+
+An `active` Rights Record requires a non-null:
+
+`effective_date`
+
+Where both `effective_date` and `expiry_date` exist, the database prevents the
+expiry date from being earlier than the effective date.
+
+Migration 009 records current rights state only.
+
+Historical rights events are deliberately deferred to a later migration.
+
+### Author-facing summary
+
+`summary_author` is nullable.
+
+It may contain a plain-English description intended for presentation within the
+Author Desk.
+
+The summary is informational only.
+
+It does not replace or override the authoritative signed Agreement.
+
+No internal Blackwood notes field was introduced on the author-readable Rights
+Record.
+
+### Author visibility through Row Level Security
+
+Row Level Security is enabled on:
+
+`public.rights`
+
+Authenticated users receive SELECT capability only.
+
+For a Rights Record to be visible to an authenticated author:
+
+1. `rights.author_visible` must be true;
+2. `rights.author_id` must equal `auth.uid()`;
+3. the corresponding Author Record must have
+   `desk_access_enabled = true`;
+4. the linked Agreement must belong to the same author;
+5. the linked Agreement must have `author_visible = true`; and
+6. where `book_id` is present, the authenticated author must have a matching
+   `public.book_contributors` record for that Book Record with
+   `desk_visible = true`.
+
+The resulting access path is conceptually:
+
+```text
+authenticated user
+        ↓
+matching author_records identity
+        ↓
+desk_access_enabled = true
+        ↓
+rights.author_id = auth.uid()
+        ↓
+rights.author_visible = true
+        ↓
+linked Agreement belongs to same author
+        ↓
+linked Agreement is author-visible
+        ↓
+if book-specific:
+matching Desk-visible book_contributors record
+        ↓
+Rights Record visible
+```
+
+Authentication alone does not grant rights access.
+
+A reader / Archivist account does not grant rights access.
+
+Knowledge of a Rights Record ID, Agreement ID or Book Record ID does not grant
+rights access.
+
+### Agreement visibility dependency
+
+The Row Level Security policy deliberately requires the linked Agreement to
+remain author-visible.
+
+Therefore:
+
+```text
+Rights Record author_visible = true
+```
+
+is not sufficient by itself.
+
+If the linked Agreement is not author-visible, the dependent Rights Record is
+also not exposed through the Author Desk.
+
+This preserves the current Author Desk visibility relationship between the
+structured Agreement and the rights recorded beneath it.
+
+### Browser mutation permissions
+
+The initial implementation grants authenticated users SELECT access only.
+
+No authenticated browser:
+
+- INSERT;
+- UPDATE; or
+- DELETE
+
+capability was introduced for `public.rights`.
+
+Rights creation, amendment, visibility changes and lifecycle changes therefore
+remain controlled Blackwood operations.
+
+### Production data
+
+Migration 009 deliberately created no permanent production Rights Record.
+
+The Agreement table contained no production Agreement Record when Migration 009
+verification began.
+
+A temporary Agreement was therefore created solely to provide the mandatory
+parent relationship required for Rights constraint and Row Level Security
+testing.
+
+The temporary Agreement was:
+
+```text
+id:                    5
+agreement_reference:   MIGRATION-009-AGREEMENT-TEST
+agreement_type:        other
+book_id:               BLACKWOOD-BOOK-001
+status:                draft
+author_visible:        true
+```
+
+A temporary Rights Record was then created solely for verification:
+
+```text
+id:                    5
+agreement_id:          5
+rights_reference:      MIGRATION-009-RIGHTS-TEST
+right_type:            publication
+format_scope:          Test scope only
+territory:             Worldwide
+language:              English
+exclusivity:           exclusive
+effective_date:        27 September 2026
+expiry_date:           none
+status:                active
+author_visible:        true
+```
+
+These values were synthetic test data only.
+
+They do not establish or describe the actual contractual rights held by
+Blackwood for Gualachulain.
+
+Both temporary records were deleted after verification.
+
+No permanent production Rights Record was invented merely to populate the
+table.
+
+Identity values consumed by failed constraint tests and temporary verification
+records were not reset.
+
+Gaps in generated identity values are permitted and have no operational
+meaning.
+
+### Constraint verification
+
+Migration 009 passed database-level constraint tests.
+
+The controlled right-type constraint rejected the deliberately invalid:
+
+```text
+permission_to_rule_the_world
+```
+
+The exclusivity constraint rejected the deliberately invalid:
+
+```text
+extremely_exclusive
+```
+
+The date-ordering constraint rejected a record containing:
+
+```text
+effective_date = 1 October 2026
+expiry_date    = 30 September 2026
+```
+
+The active-status constraint rejected a Rights Record containing:
+
+```text
+status         = active
+effective_date = null
+```
+
+A valid temporary Rights Record was then created successfully using the
+temporary Agreement.
+
+### Row Level Security verification
+
+Migration 009 was tested through the temporary authenticated Author Desk RLS
+diagnostic page.
+
+The diagnostic page was extended to query all ten implemented Author Desk data
+domains:
+
+```text
+author_records
+author_relationships
+book_records
+book_contributors
+production_events
+book_editions
+author_actions
+documents
+agreements
+rights
+```
+
+The following Rights access tests passed.
+
+#### Authenticated author
+
+Aidan Blackwood could read exactly one accessible temporary Rights Record.
+
+The record:
+
+- belonged to the authenticated Author Record;
+- referenced the temporary Agreement;
+- referenced `BLACKWOOD-BOOK-001`;
+- was author-visible; and
+- passed the existing Desk-visible Book Contributor access path.
+
+All previously implemented Author Desk diagnostic queries continued to pass.
+
+#### Ordinary authenticated non-author
+
+The ordinary authenticated non-author test account could read:
+
+```text
+0 Rights Records
+```
+
+The account also received no Agreement or other Author Desk publishing data.
+
+This confirmed that ordinary authentication does not imply Author Desk rights
+access.
+
+#### Anonymous browser
+
+Anonymous access to:
+
+`public.rights`
+
+was rejected with:
+
+```text
+permission denied for table rights
+```
+
+The existing Author Desk tables likewise remained unavailable anonymously.
+
+#### Per-record visibility
+
+The temporary Rights Record was changed to:
+
+```text
+author_visible = false
+```
+
+After refreshing the authenticated author session, the author could read:
+
+```text
+0 Rights Records
+```
+
+while the temporary parent Agreement remained visible.
+
+The existing Author Record, Author Relationship, Book Record, Book Contributor,
+Production Event, Book Editions and Author Action also remained accessible.
+
+This confirmed that Rights Record visibility can be controlled independently
+without removing the parent Agreement or disrupting the wider Author Desk
+ownership chain.
+
+The temporary Rights Record was then restored to:
+
+```text
+author_visible = true
+```
+
+and became visible to the authenticated author again.
+
+### Cleanup verification
+
+After all constraint and Row Level Security tests were complete, test data was
+removed in dependency order:
+
+```text
+1. temporary Rights Record
+2. temporary Agreement
+```
+
+A final verification returned:
+
+```text
+rights       0 rows
+agreements   0 rows
+```
+
+No identity sequences were reset.
+
+No production Rights Record or Agreement was removed because neither table
+contained permanent production data during the Migration 009 verification.
+
+### Deliberately deferred work
+
+Migration 009 does not implement:
+
+- Rights Event history;
+- automatic rights lifecycle events;
+- sublicence records;
+- rights exercise tracking;
+- trusted staff/admin browser mutation;
+- automatic `updated_at` triggers;
+- cross-table enforcement that a Rights Record `book_id` matches the contractual
+  scope of its Agreement;
+- automatic validation of contractual rights against Edition Records;
+- private rights-document delivery;
+- agreement execution or signature workflows;
+- internal rights negotiation notes;
+- automatic Author Desk activity events.
+
+These remain later implementation concerns.
+
+Migration 009 establishes the structured rights, Agreement dependency,
+ownership and author-read security foundation on which those workflows can be
+built.
+
+**Migration 009 is verified.**
