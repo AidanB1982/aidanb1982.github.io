@@ -2575,3 +2575,119 @@ Production Event browser tests continued to pass after Migration 005.
 
 **Migration 005 is verified.**
 
+### Migration 006 — Author Actions
+
+**Status:** VERIFIED
+
+Migration 006 introduced `public.author_actions` as the Author Desk record of current and historical operational actions associated with a Book Record.
+
+Production stage and author action remain separate concepts. `book_records.production_stage` describes where the work currently sits in the publishing lifecycle; `author_actions` describes whether a specific operational action or information state exists for the author.
+
+#### Table: `public.author_actions`
+
+Implemented fields:
+
+```text
+id
+book_id
+action_type
+title
+description
+due_at
+status
+author_visible
+completed_at
+created_at
+updated_at
+```
+
+`book_id` references `public.book_records(id)` using `ON DELETE RESTRICT`.
+
+Supported `action_type` values:
+
+```text
+no_action_required
+author_review_required
+signature_required
+file_available
+blackwood_action_in_progress
+```
+
+Supported lifecycle `status` values:
+
+```text
+open
+completed
+cancelled
+expired
+```
+
+`action_type` and `status` are deliberately separate.
+
+For example, an open `no_action_required` record means the current action-state record remains active while confirming that no author action is presently required.
+
+`due_at` is nullable and uses `timestamptz`.
+
+`completed_at` is nullable. A database constraint requires:
+
+- `status = 'completed'` to have a non-null `completed_at`;
+- all other statuses to have `completed_at = null`.
+
+`author_visible` defaults to `true`.
+
+`created_at` and `updated_at` default to `now()`.
+
+No automatic `updated_at` trigger has been introduced at this stage.
+
+No `completed_by` field has been introduced because the trusted staff/admin actor model has not yet been designed.
+
+No `related_document_id` field was introduced in Migration 006 because the document model does not yet exist. Document linkage is deferred until the document architecture has been implemented.
+
+#### Author access
+
+Row Level Security is enabled.
+
+Authenticated users receive `SELECT` capability only.
+
+Authors may read an Author Action only when:
+
+- `author_visible = true`;
+- the action belongs to a Book Record connected to the authenticated author through `book_contributors`;
+- the contributor record has `desk_visible = true`; and
+- the corresponding Author Record has `desk_access_enabled = true`.
+
+Authentication alone does not provide Author Desk access.
+
+No authenticated browser `INSERT`, `UPDATE`, or `DELETE` capability is granted.
+
+#### Initial production record
+
+Gualachulain received the first Author Action:
+
+```text
+id:             1
+book_id:        1
+action_type:    no_action_required
+title:          No action required
+description:    No author action is currently required for Gualachulain.
+due_at:         null
+status:         open
+author_visible: true
+completed_at:   null
+```
+
+This provides an explicit current Author Desk state rather than requiring the interface to infer that no action is required from the absence of records.
+
+#### Verification
+
+Migration 006 passed the following checks:
+
+1. Schema inspection confirmed all expected columns, nullability and defaults.
+2. The Gualachulain Author Action was inserted and read back successfully.
+3. Aidan's authenticated Author Desk account could read exactly one accessible Author Action.
+4. The ordinary authenticated non-author test account could read zero Author Actions.
+5. Anonymous access was rejected with `permission denied for table author_actions`.
+6. Setting the Gualachulain action's `author_visible` value to `false` caused the action to disappear from Aidan's Author Desk while the Author Record, Author Relationship, Book Record, Book Contributor, Production Event and Book Editions remained accessible.
+7. Restoring `author_visible = true` restored the Author Action without affecting upstream Author Desk records.
+
+Migration 006 is therefore verified for the current Author Desk read-only implementation.
