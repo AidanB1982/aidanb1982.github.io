@@ -75,8 +75,9 @@
         <code>public.book_contributors</code>,
         <code>public.production_events</code>,
         <code>public.book_editions</code>,
-        <code>public.author_actions</code> and
-        <code>public.documents</code>.
+        <code>public.author_actions</code>,
+        <code>public.documents</code> and
+        <code>public.agreements</code>.
     </p>
 
     <section class="test-card">
@@ -150,6 +151,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Agreement Query</h2>
+
+        <div id="agreement-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -190,6 +199,9 @@
 
     const documentResult =
         document.getElementById("document-result");
+
+    const agreementResult =
+        document.getElementById("agreement-result");
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -233,6 +245,7 @@
                 await testAnonymousBookEditionQuery();
                 await testAnonymousAuthorActionQuery();
                 await testAnonymousDocumentQuery();
+                await testAnonymousAgreementQuery();
 
                 return;
             }
@@ -267,6 +280,10 @@
             await testAuthenticatedAuthorActionQuery();
 
             await testAuthenticatedDocumentQuery(
+                session.user.id
+            );
+
+            await testAuthenticatedAgreementQuery(
                 session.user.id
             );
 
@@ -313,6 +330,10 @@
             documentResult.textContent =
                 "NOT TESTED\n\nAuthentication test failed.";
             documentResult.classList.add("fail");
+
+            agreementResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            agreementResult.classList.add("fail");
         }
     }
 
@@ -945,6 +966,92 @@
         }
     }
 
+    async function testAuthenticatedAgreementQuery(userId) {
+        agreementResult.textContent =
+            "Querying agreements through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("agreements")
+                .select(
+                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Agreement result."
+                );
+            }
+
+            if (data.length === 0) {
+                agreementResult.textContent =
+                    "PASS — NO AGREEMENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Agreements.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk agreements, " +
+                    "Author Desk access is disabled, no Desk-visible related book is assigned, " +
+                    "or the relevant agreements are not author-visible.";
+
+                agreementResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedAgreement =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        record.author_id !== userId ||
+                        !record.agreement_type ||
+                        !record.agreement_reference ||
+                        !record.title ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedAgreement) {
+                agreementResult.textContent =
+                    "FAIL — UNEXPECTED AGREEMENT VISIBILITY OR DATA\n\n" +
+                    "An agreement was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                agreementResult.classList.add("fail");
+                return;
+            }
+
+            agreementResult.textContent =
+                "PASS — OWN ACCESSIBLE AGREEMENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            agreementResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Agreement query failed:",
+                error
+            );
+
+            agreementResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            agreementResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1262,6 +1369,46 @@
                 String(error.message || error);
 
             documentResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousAgreementQuery() {
+        agreementResult.textContent =
+            "Querying agreements without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("agreements")
+                .select(
+                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                agreementResult.textContent =
+                    "PASS — ANONYMOUS AGREEMENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Agreements.";
+
+                agreementResult.classList.add("pass");
+                return;
+            }
+
+            agreementResult.textContent =
+                "FAIL — ANONYMOUS AGREEMENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            agreementResult.classList.add("fail");
+
+        } catch (error) {
+            agreementResult.textContent =
+                "PASS — ANONYMOUS AGREEMENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            agreementResult.classList.add("pass");
         }
     }
 })();
