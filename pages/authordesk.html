@@ -71,8 +71,9 @@
         Temporary development page for verifying authenticated access
         to <code>public.author_records</code>,
         <code>public.author_relationships</code>,
-        <code>public.book_records</code> and
-        <code>public.book_contributors</code>.
+        <code>public.book_records</code>,
+        <code>public.book_contributors</code> and
+        <code>public.production_events</code>.
     </p>
 
     <section class="test-card">
@@ -114,6 +115,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Production Event Query</h2>
+
+        <div id="production-event-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -142,6 +151,9 @@
 
     const contributorResult =
         document.getElementById("contributor-result");
+
+    const productionEventResult =
+        document.getElementById("production-event-result");
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -181,6 +193,7 @@
                 await testAnonymousRelationshipQuery();
                 await testAnonymousBookQuery();
                 await testAnonymousContributorQuery();
+                await testAnonymousProductionEventQuery();
 
                 return;
             }
@@ -207,6 +220,8 @@
             await testAuthenticatedContributorQuery(
                 session.user.id
             );
+
+            await testAuthenticatedProductionEventQuery();
 
         } catch (error) {
             console.error(
@@ -243,6 +258,12 @@
                 "Authentication test failed.";
 
             contributorResult.classList.add("fail");
+
+            productionEventResult.textContent =
+                "NOT TESTED\n\n" +
+                "Authentication test failed.";
+
+            productionEventResult.classList.add("fail");
         }
     }
 
@@ -554,6 +575,93 @@
         }
     }
 
+    async function testAuthenticatedProductionEventQuery() {
+        productionEventResult.textContent =
+            "Querying production_events through authenticated RLS...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("production_events")
+                .select(
+                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
+                )
+                .order("event_date", {
+                    ascending: true
+                })
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Production Event result."
+                );
+            }
+
+            if (data.length === 0) {
+                productionEventResult.textContent =
+                    "PASS — NO PRODUCTION EVENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Production Events.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk production history, " +
+                    "Author Desk access is disabled, no Desk-visible book is assigned, " +
+                    "or the relevant production events are not author-visible.";
+
+                productionEventResult.classList.add("pass");
+                return;
+            }
+
+            const malformedEvent =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.book_id !== "number" ||
+                        !record.event_type ||
+                        !record.event_date ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (malformedEvent) {
+                productionEventResult.textContent =
+                    "FAIL — UNEXPECTED PRODUCTION EVENT DATA\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                productionEventResult.classList.add("fail");
+                return;
+            }
+
+            productionEventResult.textContent =
+                "PASS — ACCESSIBLE PRODUCTION EVENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            productionEventResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Production Event query failed:",
+                error
+            );
+
+            productionEventResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            productionEventResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -735,6 +843,52 @@
                 String(error.message || error);
 
             contributorResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousProductionEventQuery() {
+        productionEventResult.textContent =
+            "Querying production_events without an authenticated session...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("production_events")
+                .select(
+                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 0
+            ) {
+                productionEventResult.textContent =
+                    "PASS — ANONYMOUS PRODUCTION EVENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Production Events.";
+
+                productionEventResult.classList.add("pass");
+                return;
+            }
+
+            productionEventResult.textContent =
+                "FAIL — ANONYMOUS PRODUCTION EVENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            productionEventResult.classList.add("fail");
+
+        } catch (error) {
+            productionEventResult.textContent =
+                "PASS — ANONYMOUS PRODUCTION EVENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            productionEventResult.classList.add("pass");
         }
     }
 })();
