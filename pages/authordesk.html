@@ -76,8 +76,9 @@
         <code>public.production_events</code>,
         <code>public.book_editions</code>,
         <code>public.author_actions</code>,
-        <code>public.documents</code> and
-        <code>public.agreements</code>.
+        <code>public.documents</code>,
+        <code>public.agreements</code> and
+        <code>public.rights</code>.
     </p>
 
     <section class="test-card">
@@ -159,6 +160,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Rights Query</h2>
+
+        <div id="rights-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -203,6 +212,9 @@
     const agreementResult =
         document.getElementById("agreement-result");
 
+    const rightsResult =
+        document.getElementById("rights-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -246,6 +258,7 @@
                 await testAnonymousAuthorActionQuery();
                 await testAnonymousDocumentQuery();
                 await testAnonymousAgreementQuery();
+                await testAnonymousRightsQuery();
 
                 return;
             }
@@ -284,6 +297,10 @@
             );
 
             await testAuthenticatedAgreementQuery(
+                session.user.id
+            );
+
+            await testAuthenticatedRightsQuery(
                 session.user.id
             );
 
@@ -334,6 +351,10 @@
             agreementResult.textContent =
                 "NOT TESTED\n\nAuthentication test failed.";
             agreementResult.classList.add("fail");
+
+            rightsResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            rightsResult.classList.add("fail");
         }
     }
 
@@ -1052,6 +1073,96 @@
         }
     }
 
+    async function testAuthenticatedRightsQuery(userId) {
+        rightsResult.textContent =
+            "Querying rights through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("rights")
+                .select(
+                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Rights result."
+                );
+            }
+
+            if (data.length === 0) {
+                rightsResult.textContent =
+                    "PASS — NO RIGHTS RECORDS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Rights Records.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk rights, " +
+                    "Author Desk access is disabled, the linked agreement is not visible, " +
+                    "no Desk-visible related book is assigned, " +
+                    "or the relevant Rights Records are not author-visible.";
+
+                rightsResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedRight =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.agreement_id !== "number" ||
+                        record.author_id !== userId ||
+                        !record.rights_reference ||
+                        !record.right_type ||
+                        !record.territory ||
+                        !record.language ||
+                        !record.exclusivity ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedRight) {
+                rightsResult.textContent =
+                    "FAIL — UNEXPECTED RIGHTS VISIBILITY OR DATA\n\n" +
+                    "A Rights Record was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                rightsResult.classList.add("fail");
+                return;
+            }
+
+            rightsResult.textContent =
+                "PASS — OWN ACCESSIBLE RIGHTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            rightsResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Rights query failed:",
+                error
+            );
+
+            rightsResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            rightsResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1409,6 +1520,46 @@
                 String(error.message || error);
 
             agreementResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousRightsQuery() {
+        rightsResult.textContent =
+            "Querying rights without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("rights")
+                .select(
+                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                rightsResult.textContent =
+                    "PASS — ANONYMOUS RIGHTS ACCESS BLOCKED\n\n" +
+                    "The query returned zero Rights Records.";
+
+                rightsResult.classList.add("pass");
+                return;
+            }
+
+            rightsResult.textContent =
+                "FAIL — ANONYMOUS RIGHTS DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            rightsResult.classList.add("fail");
+
+        } catch (error) {
+            rightsResult.textContent =
+                "PASS — ANONYMOUS RIGHTS ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            rightsResult.classList.add("pass");
         }
     }
 })();
