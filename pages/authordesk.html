@@ -73,8 +73,9 @@
         <code>public.author_relationships</code>,
         <code>public.book_records</code>,
         <code>public.book_contributors</code>,
-        <code>public.production_events</code> and
-        <code>public.book_editions</code>.
+        <code>public.production_events</code>,
+        <code>public.book_editions</code> and
+        <code>public.author_actions</code>.
     </p>
 
     <section class="test-card">
@@ -132,6 +133,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Author Action Query</h2>
+
+        <div id="author-action-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -166,6 +175,9 @@
 
     const bookEditionResult =
         document.getElementById("book-edition-result");
+
+    const authorActionResult =
+        document.getElementById("author-action-result");
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -207,6 +219,7 @@
                 await testAnonymousContributorQuery();
                 await testAnonymousProductionEventQuery();
                 await testAnonymousBookEditionQuery();
+                await testAnonymousAuthorActionQuery();
 
                 return;
             }
@@ -237,6 +250,8 @@
             await testAuthenticatedProductionEventQuery();
 
             await testAuthenticatedBookEditionQuery();
+
+            await testAuthenticatedAuthorActionQuery();
 
         } catch (error) {
             console.error(
@@ -285,6 +300,12 @@
                 "Authentication test failed.";
 
             bookEditionResult.classList.add("fail");
+
+            authorActionResult.textContent =
+                "NOT TESTED\n\n" +
+                "Authentication test failed.";
+
+            authorActionResult.classList.add("fail");
         }
     }
 
@@ -769,6 +790,91 @@
         }
     }
 
+    async function testAuthenticatedAuthorActionQuery() {
+        authorActionResult.textContent =
+            "Querying author_actions through authenticated RLS...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("author_actions")
+                .select(
+                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Author Action result."
+                );
+            }
+
+            if (data.length === 0) {
+                authorActionResult.textContent =
+                    "PASS — NO AUTHOR ACTIONS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Author Actions.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk actions, " +
+                    "Author Desk access is disabled, no Desk-visible book is assigned, " +
+                    "or the relevant actions are not author-visible.";
+
+                authorActionResult.classList.add("pass");
+                return;
+            }
+
+            const malformedAction =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.book_id !== "number" ||
+                        !record.action_type ||
+                        !record.title ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (malformedAction) {
+                authorActionResult.textContent =
+                    "FAIL — UNEXPECTED AUTHOR ACTION DATA\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                authorActionResult.classList.add("fail");
+                return;
+            }
+
+            authorActionResult.textContent =
+                "PASS — ACCESSIBLE AUTHOR ACTIONS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            authorActionResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Author Action query failed:",
+                error
+            );
+
+            authorActionResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            authorActionResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1042,6 +1148,52 @@
                 String(error.message || error);
 
             bookEditionResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousAuthorActionQuery() {
+        authorActionResult.textContent =
+            "Querying author_actions without an authenticated session...";
+
+        try {
+            const {
+                data,
+                error
+            } = await client
+                .from("author_actions")
+                .select(
+                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (
+                Array.isArray(data) &&
+                data.length === 0
+            ) {
+                authorActionResult.textContent =
+                    "PASS — ANONYMOUS AUTHOR ACTION ACCESS BLOCKED\n\n" +
+                    "The query returned zero Author Actions.";
+
+                authorActionResult.classList.add("pass");
+                return;
+            }
+
+            authorActionResult.textContent =
+                "FAIL — ANONYMOUS AUTHOR ACTION DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            authorActionResult.classList.add("fail");
+
+        } catch (error) {
+            authorActionResult.textContent =
+                "PASS — ANONYMOUS AUTHOR ACTION ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            authorActionResult.classList.add("pass");
         }
     }
 })();
