@@ -2555,6 +2555,7 @@
             );
         }
     }
+
     async function handlePaymentRequestCancel(
         requestId,
         button,
@@ -2654,6 +2655,7 @@
 
         return "The payment request could not be cancelled. No changes have been made.";
     }
+
     function getPaymentRequestErrorMessage(
         error
     ) {
@@ -3655,7 +3657,7 @@
         );
     }
 
-       function renderPaymentRequests(
+    function renderPaymentRequests(
         paymentRequests
     ) {
         paymentRequestList.replaceChildren();
@@ -3833,114 +3835,6 @@
                         actions
                     );
                 }
-
-                paymentRequestList.appendChild(
-                    card
-                );
-            }
-        );
-    }
-
-        paymentRequests.forEach(
-            function (request) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
-
-                card.className =
-                    "record-card";
-
-                const top =
-                    document.createElement(
-                        "div"
-                    );
-
-                top.className =
-                    "record-card-top";
-
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
-
-                title.className =
-                    "record-title";
-
-                title.textContent =
-                    request.request_reference ||
-                    "Payment Request";
-
-                top.appendChild(title);
-
-                top.appendChild(
-                    createStatusBadge(
-                        formatLabel(
-                            request.status
-                        )
-                    )
-                );
-
-                card.appendChild(top);
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Amount",
-                        formatMoney(
-                            request.requested_amount,
-                            request.currency
-                        )
-                    )
-                );
-
-                if (
-                    request.requested_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Requested",
-                            formatDate(
-                                request.requested_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    request.reviewed_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Reviewed",
-                            formatDate(
-                                request.reviewed_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    request.fulfilled_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Fulfilled",
-                            formatDate(
-                                request.fulfilled_at
-                            )
-                        )
-                    );
-                }
-
-                card.appendChild(meta);
 
                 paymentRequestList.appendChild(
                     card
