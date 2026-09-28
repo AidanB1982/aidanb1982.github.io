@@ -4,251 +4,684 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Author Desk RLS Test | Blackwood Publishing</title>
+    <title>Author Desk | Blackwood Publishing</title>
 
     <meta name="robots" content="noindex, nofollow">
 
     <style>
+        :root {
+            --bg: #161619;
+            --panel: #1c1c1f;
+            --panel-soft: #202023;
+            --text: #f1f1f1;
+            --muted: #b8b8b3;
+            --quiet: #8f918d;
+            --border: rgba(241, 241, 241, 0.14);
+            --border-strong: rgba(241, 241, 241, 0.22);
+            --green: #5f7d76;
+            --green-soft: rgba(95, 125, 118, 0.16);
+            --danger: #a95f5f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: var(--bg);
+        }
+
         body {
             margin: 0;
-            padding: 40px 20px;
-            background: #161619;
-            color: #f1f1f1;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
             font-family: Georgia, "Times New Roman", serif;
         }
 
-        main {
-            width: min(900px, 100%);
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        button {
+            color: inherit;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .page-shell {
+            width: min(1180px, calc(100% - 40px));
             margin: 0 auto;
+            padding: 34px 0 60px;
         }
 
-        h1 {
-            margin-bottom: 8px;
+        .site-mark {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
         }
 
-        p {
+        .page-title {
+            margin: 0;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            font-weight: normal;
+            line-height: 1.05;
+        }
+
+        .page-intro {
+            max-width: 720px;
+            margin: 16px 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .loading-panel,
+        .access-panel {
+            margin-top: 38px;
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        .loading-panel h2,
+        .access-panel h2 {
+            margin: 0 0 12px;
+            font-size: 1.35rem;
+            font-weight: normal;
+        }
+
+        .loading-panel p,
+        .access-panel p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .access-panel.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .desk {
+            margin-top: 36px;
+            display: grid;
+            grid-template-columns: 230px minmax(0, 1fr);
+            gap: 30px;
+            align-items: start;
+        }
+
+        .desk-sidebar {
+            position: sticky;
+            top: 24px;
+        }
+
+        .author-card {
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        .author-card-label {
+            margin: 0 0 8px;
+            color: var(--quiet);
+            font-size: 0.74rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .author-name {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: normal;
+            line-height: 1.3;
+        }
+
+        .author-status {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .desk-nav {
+            margin-top: 18px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .nav-button {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--muted);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            border-color: var(--border);
+            color: var(--text);
+        }
+
+        .nav-button.active {
+            border-color: rgba(95, 125, 118, 0.45);
+            background: var(--green-soft);
+            color: var(--text);
+        }
+
+        .nav-button:disabled {
+            cursor: default;
+            opacity: 0.5;
+        }
+
+        .sign-out-button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .sign-out-button:hover {
+            border-color: var(--border-strong);
+            color: var(--text);
+        }
+
+        .desk-main {
+            min-width: 0;
+        }
+
+        .desk-section {
+            display: none;
+        }
+
+        .desk-section.active {
+            display: block;
+        }
+
+        .section-heading {
+            margin-bottom: 24px;
+        }
+
+        .section-kicker {
+            margin: 0 0 8px;
+            color: var(--green);
+            font-size: 0.76rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: clamp(1.7rem, 4vw, 2.35rem);
+            font-weight: normal;
+        }
+
+        .section-heading p {
+            max-width: 720px;
+            margin: 12px 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .summary-card {
+            min-height: 120px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        .summary-label {
+            margin: 0 0 12px;
+            color: var(--quiet);
+            font-size: 0.74rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            margin: 0;
+            font-size: 1.45rem;
+            line-height: 1.3;
+        }
+
+        .summary-note {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .content-panel {
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        .content-panel + .content-panel {
+            margin-top: 18px;
+        }
+
+        .content-panel h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: normal;
+        }
+
+        .panel-intro {
+            margin: 8px 0 0;
+            color: var(--muted);
             line-height: 1.65;
         }
 
-        .test-card {
-            margin-top: 30px;
-            padding: 24px;
-            border: 1px solid rgba(241, 241, 241, 0.18);
-            border-radius: 6px;
+        .book-list {
+            margin-top: 20px;
+            display: grid;
+            gap: 14px;
         }
 
-        .test-status {
-            margin-top: 20px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            white-space: pre-wrap;
+        .book-card {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel-soft);
+        }
+
+        .book-card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-start;
+        }
+
+        .book-title {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: normal;
+        }
+
+        .book-subtitle {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .status-badge {
+            flex: 0 0 auto;
+            padding: 5px 8px;
+            border: 1px solid rgba(95, 125, 118, 0.45);
+            border-radius: 4px;
+            background: var(--green-soft);
+            color: var(--text);
+            font-size: 0.78rem;
+        }
+
+        .book-meta {
+            margin: 18px 0 0;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .book-meta div {
+            min-width: 0;
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--quiet);
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            color: var(--text);
+            line-height: 1.45;
             overflow-wrap: anywhere;
+        }
+
+        .empty-state {
+            margin-top: 18px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .future-panel {
+            padding: 28px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        .future-panel h3 {
+            margin: 0 0 10px;
+            font-size: 1.3rem;
+            font-weight: normal;
+        }
+
+        .future-panel p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .system-message {
+            margin-top: 16px;
+            color: var(--muted);
             line-height: 1.6;
         }
 
-        .pass {
-            border-left: 4px solid #5f7d76;
+        @media (max-width: 820px) {
+            .desk {
+                grid-template-columns: 1fr;
+            }
+
+            .desk-sidebar {
+                position: static;
+            }
+
+            .desk-nav {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .sign-out-button {
+                width: auto;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .fail {
-            border-left: 4px solid #a95f5f;
-        }
+        @media (max-width: 600px) {
+            .page-shell {
+                width: min(100% - 28px, 1180px);
+                padding-top: 24px;
+            }
 
-        code {
-            font-family: monospace;
+            .desk-nav {
+                grid-template-columns: 1fr;
+            }
+
+            .book-card-top {
+                display: block;
+            }
+
+            .status-badge {
+                display: inline-block;
+                margin-top: 12px;
+            }
+
+            .book-meta {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<main>
-    <p>Blackwood Publishing</p>
+<main class="page-shell">
+    <header>
+        <p class="site-mark">Blackwood Publishing</p>
+        <h1 class="page-title">Author Desk</h1>
 
-    <h1>Author Desk RLS Test</h1>
+        <p class="page-intro">
+            Your private publishing workspace for books, production,
+            documents, rights, statements and payments.
+        </p>
+    </header>
 
-    <p>
-        Temporary development page for verifying authenticated access
-        to <code>public.author_records</code>,
-        <code>public.author_relationships</code>,
-        <code>public.book_records</code>,
-        <code>public.book_contributors</code>,
-        <code>public.production_events</code>,
-        <code>public.book_editions</code>,
-        <code>public.author_actions</code>,
-        <code>public.documents</code>,
-        <code>public.agreements</code>,
-        <code>public.rights</code>,
-        <code>public.rights_events</code>,
-        <code>public.advances</code>,
-        <code>public.advance_instalments</code>,
-        <code>public.royalty_entries</code>,
-        <code>public.royalty_adjustments</code>,
-        <code>public.royalty_statements</code>,
-        <code>public.royalty_statement_lines</code>,
-        <code>public.payments</code> and
-        <code>public.payment_allocations</code>.
-    </p>
-
-    <section class="test-card">
-        <h2>Authentication</h2>
-
-        <div id="auth-result" class="test-status">
-            Checking current session...
-        </div>
+    <section id="loading-panel" class="loading-panel">
+        <h2>Opening Author Desk</h2>
+        <p>Checking your account and publishing records…</p>
     </section>
 
-    <section class="test-card">
-        <h2>Author Record Query</h2>
-
-        <div id="author-result" class="test-status">
-            Waiting for authentication check...
-        </div>
+    <section id="access-panel" class="access-panel" hidden>
+        <h2 id="access-title">Author Desk unavailable</h2>
+        <p id="access-message"></p>
     </section>
 
-    <section class="test-card">
-        <h2>Author Relationship Query</h2>
+    <div id="desk" class="desk" hidden>
+        <aside class="desk-sidebar">
+            <div class="author-card">
+                <p class="author-card-label">Author Record</p>
+                <h2 id="author-name" class="author-name"></h2>
+                <p id="author-status" class="author-status"></p>
+            </div>
 
-        <div id="relationship-result" class="test-status">
-            Waiting for authentication check...
+            <nav class="desk-nav" aria-label="Author Desk">
+                <button
+                    type="button"
+                    class="nav-button active"
+                    data-section="overview"
+                >
+                    Overview
+                </button>
+
+                <button
+                    type="button"
+                    class="nav-button"
+                    data-section="books"
+                >
+                    Books
+                </button>
+
+                <button
+                    type="button"
+                    class="nav-button"
+                    data-section="production"
+                >
+                    Production
+                </button>
+
+                <button
+                    type="button"
+                    class="nav-button"
+                    data-section="documents"
+                >
+                    Documents &amp; Rights
+                </button>
+
+                <button
+                    type="button"
+                    class="nav-button"
+                    data-section="finance"
+                >
+                    Statements &amp; Payments
+                </button>
+            </nav>
+
+            <button
+                id="sign-out-button"
+                type="button"
+                class="sign-out-button"
+            >
+                Sign out
+            </button>
+        </aside>
+
+        <div class="desk-main">
+
+            <section
+                id="section-overview"
+                class="desk-section active"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">Overview</p>
+                    <h2 id="welcome-heading">Welcome to your Author Desk</h2>
+
+                    <p>
+                        This is the working record of your publishing
+                        relationship with Blackwood Publishing.
+                    </p>
+                </div>
+
+                <div class="summary-grid">
+                    <article class="summary-card">
+                        <p class="summary-label">Books</p>
+                        <p id="book-count" class="summary-value">—</p>
+                        <p class="summary-note">
+                            Book Records currently available in your Desk.
+                        </p>
+                    </article>
+
+                    <article class="summary-card">
+                        <p class="summary-label">Relationship</p>
+                        <p id="relationship-summary" class="summary-value">—</p>
+                        <p class="summary-note">
+                            Current Author Record relationship status.
+                        </p>
+                    </article>
+
+                    <article class="summary-card">
+                        <p class="summary-label">Desk Access</p>
+                        <p class="summary-value">Active</p>
+                        <p class="summary-note">
+                            Your authenticated Author Desk access is enabled.
+                        </p>
+                    </article>
+                </div>
+
+                <section class="content-panel">
+                    <h3>Your books</h3>
+
+                    <p class="panel-intro">
+                        Current Book Records associated with your
+                        Author Desk account.
+                    </p>
+
+                    <div id="overview-book-list" class="book-list"></div>
+                </section>
+            </section>
+
+            <section
+                id="section-books"
+                class="desk-section"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">Books</p>
+                    <h2>Book Records</h2>
+
+                    <p>
+                        Each acquired work has a permanent Book Record.
+                        Editions, production history and other publishing
+                        records will connect back to these records.
+                    </p>
+                </div>
+
+                <section class="content-panel">
+                    <h3>Your Book Records</h3>
+                    <div id="books-book-list" class="book-list"></div>
+                </section>
+            </section>
+
+            <section
+                id="section-production"
+                class="desk-section"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">Production</p>
+                    <h2>Production</h2>
+
+                    <p>
+                        Production stages, publishing milestones and
+                        author actions will appear here.
+                    </p>
+                </div>
+
+                <div class="future-panel">
+                    <h3>Production workspace</h3>
+                    <p>
+                        Your Book Records are now connected to the Author Desk.
+                        Production history and current actions will be added
+                        to this workspace in the next build stage.
+                    </p>
+                </div>
+            </section>
+
+            <section
+                id="section-documents"
+                class="desk-section"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">Documents &amp; Rights</p>
+                    <h2>Documents &amp; Rights</h2>
+
+                    <p>
+                        Author-visible agreements, documents and rights
+                        records will be managed here.
+                    </p>
+                </div>
+
+                <div class="future-panel">
+                    <h3>Publishing records</h3>
+                    <p>
+                        The underlying secured records are in place.
+                        Their Author Desk presentation will be connected
+                        after the core Desk shell is verified.
+                    </p>
+                </div>
+            </section>
+
+            <section
+                id="section-finance"
+                class="desk-section"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">Statements &amp; Payments</p>
+                    <h2>Statements &amp; Payments</h2>
+
+                    <p>
+                        Issued royalty statements, payment history and
+                        payment requests will appear here.
+                    </p>
+                </div>
+
+                <div class="future-panel">
+                    <h3>Financial records</h3>
+                    <p>
+                        Financial data remains protected by the Author Desk
+                        access model. We will connect the author-facing
+                        statement and payment interface separately.
+                    </p>
+                </div>
+            </section>
+
         </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Book Record Query</h2>
-
-        <div id="book-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Book Contributor Query</h2>
-
-        <div id="contributor-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Production Event Query</h2>
-
-        <div id="production-event-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Book Edition Query</h2>
-
-        <div id="book-edition-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Author Action Query</h2>
-
-        <div id="author-action-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Document Query</h2>
-
-        <div id="document-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Agreement Query</h2>
-
-        <div id="agreement-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Rights Query</h2>
-
-        <div id="rights-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Rights Event Query</h2>
-
-        <div id="rights-event-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Advance Query</h2>
-
-        <div id="advance-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Advance Instalment Query</h2>
-
-        <div id="advance-instalment-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Royalty Entry Query</h2>
-
-        <div id="royalty-entry-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Royalty Adjustment Query</h2>
-
-        <div id="royalty-adjustment-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Royalty Statement Query</h2>
-
-        <div id="royalty-statement-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Royalty Statement Line Query</h2>
-
-        <div id="royalty-statement-line-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Payment Query</h2>
-
-        <div id="payment-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
-
-    <section class="test-card">
-        <h2>Payment Allocation Query</h2>
-
-        <div id="payment-allocation-result" class="test-status">
-            Waiting for authentication check...
-        </div>
-    </section>
+    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -263,66 +696,6 @@
     const SUPABASE_KEY =
         "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
 
-    const authResult =
-        document.getElementById("auth-result");
-
-    const authorResult =
-        document.getElementById("author-result");
-
-    const relationshipResult =
-        document.getElementById("relationship-result");
-
-    const bookResult =
-        document.getElementById("book-result");
-
-    const contributorResult =
-        document.getElementById("contributor-result");
-
-    const productionEventResult =
-        document.getElementById("production-event-result");
-
-    const bookEditionResult =
-        document.getElementById("book-edition-result");
-
-    const authorActionResult =
-        document.getElementById("author-action-result");
-
-    const documentResult =
-        document.getElementById("document-result");
-
-    const agreementResult =
-        document.getElementById("agreement-result");
-
-    const rightsResult =
-        document.getElementById("rights-result");
-
-    const rightsEventResult =
-        document.getElementById("rights-event-result");
-
-    const advanceResult =
-        document.getElementById("advance-result");
-
-    const advanceInstalmentResult =
-        document.getElementById("advance-instalment-result");
-
-    const royaltyEntryResult =
-        document.getElementById("royalty-entry-result");
-
-    const royaltyAdjustmentResult =
-        document.getElementById("royalty-adjustment-result");
-
-    const royaltyStatementResult =
-        document.getElementById("royalty-statement-result");
-
-    const royaltyStatementLineResult =
-        document.getElementById("royalty-statement-line-result");
-
-    const paymentResult =
-        document.getElementById("payment-result");
-
-    const paymentAllocationResult =
-        document.getElementById("payment-allocation-result");
-
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -335,9 +708,69 @@
         }
     );
 
-    runTest();
+    const loadingPanel =
+        document.getElementById("loading-panel");
 
-    async function runTest() {
+    const accessPanel =
+        document.getElementById("access-panel");
+
+    const accessTitle =
+        document.getElementById("access-title");
+
+    const accessMessage =
+        document.getElementById("access-message");
+
+    const desk =
+        document.getElementById("desk");
+
+    const authorName =
+        document.getElementById("author-name");
+
+    const authorStatus =
+        document.getElementById("author-status");
+
+    const welcomeHeading =
+        document.getElementById("welcome-heading");
+
+    const bookCount =
+        document.getElementById("book-count");
+
+    const relationshipSummary =
+        document.getElementById("relationship-summary");
+
+    const overviewBookList =
+        document.getElementById("overview-book-list");
+
+    const booksBookList =
+        document.getElementById("books-book-list");
+
+    const signOutButton =
+        document.getElementById("sign-out-button");
+
+    const navButtons =
+        Array.from(
+            document.querySelectorAll(".nav-button")
+        );
+
+    const deskSections =
+        Array.from(
+            document.querySelectorAll(".desk-section")
+        );
+
+    initialiseDesk();
+
+    navButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            showSection(button.dataset.section);
+        });
+    });
+
+    signOutButton.addEventListener(
+        "click",
+        handleSignOut
+    );
+
+    async function initialiseDesk() {
         try {
             const {
                 data: sessionData,
@@ -351,2502 +784,371 @@
             const session = sessionData.session;
 
             if (!session || !session.user) {
-                authResult.textContent =
-                    "NO AUTHENTICATED SESSION\n\n" +
-                    "This browser is not currently signed in.";
-
-                authResult.classList.add("pass");
-
-                await testAnonymousAuthorQuery();
-                await testAnonymousRelationshipQuery();
-                await testAnonymousBookQuery();
-                await testAnonymousContributorQuery();
-                await testAnonymousProductionEventQuery();
-                await testAnonymousBookEditionQuery();
-                await testAnonymousAuthorActionQuery();
-                await testAnonymousDocumentQuery();
-                await testAnonymousAgreementQuery();
-                await testAnonymousRightsQuery();
-                await testAnonymousRightsEventQuery();
-                await testAnonymousAdvanceQuery();
-                await testAnonymousAdvanceInstalmentQuery();
-                await testAnonymousRoyaltyEntryQuery();
-                await testAnonymousRoyaltyAdjustmentQuery();
-                await testAnonymousRoyaltyStatementQuery();
-                await testAnonymousRoyaltyStatementLineQuery();
-                await testAnonymousPaymentQuery();
-                await testAnonymousPaymentAllocationQuery();
+                showAccessMessage(
+                    "Sign in required",
+                    "You need to be signed in with an authorised Blackwood Publishing author account to open the Author Desk."
+                );
 
                 return;
             }
 
-            authResult.textContent =
-                "AUTHENTICATED\n\n" +
-                "User ID:\n" +
-                session.user.id +
-                "\n\nEmail:\n" +
-                (session.user.email || "(not supplied)");
+            const authorRecord =
+                await loadAuthorRecord(
+                    session.user.id
+                );
 
-            authResult.classList.add("pass");
+            if (!authorRecord) {
+                showAccessMessage(
+                    "Author Desk unavailable",
+                    "This account does not currently have access to an Author Desk."
+                );
 
-            await testAuthenticatedAuthorQuery(
-                session.user.id
+                return;
+            }
+
+            const books =
+                await loadBooks();
+
+            renderDesk(
+                authorRecord,
+                books
             );
-
-            await testAuthenticatedRelationshipQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedBookQuery();
-
-            await testAuthenticatedContributorQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedProductionEventQuery();
-
-            await testAuthenticatedBookEditionQuery();
-
-            await testAuthenticatedAuthorActionQuery();
-
-            await testAuthenticatedDocumentQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedAgreementQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedRightsQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedRightsEventQuery();
-
-            await testAuthenticatedAdvanceQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedAdvanceInstalmentQuery();
-
-            await testAuthenticatedRoyaltyEntryQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedRoyaltyAdjustmentQuery();
-
-            await testAuthenticatedRoyaltyStatementQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedRoyaltyStatementLineQuery();
-
-            await testAuthenticatedPaymentQuery(
-                session.user.id
-            );
-
-            await testAuthenticatedPaymentAllocationQuery();
 
         } catch (error) {
             console.error(
-                "Author Desk authentication test failed:",
+                "Author Desk failed to initialise:",
                 error
             );
 
-            authResult.textContent =
-                "TEST ERROR\n\n" +
-                String(error.message || error);
+            showAccessMessage(
+                "Author Desk could not be opened",
+                "There was a problem loading your publishing records. Please try again."
+            );
+        }
+    }
 
-            authResult.classList.add("fail");
+    async function loadAuthorRecord(userId) {
+        const { data, error } = await client
+            .from("author_records")
+            .select(
+                "id,publishing_name,email,relationship_status,desk_access_enabled"
+            )
+            .eq("id", userId)
+            .maybeSingle();
 
-            const resultElements = [
-                authorResult,
-                relationshipResult,
-                bookResult,
-                contributorResult,
-                productionEventResult,
-                bookEditionResult,
-                authorActionResult,
-                documentResult,
-                agreementResult,
-                rightsResult,
-                rightsEventResult,
-                advanceResult,
-                advanceInstalmentResult,
-                royaltyEntryResult,
-                royaltyAdjustmentResult,
-                royaltyStatementResult,
-                royaltyStatementLineResult,
-                paymentResult,
-                paymentAllocationResult
-            ];
+        if (error) {
+            throw error;
+        }
 
-            resultElements.forEach(function (resultElement) {
-                resultElement.textContent =
-                    "NOT TESTED\n\nAuthentication test failed.";
-                resultElement.classList.add("fail");
+        if (!data) {
+            return null;
+        }
+
+        if (data.desk_access_enabled !== true) {
+            return null;
+        }
+
+        return data;
+    }
+
+    async function loadBooks() {
+        const { data, error } = await client
+            .from("book_records")
+            .select(
+                "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+            )
+            .order("id", {
+                ascending: true
             });
+
+        if (error) {
+            throw error;
         }
+
+        return Array.isArray(data)
+            ? data
+            : [];
     }
 
-    async function testAuthenticatedAuthorQuery(userId) {
-        authorResult.textContent =
-            "Querying author_records through authenticated RLS...";
+    function renderDesk(authorRecord, books) {
+        loadingPanel.hidden = true;
+        accessPanel.hidden = true;
+        desk.hidden = false;
 
-        try {
-            const { data, error } = await client
-                .from("author_records")
-                .select(
-                    "id,publishing_name,email,relationship_status,desk_access_enabled,created_at"
-                );
+        const displayName =
+            authorRecord.publishing_name ||
+            "Blackwood Author";
 
-            if (error) {
-                throw error;
-            }
+        authorName.textContent =
+            displayName;
 
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Author Record result."
-                );
-            }
-
-            if (data.length === 0) {
-                authorResult.textContent =
-                    "PASS — NO AUTHOR RECORD VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Author Record.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk record, either because " +
-                    "they are not a Blackwood author or Author Desk access is disabled.";
-
-                authorResult.classList.add("pass");
-                return;
-            }
-
-            if (
-                data.length === 1 &&
-                data[0].id === userId
-            ) {
-                authorResult.textContent =
-                    "PASS — OWN AUTHOR RECORD ONLY\n\n" +
-                    JSON.stringify(data[0], null, 2);
-
-                authorResult.classList.add("pass");
-                return;
-            }
-
-            authorResult.textContent =
-                "FAIL — UNEXPECTED RECORD VISIBILITY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            authorResult.classList.add("fail");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Author Record query failed:",
-                error
+        authorStatus.textContent =
+            formatLabel(
+                authorRecord.relationship_status
             );
 
-            authorResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
+        welcomeHeading.textContent =
+            "Welcome, " + displayName;
 
-            authorResult.classList.add("fail");
-        }
-    }
+        bookCount.textContent =
+            String(books.length);
 
-    async function testAuthenticatedRelationshipQuery(userId) {
-        relationshipResult.textContent =
-            "Querying author_relationships through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("author_relationships")
-                .select(
-                    "id,author_id,status,started_on,concluded_on,internal_reference,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Author Relationship result."
-                );
-            }
-
-            if (data.length === 0) {
-                relationshipResult.textContent =
-                    "PASS — NO AUTHOR RELATIONSHIP VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Author Relationship.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk record, either because " +
-                    "they are not a Blackwood author or Author Desk access is disabled.";
-
-                relationshipResult.classList.add("pass");
-                return;
-            }
-
-            if (
-                data.length === 1 &&
-                data[0].author_id === userId
-            ) {
-                relationshipResult.textContent =
-                    "PASS — OWN AUTHOR RELATIONSHIP ONLY\n\n" +
-                    JSON.stringify(data[0], null, 2);
-
-                relationshipResult.classList.add("pass");
-                return;
-            }
-
-            relationshipResult.textContent =
-                "FAIL — UNEXPECTED RELATIONSHIP VISIBILITY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            relationshipResult.classList.add("fail");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated relationship query failed:",
-                error
+        relationshipSummary.textContent =
+            formatLabel(
+                authorRecord.relationship_status
             );
 
-            relationshipResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
+        renderBookList(
+            overviewBookList,
+            books
+        );
 
-            relationshipResult.classList.add("fail");
-        }
+        renderBookList(
+            booksBookList,
+            books
+        );
     }
 
-    async function testAuthenticatedBookQuery() {
-        bookResult.textContent =
-            "Querying book_records through authenticated RLS...";
+    function renderBookList(container, books) {
+        container.replaceChildren();
 
-        try {
-            const { data, error } = await client
-                .from("book_records")
-                .select(
-                    "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+        if (books.length === 0) {
+            const emptyState =
+                document.createElement("div");
+
+            emptyState.className =
+                "empty-state";
+
+            emptyState.textContent =
+                "No Book Records are currently available in your Author Desk.";
+
+            container.appendChild(
+                emptyState
+            );
+
+            return;
+        }
+
+        books.forEach(function (book) {
+            container.appendChild(
+                createBookCard(book)
+            );
+        });
+    }
+
+    function createBookCard(book) {
+        const card =
+            document.createElement("article");
+
+        card.className =
+            "book-card";
+
+        const top =
+            document.createElement("div");
+
+        top.className =
+            "book-card-top";
+
+        const titleGroup =
+            document.createElement("div");
+
+        const title =
+            document.createElement("h3");
+
+        title.className =
+            "book-title";
+
+        title.textContent =
+            book.title || "Untitled Book Record";
+
+        titleGroup.appendChild(title);
+
+        if (book.subtitle) {
+            const subtitle =
+                document.createElement("p");
+
+            subtitle.className =
+                "book-subtitle";
+
+            subtitle.textContent =
+                book.subtitle;
+
+            titleGroup.appendChild(
+                subtitle
+            );
+        }
+
+        const status =
+            document.createElement("span");
+
+        status.className =
+            "status-badge";
+
+        status.textContent =
+            formatLabel(
+                book.production_stage
+            );
+
+        top.appendChild(
+            titleGroup
+        );
+
+        top.appendChild(
+            status
+        );
+
+        const meta =
+            document.createElement("div");
+
+        meta.className =
+            "book-meta";
+
+        meta.appendChild(
+            createMetaItem(
+                "Book Record",
+                book.internal_reference
+            )
+        );
+
+        meta.appendChild(
+            createMetaItem(
+                "Work Status",
+                formatLabel(
+                    book.work_status
                 )
-                .order("id", {
-                    ascending: true
-                });
+            )
+        );
 
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Book Record result."
-                );
-            }
-
-            if (data.length === 0) {
-                bookResult.textContent =
-                    "PASS — NO BOOK RECORDS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Book Records.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk books, either because " +
-                    "they are not a Blackwood author, Author Desk access is " +
-                    "disabled, or no Desk-visible books are assigned.";
-
-                bookResult.classList.add("pass");
-                return;
-            }
-
-            const malformedRecord =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        !record.internal_reference ||
-                        !record.title
-                    );
-                });
-
-            if (malformedRecord) {
-                bookResult.textContent =
-                    "FAIL — UNEXPECTED BOOK RECORD DATA\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                bookResult.classList.add("fail");
-                return;
-            }
-
-            bookResult.textContent =
-                "PASS — ACCESSIBLE BOOK RECORDS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            bookResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Book Record query failed:",
-                error
-            );
-
-            bookResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            bookResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedContributorQuery(userId) {
-        contributorResult.textContent =
-            "Querying book_contributors through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("book_contributors")
-                .select(
-                    "id,book_id,author_id,contributor_role,desk_visible,created_at"
+        meta.appendChild(
+            createMetaItem(
+                "Production Stage",
+                formatLabel(
+                    book.production_stage
                 )
-                .order("id", {
-                    ascending: true
-                });
+            )
+        );
+
+        card.appendChild(top);
+        card.appendChild(meta);
+
+        return card;
+    }
+
+    function createMetaItem(label, value) {
+        const wrapper =
+            document.createElement("div");
+
+        const labelElement =
+            document.createElement("span");
+
+        labelElement.className =
+            "meta-label";
+
+        labelElement.textContent =
+            label;
+
+        const valueElement =
+            document.createElement("span");
+
+        valueElement.className =
+            "meta-value";
+
+        valueElement.textContent =
+            value || "Not recorded";
+
+        wrapper.appendChild(
+            labelElement
+        );
+
+        wrapper.appendChild(
+            valueElement
+        );
+
+        return wrapper;
+    }
+
+    function showSection(sectionName) {
+        navButtons.forEach(function (button) {
+            const isActive =
+                button.dataset.section ===
+                sectionName;
+
+            button.classList.toggle(
+                "active",
+                isActive
+            );
+        });
+
+        deskSections.forEach(function (section) {
+            const isActive =
+                section.id ===
+                "section-" + sectionName;
+
+            section.classList.toggle(
+                "active",
+                isActive
+            );
+        });
+    }
+
+    async function handleSignOut() {
+        signOutButton.disabled = true;
+        signOutButton.textContent =
+            "Signing out…";
+
+        try {
+            const { error } =
+                await client.auth.signOut();
 
             if (error) {
                 throw error;
             }
 
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Book Contributor result."
-                );
-            }
+            desk.hidden = true;
 
-            if (data.length === 0) {
-                contributorResult.textContent =
-                    "PASS — NO CONTRIBUTOR RECORDS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Book Contributor records.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk contributor records.";
-
-                contributorResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedContributor =
-                data.find(function (record) {
-                    return (
-                        record.author_id !== userId ||
-                        typeof record.book_id !== "number" ||
-                        record.desk_visible !== true
-                    );
-                });
-
-            if (unexpectedContributor) {
-                contributorResult.textContent =
-                    "FAIL — UNEXPECTED CONTRIBUTOR VISIBILITY\n\n" +
-                    "A contributor record was returned that does not " +
-                    "belong to the authenticated author or is not Desk-visible.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                contributorResult.classList.add("fail");
-                return;
-            }
-
-            contributorResult.textContent =
-                "PASS — OWN CONTRIBUTOR RECORDS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            contributorResult.classList.add("pass");
+            showAccessMessage(
+                "Signed out",
+                "You have been signed out of the Author Desk."
+            );
 
         } catch (error) {
             console.error(
-                "Author Desk authenticated Book Contributor query failed:",
+                "Author Desk sign-out failed:",
                 error
             );
 
-            contributorResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            contributorResult.classList.add("fail");
+            signOutButton.disabled = false;
+            signOutButton.textContent =
+                "Sign out";
         }
     }
 
-    async function testAuthenticatedProductionEventQuery() {
-        productionEventResult.textContent =
-            "Querying production_events through authenticated RLS...";
+    function showAccessMessage(title, message) {
+        loadingPanel.hidden = true;
+        desk.hidden = true;
 
-        try {
-            const { data, error } = await client
-                .from("production_events")
-                .select(
-                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
-                )
-                .order("event_date", {
-                    ascending: true
-                })
-                .order("id", {
-                    ascending: true
-                });
+        accessTitle.textContent =
+            title;
 
-            if (error) {
-                throw error;
-            }
+        accessMessage.textContent =
+            message;
 
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Production Event result."
-                );
-            }
+        accessPanel.hidden = false;
+    }
 
-            if (data.length === 0) {
-                productionEventResult.textContent =
-                    "PASS — NO PRODUCTION EVENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Production Events.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk production history, " +
-                    "Author Desk access is disabled, no Desk-visible book is assigned, " +
-                    "or the relevant production events are not author-visible.";
+    function formatLabel(value) {
+        if (!value) {
+            return "Not recorded";
+        }
 
-                productionEventResult.classList.add("pass");
-                return;
-            }
-
-            const malformedEvent =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.book_id !== "number" ||
-                        !record.event_type ||
-                        !record.event_date ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (malformedEvent) {
-                productionEventResult.textContent =
-                    "FAIL — UNEXPECTED PRODUCTION EVENT DATA\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                productionEventResult.classList.add("fail");
-                return;
-            }
-
-            productionEventResult.textContent =
-                "PASS — ACCESSIBLE PRODUCTION EVENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            productionEventResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Production Event query failed:",
-                error
+        return String(value)
+            .replace(/_/g, " ")
+            .replace(
+                /\b\w/g,
+                function (character) {
+                    return character.toUpperCase();
+                }
             );
-
-            productionEventResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            productionEventResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedBookEditionQuery() {
-        bookEditionResult.textContent =
-            "Querying book_editions through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("book_editions")
-                .select(
-                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Book Edition result."
-                );
-            }
-
-            if (data.length === 0) {
-                bookEditionResult.textContent =
-                    "PASS — NO BOOK EDITIONS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Book Editions.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk editions, " +
-                    "Author Desk access is disabled, no Desk-visible book is assigned, " +
-                    "or the relevant editions are not author-visible.";
-
-                bookEditionResult.classList.add("pass");
-                return;
-            }
-
-            const malformedEdition =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.book_id !== "number" ||
-                        !record.edition_reference ||
-                        !record.edition_name ||
-                        !record.format ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (malformedEdition) {
-                bookEditionResult.textContent =
-                    "FAIL — UNEXPECTED BOOK EDITION DATA\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                bookEditionResult.classList.add("fail");
-                return;
-            }
-
-            bookEditionResult.textContent =
-                "PASS — ACCESSIBLE BOOK EDITIONS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            bookEditionResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Book Edition query failed:",
-                error
-            );
-
-            bookEditionResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            bookEditionResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedAuthorActionQuery() {
-        authorActionResult.textContent =
-            "Querying author_actions through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("author_actions")
-                .select(
-                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Author Action result."
-                );
-            }
-
-            if (data.length === 0) {
-                authorActionResult.textContent =
-                    "PASS — NO AUTHOR ACTIONS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Author Actions.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk actions, " +
-                    "Author Desk access is disabled, no Desk-visible book is assigned, " +
-                    "or the relevant actions are not author-visible.";
-
-                authorActionResult.classList.add("pass");
-                return;
-            }
-
-            const malformedAction =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.book_id !== "number" ||
-                        !record.action_type ||
-                        !record.title ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (malformedAction) {
-                authorActionResult.textContent =
-                    "FAIL — UNEXPECTED AUTHOR ACTION DATA\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                authorActionResult.classList.add("fail");
-                return;
-            }
-
-            authorActionResult.textContent =
-                "PASS — ACCESSIBLE AUTHOR ACTIONS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            authorActionResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Author Action query failed:",
-                error
-            );
-
-            authorActionResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            authorActionResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedDocumentQuery(userId) {
-        documentResult.textContent =
-            "Querying documents through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("documents")
-                .select(
-                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Document result."
-                );
-            }
-
-            if (data.length === 0) {
-                documentResult.textContent =
-                    "PASS — NO DOCUMENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Documents.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk documents, " +
-                    "Author Desk access is disabled, no Desk-visible related book is assigned, " +
-                    "or the relevant documents are not author-visible.";
-
-                documentResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedDocument =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        record.author_id !== userId ||
-                        !record.document_type ||
-                        !record.title ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedDocument) {
-                documentResult.textContent =
-                    "FAIL — UNEXPECTED DOCUMENT VISIBILITY OR DATA\n\n" +
-                    "A document was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                documentResult.classList.add("fail");
-                return;
-            }
-
-            documentResult.textContent =
-                "PASS — OWN ACCESSIBLE DOCUMENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            documentResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Document query failed:",
-                error
-            );
-
-            documentResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            documentResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedAgreementQuery(userId) {
-        agreementResult.textContent =
-            "Querying agreements through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("agreements")
-                .select(
-                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Agreement result."
-                );
-            }
-
-            if (data.length === 0) {
-                agreementResult.textContent =
-                    "PASS — NO AGREEMENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Agreements.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk agreements, " +
-                    "Author Desk access is disabled, no Desk-visible related book is assigned, " +
-                    "or the relevant agreements are not author-visible.";
-
-                agreementResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedAgreement =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        record.author_id !== userId ||
-                        !record.agreement_type ||
-                        !record.agreement_reference ||
-                        !record.title ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedAgreement) {
-                agreementResult.textContent =
-                    "FAIL — UNEXPECTED AGREEMENT VISIBILITY OR DATA\n\n" +
-                    "An agreement was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                agreementResult.classList.add("fail");
-                return;
-            }
-
-            agreementResult.textContent =
-                "PASS — OWN ACCESSIBLE AGREEMENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            agreementResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Agreement query failed:",
-                error
-            );
-
-            agreementResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            agreementResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedRightsQuery(userId) {
-        rightsResult.textContent =
-            "Querying rights through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("rights")
-                .select(
-                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Rights result."
-                );
-            }
-
-            if (data.length === 0) {
-                rightsResult.textContent =
-                    "PASS — NO RIGHTS RECORDS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Rights Records.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk rights, " +
-                    "Author Desk access is disabled, the linked agreement is not visible, " +
-                    "no Desk-visible related book is assigned, " +
-                    "or the relevant Rights Records are not author-visible.";
-
-                rightsResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedRight =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.agreement_id !== "number" ||
-                        record.author_id !== userId ||
-                        !record.rights_reference ||
-                        !record.right_type ||
-                        !record.territory ||
-                        !record.language ||
-                        !record.exclusivity ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedRight) {
-                rightsResult.textContent =
-                    "FAIL — UNEXPECTED RIGHTS VISIBILITY OR DATA\n\n" +
-                    "A Rights Record was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                rightsResult.classList.add("fail");
-                return;
-            }
-
-            rightsResult.textContent =
-                "PASS — OWN ACCESSIBLE RIGHTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            rightsResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Rights query failed:",
-                error
-            );
-
-            rightsResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            rightsResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedRightsEventQuery() {
-        rightsEventResult.textContent =
-            "Querying rights_events through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("rights_events")
-                .select(
-                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
-                )
-                .order("event_date", {
-                    ascending: true
-                })
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Rights Event result."
-                );
-            }
-
-            if (data.length === 0) {
-                rightsEventResult.textContent =
-                    "PASS — NO RIGHTS EVENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Rights Events.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk rights history, " +
-                    "Author Desk access is disabled, the parent Rights Record " +
-                    "or linked Agreement is not visible, no Desk-visible related " +
-                    "book is assigned, or the relevant Rights Events are not author-visible.";
-
-                rightsEventResult.classList.add("pass");
-                return;
-            }
-
-            const malformedEvent =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.right_id !== "number" ||
-                        !record.event_type ||
-                        !record.event_date ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (malformedEvent) {
-                rightsEventResult.textContent =
-                    "FAIL — UNEXPECTED RIGHTS EVENT DATA\n\n" +
-                    "A Rights Event was returned with unexpected required-field " +
-                    "data or was not author-visible.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                rightsEventResult.classList.add("fail");
-                return;
-            }
-
-            rightsEventResult.textContent =
-                "PASS — OWN ACCESSIBLE RIGHTS EVENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            rightsEventResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Rights Event query failed:",
-                error
-            );
-
-            rightsEventResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            rightsEventResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedAdvanceQuery(userId) {
-        advanceResult.textContent =
-            "Querying advances through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("advances")
-                .select(
-                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Advance result."
-                );
-            }
-
-            if (data.length === 0) {
-                advanceResult.textContent =
-                    "PASS — NO ADVANCES VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Advances.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk advances, " +
-                    "Author Desk access is disabled, the linked Agreement is not visible, " +
-                    "no Desk-visible related book is assigned, " +
-                    "or the relevant Advances are not author-visible.";
-
-                advanceResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedAdvance =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.agreement_id !== "number" ||
-                        record.author_id !== userId ||
-                        !record.advance_reference ||
-                        !record.currency ||
-                        record.total_amount === null ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedAdvance) {
-                advanceResult.textContent =
-                    "FAIL — UNEXPECTED ADVANCE VISIBILITY OR DATA\n\n" +
-                    "An Advance was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                advanceResult.classList.add("fail");
-                return;
-            }
-
-            advanceResult.textContent =
-                "PASS — OWN ACCESSIBLE ADVANCES ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            advanceResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Advance query failed:",
-                error
-            );
-
-            advanceResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            advanceResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedAdvanceInstalmentQuery() {
-        advanceInstalmentResult.textContent =
-            "Querying advance_instalments through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("advance_instalments")
-                .select(
-                    "id,advance_id,instalment_number,description,amount,due_date,status,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Advance Instalment result."
-                );
-            }
-
-            if (data.length === 0) {
-                advanceInstalmentResult.textContent =
-                    "PASS — NO ADVANCE INSTALMENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Advance Instalments.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk advance instalments, " +
-                    "Author Desk access is disabled, the parent Advance or linked " +
-                    "Agreement is not visible, no Desk-visible related book is assigned, " +
-                    "or the relevant Advance Instalments are not author-visible.";
-
-                advanceInstalmentResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedInstalment =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.advance_id !== "number" ||
-                        typeof record.instalment_number !== "number" ||
-                        record.instalment_number <= 0 ||
-                        record.amount === null ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedInstalment) {
-                advanceInstalmentResult.textContent =
-                    "FAIL — UNEXPECTED ADVANCE INSTALMENT DATA\n\n" +
-                    "An Advance Instalment was returned with unexpected required-field " +
-                    "data or was not author-visible.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                advanceInstalmentResult.classList.add("fail");
-                return;
-            }
-
-            advanceInstalmentResult.textContent =
-                "PASS — OWN ACCESSIBLE ADVANCE INSTALMENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            advanceInstalmentResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Advance Instalment query failed:",
-                error
-            );
-
-            advanceInstalmentResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            advanceInstalmentResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedRoyaltyEntryQuery(userId) {
-        royaltyEntryResult.textContent =
-            "Querying royalty_entries through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_entries")
-                .select(
-                    "id,author_id,book_id,edition_id,source_reference,sales_period_start,sales_period_end,clearance_date,channel,currency,distributable_net_receipts,royalty_rate,royalty_amount,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Royalty Entry result."
-                );
-            }
-
-            if (data.length === 0) {
-                royaltyEntryResult.textContent =
-                    "PASS — NO ROYALTY ENTRIES VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Royalty Entries.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk royalty entries, " +
-                    "Author Desk access is disabled, no Desk-visible related book " +
-                    "is assigned, or the relevant Royalty Entries are not author-visible.";
-
-                royaltyEntryResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedRoyaltyEntry =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        record.author_id !== userId ||
-                        typeof record.book_id !== "number" ||
-                        !record.source_reference ||
-                        !record.clearance_date ||
-                        !record.currency ||
-                        record.distributable_net_receipts === null ||
-                        record.royalty_amount === null ||
-                        Number(record.royalty_amount) === 0 ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedRoyaltyEntry) {
-                royaltyEntryResult.textContent =
-                    "FAIL — UNEXPECTED ROYALTY ENTRY VISIBILITY OR DATA\n\n" +
-                    "A Royalty Entry was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                royaltyEntryResult.classList.add("fail");
-                return;
-            }
-
-            royaltyEntryResult.textContent =
-                "PASS — OWN ACCESSIBLE ROYALTY ENTRIES ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyEntryResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Royalty Entry query failed:",
-                error
-            );
-
-            royaltyEntryResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            royaltyEntryResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedRoyaltyAdjustmentQuery() {
-        royaltyAdjustmentResult.textContent =
-            "Querying royalty_adjustments through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_adjustments")
-                .select(
-                    "id,royalty_entry_id,adjustment_reference,amount,reason,effective_date,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Royalty Adjustment result."
-                );
-            }
-
-            if (data.length === 0) {
-                royaltyAdjustmentResult.textContent =
-                    "PASS — NO ROYALTY ADJUSTMENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Royalty Adjustments.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk royalty adjustments, " +
-                    "Author Desk access is disabled, the parent Royalty Entry " +
-                    "is not visible, no Desk-visible related book is assigned, " +
-                    "or the relevant Royalty Adjustments are not author-visible.";
-
-                royaltyAdjustmentResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedAdjustment =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.royalty_entry_id !== "number" ||
-                        !record.adjustment_reference ||
-                        record.amount === null ||
-                        Number(record.amount) === 0 ||
-                        !record.reason ||
-                        !record.reason.trim() ||
-                        !record.effective_date ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedAdjustment) {
-                royaltyAdjustmentResult.textContent =
-                    "FAIL — UNEXPECTED ROYALTY ADJUSTMENT DATA\n\n" +
-                    "A Royalty Adjustment was returned with unexpected " +
-                    "required-field data or was not author-visible.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                royaltyAdjustmentResult.classList.add("fail");
-                return;
-            }
-
-            royaltyAdjustmentResult.textContent =
-                "PASS — OWN ACCESSIBLE ROYALTY ADJUSTMENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyAdjustmentResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Royalty Adjustment query failed:",
-                error
-            );
-
-            royaltyAdjustmentResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            royaltyAdjustmentResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedRoyaltyStatementQuery(userId) {
-        royaltyStatementResult.textContent =
-            "Querying royalty_statements through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_statements")
-                .select(
-                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Royalty Statement result."
-                );
-            }
-
-            if (data.length === 0) {
-                royaltyStatementResult.textContent =
-                    "PASS — NO ROYALTY STATEMENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Royalty Statements.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk statements, " +
-                    "Author Desk access is disabled, or the relevant " +
-                    "Royalty Statements are not author-visible.";
-
-                royaltyStatementResult.classList.add("pass");
-                return;
-            }
-
-            const unexpectedStatement =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        record.author_id !== userId ||
-                        !record.statement_reference ||
-                        !record.period_start ||
-                        !record.period_end ||
-                        !record.currency ||
-                        !record.status ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedStatement) {
-                royaltyStatementResult.textContent =
-                    "FAIL — UNEXPECTED ROYALTY STATEMENT VISIBILITY OR DATA\n\n" +
-                    "A Royalty Statement was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                royaltyStatementResult.classList.add("fail");
-                return;
-            }
-
-            royaltyStatementResult.textContent =
-                "PASS — OWN ACCESSIBLE ROYALTY STATEMENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyStatementResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Royalty Statement query failed:",
-                error
-            );
-
-            royaltyStatementResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            royaltyStatementResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedRoyaltyStatementLineQuery() {
-        royaltyStatementLineResult.textContent =
-            "Querying royalty_statement_lines through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_statement_lines")
-                .select(
-                    "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
-                )
-                .order("statement_id", {
-                    ascending: true
-                })
-                .order("line_number", {
-                    ascending: true
-                })
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Royalty Statement Line result."
-                );
-            }
-
-            if (data.length === 0) {
-                royaltyStatementLineResult.textContent =
-                    "PASS — NO ROYALTY STATEMENT LINES VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Royalty Statement Lines.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk statements, " +
-                    "Author Desk access is disabled, or the parent " +
-                    "Royalty Statement is not author-visible.";
-
-                royaltyStatementLineResult.classList.add("pass");
-                return;
-            }
-
-            const malformedLine =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.statement_id !== "number" ||
-                        typeof record.line_number !== "number" ||
-                        record.line_number <= 0 ||
-                        !record.line_type ||
-                        !record.description ||
-                        !record.description.trim() ||
-                        record.amount === null ||
-                        Number(record.amount) === 0
-                    );
-                });
-
-            if (malformedLine) {
-                royaltyStatementLineResult.textContent =
-                    "FAIL — UNEXPECTED ROYALTY STATEMENT LINE DATA\n\n" +
-                    "A Royalty Statement Line was returned with unexpected " +
-                    "required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                royaltyStatementLineResult.classList.add("fail");
-                return;
-            }
-
-            royaltyStatementLineResult.textContent =
-                "PASS — OWN ACCESSIBLE ROYALTY STATEMENT LINES ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyStatementLineResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Royalty Statement Line query failed:",
-                error
-            );
-
-            royaltyStatementLineResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            royaltyStatementLineResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedPaymentQuery(userId) {
-        paymentResult.textContent =
-            "Querying payments through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("payments")
-                .select(
-                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Payment result."
-                );
-            }
-
-            if (data.length === 0) {
-                paymentResult.textContent =
-                    "PASS — NO PAYMENTS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Payments.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk payments, " +
-                    "Author Desk access is disabled, or the relevant " +
-                    "Payments are not author-visible.";
-
-                paymentResult.classList.add("pass");
-                return;
-            }
-
-            const validStatuses = [
-                "approved",
-                "processing",
-                "paid",
-                "failed",
-                "cancelled"
-            ];
-
-            const unexpectedPayment =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        record.author_id !== userId ||
-                        !record.payment_reference ||
-                        !record.currency ||
-                        record.amount === null ||
-                        Number(record.amount) <= 0 ||
-                        !validStatuses.includes(record.status) ||
-                        record.author_visible !== true
-                    );
-                });
-
-            if (unexpectedPayment) {
-                paymentResult.textContent =
-                    "FAIL — UNEXPECTED PAYMENT VISIBILITY OR DATA\n\n" +
-                    "A Payment was returned that does not belong to the " +
-                    "authenticated author, is not author-visible, or contains " +
-                    "unexpected required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                paymentResult.classList.add("fail");
-                return;
-            }
-
-            paymentResult.textContent =
-                "PASS — OWN ACCESSIBLE PAYMENTS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            paymentResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Payment query failed:",
-                error
-            );
-
-            paymentResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            paymentResult.classList.add("fail");
-        }
-    }
-
-    async function testAuthenticatedPaymentAllocationQuery() {
-        paymentAllocationResult.textContent =
-            "Querying payment_allocations through authenticated RLS...";
-
-        try {
-            const { data, error } = await client
-                .from("payment_allocations")
-                .select(
-                    "id,payment_id,statement_id,amount,created_at"
-                )
-                .order("id", {
-                    ascending: true
-                });
-
-            if (error) {
-                throw error;
-            }
-
-            if (!Array.isArray(data)) {
-                throw new Error(
-                    "Supabase returned an unexpected Payment Allocation result."
-                );
-            }
-
-            if (data.length === 0) {
-                paymentAllocationResult.textContent =
-                    "PASS — NO PAYMENT ALLOCATIONS VISIBLE\n\n" +
-                    "The authenticated account can query the table, " +
-                    "but RLS has exposed no Payment Allocations.\n\n" +
-                    "This is the expected result when the authenticated " +
-                    "user has no accessible Author Desk payment allocations, " +
-                    "Author Desk access is disabled, or the parent Payment " +
-                    "is not author-visible.";
-
-                paymentAllocationResult.classList.add("pass");
-                return;
-            }
-
-            const malformedAllocation =
-                data.find(function (record) {
-                    return (
-                        typeof record.id !== "number" ||
-                        typeof record.payment_id !== "number" ||
-                        typeof record.statement_id !== "number" ||
-                        record.amount === null ||
-                        Number(record.amount) <= 0
-                    );
-                });
-
-            if (malformedAllocation) {
-                paymentAllocationResult.textContent =
-                    "FAIL — UNEXPECTED PAYMENT ALLOCATION DATA\n\n" +
-                    "A Payment Allocation was returned with unexpected " +
-                    "required-field data.\n\n" +
-                    JSON.stringify(data, null, 2);
-
-                paymentAllocationResult.classList.add("fail");
-                return;
-            }
-
-            paymentAllocationResult.textContent =
-                "PASS — OWN ACCESSIBLE PAYMENT ALLOCATIONS ONLY\n\n" +
-                "Returned rows: " +
-                data.length +
-                "\n\n" +
-                JSON.stringify(data, null, 2);
-
-            paymentAllocationResult.classList.add("pass");
-
-        } catch (error) {
-            console.error(
-                "Author Desk authenticated Payment Allocation query failed:",
-                error
-            );
-
-            paymentAllocationResult.textContent =
-                "QUERY ERROR\n\n" +
-                String(error.message || error);
-
-            paymentAllocationResult.classList.add("fail");
-        }
-    }
-
-    async function testAnonymousAuthorQuery() {
-        authorResult.textContent =
-            "Querying author_records without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("author_records")
-                .select(
-                    "id,publishing_name,email,relationship_status,desk_access_enabled,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                authorResult.textContent =
-                    "PASS — ANONYMOUS ACCESS BLOCKED\n\n" +
-                    "The query returned zero Author Records.";
-
-                authorResult.classList.add("pass");
-                return;
-            }
-
-            authorResult.textContent =
-                "FAIL — ANONYMOUS AUTHOR DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            authorResult.classList.add("fail");
-
-        } catch (error) {
-            authorResult.textContent =
-                "PASS — ANONYMOUS ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            authorResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRelationshipQuery() {
-        relationshipResult.textContent =
-            "Querying author_relationships without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("author_relationships")
-                .select(
-                    "id,author_id,status,started_on,concluded_on,internal_reference,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                relationshipResult.textContent =
-                    "PASS — ANONYMOUS RELATIONSHIP ACCESS BLOCKED\n\n" +
-                    "The query returned zero Author Relationships.";
-
-                relationshipResult.classList.add("pass");
-                return;
-            }
-
-            relationshipResult.textContent =
-                "FAIL — ANONYMOUS RELATIONSHIP DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            relationshipResult.classList.add("fail");
-
-        } catch (error) {
-            relationshipResult.textContent =
-                "PASS — ANONYMOUS RELATIONSHIP ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            relationshipResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousBookQuery() {
-        bookResult.textContent =
-            "Querying book_records without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("book_records")
-                .select(
-                    "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                bookResult.textContent =
-                    "PASS — ANONYMOUS BOOK ACCESS BLOCKED\n\n" +
-                    "The query returned zero Book Records.";
-
-                bookResult.classList.add("pass");
-                return;
-            }
-
-            bookResult.textContent =
-                "FAIL — ANONYMOUS BOOK DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            bookResult.classList.add("fail");
-
-        } catch (error) {
-            bookResult.textContent =
-                "PASS — ANONYMOUS BOOK ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            bookResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousContributorQuery() {
-        contributorResult.textContent =
-            "Querying book_contributors without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("book_contributors")
-                .select(
-                    "id,book_id,author_id,contributor_role,desk_visible,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                contributorResult.textContent =
-                    "PASS — ANONYMOUS CONTRIBUTOR ACCESS BLOCKED\n\n" +
-                    "The query returned zero Book Contributor records.";
-
-                contributorResult.classList.add("pass");
-                return;
-            }
-
-            contributorResult.textContent =
-                "FAIL — ANONYMOUS CONTRIBUTOR DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            contributorResult.classList.add("fail");
-
-        } catch (error) {
-            contributorResult.textContent =
-                "PASS — ANONYMOUS CONTRIBUTOR ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            contributorResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousProductionEventQuery() {
-        productionEventResult.textContent =
-            "Querying production_events without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("production_events")
-                .select(
-                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                productionEventResult.textContent =
-                    "PASS — ANONYMOUS PRODUCTION EVENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Production Events.";
-
-                productionEventResult.classList.add("pass");
-                return;
-            }
-
-            productionEventResult.textContent =
-                "FAIL — ANONYMOUS PRODUCTION EVENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            productionEventResult.classList.add("fail");
-
-        } catch (error) {
-            productionEventResult.textContent =
-                "PASS — ANONYMOUS PRODUCTION EVENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            productionEventResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousBookEditionQuery() {
-        bookEditionResult.textContent =
-            "Querying book_editions without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("book_editions")
-                .select(
-                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                bookEditionResult.textContent =
-                    "PASS — ANONYMOUS BOOK EDITION ACCESS BLOCKED\n\n" +
-                    "The query returned zero Book Editions.";
-
-                bookEditionResult.classList.add("pass");
-                return;
-            }
-
-            bookEditionResult.textContent =
-                "FAIL — ANONYMOUS BOOK EDITION DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            bookEditionResult.classList.add("fail");
-
-        } catch (error) {
-            bookEditionResult.textContent =
-                "PASS — ANONYMOUS BOOK EDITION ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            bookEditionResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousAuthorActionQuery() {
-        authorActionResult.textContent =
-            "Querying author_actions without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("author_actions")
-                .select(
-                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                authorActionResult.textContent =
-                    "PASS — ANONYMOUS AUTHOR ACTION ACCESS BLOCKED\n\n" +
-                    "The query returned zero Author Actions.";
-
-                authorActionResult.classList.add("pass");
-                return;
-            }
-
-            authorActionResult.textContent =
-                "FAIL — ANONYMOUS AUTHOR ACTION DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            authorActionResult.classList.add("fail");
-
-        } catch (error) {
-            authorActionResult.textContent =
-                "PASS — ANONYMOUS AUTHOR ACTION ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            authorActionResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousDocumentQuery() {
-        documentResult.textContent =
-            "Querying documents without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("documents")
-                .select(
-                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                documentResult.textContent =
-                    "PASS — ANONYMOUS DOCUMENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Documents.";
-
-                documentResult.classList.add("pass");
-                return;
-            }
-
-            documentResult.textContent =
-                "FAIL — ANONYMOUS DOCUMENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            documentResult.classList.add("fail");
-
-        } catch (error) {
-            documentResult.textContent =
-                "PASS — ANONYMOUS DOCUMENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            documentResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousAgreementQuery() {
-        agreementResult.textContent =
-            "Querying agreements without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("agreements")
-                .select(
-                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                agreementResult.textContent =
-                    "PASS — ANONYMOUS AGREEMENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Agreements.";
-
-                agreementResult.classList.add("pass");
-                return;
-            }
-
-            agreementResult.textContent =
-                "FAIL — ANONYMOUS AGREEMENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            agreementResult.classList.add("fail");
-
-        } catch (error) {
-            agreementResult.textContent =
-                "PASS — ANONYMOUS AGREEMENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            agreementResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRightsQuery() {
-        rightsResult.textContent =
-            "Querying rights without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("rights")
-                .select(
-                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                rightsResult.textContent =
-                    "PASS — ANONYMOUS RIGHTS ACCESS BLOCKED\n\n" +
-                    "The query returned zero Rights Records.";
-
-                rightsResult.classList.add("pass");
-                return;
-            }
-
-            rightsResult.textContent =
-                "FAIL — ANONYMOUS RIGHTS DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            rightsResult.classList.add("fail");
-
-        } catch (error) {
-            rightsResult.textContent =
-                "PASS — ANONYMOUS RIGHTS ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            rightsResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRightsEventQuery() {
-        rightsEventResult.textContent =
-            "Querying rights_events without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("rights_events")
-                .select(
-                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                rightsEventResult.textContent =
-                    "PASS — ANONYMOUS RIGHTS EVENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Rights Events.";
-
-                rightsEventResult.classList.add("pass");
-                return;
-            }
-
-            rightsEventResult.textContent =
-                "FAIL — ANONYMOUS RIGHTS EVENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            rightsEventResult.classList.add("fail");
-
-        } catch (error) {
-            rightsEventResult.textContent =
-                "PASS — ANONYMOUS RIGHTS EVENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            rightsEventResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousAdvanceQuery() {
-        advanceResult.textContent =
-            "Querying advances without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("advances")
-                .select(
-                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                advanceResult.textContent =
-                    "PASS — ANONYMOUS ADVANCE ACCESS BLOCKED\n\n" +
-                    "The query returned zero Advances.";
-
-                advanceResult.classList.add("pass");
-                return;
-            }
-
-            advanceResult.textContent =
-                "FAIL — ANONYMOUS ADVANCE DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            advanceResult.classList.add("fail");
-
-        } catch (error) {
-            advanceResult.textContent =
-                "PASS — ANONYMOUS ADVANCE ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            advanceResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousAdvanceInstalmentQuery() {
-        advanceInstalmentResult.textContent =
-            "Querying advance_instalments without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("advance_instalments")
-                .select(
-                    "id,advance_id,instalment_number,description,amount,due_date,status,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                advanceInstalmentResult.textContent =
-                    "PASS — ANONYMOUS ADVANCE INSTALMENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Advance Instalments.";
-
-                advanceInstalmentResult.classList.add("pass");
-                return;
-            }
-
-            advanceInstalmentResult.textContent =
-                "FAIL — ANONYMOUS ADVANCE INSTALMENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            advanceInstalmentResult.classList.add("fail");
-
-        } catch (error) {
-            advanceInstalmentResult.textContent =
-                "PASS — ANONYMOUS ADVANCE INSTALMENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            advanceInstalmentResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRoyaltyEntryQuery() {
-        royaltyEntryResult.textContent =
-            "Querying royalty_entries without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_entries")
-                .select(
-                    "id,author_id,book_id,edition_id,source_reference,sales_period_start,sales_period_end,clearance_date,channel,currency,distributable_net_receipts,royalty_rate,royalty_amount,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                royaltyEntryResult.textContent =
-                    "PASS — ANONYMOUS ROYALTY ENTRY ACCESS BLOCKED\n\n" +
-                    "The query returned zero Royalty Entries.";
-
-                royaltyEntryResult.classList.add("pass");
-                return;
-            }
-
-            royaltyEntryResult.textContent =
-                "FAIL — ANONYMOUS ROYALTY DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyEntryResult.classList.add("fail");
-
-        } catch (error) {
-            royaltyEntryResult.textContent =
-                "PASS — ANONYMOUS ROYALTY ENTRY ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            royaltyEntryResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRoyaltyAdjustmentQuery() {
-        royaltyAdjustmentResult.textContent =
-            "Querying royalty_adjustments without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_adjustments")
-                .select(
-                    "id,royalty_entry_id,adjustment_reference,amount,reason,effective_date,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                royaltyAdjustmentResult.textContent =
-                    "PASS — ANONYMOUS ROYALTY ADJUSTMENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Royalty Adjustments.";
-
-                royaltyAdjustmentResult.classList.add("pass");
-                return;
-            }
-
-            royaltyAdjustmentResult.textContent =
-                "FAIL — ANONYMOUS ROYALTY ADJUSTMENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyAdjustmentResult.classList.add("fail");
-
-        } catch (error) {
-            royaltyAdjustmentResult.textContent =
-                "PASS — ANONYMOUS ROYALTY ADJUSTMENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            royaltyAdjustmentResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRoyaltyStatementQuery() {
-        royaltyStatementResult.textContent =
-            "Querying royalty_statements without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_statements")
-                .select(
-                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                royaltyStatementResult.textContent =
-                    "PASS — ANONYMOUS ROYALTY STATEMENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Royalty Statements.";
-
-                royaltyStatementResult.classList.add("pass");
-                return;
-            }
-
-            royaltyStatementResult.textContent =
-                "FAIL — ANONYMOUS ROYALTY STATEMENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyStatementResult.classList.add("fail");
-
-        } catch (error) {
-            royaltyStatementResult.textContent =
-                "PASS — ANONYMOUS ROYALTY STATEMENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            royaltyStatementResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousRoyaltyStatementLineQuery() {
-        royaltyStatementLineResult.textContent =
-            "Querying royalty_statement_lines without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("royalty_statement_lines")
-                .select(
-                    "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                royaltyStatementLineResult.textContent =
-                    "PASS — ANONYMOUS ROYALTY STATEMENT LINE ACCESS BLOCKED\n\n" +
-                    "The query returned zero Royalty Statement Lines.";
-
-                royaltyStatementLineResult.classList.add("pass");
-                return;
-            }
-
-            royaltyStatementLineResult.textContent =
-                "FAIL — ANONYMOUS ROYALTY STATEMENT LINE DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            royaltyStatementLineResult.classList.add("fail");
-
-        } catch (error) {
-            royaltyStatementLineResult.textContent =
-                "PASS — ANONYMOUS ROYALTY STATEMENT LINE ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            royaltyStatementLineResult.classList.add("pass");
-        }
-    }
-    async function testAnonymousPaymentQuery() {
-        paymentResult.textContent =
-            "Querying payments without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("payments")
-                .select(
-                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                paymentResult.textContent =
-                    "PASS — ANONYMOUS PAYMENT ACCESS BLOCKED\n\n" +
-                    "The query returned zero Payments.";
-
-                paymentResult.classList.add("pass");
-                return;
-            }
-
-            paymentResult.textContent =
-                "FAIL — ANONYMOUS PAYMENT DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            paymentResult.classList.add("fail");
-
-        } catch (error) {
-            paymentResult.textContent =
-                "PASS — ANONYMOUS PAYMENT ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            paymentResult.classList.add("pass");
-        }
-    }
-
-    async function testAnonymousPaymentAllocationQuery() {
-        paymentAllocationResult.textContent =
-            "Querying payment_allocations without an authenticated session...";
-
-        try {
-            const { data, error } = await client
-                .from("payment_allocations")
-                .select(
-                    "id,payment_id,statement_id,amount,created_at"
-                );
-
-            if (error) {
-                throw error;
-            }
-
-            if (Array.isArray(data) && data.length === 0) {
-                paymentAllocationResult.textContent =
-                    "PASS — ANONYMOUS PAYMENT ALLOCATION ACCESS BLOCKED\n\n" +
-                    "The query returned zero Payment Allocations.";
-
-                paymentAllocationResult.classList.add("pass");
-                return;
-            }
-
-            paymentAllocationResult.textContent =
-                "FAIL — ANONYMOUS PAYMENT ALLOCATION DATA WAS VISIBLE\n\n" +
-                JSON.stringify(data, null, 2);
-
-            paymentAllocationResult.classList.add("fail");
-
-        } catch (error) {
-            paymentAllocationResult.textContent =
-                "PASS — ANONYMOUS PAYMENT ALLOCATION ACCESS BLOCKED\n\n" +
-                "Supabase rejected the query:\n" +
-                String(error.message || error);
-
-            paymentAllocationResult.classList.add("pass");
-        }
     }
 
 })();
