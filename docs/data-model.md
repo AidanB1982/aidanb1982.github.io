@@ -3911,3 +3911,32 @@ The following remain deliberately deferred:
 - production Rights and Rights Event data.
 
 These controls should be introduced through the trusted write layer rather than browser-side mutation.
+---
+
+## Migration 011 — Advances and Advance Instalments
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 011 introduced:
+
+`public.advances`
+
+and:
+
+`public.advance_instalments`
+
+Its purpose is to establish the contractual advance and advance-instalment
+foundation for the Author Desk without confusing contractual obligations,
+scheduled instalments and actual movement of money.
+
+The implemented relationship is:
+
+```text
+Agreement
+    ↓
+Advance
+    ↓
+Advance Instalments
+        ↓
+future Payment machinery
