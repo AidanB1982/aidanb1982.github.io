@@ -80,8 +80,9 @@
         <code>public.agreements</code>,
         <code>public.rights</code>,
         <code>public.rights_events</code>,
-        <code>public.advances</code> and
-        <code>public.advance_instalments</code>.
+        <code>public.advances</code>,
+        <code>public.advance_instalments</code> and
+        <code>public.royalty_entries</code>.
     </p>
 
     <section class="test-card">
@@ -195,6 +196,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Royalty Entry Query</h2>
+
+        <div id="royalty-entry-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -251,6 +260,9 @@
     const advanceInstalmentResult =
         document.getElementById("advance-instalment-result");
 
+    const royaltyEntryResult =
+        document.getElementById("royalty-entry-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -298,6 +310,7 @@
                 await testAnonymousRightsEventQuery();
                 await testAnonymousAdvanceQuery();
                 await testAnonymousAdvanceInstalmentQuery();
+                await testAnonymousRoyaltyEntryQuery();
 
                 return;
             }
@@ -350,6 +363,10 @@
             );
 
             await testAuthenticatedAdvanceInstalmentQuery();
+
+            await testAuthenticatedRoyaltyEntryQuery(
+                session.user.id
+            );
 
         } catch (error) {
             console.error(
@@ -411,10 +428,13 @@
                 "NOT TESTED\n\nAuthentication test failed.";
             advanceResult.classList.add("fail");
 
-
             advanceInstalmentResult.textContent =
                 "NOT TESTED\n\nAuthentication test failed.";
             advanceInstalmentResult.classList.add("fail");
+
+            royaltyEntryResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            royaltyEntryResult.classList.add("fail");
         }
     }
 
@@ -1484,6 +1504,95 @@
         }
     }
 
+    async function testAuthenticatedRoyaltyEntryQuery(userId) {
+        royaltyEntryResult.textContent =
+            "Querying royalty_entries through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_entries")
+                .select(
+                    "id,author_id,book_id,edition_id,source_reference,sales_period_start,sales_period_end,clearance_date,channel,currency,distributable_net_receipts,royalty_rate,royalty_amount,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Royalty Entry result."
+                );
+            }
+
+            if (data.length === 0) {
+                royaltyEntryResult.textContent =
+                    "PASS — NO ROYALTY ENTRIES VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Royalty Entries.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk royalty entries, " +
+                    "Author Desk access is disabled, no Desk-visible related book " +
+                    "is assigned, or the relevant Royalty Entries are not author-visible.";
+
+                royaltyEntryResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedRoyaltyEntry =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        record.author_id !== userId ||
+                        typeof record.book_id !== "number" ||
+                        !record.source_reference ||
+                        !record.clearance_date ||
+                        !record.currency ||
+                        record.distributable_net_receipts === null ||
+                        record.royalty_amount === null ||
+                        Number(record.royalty_amount) === 0 ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedRoyaltyEntry) {
+                royaltyEntryResult.textContent =
+                    "FAIL — UNEXPECTED ROYALTY ENTRY VISIBILITY OR DATA\n\n" +
+                    "A Royalty Entry was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                royaltyEntryResult.classList.add("fail");
+                return;
+            }
+
+            royaltyEntryResult.textContent =
+                "PASS — OWN ACCESSIBLE ROYALTY ENTRIES ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyEntryResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Royalty Entry query failed:",
+                error
+            );
+
+            royaltyEntryResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            royaltyEntryResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1963,6 +2072,7 @@
             advanceResult.classList.add("pass");
         }
     }
+
     async function testAnonymousAdvanceInstalmentQuery() {
         advanceInstalmentResult.textContent =
             "Querying advance_instalments without an authenticated session...";
@@ -2000,6 +2110,46 @@
                 String(error.message || error);
 
             advanceInstalmentResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousRoyaltyEntryQuery() {
+        royaltyEntryResult.textContent =
+            "Querying royalty_entries without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_entries")
+                .select(
+                    "id,author_id,book_id,edition_id,source_reference,sales_period_start,sales_period_end,clearance_date,channel,currency,distributable_net_receipts,royalty_rate,royalty_amount,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                royaltyEntryResult.textContent =
+                    "PASS — ANONYMOUS ROYALTY ENTRY ACCESS BLOCKED\n\n" +
+                    "The query returned zero Royalty Entries.";
+
+                royaltyEntryResult.classList.add("pass");
+                return;
+            }
+
+            royaltyEntryResult.textContent =
+                "FAIL — ANONYMOUS ROYALTY DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyEntryResult.classList.add("fail");
+
+        } catch (error) {
+            royaltyEntryResult.textContent =
+                "PASS — ANONYMOUS ROYALTY ENTRY ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            royaltyEntryResult.classList.add("pass");
         }
     }
 })();
