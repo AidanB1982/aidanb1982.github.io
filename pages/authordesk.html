@@ -81,8 +81,9 @@
         <code>public.rights</code>,
         <code>public.rights_events</code>,
         <code>public.advances</code>,
-        <code>public.advance_instalments</code> and
-        <code>public.royalty_entries</code>.
+        <code>public.advance_instalments</code>,
+        <code>public.royalty_entries</code> and
+        <code>public.royalty_adjustments</code>.
     </p>
 
     <section class="test-card">
@@ -204,6 +205,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Royalty Adjustment Query</h2>
+
+        <div id="royalty-adjustment-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -263,6 +272,9 @@
     const royaltyEntryResult =
         document.getElementById("royalty-entry-result");
 
+    const royaltyAdjustmentResult =
+        document.getElementById("royalty-adjustment-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -311,6 +323,7 @@
                 await testAnonymousAdvanceQuery();
                 await testAnonymousAdvanceInstalmentQuery();
                 await testAnonymousRoyaltyEntryQuery();
+                await testAnonymousRoyaltyAdjustmentQuery();
 
                 return;
             }
@@ -368,6 +381,8 @@
                 session.user.id
             );
 
+            await testAuthenticatedRoyaltyAdjustmentQuery();
+
         } catch (error) {
             console.error(
                 "Author Desk authentication test failed:",
@@ -380,61 +395,29 @@
 
             authResult.classList.add("fail");
 
-            authorResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            authorResult.classList.add("fail");
+            const resultElements = [
+                authorResult,
+                relationshipResult,
+                bookResult,
+                contributorResult,
+                productionEventResult,
+                bookEditionResult,
+                authorActionResult,
+                documentResult,
+                agreementResult,
+                rightsResult,
+                rightsEventResult,
+                advanceResult,
+                advanceInstalmentResult,
+                royaltyEntryResult,
+                royaltyAdjustmentResult
+            ];
 
-            relationshipResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            relationshipResult.classList.add("fail");
-
-            bookResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            bookResult.classList.add("fail");
-
-            contributorResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            contributorResult.classList.add("fail");
-
-            productionEventResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            productionEventResult.classList.add("fail");
-
-            bookEditionResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            bookEditionResult.classList.add("fail");
-
-            authorActionResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            authorActionResult.classList.add("fail");
-
-            documentResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            documentResult.classList.add("fail");
-
-            agreementResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            agreementResult.classList.add("fail");
-
-            rightsResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            rightsResult.classList.add("fail");
-
-            rightsEventResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            rightsEventResult.classList.add("fail");
-
-            advanceResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            advanceResult.classList.add("fail");
-
-            advanceInstalmentResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            advanceInstalmentResult.classList.add("fail");
-
-            royaltyEntryResult.textContent =
-                "NOT TESTED\n\nAuthentication test failed.";
-            royaltyEntryResult.classList.add("fail");
+            resultElements.forEach(function (resultElement) {
+                resultElement.textContent =
+                    "NOT TESTED\n\nAuthentication test failed.";
+                resultElement.classList.add("fail");
+            });
         }
     }
 
@@ -1593,6 +1576,94 @@
         }
     }
 
+    async function testAuthenticatedRoyaltyAdjustmentQuery() {
+        royaltyAdjustmentResult.textContent =
+            "Querying royalty_adjustments through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_adjustments")
+                .select(
+                    "id,royalty_entry_id,adjustment_reference,amount,reason,effective_date,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Royalty Adjustment result."
+                );
+            }
+
+            if (data.length === 0) {
+                royaltyAdjustmentResult.textContent =
+                    "PASS — NO ROYALTY ADJUSTMENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Royalty Adjustments.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk royalty adjustments, " +
+                    "Author Desk access is disabled, the parent Royalty Entry " +
+                    "is not visible, no Desk-visible related book is assigned, " +
+                    "or the relevant Royalty Adjustments are not author-visible.";
+
+                royaltyAdjustmentResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedAdjustment =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.royalty_entry_id !== "number" ||
+                        !record.adjustment_reference ||
+                        record.amount === null ||
+                        Number(record.amount) === 0 ||
+                        !record.reason ||
+                        !record.reason.trim() ||
+                        !record.effective_date ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedAdjustment) {
+                royaltyAdjustmentResult.textContent =
+                    "FAIL — UNEXPECTED ROYALTY ADJUSTMENT DATA\n\n" +
+                    "A Royalty Adjustment was returned with unexpected " +
+                    "required-field data or was not author-visible.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                royaltyAdjustmentResult.classList.add("fail");
+                return;
+            }
+
+            royaltyAdjustmentResult.textContent =
+                "PASS — OWN ACCESSIBLE ROYALTY ADJUSTMENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyAdjustmentResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Royalty Adjustment query failed:",
+                error
+            );
+
+            royaltyAdjustmentResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            royaltyAdjustmentResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -2150,6 +2221,46 @@
                 String(error.message || error);
 
             royaltyEntryResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousRoyaltyAdjustmentQuery() {
+        royaltyAdjustmentResult.textContent =
+            "Querying royalty_adjustments without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_adjustments")
+                .select(
+                    "id,royalty_entry_id,adjustment_reference,amount,reason,effective_date,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                royaltyAdjustmentResult.textContent =
+                    "PASS — ANONYMOUS ROYALTY ADJUSTMENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Royalty Adjustments.";
+
+                royaltyAdjustmentResult.classList.add("pass");
+                return;
+            }
+
+            royaltyAdjustmentResult.textContent =
+                "FAIL — ANONYMOUS ROYALTY ADJUSTMENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyAdjustmentResult.classList.add("fail");
+
+        } catch (error) {
+            royaltyAdjustmentResult.textContent =
+                "PASS — ANONYMOUS ROYALTY ADJUSTMENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            royaltyAdjustmentResult.classList.add("pass");
         }
     }
 })();
