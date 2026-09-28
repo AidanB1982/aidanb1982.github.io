@@ -4643,3 +4643,30 @@ trusted payment process
 Payment
         ↓
 processing → paid
+---
+
+## Migration 017 — Activity Events
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 017 introduced:
+
+`public.activity_events`
+
+Its purpose is to provide a durable audit and activity-history foundation for
+important Author Desk events.
+
+Activity Events preserve historical information about significant actions
+without duplicating the current state held by operational tables.
+
+The architectural distinction is:
+
+```text
+Operational record
+        ↓
+current state
+
+Activity Event
+        ↓
+historical record of something that happened
