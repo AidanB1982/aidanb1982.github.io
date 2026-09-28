@@ -4497,3 +4497,23 @@ security foundation on which the later Statement and Payment architecture can
 be built.
 
 **Migration 012 is verified.**
+---
+
+## Migration 013 — Royalty Adjustments
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 013 introduced:
+
+`public.royalty_adjustments`
+
+Its purpose is to provide an explicit adjustment history for established
+Royalty Entries without silently altering the original cleared royalty value.
+
+The implemented relationship is:
+
+```text
+Royalty Entry
+    ↓
+Royalty Adjustment
