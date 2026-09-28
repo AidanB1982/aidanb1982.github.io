@@ -3795,3 +3795,119 @@ ownership and author-read security foundation on which those workflows can be
 built.
 
 **Migration 009 is verified.**
+## Migration 010 — Rights History
+
+Migration 010 introduced `public.rights_events`, providing an author-visible historical record for Rights Records while keeping the current rights position in `public.rights`.
+
+### Purpose
+
+`public.rights` represents the current rights position.
+
+`public.rights_events` records historical events that explain how that position developed over time.
+
+This preserves the Author Desk principle that current state and historical record are separate concerns.
+
+### Table: `public.rights_events`
+
+Fields:
+
+- `id` — bigint identity primary key.
+- `right_id` — required foreign key to `public.rights`.
+- `event_type` — required controlled event type.
+- `event_date` — required legal/publishing event date.
+- `description_author` — optional author-facing description.
+- `author_visible` — controls whether the event may be exposed to the author; defaults to `true`.
+- `document_id` — optional supporting-document reference to `public.documents`.
+- `created_at` — database creation timestamp.
+
+Supported `event_type` values:
+
+- `granted`
+- `activated`
+- `amended`
+- `expired`
+- `reverted`
+- `terminated`
+- `superseded`
+- `sublicensed`
+- `note`
+
+`granted` and `activated` are intentionally distinct. A contractual grant may exist before the right becomes effective.
+
+No `from_status` or `to_status` fields are stored at this stage because not every Rights Event represents a status transition.
+
+`event_date` is a `date`, representing the relevant legal or publishing date.
+
+`created_at` is a `timestamptz`, representing when the database record was created.
+
+### Ownership and scope
+
+Rights Events do not duplicate `author_id` or `book_id`.
+
+Ownership and scope are derived through the parent Rights Record:
+
+`rights_events → rights → agreements`
+
+Where the Right is book-specific, access also depends on the authenticated author having a Desk-visible contributor relationship with that Book Record.
+
+An optional `document_id` may link a Rights Event to a supporting Document.
+
+A supporting Document is not mandatory.
+
+### Author visibility and RLS
+
+Row Level Security is enabled.
+
+Authenticated authors may read a Rights Event only when:
+
+- the Rights Event is `author_visible = true`;
+- its parent Rights Record is `author_visible = true`;
+- the parent Right belongs to the authenticated author;
+- that author's Author Desk access is enabled;
+- the linked Agreement belongs to the same author and is author-visible; and
+- where the Right is book-specific, the authenticated author has a Desk-visible contributor relationship with that Book Record.
+
+This means an individually author-visible Rights Event cannot bypass the visibility or ownership controls of its parent Rights Record.
+
+Anonymous access is not granted.
+
+Browser-side mutation access is not granted.
+
+### Verification
+
+Migration 010 was verified with temporary test data only.
+
+Tests confirmed:
+
+- the expected eight-column schema;
+- controlled `event_type` enforcement;
+- parent Rights Record foreign-key enforcement;
+- optional supporting Document foreign-key enforcement;
+- successful creation of a valid Rights Event with no supporting Document;
+- the owning author could read the accessible Rights Event;
+- an authenticated non-author account could not read it;
+- anonymous access was denied;
+- setting the Rights Event's own `author_visible` flag to `false` hid the event while leaving its parent Right visible;
+- restoring event visibility made the event accessible again;
+- setting the parent Right's `author_visible` flag to `false` hid both the Right and its otherwise author-visible Rights Event; and
+- restoring the parent Right restored the complete visible chain.
+
+All temporary Migration 010 Rights Event, Right and Agreement records were deleted after verification.
+
+No production Rights Events were created by this migration.
+
+Identity sequences were not reset after testing.
+
+### Deferred controls
+
+The following remain deliberately deferred:
+
+- immutable/append-only enforcement for Rights Events;
+- trusted staff/service-role write workflows;
+- staff actor or `created_by` attribution;
+- cross-table write validation beyond the implemented foreign keys and RLS rules;
+- internal-only Rights Event notes;
+- automated Rights state transitions derived from events; and
+- production Rights and Rights Event data.
+
+These controls should be introduced through the trusted write layer rather than browser-side mutation.
