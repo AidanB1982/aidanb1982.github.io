@@ -4554,3 +4554,38 @@ Royalty Statement
 Royalty Statement Lines
         ↓
 future Payment / Allocation
+---
+
+## Migration 015 — Payments and Payment Allocations
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 015 introduced:
+
+`public.payments`
+
+and:
+
+`public.payment_allocations`
+
+Its purpose is to establish the payment layer of the Author Desk financial
+architecture while preserving the distinction between:
+
+- cleared royalty value;
+- formal royalty statements;
+- actual movement of money; and
+- the allocation of a payment against statement balances.
+
+The implemented financial relationship is:
+
+```text
+Cleared Royalty Ledger
+        ↓
+Royalty Adjustments
+        ↓
+Royalty Statement
+        ↓
+Payment Allocation
+        ↓
+Payment
