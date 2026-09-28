@@ -4589,3 +4589,57 @@ Royalty Statement
 Payment Allocation
         ↓
 Payment
+---
+
+## Migration 016 — Payment Requests
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 016 introduced:
+
+`public.payment_requests`
+
+together with the controlled financial functions:
+
+`public.calculate_available_payment_request_balance(uuid, text)`
+
+`public.create_payment_request(numeric, text)`
+
+`public.cancel_payment_request(bigint)`
+
+Its purpose is to allow an authenticated Blackwood author to request payment
+against an already-established payable balance without granting the browser
+general write access to financial tables.
+
+A Payment Request is an instruction from the author requesting payment.
+
+It is not:
+
+- royalty income;
+- a Royalty Entry;
+- a Royalty Statement;
+- a Payment;
+- evidence that money has moved; or
+- authority for the browser to alter accounting records.
+
+The implemented financial relationship is:
+
+```text
+Issued author-visible Royalty Statements
+        ↓
+available payable balance
+        ↓
+Payment Request
+        ↓
+requested
+        ↓
+Blackwood review
+        ↓
+approved / rejected / cancelled
+        ↓
+trusted payment process
+        ↓
+Payment
+        ↓
+processing → paid
