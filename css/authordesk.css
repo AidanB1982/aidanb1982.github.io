@@ -498,7 +498,96 @@ a {
     color: var(--muted);
     line-height: 1.7;
 }
+/* Author Desk payment requests */
 
+.payment-request-control {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.payment-request-control .record-title {
+    margin: 0 0 8px;
+    font-size: 1rem;
+}
+
+.payment-request-control .record-description {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.payment-request-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.payment-request-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.payment-request-field label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.payment-request-field input {
+    width: 150px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-soft);
+    color: var(--text);
+    font: inherit;
+}
+
+.payment-request-field input:focus {
+    outline: none;
+    border-color: var(--green);
+}
+
+.payment-request-button {
+    padding: 10px 16px;
+    border: 1px solid var(--green);
+    border-radius: 6px;
+    background: var(--green);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+
+.payment-request-button:hover:not(:disabled) {
+    filter: brightness(1.08);
+}
+
+.payment-request-button:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.payment-request-message {
+    flex-basis: 100%;
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+.payment-request-message.success {
+    color: var(--muted);
+}
+
+.payment-request-message.error {
+    color: #d6a0a0;
+}
 @media (max-width: 820px) {
     .desk {
         grid-template-columns: 1fr;
