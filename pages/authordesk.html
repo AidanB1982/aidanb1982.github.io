@@ -85,8 +85,9 @@
         <code>public.royalty_entries</code>,
         <code>public.royalty_adjustments</code>,
         <code>public.royalty_statements</code>,
-        <code>public.royalty_statement_lines</code> and
-        <code>public.payments</code>.
+        <code>public.royalty_statement_lines</code>,
+        <code>public.payments</code> and
+        <code>public.payment_allocations</code>.
     </p>
 
     <section class="test-card">
@@ -240,6 +241,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Payment Allocation Query</h2>
+
+        <div id="payment-allocation-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -311,6 +320,9 @@
     const paymentResult =
         document.getElementById("payment-result");
 
+    const paymentAllocationResult =
+        document.getElementById("payment-allocation-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -363,6 +375,7 @@
                 await testAnonymousRoyaltyStatementQuery();
                 await testAnonymousRoyaltyStatementLineQuery();
                 await testAnonymousPaymentQuery();
+                await testAnonymousPaymentAllocationQuery();
 
                 return;
             }
@@ -432,6 +445,8 @@
                 session.user.id
             );
 
+            await testAuthenticatedPaymentAllocationQuery();
+
         } catch (error) {
             console.error(
                 "Author Desk authentication test failed:",
@@ -462,7 +477,8 @@
                 royaltyAdjustmentResult,
                 royaltyStatementResult,
                 royaltyStatementLineResult,
-                paymentResult
+                paymentResult,
+                paymentAllocationResult
             ];
 
             resultElements.forEach(function (resultElement) {
@@ -1991,6 +2007,89 @@
         }
     }
 
+    async function testAuthenticatedPaymentAllocationQuery() {
+        paymentAllocationResult.textContent =
+            "Querying payment_allocations through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("payment_allocations")
+                .select(
+                    "id,payment_id,statement_id,amount,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Payment Allocation result."
+                );
+            }
+
+            if (data.length === 0) {
+                paymentAllocationResult.textContent =
+                    "PASS — NO PAYMENT ALLOCATIONS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Payment Allocations.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk payment allocations, " +
+                    "Author Desk access is disabled, or the parent Payment " +
+                    "is not author-visible.";
+
+                paymentAllocationResult.classList.add("pass");
+                return;
+            }
+
+            const malformedAllocation =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.payment_id !== "number" ||
+                        typeof record.statement_id !== "number" ||
+                        record.amount === null ||
+                        Number(record.amount) <= 0
+                    );
+                });
+
+            if (malformedAllocation) {
+                paymentAllocationResult.textContent =
+                    "FAIL — UNEXPECTED PAYMENT ALLOCATION DATA\n\n" +
+                    "A Payment Allocation was returned with unexpected " +
+                    "required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                paymentAllocationResult.classList.add("fail");
+                return;
+            }
+
+            paymentAllocationResult.textContent =
+                "PASS — OWN ACCESSIBLE PAYMENT ALLOCATIONS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            paymentAllocationResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Payment Allocation query failed:",
+                error
+            );
+
+            paymentAllocationResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            paymentAllocationResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -2707,6 +2806,46 @@
                 String(error.message || error);
 
             paymentResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousPaymentAllocationQuery() {
+        paymentAllocationResult.textContent =
+            "Querying payment_allocations without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("payment_allocations")
+                .select(
+                    "id,payment_id,statement_id,amount,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                paymentAllocationResult.textContent =
+                    "PASS — ANONYMOUS PAYMENT ALLOCATION ACCESS BLOCKED\n\n" +
+                    "The query returned zero Payment Allocations.";
+
+                paymentAllocationResult.classList.add("pass");
+                return;
+            }
+
+            paymentAllocationResult.textContent =
+                "FAIL — ANONYMOUS PAYMENT ALLOCATION DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            paymentAllocationResult.classList.add("fail");
+
+        } catch (error) {
+            paymentAllocationResult.textContent =
+                "PASS — ANONYMOUS PAYMENT ALLOCATION ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            paymentAllocationResult.classList.add("pass");
         }
     }
 
