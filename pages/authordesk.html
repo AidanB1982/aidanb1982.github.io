@@ -78,8 +78,9 @@
         <code>public.author_actions</code>,
         <code>public.documents</code>,
         <code>public.agreements</code>,
-        <code>public.rights</code> and
-        <code>public.rights_events</code>.
+        <code>public.rights</code>,
+        <code>public.rights_events</code> and
+        <code>public.advances</code>.
     </p>
 
     <section class="test-card">
@@ -177,6 +178,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Advance Query</h2>
+
+        <div id="advance-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -227,6 +236,9 @@
     const rightsEventResult =
         document.getElementById("rights-event-result");
 
+    const advanceResult =
+        document.getElementById("advance-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -272,6 +284,7 @@
                 await testAnonymousAgreementQuery();
                 await testAnonymousRightsQuery();
                 await testAnonymousRightsEventQuery();
+                await testAnonymousAdvanceQuery();
 
                 return;
             }
@@ -318,6 +331,10 @@
             );
 
             await testAuthenticatedRightsEventQuery();
+
+            await testAuthenticatedAdvanceQuery(
+                session.user.id
+            );
 
         } catch (error) {
             console.error(
@@ -374,6 +391,10 @@
             rightsEventResult.textContent =
                 "NOT TESTED\n\nAuthentication test failed.";
             rightsEventResult.classList.add("fail");
+
+            advanceResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            advanceResult.classList.add("fail");
         }
     }
 
@@ -1269,6 +1290,94 @@
         }
     }
 
+    async function testAuthenticatedAdvanceQuery(userId) {
+        advanceResult.textContent =
+            "Querying advances through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("advances")
+                .select(
+                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Advance result."
+                );
+            }
+
+            if (data.length === 0) {
+                advanceResult.textContent =
+                    "PASS — NO ADVANCES VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Advances.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk advances, " +
+                    "Author Desk access is disabled, the linked Agreement is not visible, " +
+                    "no Desk-visible related book is assigned, " +
+                    "or the relevant Advances are not author-visible.";
+
+                advanceResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedAdvance =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.agreement_id !== "number" ||
+                        record.author_id !== userId ||
+                        !record.advance_reference ||
+                        !record.currency ||
+                        record.total_amount === null ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedAdvance) {
+                advanceResult.textContent =
+                    "FAIL — UNEXPECTED ADVANCE VISIBILITY OR DATA\n\n" +
+                    "An Advance was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                advanceResult.classList.add("fail");
+                return;
+            }
+
+            advanceResult.textContent =
+                "PASS — OWN ACCESSIBLE ADVANCES ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            advanceResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Advance query failed:",
+                error
+            );
+
+            advanceResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            advanceResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1706,6 +1815,46 @@
                 String(error.message || error);
 
             rightsEventResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousAdvanceQuery() {
+        advanceResult.textContent =
+            "Querying advances without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("advances")
+                .select(
+                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                advanceResult.textContent =
+                    "PASS — ANONYMOUS ADVANCE ACCESS BLOCKED\n\n" +
+                    "The query returned zero Advances.";
+
+                advanceResult.classList.add("pass");
+                return;
+            }
+
+            advanceResult.textContent =
+                "FAIL — ANONYMOUS ADVANCE DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            advanceResult.classList.add("fail");
+
+        } catch (error) {
+            advanceResult.textContent =
+                "PASS — ANONYMOUS ADVANCE ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            advanceResult.classList.add("pass");
         }
     }
 })();
