@@ -61,6 +61,24 @@
     const documentsRightsContent =
         document.getElementById("documents-rights-content");
 
+    const statementCount =
+        document.getElementById("statement-count");
+
+    const paymentCount =
+        document.getElementById("payment-count");
+
+    const paymentRequestCount =
+        document.getElementById("payment-request-count");
+
+    const statementList =
+        document.getElementById("statement-list");
+
+    const paymentList =
+        document.getElementById("payment-list");
+
+    const paymentRequestList =
+        document.getElementById("payment-request-list");
+
     const signOutButton =
         document.getElementById("sign-out-button");
 
@@ -126,18 +144,21 @@
             const [
                 books,
                 productionData,
-                legalData
+                legalData,
+                financeData
             ] = await Promise.all([
                 loadBooks(),
                 loadProductionData(),
-                loadLegalData()
+                loadLegalData(),
+                loadFinanceData()
             ]);
 
             renderDesk(
                 authorRecord,
                 books,
                 productionData,
-                legalData
+                legalData,
+                financeData
             );
 
         } catch (error) {
@@ -338,11 +359,124 @@
         };
     }
 
+    async function loadFinanceData() {
+        const [
+            statementsResponse,
+            statementLinesResponse,
+            paymentsResponse,
+            paymentAllocationsResponse,
+            paymentRequestsResponse
+        ] = await Promise.all([
+            client
+                .from("royalty_statements")
+                .select(
+                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
+                )
+                .order("issue_date", {
+                    ascending: false,
+                    nullsFirst: false
+                })
+                .order("id", {
+                    ascending: false
+                }),
+
+            client
+                .from("royalty_statement_lines")
+                .select(
+                    "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
+                )
+                .order("statement_id", {
+                    ascending: true
+                })
+                .order("line_number", {
+                    ascending: true
+                }),
+
+            client
+                .from("payments")
+                .select(
+                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
+                )
+                .order("created_at", {
+                    ascending: false
+                })
+                .order("id", {
+                    ascending: false
+                }),
+
+            client
+                .from("payment_allocations")
+                .select(
+                    "id,payment_id,statement_id,amount,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                }),
+
+            client
+                .from("payment_requests")
+                .select(
+                    "id,author_id,request_reference,requested_amount,currency,status,requested_at,reviewed_at,fulfilled_at,payment_id,created_at,updated_at"
+                )
+                .order("requested_at", {
+                    ascending: false
+                })
+                .order("id", {
+                    ascending: false
+                })
+        ]);
+
+        if (statementsResponse.error) {
+            throw statementsResponse.error;
+        }
+
+        if (statementLinesResponse.error) {
+            throw statementLinesResponse.error;
+        }
+
+        if (paymentsResponse.error) {
+            throw paymentsResponse.error;
+        }
+
+        if (paymentAllocationsResponse.error) {
+            throw paymentAllocationsResponse.error;
+        }
+
+        if (paymentRequestsResponse.error) {
+            throw paymentRequestsResponse.error;
+        }
+
+        return {
+            statements: Array.isArray(statementsResponse.data)
+                ? statementsResponse.data
+                : [],
+
+            statementLines: Array.isArray(statementLinesResponse.data)
+                ? statementLinesResponse.data
+                : [],
+
+            payments: Array.isArray(paymentsResponse.data)
+                ? paymentsResponse.data
+                : [],
+
+            paymentAllocations:
+                Array.isArray(paymentAllocationsResponse.data)
+                    ? paymentAllocationsResponse.data
+                    : [],
+
+            paymentRequests:
+                Array.isArray(paymentRequestsResponse.data)
+                    ? paymentRequestsResponse.data
+                    : []
+        };
+    }
+
     function renderDesk(
         authorRecord,
         books,
         productionData,
-        legalData
+        legalData,
+        financeData
     ) {
         loadingPanel.hidden = true;
         accessPanel.hidden = true;
@@ -389,6 +523,10 @@
         renderDocumentsAndRights(
             books,
             legalData
+        );
+
+        renderFinance(
+            financeData
         );
     }
 
@@ -613,12 +751,15 @@
         );
 
         wrapper.appendChild(summary);
+
         wrapper.appendChild(
             createActionsPanel(actions)
         );
+
         wrapper.appendChild(
             createEditionsPanel(editions)
         );
+
         wrapper.appendChild(
             createProductionHistoryPanel(events)
         );
@@ -1649,6 +1790,550 @@
         panel.appendChild(list);
 
         return panel;
+    }
+
+    function renderFinance(financeData) {
+        statementCount.textContent =
+            String(financeData.statements.length);
+
+        paymentCount.textContent =
+            String(financeData.payments.length);
+
+        paymentRequestCount.textContent =
+            String(financeData.paymentRequests.length);
+
+        renderStatements(
+            financeData.statements,
+            financeData.statementLines
+        );
+
+        renderPayments(
+            financeData.payments,
+            financeData.paymentAllocations,
+            financeData.statements
+        );
+
+        renderPaymentRequests(
+            financeData.paymentRequests
+        );
+    }
+
+    function renderStatements(
+        statements,
+        statementLines
+    ) {
+        statementList.replaceChildren();
+
+        if (statements.length === 0) {
+            statementList.appendChild(
+                createEmptyState(
+                    "No issued royalty statements are currently available."
+                )
+            );
+
+            return;
+        }
+
+        statements.forEach(function (statement) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "record-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "record-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                statement.statement_reference ||
+                "Royalty Statement";
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(statement.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            if (
+                statement.period_start &&
+                statement.period_end
+            ) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Period",
+                        formatDate(statement.period_start) +
+                        " – " +
+                        formatDate(statement.period_end)
+                    )
+                );
+            }
+
+            if (statement.issue_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Issued",
+                        formatDate(
+                            statement.issue_date
+                        )
+                    )
+                );
+            }
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Royalties",
+                    formatMoney(
+                        statement.total_royalty_amount,
+                        statement.currency
+                    )
+                )
+            );
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Adjustments",
+                    formatMoney(
+                        statement.total_adjustments,
+                        statement.currency
+                    )
+                )
+            );
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Advance applied",
+                    formatMoney(
+                        statement.total_advance_applied,
+                        statement.currency
+                    )
+                )
+            );
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Amount payable",
+                    formatMoney(
+                        statement.amount_payable,
+                        statement.currency
+                    )
+                )
+            );
+
+            card.appendChild(meta);
+
+            const lines =
+                statementLines.filter(
+                    function (line) {
+                        return line.statement_id ===
+                            statement.id;
+                    }
+                );
+
+            if (lines.length > 0) {
+                const lineList =
+                    document.createElement("div");
+
+                lineList.className =
+                    "record-list";
+
+                lines.forEach(function (line) {
+                    const lineCard =
+                        document.createElement("div");
+
+                    lineCard.className =
+                        "record-card";
+
+                    const lineTop =
+                        document.createElement("div");
+
+                    lineTop.className =
+                        "record-card-top";
+
+                    const lineTitle =
+                        document.createElement("h5");
+
+                    lineTitle.className =
+                        "record-title";
+
+                    lineTitle.textContent =
+                        line.description ||
+                        "Statement line " +
+                            String(line.line_number);
+
+                    lineTop.appendChild(lineTitle);
+
+                    lineTop.appendChild(
+                        createStatusBadge(
+                            formatLabel(line.line_type)
+                        )
+                    );
+
+                    lineCard.appendChild(lineTop);
+
+                    const lineMeta =
+                        document.createElement("div");
+
+                    lineMeta.className =
+                        "record-meta";
+
+                    lineMeta.appendChild(
+                        createInlineMeta(
+                            "Amount",
+                            formatMoney(
+                                line.amount,
+                                statement.currency
+                            )
+                        )
+                    );
+
+                    lineCard.appendChild(lineMeta);
+                    lineList.appendChild(lineCard);
+                });
+
+                card.appendChild(lineList);
+            }
+
+            statementList.appendChild(card);
+        });
+    }
+
+    function renderPayments(
+        payments,
+        paymentAllocations,
+        statements
+    ) {
+        paymentList.replaceChildren();
+
+        if (payments.length === 0) {
+            paymentList.appendChild(
+                createEmptyState(
+                    "No payments are currently recorded."
+                )
+            );
+
+            return;
+        }
+
+        payments.forEach(function (payment) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "record-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "record-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                payment.payment_reference ||
+                "Payment";
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(payment.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Amount",
+                    formatMoney(
+                        payment.amount,
+                        payment.currency
+                    )
+                )
+            );
+
+            if (payment.requested_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Requested",
+                        formatDate(
+                            payment.requested_at
+                        )
+                    )
+                );
+            }
+
+            if (payment.approved_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Approved",
+                        formatDate(
+                            payment.approved_at
+                        )
+                    )
+                );
+            }
+
+            if (payment.processing_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Processing",
+                        formatDate(
+                            payment.processing_at
+                        )
+                    )
+                );
+            }
+
+            if (payment.paid_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Paid",
+                        formatDate(
+                            payment.paid_at
+                        )
+                    )
+                );
+            }
+
+            if (payment.failed_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Failed",
+                        formatDate(
+                            payment.failed_at
+                        )
+                    )
+                );
+            }
+
+            if (payment.cancelled_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Cancelled",
+                        formatDate(
+                            payment.cancelled_at
+                        )
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+
+            const allocations =
+                paymentAllocations.filter(
+                    function (allocation) {
+                        return allocation.payment_id ===
+                            payment.id;
+                    }
+                );
+
+            if (allocations.length > 0) {
+                const allocationList =
+                    document.createElement("div");
+
+                allocationList.className =
+                    "record-list";
+
+                allocations.forEach(
+                    function (allocation) {
+                        const allocationCard =
+                            document.createElement("div");
+
+                        allocationCard.className =
+                            "record-card";
+
+                        const statement =
+                            statements.find(
+                                function (
+                                    statementRecord
+                                ) {
+                                    return (
+                                        statementRecord.id ===
+                                        allocation.statement_id
+                                    );
+                                }
+                            );
+
+                        const allocationTitle =
+                            document.createElement("h5");
+
+                        allocationTitle.className =
+                            "record-title";
+
+                        allocationTitle.textContent =
+                            statement &&
+                            statement.statement_reference
+                                ? statement.statement_reference
+                                : "Statement allocation";
+
+                        allocationCard.appendChild(
+                            allocationTitle
+                        );
+
+                        const allocationMeta =
+                            document.createElement("div");
+
+                        allocationMeta.className =
+                            "record-meta";
+
+                        allocationMeta.appendChild(
+                            createInlineMeta(
+                                "Allocated",
+                                formatMoney(
+                                    allocation.amount,
+                                    payment.currency
+                                )
+                            )
+                        );
+
+                        allocationCard.appendChild(
+                            allocationMeta
+                        );
+
+                        allocationList.appendChild(
+                            allocationCard
+                        );
+                    }
+                );
+
+                card.appendChild(allocationList);
+            }
+
+            paymentList.appendChild(card);
+        });
+    }
+
+    function renderPaymentRequests(
+        paymentRequests
+    ) {
+        paymentRequestList.replaceChildren();
+
+        if (paymentRequests.length === 0) {
+            paymentRequestList.appendChild(
+                createEmptyState(
+                    "No payment requests are currently recorded."
+                )
+            );
+
+            return;
+        }
+
+        paymentRequests.forEach(function (request) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "record-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "record-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                request.request_reference ||
+                "Payment Request";
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(request.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Amount",
+                    formatMoney(
+                        request.requested_amount,
+                        request.currency
+                    )
+                )
+            );
+
+            if (request.requested_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Requested",
+                        formatDate(
+                            request.requested_at
+                        )
+                    )
+                );
+            }
+
+            if (request.reviewed_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Reviewed",
+                        formatDate(
+                            request.reviewed_at
+                        )
+                    )
+                );
+            }
+
+            if (request.fulfilled_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Fulfilled",
+                        formatDate(
+                            request.fulfilled_at
+                        )
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+            paymentRequestList.appendChild(card);
+        });
     }
 
     function createSummaryRecord(
