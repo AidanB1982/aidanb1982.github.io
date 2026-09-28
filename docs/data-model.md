@@ -3940,3 +3940,560 @@ Advance
 Advance Instalments
         ↓
 future Payment machinery
+---
+
+## Migration 012 — Cleared Royalty Ledger
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 012 introduced:
+
+`public.royalty_entries`
+
+Its purpose is to establish the cleared royalty ledger for the Author Desk.
+
+A Royalty Entry represents confirmed royalty value credited to the author's
+financial account after the underlying income has been received and reconciled
+by Blackwood.
+
+The table does not represent estimated royalties, pending distributor income,
+unreconciled sales information, formal statements or payments.
+
+The implemented financial sequence is:
+
+```text
+Distributor / sales source
+        ↓
+received + reconciled by Blackwood
+        ↓
+Cleared Royalty Ledger
+        ↓
+future Statement
+        ↓
+future Payment / Allocation
+```
+
+The governing principle is:
+
+```text
+If a Royalty Entry exists, the royalty has cleared.
+```
+
+Pending or estimated amounts therefore do not belong in
+`public.royalty_entries`.
+
+### Implemented fields
+
+The initial implementation contains:
+
+- `id`
+- `author_id`
+- `book_id`
+- `edition_id`
+- `source_reference`
+- `sales_period_start`
+- `sales_period_end`
+- `clearance_date`
+- `channel`
+- `currency`
+- `distributable_net_receipts`
+- `royalty_rate`
+- `royalty_amount`
+- `author_visible`
+- `created_at`
+- `updated_at`
+
+`author_id` references:
+
+`public.author_records.id`
+
+and is mandatory.
+
+`book_id` references:
+
+`public.book_records.id`
+
+and is mandatory.
+
+`edition_id` optionally references:
+
+`public.book_editions.id`
+
+These relationships use `ON DELETE RESTRICT`.
+
+This follows the Author Desk principle that established financial history
+should not disappear through cascading deletion.
+
+### Financial ownership
+
+A Royalty Entry belongs financially to the author's account.
+
+The mandatory `author_id` establishes that ownership directly.
+
+The mandatory `book_id` records the work from which the royalty arose.
+
+The relationship is conceptually:
+
+```text
+Author financial account
+        ↓
+Royalty Entry
+        ↓
+Book that generated the royalty
+        ↓
+optional specific Edition
+```
+
+The Book Record therefore provides the publishing source of the royalty without
+becoming the owner of the author's financial balance.
+
+Archiving or otherwise changing the operational state of a Book Record must not
+erase the historical royalty ledger.
+
+### Book and Edition attribution
+
+`book_id` is mandatory because a cleared royalty must identify the work from
+which the royalty was generated.
+
+`edition_id` is nullable.
+
+This permits a Royalty Entry to identify a particular Edition where the source
+information supports that level of attribution while still permitting
+work-level royalty entries where no specific Edition attribution is available.
+
+Migration 012 does not structurally enforce that a supplied `edition_id`
+belongs to the supplied `book_id`.
+
+That is a cross-table consistency rule reserved for the trusted Blackwood write
+layer or another controlled database operation.
+
+### Source reference
+
+Every Royalty Entry requires a:
+
+`source_reference`
+
+The field records the source or reconciliation reference associated with the
+cleared royalty.
+
+`source_reference` is deliberately not unique.
+
+A single distributor report, accounting source or reconciliation reference may
+legitimately produce more than one Royalty Entry.
+
+Migration 012 verification confirmed that multiple ledger rows may therefore
+share the same source reference.
+
+### Sales period
+
+The optional fields:
+
+- `sales_period_start`
+- `sales_period_end`
+
+allow a Royalty Entry to record the sales period represented by its source
+information.
+
+Either field may be null.
+
+Where both dates are present, the database requires:
+
+```text
+sales_period_end >= sales_period_start
+```
+
+The database therefore rejects a sales period whose end date precedes its start
+date.
+
+### Clearance date
+
+Every Royalty Entry requires:
+
+`clearance_date`
+
+This records the date on which the royalty represented by the ledger entry was
+treated as cleared.
+
+The existence of a Royalty Entry means the amount has already passed the
+required Blackwood receipt and reconciliation stage.
+
+No separate `pending` or `cleared` status is therefore required on this table.
+
+### Distributable net receipts
+
+Every Royalty Entry requires:
+
+`distributable_net_receipts`
+
+The value must be greater than or equal to zero.
+
+The database rejects negative distributable net receipts.
+
+The field represents the distributable net receipts associated with the ledger
+entry rather than the royalty amount itself.
+
+### Royalty rate
+
+`royalty_rate` is nullable.
+
+This allows the cleared ledger to represent entries where the originating
+royalty calculation does not require or does not provide a meaningful rate.
+
+Where a royalty rate is supplied, it must be greater than or equal to zero.
+
+The database rejects a negative royalty rate.
+
+### Royalty amount
+
+Every Royalty Entry requires:
+
+`royalty_amount`
+
+The value must not equal zero.
+
+Positive cleared royalty amounts are therefore supported.
+
+Negative cleared royalty amounts are also structurally permitted.
+
+Allowing a negative amount provides flexibility for legitimate financial ledger
+situations where a negative cleared entry may be required.
+
+Ordinary corrections to established royalty history should not, however, be
+performed by silently rewriting an existing cleared entry.
+
+The planned Royalty Adjustments model remains the intended mechanism for
+explicit corrections and adjustments.
+
+### Append-oriented financial history
+
+`public.royalty_entries` is intended to operate as an append-oriented financial
+journal.
+
+Once a cleared Royalty Entry exists, later Statement and Payment activity
+should reference or allocate that financial history rather than transforming
+the Royalty Entry into a Statement or Payment record.
+
+Migration 012 therefore does not contain:
+
+- `statement_id`;
+- `payment_id`;
+- payment status;
+- `paid_at`; or
+- a general royalty lifecycle status.
+
+Those concepts belong to later financial records.
+
+The separation is:
+
+```text
+Royalty Entry
+    = cleared royalty credit
+
+Statement
+    = formal accounting presentation
+
+Payment
+    = actual movement of money
+```
+
+These events are related but are not interchangeable.
+
+### Author visibility through Row Level Security
+
+Row Level Security is enabled on:
+
+`public.royalty_entries`
+
+Authenticated users receive SELECT capability only.
+
+For a Royalty Entry to be visible to an authenticated author:
+
+1. `royalty_entries.author_visible` must be true;
+2. `royalty_entries.author_id` must equal `auth.uid()`;
+3. the corresponding Author Record must have
+   `desk_access_enabled = true`; and
+4. the authenticated author must have a matching
+   `public.book_contributors` record for the Royalty Entry's Book Record with
+   `desk_visible = true`.
+
+The resulting access path is conceptually:
+
+```text
+authenticated user
+        ↓
+royalty_entries.author_id = auth.uid()
+        ↓
+matching author_records identity
+        ↓
+desk_access_enabled = true
+        ↓
+royalty_entries.author_visible = true
+        ↓
+matching Desk-visible book_contributors record
+        ↓
+Royalty Entry visible
+```
+
+Authentication alone does not grant access to royalty information.
+
+A reader / Archivist account does not grant royalty access.
+
+Knowledge of a Royalty Entry ID, Book Record ID or Edition Record ID does not
+grant royalty access.
+
+### Edition visibility is not an accounting visibility gate
+
+The Royalty Entry Row Level Security policy deliberately does not require the
+optional linked Edition Record to have:
+
+`book_editions.author_visible = true`
+
+Edition visibility is an operational Author Desk presentation control.
+
+It must not determine whether historical financial information belonging to the
+author remains visible.
+
+A cleared Royalty Entry therefore remains governed by:
+
+- author ownership;
+- Author Desk access;
+- Royalty Entry visibility; and
+- the author's Desk-visible relationship with the relevant Book Record.
+
+This prevents an operational change to Edition visibility from accidentally
+hiding established financial ledger history.
+
+### Browser mutation permissions
+
+The initial implementation grants authenticated users SELECT access only.
+
+No authenticated browser:
+
+- INSERT;
+- UPDATE; or
+- DELETE
+
+capability was introduced for `public.royalty_entries`.
+
+Creation and alteration of cleared royalty information therefore remain
+controlled Blackwood operations.
+
+The author-facing browser is not trusted to create financial credits or modify
+the cleared royalty ledger.
+
+### Production data
+
+Migration 012 deliberately created no permanent production Royalty Entry.
+
+Synthetic records were created solely for database constraint and Row Level
+Security verification.
+
+The valid positive test entry represented:
+
+```text
+Source reference:             MIGRATION-012-ROYALTY-TEST
+Book:                         BLACKWOOD-BOOK-001
+Edition:                      Paperback
+Currency:                     GBP
+Distributable net receipts:   100.00
+Royalty rate:                 0.100000
+Royalty amount:               10.00
+Author visible:               true
+```
+
+Two temporary negative-value test entries were also created using:
+
+```text
+Source reference:             MIGRATION-012-NEGATIVE-ROYALTY-TEST
+Currency:                     GBP
+Distributable net receipts:   0.00
+Royalty rate:                 null
+Royalty amount:               -5.00
+Author visible:               true
+```
+
+The duplicate negative test records also confirmed that `source_reference` is
+not unique, as designed.
+
+All synthetic Royalty Entries were deleted after verification.
+
+No production royalty value was invented merely to populate the ledger.
+
+Identity values consumed during failed constraint tests and temporary
+verification were not reset.
+
+Gaps in generated identity values are permitted and have no operational
+meaning.
+
+### Constraint verification
+
+Migration 012 passed database-level constraint and foreign-key tests.
+
+The sales-period constraint rejected a record containing:
+
+```text
+sales_period_start = 30 September 2026
+sales_period_end   = 1 September 2026
+```
+
+The distributable-net-receipts constraint rejected:
+
+```text
+distributable_net_receipts = -1.00
+```
+
+The royalty-rate constraint rejected:
+
+```text
+royalty_rate = -0.100000
+```
+
+The royalty-amount constraint rejected:
+
+```text
+royalty_amount = 0.00
+```
+
+A negative Royalty Entry containing:
+
+```text
+royalty_amount = -5.00
+```
+
+was accepted as designed.
+
+Foreign-key verification confirmed that the database rejected:
+
+- a nonexistent `author_id`;
+- a nonexistent `book_id`; and
+- a nonexistent `edition_id`.
+
+A valid positive synthetic Royalty Entry was then created successfully.
+
+### Row Level Security verification
+
+Migration 012 was tested through the temporary authenticated Author Desk RLS
+diagnostic page.
+
+The diagnostic page was extended to include:
+
+`public.royalty_entries`
+
+alongside the previously implemented Author Desk data domains.
+
+The following royalty-ledger access tests passed.
+
+#### Authenticated author
+
+Aidan Blackwood could read the three accessible synthetic Royalty Entries
+created during Migration 012 testing.
+
+These consisted of:
+
+- two negative-value test entries; and
+- one positive cleared-royalty test entry.
+
+Each visible record belonged to the authenticated Author Record and to
+`BLACKWOOD-BOOK-001`.
+
+#### Ordinary authenticated non-author
+
+The ordinary authenticated non-author test account could read:
+
+```text
+0 Royalty Entries
+```
+
+The account continued to receive no Author Desk publishing or financial data.
+
+This confirmed that ordinary authentication does not imply access to the
+cleared royalty ledger.
+
+#### Anonymous browser
+
+Anonymous access to:
+
+`public.royalty_entries`
+
+was rejected with:
+
+```text
+permission denied for table royalty_entries
+```
+
+The existing Author Desk tables likewise remained unavailable anonymously.
+
+#### Per-record visibility
+
+The positive synthetic Royalty Entry was temporarily changed to:
+
+```text
+author_visible = false
+```
+
+The authenticated author then saw exactly two Royalty Entries:
+
+```text
+MIGRATION-012-NEGATIVE-ROYALTY-TEST
+MIGRATION-012-NEGATIVE-ROYALTY-TEST
+```
+
+The hidden positive Royalty Entry remained present in the database but was not
+exposed through author RLS.
+
+The positive entry was then restored to:
+
+```text
+author_visible = true
+```
+
+and became visible to the authenticated author again.
+
+This confirmed that Royalty Entry visibility can be controlled independently
+without disrupting the wider Author Desk ownership chain.
+
+### Cleanup verification
+
+After all constraint and Row Level Security tests were complete, every
+synthetic Migration 012 Royalty Entry was deleted.
+
+The final cleanup verification returned:
+
+```text
+temporary_royalty_entries
+0
+```
+
+No production Royalty Entry was removed because no permanent production
+royalty data had been created.
+
+Identity sequences were not reset.
+
+### Deliberately deferred work
+
+Migration 012 does not implement:
+
+- Royalty Adjustments;
+- Royalty Statements;
+- Statement Lines;
+- Payments;
+- Payment Allocations;
+- Payment Requests;
+- automatic calculation of royalties from distributor or sales data;
+- distributor import or reconciliation infrastructure;
+- trusted staff/service-role write workflows;
+- automatic `updated_at` triggers;
+- cross-table validation that an Edition belongs to the supplied Book Record;
+- immutable or append-only enforcement at database level;
+- automatic Author Desk activity events; or
+- production royalty data.
+
+These remain later implementation concerns.
+
+Migration 012 establishes the cleared royalty journal, financial ownership,
+Book and optional Edition attribution, database constraints and author-read
+security foundation on which the later Statement and Payment architecture can
+be built.
+
+**Migration 012 is verified.**
