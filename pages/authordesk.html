@@ -369,6 +369,136 @@
             overflow-wrap: anywhere;
         }
 
+        .production-book {
+            margin-bottom: 28px;
+        }
+
+        .production-book:last-child {
+            margin-bottom: 0;
+        }
+
+        .production-book-heading {
+            margin-bottom: 18px;
+        }
+
+        .production-book-heading h3 {
+            margin: 0;
+            font-size: 1.55rem;
+            font-weight: normal;
+        }
+
+        .production-reference {
+            margin: 7px 0 0;
+            color: var(--quiet);
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .production-summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .production-summary-card {
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel);
+        }
+
+        .production-summary-card p {
+            margin: 0;
+        }
+
+        .production-summary-card .summary-label {
+            margin-bottom: 8px;
+        }
+
+        .production-summary-card .summary-value {
+            font-size: 1.2rem;
+        }
+
+        .action-list,
+        .edition-list,
+        .timeline {
+            margin-top: 18px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .action-card,
+        .edition-card,
+        .timeline-item {
+            padding: 17px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--panel-soft);
+        }
+
+        .action-card-top,
+        .edition-card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .record-title {
+            margin: 0;
+            font-size: 1.08rem;
+            font-weight: normal;
+        }
+
+        .record-description {
+            margin: 10px 0 0;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        .record-meta {
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 22px;
+            color: var(--muted);
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        .record-meta strong {
+            color: var(--text);
+            font-weight: normal;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 22px;
+            border-left: 3px solid var(--green);
+        }
+
+        .timeline-date {
+            margin: 0 0 6px;
+            color: var(--quiet);
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .timeline-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: normal;
+        }
+
+        .timeline-note {
+            margin: 8px 0 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
         .empty-state {
             margin-top: 18px;
             padding: 18px;
@@ -397,12 +527,6 @@
             line-height: 1.7;
         }
 
-        .system-message {
-            margin-top: 16px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
         @media (max-width: 820px) {
             .desk {
                 grid-template-columns: 1fr;
@@ -420,7 +544,8 @@
                 width: auto;
             }
 
-            .summary-grid {
+            .summary-grid,
+            .production-summary {
                 grid-template-columns: 1fr;
             }
         }
@@ -435,7 +560,9 @@
                 grid-template-columns: 1fr;
             }
 
-            .book-card-top {
+            .book-card-top,
+            .action-card-top,
+            .edition-card-top {
                 display: block;
             }
 
@@ -483,62 +610,35 @@
             </div>
 
             <nav class="desk-nav" aria-label="Author Desk">
-                <button
-                    type="button"
-                    class="nav-button active"
-                    data-section="overview"
-                >
+                <button type="button" class="nav-button active" data-section="overview">
                     Overview
                 </button>
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="books"
-                >
+                <button type="button" class="nav-button" data-section="books">
                     Books
                 </button>
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="production"
-                >
+                <button type="button" class="nav-button" data-section="production">
                     Production
                 </button>
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="documents"
-                >
+                <button type="button" class="nav-button" data-section="documents">
                     Documents &amp; Rights
                 </button>
 
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="finance"
-                >
+                <button type="button" class="nav-button" data-section="finance">
                     Statements &amp; Payments
                 </button>
             </nav>
 
-            <button
-                id="sign-out-button"
-                type="button"
-                class="sign-out-button"
-            >
+            <button id="sign-out-button" type="button" class="sign-out-button">
                 Sign out
             </button>
         </aside>
 
         <div class="desk-main">
 
-            <section
-                id="section-overview"
-                class="desk-section active"
-            >
+            <section id="section-overview" class="desk-section active">
                 <div class="section-heading">
                     <p class="section-kicker">Overview</p>
                     <h2 id="welcome-heading">Welcome to your Author Desk</h2>
@@ -587,10 +687,7 @@
                 </section>
             </section>
 
-            <section
-                id="section-books"
-                class="desk-section"
-            >
+            <section id="section-books" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Books</p>
                     <h2>Book Records</h2>
@@ -598,7 +695,7 @@
                     <p>
                         Each acquired work has a permanent Book Record.
                         Editions, production history and other publishing
-                        records will connect back to these records.
+                        records connect back to these records.
                     </p>
                 </div>
 
@@ -608,34 +705,21 @@
                 </section>
             </section>
 
-            <section
-                id="section-production"
-                class="desk-section"
-            >
+            <section id="section-production" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Production</p>
                     <h2>Production</h2>
 
                     <p>
-                        Production stages, publishing milestones and
-                        author actions will appear here.
+                        Current production position, editions, publishing
+                        milestones and actions associated with your books.
                     </p>
                 </div>
 
-                <div class="future-panel">
-                    <h3>Production workspace</h3>
-                    <p>
-                        Your Book Records are now connected to the Author Desk.
-                        Production history and current actions will be added
-                        to this workspace in the next build stage.
-                    </p>
-                </div>
+                <div id="production-content"></div>
             </section>
 
-            <section
-                id="section-documents"
-                class="desk-section"
-            >
+            <section id="section-documents" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Documents &amp; Rights</p>
                     <h2>Documents &amp; Rights</h2>
@@ -651,15 +735,12 @@
                     <p>
                         The underlying secured records are in place.
                         Their Author Desk presentation will be connected
-                        after the core Desk shell is verified.
+                        after the production workspace.
                     </p>
                 </div>
             </section>
 
-            <section
-                id="section-finance"
-                class="desk-section"
-            >
+            <section id="section-finance" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Statements &amp; Payments</p>
                     <h2>Statements &amp; Payments</h2>
@@ -674,8 +755,8 @@
                     <h3>Financial records</h3>
                     <p>
                         Financial data remains protected by the Author Desk
-                        access model. We will connect the author-facing
-                        statement and payment interface separately.
+                        access model. The author-facing statement and payment
+                        interface will be connected separately.
                     </p>
                 </div>
             </section>
@@ -744,6 +825,9 @@
     const booksBookList =
         document.getElementById("books-book-list");
 
+    const productionContent =
+        document.getElementById("production-content");
+
     const signOutButton =
         document.getElementById("sign-out-button");
 
@@ -809,9 +893,13 @@
             const books =
                 await loadBooks();
 
+            const productionData =
+                await loadProductionData();
+
             renderDesk(
                 authorRecord,
-                books
+                books,
+                productionData
             );
 
         } catch (error) {
@@ -870,7 +958,75 @@
             : [];
     }
 
-    function renderDesk(authorRecord, books) {
+    async function loadProductionData() {
+        const [
+            productionEventsResponse,
+            editionsResponse,
+            actionsResponse
+        ] = await Promise.all([
+            client
+                .from("production_events")
+                .select(
+                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
+                )
+                .order("event_date", {
+                    ascending: false
+                })
+                .order("id", {
+                    ascending: false
+                }),
+
+            client
+                .from("book_editions")
+                .select(
+                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                }),
+
+            client
+                .from("author_actions")
+                .select(
+                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                })
+        ]);
+
+        if (productionEventsResponse.error) {
+            throw productionEventsResponse.error;
+        }
+
+        if (editionsResponse.error) {
+            throw editionsResponse.error;
+        }
+
+        if (actionsResponse.error) {
+            throw actionsResponse.error;
+        }
+
+        return {
+            events: Array.isArray(productionEventsResponse.data)
+                ? productionEventsResponse.data
+                : [],
+
+            editions: Array.isArray(editionsResponse.data)
+                ? editionsResponse.data
+                : [],
+
+            actions: Array.isArray(actionsResponse.data)
+                ? actionsResponse.data
+                : []
+        };
+    }
+
+    function renderDesk(
+        authorRecord,
+        books,
+        productionData
+    ) {
         loadingPanel.hidden = true;
         accessPanel.hidden = true;
         desk.hidden = false;
@@ -907,23 +1063,21 @@
             booksBookList,
             books
         );
+
+        renderProduction(
+            books,
+            productionData
+        );
     }
 
     function renderBookList(container, books) {
         container.replaceChildren();
 
         if (books.length === 0) {
-            const emptyState =
-                document.createElement("div");
-
-            emptyState.className =
-                "empty-state";
-
-            emptyState.textContent =
-                "No Book Records are currently available in your Author Desk.";
-
             container.appendChild(
-                emptyState
+                createEmptyState(
+                    "No Book Records are currently available in your Author Desk."
+                )
             );
 
             return;
@@ -979,23 +1133,14 @@
         }
 
         const status =
-            document.createElement("span");
-
-        status.className =
-            "status-badge";
-
-        status.textContent =
-            formatLabel(
-                book.production_stage
+            createStatusBadge(
+                formatLabel(
+                    book.production_stage
+                )
             );
 
-        top.appendChild(
-            titleGroup
-        );
-
-        top.appendChild(
-            status
-        );
+        top.appendChild(titleGroup);
+        top.appendChild(status);
 
         const meta =
             document.createElement("div");
@@ -1034,6 +1179,553 @@
         return card;
     }
 
+    function renderProduction(
+        books,
+        productionData
+    ) {
+        productionContent.replaceChildren();
+
+        if (books.length === 0) {
+            productionContent.appendChild(
+                createEmptyState(
+                    "No production records are currently available in your Author Desk."
+                )
+            );
+
+            return;
+        }
+
+        books.forEach(function (book) {
+            const bookEvents =
+                productionData.events.filter(
+                    function (event) {
+                        return event.book_id === book.id;
+                    }
+                );
+
+            const bookEditions =
+                productionData.editions.filter(
+                    function (edition) {
+                        return edition.book_id === book.id;
+                    }
+                );
+
+            const bookActions =
+                productionData.actions.filter(
+                    function (action) {
+                        return action.book_id === book.id;
+                    }
+                );
+
+            productionContent.appendChild(
+                createProductionBook(
+                    book,
+                    bookEvents,
+                    bookEditions,
+                    bookActions
+                )
+            );
+        });
+    }
+
+    function createProductionBook(
+        book,
+        events,
+        editions,
+        actions
+    ) {
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "production-book";
+
+        const heading =
+            document.createElement("div");
+
+        heading.className =
+            "production-book-heading";
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent =
+            book.title || "Untitled Book Record";
+
+        const reference =
+            document.createElement("p");
+
+        reference.className =
+            "production-reference";
+
+        reference.textContent =
+            book.internal_reference ||
+            "Book Record";
+
+        heading.appendChild(title);
+        heading.appendChild(reference);
+
+        wrapper.appendChild(heading);
+
+        const summary =
+            document.createElement("div");
+
+        summary.className =
+            "production-summary";
+
+        summary.appendChild(
+            createProductionSummaryCard(
+                "Current Stage",
+                formatLabel(
+                    book.production_stage
+                )
+            )
+        );
+
+        summary.appendChild(
+            createProductionSummaryCard(
+                "Work Status",
+                formatLabel(
+                    book.work_status
+                )
+            )
+        );
+
+        wrapper.appendChild(summary);
+
+        wrapper.appendChild(
+            createActionsPanel(actions)
+        );
+
+        wrapper.appendChild(
+            createEditionsPanel(editions)
+        );
+
+        wrapper.appendChild(
+            createProductionHistoryPanel(events)
+        );
+
+        return wrapper;
+    }
+
+    function createProductionSummaryCard(
+        label,
+        value
+    ) {
+        const card =
+            document.createElement("article");
+
+        card.className =
+            "production-summary-card";
+
+        const labelElement =
+            document.createElement("p");
+
+        labelElement.className =
+            "summary-label";
+
+        labelElement.textContent =
+            label;
+
+        const valueElement =
+            document.createElement("p");
+
+        valueElement.className =
+            "summary-value";
+
+        valueElement.textContent =
+            value || "Not recorded";
+
+        card.appendChild(labelElement);
+        card.appendChild(valueElement);
+
+        return card;
+    }
+
+    function createActionsPanel(actions) {
+        const panel =
+            createContentPanel(
+                "Author Actions",
+                "Current actions and information recorded for you during production."
+            );
+
+        if (actions.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author actions are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "action-list";
+
+        actions.forEach(function (action) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "action-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "action-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                action.title ||
+                formatLabel(action.action_type);
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(action.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            if (action.description) {
+                const description =
+                    document.createElement("p");
+
+                description.className =
+                    "record-description";
+
+                description.textContent =
+                    action.description;
+
+                card.appendChild(description);
+            }
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            if (action.due_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Due",
+                        formatDate(action.due_at)
+                    )
+                );
+            }
+
+            if (action.completed_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Completed",
+                        formatDate(action.completed_at)
+                    )
+                );
+            }
+
+            if (meta.childElementCount > 0) {
+                card.appendChild(meta);
+            }
+
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createEditionsPanel(editions) {
+        const panel =
+            createContentPanel(
+                "Editions",
+                "Edition records currently associated with this Book Record."
+            );
+
+        if (editions.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible editions are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "edition-list";
+
+        editions.forEach(function (edition) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "edition-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "edition-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                edition.edition_name ||
+                formatLabel(edition.format);
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(edition.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Format",
+                    formatLabel(edition.format)
+                )
+            );
+
+            if (edition.publication_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Publication",
+                        formatDate(
+                            edition.publication_date
+                        )
+                    )
+                );
+            }
+
+            if (edition.isbn) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "ISBN",
+                        edition.isbn
+                    )
+                );
+            }
+
+            if (
+                edition.list_price !== null &&
+                edition.list_price !== undefined &&
+                edition.currency
+            ) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "List price",
+                        formatMoney(
+                            edition.list_price,
+                            edition.currency
+                        )
+                    )
+                );
+            }
+
+            if (edition.edition_reference) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Edition Record",
+                        edition.edition_reference
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createProductionHistoryPanel(events) {
+        const panel =
+            createContentPanel(
+                "Production History",
+                "Author-visible milestones recorded against this Book Record."
+            );
+
+        if (events.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible production history is currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const timeline =
+            document.createElement("div");
+
+        timeline.className =
+            "timeline";
+
+        events.forEach(function (event) {
+            const item =
+                document.createElement("article");
+
+            item.className =
+                "timeline-item";
+
+            const date =
+                document.createElement("p");
+
+            date.className =
+                "timeline-date";
+
+            date.textContent =
+                formatDate(event.event_date);
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "timeline-title";
+
+            if (event.to_stage) {
+                title.textContent =
+                    formatLabel(event.to_stage);
+            } else {
+                title.textContent =
+                    formatLabel(event.event_type);
+            }
+
+            item.appendChild(date);
+            item.appendChild(title);
+
+            if (
+                event.from_stage &&
+                event.to_stage
+            ) {
+                const transition =
+                    document.createElement("p");
+
+                transition.className =
+                    "record-description";
+
+                transition.textContent =
+                    formatLabel(event.from_stage) +
+                    " → " +
+                    formatLabel(event.to_stage);
+
+                item.appendChild(transition);
+            }
+
+            if (event.note) {
+                const note =
+                    document.createElement("p");
+
+                note.className =
+                    "timeline-note";
+
+                note.textContent =
+                    event.note;
+
+                item.appendChild(note);
+            }
+
+            timeline.appendChild(item);
+        });
+
+        panel.appendChild(timeline);
+
+        return panel;
+    }
+
+    function createContentPanel(
+        title,
+        intro
+    ) {
+        const panel =
+            document.createElement("section");
+
+        panel.className =
+            "content-panel";
+
+        const heading =
+            document.createElement("h3");
+
+        heading.textContent =
+            title;
+
+        panel.appendChild(heading);
+
+        if (intro) {
+            const paragraph =
+                document.createElement("p");
+
+            paragraph.className =
+                "panel-intro";
+
+            paragraph.textContent =
+                intro;
+
+            panel.appendChild(paragraph);
+        }
+
+        return panel;
+    }
+
+    function createEmptyState(message) {
+        const emptyState =
+            document.createElement("div");
+
+        emptyState.className =
+            "empty-state";
+
+        emptyState.textContent =
+            message;
+
+        return emptyState;
+    }
+
+    function createStatusBadge(value) {
+        const badge =
+            document.createElement("span");
+
+        badge.className =
+            "status-badge";
+
+        badge.textContent =
+            value || "Not recorded";
+
+        return badge;
+    }
+
     function createMetaItem(label, value) {
         const wrapper =
             document.createElement("div");
@@ -1056,12 +1748,31 @@
         valueElement.textContent =
             value || "Not recorded";
 
-        wrapper.appendChild(
-            labelElement
-        );
+        wrapper.appendChild(labelElement);
+        wrapper.appendChild(valueElement);
+
+        return wrapper;
+    }
+
+    function createInlineMeta(
+        label,
+        value
+    ) {
+        const wrapper =
+            document.createElement("span");
+
+        const strong =
+            document.createElement("strong");
+
+        strong.textContent =
+            label + ": ";
+
+        wrapper.appendChild(strong);
 
         wrapper.appendChild(
-            valueElement
+            document.createTextNode(
+                value || "Not recorded"
+            )
         );
 
         return wrapper;
@@ -1149,6 +1860,61 @@
                     return character.toUpperCase();
                 }
             );
+    }
+
+    function formatDate(value) {
+        if (!value) {
+            return "Not recorded";
+        }
+
+        const raw =
+            String(value);
+
+        const date =
+            /^\d{4}-\d{2}-\d{2}$/.test(raw)
+                ? new Date(raw + "T12:00:00")
+                : new Date(raw);
+
+        if (Number.isNaN(date.getTime())) {
+            return raw;
+        }
+
+        return new Intl.DateTimeFormat(
+            "en-GB",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        ).format(date);
+    }
+
+    function formatMoney(
+        value,
+        currency
+    ) {
+        const amount =
+            Number(value);
+
+        if (
+            !Number.isFinite(amount) ||
+            !currency
+        ) {
+            return String(value);
+        }
+
+        try {
+            return new Intl.NumberFormat(
+                "en-GB",
+                {
+                    style: "currency",
+                    currency: currency
+                }
+            ).format(amount);
+
+        } catch (error) {
+            return currency + " " + amount.toFixed(2);
+        }
     }
 
 })();
