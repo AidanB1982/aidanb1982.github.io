@@ -365,7 +365,8 @@
             statementLinesResponse,
             paymentsResponse,
             paymentAllocationsResponse,
-            paymentRequestsResponse
+            paymentRequestsResponse,
+            advancesResponse
         ] = await Promise.all([
             client
                 .from("royalty_statements")
@@ -423,6 +424,15 @@
                 })
                 .order("id", {
                     ascending: false
+                }),
+
+            client
+                .from("advances")
+                .select(
+                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
                 })
         ]);
 
@@ -446,6 +456,10 @@
             throw paymentRequestsResponse.error;
         }
 
+        if (advancesResponse.error) {
+            throw advancesResponse.error;
+        }
+
         return {
             statements: Array.isArray(statementsResponse.data)
                 ? statementsResponse.data
@@ -467,7 +481,11 @@
             paymentRequests:
                 Array.isArray(paymentRequestsResponse.data)
                     ? paymentRequestsResponse.data
-                    : []
+                    : [],
+
+            advances: Array.isArray(advancesResponse.data)
+                ? advancesResponse.data
+                : []
         };
     }
 
@@ -1802,6 +1820,10 @@
         paymentRequestCount.textContent =
             String(financeData.paymentRequests.length);
 
+        renderFinanceAccountSummary(
+            financeData
+        );
+
         renderStatements(
             financeData.statements,
             financeData.statementLines
@@ -1816,6 +1838,510 @@
         renderPaymentRequests(
             financeData.paymentRequests
         );
+    }
+
+    function renderFinanceAccountSummary(
+        financeData
+    ) {
+        const existingSummary =
+            document.getElementById(
+                "finance-account-summary"
+            );
+
+        if (existingSummary) {
+            existingSummary.remove();
+        }
+
+        const statements =
+            financeData.statements.filter(
+                function (statement) {
+                    return statement.status === "issued";
+                }
+            );
+
+        const currencies =
+            getFinanceCurrencies(
+                statements,
+                financeData.payments,
+                financeData.paymentRequests,
+                financeData.advances
+            );
+
+        if (currencies.length === 0) {
+            return;
+        }
+
+        const summaryPanel =
+            createContentPanel(
+                "Account Summary",
+                "A current summary of royalties, advances and payments recorded against your author account."
+            );
+
+        summaryPanel.id =
+            "finance-account-summary";
+
+        const summaryList =
+            document.createElement("div");
+
+        summaryList.className =
+            "finance-account-summary";
+
+        currencies.forEach(function (currency) {
+            const figures =
+                calculateFinanceSummary(
+                    currency,
+                    financeData
+                );
+
+            const currencyBlock =
+                document.createElement("div");
+
+            currencyBlock.className =
+                "finance-account-currency";
+
+            if (currencies.length > 1) {
+                const currencyHeading =
+                    document.createElement("h4");
+
+                currencyHeading.className =
+                    "record-title";
+
+                currencyHeading.textContent =
+                    currency;
+
+                currencyBlock.appendChild(
+                    currencyHeading
+                );
+            }
+
+            const grid =
+                document.createElement("div");
+
+            grid.className =
+                "finance-summary-grid";
+
+            grid.appendChild(
+                createFinanceSummaryCard(
+                    "Royalties Earned",
+                    formatMoney(
+                        figures.royaltiesEarned,
+                        currency
+                    ),
+                    "Royalties recorded on issued statements before advance recoupment."
+                )
+            );
+
+            grid.appendChild(
+                createFinanceSummaryCard(
+                    "Advance Remaining",
+                    formatMoney(
+                        figures.advanceRemaining,
+                        currency
+                    ),
+                    figures.advanceRemaining > 0
+                        ? "Royalties continue to reduce the unrecouped advance balance."
+                        : "No unrecouped advance balance is currently recorded."
+                )
+            );
+
+            grid.appendChild(
+                createFinanceSummaryCard(
+                    "Balance Due",
+                    formatMoney(
+                        figures.balanceDue,
+                        currency
+                    ),
+                    figures.advanceRemaining > 0
+                        ? "No royalty payment is due while royalties are being applied against the advance."
+                        : "Issued payable royalties not already reserved or allocated to a live payment."
+                )
+            );
+
+            grid.appendChild(
+                createFinanceSummaryCard(
+                    "Pending Payment",
+                    formatMoney(
+                        figures.pendingPayment,
+                        currency
+                    ),
+                    "Payment value currently requested, approved or processing."
+                )
+            );
+
+            grid.appendChild(
+                createFinanceSummaryCard(
+                    "Total Payments",
+                    formatMoney(
+                        figures.totalPayments,
+                        currency
+                    ),
+                    "Payments recorded as paid."
+                )
+            );
+
+            currencyBlock.appendChild(grid);
+            summaryList.appendChild(
+                currencyBlock
+            );
+        });
+
+        summaryPanel.appendChild(
+            summaryList
+        );
+
+        const statementsPanel =
+            statementList.closest(
+                ".content-panel"
+            );
+
+        if (
+            statementsPanel &&
+            statementsPanel.parentNode
+        ) {
+            statementsPanel.parentNode.insertBefore(
+                summaryPanel,
+                statementsPanel
+            );
+        }
+    }
+
+    function calculateFinanceSummary(
+        currency,
+        financeData
+    ) {
+        const issuedStatements =
+            financeData.statements.filter(
+                function (statement) {
+                    return (
+                        statement.status === "issued" &&
+                        normaliseCurrency(
+                            statement.currency
+                        ) === currency
+                    );
+                }
+            );
+
+        const activeAdvances =
+            financeData.advances.filter(
+                function (advance) {
+                    return (
+                        normaliseCurrency(
+                            advance.currency
+                        ) === currency &&
+                        advance.status !== "cancelled" &&
+                        advance.status !== "superseded"
+                    );
+                }
+            );
+
+        const royaltiesEarned =
+            sumValues(
+                issuedStatements,
+                "total_royalty_amount"
+            );
+
+        const totalAdvanceAmount =
+            sumValues(
+                activeAdvances,
+                "total_amount"
+            );
+
+        const advanceApplied =
+            sumValues(
+                issuedStatements,
+                "total_advance_applied"
+            );
+
+        const advanceRemaining =
+            Math.max(
+                0,
+                totalAdvanceAmount -
+                    advanceApplied
+            );
+
+        const grossPayable =
+            sumValues(
+                issuedStatements,
+                "amount_payable"
+            );
+
+        const livePaymentIds =
+            new Set(
+                financeData.payments
+                    .filter(
+                        function (payment) {
+                            return (
+                                normaliseCurrency(
+                                    payment.currency
+                                ) === currency &&
+                                (
+                                    payment.status === "approved" ||
+                                    payment.status === "processing" ||
+                                    payment.status === "paid"
+                                )
+                            );
+                        }
+                    )
+                    .map(
+                        function (payment) {
+                            return payment.id;
+                        }
+                    )
+            );
+
+        const issuedStatementIds =
+            new Set(
+                issuedStatements.map(
+                    function (statement) {
+                        return statement.id;
+                    }
+                )
+            );
+
+        const allocatedAmount =
+            financeData.paymentAllocations
+                .filter(
+                    function (allocation) {
+                        return (
+                            livePaymentIds.has(
+                                allocation.payment_id
+                            ) &&
+                            issuedStatementIds.has(
+                                allocation.statement_id
+                            )
+                        );
+                    }
+                )
+                .reduce(
+                    function (total, allocation) {
+                        return total +
+                            toNumber(
+                                allocation.amount
+                            );
+                    },
+                    0
+                );
+
+        const reservedRequests =
+            financeData.paymentRequests.filter(
+                function (request) {
+                    return (
+                        normaliseCurrency(
+                            request.currency
+                        ) === currency &&
+                        (
+                            request.status === "requested" ||
+                            request.status === "approved"
+                        )
+                    );
+                }
+            );
+
+        const reservedRequestAmount =
+            sumValues(
+                reservedRequests,
+                "requested_amount"
+            );
+
+        const pendingPayments =
+            financeData.payments.filter(
+                function (payment) {
+                    return (
+                        normaliseCurrency(
+                            payment.currency
+                        ) === currency &&
+                        (
+                            payment.status === "approved" ||
+                            payment.status === "processing"
+                        )
+                    );
+                }
+            );
+
+        const pendingPaymentAmount =
+            sumValues(
+                pendingPayments,
+                "amount"
+            );
+
+        const paidPayments =
+            financeData.payments.filter(
+                function (payment) {
+                    return (
+                        normaliseCurrency(
+                            payment.currency
+                        ) === currency &&
+                        payment.status === "paid"
+                    );
+                }
+            );
+
+        const totalPayments =
+            sumValues(
+                paidPayments,
+                "amount"
+            );
+
+        const pendingPayment =
+            pendingPaymentAmount +
+            reservedRequestAmount;
+
+        const balanceDue =
+            advanceRemaining > 0
+                ? 0
+                : Math.max(
+                    0,
+                    grossPayable -
+                        allocatedAmount -
+                        reservedRequestAmount
+                );
+
+        return {
+            royaltiesEarned: royaltiesEarned,
+            advanceRemaining: advanceRemaining,
+            balanceDue: balanceDue,
+            pendingPayment: pendingPayment,
+            totalPayments: totalPayments
+        };
+    }
+
+    function getFinanceCurrencies(
+        statements,
+        payments,
+        paymentRequests,
+        advances
+    ) {
+        const currencies =
+            new Set();
+
+        statements.forEach(function (statement) {
+            addCurrency(
+                currencies,
+                statement.currency
+            );
+        });
+
+        payments.forEach(function (payment) {
+            addCurrency(
+                currencies,
+                payment.currency
+            );
+        });
+
+        paymentRequests.forEach(function (request) {
+            addCurrency(
+                currencies,
+                request.currency
+            );
+        });
+
+        advances.forEach(function (advance) {
+            addCurrency(
+                currencies,
+                advance.currency
+            );
+        });
+
+        return Array.from(currencies).sort();
+    }
+
+    function addCurrency(
+        currencies,
+        currency
+    ) {
+        const normalised =
+            normaliseCurrency(currency);
+
+        if (normalised) {
+            currencies.add(normalised);
+        }
+    }
+
+    function normaliseCurrency(currency) {
+        if (!currency) {
+            return "";
+        }
+
+        return String(currency)
+            .trim()
+            .toUpperCase();
+    }
+
+    function sumValues(
+        records,
+        property
+    ) {
+        return records.reduce(
+            function (total, record) {
+                return total +
+                    toNumber(
+                        record[property]
+                    );
+            },
+            0
+        );
+    }
+
+    function toNumber(value) {
+        const number =
+            Number(value);
+
+        return Number.isFinite(number)
+            ? number
+            : 0;
+    }
+
+    function createFinanceSummaryCard(
+        label,
+        value,
+        description
+    ) {
+        const card =
+            document.createElement("article");
+
+        card.className =
+            "finance-summary-card";
+
+        const labelElement =
+            document.createElement("p");
+
+        labelElement.className =
+            "summary-label";
+
+        labelElement.textContent =
+            label;
+
+        const valueElement =
+            document.createElement("p");
+
+        valueElement.className =
+            "summary-value";
+
+        valueElement.textContent =
+            value;
+
+        const descriptionElement =
+            document.createElement("p");
+
+        descriptionElement.className =
+            "finance-summary-description";
+
+        descriptionElement.textContent =
+            description;
+
+        card.appendChild(
+            labelElement
+        );
+
+        card.appendChild(
+            valueElement
+        );
+
+        card.appendChild(
+            descriptionElement
+        );
+
+        return card;
     }
 
     function renderStatements(
