@@ -549,3 +549,25 @@ a {
         grid-template-columns: 1fr;
     }
 }
+/* Author Desk financial account summary */
+
+.finance-account-summary {
+    margin-bottom: 18px;
+}
+
+.finance-account-summary .summary-label {
+    margin-bottom: 7px;
+    font-size: 0.7rem;
+    letter-spacing: 0.09em;
+}
+
+.finance-account-summary .summary-value {
+    font-size: 1.25rem;
+    line-height: 1.25;
+}
+
+.finance-account-summary .summary-note {
+    margin-top: 6px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
