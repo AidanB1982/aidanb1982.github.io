@@ -84,8 +84,9 @@
         <code>public.advance_instalments</code>,
         <code>public.royalty_entries</code>,
         <code>public.royalty_adjustments</code>,
-        <code>public.royalty_statements</code> and
-        <code>public.royalty_statement_lines</code>.
+        <code>public.royalty_statements</code>,
+        <code>public.royalty_statement_lines</code> and
+        <code>public.payments</code>.
     </p>
 
     <section class="test-card">
@@ -231,6 +232,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Payment Query</h2>
+
+        <div id="payment-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -299,6 +308,9 @@
     const royaltyStatementLineResult =
         document.getElementById("royalty-statement-line-result");
 
+    const paymentResult =
+        document.getElementById("payment-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -350,6 +362,7 @@
                 await testAnonymousRoyaltyAdjustmentQuery();
                 await testAnonymousRoyaltyStatementQuery();
                 await testAnonymousRoyaltyStatementLineQuery();
+                await testAnonymousPaymentQuery();
 
                 return;
             }
@@ -415,6 +428,10 @@
 
             await testAuthenticatedRoyaltyStatementLineQuery();
 
+            await testAuthenticatedPaymentQuery(
+                session.user.id
+            );
+
         } catch (error) {
             console.error(
                 "Author Desk authentication test failed:",
@@ -444,7 +461,8 @@
                 royaltyEntryResult,
                 royaltyAdjustmentResult,
                 royaltyStatementResult,
-                royaltyStatementLineResult
+                royaltyStatementLineResult,
+                paymentResult
             ];
 
             resultElements.forEach(function (resultElement) {
@@ -1878,6 +1896,101 @@
         }
     }
 
+    async function testAuthenticatedPaymentQuery(userId) {
+        paymentResult.textContent =
+            "Querying payments through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("payments")
+                .select(
+                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Payment result."
+                );
+            }
+
+            if (data.length === 0) {
+                paymentResult.textContent =
+                    "PASS — NO PAYMENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Payments.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk payments, " +
+                    "Author Desk access is disabled, or the relevant " +
+                    "Payments are not author-visible.";
+
+                paymentResult.classList.add("pass");
+                return;
+            }
+
+            const validStatuses = [
+                "approved",
+                "processing",
+                "paid",
+                "failed",
+                "cancelled"
+            ];
+
+            const unexpectedPayment =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        record.author_id !== userId ||
+                        !record.payment_reference ||
+                        !record.currency ||
+                        record.amount === null ||
+                        Number(record.amount) <= 0 ||
+                        !validStatuses.includes(record.status) ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedPayment) {
+                paymentResult.textContent =
+                    "FAIL — UNEXPECTED PAYMENT VISIBILITY OR DATA\n\n" +
+                    "A Payment was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                paymentResult.classList.add("fail");
+                return;
+            }
+
+            paymentResult.textContent =
+                "PASS — OWN ACCESSIBLE PAYMENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            paymentResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Payment query failed:",
+                error
+            );
+
+            paymentResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            paymentResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -2557,6 +2670,46 @@
             royaltyStatementLineResult.classList.add("pass");
         }
     }
+    async function testAnonymousPaymentQuery() {
+        paymentResult.textContent =
+            "Querying payments without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("payments")
+                .select(
+                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                paymentResult.textContent =
+                    "PASS — ANONYMOUS PAYMENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Payments.";
+
+                paymentResult.classList.add("pass");
+                return;
+            }
+
+            paymentResult.textContent =
+                "FAIL — ANONYMOUS PAYMENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            paymentResult.classList.add("fail");
+
+        } catch (error) {
+            paymentResult.textContent =
+                "PASS — ANONYMOUS PAYMENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            paymentResult.classList.add("pass");
+        }
+    }
+
 })();
 </script>
 
