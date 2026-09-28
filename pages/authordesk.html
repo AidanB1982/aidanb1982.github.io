@@ -77,8 +77,9 @@
         <code>public.book_editions</code>,
         <code>public.author_actions</code>,
         <code>public.documents</code>,
-        <code>public.agreements</code> and
-        <code>public.rights</code>.
+        <code>public.agreements</code>,
+        <code>public.rights</code> and
+        <code>public.rights_events</code>.
     </p>
 
     <section class="test-card">
@@ -168,6 +169,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Rights Event Query</h2>
+
+        <div id="rights-event-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -215,6 +224,9 @@
     const rightsResult =
         document.getElementById("rights-result");
 
+    const rightsEventResult =
+        document.getElementById("rights-event-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -259,6 +271,7 @@
                 await testAnonymousDocumentQuery();
                 await testAnonymousAgreementQuery();
                 await testAnonymousRightsQuery();
+                await testAnonymousRightsEventQuery();
 
                 return;
             }
@@ -303,6 +316,8 @@
             await testAuthenticatedRightsQuery(
                 session.user.id
             );
+
+            await testAuthenticatedRightsEventQuery();
 
         } catch (error) {
             console.error(
@@ -355,6 +370,10 @@
             rightsResult.textContent =
                 "NOT TESTED\n\nAuthentication test failed.";
             rightsResult.classList.add("fail");
+
+            rightsEventResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            rightsEventResult.classList.add("fail");
         }
     }
 
@@ -1163,6 +1182,93 @@
         }
     }
 
+    async function testAuthenticatedRightsEventQuery() {
+        rightsEventResult.textContent =
+            "Querying rights_events through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("rights_events")
+                .select(
+                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
+                )
+                .order("event_date", {
+                    ascending: true
+                })
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Rights Event result."
+                );
+            }
+
+            if (data.length === 0) {
+                rightsEventResult.textContent =
+                    "PASS — NO RIGHTS EVENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Rights Events.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk rights history, " +
+                    "Author Desk access is disabled, the parent Rights Record " +
+                    "or linked Agreement is not visible, no Desk-visible related " +
+                    "book is assigned, or the relevant Rights Events are not author-visible.";
+
+                rightsEventResult.classList.add("pass");
+                return;
+            }
+
+            const malformedEvent =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.right_id !== "number" ||
+                        !record.event_type ||
+                        !record.event_date ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (malformedEvent) {
+                rightsEventResult.textContent =
+                    "FAIL — UNEXPECTED RIGHTS EVENT DATA\n\n" +
+                    "A Rights Event was returned with unexpected required-field " +
+                    "data or was not author-visible.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                rightsEventResult.classList.add("fail");
+                return;
+            }
+
+            rightsEventResult.textContent =
+                "PASS — OWN ACCESSIBLE RIGHTS EVENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            rightsEventResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Rights Event query failed:",
+                error
+            );
+
+            rightsEventResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            rightsEventResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1560,6 +1666,46 @@
                 String(error.message || error);
 
             rightsResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousRightsEventQuery() {
+        rightsEventResult.textContent =
+            "Querying rights_events without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("rights_events")
+                .select(
+                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                rightsEventResult.textContent =
+                    "PASS — ANONYMOUS RIGHTS EVENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Rights Events.";
+
+                rightsEventResult.classList.add("pass");
+                return;
+            }
+
+            rightsEventResult.textContent =
+                "FAIL — ANONYMOUS RIGHTS EVENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            rightsEventResult.classList.add("fail");
+
+        } catch (error) {
+            rightsEventResult.textContent =
+                "PASS — ANONYMOUS RIGHTS EVENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            rightsEventResult.classList.add("pass");
         }
     }
 })();
