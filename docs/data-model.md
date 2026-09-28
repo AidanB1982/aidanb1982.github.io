@@ -4517,3 +4517,40 @@ The implemented relationship is:
 Royalty Entry
     ↓
 Royalty Adjustment
+---
+
+## Migration 014 — Royalty Statements and Statement Lines
+
+**Implemented:** 28 September 2026  
+**Status:** VERIFIED
+
+Migration 014 introduced:
+
+`public.royalty_statements`
+
+and:
+
+`public.royalty_statement_lines`
+
+Its purpose is to establish the formal royalty-statement layer of the Author
+Desk financial architecture.
+
+A Royalty Statement presents established financial history for a defined
+accounting period.
+
+It does not make a royalty clear.
+
+It does not itself record movement of money.
+
+The implemented financial distinction is:
+
+```text
+Cleared Royalty Ledger
+        ↓
+Royalty Adjustments
+        ↓
+Royalty Statement
+        ↓
+Royalty Statement Lines
+        ↓
+future Payment / Allocation
