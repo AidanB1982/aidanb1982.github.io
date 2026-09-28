@@ -1,0 +1,1934 @@
+(function () {
+    "use strict";
+
+    const SUPABASE_URL =
+        "https://bmnlynjldlnxfvunqbqq.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
+
+    const client = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        }
+    );
+
+    const loadingPanel =
+        document.getElementById("loading-panel");
+
+    const accessPanel =
+        document.getElementById("access-panel");
+
+    const accessTitle =
+        document.getElementById("access-title");
+
+    const accessMessage =
+        document.getElementById("access-message");
+
+    const desk =
+        document.getElementById("desk");
+
+    const authorName =
+        document.getElementById("author-name");
+
+    const authorStatus =
+        document.getElementById("author-status");
+
+    const welcomeHeading =
+        document.getElementById("welcome-heading");
+
+    const bookCount =
+        document.getElementById("book-count");
+
+    const relationshipSummary =
+        document.getElementById("relationship-summary");
+
+    const overviewBookList =
+        document.getElementById("overview-book-list");
+
+    const booksBookList =
+        document.getElementById("books-book-list");
+
+    const productionContent =
+        document.getElementById("production-content");
+
+    const documentsRightsContent =
+        document.getElementById("documents-rights-content");
+
+    const signOutButton =
+        document.getElementById("sign-out-button");
+
+    const navButtons =
+        Array.from(
+            document.querySelectorAll(".nav-button")
+        );
+
+    const deskSections =
+        Array.from(
+            document.querySelectorAll(".desk-section")
+        );
+
+    initialiseDesk();
+
+    navButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            showSection(button.dataset.section);
+        });
+    });
+
+    signOutButton.addEventListener(
+        "click",
+        handleSignOut
+    );
+
+    async function initialiseDesk() {
+        try {
+            const {
+                data: sessionData,
+                error: sessionError
+            } = await client.auth.getSession();
+
+            if (sessionError) {
+                throw sessionError;
+            }
+
+            const session = sessionData.session;
+
+            if (!session || !session.user) {
+                showAccessMessage(
+                    "Sign in required",
+                    "You need to be signed in with an authorised Blackwood Publishing author account to open the Author Desk."
+                );
+
+                return;
+            }
+
+            const authorRecord =
+                await loadAuthorRecord(
+                    session.user.id
+                );
+
+            if (!authorRecord) {
+                showAccessMessage(
+                    "Author Desk unavailable",
+                    "This account does not currently have access to an Author Desk."
+                );
+
+                return;
+            }
+
+            const [
+                books,
+                productionData,
+                legalData
+            ] = await Promise.all([
+                loadBooks(),
+                loadProductionData(),
+                loadLegalData()
+            ]);
+
+            renderDesk(
+                authorRecord,
+                books,
+                productionData,
+                legalData
+            );
+
+        } catch (error) {
+            console.error(
+                "Author Desk failed to initialise:",
+                error
+            );
+
+            showAccessMessage(
+                "Author Desk could not be opened",
+                "There was a problem loading your publishing records. Please try again."
+            );
+        }
+    }
+
+    async function loadAuthorRecord(userId) {
+        const { data, error } = await client
+            .from("author_records")
+            .select(
+                "id,publishing_name,email,relationship_status,desk_access_enabled"
+            )
+            .eq("id", userId)
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || data.desk_access_enabled !== true) {
+            return null;
+        }
+
+        return data;
+    }
+
+    async function loadBooks() {
+        const { data, error } = await client
+            .from("book_records")
+            .select(
+                "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+            )
+            .order("id", {
+                ascending: true
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        return Array.isArray(data)
+            ? data
+            : [];
+    }
+
+    async function loadProductionData() {
+        const [
+            productionEventsResponse,
+            editionsResponse,
+            actionsResponse
+        ] = await Promise.all([
+            client
+                .from("production_events")
+                .select(
+                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
+                )
+                .order("event_date", {
+                    ascending: false
+                })
+                .order("id", {
+                    ascending: false
+                }),
+
+            client
+                .from("book_editions")
+                .select(
+                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
+                )
+                .order("id", {
+                    ascending: true
+                }),
+
+            client
+                .from("author_actions")
+                .select(
+                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                })
+        ]);
+
+        if (productionEventsResponse.error) {
+            throw productionEventsResponse.error;
+        }
+
+        if (editionsResponse.error) {
+            throw editionsResponse.error;
+        }
+
+        if (actionsResponse.error) {
+            throw actionsResponse.error;
+        }
+
+        return {
+            events: Array.isArray(productionEventsResponse.data)
+                ? productionEventsResponse.data
+                : [],
+
+            editions: Array.isArray(editionsResponse.data)
+                ? editionsResponse.data
+                : [],
+
+            actions: Array.isArray(actionsResponse.data)
+                ? actionsResponse.data
+                : []
+        };
+    }
+
+    async function loadLegalData() {
+        const [
+            documentsResponse,
+            agreementsResponse,
+            rightsResponse,
+            rightsEventsResponse
+        ] = await Promise.all([
+            client
+                .from("documents")
+                .select(
+                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                }),
+
+            client
+                .from("agreements")
+                .select(
+                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                }),
+
+            client
+                .from("rights")
+                .select(
+                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                }),
+
+            client
+                .from("rights_events")
+                .select(
+                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
+                )
+                .order("event_date", {
+                    ascending: false
+                })
+                .order("id", {
+                    ascending: false
+                })
+        ]);
+
+        if (documentsResponse.error) {
+            throw documentsResponse.error;
+        }
+
+        if (agreementsResponse.error) {
+            throw agreementsResponse.error;
+        }
+
+        if (rightsResponse.error) {
+            throw rightsResponse.error;
+        }
+
+        if (rightsEventsResponse.error) {
+            throw rightsEventsResponse.error;
+        }
+
+        return {
+            documents: Array.isArray(documentsResponse.data)
+                ? documentsResponse.data
+                : [],
+
+            agreements: Array.isArray(agreementsResponse.data)
+                ? agreementsResponse.data
+                : [],
+
+            rights: Array.isArray(rightsResponse.data)
+                ? rightsResponse.data
+                : [],
+
+            rightsEvents: Array.isArray(rightsEventsResponse.data)
+                ? rightsEventsResponse.data
+                : []
+        };
+    }
+
+    function renderDesk(
+        authorRecord,
+        books,
+        productionData,
+        legalData
+    ) {
+        loadingPanel.hidden = true;
+        accessPanel.hidden = true;
+        desk.hidden = false;
+
+        const displayName =
+            authorRecord.publishing_name ||
+            "Blackwood Author";
+
+        authorName.textContent =
+            displayName;
+
+        authorStatus.textContent =
+            formatLabel(
+                authorRecord.relationship_status
+            );
+
+        welcomeHeading.textContent =
+            "Welcome, " + displayName;
+
+        bookCount.textContent =
+            String(books.length);
+
+        relationshipSummary.textContent =
+            formatLabel(
+                authorRecord.relationship_status
+            );
+
+        renderBookList(
+            overviewBookList,
+            books
+        );
+
+        renderBookList(
+            booksBookList,
+            books
+        );
+
+        renderProduction(
+            books,
+            productionData
+        );
+
+        renderDocumentsAndRights(
+            books,
+            legalData
+        );
+    }
+
+    function renderBookList(container, books) {
+        container.replaceChildren();
+
+        if (books.length === 0) {
+            container.appendChild(
+                createEmptyState(
+                    "No Book Records are currently available in your Author Desk."
+                )
+            );
+
+            return;
+        }
+
+        books.forEach(function (book) {
+            container.appendChild(
+                createBookCard(book)
+            );
+        });
+    }
+
+    function createBookCard(book) {
+        const card =
+            document.createElement("article");
+
+        card.className =
+            "book-card";
+
+        const top =
+            document.createElement("div");
+
+        top.className =
+            "book-card-top";
+
+        const titleGroup =
+            document.createElement("div");
+
+        const title =
+            document.createElement("h3");
+
+        title.className =
+            "book-title";
+
+        title.textContent =
+            book.title || "Untitled Book Record";
+
+        titleGroup.appendChild(title);
+
+        if (book.subtitle) {
+            const subtitle =
+                document.createElement("p");
+
+            subtitle.className =
+                "book-subtitle";
+
+            subtitle.textContent =
+                book.subtitle;
+
+            titleGroup.appendChild(subtitle);
+        }
+
+        top.appendChild(titleGroup);
+
+        top.appendChild(
+            createStatusBadge(
+                formatLabel(
+                    book.production_stage
+                )
+            )
+        );
+
+        const meta =
+            document.createElement("div");
+
+        meta.className =
+            "book-meta";
+
+        meta.appendChild(
+            createMetaItem(
+                "Book Record",
+                book.internal_reference
+            )
+        );
+
+        meta.appendChild(
+            createMetaItem(
+                "Work Status",
+                formatLabel(
+                    book.work_status
+                )
+            )
+        );
+
+        meta.appendChild(
+            createMetaItem(
+                "Production Stage",
+                formatLabel(
+                    book.production_stage
+                )
+            )
+        );
+
+        card.appendChild(top);
+        card.appendChild(meta);
+
+        return card;
+    }
+
+    function renderProduction(
+        books,
+        productionData
+    ) {
+        productionContent.replaceChildren();
+
+        if (books.length === 0) {
+            productionContent.appendChild(
+                createEmptyState(
+                    "No production records are currently available in your Author Desk."
+                )
+            );
+
+            return;
+        }
+
+        books.forEach(function (book) {
+            const bookEvents =
+                productionData.events.filter(
+                    function (event) {
+                        return event.book_id === book.id;
+                    }
+                );
+
+            const bookEditions =
+                productionData.editions.filter(
+                    function (edition) {
+                        return edition.book_id === book.id;
+                    }
+                );
+
+            const bookActions =
+                productionData.actions.filter(
+                    function (action) {
+                        return action.book_id === book.id;
+                    }
+                );
+
+            productionContent.appendChild(
+                createProductionBook(
+                    book,
+                    bookEvents,
+                    bookEditions,
+                    bookActions
+                )
+            );
+        });
+    }
+
+    function createProductionBook(
+        book,
+        events,
+        editions,
+        actions
+    ) {
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "production-book";
+
+        const heading =
+            document.createElement("div");
+
+        heading.className =
+            "production-book-heading";
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent =
+            book.title || "Untitled Book Record";
+
+        const reference =
+            document.createElement("p");
+
+        reference.className =
+            "production-reference";
+
+        reference.textContent =
+            book.internal_reference ||
+            "Book Record";
+
+        heading.appendChild(title);
+        heading.appendChild(reference);
+        wrapper.appendChild(heading);
+
+        const summary =
+            document.createElement("div");
+
+        summary.className =
+            "production-summary";
+
+        summary.appendChild(
+            createSummaryRecord(
+                "Current Stage",
+                formatLabel(
+                    book.production_stage
+                ),
+                "production-summary-card"
+            )
+        );
+
+        summary.appendChild(
+            createSummaryRecord(
+                "Work Status",
+                formatLabel(
+                    book.work_status
+                ),
+                "production-summary-card"
+            )
+        );
+
+        wrapper.appendChild(summary);
+        wrapper.appendChild(
+            createActionsPanel(actions)
+        );
+        wrapper.appendChild(
+            createEditionsPanel(editions)
+        );
+        wrapper.appendChild(
+            createProductionHistoryPanel(events)
+        );
+
+        return wrapper;
+    }
+
+    function createActionsPanel(actions) {
+        const panel =
+            createContentPanel(
+                "Author Actions",
+                "Current actions and information recorded for you during production."
+            );
+
+        if (actions.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author actions are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "action-list";
+
+        actions.forEach(function (action) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "action-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "action-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                action.title ||
+                formatLabel(action.action_type);
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(action.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            if (action.description) {
+                const description =
+                    document.createElement("p");
+
+                description.className =
+                    "record-description";
+
+                description.textContent =
+                    action.description;
+
+                card.appendChild(description);
+            }
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            if (action.due_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Due",
+                        formatDate(action.due_at)
+                    )
+                );
+            }
+
+            if (action.completed_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Completed",
+                        formatDate(action.completed_at)
+                    )
+                );
+            }
+
+            if (meta.childElementCount > 0) {
+                card.appendChild(meta);
+            }
+
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createEditionsPanel(editions) {
+        const panel =
+            createContentPanel(
+                "Editions",
+                "Edition records currently associated with this Book Record."
+            );
+
+        if (editions.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible editions are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "edition-list";
+
+        editions.forEach(function (edition) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "edition-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "edition-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                edition.edition_name ||
+                formatLabel(edition.format);
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(edition.status)
+                )
+            );
+
+            card.appendChild(top);
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Format",
+                    formatLabel(edition.format)
+                )
+            );
+
+            if (edition.publication_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Publication",
+                        formatDate(
+                            edition.publication_date
+                        )
+                    )
+                );
+            }
+
+            if (edition.isbn) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "ISBN",
+                        edition.isbn
+                    )
+                );
+            }
+
+            if (
+                edition.list_price !== null &&
+                edition.list_price !== undefined &&
+                edition.currency
+            ) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "List price",
+                        formatMoney(
+                            edition.list_price,
+                            edition.currency
+                        )
+                    )
+                );
+            }
+
+            if (edition.edition_reference) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Edition Record",
+                        edition.edition_reference
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createProductionHistoryPanel(events) {
+        const panel =
+            createContentPanel(
+                "Production History",
+                "Author-visible milestones recorded against this Book Record."
+            );
+
+        if (events.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible production history is currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const timeline =
+            document.createElement("div");
+
+        timeline.className =
+            "timeline";
+
+        events.forEach(function (event) {
+            const item =
+                document.createElement("article");
+
+            item.className =
+                "timeline-item";
+
+            const date =
+                document.createElement("p");
+
+            date.className =
+                "timeline-date";
+
+            date.textContent =
+                formatDate(event.event_date);
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "timeline-title";
+
+            title.textContent =
+                event.to_stage
+                    ? formatLabel(event.to_stage)
+                    : formatLabel(event.event_type);
+
+            item.appendChild(date);
+            item.appendChild(title);
+
+            if (
+                event.from_stage &&
+                event.to_stage
+            ) {
+                const transition =
+                    document.createElement("p");
+
+                transition.className =
+                    "record-description";
+
+                transition.textContent =
+                    formatLabel(event.from_stage) +
+                    " → " +
+                    formatLabel(event.to_stage);
+
+                item.appendChild(transition);
+            }
+
+            if (event.note) {
+                const note =
+                    document.createElement("p");
+
+                note.className =
+                    "timeline-note";
+
+                note.textContent =
+                    event.note;
+
+                item.appendChild(note);
+            }
+
+            timeline.appendChild(item);
+        });
+
+        panel.appendChild(timeline);
+
+        return panel;
+    }
+
+    function renderDocumentsAndRights(
+        books,
+        legalData
+    ) {
+        documentsRightsContent.replaceChildren();
+
+        const accountDocuments =
+            legalData.documents.filter(
+                function (documentRecord) {
+                    return documentRecord.book_id === null;
+                }
+            );
+
+        const accountAgreements =
+            legalData.agreements.filter(
+                function (agreement) {
+                    return agreement.book_id === null;
+                }
+            );
+
+        const accountRights =
+            legalData.rights.filter(
+                function (right) {
+                    return right.book_id === null;
+                }
+            );
+
+        if (
+            accountDocuments.length > 0 ||
+            accountAgreements.length > 0 ||
+            accountRights.length > 0
+        ) {
+            documentsRightsContent.appendChild(
+                createLegalRecordGroup(
+                    "General publishing records",
+                    "Author-visible records associated with your publishing relationship rather than one particular Book Record.",
+                    accountDocuments,
+                    accountAgreements,
+                    accountRights,
+                    legalData.rightsEvents
+                )
+            );
+        }
+
+        if (books.length === 0) {
+            if (
+                accountDocuments.length === 0 &&
+                accountAgreements.length === 0 &&
+                accountRights.length === 0
+            ) {
+                documentsRightsContent.appendChild(
+                    createEmptyState(
+                        "No author-visible documents, agreements or rights records are currently available."
+                    )
+                );
+            }
+
+            return;
+        }
+
+        books.forEach(function (book) {
+            const documents =
+                legalData.documents.filter(
+                    function (documentRecord) {
+                        return documentRecord.book_id === book.id;
+                    }
+                );
+
+            const agreements =
+                legalData.agreements.filter(
+                    function (agreement) {
+                        return agreement.book_id === book.id;
+                    }
+                );
+
+            const rights =
+                legalData.rights.filter(
+                    function (right) {
+                        return right.book_id === book.id;
+                    }
+                );
+
+            documentsRightsContent.appendChild(
+                createLegalBook(
+                    book,
+                    documents,
+                    agreements,
+                    rights,
+                    legalData.rightsEvents
+                )
+            );
+        });
+    }
+
+    function createLegalBook(
+        book,
+        documents,
+        agreements,
+        rights,
+        rightsEvents
+    ) {
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "legal-book";
+
+        const heading =
+            document.createElement("div");
+
+        heading.className =
+            "legal-book-heading";
+
+        const title =
+            document.createElement("h3");
+
+        title.textContent =
+            book.title || "Untitled Book Record";
+
+        const reference =
+            document.createElement("p");
+
+        reference.className =
+            "legal-reference";
+
+        reference.textContent =
+            book.internal_reference ||
+            "Book Record";
+
+        heading.appendChild(title);
+        heading.appendChild(reference);
+        wrapper.appendChild(heading);
+
+        const summary =
+            document.createElement("div");
+
+        summary.className =
+            "legal-summary";
+
+        summary.appendChild(
+            createSummaryRecord(
+                "Documents",
+                String(documents.length),
+                "legal-summary-card"
+            )
+        );
+
+        summary.appendChild(
+            createSummaryRecord(
+                "Rights Records",
+                String(rights.length),
+                "legal-summary-card"
+            )
+        );
+
+        wrapper.appendChild(summary);
+
+        wrapper.appendChild(
+            createDocumentsPanel(documents)
+        );
+
+        wrapper.appendChild(
+            createAgreementsPanel(agreements)
+        );
+
+        wrapper.appendChild(
+            createRightsPanel(
+                rights,
+                rightsEvents
+            )
+        );
+
+        return wrapper;
+    }
+
+    function createLegalRecordGroup(
+        title,
+        intro,
+        documents,
+        agreements,
+        rights,
+        rightsEvents
+    ) {
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "legal-book";
+
+        const heading =
+            document.createElement("div");
+
+        heading.className =
+            "legal-book-heading";
+
+        const headingTitle =
+            document.createElement("h3");
+
+        headingTitle.textContent =
+            title;
+
+        const headingIntro =
+            document.createElement("p");
+
+        headingIntro.className =
+            "panel-intro";
+
+        headingIntro.textContent =
+            intro;
+
+        heading.appendChild(headingTitle);
+        heading.appendChild(headingIntro);
+        wrapper.appendChild(heading);
+
+        wrapper.appendChild(
+            createDocumentsPanel(documents)
+        );
+
+        wrapper.appendChild(
+            createAgreementsPanel(agreements)
+        );
+
+        wrapper.appendChild(
+            createRightsPanel(
+                rights,
+                rightsEvents
+            )
+        );
+
+        return wrapper;
+    }
+
+    function createDocumentsPanel(documents) {
+        const panel =
+            createContentPanel(
+                "Documents",
+                "Author-visible publishing documents associated with this record."
+            );
+
+        if (documents.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible documents are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "record-list";
+
+        documents.forEach(function (documentRecord) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "record-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "record-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                documentRecord.title ||
+                formatLabel(
+                    documentRecord.document_type
+                );
+
+            top.appendChild(title);
+
+            if (documentRecord.requires_signature) {
+                top.appendChild(
+                    createStatusBadge(
+                        documentRecord.signed_at
+                            ? "Signed"
+                            : "Signature Required"
+                    )
+                );
+            }
+
+            card.appendChild(top);
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Type",
+                    formatLabel(
+                        documentRecord.document_type
+                    )
+                )
+            );
+
+            if (documentRecord.version) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Version",
+                        documentRecord.version
+                    )
+                );
+            }
+
+            if (documentRecord.issued_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Issued",
+                        formatDate(
+                            documentRecord.issued_at
+                        )
+                    )
+                );
+            }
+
+            if (documentRecord.signed_at) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Signed",
+                        formatDate(
+                            documentRecord.signed_at
+                        )
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createAgreementsPanel(agreements) {
+        const panel =
+            createContentPanel(
+                "Agreements",
+                "Author-visible agreements forming part of the publishing record."
+            );
+
+        if (agreements.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible agreements are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "record-list";
+
+        agreements.forEach(function (agreement) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "record-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "record-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                agreement.title ||
+                formatLabel(
+                    agreement.agreement_type
+                );
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(
+                        agreement.status
+                    )
+                )
+            );
+
+            card.appendChild(top);
+
+            if (agreement.summary_author) {
+                const description =
+                    document.createElement("p");
+
+                description.className =
+                    "record-description";
+
+                description.textContent =
+                    agreement.summary_author;
+
+                card.appendChild(description);
+            }
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Agreement Record",
+                    agreement.agreement_reference
+                )
+            );
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Type",
+                    formatLabel(
+                        agreement.agreement_type
+                    )
+                )
+            );
+
+            if (agreement.agreement_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Agreement date",
+                        formatDate(
+                            agreement.agreement_date
+                        )
+                    )
+                );
+            }
+
+            if (agreement.effective_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Effective",
+                        formatDate(
+                            agreement.effective_date
+                        )
+                    )
+                );
+            }
+
+            if (agreement.expiry_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Expiry",
+                        formatDate(
+                            agreement.expiry_date
+                        )
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createRightsPanel(
+        rights,
+        rightsEvents
+    ) {
+        const panel =
+            createContentPanel(
+                "Rights",
+                "Rights recorded as held by Blackwood under the relevant publishing agreement."
+            );
+
+        if (rights.length === 0) {
+            panel.appendChild(
+                createEmptyState(
+                    "No author-visible rights records are currently recorded."
+                )
+            );
+
+            return panel;
+        }
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "record-list";
+
+        rights.forEach(function (right) {
+            const card =
+                document.createElement("article");
+
+            card.className =
+                "record-card";
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "record-card-top";
+
+            const title =
+                document.createElement("h4");
+
+            title.className =
+                "record-title";
+
+            title.textContent =
+                formatLabel(
+                    right.right_type
+                );
+
+            top.appendChild(title);
+
+            top.appendChild(
+                createStatusBadge(
+                    formatLabel(
+                        right.status
+                    )
+                )
+            );
+
+            card.appendChild(top);
+
+            if (right.summary_author) {
+                const description =
+                    document.createElement("p");
+
+                description.className =
+                    "record-description";
+
+                description.textContent =
+                    right.summary_author;
+
+                card.appendChild(description);
+            }
+
+            const meta =
+                document.createElement("div");
+
+            meta.className =
+                "record-meta";
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Rights Record",
+                    right.rights_reference
+                )
+            );
+
+            if (right.format_scope) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Format",
+                        formatLabel(
+                            right.format_scope
+                        )
+                    )
+                );
+            }
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Territory",
+                    right.territory
+                )
+            );
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Language",
+                    right.language
+                )
+            );
+
+            meta.appendChild(
+                createInlineMeta(
+                    "Exclusivity",
+                    formatLabel(
+                        right.exclusivity
+                    )
+                )
+            );
+
+            if (right.effective_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Effective",
+                        formatDate(
+                            right.effective_date
+                        )
+                    )
+                );
+            }
+
+            if (right.expiry_date) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Expiry",
+                        formatDate(
+                            right.expiry_date
+                        )
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+
+            const events =
+                rightsEvents.filter(
+                    function (event) {
+                        return event.right_id === right.id;
+                    }
+                );
+
+            if (events.length > 0) {
+                const history =
+                    document.createElement("div");
+
+                history.className =
+                    "timeline";
+
+                events.forEach(function (event) {
+                    const item =
+                        document.createElement("div");
+
+                    item.className =
+                        "timeline-item";
+
+                    const date =
+                        document.createElement("p");
+
+                    date.className =
+                        "timeline-date";
+
+                    date.textContent =
+                        formatDate(
+                            event.event_date
+                        );
+
+                    const eventTitle =
+                        document.createElement("h5");
+
+                    eventTitle.className =
+                        "timeline-title";
+
+                    eventTitle.textContent =
+                        formatLabel(
+                            event.event_type
+                        );
+
+                    item.appendChild(date);
+                    item.appendChild(eventTitle);
+
+                    if (event.description_author) {
+                        const note =
+                            document.createElement("p");
+
+                        note.className =
+                            "timeline-note";
+
+                        note.textContent =
+                            event.description_author;
+
+                        item.appendChild(note);
+                    }
+
+                    history.appendChild(item);
+                });
+
+                card.appendChild(history);
+            }
+
+            list.appendChild(card);
+        });
+
+        panel.appendChild(list);
+
+        return panel;
+    }
+
+    function createSummaryRecord(
+        label,
+        value,
+        className
+    ) {
+        const card =
+            document.createElement("article");
+
+        card.className =
+            className;
+
+        const labelElement =
+            document.createElement("p");
+
+        labelElement.className =
+            "summary-label";
+
+        labelElement.textContent =
+            label;
+
+        const valueElement =
+            document.createElement("p");
+
+        valueElement.className =
+            "summary-value";
+
+        valueElement.textContent =
+            value || "Not recorded";
+
+        card.appendChild(labelElement);
+        card.appendChild(valueElement);
+
+        return card;
+    }
+
+    function createContentPanel(
+        title,
+        intro
+    ) {
+        const panel =
+            document.createElement("section");
+
+        panel.className =
+            "content-panel";
+
+        const heading =
+            document.createElement("h3");
+
+        heading.textContent =
+            title;
+
+        panel.appendChild(heading);
+
+        if (intro) {
+            const paragraph =
+                document.createElement("p");
+
+            paragraph.className =
+                "panel-intro";
+
+            paragraph.textContent =
+                intro;
+
+            panel.appendChild(paragraph);
+        }
+
+        return panel;
+    }
+
+    function createEmptyState(message) {
+        const emptyState =
+            document.createElement("div");
+
+        emptyState.className =
+            "empty-state";
+
+        emptyState.textContent =
+            message;
+
+        return emptyState;
+    }
+
+    function createStatusBadge(value) {
+        const badge =
+            document.createElement("span");
+
+        badge.className =
+            "status-badge";
+
+        badge.textContent =
+            value || "Not recorded";
+
+        return badge;
+    }
+
+    function createMetaItem(label, value) {
+        const wrapper =
+            document.createElement("div");
+
+        const labelElement =
+            document.createElement("span");
+
+        labelElement.className =
+            "meta-label";
+
+        labelElement.textContent =
+            label;
+
+        const valueElement =
+            document.createElement("span");
+
+        valueElement.className =
+            "meta-value";
+
+        valueElement.textContent =
+            value || "Not recorded";
+
+        wrapper.appendChild(labelElement);
+        wrapper.appendChild(valueElement);
+
+        return wrapper;
+    }
+
+    function createInlineMeta(
+        label,
+        value
+    ) {
+        const wrapper =
+            document.createElement("span");
+
+        const strong =
+            document.createElement("strong");
+
+        strong.textContent =
+            label + ": ";
+
+        wrapper.appendChild(strong);
+
+        wrapper.appendChild(
+            document.createTextNode(
+                value || "Not recorded"
+            )
+        );
+
+        return wrapper;
+    }
+
+    function showSection(sectionName) {
+        navButtons.forEach(function (button) {
+            button.classList.toggle(
+                "active",
+                button.dataset.section ===
+                    sectionName
+            );
+        });
+
+        deskSections.forEach(function (section) {
+            section.classList.toggle(
+                "active",
+                section.id ===
+                    "section-" + sectionName
+            );
+        });
+    }
+
+    async function handleSignOut() {
+        signOutButton.disabled = true;
+        signOutButton.textContent =
+            "Signing out…";
+
+        try {
+            const { error } =
+                await client.auth.signOut();
+
+            if (error) {
+                throw error;
+            }
+
+            desk.hidden = true;
+
+            showAccessMessage(
+                "Signed out",
+                "You have been signed out of the Author Desk."
+            );
+
+        } catch (error) {
+            console.error(
+                "Author Desk sign-out failed:",
+                error
+            );
+
+            signOutButton.disabled = false;
+            signOutButton.textContent =
+                "Sign out";
+        }
+    }
+
+    function showAccessMessage(title, message) {
+        loadingPanel.hidden = true;
+        desk.hidden = true;
+
+        accessTitle.textContent =
+            title;
+
+        accessMessage.textContent =
+            message;
+
+        accessPanel.hidden = false;
+    }
+
+    function formatLabel(value) {
+        if (!value) {
+            return "Not recorded";
+        }
+
+        return String(value)
+            .replace(/_/g, " ")
+            .replace(
+                /\b\w/g,
+                function (character) {
+                    return character.toUpperCase();
+                }
+            );
+    }
+
+    function formatDate(value) {
+        if (!value) {
+            return "Not recorded";
+        }
+
+        const raw =
+            String(value);
+
+        const date =
+            /^\d{4}-\d{2}-\d{2}$/.test(raw)
+                ? new Date(raw + "T12:00:00")
+                : new Date(raw);
+
+        if (Number.isNaN(date.getTime())) {
+            return raw;
+        }
+
+        return new Intl.DateTimeFormat(
+            "en-GB",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        ).format(date);
+    }
+
+    function formatMoney(
+        value,
+        currency
+    ) {
+        const amount =
+            Number(value);
+
+        if (
+            !Number.isFinite(amount) ||
+            !currency
+        ) {
+            return String(value);
+        }
+
+        try {
+            return new Intl.NumberFormat(
+                "en-GB",
+                {
+                    style: "currency",
+                    currency: currency
+                }
+            ).format(amount);
+
+        } catch (error) {
+            return currency + " " + amount.toFixed(2);
+        }
+    }
+
+})();
