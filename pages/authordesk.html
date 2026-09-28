@@ -225,32 +225,78 @@
             </section>
 
             <section
-                id="section-finance"
-                class="desk-section"
-            >
-                <div class="section-heading">
-                    <p class="section-kicker">
-                        Statements &amp; Payments
-                    </p>
+    id="section-finance"
+    class="desk-section"
+>
+    <div class="section-heading">
+        <p class="section-kicker">
+            Statements &amp; Payments
+        </p>
 
-                    <h2>Statements &amp; Payments</h2>
+        <h2>Statements &amp; Payments</h2>
 
-                    <p>
-                        Issued royalty statements, payment history and
-                        payment requests will appear here.
-                    </p>
-                </div>
+        <p>
+            Your issued royalty statements, payment history
+            and payment requests.
+        </p>
+    </div>
 
-                <div class="future-panel">
-                    <h3>Financial records</h3>
+    <div class="summary-grid">
+        <article class="summary-card">
+            <p class="summary-label">Statements</p>
+            <p id="statement-count" class="summary-value">—</p>
+            <p class="summary-note">
+                Issued statements currently available in your Author Desk.
+            </p>
+        </article>
 
-                    <p>
-                        Financial data remains protected by the Author Desk
-                        access model. The author-facing statement and payment
-                        interface will be connected separately.
-                    </p>
-                </div>
-            </section>
+        <article class="summary-card">
+            <p class="summary-label">Payments</p>
+            <p id="payment-count" class="summary-value">—</p>
+            <p class="summary-note">
+                Payment records currently available in your Author Desk.
+            </p>
+        </article>
+
+        <article class="summary-card">
+            <p class="summary-label">Payment Requests</p>
+            <p id="payment-request-count" class="summary-value">—</p>
+            <p class="summary-note">
+                Payment requests recorded against your author account.
+            </p>
+        </article>
+    </div>
+
+    <section class="content-panel">
+        <h3>Royalty Statements</h3>
+
+        <p class="panel-intro">
+            Formal royalty statements issued by Blackwood Publishing.
+        </p>
+
+        <div id="statement-list" class="record-list"></div>
+    </section>
+
+    <section class="content-panel">
+        <h3>Payments</h3>
+
+        <p class="panel-intro">
+            Payments recorded against your author account.
+        </p>
+
+        <div id="payment-list" class="record-list"></div>
+    </section>
+
+    <section class="content-panel">
+        <h3>Payment Requests</h3>
+
+        <p class="panel-intro">
+            Payment requests submitted through your Author Desk.
+        </p>
+
+        <div id="payment-request-list" class="record-list"></div>
+    </section>
+</section>
 
         </div>
     </div>
