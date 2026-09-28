@@ -79,8 +79,9 @@
         <code>public.documents</code>,
         <code>public.agreements</code>,
         <code>public.rights</code>,
-        <code>public.rights_events</code> and
-        <code>public.advances</code>.
+        <code>public.rights_events</code>,
+        <code>public.advances</code> and
+        <code>public.advance_instalments</code>.
     </p>
 
     <section class="test-card">
@@ -186,6 +187,14 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Advance Instalment Query</h2>
+
+        <div id="advance-instalment-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -239,6 +248,9 @@
     const advanceResult =
         document.getElementById("advance-result");
 
+    const advanceInstalmentResult =
+        document.getElementById("advance-instalment-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -285,6 +297,7 @@
                 await testAnonymousRightsQuery();
                 await testAnonymousRightsEventQuery();
                 await testAnonymousAdvanceQuery();
+                await testAnonymousAdvanceInstalmentQuery();
 
                 return;
             }
@@ -335,6 +348,8 @@
             await testAuthenticatedAdvanceQuery(
                 session.user.id
             );
+
+            await testAuthenticatedAdvanceInstalmentQuery();
 
         } catch (error) {
             console.error(
@@ -395,6 +410,11 @@
             advanceResult.textContent =
                 "NOT TESTED\n\nAuthentication test failed.";
             advanceResult.classList.add("fail");
+
+
+            advanceInstalmentResult.textContent =
+                "NOT TESTED\n\nAuthentication test failed.";
+            advanceInstalmentResult.classList.add("fail");
         }
     }
 
@@ -1378,6 +1398,92 @@
         }
     }
 
+    async function testAuthenticatedAdvanceInstalmentQuery() {
+        advanceInstalmentResult.textContent =
+            "Querying advance_instalments through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("advance_instalments")
+                .select(
+                    "id,advance_id,instalment_number,description,amount,due_date,status,author_visible,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Advance Instalment result."
+                );
+            }
+
+            if (data.length === 0) {
+                advanceInstalmentResult.textContent =
+                    "PASS — NO ADVANCE INSTALMENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Advance Instalments.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk advance instalments, " +
+                    "Author Desk access is disabled, the parent Advance or linked " +
+                    "Agreement is not visible, no Desk-visible related book is assigned, " +
+                    "or the relevant Advance Instalments are not author-visible.";
+
+                advanceInstalmentResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedInstalment =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.advance_id !== "number" ||
+                        typeof record.instalment_number !== "number" ||
+                        record.instalment_number <= 0 ||
+                        record.amount === null ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedInstalment) {
+                advanceInstalmentResult.textContent =
+                    "FAIL — UNEXPECTED ADVANCE INSTALMENT DATA\n\n" +
+                    "An Advance Instalment was returned with unexpected required-field " +
+                    "data or was not author-visible.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                advanceInstalmentResult.classList.add("fail");
+                return;
+            }
+
+            advanceInstalmentResult.textContent =
+                "PASS — OWN ACCESSIBLE ADVANCE INSTALMENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            advanceInstalmentResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Advance Instalment query failed:",
+                error
+            );
+
+            advanceInstalmentResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            advanceInstalmentResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -1855,6 +1961,45 @@
                 String(error.message || error);
 
             advanceResult.classList.add("pass");
+        }
+    }
+    async function testAnonymousAdvanceInstalmentQuery() {
+        advanceInstalmentResult.textContent =
+            "Querying advance_instalments without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("advance_instalments")
+                .select(
+                    "id,advance_id,instalment_number,description,amount,due_date,status,author_visible,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                advanceInstalmentResult.textContent =
+                    "PASS — ANONYMOUS ADVANCE INSTALMENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Advance Instalments.";
+
+                advanceInstalmentResult.classList.add("pass");
+                return;
+            }
+
+            advanceInstalmentResult.textContent =
+                "FAIL — ANONYMOUS ADVANCE INSTALMENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            advanceInstalmentResult.classList.add("fail");
+
+        } catch (error) {
+            advanceInstalmentResult.textContent =
+                "PASS — ANONYMOUS ADVANCE INSTALMENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            advanceInstalmentResult.classList.add("pass");
         }
     }
 })();
