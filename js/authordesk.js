@@ -2576,11 +2576,10 @@
                 await client.rpc(
                     "cancel_payment_request",
                     {
-                        p_payment_request_id:
+                        p_request_id:
                             requestId
                     }
                 );
-
             if (error) {
                 throw error;
             }
