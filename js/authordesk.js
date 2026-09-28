@@ -2555,7 +2555,105 @@
             );
         }
     }
+    async function handlePaymentRequestCancel(
+        requestId,
+        button,
+        message
+    ) {
+        clearPaymentRequestMessage(
+            message
+        );
 
+        button.disabled =
+            true;
+
+        button.textContent =
+            "Cancelling…";
+
+        try {
+            const { error } =
+                await client.rpc(
+                    "cancel_payment_request",
+                    {
+                        p_payment_request_id:
+                            requestId
+                    }
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            const financeData =
+                await loadFinanceData();
+
+            renderFinance(
+                financeData
+            );
+
+        } catch (error) {
+            console.error(
+                "Payment request cancellation failed:",
+                error
+            );
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "Cancel request";
+
+            showPaymentRequestMessage(
+                message,
+                getPaymentRequestCancelErrorMessage(
+                    error
+                ),
+                true
+            );
+        }
+    }
+
+    function getPaymentRequestCancelErrorMessage(
+        error
+    ) {
+        const rawMessage =
+            error &&
+            error.message
+                ? String(
+                    error.message
+                )
+                : "";
+
+        const lowerMessage =
+            rawMessage.toLowerCase();
+
+        if (
+            lowerMessage.includes(
+                "requested"
+            ) ||
+            lowerMessage.includes(
+                "cancel"
+            )
+        ) {
+            return "This payment request can no longer be cancelled. Please refresh your Author Desk.";
+        }
+
+        if (
+            lowerMessage.includes(
+                "desk"
+            ) ||
+            lowerMessage.includes(
+                "author"
+            ) ||
+            lowerMessage.includes(
+                "authenticated"
+            )
+        ) {
+            return "Your Author Desk could not authorise this cancellation. Please sign in again and retry.";
+        }
+
+        return "The payment request could not be cancelled. No changes have been made.";
+    }
     function getPaymentRequestErrorMessage(
         error
     ) {
@@ -3557,7 +3655,7 @@
         );
     }
 
-    function renderPaymentRequests(
+       function renderPaymentRequests(
         paymentRequests
     ) {
         paymentRequestList.replaceChildren();
@@ -3573,6 +3671,175 @@
 
             return;
         }
+
+        paymentRequests.forEach(
+            function (request) {
+                const card =
+                    document.createElement(
+                        "article"
+                    );
+
+                card.className =
+                    "record-card";
+
+                const top =
+                    document.createElement(
+                        "div"
+                    );
+
+                top.className =
+                    "record-card-top";
+
+                const title =
+                    document.createElement(
+                        "h4"
+                    );
+
+                title.className =
+                    "record-title";
+
+                title.textContent =
+                    request.request_reference ||
+                    "Payment Request";
+
+                top.appendChild(title);
+
+                top.appendChild(
+                    createStatusBadge(
+                        formatLabel(
+                            request.status
+                        )
+                    )
+                );
+
+                card.appendChild(top);
+
+                const meta =
+                    document.createElement(
+                        "div"
+                    );
+
+                meta.className =
+                    "record-meta";
+
+                meta.appendChild(
+                    createInlineMeta(
+                        "Amount",
+                        formatMoney(
+                            request.requested_amount,
+                            request.currency
+                        )
+                    )
+                );
+
+                if (
+                    request.requested_at
+                ) {
+                    meta.appendChild(
+                        createInlineMeta(
+                            "Requested",
+                            formatDate(
+                                request.requested_at
+                            )
+                        )
+                    );
+                }
+
+                if (
+                    request.reviewed_at
+                ) {
+                    meta.appendChild(
+                        createInlineMeta(
+                            "Reviewed",
+                            formatDate(
+                                request.reviewed_at
+                            )
+                        )
+                    );
+                }
+
+                if (
+                    request.fulfilled_at
+                ) {
+                    meta.appendChild(
+                        createInlineMeta(
+                            "Fulfilled",
+                            formatDate(
+                                request.fulfilled_at
+                            )
+                        )
+                    );
+                }
+
+                card.appendChild(meta);
+
+                if (
+                    request.status ===
+                    "requested"
+                ) {
+                    const actions =
+                        document.createElement(
+                            "div"
+                        );
+
+                    actions.className =
+                        "payment-request-actions";
+
+                    const cancelButton =
+                        document.createElement(
+                            "button"
+                        );
+
+                    cancelButton.type =
+                        "button";
+
+                    cancelButton.className =
+                        "payment-request-button";
+
+                    cancelButton.textContent =
+                        "Cancel request";
+
+                    const message =
+                        document.createElement(
+                            "p"
+                        );
+
+                    message.className =
+                        "payment-request-message";
+
+                    message.hidden =
+                        true;
+
+                    cancelButton.addEventListener(
+                        "click",
+                        function () {
+                            handlePaymentRequestCancel(
+                                request.id,
+                                cancelButton,
+                                message
+                            );
+                        }
+                    );
+
+                    actions.appendChild(
+                        cancelButton
+                    );
+
+                    actions.appendChild(
+                        message
+                    );
+
+                    card.appendChild(
+                        actions
+                    );
+                }
+
+                paymentRequestList.appendChild(
+                    card
+                );
+            }
+        );
+    }
 
         paymentRequests.forEach(
             function (request) {
