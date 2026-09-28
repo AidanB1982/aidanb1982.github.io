@@ -82,8 +82,10 @@
         <code>public.rights_events</code>,
         <code>public.advances</code>,
         <code>public.advance_instalments</code>,
-        <code>public.royalty_entries</code> and
-        <code>public.royalty_adjustments</code>.
+        <code>public.royalty_entries</code>,
+        <code>public.royalty_adjustments</code>,
+        <code>public.royalty_statements</code> and
+        <code>public.royalty_statement_lines</code>.
     </p>
 
     <section class="test-card">
@@ -213,6 +215,22 @@
             Waiting for authentication check...
         </div>
     </section>
+
+    <section class="test-card">
+        <h2>Royalty Statement Query</h2>
+
+        <div id="royalty-statement-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
+
+    <section class="test-card">
+        <h2>Royalty Statement Line Query</h2>
+
+        <div id="royalty-statement-line-result" class="test-status">
+            Waiting for authentication check...
+        </div>
+    </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -275,6 +293,12 @@
     const royaltyAdjustmentResult =
         document.getElementById("royalty-adjustment-result");
 
+    const royaltyStatementResult =
+        document.getElementById("royalty-statement-result");
+
+    const royaltyStatementLineResult =
+        document.getElementById("royalty-statement-line-result");
+
     const client = window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY,
@@ -324,6 +348,8 @@
                 await testAnonymousAdvanceInstalmentQuery();
                 await testAnonymousRoyaltyEntryQuery();
                 await testAnonymousRoyaltyAdjustmentQuery();
+                await testAnonymousRoyaltyStatementQuery();
+                await testAnonymousRoyaltyStatementLineQuery();
 
                 return;
             }
@@ -383,6 +409,12 @@
 
             await testAuthenticatedRoyaltyAdjustmentQuery();
 
+            await testAuthenticatedRoyaltyStatementQuery(
+                session.user.id
+            );
+
+            await testAuthenticatedRoyaltyStatementLineQuery();
+
         } catch (error) {
             console.error(
                 "Author Desk authentication test failed:",
@@ -410,7 +442,9 @@
                 advanceResult,
                 advanceInstalmentResult,
                 royaltyEntryResult,
-                royaltyAdjustmentResult
+                royaltyAdjustmentResult,
+                royaltyStatementResult,
+                royaltyStatementLineResult
             ];
 
             resultElements.forEach(function (resultElement) {
@@ -1664,6 +1698,186 @@
         }
     }
 
+    async function testAuthenticatedRoyaltyStatementQuery(userId) {
+        royaltyStatementResult.textContent =
+            "Querying royalty_statements through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_statements")
+                .select(
+                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
+                )
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Royalty Statement result."
+                );
+            }
+
+            if (data.length === 0) {
+                royaltyStatementResult.textContent =
+                    "PASS — NO ROYALTY STATEMENTS VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Royalty Statements.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk statements, " +
+                    "Author Desk access is disabled, or the relevant " +
+                    "Royalty Statements are not author-visible.";
+
+                royaltyStatementResult.classList.add("pass");
+                return;
+            }
+
+            const unexpectedStatement =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        record.author_id !== userId ||
+                        !record.statement_reference ||
+                        !record.period_start ||
+                        !record.period_end ||
+                        !record.currency ||
+                        !record.status ||
+                        record.author_visible !== true
+                    );
+                });
+
+            if (unexpectedStatement) {
+                royaltyStatementResult.textContent =
+                    "FAIL — UNEXPECTED ROYALTY STATEMENT VISIBILITY OR DATA\n\n" +
+                    "A Royalty Statement was returned that does not belong to the " +
+                    "authenticated author, is not author-visible, or contains " +
+                    "unexpected required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                royaltyStatementResult.classList.add("fail");
+                return;
+            }
+
+            royaltyStatementResult.textContent =
+                "PASS — OWN ACCESSIBLE ROYALTY STATEMENTS ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyStatementResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Royalty Statement query failed:",
+                error
+            );
+
+            royaltyStatementResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            royaltyStatementResult.classList.add("fail");
+        }
+    }
+
+    async function testAuthenticatedRoyaltyStatementLineQuery() {
+        royaltyStatementLineResult.textContent =
+            "Querying royalty_statement_lines through authenticated RLS...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_statement_lines")
+                .select(
+                    "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
+                )
+                .order("statement_id", {
+                    ascending: true
+                })
+                .order("line_number", {
+                    ascending: true
+                })
+                .order("id", {
+                    ascending: true
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Supabase returned an unexpected Royalty Statement Line result."
+                );
+            }
+
+            if (data.length === 0) {
+                royaltyStatementLineResult.textContent =
+                    "PASS — NO ROYALTY STATEMENT LINES VISIBLE\n\n" +
+                    "The authenticated account can query the table, " +
+                    "but RLS has exposed no Royalty Statement Lines.\n\n" +
+                    "This is the expected result when the authenticated " +
+                    "user has no accessible Author Desk statements, " +
+                    "Author Desk access is disabled, or the parent " +
+                    "Royalty Statement is not author-visible.";
+
+                royaltyStatementLineResult.classList.add("pass");
+                return;
+            }
+
+            const malformedLine =
+                data.find(function (record) {
+                    return (
+                        typeof record.id !== "number" ||
+                        typeof record.statement_id !== "number" ||
+                        typeof record.line_number !== "number" ||
+                        record.line_number <= 0 ||
+                        !record.line_type ||
+                        !record.description ||
+                        !record.description.trim() ||
+                        record.amount === null ||
+                        Number(record.amount) === 0
+                    );
+                });
+
+            if (malformedLine) {
+                royaltyStatementLineResult.textContent =
+                    "FAIL — UNEXPECTED ROYALTY STATEMENT LINE DATA\n\n" +
+                    "A Royalty Statement Line was returned with unexpected " +
+                    "required-field data.\n\n" +
+                    JSON.stringify(data, null, 2);
+
+                royaltyStatementLineResult.classList.add("fail");
+                return;
+            }
+
+            royaltyStatementLineResult.textContent =
+                "PASS — OWN ACCESSIBLE ROYALTY STATEMENT LINES ONLY\n\n" +
+                "Returned rows: " +
+                data.length +
+                "\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyStatementLineResult.classList.add("pass");
+
+        } catch (error) {
+            console.error(
+                "Author Desk authenticated Royalty Statement Line query failed:",
+                error
+            );
+
+            royaltyStatementLineResult.textContent =
+                "QUERY ERROR\n\n" +
+                String(error.message || error);
+
+            royaltyStatementLineResult.classList.add("fail");
+        }
+    }
+
     async function testAnonymousAuthorQuery() {
         authorResult.textContent =
             "Querying author_records without an authenticated session...";
@@ -2261,6 +2475,86 @@
                 String(error.message || error);
 
             royaltyAdjustmentResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousRoyaltyStatementQuery() {
+        royaltyStatementResult.textContent =
+            "Querying royalty_statements without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_statements")
+                .select(
+                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                royaltyStatementResult.textContent =
+                    "PASS — ANONYMOUS ROYALTY STATEMENT ACCESS BLOCKED\n\n" +
+                    "The query returned zero Royalty Statements.";
+
+                royaltyStatementResult.classList.add("pass");
+                return;
+            }
+
+            royaltyStatementResult.textContent =
+                "FAIL — ANONYMOUS ROYALTY STATEMENT DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyStatementResult.classList.add("fail");
+
+        } catch (error) {
+            royaltyStatementResult.textContent =
+                "PASS — ANONYMOUS ROYALTY STATEMENT ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            royaltyStatementResult.classList.add("pass");
+        }
+    }
+
+    async function testAnonymousRoyaltyStatementLineQuery() {
+        royaltyStatementLineResult.textContent =
+            "Querying royalty_statement_lines without an authenticated session...";
+
+        try {
+            const { data, error } = await client
+                .from("royalty_statement_lines")
+                .select(
+                    "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
+                );
+
+            if (error) {
+                throw error;
+            }
+
+            if (Array.isArray(data) && data.length === 0) {
+                royaltyStatementLineResult.textContent =
+                    "PASS — ANONYMOUS ROYALTY STATEMENT LINE ACCESS BLOCKED\n\n" +
+                    "The query returned zero Royalty Statement Lines.";
+
+                royaltyStatementLineResult.classList.add("pass");
+                return;
+            }
+
+            royaltyStatementLineResult.textContent =
+                "FAIL — ANONYMOUS ROYALTY STATEMENT LINE DATA WAS VISIBLE\n\n" +
+                JSON.stringify(data, null, 2);
+
+            royaltyStatementLineResult.classList.add("fail");
+
+        } catch (error) {
+            royaltyStatementLineResult.textContent =
+                "PASS — ANONYMOUS ROYALTY STATEMENT LINE ACCESS BLOCKED\n\n" +
+                "Supabase rejected the query:\n" +
+                String(error.message || error);
+
+            royaltyStatementLineResult.classList.add("pass");
         }
     }
 })();
