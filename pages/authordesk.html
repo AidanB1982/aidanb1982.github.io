@@ -82,6 +82,16 @@
                 >
                     Statements &amp; Payments
                 </button>
+
+                <button
+                    id="publishing-desk-nav"
+                    type="button"
+                    class="nav-button"
+                    data-section="publishing"
+                    hidden
+                >
+                    Publishing Desk
+                </button>
             </nav>
 
             <button
@@ -225,78 +235,162 @@
             </section>
 
             <section
-    id="section-finance"
-    class="desk-section"
->
-    <div class="section-heading">
-        <p class="section-kicker">
-            Statements &amp; Payments
-        </p>
+                id="section-finance"
+                class="desk-section"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">
+                        Statements &amp; Payments
+                    </p>
 
-        <h2>Statements &amp; Payments</h2>
+                    <h2>Statements &amp; Payments</h2>
 
-        <p>
-            Your issued royalty statements, payment history
-            and payment requests.
-        </p>
-    </div>
+                    <p>
+                        Your issued royalty statements, payment history
+                        and payment requests.
+                    </p>
+                </div>
 
-    <div class="summary-grid">
-        <article class="summary-card">
-            <p class="summary-label">Statements</p>
-            <p id="statement-count" class="summary-value">—</p>
-            <p class="summary-note">
-                Issued statements currently available in your Author Desk.
-            </p>
-        </article>
+                <div class="summary-grid">
+                    <article class="summary-card">
+                        <p class="summary-label">Statements</p>
+                        <p id="statement-count" class="summary-value">—</p>
 
-        <article class="summary-card">
-            <p class="summary-label">Payments</p>
-            <p id="payment-count" class="summary-value">—</p>
-            <p class="summary-note">
-                Payment records currently available in your Author Desk.
-            </p>
-        </article>
+                        <p class="summary-note">
+                            Issued statements currently available in your Author Desk.
+                        </p>
+                    </article>
 
-        <article class="summary-card">
-            <p class="summary-label">Payment Requests</p>
-            <p id="payment-request-count" class="summary-value">—</p>
-            <p class="summary-note">
-                Payment requests recorded against your author account.
-            </p>
-        </article>
-    </div>
+                    <article class="summary-card">
+                        <p class="summary-label">Payments</p>
+                        <p id="payment-count" class="summary-value">—</p>
 
-    <section class="content-panel">
-        <h3>Royalty Statements</h3>
+                        <p class="summary-note">
+                            Payment records currently available in your Author Desk.
+                        </p>
+                    </article>
 
-        <p class="panel-intro">
-            Formal royalty statements issued by Blackwood Publishing.
-        </p>
+                    <article class="summary-card">
+                        <p class="summary-label">Payment Requests</p>
+                        <p id="payment-request-count" class="summary-value">—</p>
 
-        <div id="statement-list" class="record-list"></div>
-    </section>
+                        <p class="summary-note">
+                            Payment requests recorded against your author account.
+                        </p>
+                    </article>
+                </div>
 
-    <section class="content-panel">
-        <h3>Payments</h3>
+                <section class="content-panel">
+                    <h3>Royalty Statements</h3>
 
-        <p class="panel-intro">
-            Payments recorded against your author account.
-        </p>
+                    <p class="panel-intro">
+                        Formal royalty statements issued by Blackwood Publishing.
+                    </p>
 
-        <div id="payment-list" class="record-list"></div>
-    </section>
+                    <div
+                        id="statement-list"
+                        class="record-list"
+                    ></div>
+                </section>
 
-    <section class="content-panel">
-        <h3>Payment Requests</h3>
+                <section class="content-panel">
+                    <h3>Payments</h3>
 
-        <p class="panel-intro">
-            Payment requests submitted through your Author Desk.
-        </p>
+                    <p class="panel-intro">
+                        Payments recorded against your author account.
+                    </p>
 
-        <div id="payment-request-list" class="record-list"></div>
-    </section>
-</section>
+                    <div
+                        id="payment-list"
+                        class="record-list"
+                    ></div>
+                </section>
+
+                <section class="content-panel">
+                    <h3>Payment Requests</h3>
+
+                    <p class="panel-intro">
+                        Payment requests submitted through your Author Desk.
+                    </p>
+
+                    <div
+                        id="payment-request-list"
+                        class="record-list"
+                    ></div>
+                </section>
+            </section>
+
+            <section
+                id="section-publishing"
+                class="desk-section"
+            >
+                <div class="section-heading">
+                    <p class="section-kicker">
+                        Internal Administration
+                    </p>
+
+                    <h2>Publishing Desk</h2>
+
+                    <p>
+                        Internal Blackwood Publishing administration
+                        and financial processing.
+                    </p>
+                </div>
+
+                <section class="content-panel">
+                    <h3>Requires Attention</h3>
+
+                    <p class="panel-intro">
+                        Publishing matters requiring staff action will
+                        appear here.
+                    </p>
+
+                    <div
+                        id="publishing-attention-list"
+                        class="record-list"
+                    >
+                        <div class="empty-state">
+                            No items currently require attention.
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-panel">
+                    <h3>Add Transaction</h3>
+
+                    <p class="panel-intro">
+                        Record a credit or debit against an author
+                        publishing account.
+                    </p>
+
+                    <div
+                        id="publishing-transaction-form"
+                        class="record-list"
+                    >
+                        <div class="empty-state">
+                            Transaction entry is not yet enabled.
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-panel">
+                    <h3>Recent Transactions</h3>
+
+                    <p class="panel-intro">
+                        Recent transactions recorded through the
+                        Publishing Desk.
+                    </p>
+
+                    <div
+                        id="publishing-transaction-list"
+                        class="record-list"
+                    >
+                        <div class="empty-state">
+                            No transactions are currently recorded.
+                        </div>
+                    </div>
+                </section>
+            </section>
 
         </div>
     </div>
