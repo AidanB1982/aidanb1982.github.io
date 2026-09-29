@@ -105,7 +105,7 @@
         handleSignOut
     );
 
-    async function initialiseDesk() {
+        async function initialiseDesk() {
         try {
             const {
                 data: sessionData,
@@ -146,13 +146,50 @@
                 books,
                 productionData,
                 legalData,
-                financeData
+                financeData,
+                publishingStaffResponse
             ] = await Promise.all([
                 loadBooks(),
                 loadProductionData(),
                 loadLegalData(),
-                loadFinanceData()
+                loadFinanceData(),
+
+                client
+                    .from("publishing_staff")
+                    .select(
+                        "user_id,display_name,is_active"
+                    )
+                    .eq(
+                        "user_id",
+                        session.user.id
+                    )
+                    .maybeSingle()
             ]);
+
+            const publishingDeskNav =
+                document.getElementById(
+                    "publishing-desk-nav"
+                );
+
+            if (
+                publishingDeskNav &&
+                !publishingStaffResponse.error &&
+                publishingStaffResponse.data &&
+                publishingStaffResponse.data.is_active ===
+                    true
+            ) {
+                publishingDeskNav.hidden =
+                    false;
+            }
+
+            if (
+                publishingStaffResponse.error
+            ) {
+                console.error(
+                    "Publishing Desk access check failed:",
+                    publishingStaffResponse.error
+                );
+            }
 
             renderDesk(
                 authorRecord,
