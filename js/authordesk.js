@@ -105,7 +105,7 @@
         handleSignOut
     );
 
-        async function initialiseDesk() {
+           async function initialiseDesk() {
         try {
             const {
                 data: sessionData,
@@ -180,6 +180,178 @@
             ) {
                 publishingDeskNav.hidden =
                     false;
+
+                const [
+                    paymentRequestsResponse,
+                    authorRecordsResponse
+                ] = await Promise.all([
+                    client
+                        .from("payment_requests")
+                        .select(
+                            "id,author_id,request_reference,requested_amount,currency,status,requested_at"
+                        )
+                        .eq(
+                            "status",
+                            "requested"
+                        )
+                        .order(
+                            "requested_at",
+                            {
+                                ascending: true
+                            }
+                        ),
+
+                    client
+                        .from("author_records")
+                        .select(
+                            "id,publishing_name"
+                        )
+                ]);
+
+                if (paymentRequestsResponse.error) {
+                    throw paymentRequestsResponse.error;
+                }
+
+                if (authorRecordsResponse.error) {
+                    throw authorRecordsResponse.error;
+                }
+
+                const attentionList =
+                    document.getElementById(
+                        "publishing-attention-list"
+                    );
+
+                if (attentionList) {
+                    attentionList.replaceChildren();
+
+                    const paymentRequests =
+                        Array.isArray(
+                            paymentRequestsResponse.data
+                        )
+                            ? paymentRequestsResponse.data
+                            : [];
+
+                    const authorRecords =
+                        Array.isArray(
+                            authorRecordsResponse.data
+                        )
+                            ? authorRecordsResponse.data
+                            : [];
+
+                    if (paymentRequests.length === 0) {
+                        attentionList.appendChild(
+                            createEmptyState(
+                                "No items currently require attention."
+                            )
+                        );
+                    } else {
+                        paymentRequests.forEach(
+                            function (request) {
+                                const author =
+                                    authorRecords.find(
+                                        function (
+                                            record
+                                        ) {
+                                            return (
+                                                record.id ===
+                                                request.author_id
+                                            );
+                                        }
+                                    );
+
+                                const card =
+                                    document.createElement(
+                                        "article"
+                                    );
+
+                                card.className =
+                                    "record-card";
+
+                                const top =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+                                top.className =
+                                    "record-card-top";
+
+                                const title =
+                                    document.createElement(
+                                        "h4"
+                                    );
+
+                                title.className =
+                                    "record-title";
+
+                                title.textContent =
+                                    request.request_reference;
+
+                                top.appendChild(title);
+
+                                top.appendChild(
+                                    createStatusBadge(
+                                        "Requested"
+                                    )
+                                );
+
+                                card.appendChild(top);
+
+                                const description =
+                                    document.createElement(
+                                        "p"
+                                    );
+
+                                description.className =
+                                    "record-description";
+
+                                description.textContent =
+                                    (
+                                        author &&
+                                        author.publishing_name
+                                    )
+                                        ? author.publishing_name
+                                        : "Author";
+
+                                card.appendChild(
+                                    description
+                                );
+
+                                const meta =
+                                    document.createElement(
+                                        "div"
+                                    );
+
+                                meta.className =
+                                    "record-meta";
+
+                                meta.appendChild(
+                                    createInlineMeta(
+                                        "Amount",
+                                        formatMoney(
+                                            request.requested_amount,
+                                            request.currency
+                                        )
+                                    )
+                                );
+
+                                meta.appendChild(
+                                    createInlineMeta(
+                                        "Requested",
+                                        formatDate(
+                                            request.requested_at
+                                        )
+                                    )
+                                );
+
+                                card.appendChild(meta);
+
+                                attentionList.appendChild(
+                                    card
+                                );
+                            }
+                        );
+                    }
+                }
             }
 
             if (
