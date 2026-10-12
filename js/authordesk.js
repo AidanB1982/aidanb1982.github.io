@@ -321,6 +321,83 @@ async function initialiseDesk() {
 
                         card.appendChild(meta);
 
+const isDavidTestRequest =
+    request.author_id ===
+        "579da283-3a1f-4947-8b53-ba5d54aad939" &&
+    request.request_reference ===
+        "TEST-DAVID-REQUEST-001";
+
+if (isDavidTestRequest) {
+    const testPanel = document.createElement("div");
+    testPanel.className = "payment-request-control";
+
+    const testNotice = document.createElement("p");
+    testNotice.className = "record-description";
+    testNotice.textContent =
+        "SIMULATION ONLY — No bank transfer will occur. " +
+        "This records a test transaction, not a real payment.";
+
+    const testButton = document.createElement("button");
+    testButton.type = "button";
+    testButton.className = "payment-request-button";
+    testButton.textContent = "Record Simulated Payment";
+
+    const testMessage = document.createElement("p");
+    testMessage.className = "payment-request-message";
+    testMessage.hidden = true;
+    testMessage.setAttribute("role", "status");
+
+    testButton.addEventListener("click", async function () {
+        const confirmed = window.confirm(
+            "TEST ONLY: Record a simulated £25 payment " +
+            "for David Stewart? NO bank transfer will occur."
+        );
+
+        if (!confirmed) return;
+
+        testButton.disabled = true;
+        testButton.textContent = "Recording simulation…";
+
+        try {
+            const { error } = await client.rpc(
+                "record_simulated_author_payment",
+                { p_request_id: request.id }
+            );
+
+            if (error) throw error;
+
+            testMessage.textContent =
+                "Simulated payment recorded. No money transferred.";
+            testMessage.className =
+                "payment-request-message success";
+            testMessage.hidden = false;
+
+            window.location.reload();
+        } catch (error) {
+            console.error(
+                "Simulated payment failed:",
+                error
+            );
+
+            testMessage.textContent =
+                "Simulation failed: " +
+                (error.message || "Unknown error");
+            testMessage.className =
+                "payment-request-message error";
+            testMessage.hidden = false;
+
+            testButton.disabled = false;
+            testButton.textContent =
+                "Record Simulated Payment";
+        }
+    });
+
+    testPanel.appendChild(testNotice);
+    testPanel.appendChild(testButton);
+    testPanel.appendChild(testMessage);
+    card.appendChild(testPanel);
+}
+
                         const hasDetails =
                             requestsWithDetails.has(request.id);
 
@@ -336,7 +413,7 @@ async function initialiseDesk() {
 
                         card.appendChild(detailsStatus);
 
-                        if (hasDetails) {
+                        if (hasDetails && !isDavidTestRequest) {
                             const reviewButton =
                                 document.createElement("button");
 
@@ -4088,13 +4165,15 @@ function renderOverviewRoyalties(financeData) {
 
                 top.appendChild(title);
 
+                
                 top.appendChild(
                     createStatusBadge(
-                        formatLabel(
-                            payment.status
-                        )
+                        payment.status === "simulated"
+                            ? "Simulated — No Bank Transfer"
+                            : formatLabel(payment.status)
                     )
                 );
+
 
                 card.appendChild(top);
 
