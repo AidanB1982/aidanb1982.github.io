@@ -17,7 +17,7 @@
                 detectSessionInUrl: true
             }
         }
-    );
+    ); 
 
     const loadingPanel =
         document.getElementById("loading-panel");
