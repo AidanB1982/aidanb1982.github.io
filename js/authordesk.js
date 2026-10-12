@@ -3865,191 +3865,395 @@
         );
     }
 
-    function renderPaymentRequests(
-        paymentRequests
-    ) {
-        paymentRequestList.replaceChildren();
+    
+function renderPaymentRequests(
+    paymentRequests
+) {
+    paymentRequestList.replaceChildren();
 
-        if (
-            paymentRequests.length === 0
-        ) {
-            paymentRequestList.appendChild(
+    if (paymentRequests.length === 0) {
+        paymentRequestList.appendChild(
+            createEmptyState(
+                "No payment requests are currently recorded."
+            )
+        );
+        return;
+    }
+
+    paymentRequests.forEach(function (request) {
+        const card = document.createElement("article");
+        card.className = "record-card";
+
+        const top = document.createElement("div");
+        top.className = "record-card-top";
+
+        const title = document.createElement("h4");
+        title.className = "record-title";
+        title.textContent =
+            request.request_reference ||
+            "Payment Request";
+
+        top.appendChild(title);
+        top.appendChild(
+            createStatusBadge(
+                formatLabel(request.status)
+            )
+        );
+        card.appendChild(top);
+
+        const meta = document.createElement("div");
+        meta.className = "record-meta";
+
+        meta.appendChild(
+            createInlineMeta(
+                "Amount",
+                formatMoney(
+                    request.requested_amount,
+                    request.currency
+                )
+            )
+        );
+
+        if (request.requested_at) {
+            meta.appendChild(
+                createInlineMeta(
+                    "Requested",
+                    formatDate(request.requested_at)
+                )
+            );
+        }
+
+        if (request.reviewed_at) {
+            meta.appendChild(
+                createInlineMeta(
+                    "Reviewed",
+                    formatDate(request.reviewed_at)
+                )
+            );
+        }
+
+        if (request.fulfilled_at) {
+            meta.appendChild(
+                createInlineMeta(
+                    "Fulfilled",
+                    formatDate(request.fulfilled_at)
+                )
+            );
+        }
+
+        card.appendChild(meta);
+
+        if (request.status === "requested") {
+            const detailsContainer =
+                document.createElement("div");
+
+            detailsContainer.className =
+                "payment-request-control";
+
+            detailsContainer.appendChild(
                 createEmptyState(
-                    "No payment requests are currently recorded."
+                    "Checking payment details…"
                 )
             );
 
+            card.appendChild(detailsContainer);
+
+            loadPaymentDetailsStatus(
+                request.id,
+                detailsContainer
+            );
+
+            const actions = document.createElement("div");
+            actions.className = "payment-request-actions";
+
+            const cancelButton =
+                document.createElement("button");
+
+            cancelButton.type = "button";
+            cancelButton.className =
+                "payment-request-button";
+            cancelButton.textContent = "Cancel request";
+
+            const message = document.createElement("p");
+            message.className =
+                "payment-request-message";
+            message.hidden = true;
+
+            cancelButton.addEventListener(
+                "click",
+                function () {
+                    handlePaymentRequestCancel(
+                        request.id,
+                        cancelButton,
+                        message
+                    );
+                }
+            );
+
+            actions.appendChild(cancelButton);
+            actions.appendChild(message);
+            card.appendChild(actions);
+        }
+
+        paymentRequestList.appendChild(card);
+    });
+}
+
+async function loadPaymentDetailsStatus(
+    requestId,
+    container
+) {
+    try {
+        const { data, error } = await client
+            .from("payment_request_payment_details")
+            .select("payment_request_id")
+            .eq("payment_request_id", requestId)
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        if (!container.isConnected) {
             return;
         }
 
-        paymentRequests.forEach(
-            function (request) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
+        container.replaceChildren();
 
-                card.className =
-                    "record-card";
+        if (data) {
+            const confirmation =
+                document.createElement("p");
 
-                const top =
-                    document.createElement(
-                        "div"
-                    );
+            confirmation.className =
+                "record-description";
 
-                top.className =
-                    "record-card-top";
+            confirmation.textContent =
+                "Bank details have been securely submitted for this payment request.";
 
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
+            container.appendChild(confirmation);
+            return;
+        }
 
-                title.className =
-                    "record-title";
+        container.appendChild(
+            createPaymentDetailsForm(requestId)
+        );
 
-                title.textContent =
-                    request.request_reference ||
-                    "Payment Request";
+    } catch (error) {
+        console.error(
+            "Payment details status check failed:",
+            error
+        );
 
-                top.appendChild(title);
+        if (!container.isConnected) {
+            return;
+        }
 
-                top.appendChild(
-                    createStatusBadge(
-                        formatLabel(
-                            request.status
-                        )
-                    )
-                );
+        container.replaceChildren();
 
-                card.appendChild(top);
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Amount",
-                        formatMoney(
-                            request.requested_amount,
-                            request.currency
-                        )
-                    )
-                );
-
-                if (
-                    request.requested_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Requested",
-                            formatDate(
-                                request.requested_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    request.reviewed_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Reviewed",
-                            formatDate(
-                                request.reviewed_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    request.fulfilled_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Fulfilled",
-                            formatDate(
-                                request.fulfilled_at
-                            )
-                        )
-                    );
-                }
-
-                card.appendChild(meta);
-
-                if (
-                    request.status ===
-                    "requested"
-                ) {
-                    const actions =
-                        document.createElement(
-                            "div"
-                        );
-
-                    actions.className =
-                        "payment-request-actions";
-
-                    const cancelButton =
-                        document.createElement(
-                            "button"
-                        );
-
-                    cancelButton.type =
-                        "button";
-
-                    cancelButton.className =
-                        "payment-request-button";
-
-                    cancelButton.textContent =
-                        "Cancel request";
-
-                    const message =
-                        document.createElement(
-                            "p"
-                        );
-
-                    message.className =
-                        "payment-request-message";
-
-                    message.hidden =
-                        true;
-
-                    cancelButton.addEventListener(
-                        "click",
-                        function () {
-                            handlePaymentRequestCancel(
-                                request.id,
-                                cancelButton,
-                                message
-                            );
-                        }
-                    );
-
-                    actions.appendChild(
-                        cancelButton
-                    );
-
-                    actions.appendChild(
-                        message
-                    );
-
-                    card.appendChild(
-                        actions
-                    );
-                }
-
-                paymentRequestList.appendChild(
-                    card
-                );
-            }
+        container.appendChild(
+            createEmptyState(
+                "Payment details could not be checked. Please refresh the Author Desk."
+            )
         );
     }
+}
+
+function createPaymentDetailsForm(requestId) {
+    const form = document.createElement("form");
+    form.className = "payment-request-form";
+
+    const heading = document.createElement("h4");
+    heading.className = "record-title";
+    heading.textContent = "Bank details";
+
+    const description = document.createElement("p");
+    description.className = "record-description";
+    description.textContent =
+        "Enter the UK bank account details for this payment request.";
+
+    const fields = [
+        {
+            label: "Account holder name",
+            name: "accountHolder",
+            maxLength: 100,
+            placeholder: "Account holder name"
+        },
+        {
+            label: "Sort code",
+            name: "sortCode",
+            maxLength: 8,
+            placeholder: "00-00-00"
+        },
+        {
+            label: "Account number",
+            name: "accountNumber",
+            maxLength: 8,
+            placeholder: "12345678"
+        }
+    ];
+
+    const inputs = {};
+
+    fields.forEach(function (fieldDefinition) {
+        const field = document.createElement("div");
+        field.className = "payment-request-field";
+
+        const label = document.createElement("label");
+        const id =
+            "bank-" +
+            fieldDefinition.name +
+            "-" +
+            requestId;
+
+        label.htmlFor = id;
+        label.textContent = fieldDefinition.label;
+
+        const input = document.createElement("input");
+        input.id = id;
+        input.name = fieldDefinition.name;
+        input.type = "text";
+        input.required = true;
+        input.maxLength = fieldDefinition.maxLength;
+        input.placeholder = fieldDefinition.placeholder;
+        input.autocomplete = "off";
+
+        if (fieldDefinition.name !== "accountHolder") {
+            input.inputMode = "numeric";
+            input.spellcheck = false;
+        }
+
+        inputs[fieldDefinition.name] = input;
+
+        field.appendChild(label);
+        field.appendChild(input);
+        form.appendChild(field);
+    });
+
+    const button = document.createElement("button");
+    button.type = "submit";
+    button.className = "payment-request-button";
+    button.textContent = "Save bank details";
+
+    const message = document.createElement("p");
+    message.className = "payment-request-message";
+    message.hidden = true;
+    message.setAttribute("role", "status");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        clearPaymentRequestMessage(message);
+
+        const accountHolder =
+            inputs.accountHolder.value.trim();
+
+        const sortCode =
+            inputs.sortCode.value.replace(/\D/g, "");
+
+        const accountNumber =
+            inputs.accountNumber.value.replace(/\D/g, "");
+
+        if (!accountHolder) {
+            showPaymentRequestMessage(
+                message,
+                "Enter the account holder name.",
+                true
+            );
+            return;
+        }
+
+        if (!/^\d{6}$/.test(sortCode)) {
+            showPaymentRequestMessage(
+                message,
+                "Enter a valid six-digit sort code.",
+                true
+            );
+            return;
+        }
+
+        if (!/^\d{8}$/.test(accountNumber)) {
+            showPaymentRequestMessage(
+                message,
+                "Enter an eight-digit account number.",
+                true
+            );
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Saving…";
+
+        Object.values(inputs).forEach(function (input) {
+            input.disabled = true;
+        });
+
+        try {
+            const { error } = await client.rpc(
+                "save_payment_request_payment_details",
+                {
+                    p_request_id: requestId,
+                    p_account_holder_name: accountHolder,
+                    p_sort_code: sortCode,
+                    p_account_number: accountNumber
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            inputs.accountHolder.value = "";
+            inputs.sortCode.value = "";
+            inputs.accountNumber.value = "";
+
+            form.replaceChildren();
+
+            const confirmation =
+                document.createElement("p");
+
+            confirmation.className =
+                "record-description";
+
+            confirmation.textContent =
+                "Bank details saved successfully. Blackwood Publishing can now review this payment request.";
+
+            form.appendChild(confirmation);
+
+        } catch (error) {
+            console.error(
+                "Saving payment details failed:",
+                error &&
+                error.code
+                    ? error.code
+                    : "Request failed"
+            );
+
+            Object.values(inputs).forEach(function (input) {
+                input.disabled = false;
+            });
+
+            button.disabled = false;
+            button.textContent = "Save bank details";
+
+            showPaymentRequestMessage(
+                message,
+                "Bank details could not be saved. Please check your information and try again.",
+                true
+            );
+        }
+    });
+
+    const wrapper = document.createElement("div");
+
+    wrapper.appendChild(heading);
+    wrapper.appendChild(description);
+    wrapper.appendChild(form);
+
+    form.appendChild(button);
+    form.appendChild(message);
+
+    return wrapper;
+}
 
     function createSummaryRecord(
         label,
