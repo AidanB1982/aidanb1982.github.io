@@ -150,11 +150,10 @@ async function initialiseDesk() {
             financeData,
             publishingStaffResponse
         ] = await Promise.all([
-            loadBooks(),
-            loadProductionData(),
-            loadLegalData(),
+            loadBooks(authorRecord.id),
+            loadProductionData(authorRecord.id),
+            loadLegalData(authorRecord.id),
             loadFinanceData(authorRecord.id),
-
             client
                 .from("publishing_staff")
                 .select(
@@ -836,191 +835,219 @@ if (isDavidTestRequest) {
         return data;
     }
 
-    async function loadBooks() {
-        const { data, error } = await client
-            .from("book_records")
+    async function loadBooks(authorId) {
+    if (!authorId) {
+        throw new Error("Author ID is required to load books.");
+    }
+
+    const { data: contributors, error: contributorError } =
+        await client
+            .from("book_contributors")
+            .select("book_id")
+            .eq("author_id", authorId)
+            .eq("desk_visible", true);
+
+    if (contributorError) {
+        throw contributorError;
+    }
+
+    const bookIds = [
+        ...new Set(
+            (contributors || []).map(function (record) {
+                return record.book_id;
+            })
+        )
+    ];
+
+    if (bookIds.length === 0) {
+        return [];
+    }
+
+    const { data, error } = await client
+        .from("book_records")
+        .select(
+            "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+        )
+        .in("id", bookIds)
+        .order("id", { ascending: true });
+
+    if (error) {
+        throw error;
+    }
+
+    return Array.isArray(data) ? data : [];
+}
+
+
+async function loadProductionData(authorId) {
+    if (!authorId) {
+        throw new Error("Author ID is required to load production data.");
+    }
+
+    const { data: contributors, error: contributorError } =
+        await client
+            .from("book_contributors")
+            .select("book_id")
+            .eq("author_id", authorId)
+            .eq("desk_visible", true);
+
+    if (contributorError) {
+        throw contributorError;
+    }
+
+    const bookIds = [
+        ...new Set(
+            (contributors || []).map(function (record) {
+                return record.book_id;
+            })
+        )
+    ];
+
+    if (bookIds.length === 0) {
+        return {
+            events: [],
+            editions: [],
+            actions: []
+        };
+    }
+
+    const [
+        productionEventsResponse,
+        editionsResponse,
+        actionsResponse
+    ] = await Promise.all([
+        client
+            .from("production_events")
             .select(
-                "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+                "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
             )
-            .order("id", {
-                ascending: true
-            });
+            .in("book_id", bookIds)
+            .eq("author_visible", true)
+            .order("event_date", { ascending: false })
+            .order("id", { ascending: false }),
+
+        client
+            .from("book_editions")
+            .select(
+                "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
+            )
+            .in("book_id", bookIds)
+            .eq("author_visible", true)
+            .order("id", { ascending: true }),
+
+        client
+            .from("author_actions")
+            .select(
+                "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
+            )
+            .in("book_id", bookIds)
+            .eq("author_visible", true)
+            .order("id", { ascending: true })
+    ]);
+
+    if (productionEventsResponse.error) {
+        throw productionEventsResponse.error;
+    }
+
+    if (editionsResponse.error) {
+        throw editionsResponse.error;
+    }
+
+    if (actionsResponse.error) {
+        throw actionsResponse.error;
+    }
+
+    return {
+        events: productionEventsResponse.data || [],
+        editions: editionsResponse.data || [],
+        actions: actionsResponse.data || []
+    };
+}
+
+
+async function loadLegalData(authorId) {
+    if (!authorId) {
+        throw new Error("Author ID is required to load legal data.");
+    }
+
+    const [
+        documentsResponse,
+        agreementsResponse,
+        rightsResponse
+    ] = await Promise.all([
+        client
+            .from("documents")
+            .select(
+                "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .eq("author_visible", true)
+            .order("id", { ascending: true }),
+
+        client
+            .from("agreements")
+            .select(
+                "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .eq("author_visible", true)
+            .order("id", { ascending: true }),
+
+        client
+            .from("rights")
+            .select(
+                "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .eq("author_visible", true)
+            .order("id", { ascending: true })
+    ]);
+
+    if (documentsResponse.error) {
+        throw documentsResponse.error;
+    }
+
+    if (agreementsResponse.error) {
+        throw agreementsResponse.error;
+    }
+
+    if (rightsResponse.error) {
+        throw rightsResponse.error;
+    }
+
+    const rights = rightsResponse.data || [];
+
+    const rightIds = rights.map(function (right) {
+        return right.id;
+    });
+
+    let rightsEvents = [];
+
+    if (rightIds.length > 0) {
+        const { data, error } = await client
+            .from("rights_events")
+            .select(
+                "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
+            )
+            .in("right_id", rightIds)
+            .eq("author_visible", true)
+            .order("event_date", { ascending: false })
+            .order("id", { ascending: false });
 
         if (error) {
             throw error;
         }
 
-        return Array.isArray(data)
-            ? data
-            : [];
+        rightsEvents = data || [];
     }
 
-    async function loadProductionData() {
-        const [
-            productionEventsResponse,
-            editionsResponse,
-            actionsResponse
-        ] = await Promise.all([
-            client
-                .from("production_events")
-                .select(
-                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
-                )
-                .order("event_date", {
-                    ascending: false
-                })
-                .order("id", {
-                    ascending: false
-                }),
-
-            client
-                .from("book_editions")
-                .select(
-                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
-                )
-                .order("id", {
-                    ascending: true
-                }),
-
-            client
-                .from("author_actions")
-                .select(
-                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                })
-        ]);
-
-        if (productionEventsResponse.error) {
-            throw productionEventsResponse.error;
-        }
-
-        if (editionsResponse.error) {
-            throw editionsResponse.error;
-        }
-
-        if (actionsResponse.error) {
-            throw actionsResponse.error;
-        }
-
-        return {
-            events:
-                Array.isArray(
-                    productionEventsResponse.data
-                )
-                    ? productionEventsResponse.data
-                    : [],
-
-            editions:
-                Array.isArray(
-                    editionsResponse.data
-                )
-                    ? editionsResponse.data
-                    : [],
-
-            actions:
-                Array.isArray(
-                    actionsResponse.data
-                )
-                    ? actionsResponse.data
-                    : []
-        };
-    }
-
-    async function loadLegalData() {
-        const [
-            documentsResponse,
-            agreementsResponse,
-            rightsResponse,
-            rightsEventsResponse
-        ] = await Promise.all([
-            client
-                .from("documents")
-                .select(
-                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                }),
-
-            client
-                .from("agreements")
-                .select(
-                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                }),
-
-            client
-                .from("rights")
-                .select(
-                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
-                )
-                .order("id", {
-                    ascending: true
-                }),
-
-            client
-                .from("rights_events")
-                .select(
-                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
-                )
-                .order("event_date", {
-                    ascending: false
-                })
-                .order("id", {
-                    ascending: false
-                })
-        ]);
-
-        if (documentsResponse.error) {
-            throw documentsResponse.error;
-        }
-
-        if (agreementsResponse.error) {
-            throw agreementsResponse.error;
-        }
-
-        if (rightsResponse.error) {
-            throw rightsResponse.error;
-        }
-
-        if (rightsEventsResponse.error) {
-            throw rightsEventsResponse.error;
-        }
-
-        return {
-            documents:
-                Array.isArray(
-                    documentsResponse.data
-                )
-                    ? documentsResponse.data
-                    : [],
-
-            agreements:
-                Array.isArray(
-                    agreementsResponse.data
-                )
-                    ? agreementsResponse.data
-                    : [],
-
-            rights:
-                Array.isArray(
-                    rightsResponse.data
-                )
-                    ? rightsResponse.data
-                    : [],
-
-            rightsEvents:
-                Array.isArray(
-                    rightsEventsResponse.data
-                )
-                    ? rightsEventsResponse.data
-                    : []
-        };
-    }
+    return {
+        documents: documentsResponse.data || [],
+        agreements: agreementsResponse.data || [],
+        rights,
+        rightsEvents
+    };
+}
 
     
 async function loadFinanceData(authorId) {
