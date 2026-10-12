@@ -127,3 +127,25 @@ a:hover { color: #17392d; }
 @media (max-width: 600px) { .page-shell { width: min(100% - 28px, 1260px); padding: 25px 0 55px; } .page-title { font-size: 2.5rem; } .page-intro { font-size: .96rem; } .desk { gap: 28px; } .desk-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } .nav-button { padding: 10px 11px; font-size: .9rem; } .section-heading { margin-bottom: 23px; padding-bottom: 20px; } .summary-grid, .production-summary, .legal-summary { grid-template-columns: 1fr; } .summary-card { min-height: 0; } .content-panel { padding: 20px 17px; } .book-card-top, .action-card-top, .edition-card-top, .record-card-top { flex-wrap: wrap; gap: 10px; } .book-meta { grid-template-columns: 1fr; gap: 12px; } .status-badge { margin-top: 2px; } .payment-request-field { width: 100%; } .payment-request-field input { width: 100%; } .payment-request-button { width: 100%; } }
 @media (max-width: 380px) { .desk-nav { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Dedicated Author Desk masthead and footer */
+.desk-masthead { border-bottom: 1px solid var(--border-strong); background: #f8f6f0; }
+.desk-masthead-inner { width: min(1260px, calc(100% - 64px)); margin: 0 auto; min-height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.desk-brand { display: inline-flex; flex-direction: column; gap: 3px; color: var(--green); text-decoration: none; }
+.desk-brand:hover { color: #17392d; }
+.desk-brand-name { font-family: Georgia, 'Times New Roman', serif; font-size: 1.27rem; letter-spacing: .045em; line-height: 1.1; }
+.desk-brand-detail { font-family: Arial, Helvetica, sans-serif; font-size: .62rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; }
+.desk-masthead-label { margin: 0; color: var(--muted); font-family: Arial, Helvetica, sans-serif; font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; text-align: right; }
+.desk-page-heading { padding-top: 6px; }
+.desk-footer { margin-top: auto; background: #1b382d; color: #f5f1e7; }
+.desk-footer-inner { width: min(1260px, calc(100% - 64px)); margin: 0 auto; padding: 35px 0 24px; }
+.desk-footer-top, .desk-footer-bottom { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+.desk-footer-title { margin: 0; font-size: 1.15rem; font-weight: 400; letter-spacing: .025em; }
+.desk-footer-description { margin: 7px 0 0; color: #d4dfd5; font-size: .9rem; }
+.desk-footer-privacy { margin: 4px 0 0; color: #d4dfd5; font-family: Arial, Helvetica, sans-serif; font-size: .72rem; letter-spacing: .07em; }
+.desk-footer-bottom { margin-top: 25px; padding-top: 18px; border-top: 1px solid rgba(245,241,231,.22); color: #d4dfd5; font-family: Arial, Helvetica, sans-serif; font-size: .76rem; }
+.desk-footer-bottom p { margin: 0; }
+body { display: flex; flex-direction: column; }
+.page-shell { flex: 1 0 auto; width: min(1260px, calc(100% - 64px)); }
+@media (max-width: 820px) { .desk-masthead-inner, .desk-footer-inner { width: min(100% - 40px, 1260px); } }
+@media (max-width: 600px) { .desk-masthead-inner, .desk-footer-inner { width: min(100% - 28px, 1260px); } .desk-masthead-inner { min-height: 76px; } .desk-brand-name { font-size: 1.06rem; } .desk-masthead-label { font-size: .59rem; max-width: 115px; } .desk-footer-inner { padding: 29px 0 23px; } }
