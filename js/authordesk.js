@@ -917,12 +917,13 @@ async function initialiseDesk() {
             legalData
         );
 
-        renderFinance(
+                renderFinance(
             financeData
         );
+
         renderOverviewRoyalties(
-        financeData
-    );
+            financeData
+        );
     }
 
     function renderBookList(
