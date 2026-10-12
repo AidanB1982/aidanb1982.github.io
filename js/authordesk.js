@@ -4727,6 +4727,7 @@ function createPaymentDetailsForm(requestId) {
 
             renderFinance(financeData);
             renderOverviewRoyalties(financeData);
+            window.location.reload();
 
         } catch (error) {
             console.error(
