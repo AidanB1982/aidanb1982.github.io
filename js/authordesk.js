@@ -99,7 +99,11 @@
             showSection(button.dataset.section);
         });
     });
-
+document
+    .getElementById("overview-finance-button")
+    ?.addEventListener("click", function () {
+        showSection("finance");
+    });
     signOutButton.addEventListener(
         "click",
         handleSignOut
@@ -2389,7 +2393,79 @@ async function initialiseDesk() {
 
         return panel;
     }
+function renderOverviewRoyalties(financeData) {
+    const container = document.getElementById(
+        "overview-royalty-summary"
+    );
 
+    if (!container) return;
+
+    container.replaceChildren();
+
+    const currencies = getFinanceCurrencies(
+        financeData.statements.filter(
+            statement => statement.status === "issued"
+        ),
+        financeData.payments,
+        financeData.paymentRequests,
+        financeData.advances
+    );
+
+    if (currencies.length === 0) {
+        container.appendChild(
+            createEmptyState(
+                "No royalty statements are currently available."
+            )
+        );
+        return;
+    }
+
+    currencies.forEach(function (currency) {
+        const figures = calculateFinanceSummary(
+            currency,
+            financeData
+        );
+
+        const group = document.createElement("div");
+        group.className = "finance-account-currency";
+
+        if (currencies.length > 1) {
+            const heading = document.createElement("h4");
+            heading.textContent = currency;
+            group.appendChild(heading);
+        }
+
+        const grid = document.createElement("div");
+        grid.className = "finance-summary-grid";
+
+        grid.appendChild(
+            createFinanceSummaryCard(
+                "Royalties Earned",
+                formatMoney(figures.royaltiesEarned, currency),
+                "Royalties shown on issued statements."
+            )
+        );
+
+        grid.appendChild(
+            createFinanceSummaryCard(
+                "Payments Made",
+                formatMoney(figures.totalPayments, currency),
+                "Payments recorded as paid."
+            )
+        );
+
+        grid.appendChild(
+            createFinanceSummaryCard(
+                "Payment Pending",
+                formatMoney(figures.pendingPayment, currency),
+                "Outstanding requests and payments being processed."
+            )
+        );
+
+        group.appendChild(grid);
+        container.appendChild(group);
+    });
+}
     function renderFinance(financeData) {
         statementCount.textContent =
             String(
