@@ -111,6 +111,7 @@
     client: null,
     session: null,
     member: null,
+    hasAuthorDeskAccess: false,    
     posts: [],
     behindFiles: [],
     behindFilesIndex: 0,
@@ -745,6 +746,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             BlackwoodMembersState.isSubmittingDeliveryAddress = false;
             BlackwoodMembersState.isReactingToBehindFile = false;
             BlackwoodMembersState.isAdminRewardBusy = false;
+            BlackwoodMembersState.hasAuthorDeskAccess = false;
 
             updateMemberIntroVisibility(null);
             renderAuthView();
@@ -758,7 +760,31 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
     // =========================
     // DASHBOARD LOADING
     // =========================
-
+    async function checkAuthorDeskAccess(userId) {
+        if (!userId) {
+            return false;
+        }
+    
+        try {
+            const { data, error } = await BlackwoodMembersState.client
+                .from("author_records")
+                .select("id,desk_access_enabled")
+                .eq("id", userId)
+                .eq("desk_access_enabled", true)
+                .maybeSingle();
+    
+            if (error) {
+                console.warn("Author Desk access check failed:", error.message);
+                return false;
+            }
+    
+            return Boolean(data);
+    
+        } catch (error) {
+            console.warn("Author Desk access check failed:", error);
+            return false;
+        }
+    }
     async function loadMemberDashboard() {
         if (!BlackwoodMembersState.session || !BlackwoodMembersState.session.user) {
             renderAuthView();
@@ -770,7 +796,8 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
 
         try {
             const user = BlackwoodMembersState.session.user;
-
+            BlackwoodMembersState.hasAuthorDeskAccess =
+            await checkAuthorDeskAccess(user.id);
             const [
                 profileResult,
                 legacyPosts,
@@ -1100,10 +1127,21 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                         Latest Dispatch
                     </a>
 
+                    
                     <a href="#blackwood-bookshelf-root" class="circle-button circle-button-secondary">
                         My Bookshelf
                     </a>
-
+                    
+                    ${
+                        BlackwoodMembersState.hasAuthorDeskAccess
+                            ? `
+                                <a href="/pages/authordesk.html" class="circle-button circle-button-secondary">
+                                    Open Author Desk
+                                </a>
+                            `
+                            : ""
+                    }
+                    
                     ${
                         isAdminProfile(member)
                             ? `
@@ -1113,6 +1151,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                             `
                             : ""
                     }
+
                 </div>
             </div>
 
