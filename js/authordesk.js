@@ -3533,12 +3533,10 @@ function renderOverviewRoyalties(financeData) {
                                 ) ===
                                     currency &&
                                 (
-                                    payment.status ===
-                                        "approved" ||
-                                    payment.status ===
-                                        "processing" ||
-                                    payment.status ===
-                                        "paid"
+                                    payment.status === "approved" ||
+                                    payment.status === "processing" ||
+                                    payment.status === "paid" ||
+                                    payment.status === "simulated"
                                 )
                             );
                         }
