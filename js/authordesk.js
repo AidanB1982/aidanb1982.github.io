@@ -916,6 +916,9 @@ async function initialiseDesk() {
         renderFinance(
             financeData
         );
+        renderOverviewRoyalties(
+        financeData
+    );
     }
 
     function renderBookList(
