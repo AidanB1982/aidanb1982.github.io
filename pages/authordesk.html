@@ -5,19 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Author Desk | Blackwood Publishing</title>
-
     <meta name="robots" content="noindex, nofollow">
 
-    <link rel="stylesheet" href="/css/authordesk.css">
+    <link rel="stylesheet" href="/css/authordesk.css?v=20261012">
 </head>
-
 <body>
 
-<main class="page-shell">
-    <header>
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<header class="desk-masthead">
+    <div class="desk-masthead-inner">
+        <a class="desk-brand" href="/" aria-label="Blackwood Publishing homepage">
+            <span class="desk-brand-name">Blackwood Publishing</span>
+            <span class="desk-brand-detail">Independent Publishing</span>
+        </a>
+        <p class="desk-masthead-label">Private Author Portal</p>
+    </div>
+</header>
+
+<main id="main-content" class="page-shell">
+    <header class="desk-page-heading">
         <p class="site-mark">Blackwood Publishing</p>
         <h1 class="page-title">Author Desk</h1>
-
         <p class="page-intro">
             Your private publishing workspace for books, production,
             documents, rights, statements and payments.
@@ -43,384 +52,182 @@
             </div>
 
             <nav class="desk-nav" aria-label="Author Desk">
-                <button
-                    type="button"
-                    class="nav-button active"
-                    data-section="overview"
-                >
-                    Overview
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="books"
-                >
-                    Books
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="production"
-                >
-                    Production
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="documents"
-                >
-                    Documents &amp; Rights
-                </button>
-
-                <button
-                    type="button"
-                    class="nav-button"
-                    data-section="finance"
-                >
-                    Statements &amp; Payments
-                </button>
-
-                <button
-                    id="publishing-desk-nav"
-                    type="button"
-                    class="nav-button"
-                    data-section="publishing"
-                    hidden
-                >
-                    Publishing Desk
-                </button>
+                <button type="button" class="nav-button active" data-section="overview">Overview</button>
+                <button type="button" class="nav-button" data-section="books">Books</button>
+                <button type="button" class="nav-button" data-section="production">Production</button>
+                <button type="button" class="nav-button" data-section="documents">Documents &amp; Rights</button>
+                <button type="button" class="nav-button" data-section="finance">Statements &amp; Payments</button>
+                <button id="publishing-desk-nav" type="button" class="nav-button" data-section="publishing" hidden>Publishing Desk</button>
             </nav>
 
-            <button
-                id="sign-out-button"
-                type="button"
-                class="sign-out-button"
-            >
-                Sign out
-            </button>
+            <button id="sign-out-button" type="button" class="sign-out-button">Sign out</button>
         </aside>
 
         <div class="desk-main">
-
-            <section
-                id="section-overview"
-                class="desk-section active"
-            >
+            <section id="section-overview" class="desk-section active">
                 <div class="section-heading">
                     <p class="section-kicker">Overview</p>
-
-                    <h2 id="welcome-heading">
-                        Welcome to your Author Desk
-                    </h2>
-
-                    <p>
-                        This is the working record of your publishing
-                        relationship with Blackwood Publishing.
-                    </p>
+                    <h2 id="welcome-heading">Welcome to your Author Desk</h2>
+                    <p>This is the working record of your publishing relationship with Blackwood Publishing.</p>
                 </div>
 
                 <div class="summary-grid">
                     <article class="summary-card">
                         <p class="summary-label">Books</p>
                         <p id="book-count" class="summary-value">—</p>
-
-                        <p class="summary-note">
-                            Book Records currently available in your Desk.
-                        </p>
+                        <p class="summary-note">Book Records currently available in your Desk.</p>
                     </article>
-
                     <article class="summary-card">
                         <p class="summary-label">Relationship</p>
-
-                        <p
-                            id="relationship-summary"
-                            class="summary-value"
-                        >
-                            —
-                        </p>
-
-                        <p class="summary-note">
-                            Current Author Record relationship status.
-                        </p>
+                        <p id="relationship-summary" class="summary-value">—</p>
+                        <p class="summary-note">Current Author Record relationship status.</p>
                     </article>
-
                     <article class="summary-card">
                         <p class="summary-label">Desk Access</p>
                         <p class="summary-value">Active</p>
-
-                        <p class="summary-note">
-                            Your authenticated Author Desk access is enabled.
-                        </p>
+                        <p class="summary-note">Your authenticated Author Desk access is enabled.</p>
                     </article>
                 </div>
+
                 <section class="content-panel">
-    <h3>Your Royalties</h3>
+                    <h3>Your Royalties</h3>
+                    <p class="panel-intro">A summary of your issued royalty statements, payments and outstanding requests.</p>
+                    <div id="overview-royalty-summary" class="finance-account-summary" aria-live="polite">
+                        <div class="empty-state">Loading royalty summary…</div>
+                    </div>
+                    <button type="button" class="payment-request-button" data-section="finance" id="overview-finance-button">
+                        View statements and payments
+                    </button>
+                </section>
 
-    <p class="panel-intro">
-        A summary of your issued royalty statements,
-        payments and outstanding requests.
-    </p>
-
-    <div id="overview-royalty-summary"
-         class="finance-account-summary"
-         aria-live="polite">
-        <div class="empty-state">
-            Loading royalty summary…
-        </div>
-    </div>
-
-    <button
-        type="button"
-        class="payment-request-button"
-        data-section="finance"
-        id="overview-finance-button">
-        View statements and payments
-    </button>
-</section>
                 <section class="content-panel">
                     <h3>Your books</h3>
-
-                    <p class="panel-intro">
-                        Current Book Records associated with your
-                        Author Desk account.
-                    </p>
-
-                    <div
-                        id="overview-book-list"
-                        class="book-list"
-                    ></div>
+                    <p class="panel-intro">Current Book Records associated with your Author Desk account.</p>
+                    <div id="overview-book-list" class="book-list"></div>
                 </section>
             </section>
 
-            <section
-                id="section-books"
-                class="desk-section"
-            >
+            <section id="section-books" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Books</p>
                     <h2>Book Records</h2>
-
-                    <p>
-                        Each acquired work has a permanent Book Record.
-                        Editions, production history and other publishing
-                        records connect back to these records.
-                    </p>
+                    <p>Each acquired work has a permanent Book Record. Editions, production history and other publishing records connect back to these records.</p>
                 </div>
-
                 <section class="content-panel">
                     <h3>Your Book Records</h3>
-
-                    <div
-                        id="books-book-list"
-                        class="book-list"
-                    ></div>
+                    <div id="books-book-list" class="book-list"></div>
                 </section>
             </section>
 
-            <section
-                id="section-production"
-                class="desk-section"
-            >
+            <section id="section-production" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Production</p>
                     <h2>Production</h2>
-
-                    <p>
-                        Current production position, editions, publishing
-                        milestones and actions associated with your books.
-                    </p>
+                    <p>Current production position, editions, publishing milestones and actions associated with your books.</p>
                 </div>
-
                 <div id="production-content"></div>
             </section>
 
-            <section
-                id="section-documents"
-                class="desk-section"
-            >
+            <section id="section-documents" class="desk-section">
                 <div class="section-heading">
-                    <p class="section-kicker">
-                        Documents &amp; Rights
-                    </p>
-
+                    <p class="section-kicker">Documents &amp; Rights</p>
                     <h2>Documents &amp; Rights</h2>
-
-                    <p>
-                        Author-visible publishing documents, agreements,
-                        rights records and rights history.
-                    </p>
+                    <p>Author-visible publishing documents, agreements, rights records and rights history.</p>
                 </div>
-
                 <div id="documents-rights-content"></div>
             </section>
 
-            <section
-                id="section-finance"
-                class="desk-section"
-            >
+            <section id="section-finance" class="desk-section">
                 <div class="section-heading">
-                    <p class="section-kicker">
-                        Statements &amp; Payments
-                    </p>
-
+                    <p class="section-kicker">Statements &amp; Payments</p>
                     <h2>Statements &amp; Payments</h2>
-
-                    <p>
-                        Your issued royalty statements, payment history
-                        and payment requests.
-                    </p>
+                    <p>Your issued royalty statements, payment history and payment requests.</p>
                 </div>
 
                 <div class="summary-grid">
                     <article class="summary-card">
                         <p class="summary-label">Statements</p>
                         <p id="statement-count" class="summary-value">—</p>
-
-                        <p class="summary-note">
-                            Issued statements currently available in your Author Desk.
-                        </p>
+                        <p class="summary-note">Issued statements currently available in your Author Desk.</p>
                     </article>
-
                     <article class="summary-card">
                         <p class="summary-label">Payments</p>
                         <p id="payment-count" class="summary-value">—</p>
-
-                        <p class="summary-note">
-                            Payment records currently available in your Author Desk.
-                        </p>
+                        <p class="summary-note">Payment records currently available in your Author Desk.</p>
                     </article>
-
                     <article class="summary-card">
                         <p class="summary-label">Payment Requests</p>
                         <p id="payment-request-count" class="summary-value">—</p>
-
-                        <p class="summary-note">
-                            Payment requests recorded against your author account.
-                        </p>
+                        <p class="summary-note">Payment requests recorded against your author account.</p>
                     </article>
                 </div>
 
                 <section class="content-panel">
                     <h3>Royalty Statements</h3>
-
-                    <p class="panel-intro">
-                        Formal royalty statements issued by Blackwood Publishing.
-                    </p>
-
-                    <div
-                        id="statement-list"
-                        class="record-list"
-                    ></div>
+                    <p class="panel-intro">Formal royalty statements issued by Blackwood Publishing.</p>
+                    <div id="statement-list" class="record-list"></div>
                 </section>
-
                 <section class="content-panel">
                     <h3>Payments</h3>
-
-                    <p class="panel-intro">
-                        Payments recorded against your author account.
-                    </p>
-
-                    <div
-                        id="payment-list"
-                        class="record-list"
-                    ></div>
+                    <p class="panel-intro">Payments recorded against your author account.</p>
+                    <div id="payment-list" class="record-list"></div>
                 </section>
-
                 <section class="content-panel">
                     <h3>Payment Requests</h3>
-
-                    <p class="panel-intro">
-                        Payment requests submitted through your Author Desk.
-                    </p>
-
-                    <div
-                        id="payment-request-list"
-                        class="record-list"
-                    ></div>
+                    <p class="panel-intro">Payment requests submitted through your Author Desk.</p>
+                    <div id="payment-request-list" class="record-list"></div>
                 </section>
             </section>
 
-            <section
-                id="section-publishing"
-                class="desk-section"
-            >
+            <section id="section-publishing" class="desk-section">
                 <div class="section-heading">
-                    <p class="section-kicker">
-                        Internal Administration
-                    </p>
-
+                    <p class="section-kicker">Internal Administration</p>
                     <h2>Publishing Desk</h2>
-
-                    <p>
-                        Internal Blackwood Publishing administration
-                        and financial processing.
-                    </p>
+                    <p>Internal Blackwood Publishing administration and financial processing.</p>
                 </div>
-
                 <section class="content-panel">
                     <h3>Requires Attention</h3>
-
-                    <p class="panel-intro">
-                        Publishing matters requiring staff action will
-                        appear here.
-                    </p>
-
-                    <div
-                        id="publishing-attention-list"
-                        class="record-list"
-                    >
-                        <div class="empty-state">
-                            No items currently require attention.
-                        </div>
+                    <p class="panel-intro">Publishing matters requiring staff action will appear here.</p>
+                    <div id="publishing-attention-list" class="record-list">
+                        <div class="empty-state">No items currently require attention.</div>
                     </div>
                 </section>
-
                 <section class="content-panel">
                     <h3>Add Transaction</h3>
-
-                    <p class="panel-intro">
-                        Record a credit or debit against an author
-                        publishing account.
-                    </p>
-
-                    <div
-                        id="publishing-transaction-form"
-                        class="record-list"
-                    >
-                        <div class="empty-state">
-                            Transaction entry is not yet enabled.
-                        </div>
+                    <p class="panel-intro">Record a credit or debit against an author publishing account.</p>
+                    <div id="publishing-transaction-form" class="record-list">
+                        <div class="empty-state">Transaction entry is not yet enabled.</div>
                     </div>
                 </section>
-
                 <section class="content-panel">
                     <h3>Recent Transactions</h3>
-
-                    <p class="panel-intro">
-                        Recent transactions recorded through the
-                        Publishing Desk.
-                    </p>
-
-                    <div
-                        id="publishing-transaction-list"
-                        class="record-list"
-                    >
-                        <div class="empty-state">
-                            No transactions are currently recorded.
-                        </div>
+                    <p class="panel-intro">Recent transactions recorded through the Publishing Desk.</p>
+                    <div id="publishing-transaction-list" class="record-list">
+                        <div class="empty-state">No transactions are currently recorded.</div>
                     </div>
                 </section>
             </section>
-
         </div>
     </div>
 </main>
 
+<footer class="desk-footer">
+    <div class="desk-footer-inner">
+        <div class="desk-footer-top">
+            <div>
+                <p class="desk-footer-title">Blackwood Publishing</p>
+                <p class="desk-footer-description">Independent publishing · Author services</p>
+            </div>
+            <p class="desk-footer-privacy">Private &amp; confidential</p>
+        </div>
+        <div class="desk-footer-bottom">
+            <p>&copy; 2026 Blackwood Publishing</p>
+            <p>Author Desk</p>
+        </div>
+    </div>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/authordesk.js"></script>
-
 </body>
 </html>
