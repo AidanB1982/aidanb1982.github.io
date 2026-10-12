@@ -4462,7 +4462,61 @@ function createPaymentDetailsForm(requestId) {
 
     return wrapper;
 }
+    async function recordCompletedPayment(
+        requestId,
+        paymentMethod,
+        bankReference,
+        button,
+        message
+    ) {
+        message.hidden = true;
+        message.textContent = "";
 
+        button.disabled = true;
+        button.textContent = "Recording payment…";
+
+        try {
+            const { error } = await client.rpc(
+                "record_manual_author_payment",
+                {
+                    p_request_id: requestId,
+                    p_payment_method: paymentMethod,
+                    p_bank_reference: bankReference || null
+                }
+            );
+
+            if (error) {
+                throw error;
+            }
+
+            message.textContent =
+                "Completed bank transfer recorded successfully.";
+            message.className =
+                "payment-request-message success";
+            message.hidden = false;
+
+            const financeData = await loadFinanceData();
+
+            renderFinance(financeData);
+            renderOverviewRoyalties(financeData);
+
+        } catch (error) {
+            console.error(
+                "Recording completed payment failed:",
+                error
+            );
+
+            message.textContent =
+                "Payment could not be recorded. Please check the request and try again.";
+            message.className =
+                "payment-request-message error";
+            message.hidden = false;
+
+        } finally {
+            button.disabled = false;
+            button.textContent = "Record completed payment";
+        }
+    }
     function createSummaryRecord(
         label,
         value,
