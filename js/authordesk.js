@@ -105,284 +105,264 @@
         handleSignOut
     );
 
-           async function initialiseDesk() {
-        try {
-            const {
-                data: sessionData,
-                error: sessionError
-            } = await client.auth.getSession();
+          
+async function initialiseDesk() {
+    try {
+        const {
+            data: sessionData,
+            error: sessionError
+        } = await client.auth.getSession();
 
-            if (sessionError) {
-                throw sessionError;
-            }
+        if (sessionError) {
+            throw sessionError;
+        }
 
-            const session =
-                sessionData.session;
+        const session = sessionData.session;
 
-            if (!session || !session.user) {
-                showAccessMessage(
-                    "Sign in required",
-                    "You need to be signed in with an authorised Blackwood Publishing author account to open the Author Desk."
-                );
+        if (!session || !session.user) {
+            showAccessMessage(
+                "Sign in required",
+                "You need to be signed in with an authorised Blackwood Publishing author account to open the Author Desk."
+            );
+            return;
+        }
 
-                return;
-            }
+        const authorRecord =
+            await loadAuthorRecord(session.user.id);
 
-            const authorRecord =
-                await loadAuthorRecord(
-                    session.user.id
-                );
+        if (!authorRecord) {
+            showAccessMessage(
+                "Author Desk unavailable",
+                "This account does not currently have access to an Author Desk."
+            );
+            return;
+        }
 
-            if (!authorRecord) {
-                showAccessMessage(
-                    "Author Desk unavailable",
-                    "This account does not currently have access to an Author Desk."
-                );
+        const [
+            books,
+            productionData,
+            legalData,
+            financeData,
+            publishingStaffResponse
+        ] = await Promise.all([
+            loadBooks(),
+            loadProductionData(),
+            loadLegalData(),
+            loadFinanceData(),
 
-                return;
-            }
+            client
+                .from("publishing_staff")
+                .select(
+                    "user_id,display_name,is_active"
+                )
+                .eq("user_id", session.user.id)
+                .maybeSingle()
+        ]);
+
+        const publishingDeskNav =
+            document.getElementById(
+                "publishing-desk-nav"
+            );
+
+        if (
+            publishingDeskNav &&
+            !publishingStaffResponse.error &&
+            publishingStaffResponse.data &&
+            publishingStaffResponse.data.is_active === true
+        ) {
+            publishingDeskNav.hidden = false;
 
             const [
-                books,
-                productionData,
-                legalData,
-                financeData,
-                publishingStaffResponse
+                paymentRequestsResponse,
+                authorRecordsResponse,
+                paymentDetailsResponse
             ] = await Promise.all([
-                loadBooks(),
-                loadProductionData(),
-                loadLegalData(),
-                loadFinanceData(),
+                client
+                    .from("payment_requests")
+                    .select(
+                        "id,author_id,request_reference,requested_amount,currency,status,requested_at"
+                    )
+                    .eq("status", "requested")
+                    .order("requested_at", {
+                        ascending: true
+                    }),
 
                 client
-                    .from("publishing_staff")
-                    .select(
-                        "user_id,display_name,is_active"
-                    )
-                    .eq(
-                        "user_id",
-                        session.user.id
-                    )
-                    .maybeSingle()
+                    .from("author_records")
+                    .select("id,publishing_name"),
+
+                client
+                    .from("payment_request_payment_details")
+                    .select("payment_request_id")
             ]);
 
-            const publishingDeskNav =
+            if (paymentRequestsResponse.error) {
+                throw paymentRequestsResponse.error;
+            }
+
+            if (authorRecordsResponse.error) {
+                throw authorRecordsResponse.error;
+            }
+
+            if (paymentDetailsResponse.error) {
+                throw paymentDetailsResponse.error;
+            }
+
+            const attentionList =
                 document.getElementById(
-                    "publishing-desk-nav"
+                    "publishing-attention-list"
                 );
 
-            if (
-                publishingDeskNav &&
-                !publishingStaffResponse.error &&
-                publishingStaffResponse.data &&
-                publishingStaffResponse.data.is_active ===
-                    true
-            ) {
-                publishingDeskNav.hidden =
-                    false;
+            if (attentionList) {
+                attentionList.replaceChildren();
 
-                const [
-                    paymentRequestsResponse,
-                    authorRecordsResponse
-                ] = await Promise.all([
-                    client
-                        .from("payment_requests")
-                        .select(
-                            "id,author_id,request_reference,requested_amount,currency,status,requested_at"
+                const paymentRequests =
+                    Array.isArray(paymentRequestsResponse.data)
+                        ? paymentRequestsResponse.data
+                        : [];
+
+                const authorRecords =
+                    Array.isArray(authorRecordsResponse.data)
+                        ? authorRecordsResponse.data
+                        : [];
+
+                const paymentDetails =
+                    Array.isArray(paymentDetailsResponse.data)
+                        ? paymentDetailsResponse.data
+                        : [];
+
+                const requestsWithDetails = new Set(
+                    paymentDetails.map(function (record) {
+                        return record.payment_request_id;
+                    })
+                );
+
+                if (paymentRequests.length === 0) {
+                    attentionList.appendChild(
+                        createEmptyState(
+                            "No items currently require attention."
                         )
-                        .eq(
-                            "status",
-                            "requested"
-                        )
-                        .order(
-                            "requested_at",
-                            {
-                                ascending: true
-                            }
-                        ),
-
-                    client
-                        .from("author_records")
-                        .select(
-                            "id,publishing_name"
-                        )
-                ]);
-
-                if (paymentRequestsResponse.error) {
-                    throw paymentRequestsResponse.error;
-                }
-
-                if (authorRecordsResponse.error) {
-                    throw authorRecordsResponse.error;
-                }
-
-                const attentionList =
-                    document.getElementById(
-                        "publishing-attention-list"
                     );
+                } else {
+                    paymentRequests.forEach(function (request) {
+                        const author = authorRecords.find(
+                            function (record) {
+                                return (
+                                    record.id === request.author_id
+                                );
+                            }
+                        );
 
-                if (attentionList) {
-                    attentionList.replaceChildren();
+                        const card =
+                            document.createElement("article");
 
-                    const paymentRequests =
-                        Array.isArray(
-                            paymentRequestsResponse.data
-                        )
-                            ? paymentRequestsResponse.data
-                            : [];
+                        card.className = "record-card";
 
-                    const authorRecords =
-                        Array.isArray(
-                            authorRecordsResponse.data
-                        )
-                            ? authorRecordsResponse.data
-                            : [];
+                        const top =
+                            document.createElement("div");
 
-                    if (paymentRequests.length === 0) {
-                        attentionList.appendChild(
-                            createEmptyState(
-                                "No items currently require attention."
+                        top.className = "record-card-top";
+
+                        const title =
+                            document.createElement("h4");
+
+                        title.className = "record-title";
+                        title.textContent =
+                            request.request_reference ||
+                            "Payment Request";
+
+                        top.appendChild(title);
+
+                        top.appendChild(
+                            createStatusBadge("Requested")
+                        );
+
+                        card.appendChild(top);
+
+                        const description =
+                            document.createElement("p");
+
+                        description.className =
+                            "record-description";
+
+                        description.textContent =
+                            author && author.publishing_name
+                                ? author.publishing_name
+                                : "Author";
+
+                        card.appendChild(description);
+
+                        const meta =
+                            document.createElement("div");
+
+                        meta.className = "record-meta";
+
+                        meta.appendChild(
+                            createInlineMeta(
+                                "Amount",
+                                formatMoney(
+                                    request.requested_amount,
+                                    request.currency
+                                )
                             )
                         );
-                    } else {
-                        paymentRequests.forEach(
-                            function (request) {
-                                const author =
-                                    authorRecords.find(
-                                        function (
-                                            record
-                                        ) {
-                                            return (
-                                                record.id ===
-                                                request.author_id
-                                            );
-                                        }
-                                    );
 
-                                const card =
-                                    document.createElement(
-                                        "article"
-                                    );
-
-                                card.className =
-                                    "record-card";
-
-                                const top =
-                                    document.createElement(
-                                        "div"
-                                    );
-
-                                top.className =
-                                    "record-card-top";
-
-                                const title =
-                                    document.createElement(
-                                        "h4"
-                                    );
-
-                                title.className =
-                                    "record-title";
-
-                                title.textContent =
-                                    request.request_reference;
-
-                                top.appendChild(title);
-
-                                top.appendChild(
-                                    createStatusBadge(
-                                        "Requested"
-                                    )
-                                );
-
-                                card.appendChild(top);
-
-                                const description =
-                                    document.createElement(
-                                        "p"
-                                    );
-
-                                description.className =
-                                    "record-description";
-
-                                description.textContent =
-                                    (
-                                        author &&
-                                        author.publishing_name
-                                    )
-                                        ? author.publishing_name
-                                        : "Author";
-
-                                card.appendChild(
-                                    description
-                                );
-
-                                const meta =
-                                    document.createElement(
-                                        "div"
-                                    );
-
-                                meta.className =
-                                    "record-meta";
-
-                                meta.appendChild(
-                                    createInlineMeta(
-                                        "Amount",
-                                        formatMoney(
-                                            request.requested_amount,
-                                            request.currency
-                                        )
-                                    )
-                                );
-
-                                meta.appendChild(
-                                    createInlineMeta(
-                                        "Requested",
-                                        formatDate(
-                                            request.requested_at
-                                        )
-                                    )
-                                );
-
-                                card.appendChild(meta);
-
-                                attentionList.appendChild(
-                                    card
-                                );
-                            }
+                        meta.appendChild(
+                            createInlineMeta(
+                                "Requested",
+                                formatDate(request.requested_at)
+                            )
                         );
-                    }
+
+                        card.appendChild(meta);
+
+                        const detailsStatus =
+                            document.createElement("p");
+
+                        detailsStatus.className =
+                            "record-description";
+
+                        detailsStatus.textContent =
+                            requestsWithDetails.has(request.id)
+                                ? "Bank details: Submitted — ready for staff review."
+                                : "Bank details: Awaiting author submission.";
+
+                        card.appendChild(detailsStatus);
+
+                        attentionList.appendChild(card);
+                    });
                 }
             }
+        }
 
-            if (
-                publishingStaffResponse.error
-            ) {
-                console.error(
-                    "Publishing Desk access check failed:",
-                    publishingStaffResponse.error
-                );
-            }
-
-            renderDesk(
-                authorRecord,
-                books,
-                productionData,
-                legalData,
-                financeData
-            );
-
-        } catch (error) {
+        if (publishingStaffResponse.error) {
             console.error(
-                "Author Desk failed to initialise:",
-                error
-            );
-
-            showAccessMessage(
-                "Author Desk could not be opened",
-                "There was a problem loading your publishing records. Please try again."
+                "Publishing Desk access check failed:",
+                publishingStaffResponse.error
             );
         }
+
+        renderDesk(
+            authorRecord,
+            books,
+            productionData,
+            legalData,
+            financeData
+        );
+
+    } catch (error) {
+        console.error(
+            "Author Desk failed to initialise:",
+            error
+        );
+
+        showAccessMessage(
+            "Author Desk could not be opened",
+            "There was a problem loading your publishing records. Please try again."
+        );
     }
+}
+
 
     async function loadAuthorRecord(userId) {
         const { data, error } = await client
