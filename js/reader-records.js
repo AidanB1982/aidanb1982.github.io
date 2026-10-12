@@ -116,57 +116,8 @@ const BLACKWOOD_CIRCLE_CONFIG = {
     initForm();
     initPublicRecords();
     initCirclePointsPrompt();
-    initAuthorDeskAccess();
 }
-/* ======================================================
-   AUTHOR DESK ACCESS
-   Show only for authenticated authors
-====================================================== */
 
-async function initAuthorDeskAccess() {
-    const link = document.getElementById("reader-author-desk-link");
-
-    if (!link) return;
-
-    link.hidden = true;
-
-    try {
-        const client = await getBlackwoodCircleClient();
-
-        const { data: userData, error: userError } =
-            await client.auth.getUser();
-
-        if (userError || !userData?.user) {
-            return;
-        }
-
-        const { data: authorRecord, error: authorError } =
-            await client
-                .from("author_records")
-                .select("id")
-                .eq("id", userData.user.id)
-                .eq("desk_access_enabled", true)
-                .maybeSingle();
-
-        if (authorError) {
-            console.warn(
-                "Author Desk access check failed:",
-                authorError
-            );
-            return;
-        }
-
-        if (authorRecord) {
-            link.hidden = false;
-        }
-
-    } catch (error) {
-        console.warn(
-            "Unable to check Author Desk access:",
-            error
-        );
-    }
-}
     /* ======================================================
        FORM
     ====================================================== */
