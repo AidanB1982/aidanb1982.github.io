@@ -2940,6 +2940,10 @@ function renderOverviewRoyalties(financeData) {
                 financeData
             );
 
+            renderOverviewRoyalties(
+                financeData
+            );
+
         } catch (error) {
             console.error(
                 "Payment request failed:",
@@ -2997,6 +3001,10 @@ function renderOverviewRoyalties(financeData) {
                 await loadFinanceData();
 
             renderFinance(
+                financeData
+            );
+
+            renderOverviewRoyalties(
                 financeData
             );
 
