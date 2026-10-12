@@ -470,8 +470,236 @@ async function initialiseDesk() {
                                 }
                             );
 
-                            card.appendChild(reviewButton);
+                                                        card.appendChild(reviewButton);
                             card.appendChild(reviewPanel);
+
+                            // Protected synthetic test request.
+                            // Never offer payment recording for this fixture.
+                            const isProtectedTestRequest =
+                                request.request_reference ===
+                                "PR-20260929203327379-d46d923a";
+
+                            if (isProtectedTestRequest) {
+                                const testNotice =
+                                    document.createElement("p");
+
+                                testNotice.className =
+                                    "record-description";
+
+                                testNotice.textContent =
+                                    "Test request — payment recording disabled.";
+
+                                card.appendChild(testNotice);
+                            } else {
+                                const paymentPanel =
+                                    document.createElement("div");
+
+                                paymentPanel.className =
+                                    "payment-request-control";
+
+                                const paymentHeading =
+                                    document.createElement("h4");
+
+                                paymentHeading.className =
+                                    "record-title";
+
+                                paymentHeading.textContent =
+                                    "Record Completed Payment";
+
+                                const paymentDescription =
+                                    document.createElement("p");
+
+                                paymentDescription.className =
+                                    "record-description";
+
+                                paymentDescription.textContent =
+                                    "Only complete this form after the bank transfer has been sent through Blackwood Publishing's bank.";
+
+                                const paymentForm =
+                                    document.createElement("form");
+
+                                paymentForm.className =
+                                    "payment-request-form";
+
+                                const methodField =
+                                    document.createElement("div");
+
+                                methodField.className =
+                                    "payment-request-field";
+
+                                const methodLabel =
+                                    document.createElement("label");
+
+                                methodLabel.textContent =
+                                    "Payment method";
+
+                                const methodSelect =
+                                    document.createElement("select");
+
+                                methodSelect.required = true;
+
+                                const methodOptions = [
+                                    ["", "Select payment method"],
+                                    ["FASTER PAYMENTS", "Faster Payments"],
+                                    ["BACS", "BACS"],
+                                    ["OTHER BANK TRANSFER", "Other bank transfer"]
+                                ];
+
+                                methodOptions.forEach(function (option) {
+                                    const element =
+                                        document.createElement("option");
+
+                                    element.value = option[0];
+                                    element.textContent = option[1];
+
+                                    methodSelect.appendChild(element);
+                                });
+
+                                const methodId =
+                                    "payment-method-" + request.id;
+
+                                methodSelect.id = methodId;
+                                methodLabel.htmlFor = methodId;
+
+                                methodField.appendChild(methodLabel);
+                                methodField.appendChild(methodSelect);
+
+                                const referenceField =
+                                    document.createElement("div");
+
+                                referenceField.className =
+                                    "payment-request-field";
+
+                                const referenceLabel =
+                                    document.createElement("label");
+
+                                referenceLabel.textContent =
+                                    "Bank transaction reference";
+
+                                const referenceInput =
+                                    document.createElement("input");
+
+                                referenceInput.type = "text";
+                                referenceInput.required = true;
+                                referenceInput.maxLength = 100;
+                                referenceInput.autocomplete = "off";
+
+                                const referenceId =
+                                    "bank-reference-" + request.id;
+
+                                referenceInput.id = referenceId;
+                                referenceLabel.htmlFor = referenceId;
+
+                                referenceField.appendChild(referenceLabel);
+                                referenceField.appendChild(referenceInput);
+
+                                const confirmationLabel =
+                                    document.createElement("label");
+
+                                confirmationLabel.className =
+                                    "payment-confirmation-label";
+
+                                const confirmationCheckbox =
+                                    document.createElement("input");
+
+                                confirmationCheckbox.type = "checkbox";
+                                confirmationCheckbox.required = true;
+
+                                const confirmationText =
+                                    document.createElement("span");
+
+                                confirmationText.textContent =
+                                    "I confirm that this payment has already been sent through Blackwood Publishing's bank.";
+
+                                confirmationLabel.appendChild(
+                                    confirmationCheckbox
+                                );
+
+                                confirmationLabel.appendChild(
+                                    confirmationText
+                                );
+
+                                const paymentButton =
+                                    document.createElement("button");
+
+                                paymentButton.type = "submit";
+                                paymentButton.className =
+                                    "payment-request-button";
+
+                                paymentButton.textContent =
+                                    "Record completed payment";
+
+                                const paymentMessage =
+                                    document.createElement("p");
+
+                                paymentMessage.className =
+                                    "payment-request-message";
+
+                                paymentMessage.hidden = true;
+                                paymentMessage.setAttribute(
+                                    "role",
+                                    "status"
+                                );
+
+                                paymentForm.appendChild(methodField);
+                                paymentForm.appendChild(referenceField);
+                                paymentForm.appendChild(confirmationLabel);
+                                paymentForm.appendChild(paymentButton);
+                                paymentForm.appendChild(paymentMessage);
+
+                                paymentForm.addEventListener(
+                                    "submit",
+                                    async function (event) {
+                                        event.preventDefault();
+
+                                        if (
+                                            !confirmationCheckbox.checked ||
+                                            !methodSelect.value ||
+                                            !referenceInput.value.trim()
+                                        ) {
+                                            return;
+                                        }
+
+                                        const confirmed =
+                                            window.confirm(
+                                                "Confirm that " +
+                                                formatMoney(
+                                                    request.requested_amount,
+                                                    request.currency
+                                                ) +
+                                                " has ALREADY been transferred through your bank to this author. Recording this payment will update the financial records. Continue?"
+                                            );
+
+                                        if (!confirmed) {
+                                            return;
+                                        }
+
+                                        methodSelect.disabled = true;
+                                        referenceInput.disabled = true;
+                                        confirmationCheckbox.disabled = true;
+
+                                        try {
+                                            await recordCompletedPayment(
+                                                request.id,
+                                                methodSelect.value,
+                                                referenceInput.value.trim(),
+                                                paymentButton,
+                                                paymentMessage
+                                            );
+                                        } finally {
+                                            methodSelect.disabled = false;
+                                            referenceInput.disabled = false;
+                                            confirmationCheckbox.disabled = false;
+                                        }
+                                    }
+                                );
+
+                                paymentPanel.appendChild(paymentHeading);
+                                paymentPanel.appendChild(paymentDescription);
+                                paymentPanel.appendChild(paymentForm);
+
+                                card.appendChild(paymentPanel);
+                            }
                         }
 
                         attentionList.appendChild(card);
