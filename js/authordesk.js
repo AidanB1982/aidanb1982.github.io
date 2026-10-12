@@ -153,7 +153,7 @@ async function initialiseDesk() {
             loadBooks(),
             loadProductionData(),
             loadLegalData(),
-            loadFinanceData(),
+            loadFinanceData(authorRecord.id),
 
             client
                 .from("publishing_staff")
@@ -1022,151 +1022,177 @@ if (isDavidTestRequest) {
         };
     }
 
-    async function loadFinanceData() {
-        const [
-            statementsResponse,
-            statementLinesResponse,
-            paymentsResponse,
-            paymentAllocationsResponse,
-            paymentRequestsResponse,
-            advancesResponse
-        ] = await Promise.all([
-            client
-                .from("royalty_statements")
-                .select(
-                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
-                )
-                .order("issue_date", {
-                    ascending: false,
-                    nullsFirst: false
-                })
-                .order("id", {
-                    ascending: false
-                }),
+    
+async function loadFinanceData(authorId) {
+    if (!authorId) {
+        throw new Error("Author ID is required to load finance data.");
+    }
 
-            client
+    const [
+        statementsResponse,
+        paymentsResponse,
+        paymentRequestsResponse,
+        advancesResponse
+    ] = await Promise.all([
+        client
+            .from("royalty_statements")
+            .select(
+                "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .order("issue_date", {
+                ascending: false,
+                nullsFirst: false
+            })
+            .order("id", {
+                ascending: false
+            }),
+
+        client
+            .from("payments")
+            .select(
+                "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .order("created_at", {
+                ascending: false
+            })
+            .order("id", {
+                ascending: false
+            }),
+
+        client
+            .from("payment_requests")
+            .select(
+                "id,author_id,request_reference,requested_amount,currency,status,requested_at,reviewed_at,fulfilled_at,payment_id,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .order("requested_at", {
+                ascending: false
+            })
+            .order("id", {
+                ascending: false
+            }),
+
+        client
+            .from("advances")
+            .select(
+                "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
+            )
+            .eq("author_id", authorId)
+            .order("id", {
+                ascending: true
+            })
+    ]);
+
+    if (statementsResponse.error) {
+        throw statementsResponse.error;
+    }
+
+    if (paymentsResponse.error) {
+        throw paymentsResponse.error;
+    }
+
+    if (paymentRequestsResponse.error) {
+        throw paymentRequestsResponse.error;
+    }
+
+    if (advancesResponse.error) {
+        throw advancesResponse.error;
+    }
+
+    const statements = Array.isArray(statementsResponse.data)
+        ? statementsResponse.data
+        : [];
+
+    const payments = Array.isArray(paymentsResponse.data)
+        ? paymentsResponse.data
+        : [];
+
+    const statementIds = statements.map(statement => statement.id);
+    const paymentIds = payments.map(payment => payment.id);
+
+    const [
+        statementLinesResponse,
+        paymentAllocationsResponse
+    ] = await Promise.all([
+        statementIds.length
+            ? client
                 .from("royalty_statement_lines")
                 .select(
                     "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
                 )
+                .in("statement_id", statementIds)
                 .order("statement_id", {
                     ascending: true
                 })
                 .order("line_number", {
                     ascending: true
-                }),
-
-            client
-                .from("payments")
-                .select(
-                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
-                )
-                .order("created_at", {
-                    ascending: false
                 })
-                .order("id", {
-                    ascending: false
-                }),
+            : Promise.resolve({ data: [], error: null }),
 
-            client
+        paymentIds.length
+            ? client
                 .from("payment_allocations")
                 .select(
                     "id,payment_id,statement_id,amount,created_at"
                 )
-                .order("id", {
-                    ascending: true
-                }),
-
-            client
-                .from("payment_requests")
-                .select(
-                    "id,author_id,request_reference,requested_amount,currency,status,requested_at,reviewed_at,fulfilled_at,payment_id,created_at,updated_at"
-                )
-                .order("requested_at", {
-                    ascending: false
-                })
-                .order("id", {
-                    ascending: false
-                }),
-
-            client
-                .from("advances")
-                .select(
-                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
-                )
+                .in("payment_id", paymentIds)
                 .order("id", {
                     ascending: true
                 })
-        ]);
+            : Promise.resolve({ data: [], error: null })
+    ]);
 
-        if (statementsResponse.error) {
-            throw statementsResponse.error;
-        }
-
-        if (statementLinesResponse.error) {
-            throw statementLinesResponse.error;
-        }
-
-        if (paymentsResponse.error) {
-            throw paymentsResponse.error;
-        }
-
-        if (paymentAllocationsResponse.error) {
-            throw paymentAllocationsResponse.error;
-        }
-
-        if (paymentRequestsResponse.error) {
-            throw paymentRequestsResponse.error;
-        }
-
-        if (advancesResponse.error) {
-            throw advancesResponse.error;
-        }
-
-        return {
-            statements:
-                Array.isArray(
-                    statementsResponse.data
-                )
-                    ? statementsResponse.data
-                    : [],
-
-            statementLines:
-                Array.isArray(
-                    statementLinesResponse.data
-                )
-                    ? statementLinesResponse.data
-                    : [],
-
-            payments:
-                Array.isArray(
-                    paymentsResponse.data
-                )
-                    ? paymentsResponse.data
-                    : [],
-
-            paymentAllocations:
-                Array.isArray(
-                    paymentAllocationsResponse.data
-                )
-                    ? paymentAllocationsResponse.data
-                    : [],
-
-            paymentRequests:
-                Array.isArray(
-                    paymentRequestsResponse.data
-                )
-                    ? paymentRequestsResponse.data
-                    : [],
-
-            advances:
-                Array.isArray(
-                    advancesResponse.data
-                )
-                    ? advancesResponse.data
-                    : []
-        };
+    if (statementLinesResponse.error) {
+        throw statementLinesResponse.error;
     }
+
+    if (paymentAllocationsResponse.error) {
+        throw paymentAllocationsResponse.error;
+    }
+
+    return {
+        statements,
+
+        statementLines: Array.isArray(statementLinesResponse.data)
+            ? statementLinesResponse.data
+            : [],
+
+        payments,
+
+        paymentAllocations: Array.isArray(paymentAllocationsResponse.data)
+            ? paymentAllocationsResponse.data
+            : [],
+
+        paymentRequests: Array.isArray(paymentRequestsResponse.data)
+            ? paymentRequestsResponse.data
+            : [],
+
+        advances: Array.isArray(advancesResponse.data)
+            ? advancesResponse.data
+            : []
+    };
+}
+async function refreshAuthorFinance() {
+    const {
+        data: { user },
+        error
+    } = await client.auth.getUser();
+
+    if (error) {
+        throw error;
+    }
+
+    if (!user) {
+        throw new Error("Author session is no longer available.");
+    }
+
+    const financeData = await loadFinanceData(user.id);
+
+    renderFinance(financeData);
+    renderOverviewRoyalties(financeData);
+}
 
     function renderDesk(
         authorRecord,
@@ -3238,16 +3264,7 @@ function renderOverviewRoyalties(financeData) {
                 false
             );
 
-            const financeData =
-                await loadFinanceData();
-
-            renderFinance(
-                financeData
-            );
-
-            renderOverviewRoyalties(
-                financeData
-            );
+            await refreshAuthorFinance();
 
         } catch (error) {
             console.error(
@@ -3302,16 +3319,7 @@ function renderOverviewRoyalties(financeData) {
                 throw error;
             }
 
-            const financeData =
-                await loadFinanceData();
-
-            renderFinance(
-                financeData
-            );
-
-            renderOverviewRoyalties(
-                financeData
-            );
+            await refreshAuthorFinance();
 
         } catch (error) {
             console.error(
@@ -4800,10 +4808,6 @@ function createPaymentDetailsForm(requestId) {
                 "payment-request-message success";
             message.hidden = false;
 
-            const financeData = await loadFinanceData();
-
-            renderFinance(financeData);
-            renderOverviewRoyalties(financeData);
             window.location.reload();
 
         } catch (error) {
