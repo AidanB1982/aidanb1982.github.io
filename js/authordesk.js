@@ -106,6 +106,7 @@
     );
 
           
+
 async function initialiseDesk() {
     try {
         const {
@@ -316,18 +317,158 @@ async function initialiseDesk() {
 
                         card.appendChild(meta);
 
+                        const hasDetails =
+                            requestsWithDetails.has(request.id);
+
                         const detailsStatus =
                             document.createElement("p");
 
                         detailsStatus.className =
                             "record-description";
 
-                        detailsStatus.textContent =
-                            requestsWithDetails.has(request.id)
-                                ? "Bank details: Submitted — ready for staff review."
-                                : "Bank details: Awaiting author submission.";
+                        detailsStatus.textContent = hasDetails
+                            ? "Bank details: Submitted — ready for staff review."
+                            : "Bank details: Awaiting author submission.";
 
                         card.appendChild(detailsStatus);
+
+                        if (hasDetails) {
+                            const reviewButton =
+                                document.createElement("button");
+
+                            reviewButton.type = "button";
+                            reviewButton.className =
+                                "payment-request-button";
+                            reviewButton.textContent =
+                                "Review bank details";
+
+                            const reviewPanel =
+                                document.createElement("div");
+
+                            reviewPanel.className =
+                                "payment-request-control";
+                            reviewPanel.hidden = true;
+
+                            let reviewOpen = false;
+
+                            reviewButton.addEventListener(
+                                "click",
+                                async function () {
+                                    if (reviewOpen) {
+                                        reviewPanel.replaceChildren();
+                                        reviewPanel.hidden = true;
+                                        reviewOpen = false;
+
+                                        reviewButton.textContent =
+                                            "Review bank details";
+                                        return;
+                                    }
+
+                                    reviewButton.disabled = true;
+                                    reviewButton.textContent =
+                                        "Loading…";
+
+                                    try {
+                                        const {
+                                            data,
+                                            error
+                                        } = await client
+                                            .from(
+                                                "payment_request_payment_details"
+                                            )
+                                            .select(
+                                                "account_holder_name,sort_code,account_number"
+                                            )
+                                            .eq(
+                                                "payment_request_id",
+                                                request.id
+                                            )
+                                            .single();
+
+                                        if (error) {
+                                            throw error;
+                                        }
+
+                                        reviewPanel.replaceChildren();
+
+                                        const heading =
+                                            document.createElement("h4");
+
+                                        heading.className =
+                                            "record-title";
+                                        heading.textContent =
+                                            "Bank details for payment";
+
+                                        reviewPanel.appendChild(heading);
+
+                                        const details =
+                                            document.createElement("div");
+
+                                        details.className =
+                                            "record-meta";
+
+                                        details.appendChild(
+                                            createInlineMeta(
+                                                "Account holder",
+                                                data.account_holder_name
+                                            )
+                                        );
+
+                                        details.appendChild(
+                                            createInlineMeta(
+                                                "Sort code",
+                                                data.sort_code
+                                            )
+                                        );
+
+                                        details.appendChild(
+                                            createInlineMeta(
+                                                "Account number",
+                                                data.account_number
+                                            )
+                                        );
+
+                                        reviewPanel.appendChild(details);
+                                        reviewPanel.hidden = false;
+                                        reviewOpen = true;
+
+                                        reviewButton.textContent =
+                                            "Hide bank details";
+
+                                    } catch (error) {
+                                        console.error(
+                                            "Staff payment details review failed:",
+                                            error &&
+                                            error.code
+                                                ? error.code
+                                                : "Request failed"
+                                        );
+
+                                        reviewPanel.replaceChildren();
+
+                                        const message =
+                                            document.createElement("p");
+
+                                        message.className =
+                                            "payment-request-message error";
+
+                                        message.textContent =
+                                            "Bank details could not be loaded. Please retry.";
+
+                                        reviewPanel.appendChild(message);
+                                        reviewPanel.hidden = false;
+
+                                        reviewButton.textContent =
+                                            "Review bank details";
+                                    } finally {
+                                        reviewButton.disabled = false;
+                                    }
+                                }
+                            );
+
+                            card.appendChild(reviewButton);
+                            card.appendChild(reviewPanel);
+                        }
 
                         attentionList.appendChild(card);
                     });
@@ -362,7 +503,6 @@ async function initialiseDesk() {
         );
     }
 }
-
 
     async function loadAuthorRecord(userId) {
         const { data, error } = await client
