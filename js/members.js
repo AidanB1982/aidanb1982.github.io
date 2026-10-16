@@ -1067,7 +1067,13 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             ${renderBookshelfMount()}
 
             ${renderAdminRewardDesk()}
-
+            ${isAdminProfile(member) ? `
+                <section
+                    class="circle-section"
+                    id="blackwood-arc-shield-watch-root"
+                    aria-label="ARC Shield Watch Administration"
+                ></section>
+            ` : ""}
             ${renderBehindFilesCarousel()}
 
             ${renderRewardsDisclosure(pointsTotal)}
@@ -1147,6 +1153,11 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                             ? `
                                 <a href="#circle-admin-reward-desk" class="circle-button circle-button-secondary">
                                     Admin Reward Desk
+                                </a>
+                                <a href="#blackwood-arc-shield-watch-root"
+                                    class="circle-button circle-button-secondary"
+                                >
+                                    ARC Shield Watch
                                 </a>
                             `
                             : ""
@@ -3587,7 +3598,22 @@ function renderPointsDisclosure(pointsTotal) {
                 bindMemberArcProfile();
                 bindBlackwoodBookshelf();
                 bindAdminRewardDeskEvents();
-                bindBehindFilesCarousel();
+
+                    const shieldRoot = document.getElementById(
+                        "blackwood-arc-shield-watch-root"
+                    );
+                    
+                    if (
+                        shieldRoot &&
+                        typeof window.initBlackwoodArcShieldWatch === "function"
+                    ) {
+                        window.initBlackwoodArcShieldWatch({
+                            root: shieldRoot,
+                            client: BlackwoodMembersState.client
+                        });
+                    }
+                    
+                    bindBehindFilesCarousel();
                 bindPremiumDisclosurePanels();
                 bindPremiumDisclosureShortcuts();
     }
