@@ -1,0 +1,283 @@
+
+/* ============================================================
+   BLACKWOOD PUBLISHING — ARC SHIELD WATCH
+   File: /css/member-arc-shield-watch.css
+   ============================================================ */
+
+#blackwood-arc-shield-watch-root {
+    margin: 2rem 0;
+    color: #f0e9df;
+}
+
+.shield-desk {
+    background: #11100f;
+    border: 1px solid rgba(188, 132, 82, 0.45);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.shield-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.shield-summary::-webkit-details-marker {
+    display: none;
+}
+
+.shield-summary h2 {
+    margin: 0.3rem 0;
+    color: #e2b17d;
+}
+
+.shield-summary p {
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+.shield-kicker {
+    margin: 0;
+    color: #c18c5c;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.shield-summary-indicator {
+    flex-shrink: 0;
+    color: #d6a16d;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.shield-desk[open] .shield-summary-indicator {
+    transform: rotate(180deg);
+}
+
+.shield-panel {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(188, 132, 82, 0.25);
+}
+
+.shield-message {
+    min-height: 1.4em;
+    margin: 0 0 1rem;
+    font-size: 0.9rem;
+}
+
+.shield-message[data-type="error"] {
+    color: #f2a7a7;
+}
+
+.shield-message[data-type="success"] {
+    color: #a9d5b4;
+}
+
+.shield-message[data-type="loading"] {
+    color: #e2b17d;
+}
+
+.shield-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.shield-stats article {
+    padding: 1rem;
+    background: #1b1917;
+    border: 1px solid #39302a;
+    border-radius: 10px;
+}
+
+.shield-stats span,
+.shield-stats strong {
+    display: block;
+}
+
+.shield-stats span {
+    margin-bottom: 0.5rem;
+    color: #c9b9a9;
+    font-size: 0.8rem;
+}
+
+.shield-stats strong {
+    color: #e2b17d;
+    font-size: 1.8rem;
+}
+
+.shield-block {
+    margin-top: 2rem;
+}
+
+.shield-block h3 {
+    margin: 0 0 1rem;
+    color: #e2b17d;
+}
+
+.shield-titles,
+.shield-findings {
+    display: grid;
+    gap: 1rem;
+}
+
+.shield-title-card,
+.shield-finding,
+.shield-empty {
+    padding: 1.2rem;
+    background: #191715;
+    border: 1px solid #40342a;
+    border-radius: 12px;
+}
+
+.shield-title-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.shield-title-card strong,
+.shield-title-card small {
+    display: block;
+}
+
+.shield-title-card small {
+    margin-top: 0.35rem;
+    color: #c9b9a9;
+}
+
+.shield-tag {
+    display: inline-block;
+    padding: 0.35rem 0.65rem;
+    color: #e7bb8c;
+    background: rgba(188, 132, 82, 0.12);
+    border: 1px solid rgba(188, 132, 82, 0.35);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.shield-section-heading,
+.shield-finding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.shield-section-heading p,
+.shield-finding-header small,
+.shield-muted {
+    color: #c9b9a9;
+}
+
+.shield-finding h4 {
+    margin: 0.4rem 0;
+    color: #f0e9df;
+}
+
+.shield-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.shield-filters button {
+    padding: 0.5rem 0.75rem;
+    color: #ead7c4;
+    background: #211c18;
+    border: 1px solid #57402f;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.shield-filters button.is-active {
+    color: #111;
+    background: #d6a16d;
+    border-color: #d6a16d;
+}
+
+.shield-filters button span {
+    margin-left: 0.35rem;
+    opacity: 0.8;
+}
+
+.shield-url {
+    color: #e2b17d;
+    overflow-wrap: anywhere;
+}
+
+.shield-snippet {
+    padding: 0.75rem;
+    color: #d6c9bc;
+    background: #100f0e;
+    border-left: 2px solid #a87448;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.shield-form-grid {
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) minmax(0, 2fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.shield-form-grid label {
+    display: grid;
+    gap: 0.45rem;
+    color: #ead7c4;
+    font-size: 0.9rem;
+}
+
+.shield-form-grid select,
+.shield-form-grid textarea {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    color: #f0e9df;
+    background: #0e0d0c;
+    border: 1px solid #65503e;
+    border-radius: 8px;
+    font: inherit;
+}
+
+.shield-form-grid textarea {
+    resize: vertical;
+}
+
+.shield-form-grid select:focus-visible,
+.shield-form-grid textarea:focus-visible,
+.shield-filters button:focus-visible,
+.shield-summary:focus-visible {
+    outline: 2px solid #e2b17d;
+    outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+    .shield-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .shield-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .shield-section-heading,
+    .shield-finding-header {
+        flex-direction: column;
+    }
+
+    .shield-summary,
+    .shield-panel {
+        padding: 1rem;
+    }
+}
