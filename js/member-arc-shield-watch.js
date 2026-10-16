@@ -3,16 +3,27 @@
    BLACKWOOD PUBLISHING — ARC SHIELD WATCH ADMIN DESK
    File: /js/member-arc-shield-watch.js
 
-   Uses existing Supabase RPC functions.
-   Never uses a service-role key.
+   Private administrator dashboard powered by Supabase RPCs.
+
+   Main desk displays ONLY:
+   - Pending Review
+   - Notice Prepared
+   - Notice Sent
+
+   All other findings remain stored in Supabase.
+   No service-role key is used in the browser.
    ============================================================ */
 
 (function () {
     "use strict";
 
-    if (window.__BLACKWOOD_ARC_SHIELD_WATCH_LOADED__) return;
+    if (window.__BLACKWOOD_ARC_SHIELD_WATCH_LOADED__) {
+        return;
+    }
+
     window.__BLACKWOOD_ARC_SHIELD_WATCH_LOADED__ = true;
 
+    // All statuses remain available for administrator review.
     const STATUSES = [
         ["pending_review", "Pending Review"],
         ["confirmed_infringement", "Confirmed Infringement"],
@@ -21,6 +32,20 @@
         ["notice_sent", "Notice Sent"],
         ["removed", "Removed"],
         ["closed", "Closed"]
+    ];
+
+    // Only these statuses appear in the active desk.
+    const ACTIVE_STATUSES = [
+        "pending_review",
+        "notice_prepared",
+        "notice_sent"
+    ];
+
+    const FILTERS = [
+        ["all", "All Active"],
+        ["pending_review", "Pending Review"],
+        ["notice_prepared", "Notice Prepared"],
+        ["notice_sent", "Notice Sent"]
     ];
 
     const state = {
@@ -36,6 +61,10 @@
         }
     };
 
+    // ========================================================
+    // HELPERS
+    // ========================================================
+
     function escapeHtml(value) {
         return String(value == null ? "" : value)
             .replace(/&/g, "&amp;")
@@ -46,7 +75,9 @@
     }
 
     function formatDate(value) {
-        if (!value) return "Not recorded";
+        if (!value) {
+            return "Not recorded";
+        }
 
         const date = new Date(value);
 
@@ -75,16 +106,23 @@
         try {
             const url = new URL(String(value || ""));
 
-            return ["http:", "https:"].includes(url.protocol)
-                ? url.href
-                : "";
+            if (
+                url.protocol === "https:" ||
+                url.protocol === "http:"
+            ) {
+                return url.href;
+            }
+
+            return "";
         } catch (error) {
             return "";
         }
     }
 
     function getFindingId(finding) {
-        return String(finding.id == null ? "" : finding.id);
+        return String(
+            finding.id == null ? "" : finding.id
+        );
     }
 
     function getFindingUrl(finding) {
@@ -117,60 +155,97 @@
     }
 
     function getFindingStatus(finding) {
-        return String(finding.status || "pending_review");
+        return String(
+            finding.status || "pending_review"
+        ).trim().toLowerCase();
+    }
+
+    function isActiveFinding(finding) {
+        return ACTIVE_STATUSES.includes(
+            getFindingStatus(finding)
+        );
+    }
+
+    function getActiveFindings() {
+        return state.data.findings.filter(
+            isActiveFinding
+        );
     }
 
     function getCount(status) {
-        const count = state.data.counts[status];
+        const serverCount = state.data.counts[status];
 
-        if (count != null) return Number(count) || 0;
+        if (serverCount != null) {
+            return Number(serverCount) || 0;
+        }
 
         return state.data.findings.filter(function (finding) {
             return getFindingStatus(finding) === status;
         }).length;
     }
 
+    function getTotalActiveCount() {
+        return ACTIVE_STATUSES.reduce(function (total, status) {
+            return total + getCount(status);
+        }, 0);
+    }
+
     function setMessage(message, type) {
         const element = state.root
-            ? state.root.querySelector("[data-shield-message]")
+            ? state.root.querySelector(
+                "[data-shield-message]"
+            )
             : null;
 
-        if (!element) return;
+        if (!element) {
+            return;
+        }
 
         element.textContent = message || "";
         element.dataset.type = type || "";
     }
 
+    // ========================================================
+    // ACTIVE MONITORING SUMMARY
+    // ========================================================
+
     function renderSummary() {
-        const counts = state.data.counts || {};
-        const titles = state.data.titles || [];
-
-        const titleCount = titles.length;
-        const findingCount = counts.total != null
-            ? Number(counts.total) || 0
-            : state.data.findings.length;
-
         return `
             <div class="shield-stats">
                 <article>
                     <span>Monitored Titles</span>
-                    <strong>${titleCount}</strong>
+                    <strong>
+                        ${state.data.titles.length}
+                    </strong>
                 </article>
-                <article>
-                    <span>Total Findings</span>
-                    <strong>${findingCount}</strong>
-                </article>
+
                 <article>
                     <span>Pending Review</span>
-                    <strong>${getCount("pending_review")}</strong>
+                    <strong>
+                        ${getCount("pending_review")}
+                    </strong>
                 </article>
+
                 <article>
-                    <span>Confirmed</span>
-                    <strong>${getCount("confirmed_infringement")}</strong>
+                    <span>Notice Prepared</span>
+                    <strong>
+                        ${getCount("notice_prepared")}
+                    </strong>
+                </article>
+
+                <article>
+                    <span>Notice Sent</span>
+                    <strong>
+                        ${getCount("notice_sent")}
+                    </strong>
                 </article>
             </div>
         `;
     }
+
+    // ========================================================
+    // MONITORED TITLES
+    // ========================================================
 
     function renderTitles() {
         const titles = state.data.titles;
@@ -186,12 +261,14 @@
         return `
             <div class="shield-titles">
                 ${titles.map(function (title) {
-                    const name = title.title ||
+                    const name =
+                        title.title ||
                         title.book_title ||
                         title.name ||
                         "Untitled";
 
-                    const author = title.author_name ||
+                    const author =
+                        title.author_name ||
                         title.author ||
                         "";
 
@@ -202,15 +279,27 @@
                     return `
                         <article class="shield-title-card">
                             <div>
-                                <strong>${escapeHtml(name)}</strong>
-                                ${author
-                                    ? `<small>${escapeHtml(author)}</small>`
-                                    : ""}
+                                <strong>
+                                    ${escapeHtml(name)}
+                                </strong>
+
+                                ${
+                                    author
+                                        ? `
+                                            <small>
+                                                ${escapeHtml(author)}
+                                            </small>
+                                        `
+                                        : ""
+                                }
                             </div>
+
                             <span class="shield-tag">
-                                ${enabled === false
-                                    ? "Paused"
-                                    : "Monitored"}
+                                ${
+                                    enabled === false
+                                        ? "Paused"
+                                        : "Monitored"
+                                }
                             </span>
                         </article>
                     `;
@@ -219,28 +308,33 @@
         `;
     }
 
-    function renderFilters() {
-        const options = [
-            ["all", "All"],
-            ...STATUSES
-        ];
+    // ========================================================
+    // ACTIVE FILTERS
+    // ========================================================
 
+    function renderFilters() {
         return `
-            <div class="shield-filters" aria-label="Filter findings">
-                ${options.map(function (option) {
+            <div
+                class="shield-filters"
+                aria-label="Filter active findings"
+            >
+                ${FILTERS.map(function (option) {
                     const value = option[0];
                     const label = option[1];
+
                     const count = value === "all"
-                        ? (Number(state.data.counts.total) ||
-                            state.data.findings.length)
+                        ? getTotalActiveCount()
                         : getCount(value);
+
+                    const isActive =
+                        state.filter === value;
 
                     return `
                         <button
                             type="button"
                             data-shield-filter="${escapeHtml(value)}"
-                            aria-pressed="${state.filter === value}"
-                            class="${state.filter === value ? "is-active" : ""}"
+                            aria-pressed="${isActive}"
+                            class="${isActive ? "is-active" : ""}"
                         >
                             ${escapeHtml(label)}
                             <span>${count}</span>
@@ -251,71 +345,104 @@
         `;
     }
 
+    // ========================================================
+    // FINDING CARDS
+    // ========================================================
+
     function renderFinding(finding) {
         const id = getFindingId(finding);
         const status = getFindingStatus(finding);
         const url = getFindingUrl(finding);
         const title = getFindingTitle(finding);
 
-        const snippet = finding.snippet ||
+        const snippet =
+            finding.snippet ||
             finding.description ||
             finding.search_snippet ||
             "";
 
-        const lastDetected = finding.last_detected_at ||
+        const lastDetected =
+            finding.last_detected_at ||
             finding.detected_at ||
             finding.created_at;
 
         return `
-            <article class="shield-finding" data-shield-finding="${escapeHtml(id)}">
+            <article
+                class="shield-finding"
+                data-shield-finding="${escapeHtml(id)}"
+            >
                 <div class="shield-finding-header">
                     <div>
                         <p class="shield-kicker">
                             Finding #${escapeHtml(id)}
                         </p>
-                        <h4>${escapeHtml(title)}</h4>
+
+                        <h4>
+                            ${escapeHtml(title)}
+                        </h4>
+
                         <small>
-                            Last detected: ${escapeHtml(formatDate(lastDetected))}
+                            Last detected:
+                            ${escapeHtml(formatDate(lastDetected))}
                         </small>
                     </div>
+
                     <span class="shield-tag">
                         ${escapeHtml(labelStatus(status))}
                     </span>
                 </div>
 
-                ${url
-                    ? `
-                        <p>
-                            <a
-                                href="${escapeHtml(url)}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="shield-url"
-                            >
-                                ${escapeHtml(url)}
-                            </a>
-                        </p>
-                    `
-                    : `
-                        <p class="shield-muted">
-                            No result URL available.
-                        </p>
-                    `}
+                ${
+                    url
+                        ? `
+                            <p>
+                                <a
+                                    href="${escapeHtml(url)}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="shield-url"
+                                >
+                                    ${escapeHtml(url)}
+                                </a>
+                            </p>
+                        `
+                        : `
+                            <p class="shield-muted">
+                                No result URL available.
+                            </p>
+                        `
+                }
 
-                ${snippet
-                    ? `<p class="shield-snippet">${escapeHtml(snippet)}</p>`
-                    : ""}
+                ${
+                    snippet
+                        ? `
+                            <p class="shield-snippet">
+                                ${escapeHtml(snippet)}
+                            </p>
+                        `
+                        : ""
+                }
 
-                <form data-shield-review-form="${escapeHtml(id)}">
+                <form
+                    data-shield-review-form="${escapeHtml(id)}"
+                >
                     <div class="shield-form-grid">
                         <label>
                             Review status
-                            <select name="status" required>
+
+                            <select
+                                name="status"
+                                required
+                            >
                                 ${STATUSES.map(function (option) {
                                     return `
                                         <option
                                             value="${escapeHtml(option[0])}"
-                                            ${option[0] === status ? "selected" : ""}
+                                            ${
+                                                option[0] === status
+                                                    ? "selected"
+                                                    : ""
+                                            }
                                         >
                                             ${escapeHtml(option[1])}
                                         </option>
@@ -326,6 +453,7 @@
 
                         <label>
                             Private administrator notes
+
                             <textarea
                                 name="notes"
                                 rows="3"
@@ -346,85 +474,194 @@
         `;
     }
 
-    
-function renderFindings() {
-    const visibleStatuses = [
-        "pending_review",
-        "notice_prepared",
-        "notice_sent"
-    ];
+    // ========================================================
+    // ACTIVE FINDINGS ONLY
+    // ========================================================
 
-    const findings = state.data.findings.filter(function (finding) {
-        const status = getFindingStatus(finding);
+    function renderFindings() {
+        const findings = getActiveFindings().filter(
+            function (finding) {
+                return (
+                    state.filter === "all" ||
+                    getFindingStatus(finding) === state.filter
+                );
+            }
+        );
 
-        return visibleStatuses.includes(status) &&
-            (
-                state.filter === "all" ||
-                state.filter === status
-            );
-    });
+        if (!findings.length) {
+            if (getTotalActiveCount() === 0) {
+                return `
+                    <article class="shield-empty">
+                        <p>
+                            <strong>All clear.</strong>
+                        </p>
 
-    if (!findings.length) {
+                        <p>
+                            No findings currently require
+                            administrative attention.
+                            ARC Shield Watch continues monitoring
+                            in the background.
+                        </p>
+                    </article>
+                `;
+            }
+
+            return `
+                <article class="shield-empty">
+                    <p>
+                        No active findings match this filter.
+                    </p>
+                </article>
+            `;
+        }
+
         return `
-            <article class="shield-empty">
-                <p>
-                    No findings currently require attention.
-                    Monitoring continues in the background.
-                </p>
-            </article>
+            <div class="shield-findings">
+                ${findings.map(renderFinding).join("")}
+            </div>
         `;
     }
 
-    return `
-        <div class="shield-findings">
-            ${findings.map(renderFinding).join("")}
-        </div>
-    `;
-}
+    // ========================================================
+    // MAIN DASHBOARD CONTENT
+    // ========================================================
 
+    function renderContent() {
+        if (!state.root) {
+            return;
+        }
+
+        const content = state.root.querySelector(
+            "[data-shield-content]"
+        );
+
+        if (!content) {
+            return;
+        }
+
+        content.innerHTML = `
+            ${renderSummary()}
+
+            <section class="shield-block">
+                <h3>Monitored Titles</h3>
+
+                ${renderTitles()}
+            </section>
+
+            <section class="shield-block">
+                <div class="shield-section-heading">
+                    <div>
+                        <h3>Findings Requiring Attention</h3>
+
+                        <p>
+                            Only pending reviews and active
+                            takedown notices appear here.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="circle-button circle-button-secondary"
+                        data-shield-refresh
+                    >
+                        Refresh Findings
+                    </button>
+                </div>
+
+                ${renderFilters()}
+
+                ${renderFindings()}
+            </section>
+        `;
+
+        bindContentEvents();
+    }
+
+    // ========================================================
+    // LOAD MONITORING DATA
+    // ========================================================
 
     async function loadDashboard() {
-        if (state.busy || !state.client || !state.root) return;
+        if (
+            state.busy ||
+            !state.client ||
+            !state.root
+        ) {
+            return;
+        }
 
         state.busy = true;
-        setMessage("Retrieving ARC Shield Watch records...", "loading");
+
+        setMessage(
+            "Retrieving ARC Shield Watch records...",
+            "loading"
+        );
 
         try {
-            const result = await state.client.rpc(
+            const { data, error } = await state.client.rpc(
                 "get_arc_watch_admin_dashboard"
             );
 
-            if (result.error) throw result.error;
+            if (error) {
+                throw error;
+            }
 
-            const data = result.data || {};
-
-            if (data.success !== true) {
-                throw new Error("ARC Shield Watch returned an unexpected response.");
+            if (!data || data.success !== true) {
+                throw new Error(
+                    "ARC Shield Watch returned an unexpected response."
+                );
             }
 
             state.data = {
-                titles: Array.isArray(data.titles) ? data.titles : [],
-                findings: Array.isArray(data.findings) ? data.findings : [],
-                counts: data.counts && typeof data.counts === "object"
-                    ? data.counts
-                    : {}
+                titles: Array.isArray(data.titles)
+                    ? data.titles
+                    : [],
+
+                findings: Array.isArray(data.findings)
+                    ? data.findings
+                    : [],
+
+                counts:
+                    data.counts &&
+                    typeof data.counts === "object"
+                        ? data.counts
+                        : {}
             };
 
             state.loaded = true;
+
             renderContent();
 
-            const limit = Number(data.findings_limit || 500);
-            const total = Number(state.data.counts.total || 0);
+            const activeCount = getTotalActiveCount();
 
-            setMessage(
-                total > state.data.findings.length
-                    ? `Showing the latest ${state.data.findings.length} of ${total} findings.`
-                    : "ARC Shield Watch records loaded.",
-                "success"
-            );
+            const loadedActiveCount =
+                getActiveFindings().length;
+
+            if (activeCount > loadedActiveCount) {
+                setMessage(
+                    `${activeCount} active findings exist. ` +
+                    `Showing ${loadedActiveCount} from the latest ` +
+                    `${state.data.findings.length} loaded records.`,
+                    "success"
+                );
+            } else if (activeCount === 0) {
+                setMessage(
+                    "All clear. No findings currently require attention.",
+                    "success"
+                );
+            } else {
+                setMessage(
+                    `${activeCount} finding${activeCount === 1 ? "" : "s"} ` +
+                    `require attention.`,
+                    "success"
+                );
+            }
 
         } catch (error) {
-            console.error("ARC Shield Watch load failed:", error);
+            console.error(
+                "ARC Shield Watch load failed:",
+                error
+            );
 
             setMessage(
                 error && error.message
@@ -432,49 +669,93 @@ function renderFindings() {
                     : "The monitoring records could not be loaded.",
                 "error"
             );
+
         } finally {
             state.busy = false;
         }
     }
 
+    // ========================================================
+    // SAVE ADMINISTRATOR REVIEW
+    // ========================================================
+
     async function saveReview(event) {
         event.preventDefault();
 
-        if (state.busy || !state.client) return;
-
-        const form = event.currentTarget;
-        const id = form.dataset.shieldReviewForm;
-        const status = form.elements.status.value;
-        const notes = form.elements.notes.value;
-        const button = form.querySelector('button[type="submit"]');
-
-        if (!/^\d+$/.test(id)) {
-            setMessage("Invalid finding ID.", "error");
+        if (
+            state.busy ||
+            !state.client
+        ) {
             return;
         }
+
+        const form = event.currentTarget;
+
+        const id = String(
+            form.dataset.shieldReviewForm || ""
+        );
+
+        const statusField =
+            form.elements.namedItem("status");
+
+        const notesField =
+            form.elements.namedItem("notes");
+
+        const button = form.querySelector(
+            'button[type="submit"]'
+        );
+
+        if (!/^\d+$/.test(id)) {
+            setMessage(
+                "Invalid finding ID.",
+                "error"
+            );
+            return;
+        }
+
+        if (!statusField || !notesField) {
+            setMessage(
+                "The review form is incomplete.",
+                "error"
+            );
+            return;
+        }
+
+        const status = statusField.value;
+        const notes = notesField.value;
 
         if (!STATUSES.some(function (option) {
             return option[0] === status;
         })) {
-            setMessage("Choose a valid review status.", "error");
+            setMessage(
+                "Choose a valid review status.",
+                "error"
+            );
             return;
         }
 
         if (notes.length > 10000) {
-            setMessage("Notes cannot exceed 10,000 characters.", "error");
+            setMessage(
+                "Notes cannot exceed 10,000 characters.",
+                "error"
+            );
             return;
         }
 
         state.busy = true;
+
         if (button) {
             button.disabled = true;
             button.textContent = "Saving...";
         }
 
-        setMessage(`Saving finding #${id}...`, "loading");
+        setMessage(
+            `Saving finding #${id}...`,
+            "loading"
+        );
 
         try {
-            const result = await state.client.rpc(
+            const { data, error } = await state.client.rpc(
                 "admin_update_arc_watch_finding",
                 {
                     p_finding_id: id,
@@ -483,19 +764,26 @@ function renderFindings() {
                 }
             );
 
-            if (result.error) throw result.error;
-
-            if (!result.data || result.data.success !== true) {
-                throw new Error("The review could not be confirmed.");
+            if (error) {
+                throw error;
             }
 
-            setMessage(`Finding #${id} saved successfully.`, "success");
+            if (!data || data.success !== true) {
+                throw new Error(
+                    "The review could not be confirmed."
+                );
+            }
 
+            // Release the busy flag before refreshing.
             state.busy = false;
+
             await loadDashboard();
 
         } catch (error) {
-            console.error("ARC Shield Watch review failed:", error);
+            console.error(
+                "ARC Shield Watch review failed:",
+                error
+            );
 
             setMessage(
                 error && error.message
@@ -503,6 +791,7 @@ function renderFindings() {
                     : "The review could not be saved.",
                 "error"
             );
+
         } finally {
             state.busy = false;
 
@@ -513,33 +802,74 @@ function renderFindings() {
         }
     }
 
+    // ========================================================
+    // EVENT BINDINGS
+    // ========================================================
+
     function bindContentEvents() {
-        state.root.querySelectorAll("[data-shield-filter]")
-            .forEach(function (button) {
-                button.addEventListener("click", function () {
-                    state.filter = button.dataset.shieldFilter || "all";
-                    renderContent();
-                });
+        if (!state.root) {
+            return;
+        }
+
+        state.root.querySelectorAll(
+            "[data-shield-filter]"
+        ).forEach(function (button) {
+            button.addEventListener("click", function () {
+                const nextFilter =
+                    button.dataset.shieldFilter || "all";
+
+                const allowed = FILTERS.some(
+                    function (filter) {
+                        return filter[0] === nextFilter;
+                    }
+                );
+
+                state.filter = allowed
+                    ? nextFilter
+                    : "all";
+
+                renderContent();
             });
+        });
 
-        state.root.querySelectorAll("[data-shield-review-form]")
-            .forEach(function (form) {
-                form.addEventListener("submit", saveReview);
-            });
+        state.root.querySelectorAll(
+            "[data-shield-review-form]"
+        ).forEach(function (form) {
+            form.addEventListener(
+                "submit",
+                saveReview
+            );
+        });
 
-        const refresh = state.root.querySelector("[data-shield-refresh]");
+        const refreshButton = state.root.querySelector(
+            "[data-shield-refresh]"
+        );
 
-        if (refresh) {
-            refresh.addEventListener("click", loadDashboard);
+        if (refreshButton) {
+            refreshButton.addEventListener(
+                "click",
+                loadDashboard
+            );
         }
     }
+
+    // ========================================================
+    // PUBLIC INITIALISER
+    // Called by /js/members.js for administrators only.
+    // ========================================================
 
     window.initBlackwoodArcShieldWatch = function (options) {
         const root = options && options.root;
         const client = options && options.client;
 
-        if (!root || !client || typeof client.rpc !== "function") {
-            console.warn("ARC Shield Watch: missing root or Supabase client.");
+        if (
+            !root ||
+            !client ||
+            typeof client.rpc !== "function"
+        ) {
+            console.warn(
+                "ARC Shield Watch: missing root or Supabase client."
+            );
             return;
         }
 
@@ -549,18 +879,38 @@ function renderFindings() {
         state.busy = false;
         state.filter = "all";
 
+        state.data = {
+            titles: [],
+            findings: [],
+            counts: {}
+        };
+
         root.innerHTML = `
-            <details class="shield-desk" data-shield-details>
+            <details
+                class="shield-desk"
+                data-shield-details
+            >
                 <summary class="shield-summary">
                     <div>
-                        <p class="shield-kicker">Admin Only · Private Monitoring</p>
+                        <p class="shield-kicker">
+                            Admin Only · Private Monitoring
+                        </p>
+
                         <h2>ARC Shield Watch</h2>
+
                         <p>
-                            Monitor search findings, review potential infringements,
+                            Monitor search findings,
+                            review potential infringements,
                             and maintain the private evidence record.
                         </p>
                     </div>
-                    <span class="shield-summary-indicator" aria-hidden="true">↓</span>
+
+                    <span
+                        class="shield-summary-indicator"
+                        aria-hidden="true"
+                    >
+                        ↓
+                    </span>
                 </summary>
 
                 <div class="shield-panel">
@@ -573,19 +923,33 @@ function renderFindings() {
 
                     <div data-shield-content>
                         <p class="shield-muted">
-                            Open this desk to retrieve the latest monitoring records.
+                            Open this desk to retrieve
+                            the latest monitoring records.
                         </p>
                     </div>
                 </div>
             </details>
         `;
 
-        const details = root.querySelector("[data-shield-details]");
+        const details = root.querySelector(
+            "[data-shield-details]"
+        );
 
-        details.addEventListener("toggle", function () {
-            if (details.open && !state.loaded) {
-                loadDashboard();
+        if (!details) {
+            return;
+        }
+
+        details.addEventListener(
+            "toggle",
+            function () {
+                if (
+                    details.open &&
+                    !state.loaded
+                ) {
+                    loadDashboard();
+                }
             }
-        });
+        );
     };
+
 })();
