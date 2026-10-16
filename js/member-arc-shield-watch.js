@@ -346,62 +346,42 @@
         `;
     }
 
-    function renderFindings() {
-        const findings = state.data.findings.filter(function (finding) {
-            return state.filter === "all" ||
-                getFindingStatus(finding) === state.filter;
-        });
+    
+function renderFindings() {
+    const visibleStatuses = [
+        "pending_review",
+        "notice_prepared",
+        "notice_sent"
+    ];
 
-        if (!findings.length) {
-            return `
-                <article class="shield-empty">
-                    <p>No findings match this filter.</p>
-                </article>
-            `;
-        }
+    const findings = state.data.findings.filter(function (finding) {
+        const status = getFindingStatus(finding);
 
+        return visibleStatuses.includes(status) &&
+            (
+                state.filter === "all" ||
+                state.filter === status
+            );
+    });
+
+    if (!findings.length) {
         return `
-            <div class="shield-findings">
-                ${findings.map(renderFinding).join("")}
-            </div>
+            <article class="shield-empty">
+                <p>
+                    No findings currently require attention.
+                    Monitoring continues in the background.
+                </p>
+            </article>
         `;
     }
 
-    function renderContent() {
-        const content = state.root.querySelector("[data-shield-content]");
+    return `
+        <div class="shield-findings">
+            ${findings.map(renderFinding).join("")}
+        </div>
+    `;
+}
 
-        if (!content) return;
-
-        content.innerHTML = `
-            ${renderSummary()}
-
-            <section class="shield-block">
-                <h3>Monitored Titles</h3>
-                ${renderTitles()}
-            </section>
-
-            <section class="shield-block">
-                <div class="shield-section-heading">
-                    <div>
-                        <h3>Finding Review</h3>
-                        <p>Review suspicious results and maintain the evidence record.</p>
-                    </div>
-                    <button
-                        type="button"
-                        class="circle-button circle-button-secondary"
-                        data-shield-refresh
-                    >
-                        Refresh Findings
-                    </button>
-                </div>
-
-                ${renderFilters()}
-                ${renderFindings()}
-            </section>
-        `;
-
-        bindContentEvents();
-    }
 
     async function loadDashboard() {
         if (state.busy || !state.client || !state.root) return;
