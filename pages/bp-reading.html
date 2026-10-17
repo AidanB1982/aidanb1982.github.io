@@ -3,8 +3,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
   <meta name="theme-color" content="#171310">
 
   <title>BP Reading | Blackwood Publishing</title>
@@ -58,6 +60,8 @@
     [hidden] {
       display: none !important;
     }
+
+    /* LIBRARY */
 
     .library {
       max-width: 1120px;
@@ -116,42 +120,15 @@
       aspect-ratio: 2 / 3;
       border: 1px solid #806044;
       border-radius: .4rem;
-      background:
-        radial-gradient(
-          circle at 50% 35%,
-          #63442e,
-          transparent 60%
-        ),
-        linear-gradient(
-          145deg,
-          #3c291d,
-          #100e0c
-        );
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 1rem;
-      text-align: center;
-      box-shadow: inset 0 0 0 8px #ffffff08;
+      background: #100e0c;
+      overflow: hidden;
     }
 
-    .cover-imprint {
-      font: .65rem Arial, sans-serif;
-      letter-spacing: .2em;
-      color: #ddbb91;
-    }
-
-    .cover-title {
-      font-size: clamp(1.5rem, 4vw, 2rem);
-      color: #f3dfc1;
-      overflow-wrap: anywhere;
-    }
-
-    .cover-footer {
-      font: .7rem Arial, sans-serif;
-      color: #d3b48f;
-      letter-spacing: .12em;
+    .book-cover img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .book-card h2 {
@@ -220,7 +197,7 @@
       line-height: 1.6;
     }
 
-    /* Immersive reading mode */
+    /* IMMERSIVE READER */
 
     .reader {
       position: fixed;
@@ -243,7 +220,10 @@
 
     .reading-surface {
       height: 100%;
-      padding: clamp(1.5rem, 5vh, 3rem) 1.5rem;
+      height: 100dvh;
+      padding:
+        clamp(1.5rem, 5vh, 3rem)
+        1.5rem;
     }
 
     .reading-column {
@@ -283,18 +263,110 @@
       opacity: .75;
     }
 
-    /* Reader controls */
+    /* SIDE PAGE ARROWS */
+
+    .reader-page-arrows {
+      position: fixed;
+      inset: 0;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    .reader-page-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+
+      width: 46px;
+      height: 76px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 0;
+      border: 0;
+      border-radius: .5rem;
+
+      background: transparent;
+      color: #8a6d50;
+
+      font: 2rem Arial, sans-serif;
+      opacity: .38;
+
+      pointer-events: auto;
+      touch-action: manipulation;
+
+      transition:
+        opacity .2s,
+        background .2s;
+    }
+
+    .reader-page-arrow-left {
+      left: max(4px, env(safe-area-inset-left));
+    }
+
+    .reader-page-arrow-right {
+      right: max(4px, env(safe-area-inset-right));
+    }
+
+    .reader-page-arrow:hover,
+    .reader-page-arrow:focus-visible {
+      opacity: 1;
+      background: #7c61451c;
+    }
+
+    .reader-page-arrow:disabled {
+      opacity: .12;
+      cursor: not-allowed;
+    }
+
+    .reader[data-theme="night"] .reader-page-arrow {
+      color: #d4b18a;
+    }
+
+    .reader[data-theme="day"] .reader-page-arrow {
+      color: #796755;
+    }
+
+    /* ALWAYS-ACCESSIBLE MENU */
+
+    .reader-menu-toggle {
+      position: fixed;
+      top: max(10px, env(safe-area-inset-top));
+      right: max(10px, env(safe-area-inset-right));
+      z-index: 25;
+
+      padding: .65rem .85rem;
+      border: 1px solid #806044;
+      border-radius: .45rem;
+
+      background: #241c17ed;
+      color: #f0e5d7;
+
+      font: .8rem Arial, sans-serif;
+      box-shadow: 0 2px 10px #0002;
+    }
+
+    /* READER CONTROLS */
 
     .reader-controls {
       position: fixed;
       inset: 0 0 auto;
       z-index: 20;
+
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
       flex-wrap: wrap;
-      padding: 1rem;
+
+      padding:
+        max(1rem, env(safe-area-inset-top))
+        5.5rem
+        1rem
+        max(1rem, env(safe-area-inset-left));
+
       background: #1b1513f2;
       color: #f0e5d7;
       border-bottom: 1px solid #58402e;
@@ -305,11 +377,18 @@
       position: fixed;
       inset: auto 0 0;
       z-index: 20;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 1rem;
+
+      padding:
+        1rem
+        max(1rem, env(safe-area-inset-right))
+        max(1rem, env(safe-area-inset-bottom))
+        max(1rem, env(safe-area-inset-left));
+
       background: #1b1513f2;
       color: #f0e5d7;
       border-top: 1px solid #58402e;
@@ -348,11 +427,13 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 30;
+
       padding: .5rem .8rem;
       background: #1b1513e8;
       color: #f1cfaa;
       border-radius: .4rem;
       font: .75rem Arial, sans-serif;
+
       pointer-events: none;
       max-width: calc(100% - 2rem);
       text-align: center;
@@ -362,26 +443,77 @@
       display: none;
     }
 
+    /* MOBILE */
+
+    @media (max-width: 850px) {
+      .reading-surface {
+        padding:
+          max(1.5rem, env(safe-area-inset-top))
+          3.1rem
+          max(1.5rem, env(safe-area-inset-bottom));
+      }
+
+      .reader-page-arrow {
+        width: 42px;
+        height: 76px;
+        opacity: .55;
+      }
+
+      .reader-book-title {
+        margin-bottom: .75rem;
+      }
+    }
+
     @media (max-width: 650px) {
-      .reader-controls,
-      .reader-bottom {
-        justify-content: center;
+      .reading-surface {
+        padding:
+          max(1.2rem, env(safe-area-inset-top))
+          2.75rem
+          max(1rem, env(safe-area-inset-bottom));
+      }
+
+      .reader-page-arrow {
+        width: 40px;
+        height: 88px;
+        font-size: 1.65rem;
+        opacity: .65;
       }
 
       .reader-controls {
-        padding: .65rem;
+        justify-content: center;
+        padding:
+          calc(max(1rem, env(safe-area-inset-top)) + 2.6rem)
+          .65rem
+          .65rem;
+        gap: .5rem;
+      }
+
+      .control-group {
+        justify-content: center;
+      }
+
+      .control {
+        padding: .55rem .65rem;
+        font-size: .8rem;
       }
 
       .reader-bottom {
         gap: .5rem;
       }
 
-      .reading-surface {
-        padding: 1.25rem .75rem;
+      .reader-progress {
+        font-size: .72rem;
       }
 
-      .reader-book-title {
-        margin-bottom: .75rem;
+      .reader-menu-toggle {
+        padding: .6rem .75rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reader-page-arrow,
+      .progress-fill {
+        transition: none;
       }
     }
   </style>
@@ -389,7 +521,10 @@
 
 <body>
 
+  <!-- LIBRARY -->
+
   <main class="library" id="library">
+
     <header class="library-header">
       <div class="brand">BLACKWOOD</div>
       <div class="brand-subtitle">BP READING</div>
@@ -408,17 +543,22 @@
       aria-label="Books in your library">
     </section>
 
-    <p class="library-error"
-       id="library-error"
-       role="alert"
-       hidden></p>
+    <p
+      class="library-error"
+      id="library-error"
+      role="alert"
+      hidden>
+    </p>
 
     <p class="library-note">
       Administrator testing edition.
       Gualachulain is currently the only book
       connected to BP Reading.
     </p>
+
   </main>
+
+  <!-- READER -->
 
   <section
     class="reader"
@@ -452,6 +592,46 @@
 
       </article>
     </div>
+
+    <!-- PAGE TURNING ARROWS -->
+
+    <nav
+      class="reader-page-arrows"
+      id="reader-page-arrows"
+      aria-label="Turn book pages"
+      hidden>
+
+      <button
+        class="reader-page-arrow reader-page-arrow-left"
+        id="page-arrow-left"
+        type="button"
+        aria-label="Previous page">
+        &#10094;
+      </button>
+
+      <button
+        class="reader-page-arrow reader-page-arrow-right"
+        id="page-arrow-right"
+        type="button"
+        aria-label="Next page">
+        &#10095;
+      </button>
+
+    </nav>
+
+    <!-- MENU BUTTON -->
+
+    <button
+      class="reader-menu-toggle"
+      id="reader-menu-toggle"
+      type="button"
+      aria-controls="reader-controls"
+      aria-expanded="false"
+      hidden>
+      ☰ Menu
+    </button>
+
+    <!-- TOP CONTROLS -->
 
     <header
       class="reader-controls"
@@ -513,6 +693,8 @@
       </div>
     </header>
 
+    <!-- BOTTOM CONTROLS -->
+
     <nav
       class="reader-bottom"
       id="reader-bottom"
@@ -550,17 +732,10 @@
 
   </section>
 
-  <!-- JSZip is required for archived EPUB files. -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
-  </script>
+  <!-- EPUB DEPENDENCIES -->
 
-  <!-- EPUB.js renders the actual manuscript. -->
-  
-  <script
-    src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js">
-  </script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 
   <script type="module">
     "use strict";
@@ -654,9 +829,11 @@
           : [],
 
       hasStarted: saved.hasStarted === true,
+
       isOpen: false,
       isLoading: false,
       isNavigating: false,
+
       book: null,
       rendition: null,
       currentCfi: null,
@@ -692,6 +869,11 @@
     function setControlsVisible(visible) {
       $("reader-controls").hidden = !visible;
       $("reader-bottom").hidden = !visible;
+
+      $("reader-menu-toggle").setAttribute(
+        "aria-expanded",
+        String(visible)
+      );
     }
 
     function showLibraryError(message) {
@@ -710,30 +892,12 @@
       const cover = document.createElement("div");
       cover.className = "book-cover";
 
-      const imprint = document.createElement("div");
-      imprint.className = "cover-imprint";
-      imprint.textContent = "BLACKWOOD PUBLISHING";
-
-      const coverTitle = document.createElement("div");
-      coverTitle.className = "cover-title";
-      coverTitle.textContent = BOOK.title;
-
-      const footer = document.createElement("div");
-      footer.className = "cover-footer";
-      footer.textContent = "BP READING";
-
       const coverImage = document.createElement("img");
-
       coverImage.src = "/assets/book7.png";
       coverImage.alt = "Gualachulain book cover";
       coverImage.loading = "lazy";
-      
-      coverImage.style.width = "100%";
-      coverImage.style.height = "100%";
-      coverImage.style.objectFit = "contain";
-      coverImage.style.borderRadius = ".4rem";
-      
-      cover.replaceChildren(coverImage);
+
+      cover.appendChild(coverImage);
 
       const heading = document.createElement("h2");
       heading.textContent = BOOK.title;
@@ -787,6 +951,8 @@
       grid.appendChild(card);
     }
 
+    /* ADMIN AUTHENTICATION */
+
     async function verifyBPReadingAdmin() {
       const {
         data: { user },
@@ -819,6 +985,8 @@
 
       return user;
     }
+
+    /* PROTECTED EPUB DELIVERY */
 
     async function fetchProtectedEpub() {
       const {
@@ -868,7 +1036,7 @@
             message = payload.error;
           }
         } catch {
-          // Retain the generic error message.
+          // Keep the generic error message.
         }
 
         throw new Error(message);
@@ -886,6 +1054,7 @@
       }
 
       const bytes = await response.arrayBuffer();
+
       const signature = new Uint8Array(
         bytes,
         0,
@@ -908,13 +1077,15 @@
       return bytes;
     }
 
+    /* READING THEMES */
+
     function registerThemes(rendition) {
       rendition.themes.register(
         "parchment",
         {
-          "body": {
-            "background": "#eee0c5 !important",
-            "color": "#30271f !important",
+          body: {
+            background: "#eee0c5 !important",
+            color: "#30271f !important",
             "font-family":
               "Georgia, 'Times New Roman', serif !important",
             "line-height": "1.85 !important"
@@ -925,9 +1096,9 @@
       rendition.themes.register(
         "day",
         {
-          "body": {
-            "background": "#fffdf7 !important",
-            "color": "#242424 !important",
+          body: {
+            background: "#fffdf7 !important",
+            color: "#242424 !important",
             "font-family":
               "Georgia, 'Times New Roman', serif !important",
             "line-height": "1.85 !important"
@@ -938,9 +1109,9 @@
       rendition.themes.register(
         "night",
         {
-          "body": {
-            "background": "#201c1a !important",
-            "color": "#e9dfd2 !important",
+          body: {
+            background: "#201c1a !important",
+            color: "#e9dfd2 !important",
             "font-family":
               "Georgia, 'Times New Roman', serif !important",
             "line-height": "1.85 !important"
@@ -967,6 +1138,8 @@
         )}%`
       );
     }
+
+    /* BOOKMARKS */
 
     function getCurrentCfi() {
       const location = state.currentLocation;
@@ -995,6 +1168,8 @@
       $("bookmark").disabled = !current;
     }
 
+    /* READING PROGRESS */
+
     function updateReaderProgress() {
       const location = state.currentLocation;
 
@@ -1004,6 +1179,8 @@
 
         $("previous").disabled = true;
         $("next").disabled = true;
+        $("page-arrow-left").disabled = true;
+        $("page-arrow-right").disabled = true;
 
         updateBookmarkButton();
         return;
@@ -1045,7 +1222,10 @@
         }
 
         label = `${state.progress}% complete`;
-      } else if (page !== null && total !== null) {
+      } else if (
+        page !== null &&
+        total !== null
+      ) {
         label = `Page ${page} of ${total}`;
       } else {
         label = "Reading";
@@ -1053,13 +1233,22 @@
 
       $("reader-progress").textContent = label;
 
-      $("previous").disabled =
+      const previousDisabled =
         state.isNavigating ||
         location.atStart === true;
 
-      $("next").disabled =
+      const nextDisabled =
         state.isNavigating ||
         location.atEnd === true;
+
+      $("previous").disabled = previousDisabled;
+      $("next").disabled = nextDisabled;
+
+      $("page-arrow-left").disabled =
+        previousDisabled;
+
+      $("page-arrow-right").disabled =
+        nextDisabled;
 
       updateBookmarkButton();
     }
@@ -1112,6 +1301,8 @@
       }
     }
 
+    /* OPEN BOOK */
+
     async function openBook() {
       if (
         state.isLoading ||
@@ -1128,7 +1319,6 @@
           "The EPUB reading library could not load. " +
           "Please refresh the page and try again."
         );
-
         return;
       }
 
@@ -1145,11 +1335,15 @@
 
       $("library").hidden = true;
       $("reader").hidden = false;
+
       $("reader-loading").hidden = false;
       $("reader-loading").textContent =
         "Preparing your book…";
 
       $("epub-viewer").hidden = true;
+
+      $("reader-page-arrows").hidden = true;
+      $("reader-menu-toggle").hidden = true;
 
       setControlsVisible(false);
       showStatus("");
@@ -1165,7 +1359,6 @@
           "Opening Gualachulain…";
 
         const book = window.ePub(bytes);
-
         state.book = book;
 
         await book.ready;
@@ -1196,64 +1389,6 @@
           "relocated",
           handleRelocation
         );
-        
-
-        rendition.on("click", (event, contents) => {
-          if (
-            !state.isOpen ||
-            state.isLoading ||
-            state.isNavigating
-          ) {
-            return;
-          }
-        
-          // Allow links, footnotes and other EPUB controls.
-          if (
-            event.target?.closest?.(
-              "a, button, input, select, textarea"
-            )
-          ) {
-            return;
-          }
-        
-          // Get the actual visible iframe dimensions.
-          const iframe =
-            contents?.document?.defaultView?.frameElement;
-        
-          if (!iframe) {
-            return;
-          }
-        
-          const iframeWidth =
-            iframe.getBoundingClientRect().width;
-        
-          if (iframeWidth <= 0) {
-            return;
-          }
-        
-          // EPUB.js may report coordinates across columns.
-          // Convert them to a position within the visible page.
-          const x =
-            ((event.clientX % iframeWidth) + iframeWidth) %
-            iframeWidth;
-        
-          const position = x / iframeWidth;
-        
-          console.log("BP Reading tap position:", position);
-        
-          if (position < 0.25) {
-            void changePage(-1);
-          } else if (position > 0.75) {
-            void changePage(1);
-          } else {
-            setControlsVisible(
-              $("reader-controls").hidden
-            );
-        
-            showStatus("");
-          }
-        });
-
 
         rendition.on(
           "displayError",
@@ -1269,13 +1404,12 @@
           }
         );
 
-        // EPUB content lives inside an iframe.
-        // Register a click listener inside each section.
+        // Only keyboard handling is registered
+        // inside the EPUB iframe.
+        // Page turning uses the outer HTML arrows.
         rendition.hooks.content.register(
           contents => {
-            
-        
-        contents.document.addEventListener(
+            contents.document.addEventListener(
               "keydown",
               event => {
                 if (event.key === "Escape") {
@@ -1323,12 +1457,16 @@
         state.isLoading = false;
         state.hasStarted = true;
 
+        // Enable independent navigation arrows
+        // and the accessible menu button.
+        $("reader-page-arrows").hidden = false;
+        $("reader-menu-toggle").hidden = false;
+
         updateReaderProgress();
         saveState();
         renderLibrary();
 
-        // Location generation happens after the book
-        // is visible so it doesn't delay first reading.
+        // Calculate percentage after first display.
         void prepareLocations(
           book,
           openingId
@@ -1360,6 +1498,8 @@
         }
       }
     }
+
+    /* CLOSE BOOK */
 
     function closeBook() {
       ++state.openingId;
@@ -1400,6 +1540,9 @@
       $("epub-viewer").replaceChildren();
       $("epub-viewer").hidden = true;
 
+      $("reader-page-arrows").hidden = true;
+      $("reader-menu-toggle").hidden = true;
+
       $("reader").hidden = true;
       $("library").hidden = false;
 
@@ -1410,58 +1553,43 @@
       renderLibrary();
     }
 
-    
+    /* PAGE NAVIGATION */
+
     async function changePage(direction) {
       if (
         !state.rendition ||
         state.isNavigating ||
+        state.isLoading ||
         !state.isOpen
       ) {
         return;
       }
-    
+
       state.isNavigating = true;
       updateReaderProgress();
-    
+
       try {
-        const before =
-          state.rendition.currentLocation();
-    
-        console.log("BP Reading navigation BEFORE:", {
-          direction,
-          cfi: before?.start?.cfi,
-          page: before?.start?.displayed?.page,
-          section: before?.start?.index
-        });
-    
         if (direction > 0) {
           await state.rendition.next();
         } else {
           await state.rendition.prev();
         }
-    
-        const after =
-          state.rendition.currentLocation();
-    
-        console.log("BP Reading navigation AFTER:", {
-          direction,
-          cfi: after?.start?.cfi,
-          page: after?.start?.displayed?.page,
-          section: after?.start?.index
-        });
       } catch (error) {
         console.error(
-          "BP Reading page navigation failed:",
+          "Page navigation failed:",
           error
         );
-    
-        showStatus("Unable to turn the page.");
+
+        showStatus(
+          "Unable to turn the page."
+        );
       } finally {
         state.isNavigating = false;
         updateReaderProgress();
       }
     }
 
+    /* BUTTON EVENTS */
 
     $("back-to-library").addEventListener(
       "click",
@@ -1470,12 +1598,31 @@
 
     $("previous").addEventListener(
       "click",
-      () => changePage(-1)
+      () => void changePage(-1)
     );
 
     $("next").addEventListener(
       "click",
-      () => changePage(1)
+      () => void changePage(1)
+    );
+
+    $("page-arrow-left").addEventListener(
+      "click",
+      () => void changePage(-1)
+    );
+
+    $("page-arrow-right").addEventListener(
+      "click",
+      () => void changePage(1)
+    );
+
+    $("reader-menu-toggle").addEventListener(
+      "click",
+      () => {
+        setControlsVisible(
+          $("reader-controls").hidden
+        );
+      }
     );
 
     $("font-smaller").addEventListener(
@@ -1541,7 +1688,6 @@
           showStatus(
             "Reading position is not ready."
           );
-
           return;
         }
 
@@ -1570,6 +1716,8 @@
       }
     );
 
+    /* KEYBOARD */
+
     document.addEventListener(
       "keydown",
       event => {
@@ -1587,27 +1735,7 @@
       }
     );
 
-    // The outer reading surface remains clickable
-    // outside the EPUB iframe.
-    $("reading-surface").addEventListener(
-      "click",
-      event => {
-        if (
-          !state.isOpen ||
-          event.target.closest(
-            "#epub-viewer"
-          )
-        ) {
-          return;
-        }
-
-        setControlsVisible(
-          $("reader-controls").hidden
-        );
-
-        showStatus("");
-      }
-    );
+    /* ADMIN GATE */
 
     async function initialise() {
       renderLibrary();
