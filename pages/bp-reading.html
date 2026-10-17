@@ -3,18 +3,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171310">
+
   <title>BP Reading | Blackwood Publishing</title>
-  
-<style>
-  /* BP Reading: keep the prototype hidden until verified. */
-  html:not(.bp-admin-verified) body {
-    visibility: hidden;
-  }
-</style>
 
   <style>
+    html:not(.bp-admin-verified) body {
+      visibility: hidden;
+    }
+
     :root {
       color-scheme: dark;
       --bg: #171310;
@@ -25,9 +24,12 @@
       --muted: #b7a594;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       min-height: 100%;
     }
@@ -38,7 +40,8 @@
       font-family: Georgia, "Times New Roman", serif;
     }
 
-    button, select {
+    button,
+    select {
       font: inherit;
     }
 
@@ -95,7 +98,8 @@
 
     .book-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns:
+        repeat(auto-fill, minmax(220px, 1fr));
       gap: 2rem;
     }
 
@@ -113,8 +117,16 @@
       border: 1px solid #806044;
       border-radius: .4rem;
       background:
-        radial-gradient(circle at 50% 35%, #63442e, transparent 60%),
-        linear-gradient(145deg, #3c291d, #100e0c);
+        radial-gradient(
+          circle at 50% 35%,
+          #63442e,
+          transparent 60%
+        ),
+        linear-gradient(
+          145deg,
+          #3c291d,
+          #100e0c
+        );
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -122,12 +134,6 @@
       padding: 2rem 1rem;
       text-align: center;
       box-shadow: inset 0 0 0 8px #ffffff08;
-    }
-
-    .book-cover.crossing {
-      background:
-        radial-gradient(circle at 50% 70%, #46505a, transparent 60%),
-        linear-gradient(145deg, #222f3a, #111316);
     }
 
     .cover-imprint {
@@ -191,8 +197,13 @@
       color: #f5dfc7;
     }
 
-    .open-book:hover {
+    .open-book:hover:not(:disabled) {
       background: #4c3523;
+    }
+
+    .open-book:disabled {
+      opacity: .65;
+      cursor: wait;
     }
 
     .library-note {
@@ -202,16 +213,22 @@
       line-height: 1.6;
     }
 
+    .library-error {
+      margin-top: 1rem;
+      color: #e8b9a3;
+      font: .85rem Arial, sans-serif;
+      line-height: 1.6;
+    }
+
     /* Immersive reading mode */
 
     .reader {
       position: fixed;
       inset: 0;
       z-index: 10;
-      overflow-y: auto;
+      overflow: hidden;
       background: #eee0c5;
       color: #30271f;
-      scrollbar-width: thin;
     }
 
     .reader[data-theme="day"] {
@@ -225,13 +242,17 @@
     }
 
     .reading-surface {
-      min-height: 100%;
-      padding: clamp(3rem, 9vh, 6rem) 1.5rem 7rem;
+      height: 100%;
+      padding: clamp(1.5rem, 5vh, 3rem) 1.5rem;
     }
 
     .reading-column {
-      max-width: 680px;
+      max-width: 760px;
+      height: 100%;
       margin: auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     .reader-book-title {
@@ -239,40 +260,30 @@
       font: .72rem Arial, sans-serif;
       letter-spacing: .2em;
       opacity: .65;
-      margin-bottom: 3.5rem;
+      margin-bottom: 1.25rem;
+      flex: 0 0 auto;
     }
 
-    .chapter-title {
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
-      font-weight: normal;
+    .epub-viewer {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .epub-viewer iframe {
+      border: 0;
+    }
+
+    .reader-loading {
+      margin: auto;
       text-align: center;
-      margin: 0 0 3rem;
+      font: 1rem Arial, sans-serif;
+      line-height: 1.7;
+      opacity: .75;
     }
 
-    .chapter-text {
-      font-size: 19px;
-      line-height: 1.85;
-    }
-
-    .chapter-text p {
-      margin: 0 0 1.5em;
-    }
-
-    .chapter-text p:first-child::first-letter {
-      float: left;
-      font-size: 3.3em;
-      line-height: .9;
-      padding-right: .12em;
-    }
-
-    .sample-label {
-      margin-top: 4rem;
-      text-align: center;
-      font: .75rem Arial, sans-serif;
-      opacity: .55;
-    }
-
-    /* Controls appear only when requested */
+    /* Reader controls */
 
     .reader-controls {
       position: fixed;
@@ -343,6 +354,8 @@
       border-radius: .4rem;
       font: .75rem Arial, sans-serif;
       pointer-events: none;
+      max-width: calc(100% - 2rem);
+      text-align: center;
     }
 
     .reader-status:empty {
@@ -364,274 +377,309 @@
       }
 
       .reading-surface {
-        padding-top: 4rem;
+        padding: 1.25rem .75rem;
       }
 
       .reader-book-title {
-        margin-bottom: 2rem;
+        margin-bottom: .75rem;
       }
     }
   </style>
 </head>
 
 <body>
+
   <main class="library" id="library">
     <header class="library-header">
       <div class="brand">BLACKWOOD</div>
       <div class="brand-subtitle">BP READING</div>
 
       <h1>My Library</h1>
+
       <p class="library-intro">
-        Your books. Your stories. Your place to disappear for a while.
+        Your books. Your stories. Your place to
+        disappear for a while.
       </p>
     </header>
 
-    <section class="book-grid" id="book-grid"
-      aria-label="Books in your library"></section>
+    <section
+      class="book-grid"
+      id="book-grid"
+      aria-label="Books in your library">
+    </section>
+
+    <p class="library-error"
+       id="library-error"
+       role="alert"
+       hidden></p>
 
     <p class="library-note">
-      Prototype library with demonstration books only.
-      No live purchases, entitlements or manuscript files are connected.
+      Administrator testing edition.
+      Gualachulain is currently the only book
+      connected to BP Reading.
     </p>
   </main>
 
-  <section class="reader" id="reader"
-    aria-label="Immersive book reader" hidden>
+  <section
+    class="reader"
+    id="reader"
+    data-theme="parchment"
+    aria-label="Immersive book reader"
+    hidden>
 
     <div class="reading-surface" id="reading-surface">
       <article class="reading-column">
-        <div class="reader-book-title" id="reader-book-title"></div>
-        <h1 class="chapter-title" id="chapter-title"></h1>
-        <div class="chapter-text" id="chapter-text"></div>
-        <p class="sample-label">
-          Demonstration content — not an actual Blackwood manuscript.
-        </p>
+
+        <div
+          class="reader-book-title"
+          id="reader-book-title">
+          GUALACHULAIN
+        </div>
+
+        <div
+          class="reader-loading"
+          id="reader-loading"
+          role="status">
+          Preparing your book…
+        </div>
+
+        <div
+          class="epub-viewer"
+          id="epub-viewer"
+          aria-label="Gualachulain book pages"
+          hidden>
+        </div>
+
       </article>
     </div>
 
-    <header class="reader-controls" id="reader-controls" hidden>
-      <button class="control" id="back-to-library" type="button">
+    <header
+      class="reader-controls"
+      id="reader-controls"
+      hidden>
+
+      <button
+        class="control"
+        id="back-to-library"
+        type="button">
         ← Library
       </button>
 
       <div class="control-group">
-        <button class="control" id="font-smaller" type="button"
-          aria-label="Decrease text size">A−</button>
-        <button class="control" id="font-larger" type="button"
-          aria-label="Increase text size">A+</button>
 
-        <select class="control" id="reading-theme"
+        <button
+          class="control"
+          id="font-smaller"
+          type="button"
+          aria-label="Decrease text size">
+          A−
+        </button>
+
+        <button
+          class="control"
+          id="font-larger"
+          type="button"
+          aria-label="Increase text size">
+          A+
+        </button>
+
+        <select
+          class="control"
+          id="reading-theme"
           aria-label="Reading theme">
-          <option value="parchment">Parchment</option>
-          <option value="day">Day</option>
-          <option value="night">Night</option>
+
+          <option value="parchment">
+            Parchment
+          </option>
+
+          <option value="day">
+            Day
+          </option>
+
+          <option value="night">
+            Night
+          </option>
+
         </select>
 
-        <button class="control" id="bookmark" type="button"
-          aria-pressed="false">☆ Bookmark</button>
+        <button
+          class="control"
+          id="bookmark"
+          type="button"
+          aria-pressed="false">
+          ☆ Bookmark
+        </button>
+
       </div>
     </header>
 
-    <nav class="reader-bottom" id="reader-bottom"
-      aria-label="Reading navigation" hidden>
-      <button class="control" id="previous" type="button">
+    <nav
+      class="reader-bottom"
+      id="reader-bottom"
+      aria-label="Reading navigation"
+      hidden>
+
+      <button
+        class="control"
+        id="previous"
+        type="button">
         ← Previous
       </button>
 
-      <span class="reader-progress" id="reader-progress"></span>
+      <span
+        class="reader-progress"
+        id="reader-progress">
+        Preparing…
+      </span>
 
-      <button class="control" id="next" type="button">
+      <button
+        class="control"
+        id="next"
+        type="button">
         Next →
       </button>
+
     </nav>
 
-    <div class="reader-status" id="reader-status"
-      role="status" aria-live="polite"></div>
+    <div
+      class="reader-status"
+      id="reader-status"
+      role="status"
+      aria-live="polite">
+    </div>
+
   </section>
 
-  <script>
+  <!-- JSZip is required for archived EPUB files. -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+  </script>
+
+  <!-- EPUB.js renders the actual manuscript. -->
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/epub.js/0.3.93/epub.min.js">
+  </script>
+
+  <script type="module">
     "use strict";
 
-    const books = [
-      {
-        id: "gualachulain-demo",
-        title: "Gualachulain",
-        coverClass: "",
-        description: "Blackwood Reading Station demonstration edition.",
-        chapters: [
-          {
-            title: "Chapter One",
-            paragraphs: [
-              "Every story begins somewhere. Some begin with a door opening. Others begin with a secret that should never have been discovered.",
-              "Beyond the familiar streets and ordinary days, there are places where stories wait patiently to be told.",
-              "This is the first demonstration chapter of our immersive reading experience."
-            ]
-          },
-          {
-            title: "Chapter Two",
-            paragraphs: [
-              "The next chapter brings a new page, a fresh beginning, and the promise of something waiting just beyond the horizon.",
-              "A good reading experience should disappear into the background, leaving only the words and the imagination.",
-              "Tap the centre of the screen to reveal the reading controls whenever you need them."
-            ]
-          },
-          {
-            title: "Chapter Three",
-            paragraphs: [
-              "Some journeys are measured in miles. Others are measured in the pages we turn.",
-              "Your reading position and preferences are remembered on this device.",
-              "This concludes the demonstration of Gualachulain in BP Reading."
-            ]
-          }
-        ]
-      },
-      {
-        id: "crossing-demo",
-        title: "The Crossing",
-        coverClass: "crossing",
-        description: "Second demonstration title for the Blackwood library.",
-        chapters: [
-          {
-            title: "Chapter One",
-            paragraphs: [
-              "The horizon stretched beyond the last familiar landmark, leaving the road ahead wrapped in uncertainty.",
-              "There are moments when the simplest journey becomes the beginning of an entirely different life.",
-              "This is original placeholder text for the Blackwood Reading Station, not an excerpt from The Crossing."
-            ]
-          },
-          {
-            title: "Chapter Two",
-            paragraphs: [
-              "Morning arrived quietly, casting pale light across the landscape.",
-              "The journey continued, carrying questions that had yet to find their answers.",
-              "Every book in BP Reading will eventually have its own independently saved reading position."
-            ]
-          }
-        ]
-      }
+    import {
+      createClient
+    } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL =
+      "https://bmnlynjldlnxfvunqbqq.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
+
+    const EDITION_ID = 2;
+
+    const BOOK = {
+      id: "BLACKWOOD-BOOK-001-EPUB",
+      title: "Gualachulain",
+      description:
+        "Blackwood Publishing — administrator reading edition."
+    };
+
+    const STORAGE_KEY =
+      "bp-reading-gualachulain-v1";
+
+    const supabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const $ = id => document.getElementById(id);
+
+    const allowedThemes = [
+      "parchment",
+      "day",
+      "night"
     ];
 
-    const storageKey = "bp-reading-library-demo-v1";
-
-    function loadState() {
+    function loadSavedState() {
       try {
-        return JSON.parse(localStorage.getItem(storageKey)) || {};
+        const value = JSON.parse(
+          localStorage.getItem(STORAGE_KEY)
+        );
+
+        return value &&
+          typeof value === "object"
+          ? value
+          : {};
       } catch {
         return {};
       }
     }
 
-    const saved = loadState();
+    const saved = loadSavedState();
 
     const state = {
-      activeBookId: null,
-      theme: ["parchment", "day", "night"].includes(saved.theme)
-        ? saved.theme : "parchment",
-      fontSize: Number.isFinite(saved.fontSize)
-        ? Math.max(15, Math.min(30, saved.fontSize)) : 19,
-      positions: saved.positions &&
-        typeof saved.positions === "object" ? saved.positions : {},
-      bookmarks: saved.bookmarks &&
-        typeof saved.bookmarks === "object" ? saved.bookmarks : {}
-    };
+      theme: allowedThemes.includes(saved.theme)
+        ? saved.theme
+        : "parchment",
 
-    const $ = id => document.getElementById(id);
+      fontSize:
+        Number.isFinite(saved.fontSize)
+          ? Math.max(
+              15,
+              Math.min(30, saved.fontSize)
+            )
+          : 19,
+
+      position:
+        typeof saved.position === "string" &&
+        saved.position.startsWith("epubcfi(")
+          ? saved.position
+          : null,
+
+      progress:
+        Number.isFinite(saved.progress)
+          ? Math.max(
+              0,
+              Math.min(100, saved.progress)
+            )
+          : 0,
+
+      bookmarks:
+        Array.isArray(saved.bookmarks)
+          ? saved.bookmarks.filter(
+              value =>
+                typeof value === "string" &&
+                value.startsWith("epubcfi(")
+            )
+          : [],
+
+      hasStarted: saved.hasStarted === true,
+      isOpen: false,
+      isLoading: false,
+      isNavigating: false,
+      book: null,
+      rendition: null,
+      currentCfi: null,
+      currentLocation: null,
+      locationsReady: false,
+      openingId: 0
+    };
 
     function saveState() {
       try {
-        localStorage.setItem(storageKey, JSON.stringify({
-          theme: state.theme,
-          fontSize: state.fontSize,
-          positions: state.positions,
-          bookmarks: state.bookmarks
-        }));
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            theme: state.theme,
+            fontSize: state.fontSize,
+            position: state.position,
+            progress: state.progress,
+            bookmarks: state.bookmarks,
+            hasStarted: state.hasStarted
+          })
+        );
       } catch {
-        showStatus("Unable to save preferences on this device.");
-      }
-    }
-
-    function getBook(bookId) {
-      return books.find(book => book.id === bookId);
-    }
-
-    function getChapterIndex(book) {
-      const value = state.positions[book.id];
-      return Number.isInteger(value)
-        ? Math.max(0, Math.min(book.chapters.length - 1, value))
-        : 0;
-    }
-
-    function getProgress(book) {
-      const chapter = getChapterIndex(book);
-      return Math.round(((chapter + 1) / book.chapters.length) * 100);
-    }
-
-    function renderLibrary() {
-      const grid = $("book-grid");
-      grid.replaceChildren();
-
-      for (const book of books) {
-        const card = document.createElement("article");
-        card.className = "book-card";
-
-        const cover = document.createElement("div");
-        cover.className = "book-cover " + book.coverClass;
-
-        const imprint = document.createElement("div");
-        imprint.className = "cover-imprint";
-        imprint.textContent = "BLACKWOOD PUBLISHING";
-
-        const coverTitle = document.createElement("div");
-        coverTitle.className = "cover-title";
-        coverTitle.textContent = book.title;
-
-        const footer = document.createElement("div");
-        footer.className = "cover-footer";
-        footer.textContent = "BP READING";
-
-        cover.append(imprint, coverTitle, footer);
-
-        const heading = document.createElement("h2");
-        heading.textContent = book.title;
-
-        const description = document.createElement("p");
-        description.className = "book-description";
-        description.textContent = book.description;
-
-        const progressLabel = document.createElement("p");
-        progressLabel.className = "progress-label";
-
-        const hasStarted = Object.prototype.hasOwnProperty.call(
-          state.positions, book.id
+        showStatus(
+          "Unable to save reading progress on this device."
         );
-
-        const progress = hasStarted ? getProgress(book) : 0;
-        progressLabel.textContent = hasStarted
-          ? progress + "% through demonstration"
-          : "Not started";
-
-        const track = document.createElement("div");
-        track.className = "progress-track";
-
-        const fill = document.createElement("div");
-        fill.className = "progress-fill";
-        fill.style.width = progress + "%";
-        track.appendChild(fill);
-
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "open-book";
-        button.textContent = hasStarted
-          ? "Continue Reading"
-          : "Read Book";
-        button.addEventListener("click", () => openBook(book.id));
-
-        card.append(
-          cover, heading, description,
-          progressLabel, track, button
-        );
-
-        grid.appendChild(card);
       }
     }
 
@@ -644,211 +692,872 @@
       $("reader-bottom").hidden = !visible;
     }
 
-    function renderReader() {
-      const book = getBook(state.activeBookId);
-      if (!book) return;
+    function showLibraryError(message) {
+      const element = $("library-error");
+      element.textContent = message;
+      element.hidden = !message;
+    }
 
-      const chapterIndex = getChapterIndex(book);
-      const chapter = book.chapters[chapterIndex];
+    function renderLibrary() {
+      const grid = $("book-grid");
+      grid.replaceChildren();
 
-      $("reader-book-title").textContent = book.title.toUpperCase();
-      $("chapter-title").textContent = chapter.title;
+      const card = document.createElement("article");
+      card.className = "book-card";
 
-      const container = $("chapter-text");
-      container.replaceChildren();
+      const cover = document.createElement("div");
+      cover.className = "book-cover";
 
-      for (const text of chapter.paragraphs) {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = text;
-        container.appendChild(paragraph);
-      }
+      const imprint = document.createElement("div");
+      imprint.className = "cover-imprint";
+      imprint.textContent = "BLACKWOOD PUBLISHING";
 
-      container.style.fontSize = state.fontSize + "px";
-      $("reader").dataset.theme = state.theme;
-      $("reading-theme").value = state.theme;
+      const coverTitle = document.createElement("div");
+      coverTitle.className = "cover-title";
+      coverTitle.textContent = BOOK.title;
 
-      const savedBookmarks = Array.isArray(state.bookmarks[book.id])
-        ? state.bookmarks[book.id] : [];
+      const footer = document.createElement("div");
+      footer.className = "cover-footer";
+      footer.textContent = "BP READING";
 
-      const bookmarked = savedBookmarks.includes(chapterIndex);
-      $("bookmark").textContent = bookmarked
-        ? "★ Bookmarked" : "☆ Bookmark";
-      $("bookmark").setAttribute(
-        "aria-pressed", String(bookmarked)
+      cover.append(
+        imprint,
+        coverTitle,
+        footer
       );
 
-      $("previous").disabled = chapterIndex === 0;
-      $("next").disabled = chapterIndex === book.chapters.length - 1;
+      const heading = document.createElement("h2");
+      heading.textContent = BOOK.title;
 
-      $("reader-progress").textContent =
-        "Chapter " + (chapterIndex + 1) +
-        " of " + book.chapters.length +
-        " · " + getProgress(book) + "%";
+      const description = document.createElement("p");
+      description.className = "book-description";
+      description.textContent = BOOK.description;
+
+      const progressLabel = document.createElement("p");
+      progressLabel.className = "progress-label";
+
+      progressLabel.textContent = state.hasStarted
+        ? `${state.progress}% complete`
+        : "Not started";
+
+      const track = document.createElement("div");
+      track.className = "progress-track";
+
+      const fill = document.createElement("div");
+      fill.className = "progress-fill";
+      fill.style.width = `${state.progress}%`;
+
+      track.appendChild(fill);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "open-book";
+
+      button.textContent = state.isLoading
+        ? "Opening…"
+        : state.hasStarted
+          ? "Continue Reading"
+          : "Read Book";
+
+      button.disabled = state.isLoading;
+
+      button.addEventListener(
+        "click",
+        openBook
+      );
+
+      card.append(
+        cover,
+        heading,
+        description,
+        progressLabel,
+        track,
+        button
+      );
+
+      grid.appendChild(card);
     }
 
-    function openBook(bookId) {
-      const book = getBook(bookId);
-      if (!book) return;
-
-      state.activeBookId = bookId;
-
-      if (!Object.prototype.hasOwnProperty.call(
-        state.positions, bookId
-      )) {
-        state.positions[bookId] = 0;
-      }
-
-      saveState();
-      $("library").hidden = true;
-      $("reader").hidden = false;
-      $("reader").scrollTop = 0;
-
-      renderReader();
-      setControlsVisible(false);
-      showStatus("");
-    }
-
-    function closeBook() {
-      state.activeBookId = null;
-      saveState();
-      $("reader").hidden = true;
-      $("library").hidden = false;
-      showStatus("");
-      renderLibrary();
-    }
-
-    function changeChapter(offset) {
-      const book = getBook(state.activeBookId);
-      if (!book) return;
-
-      const next = getChapterIndex(book) + offset;
-      if (next < 0 || next >= book.chapters.length) return;
-
-      state.positions[book.id] = next;
-      saveState();
-      renderReader();
-      $("reader").scrollTop = 0;
-      showStatus("Reading position saved.");
-    }
-
-    $("reading-surface").addEventListener("click", () => {
-      const visible = !$("reader-controls").hidden;
-      setControlsVisible(!visible);
-      showStatus("");
-    });
-
-    $("back-to-library").addEventListener("click", closeBook);
-
-    $("previous").addEventListener("click", () => changeChapter(-1));
-    $("next").addEventListener("click", () => changeChapter(1));
-
-    $("font-smaller").addEventListener("click", () => {
-      state.fontSize = Math.max(15, state.fontSize - 1);
-      saveState();
-      renderReader();
-    });
-
-    $("font-larger").addEventListener("click", () => {
-      state.fontSize = Math.min(30, state.fontSize + 1);
-      saveState();
-      renderReader();
-    });
-
-    $("reading-theme").addEventListener("change", event => {
-      state.theme = event.target.value;
-      saveState();
-      renderReader();
-    });
-
-    $("bookmark").addEventListener("click", () => {
-      const book = getBook(state.activeBookId);
-      if (!book) return;
-
-      const index = getChapterIndex(book);
-      const bookmarks = Array.isArray(state.bookmarks[book.id])
-        ? state.bookmarks[book.id] : [];
-
-      const existing = bookmarks.indexOf(index);
-
-      if (existing >= 0) {
-        bookmarks.splice(existing, 1);
-        showStatus("Bookmark removed.");
-      } else {
-        bookmarks.push(index);
-        showStatus("Chapter bookmarked.");
-      }
-
-      state.bookmarks[book.id] = bookmarks;
-      saveState();
-      renderReader();
-    });
-
-    document.addEventListener("keydown", event => {
-      if (!state.activeBookId) return;
-
-      if (event.key === "Escape") {
-        if (!$("reader-controls").hidden) {
-          setControlsVisible(false);
-        } else {
-          closeBook();
-        }
-      }
-    });
-
-    renderLibrary();
-  </script>
-  
-<script type="module">
-  import {
-    createClient
-  } from "https://esm.sh/@supabase/supabase-js@2";
-
-  const SUPABASE_URL =
-    "https://bmnlynjldlnxfvunqbqq.supabase.co";
-
-  const SUPABASE_ANON_KEY =
-    "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
-
-  const supabase = createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-  async function verifyBPReadingAdmin() {
-    try {
+    async function verifyBPReadingAdmin() {
       const {
         data: { user },
         error: authError
       } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        throw new Error("Authentication required");
+        throw new Error(
+          "Authentication required"
+        );
       }
 
-      const { data: profile, error: profileError } =
-        await supabase
-          .from("member_profiles")
-          .select("is_admin")
-          .eq("id", user.id)
-          .single();
+      const {
+        data: profile,
+        error: profileError
+      } = await supabase
+        .from("member_profiles")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
 
-      if (profileError || profile?.is_admin !== true) {
-        throw new Error("Administrator access required");
+      if (
+        profileError ||
+        profile?.is_admin !== true
+      ) {
+        throw new Error(
+          "Administrator access required"
+        );
       }
 
-      document.documentElement.classList.add(
-        "bp-admin-verified"
-      );
-    } catch (error) {
-      console.warn("BP Reading access denied:", error.message);
-
-      // Redirect visitors to the existing member login area.
-      window.location.replace("/pages/members.html");
+      return user;
     }
-  }
 
-  await verifyBPReadingAdmin();
-</script>
+    async function fetchProtectedEpub() {
+      const {
+        data: { session },
+        error: sessionError
+      } = await supabase.auth.getSession();
+
+      if (
+        sessionError ||
+        !session?.access_token
+      ) {
+        throw new Error(
+          "Your session has expired. Please sign in again."
+        );
+      }
+
+      const response = await fetch(
+        `${SUPABASE_URL}/functions/v1/bp-reading-deliver-epub`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization":
+              `Bearer ${session.access_token}`,
+            "apikey": SUPABASE_ANON_KEY
+          },
+
+          body: JSON.stringify({
+            editionId: EDITION_ID
+          }),
+
+          cache: "no-store"
+        }
+      );
+
+      if (!response.ok) {
+        let message =
+          "The reading edition could not be loaded.";
+
+        try {
+          const payload = await response.json();
+
+          if (
+            typeof payload.error === "string"
+          ) {
+            message = payload.error;
+          }
+        } catch {
+          // Retain the generic error message.
+        }
+
+        throw new Error(message);
+      }
+
+      const contentType =
+        response.headers.get("Content-Type") || "";
+
+      if (
+        !contentType.includes("application/epub+zip")
+      ) {
+        throw new Error(
+          "The server returned an unexpected file type."
+        );
+      }
+
+      const bytes = await response.arrayBuffer();
+      const signature = new Uint8Array(
+        bytes,
+        0,
+        Math.min(4, bytes.byteLength)
+      );
+
+      const validZip =
+        signature.length === 4 &&
+        signature[0] === 0x50 &&
+        signature[1] === 0x4b &&
+        signature[2] === 0x03 &&
+        signature[3] === 0x04;
+
+      if (!validZip) {
+        throw new Error(
+          "The returned file is not a valid EPUB archive."
+        );
+      }
+
+      return bytes;
+    }
+
+    function registerThemes(rendition) {
+      rendition.themes.register(
+        "parchment",
+        {
+          "body": {
+            "background": "#eee0c5 !important",
+            "color": "#30271f !important",
+            "font-family":
+              "Georgia, 'Times New Roman', serif !important",
+            "line-height": "1.85 !important"
+          }
+        }
+      );
+
+      rendition.themes.register(
+        "day",
+        {
+          "body": {
+            "background": "#fffdf7 !important",
+            "color": "#242424 !important",
+            "font-family":
+              "Georgia, 'Times New Roman', serif !important",
+            "line-height": "1.85 !important"
+          }
+        }
+      );
+
+      rendition.themes.register(
+        "night",
+        {
+          "body": {
+            "background": "#201c1a !important",
+            "color": "#e9dfd2 !important",
+            "font-family":
+              "Georgia, 'Times New Roman', serif !important",
+            "line-height": "1.85 !important"
+          }
+        }
+      );
+    }
+
+    function applyReaderPreferences() {
+      $("reader").dataset.theme = state.theme;
+      $("reading-theme").value = state.theme;
+
+      if (!state.rendition) {
+        return;
+      }
+
+      state.rendition.themes.select(
+        state.theme
+      );
+
+      state.rendition.themes.fontSize(
+        `${Math.round(
+          state.fontSize / 19 * 100
+        )}%`
+      );
+    }
+
+    function getCurrentCfi() {
+      const location = state.currentLocation;
+
+      return location?.start?.cfi ||
+        state.currentCfi ||
+        null;
+    }
+
+    function updateBookmarkButton() {
+      const current = getCurrentCfi();
+
+      const bookmarked =
+        current !== null &&
+        state.bookmarks.includes(current);
+
+      $("bookmark").textContent = bookmarked
+        ? "★ Bookmarked"
+        : "☆ Bookmark";
+
+      $("bookmark").setAttribute(
+        "aria-pressed",
+        String(bookmarked)
+      );
+
+      $("bookmark").disabled = !current;
+    }
+
+    function updateReaderProgress() {
+      const location = state.currentLocation;
+
+      if (!location) {
+        $("reader-progress").textContent =
+          "Preparing…";
+
+        $("previous").disabled = true;
+        $("next").disabled = true;
+
+        updateBookmarkButton();
+        return;
+      }
+
+      const start = location.start || {};
+      const displayed = start.displayed || {};
+
+      const page =
+        Number.isFinite(displayed.page)
+          ? displayed.page
+          : null;
+
+      const total =
+        Number.isFinite(displayed.total)
+          ? displayed.total
+          : null;
+
+      let label = "";
+
+      if (
+        state.locationsReady &&
+        state.book &&
+        typeof start.cfi === "string"
+      ) {
+        const fraction =
+          state.book.locations.percentageFromCfi(
+            start.cfi
+          );
+
+        if (Number.isFinite(fraction)) {
+          state.progress = Math.max(
+            0,
+            Math.min(
+              100,
+              Math.round(fraction * 100)
+            )
+          );
+        }
+
+        label = `${state.progress}% complete`;
+      } else if (page !== null && total !== null) {
+        label = `Page ${page} of ${total}`;
+      } else {
+        label = "Reading";
+      }
+
+      $("reader-progress").textContent = label;
+
+      $("previous").disabled =
+        state.isNavigating ||
+        location.atStart === true;
+
+      $("next").disabled =
+        state.isNavigating ||
+        location.atEnd === true;
+
+      updateBookmarkButton();
+    }
+
+    function handleRelocation(location) {
+      if (!state.isOpen) {
+        return;
+      }
+
+      const cfi = location?.start?.cfi;
+
+      if (
+        typeof cfi !== "string" ||
+        !cfi.startsWith("epubcfi(")
+      ) {
+        return;
+      }
+
+      state.currentLocation = location;
+      state.currentCfi = cfi;
+      state.position = cfi;
+      state.hasStarted = true;
+
+      updateReaderProgress();
+      saveState();
+    }
+
+    async function prepareLocations(book, openingId) {
+      try {
+        await book.locations.generate(1024);
+
+        if (
+          openingId !== state.openingId ||
+          !state.isOpen ||
+          state.book !== book
+        ) {
+          return;
+        }
+
+        state.locationsReady = true;
+
+        updateReaderProgress();
+        saveState();
+        renderLibrary();
+      } catch (error) {
+        console.warn(
+          "EPUB percentage calculation unavailable:",
+          error
+        );
+      }
+    }
+
+    async function openBook() {
+      if (
+        state.isLoading ||
+        state.isOpen
+      ) {
+        return;
+      }
+
+      if (
+        typeof window.ePub !== "function" ||
+        typeof window.JSZip === "undefined"
+      ) {
+        showLibraryError(
+          "The EPUB reading library could not load. " +
+          "Please refresh the page and try again."
+        );
+
+        return;
+      }
+
+      state.isLoading = true;
+      state.isOpen = true;
+      state.locationsReady = false;
+      state.currentLocation = null;
+      state.currentCfi = null;
+
+      const openingId = ++state.openingId;
+
+      showLibraryError("");
+      renderLibrary();
+
+      $("library").hidden = true;
+      $("reader").hidden = false;
+      $("reader-loading").hidden = false;
+      $("reader-loading").textContent =
+        "Preparing your book…";
+
+      $("epub-viewer").hidden = true;
+
+      setControlsVisible(false);
+      showStatus("");
+
+      try {
+        const bytes = await fetchProtectedEpub();
+
+        if (openingId !== state.openingId) {
+          return;
+        }
+
+        $("reader-loading").textContent =
+          "Opening Gualachulain…";
+
+        const book = window.ePub(bytes);
+
+        state.book = book;
+
+        await book.ready;
+
+        if (openingId !== state.openingId) {
+          return;
+        }
+
+        $("epub-viewer").hidden = false;
+
+        const rendition = book.renderTo(
+          "epub-viewer",
+          {
+            width: "100%",
+            height: "100%",
+            manager: "default",
+            flow: "paginated",
+            spread: "none"
+          }
+        );
+
+        state.rendition = rendition;
+
+        registerThemes(rendition);
+        applyReaderPreferences();
+
+        rendition.on(
+          "relocated",
+          handleRelocation
+        );
+
+        rendition.on(
+          "displayError",
+          error => {
+            console.error(
+              "EPUB display error:",
+              error
+            );
+
+            showStatus(
+              "A book page could not be displayed."
+            );
+          }
+        );
+
+        // EPUB content lives inside an iframe.
+        // Register a click listener inside each section.
+        rendition.hooks.content.register(
+          contents => {
+            contents.document.addEventListener(
+              "click",
+              () => {
+                if (!state.isOpen) {
+                  return;
+                }
+
+                setControlsVisible(
+                  $("reader-controls").hidden
+                );
+
+                showStatus("");
+              }
+            );
+
+            contents.document.addEventListener(
+              "keydown",
+              event => {
+                if (event.key === "Escape") {
+                  event.preventDefault();
+
+                  if (
+                    !$("reader-controls").hidden
+                  ) {
+                    setControlsVisible(false);
+                  } else {
+                    closeBook();
+                  }
+                }
+              }
+            );
+          }
+        );
+
+        const savedPosition = state.position;
+
+        try {
+          await rendition.display(
+            savedPosition || undefined
+          );
+        } catch (error) {
+          if (!savedPosition) {
+            throw error;
+          }
+
+          console.warn(
+            "Saved position unavailable; opening start:",
+            error
+          );
+
+          state.position = null;
+          await rendition.display();
+        }
+
+        if (openingId !== state.openingId) {
+          return;
+        }
+
+        $("reader-loading").hidden = true;
+
+        state.isLoading = false;
+        state.hasStarted = true;
+
+        updateReaderProgress();
+        saveState();
+        renderLibrary();
+
+        // Location generation happens after the book
+        // is visible so it doesn't delay first reading.
+        void prepareLocations(
+          book,
+          openingId
+        );
+      } catch (error) {
+        if (openingId !== state.openingId) {
+          return;
+        }
+
+        console.error(
+          "BP Reading failed to open EPUB:",
+          error
+        );
+
+        const message =
+          error instanceof Error
+            ? error.message
+            : "An unexpected reading error occurred.";
+
+        closeBook();
+
+        showLibraryError(
+          `Unable to open Gualachulain: ${message}`
+        );
+      } finally {
+        if (openingId === state.openingId) {
+          state.isLoading = false;
+          renderLibrary();
+        }
+      }
+    }
+
+    function closeBook() {
+      ++state.openingId;
+
+      state.isOpen = false;
+      state.isLoading = false;
+      state.isNavigating = false;
+      state.locationsReady = false;
+      state.currentLocation = null;
+      state.currentCfi = null;
+
+      if (state.rendition) {
+        try {
+          state.rendition.destroy();
+        } catch (error) {
+          console.warn(
+            "Reader cleanup warning:",
+            error
+          );
+        }
+      }
+
+      state.rendition = null;
+
+      if (state.book) {
+        try {
+          state.book.destroy();
+        } catch (error) {
+          console.warn(
+            "EPUB cleanup warning:",
+            error
+          );
+        }
+      }
+
+      state.book = null;
+
+      $("epub-viewer").replaceChildren();
+      $("epub-viewer").hidden = true;
+
+      $("reader").hidden = true;
+      $("library").hidden = false;
+
+      setControlsVisible(false);
+      showStatus("");
+
+      saveState();
+      renderLibrary();
+    }
+
+    async function changePage(direction) {
+      if (
+        !state.rendition ||
+        state.isNavigating ||
+        !state.isOpen
+      ) {
+        return;
+      }
+
+      state.isNavigating = true;
+      updateReaderProgress();
+
+      try {
+        if (direction > 0) {
+          await state.rendition.next();
+        } else {
+          await state.rendition.prev();
+        }
+      } catch (error) {
+        console.error(
+          "Page navigation failed:",
+          error
+        );
+
+        showStatus(
+          "Unable to turn the page."
+        );
+      } finally {
+        state.isNavigating = false;
+        updateReaderProgress();
+      }
+    }
+
+    $("back-to-library").addEventListener(
+      "click",
+      closeBook
+    );
+
+    $("previous").addEventListener(
+      "click",
+      () => changePage(-1)
+    );
+
+    $("next").addEventListener(
+      "click",
+      () => changePage(1)
+    );
+
+    $("font-smaller").addEventListener(
+      "click",
+      () => {
+        state.fontSize = Math.max(
+          15,
+          state.fontSize - 1
+        );
+
+        saveState();
+        applyReaderPreferences();
+
+        showStatus(
+          `Text size: ${state.fontSize}px`
+        );
+      }
+    );
+
+    $("font-larger").addEventListener(
+      "click",
+      () => {
+        state.fontSize = Math.min(
+          30,
+          state.fontSize + 1
+        );
+
+        saveState();
+        applyReaderPreferences();
+
+        showStatus(
+          `Text size: ${state.fontSize}px`
+        );
+      }
+    );
+
+    $("reading-theme").addEventListener(
+      "change",
+      event => {
+        const requested = event.target.value;
+
+        if (!allowedThemes.includes(requested)) {
+          return;
+        }
+
+        state.theme = requested;
+
+        saveState();
+        applyReaderPreferences();
+
+        showStatus(
+          `Theme: ${requested}`
+        );
+      }
+    );
+
+    $("bookmark").addEventListener(
+      "click",
+      () => {
+        const cfi = getCurrentCfi();
+
+        if (!cfi) {
+          showStatus(
+            "Reading position is not ready."
+          );
+
+          return;
+        }
+
+        const existing =
+          state.bookmarks.indexOf(cfi);
+
+        if (existing >= 0) {
+          state.bookmarks.splice(
+            existing,
+            1
+          );
+
+          showStatus(
+            "Bookmark removed."
+          );
+        } else {
+          state.bookmarks.push(cfi);
+
+          showStatus(
+            "Page bookmarked."
+          );
+        }
+
+        saveState();
+        updateBookmarkButton();
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      event => {
+        if (!state.isOpen) {
+          return;
+        }
+
+        if (event.key === "Escape") {
+          if (!$("reader-controls").hidden) {
+            setControlsVisible(false);
+          } else {
+            closeBook();
+          }
+        }
+      }
+    );
+
+    // The outer reading surface remains clickable
+    // outside the EPUB iframe.
+    $("reading-surface").addEventListener(
+      "click",
+      event => {
+        if (
+          !state.isOpen ||
+          event.target.closest(
+            "#epub-viewer"
+          )
+        ) {
+          return;
+        }
+
+        setControlsVisible(
+          $("reader-controls").hidden
+        );
+
+        showStatus("");
+      }
+    );
+
+    async function initialise() {
+      renderLibrary();
+
+      try {
+        await verifyBPReadingAdmin();
+
+        document.documentElement.classList.add(
+          "bp-admin-verified"
+        );
+      } catch (error) {
+        console.warn(
+          "BP Reading access denied:",
+          error.message
+        );
+
+        window.location.replace(
+          "/pages/members.html"
+        );
+      }
+    }
+
+    await initialise();
+  </script>
 
 </body>
 </html>
