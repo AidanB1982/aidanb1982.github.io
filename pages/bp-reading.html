@@ -1215,20 +1215,56 @@
         // Register a click listener inside each section.
         rendition.hooks.content.register(
           contents => {
-            contents.document.addEventListener(
-              "click",
-              () => {
-                if (!state.isOpen) {
-                  return;
-                }
+            
+        contents.document.addEventListener(
+          "click",
+          event => {
+            if (
+              !state.isOpen ||
+              state.isLoading ||
+              state.isNavigating
+            ) {
+              return;
+            }
+        
+            // Preserve links inside the actual EPUB.
+            // Clicking a contents link or footnote must
+            // not accidentally turn the page.
+            const target = event.target;
+        
+            if (
+              target instanceof Element &&
+              target.closest(
+                "a, button, input, select, textarea"
+              )
+            ) {
+              return;
+            }
+        
+            const viewportWidth =
+              contents.document.documentElement.clientWidth;
+        
+            if (viewportWidth <= 0) {
+              return;
+            }
+        
+            const tapPosition =
+              event.clientX / viewportWidth;
+        
+            if (tapPosition < 0.30) {
+              void changePage(-1);
+            } else if (tapPosition > 0.70) {
+              void changePage(1);
+            } else {
+              setControlsVisible(
+                $("reader-controls").hidden
+              );
+        
+              showStatus("");
+            }
+          }
+        );
 
-                setControlsVisible(
-                  $("reader-controls").hidden
-                );
-
-                showStatus("");
-              }
-            );
 
             contents.document.addEventListener(
               "keydown",
