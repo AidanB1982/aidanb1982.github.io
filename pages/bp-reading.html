@@ -1197,54 +1197,63 @@
           handleRelocation
         );
         
-rendition.on("click", event => {
-  if (
-    !state.isOpen ||
-    state.isLoading ||
-    state.isNavigating
-  ) {
-    return;
-  }
 
-  const target = event.target;
+        rendition.on("click", (event, contents) => {
+          if (
+            !state.isOpen ||
+            state.isLoading ||
+            state.isNavigating
+          ) {
+            return;
+          }
+        
+          // Allow links, footnotes and other EPUB controls.
+          if (
+            event.target?.closest?.(
+              "a, button, input, select, textarea"
+            )
+          ) {
+            return;
+          }
+        
+          // Get the actual visible iframe dimensions.
+          const iframe =
+            contents?.document?.defaultView?.frameElement;
+        
+          if (!iframe) {
+            return;
+          }
+        
+          const iframeWidth =
+            iframe.getBoundingClientRect().width;
+        
+          if (iframeWidth <= 0) {
+            return;
+          }
+        
+          // EPUB.js may report coordinates across columns.
+          // Convert them to a position within the visible page.
+          const x =
+            ((event.clientX % iframeWidth) + iframeWidth) %
+            iframeWidth;
+        
+          const position = x / iframeWidth;
+        
+          console.log("BP Reading tap position:", position);
+        
+          if (position < 0.25) {
+            void changePage(-1);
+          } else if (position > 0.75) {
+            void changePage(1);
+          } else {
+            setControlsVisible(
+              $("reader-controls").hidden
+            );
+        
+            showStatus("");
+          }
+        });
 
-  if (
-    target?.closest?.(
-      "a, button, input, select, textarea"
-    )
-  ) {
-    return;
-  }
-
-  const iframe = document.querySelector(
-    "#epub-viewer iframe"
-  );
-
-  if (!iframe) {
-    return;
-  }
-
-  const visibleWidth =
-    iframe.getBoundingClientRect().width;
-
-  if (visibleWidth <= 0) {
-    return;
-  }
-
-  const x = event.clientX;
-
-  if (x < visibleWidth * 0.25) {
-    void changePage(-1);
-  } else if (x > visibleWidth * 0.75) {
-    void changePage(1);
-  } else {
-    setControlsVisible(
-      $("reader-controls").hidden
-    );
-
-    showStatus("");
-  }
-});
 
         rendition.on(
           "displayError",
