@@ -720,11 +720,18 @@
       footer.className = "cover-footer";
       footer.textContent = "BP READING";
 
-      cover.append(
-        imprint,
-        coverTitle,
-        footer
-      );
+      const coverImage = document.createElement("img");
+
+      coverImage.src = "/assets/book7.png";
+      coverImage.alt = "Gualachulain book cover";
+      coverImage.loading = "lazy";
+      
+      coverImage.style.width = "100%";
+      coverImage.style.height = "100%";
+      coverImage.style.objectFit = "contain";
+      coverImage.style.borderRadius = ".4rem";
+      
+      cover.replaceChildren(coverImage);
 
       const heading = document.createElement("h2");
       heading.textContent = BOOK.title;
