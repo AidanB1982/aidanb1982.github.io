@@ -6,6 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171310">
   <title>BP Reading | Blackwood Publishing</title>
+  
+<style>
+  /* BP Reading: keep the prototype hidden until verified. */
+  html:not(.bp-admin-verified) body {
+    visibility: hidden;
+  }
+</style>
 
   <style>
     :root {
@@ -790,5 +797,58 @@
 
     renderLibrary();
   </script>
+  
+<script type="module">
+  import {
+    createClient
+  } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL =
+    "https://bmnlynjldlnxfvunqbqq.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
+
+  const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  async function verifyBPReadingAdmin() {
+    try {
+      const {
+        data: { user },
+        error: authError
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        throw new Error("Authentication required");
+      }
+
+      const { data: profile, error: profileError } =
+        await supabase
+          .from("member_profiles")
+          .select("is_admin")
+          .eq("id", user.id)
+          .single();
+
+      if (profileError || profile?.is_admin !== true) {
+        throw new Error("Administrator access required");
+      }
+
+      document.documentElement.classList.add(
+        "bp-admin-verified"
+      );
+    } catch (error) {
+      console.warn("BP Reading access denied:", error.message);
+
+      // Redirect visitors to the existing member login area.
+      window.location.replace("/pages/members.html");
+    }
+  }
+
+  await verifyBPReadingAdmin();
+</script>
+
 </body>
 </html>
