@@ -1,0 +1,474 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171310">
+  <title>BP Reading | Blackwood Publishing</title>
+  <style>
+    :root {
+      font-family: Georgia, "Times New Roman", serif;
+      color-scheme: dark;
+      --copper: #c99b6b;
+      --background: #171310;
+      --panel: #241c17;
+      --border: #4b382b;
+      --muted: #b2a294;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: #f0e5d7;
+    }
+
+    button, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--copper);
+      outline-offset: 3px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: #1e1713;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+      letter-spacing: .14em;
+      color: var(--copper);
+      font-size: .95rem;
+    }
+
+    .brand small {
+      color: var(--muted);
+      font: .65rem Arial, sans-serif;
+      letter-spacing: .25em;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+
+    .control {
+      padding: .6rem .85rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: .5rem;
+      color: #f0e5d7;
+    }
+
+    .control:hover:not(:disabled) {
+      border-color: var(--copper);
+    }
+
+    .control:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .reader-shell {
+      max-width: 940px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .book-meta {
+      text-align: center;
+      margin-bottom: 1.4rem;
+      font: .8rem Arial, sans-serif;
+      letter-spacing: .13em;
+      color: var(--copper);
+    }
+
+    .reading-page {
+      --page-background: #eee0c5;
+      --page-text: #30271f;
+      --page-muted: #806e5c;
+
+      background: var(--page-background);
+      color: var(--page-text);
+      border-radius: .65rem;
+      padding: clamp(1.5rem, 6vw, 5rem);
+      min-height: 540px;
+      box-shadow: 0 20px 60px #0006;
+      transition: background .2s, color .2s;
+    }
+
+    .reading-page[data-theme="day"] {
+      --page-background: #fffdf7;
+      --page-text: #242424;
+      --page-muted: #6b6b6b;
+    }
+
+    .reading-page[data-theme="night"] {
+      --page-background: #201c1a;
+      --page-text: #e9dfd2;
+      --page-muted: #b8a999;
+    }
+
+    .reading-page h1 {
+      margin: 0 0 2.2rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: normal;
+    }
+
+    .chapter-text {
+      max-width: 650px;
+      margin: auto;
+      font-size: 19px;
+      line-height: 1.85;
+    }
+
+    .chapter-text p {
+      margin: 0 0 1.5em;
+    }
+
+    .chapter-text p:first-child::first-letter {
+      float: left;
+      font-size: 3.4em;
+      line-height: .9;
+      padding-right: .12em;
+    }
+
+    .sample-notice {
+      text-align: center;
+      color: var(--page-muted);
+      font: .75rem Arial, sans-serif;
+      margin-top: 3rem;
+    }
+
+    .reader-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1.5rem 0;
+      font: .85rem Arial, sans-serif;
+    }
+
+    .progress-area {
+      flex: 1;
+      min-width: 180px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .progress-track {
+      height: 5px;
+      background: #49372b;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: .7rem;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--copper);
+      transition: width .25s;
+    }
+
+    .status {
+      min-height: 1.5rem;
+      text-align: center;
+      font: .8rem Arial, sans-serif;
+      color: var(--copper);
+    }
+
+    @media (max-width: 600px) {
+      .topbar { padding: 1rem; }
+      .controls { width: 100%; }
+      .reader-shell { margin-top: 1.25rem; }
+      .reading-page { min-height: 460px; }
+      .reader-footer { justify-content: center; }
+      .progress-area { order: -1; flex-basis: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      BLACKWOOD
+      <small>BP READING</small>
+    </div>
+
+    <div class="controls" aria-label="Reading settings">
+      <button class="control" id="smaller" type="button"
+        aria-label="Decrease font size">A−</button>
+      <button class="control" id="larger" type="button"
+        aria-label="Increase font size">A+</button>
+
+      <select class="control" id="theme" aria-label="Reading theme">
+        <option value="parchment">Parchment</option>
+        <option value="day">Day</option>
+        <option value="night">Night</option>
+      </select>
+
+      <button class="control" id="bookmark" type="button"
+        aria-pressed="false">☆ Bookmark</button>
+    </div>
+  </header>
+
+  <main class="reader-shell">
+    <div class="book-meta">
+      GUALACHULAIN · READER PROTOTYPE
+    </div>
+
+    <article class="reading-page" id="page" data-theme="parchment">
+      <h1 id="chapter-title"></h1>
+      <div class="chapter-text" id="chapter-text"></div>
+      <p class="sample-notice">
+        Demonstration text only — no manuscript content loaded.
+      </p>
+    </article>
+
+    <nav class="reader-footer" aria-label="Chapter navigation">
+      <button class="control" id="previous" type="button">
+        ← Previous
+      </button>
+
+      <div class="progress-area">
+        <span id="progress-label"></span>
+        <div class="progress-track" role="progressbar"
+          id="progress-track"
+          aria-label="Book progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <button class="control" id="next" type="button">
+        Next →
+      </button>
+    </nav>
+
+    <p class="status" id="status" role="status"
+      aria-live="polite"></p>
+  </main>
+
+  <script>
+    "use strict";
+
+    // All text below is original placeholder material.
+    // No ARC or unpublished manuscript is accessed.
+    const chapters = [
+      {
+        title: "Chapter One",
+        paragraphs: [
+          "Every story begins somewhere. Some begin with a door opening. Others begin with a secret that should never have been discovered.",
+          "Beyond the familiar streets and ordinary days, there are places where stories wait patiently to be told.",
+          "This is a demonstration of the Blackwood Reading Station. The finished reader will display authorised book content through a protected delivery system."
+        ]
+      },
+      {
+        title: "Chapter Two",
+        paragraphs: [
+          "The next chapter brings a new page, a fresh beginning, and the promise of something waiting just beyond the horizon.",
+          "A good reading experience should disappear into the background, leaving only the words and the imagination.",
+          "Change the text size, switch the reading theme, or place a bookmark. Your preferences will remain on this device."
+        ]
+      },
+      {
+        title: "Chapter Three",
+        paragraphs: [
+          "Some journeys are measured in miles. Others are measured in the pages we turn.",
+          "The Blackwood Reading Station is being designed for quiet moments, comfortable evenings, and stories worth returning to.",
+          "This concludes our first demonstration. The next stage will introduce a real EPUB through a secure, administrator-only content connection."
+        ]
+      }
+    ];
+
+    const storageKey = "bp-reading-demo-v1";
+
+    function loadSavedState() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        return raw ? JSON.parse(raw) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    const saved = loadSavedState();
+
+    const state = {
+      chapter: Number.isInteger(saved.chapter)
+        ? Math.max(0, Math.min(chapters.length - 1, saved.chapter))
+        : 0,
+      fontSize: Number.isFinite(saved.fontSize)
+        ? Math.max(15, Math.min(30, saved.fontSize))
+        : 19,
+      theme: ["parchment", "day", "night"].includes(saved.theme)
+        ? saved.theme
+        : "parchment",
+      bookmarks: Array.isArray(saved.bookmarks)
+        ? saved.bookmarks.filter(
+            value => Number.isInteger(value)
+              && value >= 0
+              && value < chapters.length
+          )
+        : []
+    };
+
+    const elements = {
+      page: document.getElementById("page"),
+      title: document.getElementById("chapter-title"),
+      text: document.getElementById("chapter-text"),
+      theme: document.getElementById("theme"),
+      bookmark: document.getElementById("bookmark"),
+      previous: document.getElementById("previous"),
+      next: document.getElementById("next"),
+      smaller: document.getElementById("smaller"),
+      larger: document.getElementById("larger"),
+      progressLabel: document.getElementById("progress-label"),
+      progressFill: document.getElementById("progress-fill"),
+      progressTrack: document.getElementById("progress-track"),
+      status: document.getElementById("status")
+    };
+
+    function saveState() {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+      } catch {
+        showStatus("Preferences could not be saved on this device.");
+      }
+    }
+
+    function showStatus(message) {
+      elements.status.textContent = message;
+    }
+
+    function render() {
+      const chapter = chapters[state.chapter];
+
+      elements.title.textContent = chapter.title;
+      elements.text.replaceChildren();
+
+      for (const paragraphText of chapter.paragraphs) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = paragraphText;
+        elements.text.appendChild(paragraph);
+      }
+
+      elements.text.style.fontSize = state.fontSize + "px";
+      elements.page.dataset.theme = state.theme;
+      elements.theme.value = state.theme;
+
+      const isBookmarked = state.bookmarks.includes(state.chapter);
+      elements.bookmark.textContent = isBookmarked
+        ? "★ Bookmarked"
+        : "☆ Bookmark";
+      elements.bookmark.setAttribute(
+        "aria-pressed",
+        String(isBookmarked)
+      );
+
+      elements.previous.disabled = state.chapter === 0;
+      elements.next.disabled =
+        state.chapter === chapters.length - 1;
+
+      const percentage = Math.round(
+        ((state.chapter + 1) / chapters.length) * 100
+      );
+
+      elements.progressLabel.textContent =
+        "Chapter " + (state.chapter + 1) +
+        " of " + chapters.length +
+        " · " + percentage + "%";
+
+      elements.progressFill.style.width = percentage + "%";
+      elements.progressTrack.setAttribute(
+        "aria-valuenow",
+        String(percentage)
+      );
+    }
+
+    function changeChapter(offset) {
+      const nextChapter = state.chapter + offset;
+
+      if (nextChapter < 0 || nextChapter >= chapters.length) {
+        return;
+      }
+
+      state.chapter = nextChapter;
+      saveState();
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      showStatus("Reading position saved.");
+    }
+
+    elements.previous.addEventListener("click", () => {
+      changeChapter(-1);
+    });
+
+    elements.next.addEventListener("click", () => {
+      changeChapter(1);
+    });
+
+    elements.smaller.addEventListener("click", () => {
+      state.fontSize = Math.max(15, state.fontSize - 1);
+      saveState();
+      render();
+      showStatus("Text size updated.");
+    });
+
+    elements.larger.addEventListener("click", () => {
+      state.fontSize = Math.min(30, state.fontSize + 1);
+      saveState();
+      render();
+      showStatus("Text size updated.");
+    });
+
+    elements.theme.addEventListener("change", event => {
+      state.theme = event.target.value;
+      saveState();
+      render();
+      showStatus("Reading theme updated.");
+    });
+
+    elements.bookmark.addEventListener("click", () => {
+      const index = state.bookmarks.indexOf(state.chapter);
+
+      if (index >= 0) {
+        state.bookmarks.splice(index, 1);
+        showStatus("Bookmark removed.");
+      } else {
+        state.bookmarks.push(state.chapter);
+        showStatus("Chapter bookmarked.");
+      }
+
+      saveState();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
