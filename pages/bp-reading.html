@@ -6,23 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#171310">
   <title>BP Reading | Blackwood Publishing</title>
+
   <style>
     :root {
-      font-family: Georgia, "Times New Roman", serif;
       color-scheme: dark;
-      --copper: #c99b6b;
-      --background: #171310;
+      --bg: #171310;
       --panel: #241c17;
-      --border: #4b382b;
-      --muted: #b2a294;
+      --copper: #c99b6b;
+      --border: #49372b;
+      --text: #f0e5d7;
+      --muted: #b7a594;
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
-      background: var(--background);
-      color: #f0e5d7;
+      min-height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
     }
 
     button, select {
@@ -39,106 +45,204 @@
       outline-offset: 3px;
     }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 1rem 1.5rem;
+    [hidden] {
+      display: none !important;
+    }
+
+    .library {
+      max-width: 1120px;
+      margin: auto;
+      padding: 2rem 1.25rem 5rem;
+    }
+
+    .library-header {
       border-bottom: 1px solid var(--border);
-      background: #1e1713;
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
 
     .brand {
+      color: var(--copper);
+      letter-spacing: .2em;
+      font-size: 1.1rem;
+    }
+
+    .brand-subtitle {
+      color: var(--muted);
+      font: .7rem Arial, sans-serif;
+      letter-spacing: .28em;
+      margin-top: .4rem;
+    }
+
+    .library h1 {
+      margin: 2.5rem 0 .6rem;
+      font-weight: normal;
+      font-size: clamp(2rem, 5vw, 3rem);
+    }
+
+    .library-intro {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 2rem;
+    }
+
+    .book-card {
+      border: 1px solid var(--border);
+      border-radius: .8rem;
+      background: var(--panel);
+      overflow: hidden;
+      padding: 1rem;
+    }
+
+    .book-cover {
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      border: 1px solid #806044;
+      border-radius: .4rem;
+      background:
+        radial-gradient(circle at 50% 35%, #63442e, transparent 60%),
+        linear-gradient(145deg, #3c291d, #100e0c);
       display: flex;
       flex-direction: column;
-      gap: .25rem;
-      letter-spacing: .14em;
-      color: var(--copper);
-      font-size: .95rem;
-    }
-
-    .brand small {
-      color: var(--muted);
-      font: .65rem Arial, sans-serif;
-      letter-spacing: .25em;
-    }
-
-    .controls {
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: .6rem;
-    }
-
-    .control {
-      padding: .6rem .85rem;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: .5rem;
-      color: #f0e5d7;
-    }
-
-    .control:hover:not(:disabled) {
-      border-color: var(--copper);
-    }
-
-    .control:disabled {
-      opacity: .4;
-      cursor: not-allowed;
-    }
-
-    .reader-shell {
-      max-width: 940px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    .book-meta {
+      padding: 2rem 1rem;
       text-align: center;
-      margin-bottom: 1.4rem;
-      font: .8rem Arial, sans-serif;
-      letter-spacing: .13em;
-      color: var(--copper);
+      box-shadow: inset 0 0 0 8px #ffffff08;
     }
 
-    .reading-page {
-      --page-background: #eee0c5;
-      --page-text: #30271f;
-      --page-muted: #806e5c;
-
-      background: var(--page-background);
-      color: var(--page-text);
-      border-radius: .65rem;
-      padding: clamp(1.5rem, 6vw, 5rem);
-      min-height: 540px;
-      box-shadow: 0 20px 60px #0006;
-      transition: background .2s, color .2s;
+    .book-cover.crossing {
+      background:
+        radial-gradient(circle at 50% 70%, #46505a, transparent 60%),
+        linear-gradient(145deg, #222f3a, #111316);
     }
 
-    .reading-page[data-theme="day"] {
-      --page-background: #fffdf7;
-      --page-text: #242424;
-      --page-muted: #6b6b6b;
+    .cover-imprint {
+      font: .65rem Arial, sans-serif;
+      letter-spacing: .2em;
+      color: #ddbb91;
     }
 
-    .reading-page[data-theme="night"] {
-      --page-background: #201c1a;
-      --page-text: #e9dfd2;
-      --page-muted: #b8a999;
+    .cover-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      color: #f3dfc1;
+      overflow-wrap: anywhere;
     }
 
-    .reading-page h1 {
-      margin: 0 0 2.2rem;
-      text-align: center;
-      font-size: 2rem;
+    .cover-footer {
+      font: .7rem Arial, sans-serif;
+      color: #d3b48f;
+      letter-spacing: .12em;
+    }
+
+    .book-card h2 {
+      font-size: 1.2rem;
       font-weight: normal;
+      margin: 1.2rem 0 .35rem;
+    }
+
+    .book-description {
+      color: var(--muted);
+      font: .85rem Arial, sans-serif;
+      line-height: 1.5;
+      min-height: 2.5rem;
+    }
+
+    .progress-label {
+      color: var(--muted);
+      font: .75rem Arial, sans-serif;
+      margin: 1rem 0 .5rem;
+    }
+
+    .progress-track {
+      height: 5px;
+      background: #49372b;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--copper);
+      transition: width .2s;
+    }
+
+    .open-book {
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: .8rem;
+      border: 1px solid var(--copper);
+      border-radius: .5rem;
+      background: #382719;
+      color: #f5dfc7;
+    }
+
+    .open-book:hover {
+      background: #4c3523;
+    }
+
+    .library-note {
+      margin-top: 2.5rem;
+      color: var(--muted);
+      font: .8rem Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Immersive reading mode */
+
+    .reader {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      overflow-y: auto;
+      background: #eee0c5;
+      color: #30271f;
+      scrollbar-width: thin;
+    }
+
+    .reader[data-theme="day"] {
+      background: #fffdf7;
+      color: #242424;
+    }
+
+    .reader[data-theme="night"] {
+      background: #201c1a;
+      color: #e9dfd2;
+    }
+
+    .reading-surface {
+      min-height: 100%;
+      padding: clamp(3rem, 9vh, 6rem) 1.5rem 7rem;
+    }
+
+    .reading-column {
+      max-width: 680px;
+      margin: auto;
+    }
+
+    .reader-book-title {
+      text-align: center;
+      font: .72rem Arial, sans-serif;
+      letter-spacing: .2em;
+      opacity: .65;
+      margin-bottom: 3.5rem;
+    }
+
+    .chapter-title {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: normal;
+      text-align: center;
+      margin: 0 0 3rem;
     }
 
     .chapter-text {
-      max-width: 650px;
-      margin: auto;
       font-size: 19px;
       line-height: 1.85;
     }
@@ -149,326 +253,542 @@
 
     .chapter-text p:first-child::first-letter {
       float: left;
-      font-size: 3.4em;
+      font-size: 3.3em;
       line-height: .9;
       padding-right: .12em;
     }
 
-    .sample-notice {
+    .sample-label {
+      margin-top: 4rem;
       text-align: center;
-      color: var(--page-muted);
       font: .75rem Arial, sans-serif;
-      margin-top: 3rem;
+      opacity: .55;
     }
 
-    .reader-footer {
+    /* Controls appear only when requested */
+
+    .reader-controls {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
+      align-items: center;
       gap: 1rem;
-      padding: 1.5rem 0;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: #1b1513f2;
+      color: #f0e5d7;
+      border-bottom: 1px solid #58402e;
       font: .85rem Arial, sans-serif;
     }
 
-    .progress-area {
-      flex: 1;
-      min-width: 180px;
+    .reader-bottom {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem;
+      background: #1b1513f2;
+      color: #f0e5d7;
+      border-top: 1px solid #58402e;
+      font: .85rem Arial, sans-serif;
+    }
+
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    .control {
+      padding: .65rem .8rem;
+      border: 1px solid #604631;
+      border-radius: .4rem;
+      background: #30241c;
+      color: #f0e5d7;
+    }
+
+    .control:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .reader-progress {
+      color: #cbb7a3;
       text-align: center;
-      color: var(--muted);
+      font-size: .8rem;
     }
 
-    .progress-track {
-      height: 5px;
-      background: #49372b;
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: .7rem;
+    .reader-status {
+      position: fixed;
+      bottom: 5.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      padding: .5rem .8rem;
+      background: #1b1513e8;
+      color: #f1cfaa;
+      border-radius: .4rem;
+      font: .75rem Arial, sans-serif;
+      pointer-events: none;
     }
 
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: var(--copper);
-      transition: width .25s;
+    .reader-status:empty {
+      display: none;
     }
 
-    .status {
-      min-height: 1.5rem;
-      text-align: center;
-      font: .8rem Arial, sans-serif;
-      color: var(--copper);
-    }
+    @media (max-width: 650px) {
+      .reader-controls,
+      .reader-bottom {
+        justify-content: center;
+      }
 
-    @media (max-width: 600px) {
-      .topbar { padding: 1rem; }
-      .controls { width: 100%; }
-      .reader-shell { margin-top: 1.25rem; }
-      .reading-page { min-height: 460px; }
-      .reader-footer { justify-content: center; }
-      .progress-area { order: -1; flex-basis: 100%; }
+      .reader-controls {
+        padding: .65rem;
+      }
+
+      .reader-bottom {
+        gap: .5rem;
+      }
+
+      .reading-surface {
+        padding-top: 4rem;
+      }
+
+      .reader-book-title {
+        margin-bottom: 2rem;
+      }
     }
   </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="brand">
-      BLACKWOOD
-      <small>BP READING</small>
-    </div>
+  <main class="library" id="library">
+    <header class="library-header">
+      <div class="brand">BLACKWOOD</div>
+      <div class="brand-subtitle">BP READING</div>
 
-    <div class="controls" aria-label="Reading settings">
-      <button class="control" id="smaller" type="button"
-        aria-label="Decrease font size">A−</button>
-      <button class="control" id="larger" type="button"
-        aria-label="Increase font size">A+</button>
-
-      <select class="control" id="theme" aria-label="Reading theme">
-        <option value="parchment">Parchment</option>
-        <option value="day">Day</option>
-        <option value="night">Night</option>
-      </select>
-
-      <button class="control" id="bookmark" type="button"
-        aria-pressed="false">☆ Bookmark</button>
-    </div>
-  </header>
-
-  <main class="reader-shell">
-    <div class="book-meta">
-      GUALACHULAIN · READER PROTOTYPE
-    </div>
-
-    <article class="reading-page" id="page" data-theme="parchment">
-      <h1 id="chapter-title"></h1>
-      <div class="chapter-text" id="chapter-text"></div>
-      <p class="sample-notice">
-        Demonstration text only — no manuscript content loaded.
+      <h1>My Library</h1>
+      <p class="library-intro">
+        Your books. Your stories. Your place to disappear for a while.
       </p>
-    </article>
+    </header>
 
-    <nav class="reader-footer" aria-label="Chapter navigation">
+    <section class="book-grid" id="book-grid"
+      aria-label="Books in your library"></section>
+
+    <p class="library-note">
+      Prototype library with demonstration books only.
+      No live purchases, entitlements or manuscript files are connected.
+    </p>
+  </main>
+
+  <section class="reader" id="reader"
+    aria-label="Immersive book reader" hidden>
+
+    <div class="reading-surface" id="reading-surface">
+      <article class="reading-column">
+        <div class="reader-book-title" id="reader-book-title"></div>
+        <h1 class="chapter-title" id="chapter-title"></h1>
+        <div class="chapter-text" id="chapter-text"></div>
+        <p class="sample-label">
+          Demonstration content — not an actual Blackwood manuscript.
+        </p>
+      </article>
+    </div>
+
+    <header class="reader-controls" id="reader-controls" hidden>
+      <button class="control" id="back-to-library" type="button">
+        ← Library
+      </button>
+
+      <div class="control-group">
+        <button class="control" id="font-smaller" type="button"
+          aria-label="Decrease text size">A−</button>
+        <button class="control" id="font-larger" type="button"
+          aria-label="Increase text size">A+</button>
+
+        <select class="control" id="reading-theme"
+          aria-label="Reading theme">
+          <option value="parchment">Parchment</option>
+          <option value="day">Day</option>
+          <option value="night">Night</option>
+        </select>
+
+        <button class="control" id="bookmark" type="button"
+          aria-pressed="false">☆ Bookmark</button>
+      </div>
+    </header>
+
+    <nav class="reader-bottom" id="reader-bottom"
+      aria-label="Reading navigation" hidden>
       <button class="control" id="previous" type="button">
         ← Previous
       </button>
 
-      <div class="progress-area">
-        <span id="progress-label"></span>
-        <div class="progress-track" role="progressbar"
-          id="progress-track"
-          aria-label="Book progress"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          aria-valuenow="0">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-      </div>
+      <span class="reader-progress" id="reader-progress"></span>
 
       <button class="control" id="next" type="button">
         Next →
       </button>
     </nav>
 
-    <p class="status" id="status" role="status"
-      aria-live="polite"></p>
-  </main>
+    <div class="reader-status" id="reader-status"
+      role="status" aria-live="polite"></div>
+  </section>
 
   <script>
     "use strict";
 
-    // All text below is original placeholder material.
-    // No ARC or unpublished manuscript is accessed.
-    const chapters = [
+    const books = [
       {
-        title: "Chapter One",
-        paragraphs: [
-          "Every story begins somewhere. Some begin with a door opening. Others begin with a secret that should never have been discovered.",
-          "Beyond the familiar streets and ordinary days, there are places where stories wait patiently to be told.",
-          "This is a demonstration of the Blackwood Reading Station. The finished reader will display authorised book content through a protected delivery system."
+        id: "gualachulain-demo",
+        title: "Gualachulain",
+        coverClass: "",
+        description: "Blackwood Reading Station demonstration edition.",
+        chapters: [
+          {
+            title: "Chapter One",
+            paragraphs: [
+              "Every story begins somewhere. Some begin with a door opening. Others begin with a secret that should never have been discovered.",
+              "Beyond the familiar streets and ordinary days, there are places where stories wait patiently to be told.",
+              "This is the first demonstration chapter of our immersive reading experience."
+            ]
+          },
+          {
+            title: "Chapter Two",
+            paragraphs: [
+              "The next chapter brings a new page, a fresh beginning, and the promise of something waiting just beyond the horizon.",
+              "A good reading experience should disappear into the background, leaving only the words and the imagination.",
+              "Tap the centre of the screen to reveal the reading controls whenever you need them."
+            ]
+          },
+          {
+            title: "Chapter Three",
+            paragraphs: [
+              "Some journeys are measured in miles. Others are measured in the pages we turn.",
+              "Your reading position and preferences are remembered on this device.",
+              "This concludes the demonstration of Gualachulain in BP Reading."
+            ]
+          }
         ]
       },
       {
-        title: "Chapter Two",
-        paragraphs: [
-          "The next chapter brings a new page, a fresh beginning, and the promise of something waiting just beyond the horizon.",
-          "A good reading experience should disappear into the background, leaving only the words and the imagination.",
-          "Change the text size, switch the reading theme, or place a bookmark. Your preferences will remain on this device."
-        ]
-      },
-      {
-        title: "Chapter Three",
-        paragraphs: [
-          "Some journeys are measured in miles. Others are measured in the pages we turn.",
-          "The Blackwood Reading Station is being designed for quiet moments, comfortable evenings, and stories worth returning to.",
-          "This concludes our first demonstration. The next stage will introduce a real EPUB through a secure, administrator-only content connection."
+        id: "crossing-demo",
+        title: "The Crossing",
+        coverClass: "crossing",
+        description: "Second demonstration title for the Blackwood library.",
+        chapters: [
+          {
+            title: "Chapter One",
+            paragraphs: [
+              "The horizon stretched beyond the last familiar landmark, leaving the road ahead wrapped in uncertainty.",
+              "There are moments when the simplest journey becomes the beginning of an entirely different life.",
+              "This is original placeholder text for the Blackwood Reading Station, not an excerpt from The Crossing."
+            ]
+          },
+          {
+            title: "Chapter Two",
+            paragraphs: [
+              "Morning arrived quietly, casting pale light across the landscape.",
+              "The journey continued, carrying questions that had yet to find their answers.",
+              "Every book in BP Reading will eventually have its own independently saved reading position."
+            ]
+          }
         ]
       }
     ];
 
-    const storageKey = "bp-reading-demo-v1";
+    const storageKey = "bp-reading-library-demo-v1";
 
-    function loadSavedState() {
+    function loadState() {
       try {
-        const raw = localStorage.getItem(storageKey);
-        return raw ? JSON.parse(raw) : {};
+        return JSON.parse(localStorage.getItem(storageKey)) || {};
       } catch {
         return {};
       }
     }
 
-    const saved = loadSavedState();
+    const saved = loadState();
 
     const state = {
-      chapter: Number.isInteger(saved.chapter)
-        ? Math.max(0, Math.min(chapters.length - 1, saved.chapter))
-        : 0,
-      fontSize: Number.isFinite(saved.fontSize)
-        ? Math.max(15, Math.min(30, saved.fontSize))
-        : 19,
+      activeBookId: null,
       theme: ["parchment", "day", "night"].includes(saved.theme)
-        ? saved.theme
-        : "parchment",
-      bookmarks: Array.isArray(saved.bookmarks)
-        ? saved.bookmarks.filter(
-            value => Number.isInteger(value)
-              && value >= 0
-              && value < chapters.length
-          )
-        : []
+        ? saved.theme : "parchment",
+      fontSize: Number.isFinite(saved.fontSize)
+        ? Math.max(15, Math.min(30, saved.fontSize)) : 19,
+      positions: saved.positions &&
+        typeof saved.positions === "object" ? saved.positions : {},
+      bookmarks: saved.bookmarks &&
+        typeof saved.bookmarks === "object" ? saved.bookmarks : {}
     };
 
-    const elements = {
-      page: document.getElementById("page"),
-      title: document.getElementById("chapter-title"),
-      text: document.getElementById("chapter-text"),
-      theme: document.getElementById("theme"),
-      bookmark: document.getElementById("bookmark"),
-      previous: document.getElementById("previous"),
-      next: document.getElementById("next"),
-      smaller: document.getElementById("smaller"),
-      larger: document.getElementById("larger"),
-      progressLabel: document.getElementById("progress-label"),
-      progressFill: document.getElementById("progress-fill"),
-      progressTrack: document.getElementById("progress-track"),
-      status: document.getElementById("status")
-    };
+    const $ = id => document.getElementById(id);
 
     function saveState() {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(state));
+        localStorage.setItem(storageKey, JSON.stringify({
+          theme: state.theme,
+          fontSize: state.fontSize,
+          positions: state.positions,
+          bookmarks: state.bookmarks
+        }));
       } catch {
-        showStatus("Preferences could not be saved on this device.");
+        showStatus("Unable to save preferences on this device.");
+      }
+    }
+
+    function getBook(bookId) {
+      return books.find(book => book.id === bookId);
+    }
+
+    function getChapterIndex(book) {
+      const value = state.positions[book.id];
+      return Number.isInteger(value)
+        ? Math.max(0, Math.min(book.chapters.length - 1, value))
+        : 0;
+    }
+
+    function getProgress(book) {
+      const chapter = getChapterIndex(book);
+      return Math.round(((chapter + 1) / book.chapters.length) * 100);
+    }
+
+    function renderLibrary() {
+      const grid = $("book-grid");
+      grid.replaceChildren();
+
+      for (const book of books) {
+        const card = document.createElement("article");
+        card.className = "book-card";
+
+        const cover = document.createElement("div");
+        cover.className = "book-cover " + book.coverClass;
+
+        const imprint = document.createElement("div");
+        imprint.className = "cover-imprint";
+        imprint.textContent = "BLACKWOOD PUBLISHING";
+
+        const coverTitle = document.createElement("div");
+        coverTitle.className = "cover-title";
+        coverTitle.textContent = book.title;
+
+        const footer = document.createElement("div");
+        footer.className = "cover-footer";
+        footer.textContent = "BP READING";
+
+        cover.append(imprint, coverTitle, footer);
+
+        const heading = document.createElement("h2");
+        heading.textContent = book.title;
+
+        const description = document.createElement("p");
+        description.className = "book-description";
+        description.textContent = book.description;
+
+        const progressLabel = document.createElement("p");
+        progressLabel.className = "progress-label";
+
+        const hasStarted = Object.prototype.hasOwnProperty.call(
+          state.positions, book.id
+        );
+
+        const progress = hasStarted ? getProgress(book) : 0;
+        progressLabel.textContent = hasStarted
+          ? progress + "% through demonstration"
+          : "Not started";
+
+        const track = document.createElement("div");
+        track.className = "progress-track";
+
+        const fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.width = progress + "%";
+        track.appendChild(fill);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "open-book";
+        button.textContent = hasStarted
+          ? "Continue Reading"
+          : "Read Book";
+        button.addEventListener("click", () => openBook(book.id));
+
+        card.append(
+          cover, heading, description,
+          progressLabel, track, button
+        );
+
+        grid.appendChild(card);
       }
     }
 
     function showStatus(message) {
-      elements.status.textContent = message;
+      $("reader-status").textContent = message;
     }
 
-    function render() {
-      const chapter = chapters[state.chapter];
+    function setControlsVisible(visible) {
+      $("reader-controls").hidden = !visible;
+      $("reader-bottom").hidden = !visible;
+    }
 
-      elements.title.textContent = chapter.title;
-      elements.text.replaceChildren();
+    function renderReader() {
+      const book = getBook(state.activeBookId);
+      if (!book) return;
 
-      for (const paragraphText of chapter.paragraphs) {
+      const chapterIndex = getChapterIndex(book);
+      const chapter = book.chapters[chapterIndex];
+
+      $("reader-book-title").textContent = book.title.toUpperCase();
+      $("chapter-title").textContent = chapter.title;
+
+      const container = $("chapter-text");
+      container.replaceChildren();
+
+      for (const text of chapter.paragraphs) {
         const paragraph = document.createElement("p");
-        paragraph.textContent = paragraphText;
-        elements.text.appendChild(paragraph);
+        paragraph.textContent = text;
+        container.appendChild(paragraph);
       }
 
-      elements.text.style.fontSize = state.fontSize + "px";
-      elements.page.dataset.theme = state.theme;
-      elements.theme.value = state.theme;
+      container.style.fontSize = state.fontSize + "px";
+      $("reader").dataset.theme = state.theme;
+      $("reading-theme").value = state.theme;
 
-      const isBookmarked = state.bookmarks.includes(state.chapter);
-      elements.bookmark.textContent = isBookmarked
-        ? "★ Bookmarked"
-        : "☆ Bookmark";
-      elements.bookmark.setAttribute(
-        "aria-pressed",
-        String(isBookmarked)
+      const savedBookmarks = Array.isArray(state.bookmarks[book.id])
+        ? state.bookmarks[book.id] : [];
+
+      const bookmarked = savedBookmarks.includes(chapterIndex);
+      $("bookmark").textContent = bookmarked
+        ? "★ Bookmarked" : "☆ Bookmark";
+      $("bookmark").setAttribute(
+        "aria-pressed", String(bookmarked)
       );
 
-      elements.previous.disabled = state.chapter === 0;
-      elements.next.disabled =
-        state.chapter === chapters.length - 1;
+      $("previous").disabled = chapterIndex === 0;
+      $("next").disabled = chapterIndex === book.chapters.length - 1;
 
-      const percentage = Math.round(
-        ((state.chapter + 1) / chapters.length) * 100
-      );
+      $("reader-progress").textContent =
+        "Chapter " + (chapterIndex + 1) +
+        " of " + book.chapters.length +
+        " · " + getProgress(book) + "%";
+    }
 
-      elements.progressLabel.textContent =
-        "Chapter " + (state.chapter + 1) +
-        " of " + chapters.length +
-        " · " + percentage + "%";
+    function openBook(bookId) {
+      const book = getBook(bookId);
+      if (!book) return;
 
-      elements.progressFill.style.width = percentage + "%";
-      elements.progressTrack.setAttribute(
-        "aria-valuenow",
-        String(percentage)
-      );
+      state.activeBookId = bookId;
+
+      if (!Object.prototype.hasOwnProperty.call(
+        state.positions, bookId
+      )) {
+        state.positions[bookId] = 0;
+      }
+
+      saveState();
+      $("library").hidden = true;
+      $("reader").hidden = false;
+      $("reader").scrollTop = 0;
+
+      renderReader();
+      setControlsVisible(false);
+      showStatus("");
+    }
+
+    function closeBook() {
+      state.activeBookId = null;
+      saveState();
+      $("reader").hidden = true;
+      $("library").hidden = false;
+      showStatus("");
+      renderLibrary();
     }
 
     function changeChapter(offset) {
-      const nextChapter = state.chapter + offset;
+      const book = getBook(state.activeBookId);
+      if (!book) return;
 
-      if (nextChapter < 0 || nextChapter >= chapters.length) {
-        return;
-      }
+      const next = getChapterIndex(book) + offset;
+      if (next < 0 || next >= book.chapters.length) return;
 
-      state.chapter = nextChapter;
+      state.positions[book.id] = next;
       saveState();
-      render();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      renderReader();
+      $("reader").scrollTop = 0;
       showStatus("Reading position saved.");
     }
 
-    elements.previous.addEventListener("click", () => {
-      changeChapter(-1);
+    $("reading-surface").addEventListener("click", () => {
+      const visible = !$("reader-controls").hidden;
+      setControlsVisible(!visible);
+      showStatus("");
     });
 
-    elements.next.addEventListener("click", () => {
-      changeChapter(1);
-    });
+    $("back-to-library").addEventListener("click", closeBook);
 
-    elements.smaller.addEventListener("click", () => {
+    $("previous").addEventListener("click", () => changeChapter(-1));
+    $("next").addEventListener("click", () => changeChapter(1));
+
+    $("font-smaller").addEventListener("click", () => {
       state.fontSize = Math.max(15, state.fontSize - 1);
       saveState();
-      render();
-      showStatus("Text size updated.");
+      renderReader();
     });
 
-    elements.larger.addEventListener("click", () => {
+    $("font-larger").addEventListener("click", () => {
       state.fontSize = Math.min(30, state.fontSize + 1);
       saveState();
-      render();
-      showStatus("Text size updated.");
+      renderReader();
     });
 
-    elements.theme.addEventListener("change", event => {
+    $("reading-theme").addEventListener("change", event => {
       state.theme = event.target.value;
       saveState();
-      render();
-      showStatus("Reading theme updated.");
+      renderReader();
     });
 
-    elements.bookmark.addEventListener("click", () => {
-      const index = state.bookmarks.indexOf(state.chapter);
+    $("bookmark").addEventListener("click", () => {
+      const book = getBook(state.activeBookId);
+      if (!book) return;
 
-      if (index >= 0) {
-        state.bookmarks.splice(index, 1);
+      const index = getChapterIndex(book);
+      const bookmarks = Array.isArray(state.bookmarks[book.id])
+        ? state.bookmarks[book.id] : [];
+
+      const existing = bookmarks.indexOf(index);
+
+      if (existing >= 0) {
+        bookmarks.splice(existing, 1);
         showStatus("Bookmark removed.");
       } else {
-        state.bookmarks.push(state.chapter);
+        bookmarks.push(index);
         showStatus("Chapter bookmarked.");
       }
 
+      state.bookmarks[book.id] = bookmarks;
       saveState();
-      render();
+      renderReader();
     });
 
-    render();
+    document.addEventListener("keydown", event => {
+      if (!state.activeBookId) return;
+
+      if (event.key === "Escape") {
+        if (!$("reader-controls").hidden) {
+          setControlsVisible(false);
+        } else {
+          closeBook();
+        }
+      }
+    });
+
+    renderLibrary();
   </script>
 </body>
 </html>
