@@ -1416,6 +1416,7 @@
       renderLibrary();
     }
 
+    
     async function changePage(direction) {
       if (
         !state.rendition ||
@@ -1424,30 +1425,49 @@
       ) {
         return;
       }
-
+    
       state.isNavigating = true;
       updateReaderProgress();
-
+    
       try {
+        const before =
+          state.rendition.currentLocation();
+    
+        console.log("BP Reading navigation BEFORE:", {
+          direction,
+          cfi: before?.start?.cfi,
+          page: before?.start?.displayed?.page,
+          section: before?.start?.index
+        });
+    
         if (direction > 0) {
           await state.rendition.next();
         } else {
           await state.rendition.prev();
         }
+    
+        const after =
+          state.rendition.currentLocation();
+    
+        console.log("BP Reading navigation AFTER:", {
+          direction,
+          cfi: after?.start?.cfi,
+          page: after?.start?.displayed?.page,
+          section: after?.start?.index
+        });
       } catch (error) {
         console.error(
-          "Page navigation failed:",
+          "BP Reading page navigation failed:",
           error
         );
-
-        showStatus(
-          "Unable to turn the page."
-        );
+    
+        showStatus("Unable to turn the page.");
       } finally {
         state.isNavigating = false;
         updateReaderProgress();
       }
     }
+
 
     $("back-to-library").addEventListener(
       "click",
