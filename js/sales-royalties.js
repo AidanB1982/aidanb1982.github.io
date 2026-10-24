@@ -2913,95 +2913,112 @@
     // STARTUP
     // ========================================================
 
-    async function initialize() {
-        if (
-            !$("sr-access-screen") ||
-            !$("sr-admin-content")
-        ) {
-            console.error(
-                "Department 03 page elements missing."
+    
+async function initialize() {
+    if (
+        !$("sr-access-screen") ||
+        !$("sr-admin-content")
+    ) {
+        console.error(
+            "Department 03 page elements missing."
+        );
+        return;
+    }
+
+    lock();
+    populateCategorySelects();
+    setFormDates();
+    bindEvents();
+
+    // The website header is not allowed to block
+    // Supabase authentication or dashboard loading.
+    if (typeof loadHeader === "function") {
+        Promise.resolve()
+            .then(() => loadHeader("simple"))
+            .catch(error => {
+                console.warn(
+                    "Header could not load:",
+                    error
+                );
+            });
+    }
+
+    try {
+        accessMessage(
+            "Connecting to Blackwood management..."
+        );
+
+        await loadLibrary();
+
+        if (!window.supabase?.createClient) {
+            throw new Error(
+                "Supabase client library is unavailable."
             );
-            return;
         }
 
-        lock();
-        populateCategorySelects();
-        setFormDates();
-        bindEvents();
-
-        try {
-            if (
-                typeof loadHeader === "function"
-            ) {
-                await loadHeader("simple");
+        db = window.supabase.createClient(
+            URL,
+            KEY,
+            {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: true
+                }
             }
-        } catch (error) {
-            console.warn(
-                "Header could not load:",
-                error
+        );
+
+        console.log(
+            "Department 03: Supabase client initialised."
+        );
+
+        db.auth.onAuthStateChange(event => {
+            console.log(
+                "Department 03 auth event:",
+                event
             );
-        }
 
-        try {
-            await loadLibrary();
+            if (event === "SIGNED_OUT") {
+                ++accessVersion;
+                lock();
 
-            db =
-                window.supabase.createClient(
-                    URL,
-                    KEY,
-                    {
-                        auth: {
-                            persistSession: true,
-                            autoRefreshToken: true,
-                            detectSessionInUrl: true
-                        }
-                    }
+                accessMessage(
+                    "Your session has ended. " +
+                    "Please sign in again."
                 );
 
-            db.auth.onAuthStateChange(
-                event => {
-                    if (
-                        event === "SIGNED_OUT"
-                    ) {
-                        ++accessVersion;
-                        lock();
+                return;
+            }
 
-                        accessMessage(
-                            "Your session has ended. " +
-                            "Please sign in again."
-                        );
-                    }
+            if (
+                event === "SIGNED_IN" ||
+                event === "USER_UPDATED"
+            ) {
+                // Defer access verification until the
+                // current authentication callback finishes.
+                window.setTimeout(() => {
+                    verifyAccess();
+                }, 0);
+            }
+        });
 
-                    if (
-                        [
-                            "SIGNED_IN",
-                            "USER_UPDATED"
-                        ].includes(event)
-                    ) {
-                        window.setTimeout(
-                            verifyAccess,
-                            0
-                        );
-                    }
-                }
-            );
+        await verifyAccess();
 
-            await verifyAccess();
+    } catch (error) {
+        console.error(
+            "Department 03 startup error:",
+            error
+        );
 
-        } catch (error) {
-            console.error(
-                "Department 03 startup error:",
-                error
-            );
+        lock();
 
-            lock();
-
-            accessMessage(
-                "Unable to initialise " +
-                "the financial dashboard."
-            );
-        }
+        accessMessage(
+            "Unable to initialise the financial dashboard: " +
+            error.message
+        );
     }
+}
+
 
     window.addEventListener(
         "load",
