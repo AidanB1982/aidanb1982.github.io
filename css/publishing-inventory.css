@@ -1,0 +1,435 @@
+
+/* ==========================================
+   BLACKWOOD PUBLISHING
+   PUBLISHING INVENTORY — DEPARTMENT 02
+
+   Dark and copper Management Hub styling.
+   Works alongside behind-files-admin.css.
+
+   This file only styles Publishing Inventory.
+   ========================================== */
+
+/* ==========================================
+   CATALOGUE STATISTICS
+   ========================================== */
+
+.pi-stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0 0 28px;
+}
+
+.pi-stat {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid rgba(166, 106, 56, 0.45);
+    border-radius: 12px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(166, 106, 56, 0.13),
+            rgba(15, 13, 12, 0.92)
+        );
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.pi-stat span {
+    display: block;
+    margin-bottom: 12px;
+    color: #c9b9a8;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+}
+
+.pi-stat strong {
+    display: block;
+    color: #e0a76e;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================
+   SEARCH
+   ========================================== */
+
+.pi-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 24px 0 18px;
+}
+
+.pi-toolbar label {
+    display: block;
+    color: #e8ddd1;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.pi-toolbar input[type="search"] {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+
+    border: 1px solid rgba(166, 106, 56, 0.55);
+    border-radius: 8px;
+
+    background: #171411;
+    color: #f5ede4;
+
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.pi-toolbar input[type="search"]::placeholder {
+    color: #a99a8d;
+    opacity: 1;
+}
+
+.pi-toolbar input[type="search"]:focus {
+    border-color: #d7a474;
+    outline: 2px solid #d7a474;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(166, 106, 56, 0.12);
+}
+
+/* ==========================================
+   CATALOGUE LIST
+   ========================================== */
+
+.pi-catalogue {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.pi-book {
+    min-width: 0;
+    overflow: hidden;
+
+    border: 1px solid rgba(166, 106, 56, 0.38);
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(166, 106, 56, 0.07),
+            rgba(11, 10, 9, 0.65)
+        );
+}
+
+.pi-book[open] {
+    border-color: rgba(215, 164, 116, 0.75);
+}
+
+/* ==========================================
+   EXPANDABLE BOOK HEADINGS
+   ========================================== */
+
+.pi-book > summary {
+    display: block;
+    position: relative;
+    cursor: pointer;
+
+    padding: 20px 52px 20px 22px;
+
+    list-style: none;
+    transition: background-color 0.2s ease;
+}
+
+.pi-book > summary::-webkit-details-marker {
+    display: none;
+}
+
+.pi-book > summary::marker {
+    content: "";
+}
+
+.pi-book > summary::after {
+    content: "+";
+    position: absolute;
+    top: 50%;
+    right: 22px;
+    transform: translateY(-50%);
+
+    color: #d7a474;
+    font-family: Arial, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.pi-book[open] > summary::after {
+    content: "−";
+}
+
+.pi-book > summary:hover {
+    background: rgba(166, 106, 56, 0.12);
+}
+
+.pi-book > summary:focus-visible {
+    outline: 2px solid #d7a474;
+    outline-offset: -4px;
+}
+
+.pi-book-title {
+    display: block;
+    color: #f2e7dc;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.pi-book-author {
+    display: block;
+    margin-top: 6px;
+    color: #c8b8a8;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.pi-book-count {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+
+    border: 1px solid rgba(166, 106, 56, 0.35);
+    border-radius: 999px;
+
+    background: rgba(166, 106, 56, 0.12);
+    color: #dfad7e;
+
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   EDITIONS WITHIN A BOOK
+   ========================================== */
+
+.pi-editions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+
+    padding: 0 20px 20px;
+}
+
+.pi-edition {
+    min-width: 0;
+    padding: 20px;
+
+    border: 1px solid rgba(166, 106, 56, 0.25);
+    border-radius: 10px;
+
+    background: rgba(166, 106, 56, 0.055);
+    overflow-wrap: anywhere;
+}
+
+.pi-edition h3 {
+    margin: 0 0 16px;
+    color: #e1ae7b;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.4;
+    text-transform: capitalize;
+}
+
+/* ==========================================
+   EDITION DETAILS
+   ========================================== */
+
+.pi-edition dl {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 10px 16px;
+    margin: 0;
+}
+
+.pi-edition dt {
+    color: #bfae9f;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.pi-edition dd {
+    min-width: 0;
+    margin: 0;
+    color: #f2e7dc;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   DISTRIBUTION BADGES
+   ========================================== */
+
+.pi-distributors {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.pi-platform {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 7px 12px;
+
+    border: 1px solid rgba(215, 164, 116, 0.5);
+    border-radius: 999px;
+
+    background: rgba(166, 106, 56, 0.12);
+    color: #e6b889;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* ==========================================
+   DISTRIBUTOR DETAILS
+   ========================================== */
+
+.pi-distribution-details {
+    margin-top: 16px;
+    padding: 14px 0 0;
+
+    border-top: 1px solid rgba(166, 106, 56, 0.25);
+}
+
+.pi-distribution-details strong {
+    display: block;
+    margin-bottom: 8px;
+
+    color: #e0ad7a;
+    font-size: 0.92rem;
+}
+
+.pi-distribution-details p {
+    margin: 6px 0;
+    color: #cbbbab;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+/* ==========================================
+   EMPTY SEARCH RESULTS
+   ========================================== */
+
+.pi-empty {
+    margin: 0;
+    padding: 32px 20px;
+
+    border: 1px dashed rgba(166, 106, 56, 0.4);
+    border-radius: 10px;
+
+    color: #c9b9a8;
+    text-align: center;
+}
+
+/* ==========================================
+   TABLET
+   ========================================== */
+
+@media (max-width: 900px) {
+    .pi-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pi-stat {
+        padding: 20px;
+    }
+}
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 600px) {
+    .pi-stats {
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .pi-stat {
+        padding: 16px;
+    }
+
+    .pi-stat span {
+        font-size: 0.75rem;
+    }
+
+    .pi-stat strong {
+        font-size: 1.8rem;
+    }
+
+    .pi-book > summary {
+        padding: 16px 44px 16px 16px;
+    }
+
+    .pi-book > summary::after {
+        right: 16px;
+    }
+
+    .pi-book-title {
+        font-size: 1.05rem;
+    }
+
+    .pi-editions {
+        gap: 12px;
+        padding: 0 12px 12px;
+    }
+
+    .pi-edition {
+        padding: 16px;
+    }
+
+    .pi-edition dl {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .pi-edition dt {
+        margin-top: 6px;
+    }
+
+    .pi-edition dd {
+        margin-bottom: 6px;
+    }
+}
+
+@media (max-width: 360px) {
+    .pi-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .pi-book > summary,
+    .pi-toolbar input[type="search"] {
+        transition: none;
+    }
+}
