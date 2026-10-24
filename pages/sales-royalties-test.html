@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Sales & Royalties | Blackwood Management</title>
+    <title>Sales &amp; Royalties | Blackwood Management</title>
     <meta name="description"
           content="Private sales and financial management dashboard for Blackwood Publishing.">
 
@@ -63,6 +63,8 @@
         <p id="sr-status" class="sr-status" role="status"
            aria-live="polite">Loading financial records...</p>
 
+        <!-- REPORTING CONTROLS -->
+
         <section class="sr-panel" aria-labelledby="sr-filter-title">
             <div class="sr-section-heading">
                 <div>
@@ -116,10 +118,12 @@
                     </select>
                 </label>
             </div>
+
             <p id="sr-period-label" class="sr-muted"></p>
         </section>
 
-        
+        <!-- NEW: ESTIMATED RETAIL SALES -->
+
         <section class="sr-panel" aria-labelledby="sr-retail-heading">
             <div class="sr-section-heading">
                 <div>
@@ -166,6 +170,58 @@
             </p>
         </section>
 
+        <!-- RESTORED: EXECUTIVE OVERVIEW -->
+
+        <section aria-labelledby="sr-kpi-title">
+            <div class="sr-section-heading">
+                <div>
+                    <p class="sr-kicker">Executive Overview</p>
+                    <h2 id="sr-kpi-title">Publishing KPIs</h2>
+                </div>
+            </div>
+
+            <div class="sr-kpi-grid">
+                <article class="sr-kpi">
+                    <span>KDP royalties</span>
+                    <strong id="sr-kpi-royalties">—</strong>
+                    <small>Confirmed KDP royalty report values</small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>KDP net copies</span>
+                    <strong id="sr-kpi-copies">—</strong>
+                    <small id="sr-kpi-copy-detail">
+                        Sales less refunds
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Kindle+ estimate</span>
+                    <strong id="sr-kpi-ku">—</strong>
+                    <small>Estimated only; not confirmed income</small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Recorded expenses</span>
+                    <strong id="sr-kpi-expenses">—</strong>
+                    <small>Expenses entered into Department 03</small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Previous month</span>
+                    <strong id="sr-kpi-previous">—</strong>
+                    <small>KDP royalty comparison</small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Month-on-month</span>
+                    <strong id="sr-kpi-growth">—</strong>
+                    <small>Latest two reported KDP months</small>
+                </article>
+            </div>
+        </section>
+
+        <!-- PERFORMANCE CHARTS -->
 
         <div class="sr-two-columns">
             <section class="sr-panel" aria-labelledby="sr-trend-title">
@@ -196,6 +252,8 @@
             </section>
         </div>
 
+        <!-- CATALOGUE AND DISTRIBUTION -->
+
         <div class="sr-two-columns">
             <section class="sr-panel" aria-labelledby="sr-top-title">
                 <div class="sr-section-heading">
@@ -204,6 +262,7 @@
                         <h2 id="sr-top-title">Top-Selling Books</h2>
                     </div>
                 </div>
+
                 <div class="sr-table-scroll">
                     <table>
                         <thead>
@@ -225,7 +284,9 @@
                         <h2 id="sr-platform-title">Platform Breakdown</h2>
                     </div>
                 </div>
+
                 <div id="sr-platform-summary"></div>
+
                 <p class="sr-muted">
                     KDP royalties, IngramSpark compensation,
                     Shopify product activity and Tide payments
@@ -234,6 +295,8 @@
             </section>
         </div>
 
+        <!-- FINANCIAL YEAR COMPARISON -->
+
         <section class="sr-panel" aria-labelledby="sr-financial-title">
             <div class="sr-section-heading">
                 <div>
@@ -241,6 +304,7 @@
                     <h2 id="sr-financial-title">Financial Year Comparison</h2>
                 </div>
             </div>
+
             <div class="sr-table-scroll">
                 <table>
                     <thead>
@@ -256,6 +320,8 @@
                 </table>
             </div>
         </section>
+
+        <!-- EXPENSES -->
 
         <section class="sr-panel" aria-labelledby="sr-cost-title">
             <div class="sr-section-heading">
@@ -318,6 +384,7 @@
                aria-live="polite"></p>
 
             <h3>Recorded Expenses</h3>
+
             <div class="sr-table-scroll">
                 <table>
                     <thead>
@@ -334,6 +401,8 @@
                 </table>
             </div>
         </section>
+
+        <!-- BUDGETS AND TARGETS -->
 
         <div class="sr-two-columns">
             <section class="sr-panel" aria-labelledby="sr-budget-title">
@@ -408,7 +477,9 @@
                             <option value="royalties">KDP royalties</option>
                             <option value="kindle_pages">Kindle+ pages</option>
                             <option value="direct_receipts">Tide receipts</option>
-                            <option value="profit">Profit — pending full cost data</option>
+                            <option value="profit">
+                                Profit — pending full cost data
+                            </option>
                         </select>
                     </label>
                     <label>
@@ -447,6 +518,8 @@
                 <div id="sr-target-list" class="sr-record-list"></div>
             </section>
         </div>
+
+        <!-- BOOK PROFITABILITY -->
 
         <section class="sr-panel" aria-labelledby="sr-profit-title">
             <div class="sr-section-heading">
