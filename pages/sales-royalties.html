@@ -5,9 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Sales & Royalties | Blackwood Management</title>
-    <meta name="description"
-          content="Private sales and financial management dashboard for Blackwood Publishing.">
+    <title>Sales &amp; Royalties | Blackwood Management</title>
+
+    <meta
+        name="description"
+        content="Private sales, royalties and financial management dashboard for Blackwood Publishing."
+    >
 
     <link rel="icon" href="/assets/favicon.png" type="image/png">
 
@@ -20,66 +23,119 @@
 </head>
 
 <body class="sr-page">
+
     <a class="skip-link" href="#sr-title">Skip to content</a>
 
     <div id="header-placeholder"></div>
 
-    <section id="sr-access-screen" class="sr-wrap" role="status"
-             aria-live="polite">
+    <!-- ACCESS CONTROL -->
+
+    <section
+        id="sr-access-screen"
+        class="sr-wrap"
+        role="status"
+        aria-live="polite"
+    >
         <div class="sr-panel sr-access-panel">
             <p class="sr-kicker">Blackwood Management</p>
             <h1>Verifying Access</h1>
+
             <p id="sr-access-message">
                 Checking your management credentials...
             </p>
+
             <a href="/pages/members.html" class="sr-button">
                 Return to The Archivists
             </a>
         </div>
     </section>
 
+    <!-- MANAGEMENT DASHBOARD -->
+
     <main id="sr-admin-content" class="sr-wrap" hidden>
+
         <header class="sr-hero">
-            <p class="sr-kicker">Department 03 · Private Headquarters</p>
-            <h1 id="sr-title">Sales &amp; Royalties</h1>
-            <p>
-                The Blackwood financial command centre.
-                Sales intelligence, royalties, publishing costs,
-                budgets and performance tracking.
+
+            <p class="sr-kicker">
+                Department 03 · Private Headquarters
             </p>
+
+            <h1 id="sr-title">Sales &amp; Royalties</h1>
+
+            <p>
+                Blackwood Publishing financial management.
+                Amazon sales, publishing costs, royalty income,
+                budgets and catalogue performance.
+            </p>
+
             <div class="sr-actions">
-                <a href="/pages/behind-files-admin.html" class="sr-button">
+
+                <a
+                    href="/pages/behind-files-admin.html"
+                    class="sr-button"
+                >
                     ← Management Hub
                 </a>
-                <a href="/pages/publishing-inventory.html" class="sr-button">
+
+                <a
+                    href="/pages/publishing-inventory.html"
+                    class="sr-button"
+                >
                     Publishing Inventory
                 </a>
-                <button id="sr-refresh" type="button" class="sr-button">
+
+                <button
+                    id="sr-refresh"
+                    type="button"
+                    class="sr-button"
+                >
                     Refresh Data
                 </button>
+
             </div>
+
         </header>
 
-        <p id="sr-status" class="sr-status" role="status"
-           aria-live="polite">Loading financial records...</p>
+        <p
+            id="sr-status"
+            class="sr-status"
+            role="status"
+            aria-live="polite"
+        >
+            Loading financial records...
+        </p>
 
-        <section class="sr-panel" aria-labelledby="sr-filter-title">
+        <!-- REPORTING FILTERS -->
+
+        <section
+            class="sr-panel"
+            aria-labelledby="sr-filter-title"
+        >
+
             <div class="sr-section-heading">
                 <div>
                     <p class="sr-kicker">Reporting Controls</p>
-                    <h2 id="sr-filter-title">Reporting Period</h2>
+                    <h2 id="sr-filter-title">
+                        Reporting Period
+                    </h2>
                 </div>
             </div>
 
             <div class="sr-filters">
+
                 <label>
                     Financial year
                     <select id="sr-year"></select>
                 </label>
+
                 <label>
                     Reporting month
                     <select id="sr-month">
-                        <option value="all">Entire financial year</option>
+
+                        <option value="all">
+                            Entire financial year
+                        </option>
+
                         <option value="4">April</option>
                         <option value="5">May</option>
                         <option value="6">June</option>
@@ -92,501 +148,1078 @@
                         <option value="1">January</option>
                         <option value="2">February</option>
                         <option value="3">March</option>
+
                     </select>
                 </label>
+
                 <label>
-                    Currency
+                    Reporting currency
+
                     <select id="sr-currency">
-                        <option value="GBP">GBP — Sterling</option>
+                        <option value="GBP">
+                            GBP — Sterling
+                        </option>
                     </select>
+
                 </label>
+
                 <label>
                     Book
+
                     <select id="sr-title-filter">
-                        <option value="all">All books</option>
+                        <option value="all">
+                            All books
+                        </option>
                     </select>
+
                 </label>
+
                 <label>
                     Format
+
                     <select id="sr-format">
-                        <option value="all">All formats</option>
+
+                        <option value="all">
+                            All formats
+                        </option>
+
                         <option value="ebook">eBook</option>
                         <option value="paperback">Paperback</option>
                         <option value="hardcover">Hardcover</option>
+
                     </select>
+
                 </label>
+
             </div>
+
             <p id="sr-period-label" class="sr-muted"></p>
+
+            <p class="sr-muted">
+                Financial years run from April to March.
+                International Amazon figures are converted to GBP
+                using the agreed fixed April 2026 exchange rates
+                for FY 2026/27.
+            </p>
+
         </section>
-        
-        <section aria-labelledby="sr-retail-title">
+
+        <!-- PRIMARY FINANCIAL RECONCILIATION -->
+
+        <section
+            class="sr-panel"
+            aria-labelledby="sr-reconciliation-title"
+        >
+
             <div class="sr-section-heading">
                 <div>
-                    <p class="sr-kicker">Retail Sales Intelligence</p>
-                    <h2 id="sr-retail-title">
-                        Estimated KDP Retail Sales
+
+                    <p class="sr-kicker">
+                        Amazon Financial Reconciliation
+                    </p>
+
+                    <h2 id="sr-reconciliation-title">
+                        Income, Costs &amp; Blackwood Royalties
                     </h2>
+
                 </div>
             </div>
-        
+
+            <p class="sr-muted">
+                A complete management view of estimated customer
+                spending, Amazon-related costs and Blackwood's
+                reported royalty income.
+            </p>
+
+            <h3>Income</h3>
+
             <div class="sr-kpi-grid">
+
+                <article class="sr-kpi">
+                    <span>Amazon book sales</span>
+
+                    <strong id="sr-amazon-retail">—</strong>
+
+                    <small>
+                        Estimated gross retail sales across
+                        all Amazon marketplaces, converted to GBP
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Kindle Unlimited income</span>
+
+                    <strong id="sr-amazon-pages">—</strong>
+
+                    <small>
+                        Estimated page-read royalties in GBP
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Total Amazon-related income</span>
+
+                    <strong id="sr-income-total">—</strong>
+
+                    <small>
+                        Estimated book retail sales plus
+                        Kindle Unlimited income
+                    </small>
+                </article>
+
+            </div>
+
+            <h3>Cost of Sales</h3>
+
+            <div class="sr-kpi-grid">
+
+                <article class="sr-kpi">
+                    <span>Manufacturing costs</span>
+
+                    <strong id="sr-amazon-print">—</strong>
+
+                    <small>
+                        KDP paperback and hardcover
+                        manufacturing charges
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Digital delivery costs</span>
+
+                    <strong id="sr-amazon-delivery">—</strong>
+
+                    <small>
+                        KDP eBook delivery charges
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Estimated Amazon retained</span>
+
+                    <strong id="sr-amazon-remainder">—</strong>
+
+                    <small>
+                        Retail sales less manufacturing,
+                        delivery and reported book royalties
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Total Amazon-related costs</span>
+
+                    <strong id="sr-cost-of-sales-total">—</strong>
+
+                    <small>
+                        Manufacturing, delivery and
+                        estimated Amazon retained
+                    </small>
+                </article>
+
+            </div>
+
+            <h3>Blackwood Royalty Income</h3>
+
+            <div class="sr-kpi-grid">
+
+                <article class="sr-kpi">
+                    <span>Book sales royalties</span>
+
+                    <strong id="sr-amazon-royalties">—</strong>
+
+                    <small>
+                        Reported Amazon KDP book royalties
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Kindle Unlimited royalties</span>
+
+                    <strong id="sr-reconciliation-ku">—</strong>
+
+                    <small>
+                        Estimated Kindle Unlimited
+                        page-read income
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Blackwood combined royalties</span>
+
+                    <strong id="sr-amazon-combined">—</strong>
+
+                    <small>
+                        Reported book royalties plus
+                        estimated Kindle Unlimited income
+                    </small>
+                </article>
+
+                <article class="sr-kpi">
+                    <span>Reconciled royalty balance</span>
+
+                    <strong id="sr-reconciliation-balance">—</strong>
+
+                    <small>
+                        Total income minus Amazon-related
+                        costs; should equal combined royalties
+                    </small>
+                </article>
+
+            </div>
+
+            <p class="sr-warning">
+                Management reconciliation only. Gross retail
+                values are estimated from KDP average offer
+                prices. Amazon retained is a calculated residual,
+                not a separately reported Amazon fee.
+                Kindle Unlimited royalties are estimates.
+                The reconciliation is not independent
+                confirmation of Amazon payouts.
+            </p>
+
+        </section>
+
+        <!-- MONTHLY FINANCIAL TABLE -->
+
+        <section
+            class="sr-panel"
+            aria-labelledby="sr-monthly-finance-title"
+        >
+
+            <div class="sr-section-heading">
+                <div>
+
+                    <p class="sr-kicker">
+                        Monthly Financial Accounts
+                    </p>
+
+                    <h2 id="sr-monthly-finance-title">
+                        Amazon Income &amp; Costs by Month
+                    </h2>
+
+                </div>
+            </div>
+
+            <div class="sr-table-scroll">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+
+                            <th class="sr-number">
+                                Retail sales
+                            </th>
+
+                            <th class="sr-number">
+                                Kindle Unlimited
+                            </th>
+
+                            <th class="sr-number">
+                                Total income
+                            </th>
+
+                            <th class="sr-number">
+                                Manufacturing
+                            </th>
+
+                            <th class="sr-number">
+                                Delivery
+                            </th>
+
+                            <th class="sr-number">
+                                Amazon retained
+                            </th>
+
+                            <th class="sr-number">
+                                Total costs
+                            </th>
+
+                            <th class="sr-number">
+                                Blackwood royalties
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="sr-monthly-reconciliation">
+                        <tr>
+                            <td colspan="9">
+                                Loading monthly reconciliation...
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tfoot id="sr-monthly-reconciliation-total"></tfoot>
+
+                </table>
+
+            </div>
+
+            <p class="sr-muted">
+                Values shown in GBP. Reporting months follow
+                KDP royalty months for book sales and reading
+                months for Kindle Unlimited.
+            </p>
+
+        </section>
+
+        <!-- DATA QUALITY -->
+
+        <section
+            aria-labelledby="sr-retail-title"
+        >
+
+            <div class="sr-section-heading">
+                <div>
+
+                    <p class="sr-kicker">
+                        Data Quality
+                    </p>
+
+                    <h2 id="sr-retail-title">
+                        Amazon Retail Sales Checks
+                    </h2>
+
+                </div>
+            </div>
+
+            <div class="sr-kpi-grid">
+
                 <article class="sr-kpi">
                     <span>Estimated retail sales value</span>
+
                     <strong id="sr-retail-value">—</strong>
+
                     <small>
-                        Net copies × reported average offer price,
-                        where positive
+                        Net copies multiplied by reported
+                        average offer price
                     </small>
                 </article>
-        
+
                 <article class="sr-kpi">
                     <span>Price exception rows</span>
+
                     <strong id="sr-retail-exceptions">—</strong>
+
                     <small>
-                        Royalty-bearing rows with zero or missing
-                        offer prices
+                        Royalty-bearing rows with missing
+                        or zero offer prices
                     </small>
                 </article>
-        
+
                 <article class="sr-kpi">
                     <span>Copies affected</span>
+
                     <strong id="sr-retail-exception-copies">—</strong>
+
                     <small>
                         Net copies affected by price exceptions
                     </small>
                 </article>
+
             </div>
+
         </section>
 
-        
-<section class="sr-panel" aria-labelledby="sr-amazon-title">
-    <div class="sr-section-heading">
-        <div>
-            <p class="sr-kicker">Amazon KDP Intelligence</p>
-            <h2 id="sr-amazon-title">
-                Amazon KDP Cost Breakdown
-            </h2>
-        </div>
-    </div>
+        <!-- EXECUTIVE KPIS -->
 
-    <div class="sr-kpi-grid">
-        <article class="sr-kpi">
-            <span>Estimated retail sales</span>
-            <strong id="sr-amazon-retail">—</strong>
-            <small>Net copies × reported average offer price</small>
-        </article>
-
-        <article class="sr-kpi">
-            <span>Manufacturing costs</span>
-            <strong id="sr-amazon-print">—</strong>
-            <small>Reported print production costs</small>
-        </article>
-
-        <article class="sr-kpi">
-            <span>eBook delivery costs</span>
-            <strong id="sr-amazon-delivery">—</strong>
-            <small>Reported KDP digital delivery charges</small>
-        </article>
-
-        <article class="sr-kpi">
-            <span>Blackwood royalties</span>
-            <strong id="sr-amazon-royalties">—</strong>
-            <small>Reported KDP royalty amounts</small>
-        </article>
-
-
-        
-<article class="sr-kpi">
-    <span>Kindle Unlimited page-read royalties</span>
-    <strong id="sr-amazon-pages">—</strong>
-    <small>
-        Estimated KDP page-read royalties · GBP only
-    </small>
-</article>
-
-<article class="sr-kpi">
-    <span>Combined KDP royalties</span>
-    <strong id="sr-amazon-combined">—</strong>
-    <small>
-        Reported book royalties plus estimated page-read royalties
-    </small>
-</article>
-
-        <article class="sr-kpi">
-            <span>Estimated Amazon remainder</span>
-            <strong id="sr-amazon-remainder">—</strong>
-            <small>
-                Retail less manufacturing, delivery and royalties
-            </small>
-        </article>
-    </div>
-
-    <p class="sr-warning">
-        This is an estimated sales reconciliation.
-    </p>
-</section>
-
-        
         <section aria-labelledby="sr-kpi-title">
+
             <div class="sr-section-heading">
                 <div>
                     <p class="sr-kicker">Executive Overview</p>
-                    <h2 id="sr-kpi-title">Publishing KPIs</h2>
+                    <h2 id="sr-kpi-title">
+                        Publishing KPIs
+                    </h2>
                 </div>
             </div>
 
             <div class="sr-kpi-grid">
+
                 <article class="sr-kpi">
-                    <span>KDP royalties</span>
+                    <span>KDP book royalties</span>
                     <strong id="sr-kpi-royalties">—</strong>
-                    <small>Confirmed KDP royalty report values</small>
+                    <small>
+                        Reported book royalties, GBP reporting basis
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
                     <span>KDP net copies</span>
                     <strong id="sr-kpi-copies">—</strong>
-                    <small id="sr-kpi-copy-detail">Sales less refunds</small>
+                    <small id="sr-kpi-copy-detail">
+                        Sales less refunds
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
-                    <span>Kindle+ estimate</span>
+                    <span>Kindle Unlimited estimate</span>
                     <strong id="sr-kpi-ku">—</strong>
-                    <small>Estimated only; not confirmed income</small>
+                    <small>
+                        Estimated page-read royalties
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
                     <span>Recorded expenses</span>
                     <strong id="sr-kpi-expenses">—</strong>
-                    <small>Expenses entered into Department 03</small>
+                    <small>
+                        Expenses entered into Department 03
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
                     <span>Previous month</span>
                     <strong id="sr-kpi-previous">—</strong>
-                    <small>KDP royalty comparison</small>
+                    <small>
+                        KDP royalty comparison
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
                     <span>Month-on-month</span>
                     <strong id="sr-kpi-growth">—</strong>
-                    <small>Latest two reported KDP months</small>
+                    <small>
+                        Latest two reported KDP months
+                    </small>
                 </article>
+
             </div>
+
         </section>
 
+        <!-- PERFORMANCE CHARTS -->
+
         <div class="sr-two-columns">
-            <section class="sr-panel" aria-labelledby="sr-trend-title">
+
+            <section
+                class="sr-panel"
+                aria-labelledby="sr-trend-title"
+            >
+
                 <div class="sr-section-heading">
                     <div>
                         <p class="sr-kicker">Performance</p>
-                        <h2 id="sr-trend-title">Monthly Royalties</h2>
+                        <h2 id="sr-trend-title">
+                            Monthly Royalties
+                        </h2>
                     </div>
                 </div>
-                <div id="sr-monthly-chart" class="sr-chart"></div>
+
+                <div
+                    id="sr-monthly-chart"
+                    class="sr-chart"
+                ></div>
+
                 <p class="sr-muted">
-                    KDP royalties in the selected currency.
-                    Each month uses its royalty reporting date.
+                    Book royalties converted to GBP plus
+                    estimated Kindle Unlimited income.
                 </p>
+
             </section>
 
-            <section class="sr-panel" aria-labelledby="sr-format-title">
+            <section
+                class="sr-panel"
+                aria-labelledby="sr-format-title"
+            >
+
                 <div class="sr-section-heading">
                     <div>
                         <p class="sr-kicker">Sales Intelligence</p>
-                        <h2 id="sr-format-title">Sales by Format</h2>
+                        <h2 id="sr-format-title">
+                            Sales by Format
+                        </h2>
                     </div>
                 </div>
-                <div id="sr-format-chart" class="sr-chart"></div>
+
+                <div
+                    id="sr-format-chart"
+                    class="sr-chart"
+                ></div>
+
                 <p class="sr-muted">
                     KDP net copies, including promotional copies.
                 </p>
+
             </section>
+
         </div>
 
+        <!-- CATALOGUE AND PLATFORMS -->
+
         <div class="sr-two-columns">
-            <section class="sr-panel" aria-labelledby="sr-top-title">
+
+            <section
+                class="sr-panel"
+                aria-labelledby="sr-top-title"
+            >
+
                 <div class="sr-section-heading">
                     <div>
-                        <p class="sr-kicker">Catalogue Performance</p>
-                        <h2 id="sr-top-title">Top-Selling Books</h2>
+                        <p class="sr-kicker">
+                            Catalogue Performance
+                        </p>
+                        <h2 id="sr-top-title">
+                            Top-Selling Books
+                        </h2>
                     </div>
                 </div>
+
                 <div class="sr-table-scroll">
+
                     <table>
                         <thead>
                             <tr>
                                 <th>Book</th>
-                                <th class="sr-number">Net copies</th>
-                                <th class="sr-number">Royalties</th>
+                                <th class="sr-number">
+                                    Net copies
+                                </th>
+                                <th class="sr-number">
+                                    Royalties
+                                </th>
                             </tr>
                         </thead>
+
                         <tbody id="sr-top-books"></tbody>
                     </table>
+
                 </div>
+
             </section>
 
-            <section class="sr-panel" aria-labelledby="sr-platform-title">
+            <section
+                class="sr-panel"
+                aria-labelledby="sr-platform-title"
+            >
+
                 <div class="sr-section-heading">
                     <div>
                         <p class="sr-kicker">Distribution</p>
-                        <h2 id="sr-platform-title">Platform Breakdown</h2>
+                        <h2 id="sr-platform-title">
+                            Platform Breakdown
+                        </h2>
                     </div>
                 </div>
+
                 <div id="sr-platform-summary"></div>
+
                 <p class="sr-muted">
-                    KDP royalties, IngramSpark compensation,
-                    Shopify product activity and Tide payments
-                    are displayed as different financial measures.
+                    Amazon KDP royalties, IngramSpark compensation,
+                    Shopify activity and Tide payments are
+                    different financial measures and must
+                    not be treated as interchangeable income.
                 </p>
+
             </section>
+
         </div>
 
-        <section class="sr-panel" aria-labelledby="sr-financial-title">
+        <!-- FINANCIAL YEAR COMPARISON -->
+
+        <section
+            class="sr-panel"
+            aria-labelledby="sr-financial-title"
+        >
+
             <div class="sr-section-heading">
                 <div>
                     <p class="sr-kicker">April–March</p>
-                    <h2 id="sr-financial-title">Financial Year Comparison</h2>
+                    <h2 id="sr-financial-title">
+                        Financial Year Comparison
+                    </h2>
                 </div>
             </div>
+
             <div class="sr-table-scroll">
+
                 <table>
+
                     <thead>
                         <tr>
                             <th>Financial year</th>
-                            <th class="sr-number">KDP net copies</th>
-                            <th class="sr-number">KDP royalties</th>
-                            <th class="sr-number">Kindle+ estimate</th>
-                            <th class="sr-number">Recorded expenses</th>
+
+                            <th class="sr-number">
+                                KDP net copies
+                            </th>
+
+                            <th class="sr-number">
+                                KDP book royalties
+                            </th>
+
+                            <th class="sr-number">
+                                Kindle Unlimited estimate
+                            </th>
+
+                            <th class="sr-number">
+                                Recorded expenses
+                            </th>
                         </tr>
                     </thead>
+
                     <tbody id="sr-financial-years"></tbody>
+
                 </table>
+
             </div>
+
         </section>
 
-        <section class="sr-panel" aria-labelledby="sr-cost-title">
+        <!-- EXPENSES -->
+
+        <section
+            class="sr-panel"
+            aria-labelledby="sr-cost-title"
+        >
+
             <div class="sr-section-heading">
+
                 <div>
-                    <p class="sr-kicker">Financial Management</p>
-                    <h2 id="sr-cost-title">Expenses &amp; Costs</h2>
+                    <p class="sr-kicker">
+                        Financial Management
+                    </p>
+
+                    <h2 id="sr-cost-title">
+                        Expenses &amp; Costs
+                    </h2>
                 </div>
+
                 <p class="sr-muted">
                     Admin-only records · Original currencies preserved
                 </p>
+
             </div>
 
             <form id="sr-expense-form" class="sr-form">
+
                 <label>
                     Date
-                    <input id="sr-expense-date" type="date" required>
+                    <input
+                        id="sr-expense-date"
+                        type="date"
+                        required
+                    >
                 </label>
+
                 <label>
                     Category
-                    <select id="sr-expense-category" required></select>
+                    <select
+                        id="sr-expense-category"
+                        required
+                    ></select>
                 </label>
+
                 <label>
                     Description
-                    <input id="sr-expense-description" type="text"
-                           maxlength="300" required>
+                    <input
+                        id="sr-expense-description"
+                        type="text"
+                        maxlength="300"
+                        required
+                    >
                 </label>
+
                 <label>
                     Amount
-                    <input id="sr-expense-amount" type="number"
-                           min="0" step="0.01" required>
+                    <input
+                        id="sr-expense-amount"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
                 </label>
+
                 <label>
                     Currency
                     <select id="sr-expense-currency"></select>
                 </label>
+
                 <label>
                     Book (optional)
                     <select id="sr-expense-title">
-                        <option value="">Business-wide</option>
+                        <option value="">
+                            Business-wide
+                        </option>
                     </select>
                 </label>
+
                 <label>
                     Supplier (optional)
-                    <input id="sr-expense-supplier" type="text"
-                           maxlength="200">
+                    <input
+                        id="sr-expense-supplier"
+                        type="text"
+                        maxlength="200"
+                    >
                 </label>
+
                 <label class="sr-wide">
                     Notes (optional)
-                    <input id="sr-expense-notes" type="text"
-                           maxlength="500">
+                    <input
+                        id="sr-expense-notes"
+                        type="text"
+                        maxlength="500"
+                    >
                 </label>
+
                 <div class="sr-wide sr-actions">
-                    <button class="sr-button sr-primary" type="submit">
+
+                    <button
+                        class="sr-button sr-primary"
+                        type="submit"
+                    >
                         Save Expense
                     </button>
+
                 </div>
+
             </form>
 
-            <p id="sr-expense-message" class="sr-muted"
-               aria-live="polite"></p>
+            <p
+                id="sr-expense-message"
+                class="sr-muted"
+                aria-live="polite"
+            ></p>
 
             <h3>Recorded Expenses</h3>
+
             <div class="sr-table-scroll">
+
                 <table>
+
                     <thead>
                         <tr>
                             <th>Date</th>
                             <th>Category</th>
                             <th>Description</th>
                             <th>Book</th>
-                            <th class="sr-number">Amount</th>
+                            <th class="sr-number">
+                                Amount
+                            </th>
                             <th>Action</th>
                         </tr>
                     </thead>
+
                     <tbody id="sr-expense-list"></tbody>
+
                 </table>
+
             </div>
+
         </section>
 
+        <!-- BUDGETS AND TARGETS -->
+
         <div class="sr-two-columns">
-            <section class="sr-panel" aria-labelledby="sr-budget-title">
+
+            <section
+                class="sr-panel"
+                aria-labelledby="sr-budget-title"
+            >
+
                 <div class="sr-section-heading">
                     <div>
-                        <p class="sr-kicker">Cost Planning</p>
-                        <h2 id="sr-budget-title">Expense Budgets</h2>
+                        <p class="sr-kicker">
+                            Cost Planning
+                        </p>
+                        <h2 id="sr-budget-title">
+                            Expense Budgets
+                        </h2>
                     </div>
                 </div>
 
                 <form id="sr-budget-form" class="sr-form">
+
                     <label>
                         Start date
-                        <input id="sr-budget-start" type="date" required>
+                        <input
+                            id="sr-budget-start"
+                            type="date"
+                            required
+                        >
                     </label>
+
                     <label>
                         End date
-                        <input id="sr-budget-end" type="date" required>
+                        <input
+                            id="sr-budget-end"
+                            type="date"
+                            required
+                        >
                     </label>
+
                     <label>
                         Category
-                        <select id="sr-budget-category" required></select>
+                        <select
+                            id="sr-budget-category"
+                            required
+                        ></select>
                     </label>
+
                     <label>
                         Budget amount
-                        <input id="sr-budget-amount" type="number"
-                               min="0" step="0.01" required>
+                        <input
+                            id="sr-budget-amount"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
                     </label>
+
                     <label>
                         Currency
                         <select id="sr-budget-currency"></select>
                     </label>
+
                     <label>
                         Book
                         <select id="sr-budget-title">
-                            <option value="">Business-wide</option>
+                            <option value="">
+                                Business-wide
+                            </option>
                         </select>
                     </label>
+
                     <div class="sr-wide">
-                        <button class="sr-button sr-primary" type="submit">
+
+                        <button
+                            class="sr-button sr-primary"
+                            type="submit"
+                        >
                             Save Budget
                         </button>
+
                     </div>
+
                 </form>
 
-                <p id="sr-budget-message" class="sr-muted"
-                   aria-live="polite"></p>
-                <div id="sr-budget-list" class="sr-record-list"></div>
+                <p
+                    id="sr-budget-message"
+                    class="sr-muted"
+                    aria-live="polite"
+                ></p>
+
+                <div
+                    id="sr-budget-list"
+                    class="sr-record-list"
+                ></div>
+
             </section>
 
-            <section class="sr-panel" aria-labelledby="sr-target-title">
+            <section
+                class="sr-panel"
+                aria-labelledby="sr-target-title"
+            >
+
                 <div class="sr-section-heading">
                     <div>
-                        <p class="sr-kicker">Performance Planning</p>
-                        <h2 id="sr-target-title">Targets &amp; Trackers</h2>
+                        <p class="sr-kicker">
+                            Performance Planning
+                        </p>
+                        <h2 id="sr-target-title">
+                            Targets &amp; Trackers
+                        </h2>
                     </div>
                 </div>
 
                 <form id="sr-target-form" class="sr-form">
+
                     <label>
                         Start date
-                        <input id="sr-target-start" type="date" required>
+                        <input
+                            id="sr-target-start"
+                            type="date"
+                            required
+                        >
                     </label>
+
                     <label>
                         End date
-                        <input id="sr-target-end" type="date" required>
+                        <input
+                            id="sr-target-end"
+                            type="date"
+                            required
+                        >
                     </label>
+
                     <label>
                         Metric
                         <select id="sr-target-metric">
-                            <option value="net_copies">KDP net copies</option>
-                            <option value="royalties">KDP royalties</option>
-                            <option value="kindle_pages">Kindle+ pages</option>
-                            <option value="direct_receipts">Tide receipts</option>
-                            <option value="profit">Profit — pending full cost data</option>
+
+                            <option value="net_copies">
+                                KDP net copies
+                            </option>
+
+                            <option value="royalties">
+                                KDP book royalties
+                            </option>
+
+                            <option value="kindle_pages">
+                                Kindle Unlimited pages
+                            </option>
+
+                            <option value="direct_receipts">
+                                Tide receipts
+                            </option>
+
+                            <option value="profit">
+                                Profit — pending full cost data
+                            </option>
+
                         </select>
                     </label>
+
                     <label>
                         Target value
-                        <input id="sr-target-value" type="number"
-                               min="0" step="0.0001" required>
+                        <input
+                            id="sr-target-value"
+                            type="number"
+                            min="0"
+                            step="0.0001"
+                            required
+                        >
                     </label>
+
                     <label>
                         Currency
                         <select id="sr-target-currency"></select>
                     </label>
+
                     <label>
                         Book
                         <select id="sr-target-title">
-                            <option value="">All books</option>
+                            <option value="">
+                                All books
+                            </option>
                         </select>
                     </label>
+
                     <label>
                         Format
                         <select id="sr-target-format">
-                            <option value="">All formats</option>
-                            <option value="ebook">eBook</option>
-                            <option value="paperback">Paperback</option>
-                            <option value="hardcover">Hardcover</option>
+
+                            <option value="">
+                                All formats
+                            </option>
+
+                            <option value="ebook">
+                                eBook
+                            </option>
+
+                            <option value="paperback">
+                                Paperback
+                            </option>
+
+                            <option value="hardcover">
+                                Hardcover
+                            </option>
+
                         </select>
                     </label>
+
                     <div class="sr-wide">
-                        <button class="sr-button sr-primary" type="submit">
+
+                        <button
+                            class="sr-button sr-primary"
+                            type="submit"
+                        >
                             Save Target
                         </button>
+
                     </div>
+
                 </form>
 
-                <p id="sr-target-message" class="sr-muted"
-                   aria-live="polite"></p>
-                <div id="sr-target-list" class="sr-record-list"></div>
+                <p
+                    id="sr-target-message"
+                    class="sr-muted"
+                    aria-live="polite"
+                ></p>
+
+                <div
+                    id="sr-target-list"
+                    class="sr-record-list"
+                ></div>
+
             </section>
+
         </div>
 
-        <section class="sr-panel" aria-labelledby="sr-profit-title">
+        <!-- BOOK PROFITABILITY -->
+
+        <section
+            class="sr-panel"
+            aria-labelledby="sr-profit-title"
+        >
+
             <div class="sr-section-heading">
                 <div>
-                    <p class="sr-kicker">Title Intelligence</p>
-                    <h2 id="sr-profit-title">Book Profitability</h2>
+
+                    <p class="sr-kicker">
+                        Title Intelligence
+                    </p>
+
+                    <h2 id="sr-profit-title">
+                        Book Profitability
+                    </h2>
+
                 </div>
             </div>
 
             <p class="sr-warning">
                 This is a partial contribution view, not confirmed
-                accounting profit. It compares KDP royalties with
-                expenses explicitly allocated to each book.
-                Unallocated business overheads, unrecorded costs
-                and other income streams are excluded.
+                accounting profit. It compares KDP royalties
+                with expenses allocated to each book.
+                Unallocated overheads, unrecorded costs and
+                other income streams are excluded.
             </p>
 
             <div class="sr-table-scroll">
+
                 <table>
+
                     <thead>
                         <tr>
                             <th>Book</th>
-                            <th class="sr-number">KDP royalties</th>
-                            <th class="sr-number">Allocated costs</th>
-                            <th class="sr-number">Partial contribution</th>
+
+                            <th class="sr-number">
+                                KDP royalties
+                            </th>
+
+                            <th class="sr-number">
+                                Allocated costs
+                            </th>
+
+                            <th class="sr-number">
+                                Partial contribution
+                            </th>
                         </tr>
                     </thead>
+
                     <tbody id="sr-profit-list"></tbody>
+
                 </table>
+
             </div>
+
         </section>
 
+        <!-- FOOTER -->
+
         <footer class="sr-dashboard-footer">
+
             Blackwood Publishing · Department 03
-            <span>Private Management Reporting</span>
+
+            <span>
+                Private Management Reporting
+            </span>
+
         </footer>
+
     </main>
 
     <div id="footer-placeholder"></div>
+
 </body>
 </html>
