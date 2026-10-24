@@ -967,9 +967,14 @@ function calculateAmazonCosts(rows) {
     };
 }
 
+
 function renderAmazonCosts() {
     const result = calculateAmazonCosts(filteredRoyalties());
     const selectedCurrency = currency();
+
+    const pageRoyalties = selectedCurrency === "GBP"
+        ? sum(filteredPages(), "estimated_royalty_gbp")
+        : null;
 
     $("sr-amazon-retail").textContent =
         money(result.retail, selectedCurrency);
@@ -983,9 +988,20 @@ function renderAmazonCosts() {
     $("sr-amazon-royalties").textContent =
         money(result.royalties, selectedCurrency);
 
+    $("sr-amazon-pages").textContent =
+        pageRoyalties === null
+            ? "GBP only"
+            : money(pageRoyalties, "GBP");
+
+    $("sr-amazon-combined").textContent =
+        pageRoyalties === null
+            ? "GBP only"
+            : money(result.royalties + pageRoyalties, "GBP");
+
     $("sr-amazon-remainder").textContent =
         money(result.remainder, selectedCurrency);
 }
+
     
     
     function renderFinancialYears() {
