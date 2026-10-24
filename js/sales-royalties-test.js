@@ -4,6 +4,7 @@
 // ==========================================
 // BLACKWOOD PUBLISHING
 // DEPARTMENT 03 — SALES & ROYALTIES
+// TEST VERSION — RETAIL SALES INTELLIGENCE
 // ==========================================
 
 (function () {
@@ -146,19 +147,27 @@
     }
 
     function sum(rows, key) {
-        return rows.reduce((total, row) => total + number(row[key]), 0);
+        return rows.reduce(
+            (total, row) => total + number(row[key]),
+            0
+        );
     }
 
     function titleMap() {
-        return new Map(data.titles.map(row => [row.id, row]));
+        return new Map(
+            data.titles.map(row => [row.id, row])
+        );
     }
 
     function editionMap() {
-        return new Map(data.editions.map(row => [row.id, row]));
+        return new Map(
+            data.editions.map(row => [row.id, row])
+        );
     }
 
     function titleName(id) {
         if (!id) return "Business-wide";
+
         return titleMap().get(id)?.title || "Unknown book";
     }
 
@@ -200,7 +209,6 @@
             return false;
         }
 
-        // Business-wide costs are not attributed to a specific format.
         return selectedFormat() === "all";
     }
 
@@ -239,6 +247,7 @@
 
     async function verifyAccess() {
         const version = ++accessVersion;
+
         lock();
         accessMessage("Checking administrator permissions...");
 
@@ -248,7 +257,9 @@
             if (version !== accessVersion) return;
 
             if (userResult.error || !userResult.data.user) {
-                accessMessage("Please sign in through The Archivists.");
+                accessMessage(
+                    "Please sign in through The Archivists."
+                );
                 return;
             }
 
@@ -277,14 +288,20 @@
 
         } catch (error) {
             if (version !== accessVersion) return;
-            console.error("Department 03 access error:", error);
+
+            console.error(
+                "Department 03 access error:",
+                error
+            );
+
             lock();
-            accessMessage("Unable to verify management access.");
+
+            accessMessage(
+                "Unable to verify management access."
+            );
         }
     }
 
-    // Fetch every page rather than silently stopping
-    // at Supabase's default 1,000-row response limit.
     async function fetchAll(table, columns, version) {
         const results = [];
         const pageSize = 500;
@@ -292,7 +309,9 @@
 
         while (true) {
             if (version !== accessVersion) {
-                throw new Error("Access changed while loading.");
+                throw new Error(
+                    "Access changed while loading."
+                );
             }
 
             const response = await db
@@ -314,133 +333,174 @@
         return results;
     }
 
-    
-async function refresh(version = accessVersion) {
-    status("Loading live Blackwood financial records...");
+    async function refresh(version = accessVersion) {
+        status(
+            "Loading live Blackwood financial records..."
+        );
 
-    const specs = [
-        ["titles", "publishing_titles",
-            "id,title,author_name"],
+        const specs = [
+            [
+                "titles",
+                "publishing_titles",
+                "id,title,author_name"
+            ],
+            [
+                "editions",
+                "publishing_editions",
+                "id,title_id,format,isbn,asin"
+            ],
+            [
+                "royalties",
+                "publishing_kdp_royalties",
+                "id,edition_id,format,royalty_month," +
+                "units_sold,units_refunded,net_units_sold," +
+                "average_list_price,average_offer_price," +
+                "royalty_amount,currency,transaction_type,marketplace"
+            ],
+            [
+                "pages",
+                "publishing_kdp_page_reads",
+                "id,edition_id,reading_month,pages_read," +
+                "pages_listened,total_pages,estimated_royalty_gbp"
+            ],
+            [
+                "batches",
+                "sales_report_batches",
+                "id,platform,report_name,period_start,period_end,currency"
+            ],
+            [
+                "lines",
+                "sales_report_lines",
+                "id,batch_id,reporting_month,net_quantity," +
+                "gross_quantity,returned_quantity,reversed_quantity," +
+                "orders_count,net_compensation,payment_received_date," +
+                "payment_amount,order_date,product_title"
+            ],
+            [
+                "links",
+                "sales_product_links",
+                "id,sales_line_id,edition_id,title_id"
+            ],
+            [
+                "expenses",
+                "publishing_expenses",
+                "id,expense_date,category,description,amount," +
+                "currency,title_id,edition_id,supplier,notes,created_at"
+            ],
+            [
+                "budgets",
+                "publishing_budgets",
+                "id,period_start,period_end,category,budget_amount," +
+                "currency,title_id,notes,created_at"
+            ],
+            [
+                "targets",
+                "publishing_targets",
+                "id,period_start,period_end,metric,target_value," +
+                "currency,title_id,format,notes,created_at"
+            ]
+        ];
 
-        ["editions", "publishing_editions",
-            "id,title_id,format,isbn,asin"],
+        try {
+            for (const [key, table, columns] of specs) {
+                status(`Loading ${table}...`);
 
-        ["royalties", "publishing_kdp_royalties",
-    "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,average_list_price,average_offer_price,royalty_amount,currency,transaction_type,marketplace"],
+                const rows = await fetchAll(
+                    table,
+                    columns,
+                    version
+                );
 
-        ["pages", "publishing_kdp_page_reads",
-            "id,edition_id,reading_month,pages_read,pages_listened,total_pages,estimated_royalty_gbp"],
+                if (!Array.isArray(rows)) {
+                    throw new Error(
+                        `${table} returned an invalid response.`
+                    );
+                }
 
-        ["batches", "sales_report_batches",
-            "id,platform,report_name,period_start,period_end,currency"],
+                data[key] = rows;
 
-        ["lines", "sales_report_lines",
-            "id,batch_id,reporting_month,net_quantity,gross_quantity,returned_quantity,reversed_quantity,orders_count,net_compensation,payment_received_date,payment_amount,order_date,product_title"],
-
-        ["links", "sales_product_links",
-            "id,sales_line_id,edition_id,title_id"],
-
-        ["expenses", "publishing_expenses",
-            "id,expense_date,category,description,amount,currency,title_id,edition_id,supplier,notes,created_at"],
-
-        ["budgets", "publishing_budgets",
-            "id,period_start,period_end,category,budget_amount,currency,title_id,notes,created_at"],
-
-        ["targets", "publishing_targets",
-            "id,period_start,period_end,metric,target_value,currency,title_id,format,notes,created_at"]
-    ];
-
-    try {
-        for (const [key, table, columns] of specs) {
-            status(`Loading ${table}...`);
-
-            const rows = await fetchAll(table, columns, version);
-
-            if (!Array.isArray(rows)) {
-                throw new Error(
-                    `${table} returned an invalid response.`
+                console.log(
+                    `Department 03: ${table} loaded ` +
+                    `${rows.length} records`
                 );
             }
 
-            data[key] = rows;
+            if (version !== accessVersion) return;
 
-            console.log(
-                `Department 03: ${table} loaded ${rows.length} records`
+            loaded = true;
+
+            status(
+                "Database records loaded. Preparing dashboard..."
             );
+
+            console.log("Department 03 data check:", {
+                titles: data.titles?.length,
+                editions: data.editions?.length,
+                royalties: data.royalties?.length,
+                pages: data.pages?.length,
+                batches: data.batches?.length,
+                lines: data.lines?.length,
+                links: data.links?.length,
+                expenses: data.expenses?.length,
+                budgets: data.budgets?.length,
+                targets: data.targets?.length
+            });
+
+            try {
+                populateFilters();
+            } catch (error) {
+                throw new Error(
+                    "populateFilters failed: " + error.message,
+                    { cause: error }
+                );
+            }
+
+            status(
+                "Calculating dashboard figures..."
+            );
+
+            try {
+                render();
+            } catch (error) {
+                throw new Error(
+                    "render failed: " + error.message,
+                    { cause: error }
+                );
+            }
+
+            status(
+                "Dashboard loaded successfully. " +
+                `${integer(data.royalties.length)} KDP royalty rows, ` +
+                `${integer(data.pages.length)} Kindle+ rows, ` +
+                `${integer(data.expenses.length)} expenses.`
+            );
+
+        } catch (error) {
+            if (version !== accessVersion) return;
+
+            console.error(
+                "Department 03 load error:",
+                error
+            );
+
+            loaded = false;
+
+            const details = [
+                error?.message,
+                error?.stack?.split("\n")[1]?.trim(),
+                error?.details,
+                error?.hint,
+                error?.code
+            ].filter(Boolean).join(" | ");
+
+            status(
+                "Department 03 error: " +
+                (details || "Unknown error.")
+            );
+
+            clearOutputs();
         }
-
-        if (version !== accessVersion) return;
-
-        
-loaded = true;
-
-status("Database records loaded. Preparing dashboard...");
-
-console.log("Department 03 data check:", {
-    titles: data.titles?.length,
-    editions: data.editions?.length,
-    royalties: data.royalties?.length,
-    pages: data.pages?.length,
-    batches: data.batches?.length,
-    lines: data.lines?.length,
-    links: data.links?.length,
-    expenses: data.expenses?.length,
-    budgets: data.budgets?.length,
-    targets: data.targets?.length
-});
-
-try {
-    populateFilters();
-} catch (error) {
-    throw new Error(
-        "populateFilters failed: " + error.message,
-        { cause: error }
-    );
-}
-
-status("Calculating dashboard figures...");
-
-try {
-    render();
-} catch (error) {
-    throw new Error(
-        "render failed: " + error.message,
-        { cause: error }
-    );
-}
-
-
-        status(
-            "Dashboard loaded successfully. " +
-            `${integer(data.royalties.length)} KDP royalty rows, ` +
-            `${integer(data.pages.length)} Kindle+ rows, ` +
-            `${integer(data.expenses.length)} expenses.`
-        );
-
-    } catch (error) {
-        if (version !== accessVersion) return;
-
-        console.error("Department 03 load error:", error);
-
-        loaded = false;
-
-        const details = [
-            error?.message,
-            error?.stack?.split("\n")[1]?.trim(),
-            error?.details,
-            error?.hint,
-            error?.code
-        ].filter(Boolean).join(" | ");
-
-        status(
-            "Department 03 error: " +
-            (details || "Unknown error.")
-        );
-
-        clearOutputs();
     }
-}
-
 
     function clearOutputs() {
         document.querySelectorAll(
@@ -450,122 +510,163 @@ try {
         });
 
         [
-            "sr-monthly-chart", "sr-format-chart",
-            "sr-top-books", "sr-platform-summary",
-            "sr-financial-years", "sr-expense-list",
-            "sr-budget-list", "sr-target-list",
+            "sr-retail-value",
+            "sr-retail-exceptions",
+            "sr-retail-exception-copies"
+        ].forEach(id => {
+            const element = $(id);
+
+            if (element) {
+                element.textContent = "—";
+            }
+        });
+
+        [
+            "sr-monthly-chart",
+            "sr-format-chart",
+            "sr-top-books",
+            "sr-platform-summary",
+            "sr-financial-years",
+            "sr-expense-list",
+            "sr-budget-list",
+            "sr-target-list",
             "sr-profit-list"
         ].forEach(id => {
             $(id).replaceChildren();
         });
     }
 
-    
-function populateFilters() {
-    const today = dateOnly(new Date());
-    const thisFY = fyStart(today);
+    function populateFilters() {
+        const today = dateOnly(new Date());
+        const thisFY = fyStart(today);
 
-    const dates = [
-        ...data.royalties.map(row => row.royalty_month),
-        ...data.pages.map(row => row.reading_month),
-        ...data.lines.map(row => row.reporting_month),
-        ...data.expenses.map(row => row.expense_date)
-    ].filter(Boolean);
+        const dates = [
+            ...data.royalties.map(row => row.royalty_month),
+            ...data.pages.map(row => row.reading_month),
+            ...data.lines.map(row => row.reporting_month),
+            ...data.expenses.map(row => row.expense_date)
+        ].filter(Boolean);
 
-    const earliest = dates.length
-        ? Math.min(thisFY, ...dates.map(fyStart))
-        : thisFY;
+        const earliest = dates.length
+            ? Math.min(
+                thisFY,
+                ...dates.map(fyStart)
+            )
+            : thisFY;
 
-    const latest = dates.length
-        ? Math.max(thisFY, ...dates.map(fyStart))
-        : thisFY;
+        const latest = dates.length
+            ? Math.max(
+                thisFY,
+                ...dates.map(fyStart)
+            )
+            : thisFY;
 
-    // Financial year selector
-    const yearSelect = $("sr-year");
-    const previousYear = yearSelect.value;
+        const yearSelect = $("sr-year");
+        const previousYear = yearSelect.value;
+        const yearOptions = [];
 
-    const yearOptions = [];
+        for (let year = latest; year >= earliest; year--) {
+            yearOptions.push(
+                new Option(
+                    labelFY(year),
+                    String(year)
+                )
+            );
+        }
 
-    for (let year = latest; year >= earliest; year--) {
-        yearOptions.push(
-            new Option(labelFY(year), String(year))
-        );
-    }
+        yearSelect.replaceChildren(...yearOptions);
 
-    yearSelect.replaceChildren(...yearOptions);
-
-    const validYears = yearOptions.map(option => option.value);
-
-    yearSelect.value = validYears.includes(previousYear)
-        ? previousYear
-        : String(thisFY);
-
-    // Reporting currency selector
-    const currencySelect = $("sr-currency");
-    const previousCurrency = currencySelect.value || "GBP";
-
-    const currencies = [...new Set([
-        ...CURRENCIES,
-        ...data.royalties.map(row => row.currency),
-        ...data.batches.map(row => row.currency),
-        ...data.expenses.map(row => row.currency)
-    ])].filter(Boolean).sort();
-
-    currencySelect.replaceChildren(
-        ...currencies.map(code => new Option(code, code))
-    );
-
-    currencySelect.value = currencies.includes(previousCurrency)
-        ? previousCurrency
-        : "GBP";
-
-    // Book selector
-    const books = [...data.titles].sort(
-        (a, b) => a.title.localeCompare(b.title)
-    );
-
-    const titleSelect = $("sr-title-filter");
-    const previousTitle = titleSelect.value || "all";
-
-    titleSelect.replaceChildren(
-        new Option("All books", "all"),
-        ...books.map(book => new Option(book.title, book.id))
-    );
-
-    titleSelect.value =
-        previousTitle === "all" ||
-        books.some(book => book.id === previousTitle)
-            ? previousTitle
-            : "all";
-
-    // Financial record forms
-    const formSelectors = [
-        "sr-expense-title",
-        "sr-budget-title",
-        "sr-target-title"
-    ];
-
-    for (const id of formSelectors) {
-        const select = $(id);
-        const previousValue = select.value;
-
-        const firstLabel = id === "sr-target-title"
-            ? "All books"
-            : "Business-wide";
-
-        select.replaceChildren(
-            new Option(firstLabel, ""),
-            ...books.map(book => new Option(book.title, book.id))
+        const validYears = yearOptions.map(
+            option => option.value
         );
 
-        select.value = books.some(book => book.id === previousValue)
-            ? previousValue
-            : "";
+        yearSelect.value =
+            validYears.includes(previousYear)
+                ? previousYear
+                : String(thisFY);
+
+        const currencySelect = $("sr-currency");
+        const previousCurrency =
+            currencySelect.value || "GBP";
+
+        const currencies = [...new Set([
+            ...CURRENCIES,
+            ...data.royalties.map(row => row.currency),
+            ...data.batches.map(row => row.currency),
+            ...data.expenses.map(row => row.currency)
+        ])].filter(Boolean).sort();
+
+        currencySelect.replaceChildren(
+            ...currencies.map(
+                code => new Option(code, code)
+            )
+        );
+
+        currencySelect.value =
+            currencies.includes(previousCurrency)
+                ? previousCurrency
+                : "GBP";
+
+        const books = [...data.titles].sort(
+            (a, b) => a.title.localeCompare(b.title)
+        );
+
+        const titleSelect = $("sr-title-filter");
+        const previousTitle =
+            titleSelect.value || "all";
+
+        titleSelect.replaceChildren(
+            new Option("All books", "all"),
+            ...books.map(
+                book => new Option(book.title, book.id)
+            )
+        );
+
+        titleSelect.value =
+            previousTitle === "all" ||
+            books.some(
+                book => book.id === previousTitle
+            )
+                ? previousTitle
+                : "all";
+
+        const formSelectors = [
+            "sr-expense-title",
+            "sr-budget-title",
+            "sr-target-title"
+        ];
+
+        for (const id of formSelectors) {
+            const select = $(id);
+            const previousValue = select.value;
+
+            const firstLabel =
+                id === "sr-target-title"
+                    ? "All books"
+                    : "Business-wide";
+
+            select.replaceChildren(
+                new Option(firstLabel, ""),
+                ...books.map(
+                    book => new Option(
+                        book.title,
+                        book.id
+                    )
+                )
+            );
+
+            select.value =
+                books.some(
+                    book => book.id === previousValue
+                )
+                    ? previousValue
+                    : "";
+        }
     }
-}
 
-
-    function filteredRoyalties(range = selectedRange()) {
+    function filteredRoyalties(
+        range = selectedRange()
+    ) {
         return data.royalties.filter(row =>
             row.currency === currency() &&
             inRange(row.royalty_month, range) &&
@@ -573,15 +674,18 @@ function populateFilters() {
         );
     }
 
-    function filteredPages(range = selectedRange()) {
-        // Estimated royalty is GBP only.
+    function filteredPages(
+        range = selectedRange()
+    ) {
         return data.pages.filter(row =>
             inRange(row.reading_month, range) &&
             matchesPageScope(row)
         );
     }
 
-    function filteredExpenses(range = selectedRange()) {
+    function filteredExpenses(
+        range = selectedRange()
+    ) {
         return data.expenses.filter(row =>
             row.currency === currency() &&
             inRange(row.expense_date, range) &&
@@ -589,16 +693,130 @@ function populateFilters() {
         );
     }
 
+    // ==========================================
+    // NEW: ESTIMATED KDP RETAIL SALES
+    // ==========================================
+    //
+    // This reproduces the SQL benchmark:
+    //
+    // SUM(
+    //   CASE WHEN average_offer_price > 0
+    //   THEN net_units_sold * average_offer_price
+    //   ELSE 0 END
+    // )
+    //
+    // Price exceptions:
+    // average_offer_price = 0
+    // AND royalty_amount > 0
+    //
+    // These values are estimates, not confirmed
+    // transaction-level customer receipts.
+    // ==========================================
+
+    function calculateRetailSales(rows) {
+        let estimatedRetailSales = 0;
+        let priceExceptionRows = 0;
+        let exceptionCopies = 0;
+
+        for (const row of rows) {
+            const offerPrice =
+                row.average_offer_price === null ||
+                row.average_offer_price === undefined
+                    ? null
+                    : Number(row.average_offer_price);
+
+            const netCopies = number(
+                row.net_units_sold
+            );
+
+            const royaltyAmount = number(
+                row.royalty_amount
+            );
+
+            if (
+                offerPrice !== null &&
+                Number.isFinite(offerPrice) &&
+                offerPrice > 0
+            ) {
+                estimatedRetailSales +=
+                    netCopies * offerPrice;
+
+                continue;
+            }
+
+            // Missing or zero reported offer price
+            // with a positive royalty is unresolved.
+            //
+            // Do not substitute list price.
+            // Do not classify it as a free promotion.
+
+            if (
+                (offerPrice === null ||
+                    offerPrice === 0 ||
+                    !Number.isFinite(offerPrice)) &&
+                royaltyAmount > 0
+            ) {
+                priceExceptionRows += 1;
+                exceptionCopies += netCopies;
+            }
+        }
+
+        return {
+            estimatedRetailSales,
+            priceExceptionRows,
+            exceptionCopies
+        };
+    }
+
+    function renderRetailSales() {
+        const rows = filteredRoyalties();
+
+        const results = calculateRetailSales(
+            rows
+        );
+
+        $("sr-retail-value").textContent =
+            money(
+                results.estimatedRetailSales,
+                currency()
+            );
+
+        $("sr-retail-exceptions").textContent =
+            integer(
+                results.priceExceptionRows
+            );
+
+        $("sr-retail-exception-copies").textContent =
+            integer(
+                results.exceptionCopies
+            );
+    }
+
+    // ==========================================
+    // EXISTING DASHBOARD REPORTING
+    // ==========================================
+
     function monthKey(date) {
         return date?.slice(0, 7) || "";
     }
 
     function previousMonth(key) {
-        const [year, month] = key.split("-").map(Number);
-        const date = new Date(year, month - 2, 1);
-        return `${date.getFullYear()}-${String(
-            date.getMonth() + 1
-        ).padStart(2, "0")}`;
+        const [year, month] = key
+            .split("-")
+            .map(Number);
+
+        const date = new Date(
+            year,
+            month - 2,
+            1
+        );
+
+        return (
+            `${date.getFullYear()}-` +
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0")
+        );
     }
 
     function renderKPIs() {
@@ -607,25 +825,41 @@ function populateFilters() {
         const expenses = filteredExpenses();
 
         $("sr-kpi-royalties").textContent =
-            money(sum(rows, "royalty_amount"), currency());
+            money(
+                sum(rows, "royalty_amount"),
+                currency()
+            );
 
         $("sr-kpi-copies").textContent =
-            integer(sum(rows, "net_units_sold"));
+            integer(
+                sum(rows, "net_units_sold")
+            );
 
         $("sr-kpi-copy-detail").textContent =
             `${integer(sum(rows, "units_sold"))} sold · ` +
             `${integer(sum(rows, "units_refunded"))} refunded`;
 
-        $("sr-kpi-ku").textContent = currency() === "GBP"
-            ? money(sum(pages, "estimated_royalty_gbp"))
-            : "GBP only";
+        $("sr-kpi-ku").textContent =
+            currency() === "GBP"
+                ? money(
+                    sum(
+                        pages,
+                        "estimated_royalty_gbp"
+                    )
+                )
+                : "GBP only";
 
         $("sr-kpi-expenses").textContent =
-            money(sum(expenses, "amount"), currency());
+            money(
+                sum(expenses, "amount"),
+                currency()
+            );
 
-        const months = [...new Set(rows.map(row =>
-            monthKey(row.royalty_month)
-        ))].filter(Boolean).sort();
+        const months = [...new Set(
+            rows.map(
+                row => monthKey(row.royalty_month)
+            )
+        )].filter(Boolean).sort();
 
         if (!months.length) {
             $("sr-kpi-previous").textContent = "—";
@@ -633,21 +867,36 @@ function populateFilters() {
             return;
         }
 
-        const latest = months[months.length - 1];
+        const latest =
+            months[months.length - 1];
+
         const prior = previousMonth(latest);
 
         const currentTotal = sum(
-            rows.filter(row => monthKey(row.royalty_month) === latest),
+            rows.filter(
+                row =>
+                    monthKey(
+                        row.royalty_month
+                    ) === latest
+            ),
             "royalty_amount"
         );
 
         const previousTotal = sum(
-            rows.filter(row => monthKey(row.royalty_month) === prior),
+            rows.filter(
+                row =>
+                    monthKey(
+                        row.royalty_month
+                    ) === prior
+            ),
             "royalty_amount"
         );
 
         $("sr-kpi-previous").textContent =
-            money(previousTotal, currency());
+            money(
+                previousTotal,
+                currency()
+            );
 
         $("sr-kpi-growth").textContent =
             previousTotal > 0
@@ -658,47 +907,87 @@ function populateFilters() {
                 : "N/A";
     }
 
-    function barRow(label, value, maximum, display) {
+    function barRow(
+        label,
+        value,
+        maximum,
+        display
+    ) {
         const width = maximum > 0
-            ? Math.max(0, Math.min(100, value / maximum * 100))
+            ? Math.max(
+                0,
+                Math.min(
+                    100,
+                    value / maximum * 100
+                )
+            )
             : 0;
 
         return `
             <div class="sr-bar-row">
-                <span class="sr-bar-label">${escapeHtml(label)}</span>
+                <span class="sr-bar-label">
+                    ${escapeHtml(label)}
+                </span>
                 <span class="sr-bar-track">
                     <span class="sr-bar-fill"
                           style="width:${width}%"></span>
                 </span>
-                <span class="sr-bar-value">${escapeHtml(display)}</span>
+                <span class="sr-bar-value">
+                    ${escapeHtml(display)}
+                </span>
             </div>
         `;
     }
 
     function renderMonthly() {
-        const year = Number($("sr-year").value);
-        const rows = filteredRoyalties(fyRange(year));
-        const monthFilter = $("sr-month").value;
+        const year = Number(
+            $("sr-year").value
+        );
+
+        const rows = filteredRoyalties(
+            fyRange(year)
+        );
+
+        const monthFilter =
+            $("sr-month").value;
 
         const monthly = [];
 
-        for (let index = 0; index < 12; index++) {
-            const calendarMonth = ((index + 3) % 12) + 1;
-            const calendarYear = index < 9 ? year : year + 1;
-            const key = `${calendarYear}-${String(
-                calendarMonth
-            ).padStart(2, "0")}`;
+        for (
+            let index = 0;
+            index < 12;
+            index++
+        ) {
+            const calendarMonth =
+                ((index + 3) % 12) + 1;
 
-            if (monthFilter !== "all" &&
-                Number(monthFilter) !== calendarMonth) {
+            const calendarYear =
+                index < 9
+                    ? year
+                    : year + 1;
+
+            const key =
+                `${calendarYear}-` +
+                String(
+                    calendarMonth
+                ).padStart(2, "0");
+
+            if (
+                monthFilter !== "all" &&
+                Number(monthFilter) !==
+                    calendarMonth
+            ) {
                 continue;
             }
 
             monthly.push({
                 label: MONTHS[index],
                 value: sum(
-                    rows.filter(row =>
-                        monthKey(row.royalty_month) === key
+                    rows.filter(
+                        row =>
+                            monthKey(
+                                row.royalty_month
+                            ) === key
                     ),
                     "royalty_amount"
                 )
@@ -707,91 +996,172 @@ function populateFilters() {
 
         const max = Math.max(
             0,
-            ...monthly.map(item => Math.max(0, item.value))
+            ...monthly.map(
+                item =>
+                    Math.max(
+                        0,
+                        item.value
+                    )
+            )
         );
 
-        $("sr-monthly-chart").innerHTML = monthly.map(item =>
-            barRow(
-                item.label,
-                Math.max(0, item.value),
-                max,
-                money(item.value, currency())
-            )
-        ).join("");
+        $("sr-monthly-chart").innerHTML =
+            monthly.map(
+                item => barRow(
+                    item.label,
+                    Math.max(
+                        0,
+                        item.value
+                    ),
+                    max,
+                    money(
+                        item.value,
+                        currency()
+                    )
+                )
+            ).join("");
     }
 
     function renderFormats() {
         const rows = filteredRoyalties();
-        const formats = ["ebook", "paperback", "hardcover"];
 
-        const values = formats.map(format => ({
-            label: format === "ebook"
-                ? "eBook"
-                : format[0].toUpperCase() + format.slice(1),
-            value: sum(
-                rows.filter(row => row.format === format),
-                "net_units_sold"
-            )
-        }));
+        const formats = [
+            "ebook",
+            "paperback",
+            "hardcover"
+        ];
+
+        const values = formats.map(
+            format => ({
+                label:
+                    format === "ebook"
+                        ? "eBook"
+                        : format[0].toUpperCase() +
+                          format.slice(1),
+
+                value: sum(
+                    rows.filter(
+                        row =>
+                            row.format === format
+                    ),
+                    "net_units_sold"
+                )
+            })
+        );
 
         const max = Math.max(
             0,
-            ...values.map(item => Math.max(0, item.value))
+            ...values.map(
+                item =>
+                    Math.max(
+                        0,
+                        item.value
+                    )
+            )
         );
 
-        $("sr-format-chart").innerHTML = values.map(item =>
-            barRow(
-                item.label,
-                Math.max(0, item.value),
-                max,
-                integer(item.value)
-            )
-        ).join("");
+        $("sr-format-chart").innerHTML =
+            values.map(
+                item => barRow(
+                    item.label,
+                    Math.max(
+                        0,
+                        item.value
+                    ),
+                    max,
+                    integer(
+                        item.value
+                    )
+                )
+            ).join("");
     }
 
     function renderTopBooks() {
         const totals = new Map();
 
-        filteredRoyalties().forEach(row => {
-            const id = royaltyTitle(row);
-            if (!id) return;
+        filteredRoyalties().forEach(
+            row => {
+                const id =
+                    royaltyTitle(row);
 
-            if (!totals.has(id)) {
-                totals.set(id, { copies: 0, royalties: 0 });
+                if (!id) return;
+
+                if (!totals.has(id)) {
+                    totals.set(
+                        id,
+                        {
+                            copies: 0,
+                            royalties: 0
+                        }
+                    );
+                }
+
+                const item =
+                    totals.get(id);
+
+                item.copies += number(
+                    row.net_units_sold
+                );
+
+                item.royalties += number(
+                    row.royalty_amount
+                );
             }
+        );
 
-            const item = totals.get(id);
-            item.copies += number(row.net_units_sold);
-            item.royalties += number(row.royalty_amount);
-        });
-
-        const sorted = [...totals.entries()]
-            .sort((a, b) => b[1].copies - a[1].copies)
+        const sorted = [
+            ...totals.entries()
+        ]
+            .sort(
+                (a, b) =>
+                    b[1].copies -
+                    a[1].copies
+            )
             .slice(0, 15);
 
-        $("sr-top-books").innerHTML = sorted.length
-            ? sorted.map(([id, item]) => `
-                <tr>
-                    <td>${escapeHtml(titleName(id))}</td>
-                    <td class="sr-number">${integer(item.copies)}</td>
-                    <td class="sr-number">
-                        ${money(item.royalties, currency())}
-                    </td>
-                </tr>
-            `).join("")
-            : '<tr><td colspan="3">No KDP sales in this period.</td></tr>';
+        $("sr-top-books").innerHTML =
+            sorted.length
+                ? sorted.map(
+                    ([id, item]) => `
+                        <tr>
+                            <td>
+                                ${escapeHtml(
+                                    titleName(id)
+                                )}
+                            </td>
+                            <td class="sr-number">
+                                ${integer(
+                                    item.copies
+                                )}
+                            </td>
+                            <td class="sr-number">
+                                ${money(
+                                    item.royalties,
+                                    currency()
+                                )}
+                            </td>
+                        </tr>
+                    `
+                ).join("")
+                : '<tr><td colspan="3">No KDP sales in this period.</td></tr>';
     }
 
     function reportLineTitleId(line) {
-        const link = data.links.find(item =>
-            item.sales_line_id === line.id
+        const link = data.links.find(
+            item =>
+                item.sales_line_id ===
+                line.id
         );
 
         if (!link) return null;
 
-        return link.title_id ||
-            editionMap().get(link.edition_id)?.title_id ||
-            null;
+        return (
+            link.title_id ||
+            editionMap().get(
+                link.edition_id
+            )?.title_id ||
+            null
+        );
     }
 
     function renderPlatforms() {
@@ -801,226 +1171,479 @@ function populateFilters() {
         const format = selectedFormat();
 
         const batchMap = new Map(
-            data.batches.map(row => [row.id, row])
+            data.batches.map(
+                row => [
+                    row.id,
+                    row
+                ]
+            )
         );
 
-        const lines = data.lines.filter(line => {
-            const batch = batchMap.get(line.batch_id);
-            if (!batch || batch.currency !== selectedCurrency) {
-                return false;
-            }
+        const lines = data.lines.filter(
+            line => {
+                const batch =
+                    batchMap.get(
+                        line.batch_id
+                    );
 
-            if (title !== "all" && reportLineTitleId(line) !== title) {
-                return false;
-            }
-
-            if (format !== "all") {
-                const link = data.links.find(item =>
-                    item.sales_line_id === line.id
-                );
-
-                if (!link?.edition_id ||
-                    editionMap().get(link.edition_id)?.format !== format) {
+                if (
+                    !batch ||
+                    batch.currency !==
+                        selectedCurrency
+                ) {
                     return false;
                 }
+
+                if (
+                    title !== "all" &&
+                    reportLineTitleId(line) !==
+                        title
+                ) {
+                    return false;
+                }
+
+                if (format !== "all") {
+                    const link =
+                        data.links.find(
+                            item =>
+                                item.sales_line_id ===
+                                line.id
+                        );
+
+                    if (
+                        !link?.edition_id ||
+                        editionMap().get(
+                            link.edition_id
+                        )?.format !== format
+                    ) {
+                        return false;
+                    }
+                }
+
+                const effectiveDate =
+                    batch.platform === "tide"
+                        ? line.payment_received_date
+                        : line.reporting_month;
+
+                return inRange(
+                    effectiveDate,
+                    range
+                );
             }
+        );
 
-            const effectiveDate =
-                batch.platform === "tide"
-                    ? line.payment_received_date
-                    : line.reporting_month;
-
-            return inRange(effectiveDate, range);
-        });
-
-        const kdp = sum(filteredRoyalties(), "royalty_amount");
+        const kdp = sum(
+            filteredRoyalties(),
+            "royalty_amount"
+        );
 
         const ingram = sum(
-            lines.filter(line =>
-                batchMap.get(line.batch_id)?.platform === "ingramspark"
+            lines.filter(
+                line =>
+                    batchMap.get(
+                        line.batch_id
+                    )?.platform ===
+                    "ingramspark"
             ),
             "net_compensation"
         );
 
         const tide = sum(
-            lines.filter(line =>
-                batchMap.get(line.batch_id)?.platform === "tide"
+            lines.filter(
+                line =>
+                    batchMap.get(
+                        line.batch_id
+                    )?.platform ===
+                    "tide"
             ),
             "payment_amount"
         );
 
-        const shopify = lines.filter(line =>
-            batchMap.get(line.batch_id)?.platform === "shopify"
+        const shopify = lines.filter(
+            line =>
+                batchMap.get(
+                    line.batch_id
+                )?.platform ===
+                "shopify"
         );
 
-        const shopifyUnits = sum(shopify, "net_quantity");
+        const shopifyUnits = sum(
+            shopify,
+            "net_quantity"
+        );
 
         $("sr-platform-summary").innerHTML = `
             <div class="sr-record-list">
                 <div class="sr-record">
                     <strong>Amazon KDP</strong>
-                    <p>${money(kdp, selectedCurrency)} royalties</p>
+                    <p>
+                        ${money(
+                            kdp,
+                            selectedCurrency
+                        )} royalties
+                    </p>
                 </div>
+
                 <div class="sr-record">
                     <strong>IngramSpark</strong>
-                    <p>${money(ingram, selectedCurrency)}
-                       reported compensation</p>
+                    <p>
+                        ${money(
+                            ingram,
+                            selectedCurrency
+                        )} reported compensation
+                    </p>
                 </div>
+
                 <div class="sr-record">
                     <strong>Shopify</strong>
-                    <p>${integer(shopifyUnits)} net product units</p>
-                    <p>Revenue not calculated from average order value.</p>
+                    <p>
+                        ${integer(
+                            shopifyUnits
+                        )} net product units
+                    </p>
+                    <p>
+                        Revenue not calculated
+                        from average order value.
+                    </p>
                 </div>
+
                 <div class="sr-record">
                     <strong>Tide</strong>
-                    <p>${money(tide, selectedCurrency)}
-                       customer payments</p>
+                    <p>
+                        ${money(
+                            tide,
+                            selectedCurrency
+                        )} customer payments
+                    </p>
                 </div>
             </div>
         `;
 
-        const missingDates = data.lines.filter(line => {
-            const batch = batchMap.get(line.batch_id);
-            return batch?.currency === selectedCurrency &&
-                batch.platform === "ingramspark" &&
-                !line.reporting_month;
-        }).length;
+        const missingDates =
+            data.lines.filter(
+                line => {
+                    const batch =
+                        batchMap.get(
+                            line.batch_id
+                        );
+
+                    return (
+                        batch?.currency ===
+                            selectedCurrency &&
+                        batch.platform ===
+                            "ingramspark" &&
+                        !line.reporting_month
+                    );
+                }
+            ).length;
 
         if (missingDates) {
-            $("sr-platform-summary").insertAdjacentHTML(
-                "beforeend",
-                `<p class="sr-muted">
-                    ${integer(missingDates)} IngramSpark report lines
-                    have no reporting month and are excluded
-                    from date-filtered totals.
-                </p>`
-            );
+            $("sr-platform-summary")
+                .insertAdjacentHTML(
+                    "beforeend",
+                    `<p class="sr-muted">
+                        ${integer(
+                            missingDates
+                        )} IngramSpark report lines
+                        have no reporting month
+                        and are excluded from
+                        date-filtered totals.
+                    </p>`
+                );
         }
     }
 
     function renderFinancialYears() {
-        const years = [...$("sr-year").options]
-            .map(option => Number(option.value));
+        const years = [
+            ...$("sr-year").options
+        ].map(
+            option =>
+                Number(
+                    option.value
+                )
+        );
 
-        const html = years.map(year => {
-            const range = fyRange(year);
-            const royalties = filteredRoyalties(range);
-            const pages = filteredPages(range);
-            const expenses = filteredExpenses(range);
+        const html = years.map(
+            year => {
+                const range =
+                    fyRange(year);
 
-            return `
-                <tr>
-                    <td>${labelFY(year)}</td>
-                    <td class="sr-number">
-                        ${integer(sum(royalties, "net_units_sold"))}
-                    </td>
-                    <td class="sr-number">
-                        ${money(sum(royalties, "royalty_amount"), currency())}
-                    </td>
-                    <td class="sr-number">
-                        ${currency() === "GBP"
-                            ? money(sum(pages, "estimated_royalty_gbp"))
-                            : "GBP only"}
-                    </td>
-                    <td class="sr-number">
-                        ${money(sum(expenses, "amount"), currency())}
-                    </td>
-                </tr>
-            `;
-        }).join("");
+                const royalties =
+                    filteredRoyalties(
+                        range
+                    );
 
-        $("sr-financial-years").innerHTML = html;
+                const pages =
+                    filteredPages(
+                        range
+                    );
+
+                const expenses =
+                    filteredExpenses(
+                        range
+                    );
+
+                return `
+                    <tr>
+                        <td>
+                            ${labelFY(year)}
+                        </td>
+
+                        <td class="sr-number">
+                            ${integer(
+                                sum(
+                                    royalties,
+                                    "net_units_sold"
+                                )
+                            )}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(
+                                sum(
+                                    royalties,
+                                    "royalty_amount"
+                                ),
+                                currency()
+                            )}
+                        </td>
+
+                        <td class="sr-number">
+                            ${
+                                currency() === "GBP"
+                                    ? money(
+                                        sum(
+                                            pages,
+                                            "estimated_royalty_gbp"
+                                        )
+                                    )
+                                    : "GBP only"
+                            }
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(
+                                sum(
+                                    expenses,
+                                    "amount"
+                                ),
+                                currency()
+                            )}
+                        </td>
+                    </tr>
+                `;
+            }
+        ).join("");
+
+        $("sr-financial-years").innerHTML =
+            html;
     }
 
     function renderExpenses() {
-        const rows = [...filteredExpenses()]
-            .sort((a, b) =>
-                b.expense_date.localeCompare(a.expense_date)
-            );
+        const rows = [
+            ...filteredExpenses()
+        ].sort(
+            (a, b) =>
+                b.expense_date.localeCompare(
+                    a.expense_date
+                )
+        );
 
-        $("sr-expense-list").innerHTML = rows.length
-            ? rows.map(row => `
-                <tr>
-                    <td>${escapeHtml(row.expense_date)}</td>
-                    <td>${escapeHtml(
-                        row.category.replace(/_/g, " ")
-                    )}</td>
-                    <td>${escapeHtml(row.description)}</td>
-                    <td>${escapeHtml(titleName(row.title_id))}</td>
-                    <td class="sr-number">
-                        ${money(row.amount, row.currency)}
-                    </td>
-                    <td>
-                        <button class="sr-delete"
-                                type="button"
-                                data-delete-table="publishing_expenses"
-                                data-delete-id="${escapeHtml(row.id)}">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            `).join("")
-            : '<tr><td colspan="6">No recorded expenses for these filters.</td></tr>';
+        $("sr-expense-list").innerHTML =
+            rows.length
+                ? rows.map(
+                    row => `
+                        <tr>
+                            <td>
+                                ${escapeHtml(
+                                    row.expense_date
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    row.category.replace(
+                                        /_/g,
+                                        " "
+                                    )
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    row.description
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    titleName(
+                                        row.title_id
+                                    )
+                                )}
+                            </td>
+
+                            <td class="sr-number">
+                                ${money(
+                                    row.amount,
+                                    row.currency
+                                )}
+                            </td>
+
+                            <td>
+                                <button
+                                    class="sr-delete"
+                                    type="button"
+                                    data-delete-table="publishing_expenses"
+                                    data-delete-id="${escapeHtml(
+                                        row.id
+                                    )}">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    `
+                ).join("")
+                : '<tr><td colspan="6">No recorded expenses for these filters.</td></tr>';
     }
 
     function renderBudgets() {
-        const range = selectedRange();
+        const range =
+            selectedRange();
 
-        const rows = data.budgets.filter(row =>
-            row.currency === currency() &&
-            overlaps(row.period_start, row.period_end, range) &&
-            (selectedTitle() === "all" ||
-                row.title_id === selectedTitle())
+        const rows = data.budgets.filter(
+            row =>
+                row.currency ===
+                    currency() &&
+                overlaps(
+                    row.period_start,
+                    row.period_end,
+                    range
+                ) &&
+                (
+                    selectedTitle() === "all" ||
+                    row.title_id ===
+                        selectedTitle()
+                )
         );
 
-        $("sr-budget-list").innerHTML = rows.length
-            ? rows.map(row => {
-                const matchingExpenses = data.expenses.filter(expense =>
-                    expense.currency === row.currency &&
-                    expense.category === row.category &&
-                    inRange(expense.expense_date, {
-                        start: row.period_start,
-                        end: row.period_end
-                    }) &&
-                    (row.title_id
-                        ? expense.title_id === row.title_id
-                        : !expense.title_id)
-                );
+        $("sr-budget-list").innerHTML =
+            rows.length
+                ? rows.map(
+                    row => {
+                        const matchingExpenses =
+                            data.expenses.filter(
+                                expense =>
+                                    expense.currency ===
+                                        row.currency &&
+                                    expense.category ===
+                                        row.category &&
+                                    inRange(
+                                        expense.expense_date,
+                                        {
+                                            start:
+                                                row.period_start,
+                                            end:
+                                                row.period_end
+                                        }
+                                    ) &&
+                                    (
+                                        row.title_id
+                                            ? expense.title_id ===
+                                                row.title_id
+                                            : !expense.title_id
+                                    )
+                            );
 
-                const spent = sum(matchingExpenses, "amount");
-                const percent = number(row.budget_amount) > 0
-                    ? spent / number(row.budget_amount) * 100
-                    : 0;
+                        const spent = sum(
+                            matchingExpenses,
+                            "amount"
+                        );
 
-                return `
-                    <article class="sr-record">
-                        <div class="sr-record-top">
-                            <strong>${escapeHtml(
-                                row.category.replace(/_/g, " ")
-                            )}</strong>
-                            <button class="sr-delete" type="button"
-                                    data-delete-table="publishing_budgets"
-                                    data-delete-id="${escapeHtml(row.id)}">
-                                Delete
-                            </button>
-                        </div>
-                        <p>${escapeHtml(titleName(row.title_id))}</p>
-                        <p>${escapeHtml(row.period_start)}
-                           to ${escapeHtml(row.period_end)}</p>
-                        <p>
-                            ${money(spent, row.currency)} recorded /
-                            ${money(row.budget_amount, row.currency)} budgeted
-                        </p>
-                        <div class="sr-progress">
-                            <span style="width:${
-                                Math.min(100, Math.max(0, percent))
-                            }%"></span>
-                        </div>
-                        <p>${decimal(percent)}% of budget recorded</p>
-                    </article>
-                `;
-            }).join("")
-            : '<p class="sr-muted">No budgets for this selection.</p>';
+                        const percent =
+                            number(
+                                row.budget_amount
+                            ) > 0
+                                ? spent /
+                                    number(
+                                        row.budget_amount
+                                    ) * 100
+                                : 0;
+
+                        return `
+                            <article class="sr-record">
+                                <div class="sr-record-top">
+                                    <strong>
+                                        ${escapeHtml(
+                                            row.category.replace(
+                                                /_/g,
+                                                " "
+                                            )
+                                        )}
+                                    </strong>
+
+                                    <button
+                                        class="sr-delete"
+                                        type="button"
+                                        data-delete-table="publishing_budgets"
+                                        data-delete-id="${escapeHtml(
+                                            row.id
+                                        )}">
+                                        Delete
+                                    </button>
+                                </div>
+
+                                <p>
+                                    ${escapeHtml(
+                                        titleName(
+                                            row.title_id
+                                        )
+                                    )}
+                                </p>
+
+                                <p>
+                                    ${escapeHtml(
+                                        row.period_start
+                                    )}
+                                    to
+                                    ${escapeHtml(
+                                        row.period_end
+                                    )}
+                                </p>
+
+                                <p>
+                                    ${money(
+                                        spent,
+                                        row.currency
+                                    )} recorded /
+                                    ${money(
+                                        row.budget_amount,
+                                        row.currency
+                                    )} budgeted
+                                </p>
+
+                                <div class="sr-progress">
+                                    <span style="width:${
+                                        Math.min(
+                                            100,
+                                            Math.max(
+                                                0,
+                                                percent
+                                            )
+                                        )
+                                    }%"></span>
+                                </div>
+
+                                <p>
+                                    ${decimal(
+                                        percent
+                                    )}% of budget recorded
+                                </p>
+                            </article>
+                        `;
+                    }
+                ).join("")
+                : '<p class="sr-muted">No budgets for this selection.</p>';
     }
 
     function actualForTarget(row) {
@@ -1029,182 +1652,430 @@ function populateFilters() {
             end: row.period_end
         };
 
-        const royaltyRows = data.royalties.filter(item => {
-            if (!inRange(item.royalty_month, range)) return false;
-            if (row.title_id && royaltyTitle(item) !== row.title_id) {
-                return false;
-            }
-            if (row.format && item.format !== row.format) {
-                return false;
-            }
-            return row.metric === "net_copies" ||
-                item.currency === row.currency;
-        });
+        const royaltyRows =
+            data.royalties.filter(
+                item => {
+                    if (
+                        !inRange(
+                            item.royalty_month,
+                            range
+                        )
+                    ) {
+                        return false;
+                    }
 
-        if (row.metric === "net_copies") {
-            return sum(royaltyRows, "net_units_sold");
-        }
+                    if (
+                        row.title_id &&
+                        royaltyTitle(item) !==
+                            row.title_id
+                    ) {
+                        return false;
+                    }
 
-        if (row.metric === "royalties") {
-            return sum(royaltyRows, "royalty_amount");
-        }
+                    if (
+                        row.format &&
+                        item.format !==
+                            row.format
+                    ) {
+                        return false;
+                    }
 
-        if (row.metric === "kindle_pages") {
-            if (row.format && row.format !== "ebook") return 0;
-
-            return sum(data.pages.filter(item =>
-                inRange(item.reading_month, range) &&
-                (!row.title_id ||
-                    editionMap().get(item.edition_id)?.title_id ===
-                    row.title_id)
-            ), "total_pages");
-        }
-
-        if (row.metric === "direct_receipts") {
-            if (row.format) return null;
-
-            const batches = new Map(
-                data.batches.map(item => [item.id, item])
+                    return (
+                        row.metric ===
+                            "net_copies" ||
+                        item.currency ===
+                            row.currency
+                    );
+                }
             );
 
-            return sum(data.lines.filter(line => {
-                const batch = batches.get(line.batch_id);
-                return batch?.platform === "tide" &&
-                    batch.currency === row.currency &&
-                    inRange(line.payment_received_date, range) &&
-                    (!row.title_id ||
-                        reportLineTitleId(line) === row.title_id);
-            }), "payment_amount");
+        if (
+            row.metric ===
+            "net_copies"
+        ) {
+            return sum(
+                royaltyRows,
+                "net_units_sold"
+            );
         }
 
-        // Profit is deliberately unavailable until
-        // complete financial accounting inputs exist.
+        if (
+            row.metric ===
+            "royalties"
+        ) {
+            return sum(
+                royaltyRows,
+                "royalty_amount"
+            );
+        }
+
+        if (
+            row.metric ===
+            "kindle_pages"
+        ) {
+            if (
+                row.format &&
+                row.format !==
+                    "ebook"
+            ) {
+                return 0;
+            }
+
+            return sum(
+                data.pages.filter(
+                    item =>
+                        inRange(
+                            item.reading_month,
+                            range
+                        ) &&
+                        (
+                            !row.title_id ||
+                            editionMap().get(
+                                item.edition_id
+                            )?.title_id ===
+                                row.title_id
+                        )
+                ),
+                "total_pages"
+            );
+        }
+
+        if (
+            row.metric ===
+            "direct_receipts"
+        ) {
+            if (row.format) {
+                return null;
+            }
+
+            const batches =
+                new Map(
+                    data.batches.map(
+                        item => [
+                            item.id,
+                            item
+                        ]
+                    )
+                );
+
+            return sum(
+                data.lines.filter(
+                    line => {
+                        const batch =
+                            batches.get(
+                                line.batch_id
+                            );
+
+                        return (
+                            batch?.platform ===
+                                "tide" &&
+                            batch.currency ===
+                                row.currency &&
+                            inRange(
+                                line.payment_received_date,
+                                range
+                            ) &&
+                            (
+                                !row.title_id ||
+                                reportLineTitleId(
+                                    line
+                                ) ===
+                                    row.title_id
+                            )
+                        );
+                    }
+                ),
+                "payment_amount"
+            );
+        }
+
         return null;
     }
 
     function renderTargets() {
-        const range = selectedRange();
+        const range =
+            selectedRange();
 
-        const rows = data.targets.filter(row =>
-            row.currency === currency() &&
-            overlaps(row.period_start, row.period_end, range) &&
-            (selectedTitle() === "all" ||
-                row.title_id === selectedTitle()) &&
-            (selectedFormat() === "all" ||
-                row.format === selectedFormat())
+        const rows = data.targets.filter(
+            row =>
+                row.currency ===
+                    currency() &&
+                overlaps(
+                    row.period_start,
+                    row.period_end,
+                    range
+                ) &&
+                (
+                    selectedTitle() === "all" ||
+                    row.title_id ===
+                        selectedTitle()
+                ) &&
+                (
+                    selectedFormat() === "all" ||
+                    row.format ===
+                        selectedFormat()
+                )
         );
 
-        $("sr-target-list").innerHTML = rows.length
-            ? rows.map(row => {
-                const actual = actualForTarget(row);
-                const percent = actual !== null &&
-                    number(row.target_value) > 0
-                    ? actual / number(row.target_value) * 100
-                    : 0;
+        $("sr-target-list").innerHTML =
+            rows.length
+                ? rows.map(
+                    row => {
+                        const actual =
+                            actualForTarget(
+                                row
+                            );
 
-                const isMoney = [
-                    "royalties", "direct_receipts", "profit"
-                ].includes(row.metric);
+                        const percent =
+                            actual !== null &&
+                            number(
+                                row.target_value
+                            ) > 0
+                                ? actual /
+                                    number(
+                                        row.target_value
+                                    ) * 100
+                                : 0;
 
-                const display = value => isMoney
-                    ? money(value, row.currency)
-                    : integer(value);
+                        const isMoney = [
+                            "royalties",
+                            "direct_receipts",
+                            "profit"
+                        ].includes(
+                            row.metric
+                        );
 
-                return `
-                    <article class="sr-record">
-                        <div class="sr-record-top">
-                            <strong>${escapeHtml(
-                                row.metric.replace(/_/g, " ")
-                            )}</strong>
-                            <button class="sr-delete" type="button"
-                                    data-delete-table="publishing_targets"
-                                    data-delete-id="${escapeHtml(row.id)}">
-                                Delete
-                            </button>
-                        </div>
-                        <p>${escapeHtml(titleName(row.title_id))}
-                           · ${escapeHtml(row.format || "All formats")}</p>
-                        <p>${escapeHtml(row.period_start)}
-                           to ${escapeHtml(row.period_end)}</p>
-                        <p>${actual === null
-                            ? "Actual result not yet available"
-                            : `${display(actual)} / ${
-                                display(row.target_value)
-                            } target`}</p>
-                        <div class="sr-progress">
-                            <span style="width:${
-                                Math.min(100, Math.max(0, percent))
-                            }%"></span>
-                        </div>
-                        <p>${actual === null
-                            ? "Pending"
-                            : `${decimal(percent)}% achieved`}</p>
-                    </article>
-                `;
-            }).join("")
-            : '<p class="sr-muted">No targets for this selection.</p>';
+                        const display =
+                            value =>
+                                isMoney
+                                    ? money(
+                                        value,
+                                        row.currency
+                                    )
+                                    : integer(
+                                        value
+                                    );
+
+                        return `
+                            <article class="sr-record">
+                                <div class="sr-record-top">
+                                    <strong>
+                                        ${escapeHtml(
+                                            row.metric.replace(
+                                                /_/g,
+                                                " "
+                                            )
+                                        )}
+                                    </strong>
+
+                                    <button
+                                        class="sr-delete"
+                                        type="button"
+                                        data-delete-table="publishing_targets"
+                                        data-delete-id="${escapeHtml(
+                                            row.id
+                                        )}">
+                                        Delete
+                                    </button>
+                                </div>
+
+                                <p>
+                                    ${escapeHtml(
+                                        titleName(
+                                            row.title_id
+                                        )
+                                    )}
+                                    ·
+                                    ${escapeHtml(
+                                        row.format ||
+                                            "All formats"
+                                    )}
+                                </p>
+
+                                <p>
+                                    ${escapeHtml(
+                                        row.period_start
+                                    )}
+                                    to
+                                    ${escapeHtml(
+                                        row.period_end
+                                    )}
+                                </p>
+
+                                <p>
+                                    ${
+                                        actual === null
+                                            ? "Actual result not yet available"
+                                            : `${display(
+                                                actual
+                                            )} / ${display(
+                                                row.target_value
+                                            )} target`
+                                    }
+                                </p>
+
+                                <div class="sr-progress">
+                                    <span style="width:${
+                                        Math.min(
+                                            100,
+                                            Math.max(
+                                                0,
+                                                percent
+                                            )
+                                        )
+                                    }%"></span>
+                                </div>
+
+                                <p>
+                                    ${
+                                        actual === null
+                                            ? "Pending"
+                                            : `${decimal(
+                                                percent
+                                            )}% achieved`
+                                    }
+                                </p>
+                            </article>
+                        `;
+                    }
+                ).join("")
+                : '<p class="sr-muted">No targets for this selection.</p>';
     }
 
     function renderProfitability() {
-        const royalties = filteredRoyalties();
-        const expenses = data.expenses.filter(row =>
-            row.currency === currency() &&
-            inRange(row.expense_date, selectedRange())
-        );
+        const royalties =
+            filteredRoyalties();
 
-        const ids = selectedTitle() === "all"
-            ? data.titles.map(book => book.id)
-            : [selectedTitle()];
-
-        const rows = ids.map(id => {
-            const earned = sum(
-                royalties.filter(row => royaltyTitle(row) === id),
-                "royalty_amount"
+        const expenses =
+            data.expenses.filter(
+                row =>
+                    row.currency ===
+                        currency() &&
+                    inRange(
+                        row.expense_date,
+                        selectedRange()
+                    )
             );
 
-            const costs = sum(
-                expenses.filter(row => {
-                    if (row.title_id === id) return true;
+        const ids =
+            selectedTitle() === "all"
+                ? data.titles.map(
+                    book => book.id
+                )
+                : [
+                    selectedTitle()
+                ];
 
-                    return row.edition_id &&
-                        editionMap().get(row.edition_id)?.title_id === id;
-                }),
-                "amount"
+        const rows = ids.map(
+            id => {
+                const earned = sum(
+                    royalties.filter(
+                        row =>
+                            royaltyTitle(row) ===
+                            id
+                    ),
+                    "royalty_amount"
+                );
+
+                const costs = sum(
+                    expenses.filter(
+                        row => {
+                            if (
+                                row.title_id ===
+                                id
+                            ) {
+                                return true;
+                            }
+
+                            return (
+                                row.edition_id &&
+                                editionMap().get(
+                                    row.edition_id
+                                )?.title_id ===
+                                    id
+                            );
+                        }
+                    ),
+                    "amount"
+                );
+
+                return {
+                    id,
+                    earned,
+                    costs
+                };
+            }
+        )
+            .filter(
+                item =>
+                    item.earned ||
+                    item.costs
+            )
+            .sort(
+                (a, b) =>
+                    b.earned -
+                    a.earned
             );
 
-            return { id, earned, costs };
-        }).filter(item => item.earned || item.costs)
-          .sort((a, b) => b.earned - a.earned);
+        $("sr-profit-list").innerHTML =
+            rows.length
+                ? rows.map(
+                    row => `
+                        <tr>
+                            <td>
+                                ${escapeHtml(
+                                    titleName(
+                                        row.id
+                                    )
+                                )}
+                            </td>
 
-        $("sr-profit-list").innerHTML = rows.length
-            ? rows.map(row => `
-                <tr>
-                    <td>${escapeHtml(titleName(row.id))}</td>
-                    <td class="sr-number">
-                        ${money(row.earned, currency())}
-                    </td>
-                    <td class="sr-number">
-                        ${money(row.costs, currency())}
-                    </td>
-                    <td class="sr-number">
-                        ${money(row.earned - row.costs, currency())}
-                    </td>
-                </tr>
-            `).join("")
-            : '<tr><td colspan="4">No book-level records for this selection.</td></tr>';
+                            <td class="sr-number">
+                                ${money(
+                                    row.earned,
+                                    currency()
+                                )}
+                            </td>
+
+                            <td class="sr-number">
+                                ${money(
+                                    row.costs,
+                                    currency()
+                                )}
+                            </td>
+
+                            <td class="sr-number">
+                                ${money(
+                                    row.earned -
+                                        row.costs,
+                                    currency()
+                                )}
+                            </td>
+                        </tr>
+                    `
+                ).join("")
+                : '<tr><td colspan="4">No book-level records for this selection.</td></tr>';
     }
 
     function render() {
         if (!loaded) return;
 
-        const range = selectedRange();
+        const range =
+            selectedRange();
 
         $("sr-period-label").textContent =
             `Showing ${range.start} to ${range.end} · ` +
-            `${currency()} · ${selectedFormat() === "all"
-                ? "All formats"
-                : selectedFormat()}`;
+            `${currency()} · ${
+                selectedFormat() === "all"
+                    ? "All formats"
+                    : selectedFormat()
+            }`;
 
+        // NEW: Retail estimate, independent
+        // of confirmed royalty reporting.
+        renderRetailSales();
+
+        // Existing dashboard sections.
         renderKPIs();
         renderMonthly();
         renderFormats();
@@ -1221,143 +2092,310 @@ function populateFilters() {
         [
             "sr-expense-category",
             "sr-budget-category"
-        ].forEach(id => {
-            const select = $(id);
-            select.replaceChildren();
+        ].forEach(
+            id => {
+                const select = $(id);
 
-            CATEGORIES.forEach(category => {
-                const label = category
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, character =>
-                        character.toUpperCase()
-                    );
+                select.replaceChildren();
 
-                select.add(new Option(label, category));
-            });
-        });
+                CATEGORIES.forEach(
+                    category => {
+                        const label =
+                            category
+                                .replace(
+                                    /_/g,
+                                    " "
+                                )
+                                .replace(
+                                    /\b\w/g,
+                                    character =>
+                                        character.toUpperCase()
+                                );
+
+                        select.add(
+                            new Option(
+                                label,
+                                category
+                            )
+                        );
+                    }
+                );
+            }
+        );
 
         [
             "sr-expense-currency",
             "sr-budget-currency",
             "sr-target-currency"
-        ].forEach(id => {
-            const select = $(id);
-            select.replaceChildren();
+        ].forEach(
+            id => {
+                const select = $(id);
 
-            CURRENCIES.forEach(code => {
-                select.add(new Option(code, code));
-            });
+                select.replaceChildren();
 
-            select.value = "GBP";
-        });
+                CURRENCIES.forEach(
+                    code => {
+                        select.add(
+                            new Option(
+                                code,
+                                code
+                            )
+                        );
+                    }
+                );
+
+                select.value = "GBP";
+            }
+        );
     }
 
     function setFormDates() {
-        const today = dateOnly(new Date());
-        const range = fyRange(fyStart(today));
+        const today =
+            dateOnly(
+                new Date()
+            );
 
-        $("sr-expense-date").value = today;
+        const range =
+            fyRange(
+                fyStart(
+                    today
+                )
+            );
 
-        ["budget", "target"].forEach(type => {
-            $(`sr-${type}-start`).value = range.start;
-            $(`sr-${type}-end`).value = range.end;
-        });
+        $("sr-expense-date").value =
+            today;
+
+        [
+            "budget",
+            "target"
+        ].forEach(
+            type => {
+                $(
+                    `sr-${type}-start`
+                ).value =
+                    range.start;
+
+                $(
+                    `sr-${type}-end`
+                ).value =
+                    range.end;
+            }
+        );
     }
 
-    async function insertRecord(table, record, messageId, form) {
-        const message = $(messageId);
-        const button = form.querySelector('[type="submit"]');
+    async function insertRecord(
+        table,
+        record,
+        messageId,
+        form
+    ) {
+        const message =
+            $(messageId);
+
+        const button =
+            form.querySelector(
+                '[type="submit"]'
+            );
 
         button.disabled = true;
-        message.textContent = "Saving...";
+
+        message.textContent =
+            "Saving...";
 
         try {
-            const response = await db.from(table).insert(record);
+            const response =
+                await db
+                    .from(table)
+                    .insert(record);
 
-            if (response.error) throw response.error;
+            if (response.error) {
+                throw response.error;
+            }
 
-            message.textContent = "Saved successfully.";
+            message.textContent =
+                "Saved successfully.";
+
             await refresh();
 
         } catch (error) {
-            console.error("Financial record save error:", error);
+            console.error(
+                "Financial record save error:",
+                error
+            );
+
             message.textContent =
-                "Unable to save: " + error.message;
+                "Unable to save: " +
+                error.message;
+
         } finally {
             button.disabled = false;
         }
     }
 
     function bindForms() {
-        $("sr-expense-form").addEventListener("submit", async event => {
-            event.preventDefault();
-            if (!loaded) return;
+        $("sr-expense-form")
+            .addEventListener(
+                "submit",
+                async event => {
+                    event.preventDefault();
 
-            const form = event.currentTarget;
+                    if (!loaded) return;
 
-            await insertRecord("publishing_expenses", {
-                expense_date: $("sr-expense-date").value,
-                category: $("sr-expense-category").value,
-                description: $("sr-expense-description").value.trim(),
-                amount: Number($("sr-expense-amount").value),
-                currency: $("sr-expense-currency").value,
-                title_id: $("sr-expense-title").value || null,
-                supplier: $("sr-expense-supplier").value.trim() || null,
-                notes: $("sr-expense-notes").value.trim() || null
-            }, "sr-expense-message", form);
-        });
+                    const form =
+                        event.currentTarget;
 
-        $("sr-budget-form").addEventListener("submit", async event => {
-            event.preventDefault();
-            if (!loaded) return;
+                    await insertRecord(
+                        "publishing_expenses",
+                        {
+                            expense_date:
+                                $("sr-expense-date").value,
 
-            const form = event.currentTarget;
-            const start = $("sr-budget-start").value;
-            const end = $("sr-budget-end").value;
+                            category:
+                                $("sr-expense-category").value,
 
-            if (end < start) {
-                $("sr-budget-message").textContent =
-                    "End date must not precede start date.";
-                return;
-            }
+                            description:
+                                $("sr-expense-description")
+                                    .value.trim(),
 
-            await insertRecord("publishing_budgets", {
-                period_start: start,
-                period_end: end,
-                category: $("sr-budget-category").value,
-                budget_amount: Number($("sr-budget-amount").value),
-                currency: $("sr-budget-currency").value,
-                title_id: $("sr-budget-title").value || null
-            }, "sr-budget-message", form);
-        });
+                            amount:
+                                Number(
+                                    $("sr-expense-amount").value
+                                ),
 
-        $("sr-target-form").addEventListener("submit", async event => {
-            event.preventDefault();
-            if (!loaded) return;
+                            currency:
+                                $("sr-expense-currency").value,
 
-            const form = event.currentTarget;
-            const start = $("sr-target-start").value;
-            const end = $("sr-target-end").value;
+                            title_id:
+                                $("sr-expense-title").value ||
+                                null,
 
-            if (end < start) {
-                $("sr-target-message").textContent =
-                    "End date must not precede start date.";
-                return;
-            }
+                            supplier:
+                                $("sr-expense-supplier")
+                                    .value.trim() ||
+                                null,
 
-            await insertRecord("publishing_targets", {
-                period_start: start,
-                period_end: end,
-                metric: $("sr-target-metric").value,
-                target_value: Number($("sr-target-value").value),
-                currency: $("sr-target-currency").value,
-                title_id: $("sr-target-title").value || null,
-                format: $("sr-target-format").value || null
-            }, "sr-target-message", form);
-        });
+                            notes:
+                                $("sr-expense-notes")
+                                    .value.trim() ||
+                                null
+                        },
+                        "sr-expense-message",
+                        form
+                    );
+                }
+            );
+
+        $("sr-budget-form")
+            .addEventListener(
+                "submit",
+                async event => {
+                    event.preventDefault();
+
+                    if (!loaded) return;
+
+                    const form =
+                        event.currentTarget;
+
+                    const start =
+                        $("sr-budget-start").value;
+
+                    const end =
+                        $("sr-budget-end").value;
+
+                    if (end < start) {
+                        $("sr-budget-message")
+                            .textContent =
+                            "End date must not precede start date.";
+                        return;
+                    }
+
+                    await insertRecord(
+                        "publishing_budgets",
+                        {
+                            period_start: start,
+                            period_end: end,
+
+                            category:
+                                $("sr-budget-category").value,
+
+                            budget_amount:
+                                Number(
+                                    $("sr-budget-amount").value
+                                ),
+
+                            currency:
+                                $("sr-budget-currency").value,
+
+                            title_id:
+                                $("sr-budget-title").value ||
+                                null
+                        },
+                        "sr-budget-message",
+                        form
+                    );
+                }
+            );
+
+        $("sr-target-form")
+            .addEventListener(
+                "submit",
+                async event => {
+                    event.preventDefault();
+
+                    if (!loaded) return;
+
+                    const form =
+                        event.currentTarget;
+
+                    const start =
+                        $("sr-target-start").value;
+
+                    const end =
+                        $("sr-target-end").value;
+
+                    if (end < start) {
+                        $("sr-target-message")
+                            .textContent =
+                            "End date must not precede start date.";
+                        return;
+                    }
+
+                    await insertRecord(
+                        "publishing_targets",
+                        {
+                            period_start: start,
+                            period_end: end,
+
+                            metric:
+                                $("sr-target-metric").value,
+
+                            target_value:
+                                Number(
+                                    $("sr-target-value").value
+                                ),
+
+                            currency:
+                                $("sr-target-currency").value,
+
+                            title_id:
+                                $("sr-target-title").value ||
+                                null,
+
+                            format:
+                                $("sr-target-format").value ||
+                                null
+                        },
+                        "sr-target-message",
+                        form
+                    );
+                }
+            );
     }
 
-    async function deleteRecord(table, id) {
+    async function deleteRecord(
+        table,
+        id
+    ) {
         if (!loaded) return;
 
         const allowed = new Set([
@@ -1366,22 +2404,33 @@ function populateFilters() {
             "publishing_targets"
         ]);
 
-        if (!allowed.has(table)) return;
+        if (!allowed.has(table) {
+            return;
+        }
 
-        if (!window.confirm(
-            "Permanently delete this financial record?"
-        )) return;
+        if (
+            !window.confirm(
+                "Permanently delete this financial record?"
+            )
+        ) {
+            return;
+        }
 
         try {
-            const response = await db
-                .from(table)
-                .delete()
-                .eq("id", id)
-                .select("id");
+            const response =
+                await db
+                    .from(table)
+                    .delete()
+                    .eq("id", id)
+                    .select("id");
 
-            if (response.error) throw response.error;
+            if (response.error) {
+                throw response.error;
+            }
 
-            if (!response.data?.length) {
+            if (
+                !response.data?.length
+            ) {
                 throw new Error(
                     "No record was deleted. Check administrator access."
                 );
@@ -1390,8 +2439,15 @@ function populateFilters() {
             await refresh();
 
         } catch (error) {
-            console.error("Delete failed:", error);
-            window.alert("Delete failed: " + error.message);
+            console.error(
+                "Delete failed:",
+                error
+            );
+
+            window.alert(
+                "Delete failed: " +
+                error.message
+            );
         }
     }
 
@@ -1402,33 +2458,53 @@ function populateFilters() {
             "sr-currency",
             "sr-title-filter",
             "sr-format"
-        ].forEach(id => {
-            $(id).addEventListener("change", render);
-        });
+        ].forEach(
+            id => {
+                $(id).addEventListener(
+                    "change",
+                    render
+                );
+            }
+        );
 
-        $("sr-refresh").addEventListener("click", () => {
-            if (db) verifyAccess();
-        });
-
-        document.addEventListener("click", event => {
-            const button = event.target.closest(
-                "[data-delete-table][data-delete-id]"
+        $("sr-refresh")
+            .addEventListener(
+                "click",
+                () => {
+                    if (db) {
+                        verifyAccess();
+                    }
+                }
             );
 
-            if (!button) return;
+        document.addEventListener(
+            "click",
+            event => {
+                const button =
+                    event.target.closest(
+                        "[data-delete-table][data-delete-id]"
+                    );
 
-            deleteRecord(
-                button.dataset.deleteTable,
-                button.dataset.deleteId
-            );
-        });
+                if (!button) return;
+
+                deleteRecord(
+                    button.dataset.deleteTable,
+                    button.dataset.deleteId
+                );
+            }
+        );
 
         bindForms();
     }
 
     async function initialize() {
-        if (!$("sr-access-screen") || !$("sr-admin-content")) {
-            console.error("Department 03 page elements missing.");
+        if (
+            !$("sr-access-screen") ||
+            !$("sr-admin-content")
+        ) {
+            console.error(
+                "Department 03 page elements missing."
+            );
             return;
         }
 
@@ -1438,52 +2514,87 @@ function populateFilters() {
         bindEvents();
 
         try {
-            if (typeof loadHeader === "function") {
-                await loadHeader("simple");
+            if (
+                typeof loadHeader ===
+                "function"
+            ) {
+                await loadHeader(
+                    "simple"
+                );
             }
         } catch (error) {
-            console.warn("Header could not load:", error);
+            console.warn(
+                "Header could not load:",
+                error
+            );
         }
 
         try {
             await loadLibrary();
 
-            db = window.supabase.createClient(URL, KEY, {
-                auth: {
-                    persistSession: true,
-                    autoRefreshToken: true,
-                    detectSessionInUrl: true
-                }
-            });
+            db =
+                window.supabase.createClient(
+                    URL,
+                    KEY,
+                    {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true,
+                            detectSessionInUrl: true
+                        }
+                    }
+                );
 
-            db.auth.onAuthStateChange(event => {
-                if (event === "SIGNED_OUT") {
-                    ++accessVersion;
-                    lock();
-                    accessMessage(
-                        "Your session has ended. Please sign in again."
-                    );
-                }
+            db.auth.onAuthStateChange(
+                event => {
+                    if (
+                        event ===
+                        "SIGNED_OUT"
+                    ) {
+                        ++accessVersion;
 
-                if ([
-                    "SIGNED_IN",
-                    "TOKEN_REFRESHED",
-                    "USER_UPDATED"
-                ].includes(event)) {
-                    window.setTimeout(verifyAccess, 0);
+                        lock();
+
+                        accessMessage(
+                            "Your session has ended. Please sign in again."
+                        );
+                    }
+
+                    if (
+                        [
+                            "SIGNED_IN",
+                            "TOKEN_REFRESHED",
+                            "USER_UPDATED"
+                        ].includes(
+                            event
+                        )
+                    ) {
+                        window.setTimeout(
+                            verifyAccess,
+                            0
+                        );
+                    }
                 }
-            });
+            );
 
             await verifyAccess();
 
         } catch (error) {
-            console.error("Department 03 startup error:", error);
+            console.error(
+                "Department 03 startup error:",
+                error
+            );
+
             lock();
+
             accessMessage(
                 "Unable to initialise the financial dashboard."
             );
         }
     }
 
-    window.addEventListener("load", initialize);
+    window.addEventListener(
+        "load",
+        initialize
+    );
 })();
