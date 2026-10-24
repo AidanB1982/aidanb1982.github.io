@@ -886,23 +886,22 @@ function registerPageGestures(contents) {
 
   doc.__bpReadingGesturesInstalled = true;
 
-  const iframe = contents.iframe ||
-    doc.defaultView?.frameElement;
-
-  if (!iframe) {
-    return;
-  }
-
+ 
   const getCoordinates = event => {
-    const frameRect =
-      iframe.getBoundingClientRect();
-
+    const width = Math.max(
+      1,
+      doc.documentElement.clientWidth ||
+      doc.body?.clientWidth ||
+      getReadingWidth()
+    );
+  
     return {
       x: event.clientX,
       y: event.clientY,
-      width: Math.max(1, frameRect.width)
+      width
     };
   };
+
 
   const begin = event => {
     if (
