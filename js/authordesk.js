@@ -1,11 +1,14 @@
+
 (function () {
     "use strict";
 
-    const SUPABASE_URL =
-        "https://bmnlynjldlnxfvunqbqq.supabase.co";
+    const SUPABASE_URL = "https://bmnlynjldlnxfvunqbqq.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
 
-    const SUPABASE_KEY =
-        "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
+    if (!window.supabase || !window.supabase.createClient) {
+        console.error("Supabase JavaScript library is not loaded.");
+        return;
+    }
 
     const client = window.supabase.createClient(
         SUPABASE_URL,
@@ -17,800 +20,158 @@
                 detectSessionInUrl: true
             }
         }
-    ); 
+    );
 
-    const loadingPanel =
-        document.getElementById("loading-panel");
+    const $ = (id) => document.getElementById(id);
 
-    const accessPanel =
-        document.getElementById("access-panel");
+    const elements = {
+        loadingPanel: $("loading-panel"),
+        accessPanel: $("access-panel"),
+        accessTitle: $("access-title"),
+        accessMessage: $("access-message"),
+        desk: $("desk"),
+        authorName: $("author-name"),
+        authorStatus: $("author-status"),
+        welcomeHeading: $("welcome-heading"),
+        bookCount: $("book-count"),
+        relationshipSummary: $("relationship-summary"),
+        overviewBookList: $("overview-book-list"),
+        booksBookList: $("books-book-list"),
+        productionContent: $("production-content"),
+        documentsRightsContent: $("documents-rights-content"),
+        statementCount: $("statement-count"),
+        paymentCount: $("payment-count"),
+        paymentRequestCount: $("payment-request-count"),
+        statementList: $("statement-list"),
+        paymentList: $("payment-list"),
+        paymentRequestList: $("payment-request-list"),
+        signOutButton: $("sign-out-button"),
+        publishingDeskNav: $("publishing-desk-nav"),
+        publishingAttentionList: $("publishing-attention-list")
+    };
 
-    const accessTitle =
-        document.getElementById("access-title");
+    const navButtons = Array.from(
+        document.querySelectorAll(".nav-button")
+    );
 
-    const accessMessage =
-        document.getElementById("access-message");
+    const deskSections = Array.from(
+        document.querySelectorAll(".desk-section")
+    );
 
-    const desk =
-        document.getElementById("desk");
+    let currentAuthor = null;
+    let currentBooks = [];
+    let currentMonthlyRoyalties = [];
+    let monthlyRoyaltiesAvailable = false;
 
-    const authorName =
-        document.getElementById("author-name");
-
-    const authorStatus =
-        document.getElementById("author-status");
-
-    const welcomeHeading =
-        document.getElementById("welcome-heading");
-
-    const bookCount =
-        document.getElementById("book-count");
-
-    const relationshipSummary =
-        document.getElementById("relationship-summary");
-
-    const overviewBookList =
-        document.getElementById("overview-book-list");
-
-    const booksBookList =
-        document.getElementById("books-book-list");
-
-    const productionContent =
-        document.getElementById("production-content");
-
-    const documentsRightsContent =
-        document.getElementById("documents-rights-content");
-
-    const statementCount =
-        document.getElementById("statement-count");
-
-    const paymentCount =
-        document.getElementById("payment-count");
-
-    const paymentRequestCount =
-        document.getElementById("payment-request-count");
-
-    const statementList =
-        document.getElementById("statement-list");
-
-    const paymentList =
-        document.getElementById("payment-list");
-
-    const paymentRequestList =
-        document.getElementById("payment-request-list");
-
-    const signOutButton =
-        document.getElementById("sign-out-button");
-
-    const navButtons =
-        Array.from(
-            document.querySelectorAll(".nav-button")
-        );
-
-    const deskSections =
-        Array.from(
-            document.querySelectorAll(".desk-section")
-        );
-
-    initialiseDesk();
-
-    navButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
+    navButtons.forEach((button) => {
+        button.addEventListener("click", () => {
             showSection(button.dataset.section);
         });
     });
-document
-    .getElementById("overview-finance-button")
-    ?.addEventListener("click", function () {
+
+    $("overview-finance-button")?.addEventListener("click", () => {
         showSection("finance");
     });
-    signOutButton.addEventListener(
+
+    elements.signOutButton?.addEventListener(
         "click",
         handleSignOut
     );
 
-          
+    initialiseDesk();
 
-async function initialiseDesk() {
-    try {
-        const {
-            data: sessionData,
-            error: sessionError
-        } = await client.auth.getSession();
+    // ---------------------------------------------------------
+    // INITIALISATION
+    // ---------------------------------------------------------
 
-        if (sessionError) {
-            throw sessionError;
-        }
+    async function initialiseDesk() {
+        try {
+            const {
+                data: { user },
+                error: authError
+            } = await client.auth.getUser();
 
-        const session = sessionData.session;
+            if (authError) throw authError;
 
-        if (!session || !session.user) {
-            showAccessMessage(
-                "Sign in required",
-                "You need to be signed in with an authorised Blackwood Publishing author account to open the Author Desk."
-            );
-            return;
-        }
+            if (!user) {
+                showAccessMessage(
+                    "Sign in required",
+                    "You need to be signed in with an authorised Blackwood Publishing author account to open the Author Desk."
+                );
+                return;
+            }
 
-        const authorRecord =
-            await loadAuthorRecord(session.user.id);
+            const author = await loadAuthorRecord(user.id);
 
-        if (!authorRecord) {
-            showAccessMessage(
-                "Author Desk unavailable",
-                "This account does not currently have access to an Author Desk."
-            );
-            return;
-        }
+            if (!author) {
+                showAccessMessage(
+                    "Author Desk unavailable",
+                    "This account does not currently have access to an Author Desk."
+                );
+                return;
+            }
 
-        const [
-            books,
-            productionData,
-            legalData,
-            financeData,
-            publishingStaffResponse
-        ] = await Promise.all([
-            loadBooks(authorRecord.id),
-            loadProductionData(authorRecord.id),
-            loadLegalData(authorRecord.id),
-            loadFinanceData(authorRecord.id),
-            client
-                .from("publishing_staff")
-                .select(
-                    "user_id,display_name,is_active"
-                )
-                .eq("user_id", session.user.id)
-                .maybeSingle()
-        ]);
-
-        const publishingDeskNav =
-            document.getElementById(
-                "publishing-desk-nav"
-            );
-
-        if (
-            publishingDeskNav &&
-            !publishingStaffResponse.error &&
-            publishingStaffResponse.data &&
-            publishingStaffResponse.data.is_active === true
-        ) {
-            publishingDeskNav.hidden = false;
+            currentAuthor = author;
 
             const [
-                paymentRequestsResponse,
-                authorRecordsResponse,
-                paymentDetailsResponse
+                books,
+                productionData,
+                legalData,
+                financeData,
+                royaltyResult,
+                staffResponse
             ] = await Promise.all([
+                loadBooks(author.id),
+                loadProductionData(author.id),
+                loadLegalData(author.id),
+                loadFinanceData(author.id),
+                loadMonthlyRoyalties(),
                 client
-                    .from("payment_requests")
-                    .select(
-                        "id,author_id,request_reference,requested_amount,currency,status,requested_at"
-                    )
-                    .eq("status", "requested")
-                    .order("requested_at", {
-                        ascending: true
-                    }),
-
-                client
-                    .from("author_records")
-                    .select("id,publishing_name"),
-
-                client
-                    .from("payment_request_payment_details")
-                    .select("payment_request_id")
+                    .from("publishing_staff")
+                    .select("user_id,display_name,is_active")
+                    .eq("user_id", user.id)
+                    .maybeSingle()
             ]);
 
-            if (paymentRequestsResponse.error) {
-                throw paymentRequestsResponse.error;
-            }
+            currentBooks = books;
+            currentMonthlyRoyalties = royaltyResult.rows;
+            monthlyRoyaltiesAvailable = royaltyResult.available;
 
-            if (authorRecordsResponse.error) {
-                throw authorRecordsResponse.error;
-            }
+            if (
+                !staffResponse.error &&
+                staffResponse.data?.is_active === true
+            ) {
+                if (elements.publishingDeskNav) {
+                    elements.publishingDeskNav.hidden = false;
+                }
 
-            if (paymentDetailsResponse.error) {
-                throw paymentDetailsResponse.error;
-            }
-
-            const attentionList =
-                document.getElementById(
-                    "publishing-attention-list"
+                await loadPublishingAttention();
+            } else if (staffResponse.error) {
+                console.error(
+                    "Publishing Desk access check failed:",
+                    staffResponse.error
                 );
+            }
 
-            if (attentionList) {
-                attentionList.replaceChildren();
-
-                const paymentRequests =
-                    Array.isArray(paymentRequestsResponse.data)
-                        ? paymentRequestsResponse.data
-                        : [];
-
-                const authorRecords =
-                    Array.isArray(authorRecordsResponse.data)
-                        ? authorRecordsResponse.data
-                        : [];
-
-                const paymentDetails =
-                    Array.isArray(paymentDetailsResponse.data)
-                        ? paymentDetailsResponse.data
-                        : [];
-
-                const requestsWithDetails = new Set(
-                    paymentDetails.map(function (record) {
-                        return record.payment_request_id;
-                    })
-                );
-
-                if (paymentRequests.length === 0) {
-                    attentionList.appendChild(
-                        createEmptyState(
-                            "No items currently require attention."
-                        )
-                    );
-                } else {
-                    paymentRequests.forEach(function (request) {
-                        const author = authorRecords.find(
-                            function (record) {
-                                return (
-                                    record.id === request.author_id
-                                );
-                            }
-                        );
-
-                        const card =
-                            document.createElement("article");
-
-                        card.className = "record-card";
-
-                        const top =
-                            document.createElement("div");
-
-                        top.className = "record-card-top";
-
-                        const title =
-                            document.createElement("h4");
-
-                        title.className = "record-title";
-                        title.textContent =
-                            request.request_reference ||
-                            "Payment Request";
-
-                        top.appendChild(title);
-
-                        top.appendChild(
-                            createStatusBadge("Requested")
-                        );
-
-                        card.appendChild(top);
-
-                        const description =
-                            document.createElement("p");
-
-                        description.className =
-                            "record-description";
-
-                        description.textContent =
-                            author && author.publishing_name
-                                ? author.publishing_name
-                                : "Author";
-
-                        card.appendChild(description);
-
-                        const meta =
-                            document.createElement("div");
-
-                        meta.className = "record-meta";
-
-                        meta.appendChild(
-                            createInlineMeta(
-                                "Amount",
-                                formatMoney(
-                                    request.requested_amount,
-                                    request.currency
-                                )
-                            )
-                        );
-
-                        meta.appendChild(
-                            createInlineMeta(
-                                "Requested",
-                                formatDate(request.requested_at)
-                            )
-                        );
-
-                        card.appendChild(meta);
-
-const isDavidTestRequest =
-    request.author_id ===
-        "579da283-3a1f-4947-8b53-ba5d54aad939" &&
-    request.request_reference ===
-        "TEST-DAVID-REQUEST-001";
-
-if (isDavidTestRequest) {
-    const testPanel = document.createElement("div");
-    testPanel.className = "payment-request-control";
-
-    const testNotice = document.createElement("p");
-    testNotice.className = "record-description";
-    testNotice.textContent =
-        "SIMULATION ONLY — No bank transfer will occur. " +
-        "This records a test transaction, not a real payment.";
-
-    const testButton = document.createElement("button");
-    testButton.type = "button";
-    testButton.className = "payment-request-button";
-    testButton.textContent = "Record Simulated Payment";
-
-    const testMessage = document.createElement("p");
-    testMessage.className = "payment-request-message";
-    testMessage.hidden = true;
-    testMessage.setAttribute("role", "status");
-
-    testButton.addEventListener("click", async function () {
-        const confirmed = window.confirm(
-            "TEST ONLY: Record a simulated £25 payment " +
-            "for David Stewart? NO bank transfer will occur."
-        );
-
-        if (!confirmed) return;
-
-        testButton.disabled = true;
-        testButton.textContent = "Recording simulation…";
-
-        try {
-            const { error } = await client.rpc(
-                "record_simulated_author_payment",
-                { p_request_id: request.id }
+            renderDesk(
+                author,
+                books,
+                productionData,
+                legalData,
+                financeData
             );
-
-            if (error) throw error;
-
-            testMessage.textContent =
-                "Simulated payment recorded. No money transferred.";
-            testMessage.className =
-                "payment-request-message success";
-            testMessage.hidden = false;
-
-            window.location.reload();
         } catch (error) {
             console.error(
-                "Simulated payment failed:",
+                "Author Desk failed to initialise:",
                 error
             );
 
-            testMessage.textContent =
-                "Simulation failed: " +
-                (error.message || "Unknown error");
-            testMessage.className =
-                "payment-request-message error";
-            testMessage.hidden = false;
-
-            testButton.disabled = false;
-            testButton.textContent =
-                "Record Simulated Payment";
-        }
-    });
-
-    testPanel.appendChild(testNotice);
-    testPanel.appendChild(testButton);
-    testPanel.appendChild(testMessage);
-    card.appendChild(testPanel);
-}
-
-                        const hasDetails =
-                            requestsWithDetails.has(request.id);
-
-                        const detailsStatus =
-                            document.createElement("p");
-
-                        detailsStatus.className =
-                            "record-description";
-
-                        detailsStatus.textContent = hasDetails
-                            ? "Bank details: Submitted — ready for staff review."
-                            : "Bank details: Awaiting author submission.";
-
-                        card.appendChild(detailsStatus);
-
-                        if (hasDetails && !isDavidTestRequest) {
-                            const reviewButton =
-                                document.createElement("button");
-
-                            reviewButton.type = "button";
-                            reviewButton.className =
-                                "payment-request-button";
-                            reviewButton.textContent =
-                                "Review bank details";
-
-                            const reviewPanel =
-                                document.createElement("div");
-
-                            reviewPanel.className =
-                                "payment-request-control";
-                            reviewPanel.hidden = true;
-
-                            let reviewOpen = false;
-
-                            reviewButton.addEventListener(
-                                "click",
-                                async function () {
-                                    if (reviewOpen) {
-                                        reviewPanel.replaceChildren();
-                                        reviewPanel.hidden = true;
-                                        reviewOpen = false;
-
-                                        reviewButton.textContent =
-                                            "Review bank details";
-                                        return;
-                                    }
-
-                                    reviewButton.disabled = true;
-                                    reviewButton.textContent =
-                                        "Loading…";
-
-                                    try {
-                                        const {
-                                            data,
-                                            error
-                                        } = await client
-                                            .from(
-                                                "payment_request_payment_details"
-                                            )
-                                            .select(
-                                                "account_holder_name,sort_code,account_number"
-                                            )
-                                            .eq(
-                                                "payment_request_id",
-                                                request.id
-                                            )
-                                            .single();
-
-                                        if (error) {
-                                            throw error;
-                                        }
-
-                                        reviewPanel.replaceChildren();
-
-                                        const heading =
-                                            document.createElement("h4");
-
-                                        heading.className =
-                                            "record-title";
-                                        heading.textContent =
-                                            "Bank details for payment";
-
-                                        reviewPanel.appendChild(heading);
-
-                                        const details =
-                                            document.createElement("div");
-
-                                        details.className =
-                                            "record-meta";
-
-                                        details.appendChild(
-                                            createInlineMeta(
-                                                "Account holder",
-                                                data.account_holder_name
-                                            )
-                                        );
-
-                                        details.appendChild(
-                                            createInlineMeta(
-                                                "Sort code",
-                                                data.sort_code
-                                            )
-                                        );
-
-                                        details.appendChild(
-                                            createInlineMeta(
-                                                "Account number",
-                                                data.account_number
-                                            )
-                                        );
-
-                                        reviewPanel.appendChild(details);
-                                        reviewPanel.hidden = false;
-                                        reviewOpen = true;
-
-                                        reviewButton.textContent =
-                                            "Hide bank details";
-
-                                    } catch (error) {
-                                        console.error(
-                                            "Staff payment details review failed:",
-                                            error &&
-                                            error.code
-                                                ? error.code
-                                                : "Request failed"
-                                        );
-
-                                        reviewPanel.replaceChildren();
-
-                                        const message =
-                                            document.createElement("p");
-
-                                        message.className =
-                                            "payment-request-message error";
-
-                                        message.textContent =
-                                            "Bank details could not be loaded. Please retry.";
-
-                                        reviewPanel.appendChild(message);
-                                        reviewPanel.hidden = false;
-
-                                        reviewButton.textContent =
-                                            "Review bank details";
-                                    } finally {
-                                        reviewButton.disabled = false;
-                                    }
-                                }
-                            );
-
-                                                        card.appendChild(reviewButton);
-                            card.appendChild(reviewPanel);
-
-                            // Protected synthetic test request.
-                            // Never offer payment recording for this fixture.
-                            const isProtectedTestRequest =
-                                request.request_reference ===
-                                "PR-20260929203327379-d46d923a";
-
-                            if (isProtectedTestRequest) {
-                                const testNotice =
-                                    document.createElement("p");
-
-                                testNotice.className =
-                                    "record-description";
-
-                                testNotice.textContent =
-                                    "Test request — payment recording disabled.";
-
-                                card.appendChild(testNotice);
-                            } else {
-                                const paymentPanel =
-                                    document.createElement("div");
-
-                                paymentPanel.className =
-                                    "payment-request-control";
-
-                                const paymentHeading =
-                                    document.createElement("h4");
-
-                                paymentHeading.className =
-                                    "record-title";
-
-                                paymentHeading.textContent =
-                                    "Record Completed Payment";
-
-                                const paymentDescription =
-                                    document.createElement("p");
-
-                                paymentDescription.className =
-                                    "record-description";
-
-                                paymentDescription.textContent =
-                                    "Only complete this form after the bank transfer has been sent through Blackwood Publishing's bank.";
-
-                                const paymentForm =
-                                    document.createElement("form");
-
-                                paymentForm.className =
-                                    "payment-request-form";
-
-                                const methodField =
-                                    document.createElement("div");
-
-                                methodField.className =
-                                    "payment-request-field";
-
-                                const methodLabel =
-                                    document.createElement("label");
-
-                                methodLabel.textContent =
-                                    "Payment method";
-
-                                const methodSelect =
-                                    document.createElement("select");
-
-                                methodSelect.required = true;
-
-                                const methodOptions = [
-                                    ["", "Select payment method"],
-                                    ["FASTER PAYMENTS", "Faster Payments"],
-                                    ["BACS", "BACS"],
-                                    ["OTHER BANK TRANSFER", "Other bank transfer"]
-                                ];
-
-                                methodOptions.forEach(function (option) {
-                                    const element =
-                                        document.createElement("option");
-
-                                    element.value = option[0];
-                                    element.textContent = option[1];
-
-                                    methodSelect.appendChild(element);
-                                });
-
-                                const methodId =
-                                    "payment-method-" + request.id;
-
-                                methodSelect.id = methodId;
-                                methodLabel.htmlFor = methodId;
-
-                                methodField.appendChild(methodLabel);
-                                methodField.appendChild(methodSelect);
-
-                                const referenceField =
-                                    document.createElement("div");
-
-                                referenceField.className =
-                                    "payment-request-field";
-
-                                const referenceLabel =
-                                    document.createElement("label");
-
-                                referenceLabel.textContent =
-                                    "Bank transaction reference";
-
-                                const referenceInput =
-                                    document.createElement("input");
-
-                                referenceInput.type = "text";
-                                referenceInput.required = true;
-                                referenceInput.maxLength = 100;
-                                referenceInput.autocomplete = "off";
-
-                                const referenceId =
-                                    "bank-reference-" + request.id;
-
-                                referenceInput.id = referenceId;
-                                referenceLabel.htmlFor = referenceId;
-
-                                referenceField.appendChild(referenceLabel);
-                                referenceField.appendChild(referenceInput);
-
-                                const confirmationLabel =
-                                    document.createElement("label");
-
-                                confirmationLabel.className =
-                                    "payment-confirmation-label";
-
-                                const confirmationCheckbox =
-                                    document.createElement("input");
-
-                                confirmationCheckbox.type = "checkbox";
-                                confirmationCheckbox.required = true;
-
-                                const confirmationText =
-                                    document.createElement("span");
-
-                                confirmationText.textContent =
-                                    "I confirm that this payment has already been sent through Blackwood Publishing's bank.";
-
-                                confirmationLabel.appendChild(
-                                    confirmationCheckbox
-                                );
-
-                                confirmationLabel.appendChild(
-                                    confirmationText
-                                );
-
-                                const paymentButton =
-                                    document.createElement("button");
-
-                                paymentButton.type = "submit";
-                                paymentButton.className =
-                                    "payment-request-button";
-
-                                paymentButton.textContent =
-                                    "Record completed payment";
-
-                                const paymentMessage =
-                                    document.createElement("p");
-
-                                paymentMessage.className =
-                                    "payment-request-message";
-
-                                paymentMessage.hidden = true;
-                                paymentMessage.setAttribute(
-                                    "role",
-                                    "status"
-                                );
-
-                                paymentForm.appendChild(methodField);
-                                paymentForm.appendChild(referenceField);
-                                paymentForm.appendChild(confirmationLabel);
-                                paymentForm.appendChild(paymentButton);
-                                paymentForm.appendChild(paymentMessage);
-
-                                paymentForm.addEventListener(
-                                    "submit",
-                                    async function (event) {
-                                        event.preventDefault();
-
-                                        if (
-                                            !confirmationCheckbox.checked ||
-                                            !methodSelect.value ||
-                                            !referenceInput.value.trim()
-                                        ) {
-                                            return;
-                                        }
-
-                                        const confirmed =
-                                            window.confirm(
-                                                "Confirm that " +
-                                                formatMoney(
-                                                    request.requested_amount,
-                                                    request.currency
-                                                ) +
-                                                " has ALREADY been transferred through your bank to this author. Recording this payment will update the financial records. Continue?"
-                                            );
-
-                                        if (!confirmed) {
-                                            return;
-                                        }
-
-                                        methodSelect.disabled = true;
-                                        referenceInput.disabled = true;
-                                        confirmationCheckbox.disabled = true;
-
-                                        try {
-                                            await recordCompletedPayment(
-                                                request.id,
-                                                methodSelect.value,
-                                                referenceInput.value.trim(),
-                                                paymentButton,
-                                                paymentMessage
-                                            );
-                                        } finally {
-                                            methodSelect.disabled = false;
-                                            referenceInput.disabled = false;
-                                            confirmationCheckbox.disabled = false;
-                                        }
-                                    }
-                                );
-
-                                paymentPanel.appendChild(paymentHeading);
-                                paymentPanel.appendChild(paymentDescription);
-                                paymentPanel.appendChild(paymentForm);
-
-                                card.appendChild(paymentPanel);
-                            }
-                        }
-
-                        attentionList.appendChild(card);
-                    });
-                }
-            }
-        }
-
-        if (publishingStaffResponse.error) {
-            console.error(
-                "Publishing Desk access check failed:",
-                publishingStaffResponse.error
+            showAccessMessage(
+                "Author Desk could not be opened",
+                "There was a problem loading your publishing records. Please try again."
             );
         }
-
-        renderDesk(
-            authorRecord,
-            books,
-            productionData,
-            legalData,
-            financeData
-        );
-
-    } catch (error) {
-        console.error(
-            "Author Desk failed to initialise:",
-            error
-        );
-
-        showAccessMessage(
-            "Author Desk could not be opened",
-            "There was a problem loading your publishing records. Please try again."
-        );
     }
-}
 
     async function loadAuthorRecord(userId) {
         const { data, error } = await client
@@ -821,818 +182,567 @@ if (isDavidTestRequest) {
             .eq("id", userId)
             .maybeSingle();
 
-        if (error) {
-            throw error;
+        if (error) throw error;
+
+        return data?.desk_access_enabled === true
+            ? data
+            : null;
+    }
+
+    async function getAuthorBookIds(authorId) {
+        if (!authorId) {
+            throw new Error("Author ID is required.");
         }
 
-        if (
-            !data ||
-            data.desk_access_enabled !== true
-        ) {
-            return null;
-        }
+        const { data, error } = await client
+            .from("book_contributors")
+            .select("book_id")
+            .eq("author_id", authorId)
+            .eq("desk_visible", true);
 
-        return data;
+        if (error) throw error;
+
+        return [...new Set(
+            (data || []).map((row) => row.book_id)
+        )];
     }
 
     async function loadBooks(authorId) {
-    if (!authorId) {
-        throw new Error("Author ID is required to load books.");
+        const ids = await getAuthorBookIds(authorId);
+
+        if (!ids.length) return [];
+
+        const { data, error } = await client
+            .from("book_records")
+            .select(
+                "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
+            )
+            .in("id", ids)
+            .order("id", { ascending: true });
+
+        if (error) throw error;
+
+        return data || [];
     }
 
-    const { data: contributors, error: contributorError } =
-        await client
-            .from("book_contributors")
-            .select("book_id")
-            .eq("author_id", authorId)
-            .eq("desk_visible", true);
+    async function loadProductionData(authorId) {
+        const ids = await getAuthorBookIds(authorId);
 
-    if (contributorError) {
-        throw contributorError;
-    }
+        if (!ids.length) {
+            return {
+                events: [],
+                editions: [],
+                actions: []
+            };
+        }
 
-    const bookIds = [
-        ...new Set(
-            (contributors || []).map(function (record) {
-                return record.book_id;
-            })
-        )
-    ];
+        const [events, editions, actions] = await Promise.all([
+            client
+                .from("production_events")
+                .select(
+                    "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
+                )
+                .in("book_id", ids)
+                .eq("author_visible", true)
+                .order("event_date", { ascending: false })
+                .order("id", { ascending: false }),
 
-    if (bookIds.length === 0) {
-        return [];
-    }
+            client
+                .from("book_editions")
+                .select(
+                    "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
+                )
+                .in("book_id", ids)
+                .eq("author_visible", true)
+                .order("id", { ascending: true }),
 
-    const { data, error } = await client
-        .from("book_records")
-        .select(
-            "id,internal_reference,title,subtitle,work_status,production_stage,acquired_on,contracted_on,created_at"
-        )
-        .in("id", bookIds)
-        .order("id", { ascending: true });
+            client
+                .from("author_actions")
+                .select(
+                    "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
+                )
+                .in("book_id", ids)
+                .eq("author_visible", true)
+                .order("id", { ascending: true })
+        ]);
 
-    if (error) {
-        throw error;
-    }
+        for (const response of [events, editions, actions]) {
+            if (response.error) throw response.error;
+        }
 
-    return Array.isArray(data) ? data : [];
-}
-
-
-async function loadProductionData(authorId) {
-    if (!authorId) {
-        throw new Error("Author ID is required to load production data.");
-    }
-
-    const { data: contributors, error: contributorError } =
-        await client
-            .from("book_contributors")
-            .select("book_id")
-            .eq("author_id", authorId)
-            .eq("desk_visible", true);
-
-    if (contributorError) {
-        throw contributorError;
-    }
-
-    const bookIds = [
-        ...new Set(
-            (contributors || []).map(function (record) {
-                return record.book_id;
-            })
-        )
-    ];
-
-    if (bookIds.length === 0) {
         return {
-            events: [],
-            editions: [],
-            actions: []
+            events: events.data || [],
+            editions: editions.data || [],
+            actions: actions.data || []
         };
     }
 
-    const [
-        productionEventsResponse,
-        editionsResponse,
-        actionsResponse
-    ] = await Promise.all([
-        client
-            .from("production_events")
-            .select(
-                "id,book_id,event_type,from_stage,to_stage,event_date,note,author_visible,created_at"
-            )
-            .in("book_id", bookIds)
-            .eq("author_visible", true)
-            .order("event_date", { ascending: false })
-            .order("id", { ascending: false }),
+    async function loadLegalData(authorId) {
+        const [documents, agreements, rights] = await Promise.all([
+            client
+                .from("documents")
+                .select(
+                    "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
+                )
+                .eq("author_id", authorId)
+                .eq("author_visible", true)
+                .order("id", { ascending: true }),
 
-        client
-            .from("book_editions")
-            .select(
-                "id,book_id,edition_reference,edition_name,format,isbn,publication_date,status,territory,language,list_price,currency,author_visible,created_at"
-            )
-            .in("book_id", bookIds)
-            .eq("author_visible", true)
-            .order("id", { ascending: true }),
+            client
+                .from("agreements")
+                .select(
+                    "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
+                )
+                .eq("author_id", authorId)
+                .eq("author_visible", true)
+                .order("id", { ascending: true }),
 
-        client
-            .from("author_actions")
-            .select(
-                "id,book_id,action_type,title,description,due_at,status,author_visible,completed_at,created_at,updated_at"
-            )
-            .in("book_id", bookIds)
-            .eq("author_visible", true)
-            .order("id", { ascending: true })
-    ]);
+            client
+                .from("rights")
+                .select(
+                    "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
+                )
+                .eq("author_id", authorId)
+                .eq("author_visible", true)
+                .order("id", { ascending: true })
+        ]);
 
-    if (productionEventsResponse.error) {
-        throw productionEventsResponse.error;
-    }
-
-    if (editionsResponse.error) {
-        throw editionsResponse.error;
-    }
-
-    if (actionsResponse.error) {
-        throw actionsResponse.error;
-    }
-
-    return {
-        events: productionEventsResponse.data || [],
-        editions: editionsResponse.data || [],
-        actions: actionsResponse.data || []
-    };
-}
-
-
-async function loadLegalData(authorId) {
-    if (!authorId) {
-        throw new Error("Author ID is required to load legal data.");
-    }
-
-    const [
-        documentsResponse,
-        agreementsResponse,
-        rightsResponse
-    ] = await Promise.all([
-        client
-            .from("documents")
-            .select(
-                "id,author_id,book_id,edition_id,document_type,title,version,storage_bucket,storage_path,mime_type,author_visible,requires_signature,signed_at,issued_at,supersedes_document_id,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .eq("author_visible", true)
-            .order("id", { ascending: true }),
-
-        client
-            .from("agreements")
-            .select(
-                "id,author_id,book_id,agreement_type,agreement_reference,title,agreement_date,effective_date,expiry_date,status,signed_document_id,summary_author,author_visible,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .eq("author_visible", true)
-            .order("id", { ascending: true }),
-
-        client
-            .from("rights")
-            .select(
-                "id,agreement_id,author_id,book_id,rights_reference,right_type,format_scope,territory,language,exclusivity,effective_date,expiry_date,status,summary_author,author_visible,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .eq("author_visible", true)
-            .order("id", { ascending: true })
-    ]);
-
-    if (documentsResponse.error) {
-        throw documentsResponse.error;
-    }
-
-    if (agreementsResponse.error) {
-        throw agreementsResponse.error;
-    }
-
-    if (rightsResponse.error) {
-        throw rightsResponse.error;
-    }
-
-    const rights = rightsResponse.data || [];
-
-    const rightIds = rights.map(function (right) {
-        return right.id;
-    });
-
-    let rightsEvents = [];
-
-    if (rightIds.length > 0) {
-        const { data, error } = await client
-            .from("rights_events")
-            .select(
-                "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
-            )
-            .in("right_id", rightIds)
-            .eq("author_visible", true)
-            .order("event_date", { ascending: false })
-            .order("id", { ascending: false });
-
-        if (error) {
-            throw error;
+        for (const response of [documents, agreements, rights]) {
+            if (response.error) throw response.error;
         }
 
-        rightsEvents = data || [];
-    }
+        const rightsRows = rights.data || [];
+        const rightIds = rightsRows.map((right) => right.id);
 
-    return {
-        documents: documentsResponse.data || [],
-        agreements: agreementsResponse.data || [],
-        rights,
-        rightsEvents
-    };
-}
+        let rightsEvents = [];
 
-    
-async function loadFinanceData(authorId) {
-    if (!authorId) {
-        throw new Error("Author ID is required to load finance data.");
-    }
-
-    const [
-        statementsResponse,
-        paymentsResponse,
-        paymentRequestsResponse,
-        advancesResponse
-    ] = await Promise.all([
-        client
-            .from("royalty_statements")
-            .select(
-                "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .order("issue_date", {
-                ascending: false,
-                nullsFirst: false
-            })
-            .order("id", {
-                ascending: false
-            }),
-
-        client
-            .from("payments")
-            .select(
-                "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .order("created_at", {
-                ascending: false
-            })
-            .order("id", {
-                ascending: false
-            }),
-
-        client
-            .from("payment_requests")
-            .select(
-                "id,author_id,request_reference,requested_amount,currency,status,requested_at,reviewed_at,fulfilled_at,payment_id,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .order("requested_at", {
-                ascending: false
-            })
-            .order("id", {
-                ascending: false
-            }),
-
-        client
-            .from("advances")
-            .select(
-                "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
-            )
-            .eq("author_id", authorId)
-            .order("id", {
-                ascending: true
-            })
-    ]);
-
-    if (statementsResponse.error) {
-        throw statementsResponse.error;
-    }
-
-    if (paymentsResponse.error) {
-        throw paymentsResponse.error;
-    }
-
-    if (paymentRequestsResponse.error) {
-        throw paymentRequestsResponse.error;
-    }
-
-    if (advancesResponse.error) {
-        throw advancesResponse.error;
-    }
-
-    const statements = Array.isArray(statementsResponse.data)
-        ? statementsResponse.data
-        : [];
-
-    const payments = Array.isArray(paymentsResponse.data)
-        ? paymentsResponse.data
-        : [];
-
-    const statementIds = statements.map(statement => statement.id);
-    const paymentIds = payments.map(payment => payment.id);
-
-    const [
-        statementLinesResponse,
-        paymentAllocationsResponse
-    ] = await Promise.all([
-        statementIds.length
-            ? client
-                .from("royalty_statement_lines")
+        if (rightIds.length) {
+            const { data, error } = await client
+                .from("rights_events")
                 .select(
-                    "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
+                    "id,right_id,event_type,event_date,description_author,author_visible,document_id,created_at"
                 )
-                .in("statement_id", statementIds)
-                .order("statement_id", {
-                    ascending: true
-                })
-                .order("line_number", {
-                    ascending: true
-                })
-            : Promise.resolve({ data: [], error: null }),
+                .in("right_id", rightIds)
+                .eq("author_visible", true)
+                .order("event_date", { ascending: false })
+                .order("id", { ascending: false });
 
-        paymentIds.length
-            ? client
-                .from("payment_allocations")
+            if (error) throw error;
+
+            rightsEvents = data || [];
+        }
+
+        return {
+            documents: documents.data || [],
+            agreements: agreements.data || [],
+            rights: rightsRows,
+            rightsEvents
+        };
+    }
+
+    // ---------------------------------------------------------
+    // MONTHLY AUTHOR ROYALTIES
+    //
+    // This RPC must be secured in PostgreSQL.
+    // It must identify the author from auth.uid().
+    // It must not expose publisher commission or gross income.
+    // ---------------------------------------------------------
+
+    async function loadMonthlyRoyalties() {
+        const { data, error } = await client.rpc(
+            "author_desk_monthly_royalties"
+        );
+
+        if (error) {
+            console.error(
+                "Monthly author royalties unavailable:",
+                error
+            );
+
+            return {
+                available: false,
+                rows: []
+            };
+        }
+
+        if (!Array.isArray(data)) {
+            return {
+                available: false,
+                rows: []
+            };
+        }
+
+        // Explicitly retain only author-facing fields.
+        // This is display hygiene, NOT database security.
+        const rows = data.map((row) => ({
+            book_id: row.book_id,
+            book_title: row.book_title || "Untitled book",
+            royalty_month: row.royalty_month,
+            net_units_sold: Number(row.net_units_sold) || 0,
+            author_royalties_gbp:
+                Number(row.author_royalties_gbp) || 0,
+            currency: "GBP",
+            reporting_status:
+                row.reporting_status || "reported"
+        }));
+
+        rows.sort((a, b) => {
+            const monthComparison = String(
+                b.royalty_month || ""
+            ).localeCompare(
+                String(a.royalty_month || "")
+            );
+
+            return monthComparison ||
+                a.book_title.localeCompare(b.book_title);
+        });
+
+        return {
+            available: true,
+            rows
+        };
+    }
+
+    // ---------------------------------------------------------
+    // EXISTING FINANCE RECORDS
+    // ---------------------------------------------------------
+
+    async function loadFinanceData(authorId) {
+        const [
+            statements,
+            payments,
+            requests,
+            advances
+        ] = await Promise.all([
+            client
+                .from("royalty_statements")
                 .select(
-                    "id,payment_id,statement_id,amount,created_at"
+                    "id,author_id,statement_reference,period_start,period_end,issue_date,currency,total_royalty_amount,total_adjustments,total_advance_applied,amount_payable,status,author_visible,supersedes_statement_id,created_at,updated_at"
                 )
-                .in("payment_id", paymentIds)
-                .order("id", {
-                    ascending: true
+                .eq("author_id", authorId)
+                .order("issue_date", {
+                    ascending: false,
+                    nullsFirst: false
                 })
-            : Promise.resolve({ data: [], error: null })
-    ]);
+                .order("id", { ascending: false }),
 
-    if (statementLinesResponse.error) {
-        throw statementLinesResponse.error;
+            client
+                .from("payments")
+                .select(
+                    "id,author_id,payment_reference,currency,amount,status,requested_at,approved_at,processing_at,paid_at,failed_at,cancelled_at,payment_method_reference,author_visible,created_at,updated_at"
+                )
+                .eq("author_id", authorId)
+                .order("created_at", { ascending: false })
+                .order("id", { ascending: false }),
+
+            client
+                .from("payment_requests")
+                .select(
+                    "id,author_id,request_reference,requested_amount,currency,status,requested_at,reviewed_at,fulfilled_at,payment_id,created_at,updated_at"
+                )
+                .eq("author_id", authorId)
+                .order("requested_at", { ascending: false })
+                .order("id", { ascending: false }),
+
+            client
+                .from("advances")
+                .select(
+                    "id,agreement_id,author_id,book_id,advance_reference,currency,total_amount,status,agreed_date,summary_author,author_visible,created_at,updated_at"
+                )
+                .eq("author_id", authorId)
+                .order("id", { ascending: true })
+        ]);
+
+        for (const response of [
+            statements,
+            payments,
+            requests,
+            advances
+        ]) {
+            if (response.error) throw response.error;
+        }
+
+        const statementRows = statements.data || [];
+        const paymentRows = payments.data || [];
+
+        const statementIds = statementRows.map((row) => row.id);
+        const paymentIds = paymentRows.map((row) => row.id);
+
+        const [lines, allocations] = await Promise.all([
+            statementIds.length
+                ? client
+                    .from("royalty_statement_lines")
+                    .select(
+                        "id,statement_id,line_number,line_type,royalty_entry_id,royalty_adjustment_id,advance_id,description,amount,created_at"
+                    )
+                    .in("statement_id", statementIds)
+                    .order("statement_id", { ascending: true })
+                    .order("line_number", { ascending: true })
+                : Promise.resolve({ data: [], error: null }),
+
+            paymentIds.length
+                ? client
+                    .from("payment_allocations")
+                    .select(
+                        "id,payment_id,statement_id,amount,created_at"
+                    )
+                    .in("payment_id", paymentIds)
+                    .order("id", { ascending: true })
+                : Promise.resolve({ data: [], error: null })
+        ]);
+
+        if (lines.error) throw lines.error;
+        if (allocations.error) throw allocations.error;
+
+        return {
+            statements: statementRows,
+            statementLines: lines.data || [],
+            payments: paymentRows,
+            paymentAllocations: allocations.data || [],
+            paymentRequests: requests.data || [],
+            advances: advances.data || []
+        };
     }
 
-    if (paymentAllocationsResponse.error) {
-        throw paymentAllocationsResponse.error;
+    async function refreshAuthorFinance() {
+        const {
+            data: { user },
+            error
+        } = await client.auth.getUser();
+
+        if (error) throw error;
+
+        if (!user || user.id !== currentAuthor?.id) {
+            throw new Error(
+                "Author session is no longer available."
+            );
+        }
+
+        const financeData = await loadFinanceData(user.id);
+
+        renderFinance(financeData);
+        renderOverviewRoyalties(financeData);
     }
 
-    return {
-        statements,
-
-        statementLines: Array.isArray(statementLinesResponse.data)
-            ? statementLinesResponse.data
-            : [],
-
-        payments,
-
-        paymentAllocations: Array.isArray(paymentAllocationsResponse.data)
-            ? paymentAllocationsResponse.data
-            : [],
-
-        paymentRequests: Array.isArray(paymentRequestsResponse.data)
-            ? paymentRequestsResponse.data
-            : [],
-
-        advances: Array.isArray(advancesResponse.data)
-            ? advancesResponse.data
-            : []
-    };
-}
-async function refreshAuthorFinance() {
-    const {
-        data: { user },
-        error
-    } = await client.auth.getUser();
-
-    if (error) {
-        throw error;
-    }
-
-    if (!user) {
-        throw new Error("Author session is no longer available.");
-    }
-
-    const financeData = await loadFinanceData(user.id);
-
-    renderFinance(financeData);
-    renderOverviewRoyalties(financeData);
-}
+    // ---------------------------------------------------------
+    // MAIN RENDERING
+    // ---------------------------------------------------------
 
     function renderDesk(
-        authorRecord,
+        author,
         books,
         productionData,
         legalData,
         financeData
     ) {
-        loadingPanel.hidden = true;
-        accessPanel.hidden = true;
-        desk.hidden = false;
+        elements.loadingPanel.hidden = true;
+        elements.accessPanel.hidden = true;
+        elements.desk.hidden = false;
 
         const displayName =
-            authorRecord.publishing_name ||
-            "Blackwood Author";
+            author.publishing_name || "Blackwood Author";
 
-        authorName.textContent =
-            displayName;
-
-        authorStatus.textContent =
-            formatLabel(
-                authorRecord.relationship_status
-            );
-
-        welcomeHeading.textContent =
-            "Welcome, " + displayName;
-
-        bookCount.textContent =
-            String(books.length);
-
-        relationshipSummary.textContent =
-            formatLabel(
-                authorRecord.relationship_status
-            );
-
-        renderBookList(
-            overviewBookList,
-            books
+        setText(elements.authorName, displayName);
+        setText(
+            elements.authorStatus,
+            formatLabel(author.relationship_status)
+        );
+        setText(
+            elements.welcomeHeading,
+            "Welcome, " + displayName
+        );
+        setText(elements.bookCount, books.length);
+        setText(
+            elements.relationshipSummary,
+            formatLabel(author.relationship_status)
         );
 
-        renderBookList(
-            booksBookList,
-            books
-        );
-
-        renderProduction(
-            books,
-            productionData
-        );
-
-        renderDocumentsAndRights(
-            books,
-            legalData
-        );
-
-                renderFinance(
-            financeData
-        );
-
-        renderOverviewRoyalties(
-            financeData
-        );
+        renderBookList(elements.overviewBookList, books);
+        renderBookList(elements.booksBookList, books);
+        renderProduction(books, productionData);
+        renderDocumentsAndRights(books, legalData);
+        renderFinance(financeData);
+        renderOverviewRoyalties(financeData);
     }
 
-    function renderBookList(
-        container,
-        books
-    ) {
+    function renderBookList(container, books) {
+        if (!container) return;
+
         container.replaceChildren();
 
-        if (books.length === 0) {
+        if (!books.length) {
             container.appendChild(
                 createEmptyState(
                     "No Book Records are currently available in your Author Desk."
                 )
             );
-
             return;
         }
 
-        books.forEach(function (book) {
-            container.appendChild(
-                createBookCard(book)
+        books.forEach((book) => {
+            const card = make("article", "book-card");
+            const top = make("div", "book-card-top");
+            const titleGroup = make("div");
+            const title = make(
+                "h3",
+                "book-title",
+                book.title || "Untitled Book Record"
             );
+
+            titleGroup.appendChild(title);
+
+            if (book.subtitle) {
+                titleGroup.appendChild(
+                    make("p", "book-subtitle", book.subtitle)
+                );
+            }
+
+            top.append(
+                titleGroup,
+                createStatusBadge(
+                    formatLabel(book.production_stage)
+                )
+            );
+
+            const meta = make("div", "book-meta");
+
+            [
+                ["Book Record", book.internal_reference],
+                ["Work Status", formatLabel(book.work_status)],
+                [
+                    "Production Stage",
+                    formatLabel(book.production_stage)
+                ]
+            ].forEach(([label, value]) => {
+                meta.appendChild(createMetaItem(label, value));
+            });
+
+            card.append(top, meta);
+            container.appendChild(card);
         });
     }
 
-    function createBookCard(book) {
-        const card =
-            document.createElement("article");
+    // ---------------------------------------------------------
+    // PRODUCTION
+    // ---------------------------------------------------------
 
-        card.className =
-            "book-card";
+    function renderProduction(books, data) {
+        const container = elements.productionContent;
+        if (!container) return;
 
-        const top =
-            document.createElement("div");
+        container.replaceChildren();
 
-        top.className =
-            "book-card-top";
-
-        const titleGroup =
-            document.createElement("div");
-
-        const title =
-            document.createElement("h3");
-
-        title.className =
-            "book-title";
-
-        title.textContent =
-            book.title ||
-            "Untitled Book Record";
-
-        titleGroup.appendChild(title);
-
-        if (book.subtitle) {
-            const subtitle =
-                document.createElement("p");
-
-            subtitle.className =
-                "book-subtitle";
-
-            subtitle.textContent =
-                book.subtitle;
-
-            titleGroup.appendChild(
-                subtitle
-            );
-        }
-
-        top.appendChild(
-            titleGroup
-        );
-
-        top.appendChild(
-            createStatusBadge(
-                formatLabel(
-                    book.production_stage
-                )
-            )
-        );
-
-        const meta =
-            document.createElement("div");
-
-        meta.className =
-            "book-meta";
-
-        meta.appendChild(
-            createMetaItem(
-                "Book Record",
-                book.internal_reference
-            )
-        );
-
-        meta.appendChild(
-            createMetaItem(
-                "Work Status",
-                formatLabel(
-                    book.work_status
-                )
-            )
-        );
-
-        meta.appendChild(
-            createMetaItem(
-                "Production Stage",
-                formatLabel(
-                    book.production_stage
-                )
-            )
-        );
-
-        card.appendChild(top);
-        card.appendChild(meta);
-
-        return card;
-    }
-
-    function renderProduction(
-        books,
-        productionData
-    ) {
-        productionContent.replaceChildren();
-
-        if (books.length === 0) {
-            productionContent.appendChild(
+        if (!books.length) {
+            container.appendChild(
                 createEmptyState(
                     "No production records are currently available in your Author Desk."
                 )
             );
-
             return;
         }
 
-        books.forEach(function (book) {
-            const bookEvents =
-                productionData.events.filter(
-                    function (event) {
-                        return (
-                            event.book_id ===
-                            book.id
-                        );
-                    }
-                );
+        books.forEach((book) => {
+            const events = data.events.filter(
+                (row) => row.book_id === book.id
+            );
+            const editions = data.editions.filter(
+                (row) => row.book_id === book.id
+            );
+            const actions = data.actions.filter(
+                (row) => row.book_id === book.id
+            );
 
-            const bookEditions =
-                productionData.editions.filter(
-                    function (edition) {
-                        return (
-                            edition.book_id ===
-                            book.id
-                        );
-                    }
-                );
+            const wrapper = make("div", "production-book");
+            const heading = make(
+                "div",
+                "production-book-heading"
+            );
 
-            const bookActions =
-                productionData.actions.filter(
-                    function (action) {
-                        return (
-                            action.book_id ===
-                            book.id
-                        );
-                    }
-                );
-
-            productionContent.appendChild(
-                createProductionBook(
-                    book,
-                    bookEvents,
-                    bookEditions,
-                    bookActions
+            heading.append(
+                make("h3", "", book.title || "Untitled Book Record"),
+                make(
+                    "p",
+                    "production-reference",
+                    book.internal_reference || "Book Record"
                 )
             );
+
+            const summary = make("div", "production-summary");
+
+            summary.append(
+                createSummaryRecord(
+                    "Current Stage",
+                    formatLabel(book.production_stage),
+                    "production-summary-card"
+                ),
+                createSummaryRecord(
+                    "Work Status",
+                    formatLabel(book.work_status),
+                    "production-summary-card"
+                )
+            );
+
+            wrapper.append(
+                heading,
+                summary,
+                createActionsPanel(actions),
+                createEditionsPanel(editions),
+                createProductionHistoryPanel(events)
+            );
+
+            container.appendChild(wrapper);
         });
     }
 
-    function createProductionBook(
-        book,
-        events,
-        editions,
-        actions
-    ) {
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className =
-            "production-book";
-
-        const heading =
-            document.createElement("div");
-
-        heading.className =
-            "production-book-heading";
-
-        const title =
-            document.createElement("h3");
-
-        title.textContent =
-            book.title ||
-            "Untitled Book Record";
-
-        const reference =
-            document.createElement("p");
-
-        reference.className =
-            "production-reference";
-
-        reference.textContent =
-            book.internal_reference ||
-            "Book Record";
-
-        heading.appendChild(title);
-        heading.appendChild(reference);
-        wrapper.appendChild(heading);
-
-        const summary =
-            document.createElement("div");
-
-        summary.className =
-            "production-summary";
-
-        summary.appendChild(
-            createSummaryRecord(
-                "Current Stage",
-                formatLabel(
-                    book.production_stage
-                ),
-                "production-summary-card"
-            )
-        );
-
-        summary.appendChild(
-            createSummaryRecord(
-                "Work Status",
-                formatLabel(
-                    book.work_status
-                ),
-                "production-summary-card"
-            )
-        );
-
-        wrapper.appendChild(summary);
-
-        wrapper.appendChild(
-            createActionsPanel(
-                actions
-            )
-        );
-
-        wrapper.appendChild(
-            createEditionsPanel(
-                editions
-            )
-        );
-
-        wrapper.appendChild(
-            createProductionHistoryPanel(
-                events
-            )
-        );
-
-        return wrapper;
-    }
-
     function createActionsPanel(actions) {
-        const panel =
-            createContentPanel(
-                "Author Actions",
-                "Current actions and information recorded for you during production."
-            );
+        const panel = createContentPanel(
+            "Author Actions",
+            "Current actions and information recorded for you during production."
+        );
 
-        if (actions.length === 0) {
+        if (!actions.length) {
             panel.appendChild(
                 createEmptyState(
                     "No author actions are currently recorded."
                 )
             );
-
             return panel;
         }
 
-        const list =
-            document.createElement("div");
+        const list = make("div", "action-list");
 
-        list.className =
-            "action-list";
+        actions.forEach((action) => {
+            const card = make("article", "action-card");
+            const top = make("div", "action-card-top");
 
-        actions.forEach(function (action) {
-            const card =
-                document.createElement("article");
-
-            card.className =
-                "action-card";
-
-            const top =
-                document.createElement("div");
-
-            top.className =
-                "action-card-top";
-
-            const title =
-                document.createElement("h4");
-
-            title.className =
-                "record-title";
-
-            title.textContent =
-                action.title ||
-                formatLabel(
-                    action.action_type
-                );
-
-            top.appendChild(title);
-
-            top.appendChild(
-                createStatusBadge(
-                    formatLabel(
-                        action.status
-                    )
-                )
+            top.append(
+                make(
+                    "h4",
+                    "record-title",
+                    action.title || formatLabel(action.action_type)
+                ),
+                createStatusBadge(formatLabel(action.status))
             );
 
             card.appendChild(top);
 
             if (action.description) {
-                const description =
-                    document.createElement("p");
-
-                description.className =
-                    "record-description";
-
-                description.textContent =
-                    action.description;
-
                 card.appendChild(
-                    description
+                    make(
+                        "p",
+                        "record-description",
+                        action.description
+                    )
                 );
             }
 
-            const meta =
-                document.createElement("div");
-
-            meta.className =
-                "record-meta";
+            const meta = make("div", "record-meta");
 
             if (action.due_at) {
                 meta.appendChild(
                     createInlineMeta(
                         "Due",
-                        formatDate(
-                            action.due_at
-                        )
+                        formatDate(action.due_at)
                     )
                 );
             }
@@ -1641,16 +751,12 @@ async function refreshAuthorFinance() {
                 meta.appendChild(
                     createInlineMeta(
                         "Completed",
-                        formatDate(
-                            action.completed_at
-                        )
+                        formatDate(action.completed_at)
                     )
                 );
             }
 
-            if (
-                meta.childElementCount > 0
-            ) {
+            if (meta.childElementCount) {
                 card.appendChild(meta);
             }
 
@@ -1658,1664 +764,1289 @@ async function refreshAuthorFinance() {
         });
 
         panel.appendChild(list);
-
         return panel;
     }
 
     function createEditionsPanel(editions) {
-        const panel =
-            createContentPanel(
-                "Editions",
-                "Edition records currently associated with this Book Record."
-            );
+        const panel = createContentPanel(
+            "Editions",
+            "Edition records currently associated with this Book Record."
+        );
 
-        if (editions.length === 0) {
+        if (!editions.length) {
             panel.appendChild(
                 createEmptyState(
                     "No author-visible editions are currently recorded."
                 )
             );
-
             return panel;
         }
 
-        const list =
-            document.createElement("div");
+        const list = make("div", "edition-list");
 
-        list.className =
-            "edition-list";
+        editions.forEach((edition) => {
+            const card = make("article", "edition-card");
+            const top = make("div", "edition-card-top");
 
-        editions.forEach(
-            function (edition) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
-
-                card.className =
-                    "edition-card";
-
-                const top =
-                    document.createElement(
-                        "div"
-                    );
-
-                top.className =
-                    "edition-card-top";
-
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
-
-                title.className =
-                    "record-title";
-
-                title.textContent =
+            top.append(
+                make(
+                    "h4",
+                    "record-title",
                     edition.edition_name ||
-                    formatLabel(
-                        edition.format
-                    );
+                        formatLabel(edition.format)
+                ),
+                createStatusBadge(formatLabel(edition.status))
+            );
 
-                top.appendChild(title);
+            card.appendChild(top);
 
-                top.appendChild(
-                    createStatusBadge(
-                        formatLabel(
-                            edition.status
-                        )
-                    )
-                );
+            const meta = make("div", "record-meta");
 
-                card.appendChild(top);
+            meta.appendChild(
+                createInlineMeta(
+                    "Format",
+                    formatLabel(edition.format)
+                )
+            );
 
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
+            if (edition.publication_date) {
                 meta.appendChild(
                     createInlineMeta(
-                        "Format",
-                        formatLabel(
-                            edition.format
+                        "Publication",
+                        formatDate(edition.publication_date)
+                    )
+                );
+            }
+
+            if (edition.isbn) {
+                meta.appendChild(
+                    createInlineMeta("ISBN", edition.isbn)
+                );
+            }
+
+            if (
+                edition.list_price != null &&
+                edition.currency
+            ) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "List price",
+                        formatMoney(
+                            edition.list_price,
+                            edition.currency
                         )
                     )
                 );
-
-                if (
-                    edition.publication_date
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Publication",
-                            formatDate(
-                                edition.publication_date
-                            )
-                        )
-                    );
-                }
-
-                if (edition.isbn) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "ISBN",
-                            edition.isbn
-                        )
-                    );
-                }
-
-                if (
-                    edition.list_price !==
-                        null &&
-                    edition.list_price !==
-                        undefined &&
-                    edition.currency
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "List price",
-                            formatMoney(
-                                edition.list_price,
-                                edition.currency
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    edition.edition_reference
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Edition Record",
-                            edition.edition_reference
-                        )
-                    );
-                }
-
-                card.appendChild(meta);
-                list.appendChild(card);
             }
-        );
+
+            if (edition.edition_reference) {
+                meta.appendChild(
+                    createInlineMeta(
+                        "Edition Record",
+                        edition.edition_reference
+                    )
+                );
+            }
+
+            card.appendChild(meta);
+            list.appendChild(card);
+        });
 
         panel.appendChild(list);
-
         return panel;
     }
 
-    function createProductionHistoryPanel(
-        events
-    ) {
-        const panel =
-            createContentPanel(
-                "Production History",
-                "Author-visible milestones recorded against this Book Record."
-            );
+    function createProductionHistoryPanel(events) {
+        const panel = createContentPanel(
+            "Production History",
+            "Author-visible milestones recorded against this Book Record."
+        );
 
-        if (events.length === 0) {
+        if (!events.length) {
             panel.appendChild(
                 createEmptyState(
                     "No author-visible production history is currently recorded."
                 )
             );
-
             return panel;
         }
 
-        const timeline =
-            document.createElement("div");
+        const timeline = make("div", "timeline");
 
-        timeline.className =
-            "timeline";
+        events.forEach((event) => {
+            const item = make("article", "timeline-item");
 
-        events.forEach(function (event) {
-            const item =
-                document.createElement(
-                    "article"
-                );
-
-            item.className =
-                "timeline-item";
-
-            const date =
-                document.createElement("p");
-
-            date.className =
-                "timeline-date";
-
-            date.textContent =
-                formatDate(
-                    event.event_date
-                );
-
-            const title =
-                document.createElement("h4");
-
-            title.className =
-                "timeline-title";
-
-            title.textContent =
-                event.to_stage
-                    ? formatLabel(
-                        event.to_stage
+            item.append(
+                make(
+                    "p",
+                    "timeline-date",
+                    formatDate(event.event_date)
+                ),
+                make(
+                    "h4",
+                    "timeline-title",
+                    formatLabel(
+                        event.to_stage || event.event_type
                     )
-                    : formatLabel(
-                        event.event_type
-                    );
+                )
+            );
 
-            item.appendChild(date);
-            item.appendChild(title);
-
-            if (
-                event.from_stage &&
-                event.to_stage
-            ) {
-                const transition =
-                    document.createElement(
-                        "p"
-                    );
-
-                transition.className =
-                    "record-description";
-
-                transition.textContent =
-                    formatLabel(
-                        event.from_stage
-                    ) +
-                    " → " +
-                    formatLabel(
-                        event.to_stage
-                    );
-
+            if (event.from_stage && event.to_stage) {
                 item.appendChild(
-                    transition
+                    make(
+                        "p",
+                        "record-description",
+                        formatLabel(event.from_stage) +
+                            " → " +
+                            formatLabel(event.to_stage)
+                    )
                 );
             }
 
             if (event.note) {
-                const note =
-                    document.createElement(
-                        "p"
-                    );
-
-                note.className =
-                    "timeline-note";
-
-                note.textContent =
-                    event.note;
-
-                item.appendChild(note);
+                item.appendChild(
+                    make("p", "timeline-note", event.note)
+                );
             }
 
             timeline.appendChild(item);
         });
 
         panel.appendChild(timeline);
-
         return panel;
     }
 
-    function renderDocumentsAndRights(
-        books,
-        legalData
-    ) {
-        documentsRightsContent.replaceChildren();
+    // ---------------------------------------------------------
+    // DOCUMENTS, AGREEMENTS AND RIGHTS
+    // ---------------------------------------------------------
 
-        const accountDocuments =
-            legalData.documents.filter(
-                function (documentRecord) {
-                    return (
-                        documentRecord.book_id ===
-                        null
-                    );
-                }
-            );
+    function renderDocumentsAndRights(books, data) {
+        const container = elements.documentsRightsContent;
+        if (!container) return;
 
-        const accountAgreements =
-            legalData.agreements.filter(
-                function (agreement) {
-                    return (
-                        agreement.book_id ===
-                        null
-                    );
-                }
-            );
+        container.replaceChildren();
 
-        const accountRights =
-            legalData.rights.filter(
-                function (right) {
-                    return (
-                        right.book_id ===
-                        null
-                    );
-                }
-            );
+        const generalDocuments = data.documents.filter(
+            (row) => row.book_id == null
+        );
+        const generalAgreements = data.agreements.filter(
+            (row) => row.book_id == null
+        );
+        const generalRights = data.rights.filter(
+            (row) => row.book_id == null
+        );
 
         if (
-            accountDocuments.length > 0 ||
-            accountAgreements.length > 0 ||
-            accountRights.length > 0
+            generalDocuments.length ||
+            generalAgreements.length ||
+            generalRights.length
         ) {
-            documentsRightsContent.appendChild(
-                createLegalRecordGroup(
+            container.appendChild(
+                createLegalGroup(
                     "General publishing records",
                     "Author-visible records associated with your publishing relationship rather than one particular Book Record.",
-                    accountDocuments,
-                    accountAgreements,
-                    accountRights,
-                    legalData.rightsEvents
+                    generalDocuments,
+                    generalAgreements,
+                    generalRights,
+                    data.rightsEvents
                 )
             );
         }
 
-        if (books.length === 0) {
-            if (
-                accountDocuments.length === 0 &&
-                accountAgreements.length === 0 &&
-                accountRights.length === 0
-            ) {
-                documentsRightsContent.appendChild(
-                    createEmptyState(
-                        "No author-visible documents, agreements or rights records are currently available."
-                    )
-                );
-            }
-
-            return;
-        }
-
-        books.forEach(function (book) {
-            const documents =
-                legalData.documents.filter(
-                    function (
-                        documentRecord
-                    ) {
-                        return (
-                            documentRecord.book_id ===
-                            book.id
-                        );
-                    }
-                );
-
-            const agreements =
-                legalData.agreements.filter(
-                    function (agreement) {
-                        return (
-                            agreement.book_id ===
-                            book.id
-                        );
-                    }
-                );
-
-            const rights =
-                legalData.rights.filter(
-                    function (right) {
-                        return (
-                            right.book_id ===
-                            book.id
-                        );
-                    }
-                );
-
-            documentsRightsContent.appendChild(
-                createLegalBook(
-                    book,
-                    documents,
-                    agreements,
-                    rights,
-                    legalData.rightsEvents
+        books.forEach((book) => {
+            container.appendChild(
+                createLegalGroup(
+                    book.title || "Untitled Book Record",
+                    book.internal_reference || "Book Record",
+                    data.documents.filter(
+                        (row) => row.book_id === book.id
+                    ),
+                    data.agreements.filter(
+                        (row) => row.book_id === book.id
+                    ),
+                    data.rights.filter(
+                        (row) => row.book_id === book.id
+                    ),
+                    data.rightsEvents,
+                    true
                 )
             );
         });
+
+        if (!container.childElementCount) {
+            container.appendChild(
+                createEmptyState(
+                    "No author-visible documents, agreements or rights records are currently available."
+                )
+            );
+        }
     }
 
-    function createLegalBook(
-        book,
-        documents,
-        agreements,
-        rights,
-        rightsEvents
-    ) {
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className =
-            "legal-book";
-
-        const heading =
-            document.createElement("div");
-
-        heading.className =
-            "legal-book-heading";
-
-        const title =
-            document.createElement("h3");
-
-        title.textContent =
-            book.title ||
-            "Untitled Book Record";
-
-        const reference =
-            document.createElement("p");
-
-        reference.className =
-            "legal-reference";
-
-        reference.textContent =
-            book.internal_reference ||
-            "Book Record";
-
-        heading.appendChild(title);
-        heading.appendChild(reference);
-        wrapper.appendChild(heading);
-
-        const summary =
-            document.createElement("div");
-
-        summary.className =
-            "legal-summary";
-
-        summary.appendChild(
-            createSummaryRecord(
-                "Documents",
-                String(
-                    documents.length
-                ),
-                "legal-summary-card"
-            )
-        );
-
-        summary.appendChild(
-            createSummaryRecord(
-                "Rights Records",
-                String(
-                    rights.length
-                ),
-                "legal-summary-card"
-            )
-        );
-
-        wrapper.appendChild(summary);
-
-        wrapper.appendChild(
-            createDocumentsPanel(
-                documents
-            )
-        );
-
-        wrapper.appendChild(
-            createAgreementsPanel(
-                agreements
-            )
-        );
-
-        wrapper.appendChild(
-            createRightsPanel(
-                rights,
-                rightsEvents
-            )
-        );
-
-        return wrapper;
-    }
-
-    function createLegalRecordGroup(
+    function createLegalGroup(
         title,
         intro,
         documents,
         agreements,
         rights,
-        rightsEvents
+        rightsEvents,
+        isBook = false
     ) {
-        const wrapper =
-            document.createElement("div");
+        const wrapper = make("div", "legal-book");
+        const heading = make("div", "legal-book-heading");
 
-        wrapper.className =
-            "legal-book";
-
-        const heading =
-            document.createElement("div");
-
-        heading.className =
-            "legal-book-heading";
-
-        const headingTitle =
-            document.createElement("h3");
-
-        headingTitle.textContent =
-            title;
-
-        const headingIntro =
-            document.createElement("p");
-
-        headingIntro.className =
-            "panel-intro";
-
-        headingIntro.textContent =
-            intro;
-
-        heading.appendChild(
-            headingTitle
-        );
-
-        heading.appendChild(
-            headingIntro
+        heading.append(
+            make("h3", "", title),
+            make(
+                "p",
+                isBook ? "legal-reference" : "panel-intro",
+                intro
+            )
         );
 
         wrapper.appendChild(heading);
 
-        wrapper.appendChild(
-            createDocumentsPanel(
-                documents
-            )
-        );
+        if (isBook) {
+            const summary = make("div", "legal-summary");
 
-        wrapper.appendChild(
-            createAgreementsPanel(
-                agreements
-            )
-        );
+            summary.append(
+                createSummaryRecord(
+                    "Documents",
+                    String(documents.length),
+                    "legal-summary-card"
+                ),
+                createSummaryRecord(
+                    "Rights Records",
+                    String(rights.length),
+                    "legal-summary-card"
+                )
+            );
 
-        wrapper.appendChild(
-            createRightsPanel(
-                rights,
-                rightsEvents
-            )
+            wrapper.appendChild(summary);
+        }
+
+        wrapper.append(
+            createDocumentsPanel(documents),
+            createAgreementsPanel(agreements),
+            createRightsPanel(rights, rightsEvents)
         );
 
         return wrapper;
     }
 
-    function createDocumentsPanel(
-        documents
-    ) {
-        const panel =
-            createContentPanel(
-                "Documents",
-                "Author-visible publishing documents associated with this record."
-            );
+    function createDocumentsPanel(documents) {
+        const panel = createContentPanel(
+            "Documents",
+            "Author-visible publishing documents associated with this record."
+        );
 
-        if (documents.length === 0) {
+        if (!documents.length) {
             panel.appendChild(
                 createEmptyState(
                     "No author-visible documents are currently recorded."
                 )
             );
-
             return panel;
         }
 
-        const list =
-            document.createElement("div");
+        const list = make("div", "record-list");
 
-        list.className =
-            "record-list";
+        documents.forEach((record) => {
+            const card = make("article", "record-card");
+            const top = make("div", "record-card-top");
 
-        documents.forEach(
-            function (documentRecord) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
+            top.appendChild(
+                make(
+                    "h4",
+                    "record-title",
+                    record.title ||
+                        formatLabel(record.document_type)
+                )
+            );
 
-                card.className =
-                    "record-card";
-
-                const top =
-                    document.createElement(
-                        "div"
-                    );
-
-                top.className =
-                    "record-card-top";
-
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
-
-                title.className =
-                    "record-title";
-
-                title.textContent =
-                    documentRecord.title ||
-                    formatLabel(
-                        documentRecord.document_type
-                    );
-
-                top.appendChild(title);
-
-                if (
-                    documentRecord.requires_signature
-                ) {
-                    top.appendChild(
-                        createStatusBadge(
-                            documentRecord.signed_at
-                                ? "Signed"
-                                : "Signature Required"
-                        )
-                    );
-                }
-
-                card.appendChild(top);
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Type",
-                        formatLabel(
-                            documentRecord.document_type
-                        )
+            if (record.requires_signature) {
+                top.appendChild(
+                    createStatusBadge(
+                        record.signed_at
+                            ? "Signed"
+                            : "Signature Required"
                     )
                 );
-
-                if (
-                    documentRecord.version
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Version",
-                            documentRecord.version
-                        )
-                    );
-                }
-
-                if (
-                    documentRecord.issued_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Issued",
-                            formatDate(
-                                documentRecord.issued_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    documentRecord.signed_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Signed",
-                            formatDate(
-                                documentRecord.signed_at
-                            )
-                        )
-                    );
-                }
-
-                card.appendChild(meta);
-                list.appendChild(card);
             }
-        );
+
+            card.appendChild(top);
+
+            const meta = make("div", "record-meta");
+
+            appendMeta(meta, "Type", formatLabel(record.document_type));
+            appendMeta(meta, "Version", record.version);
+
+            if (record.issued_at) {
+                appendMeta(
+                    meta,
+                    "Issued",
+                    formatDate(record.issued_at)
+                );
+            }
+
+            if (record.signed_at) {
+                appendMeta(
+                    meta,
+                    "Signed",
+                    formatDate(record.signed_at)
+                );
+            }
+
+            card.appendChild(meta);
+            list.appendChild(card);
+        });
 
         panel.appendChild(list);
-
         return panel;
     }
 
-    function createAgreementsPanel(
-        agreements
-    ) {
-        const panel =
-            createContentPanel(
-                "Agreements",
-                "Author-visible agreements forming part of the publishing record."
-            );
+    function createAgreementsPanel(agreements) {
+        const panel = createContentPanel(
+            "Agreements",
+            "Author-visible agreements forming part of the publishing record."
+        );
 
-        if (agreements.length === 0) {
+        if (!agreements.length) {
             panel.appendChild(
                 createEmptyState(
                     "No author-visible agreements are currently recorded."
                 )
             );
-
             return panel;
         }
 
-        const list =
-            document.createElement("div");
+        const list = make("div", "record-list");
 
-        list.className =
-            "record-list";
+        agreements.forEach((agreement) => {
+            const card = make("article", "record-card");
+            const top = make("div", "record-card-top");
 
-        agreements.forEach(
-            function (agreement) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
-
-                card.className =
-                    "record-card";
-
-                const top =
-                    document.createElement(
-                        "div"
-                    );
-
-                top.className =
-                    "record-card-top";
-
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
-
-                title.className =
-                    "record-title";
-
-                title.textContent =
+            top.append(
+                make(
+                    "h4",
+                    "record-title",
                     agreement.title ||
-                    formatLabel(
-                        agreement.agreement_type
-                    );
+                        formatLabel(agreement.agreement_type)
+                ),
+                createStatusBadge(formatLabel(agreement.status))
+            );
 
-                top.appendChild(title);
+            card.appendChild(top);
 
-                top.appendChild(
-                    createStatusBadge(
-                        formatLabel(
-                            agreement.status
-                        )
+            if (agreement.summary_author) {
+                card.appendChild(
+                    make(
+                        "p",
+                        "record-description",
+                        agreement.summary_author
                     )
                 );
-
-                card.appendChild(top);
-
-                if (
-                    agreement.summary_author
-                ) {
-                    const description =
-                        document.createElement(
-                            "p"
-                        );
-
-                    description.className =
-                        "record-description";
-
-                    description.textContent =
-                        agreement.summary_author;
-
-                    card.appendChild(
-                        description
-                    );
-                }
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Agreement Record",
-                        agreement.agreement_reference
-                    )
-                );
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Type",
-                        formatLabel(
-                            agreement.agreement_type
-                        )
-                    )
-                );
-
-                if (
-                    agreement.agreement_date
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Agreement date",
-                            formatDate(
-                                agreement.agreement_date
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    agreement.effective_date
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Effective",
-                            formatDate(
-                                agreement.effective_date
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    agreement.expiry_date
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Expiry",
-                            formatDate(
-                                agreement.expiry_date
-                            )
-                        )
-                    );
-                }
-
-                card.appendChild(meta);
-                list.appendChild(card);
             }
-        );
+
+            const meta = make("div", "record-meta");
+
+            appendMeta(
+                meta,
+                "Agreement Record",
+                agreement.agreement_reference
+            );
+            appendMeta(
+                meta,
+                "Type",
+                formatLabel(agreement.agreement_type)
+            );
+
+            for (const [label, field] of [
+                ["Agreement date", "agreement_date"],
+                ["Effective", "effective_date"],
+                ["Expiry", "expiry_date"]
+            ]) {
+                if (agreement[field]) {
+                    appendMeta(
+                        meta,
+                        label,
+                        formatDate(agreement[field])
+                    );
+                }
+            }
+
+            card.appendChild(meta);
+            list.appendChild(card);
+        });
 
         panel.appendChild(list);
-
         return panel;
     }
 
-    function createRightsPanel(
-        rights,
-        rightsEvents
-    ) {
-        const panel =
-            createContentPanel(
-                "Rights",
-                "Rights recorded as held by Blackwood under the relevant publishing agreement."
-            );
+    function createRightsPanel(rights, rightsEvents) {
+        const panel = createContentPanel(
+            "Rights",
+            "Rights recorded as held by Blackwood under the relevant publishing agreement."
+        );
 
-        if (rights.length === 0) {
+        if (!rights.length) {
             panel.appendChild(
                 createEmptyState(
                     "No author-visible rights records are currently recorded."
                 )
             );
-
             return panel;
         }
 
-        const list =
-            document.createElement("div");
+        const list = make("div", "record-list");
 
-        list.className =
-            "record-list";
+        rights.forEach((right) => {
+            const card = make("article", "record-card");
+            const top = make("div", "record-card-top");
 
-        rights.forEach(function (right) {
-            const card =
-                document.createElement(
-                    "article"
-                );
-
-            card.className =
-                "record-card";
-
-            const top =
-                document.createElement(
-                    "div"
-                );
-
-            top.className =
-                "record-card-top";
-
-            const title =
-                document.createElement(
-                    "h4"
-                );
-
-            title.className =
-                "record-title";
-
-            title.textContent =
-                formatLabel(
-                    right.right_type
-                );
-
-            top.appendChild(title);
-
-            top.appendChild(
-                createStatusBadge(
-                    formatLabel(
-                        right.status
-                    )
-                )
+            top.append(
+                make(
+                    "h4",
+                    "record-title",
+                    formatLabel(right.right_type)
+                ),
+                createStatusBadge(formatLabel(right.status))
             );
 
             card.appendChild(top);
 
-            if (
-                right.summary_author
-            ) {
-                const description =
-                    document.createElement(
-                        "p"
-                    );
-
-                description.className =
-                    "record-description";
-
-                description.textContent =
-                    right.summary_author;
-
+            if (right.summary_author) {
                 card.appendChild(
-                    description
-                );
-            }
-
-            const meta =
-                document.createElement(
-                    "div"
-                );
-
-            meta.className =
-                "record-meta";
-
-            meta.appendChild(
-                createInlineMeta(
-                    "Rights Record",
-                    right.rights_reference
-                )
-            );
-
-            if (right.format_scope) {
-                meta.appendChild(
-                    createInlineMeta(
-                        "Format",
-                        formatLabel(
-                            right.format_scope
-                        )
+                    make(
+                        "p",
+                        "record-description",
+                        right.summary_author
                     )
                 );
             }
 
-            meta.appendChild(
-                createInlineMeta(
-                    "Territory",
-                    right.territory
-                )
+            const meta = make("div", "record-meta");
+
+            appendMeta(meta, "Rights Record", right.rights_reference);
+            appendMeta(
+                meta,
+                "Format",
+                right.format_scope
+                    ? formatLabel(right.format_scope)
+                    : null
+            );
+            appendMeta(meta, "Territory", right.territory);
+            appendMeta(meta, "Language", right.language);
+            appendMeta(
+                meta,
+                "Exclusivity",
+                formatLabel(right.exclusivity)
             );
 
-            meta.appendChild(
-                createInlineMeta(
-                    "Language",
-                    right.language
-                )
-            );
-
-            meta.appendChild(
-                createInlineMeta(
-                    "Exclusivity",
-                    formatLabel(
-                        right.exclusivity
-                    )
-                )
-            );
-
-            if (
-                right.effective_date
-            ) {
-                meta.appendChild(
-                    createInlineMeta(
-                        "Effective",
-                        formatDate(
-                            right.effective_date
-                        )
-                    )
+            if (right.effective_date) {
+                appendMeta(
+                    meta,
+                    "Effective",
+                    formatDate(right.effective_date)
                 );
             }
 
-            if (
-                right.expiry_date
-            ) {
-                meta.appendChild(
-                    createInlineMeta(
-                        "Expiry",
-                        formatDate(
-                            right.expiry_date
-                        )
-                    )
+            if (right.expiry_date) {
+                appendMeta(
+                    meta,
+                    "Expiry",
+                    formatDate(right.expiry_date)
                 );
             }
 
             card.appendChild(meta);
 
-            const events =
-                rightsEvents.filter(
-                    function (event) {
-                        return (
-                            event.right_id ===
-                            right.id
-                        );
-                    }
-                );
+            const events = rightsEvents.filter(
+                (event) => event.right_id === right.id
+            );
 
-            if (events.length > 0) {
-                const history =
-                    document.createElement(
-                        "div"
+            if (events.length) {
+                const timeline = make("div", "timeline");
+
+                events.forEach((event) => {
+                    const item = make("div", "timeline-item");
+
+                    item.append(
+                        make(
+                            "p",
+                            "timeline-date",
+                            formatDate(event.event_date)
+                        ),
+                        make(
+                            "h5",
+                            "timeline-title",
+                            formatLabel(event.event_type)
+                        )
                     );
 
-                history.className =
-                    "timeline";
-
-                events.forEach(
-                    function (event) {
-                        const item =
-                            document.createElement(
-                                "div"
-                            );
-
-                        item.className =
-                            "timeline-item";
-
-                        const date =
-                            document.createElement(
-                                "p"
-                            );
-
-                        date.className =
-                            "timeline-date";
-
-                        date.textContent =
-                            formatDate(
-                                event.event_date
-                            );
-
-                        const eventTitle =
-                            document.createElement(
-                                "h5"
-                            );
-
-                        eventTitle.className =
-                            "timeline-title";
-
-                        eventTitle.textContent =
-                            formatLabel(
-                                event.event_type
-                            );
-
+                    if (event.description_author) {
                         item.appendChild(
-                            date
-                        );
-
-                        item.appendChild(
-                            eventTitle
-                        );
-
-                        if (
-                            event.description_author
-                        ) {
-                            const note =
-                                document.createElement(
-                                    "p"
-                                );
-
-                            note.className =
-                                "timeline-note";
-
-                            note.textContent =
-                                event.description_author;
-
-                            item.appendChild(
-                                note
-                            );
-                        }
-
-                        history.appendChild(
-                            item
+                            make(
+                                "p",
+                                "timeline-note",
+                                event.description_author
+                            )
                         );
                     }
-                );
 
-                card.appendChild(
-                    history
-                );
+                    timeline.appendChild(item);
+                });
+
+                card.appendChild(timeline);
             }
 
             list.appendChild(card);
         });
 
         panel.appendChild(list);
-
         return panel;
     }
-function renderOverviewRoyalties(financeData) {
-    const container = document.getElementById(
-        "overview-royalty-summary"
-    );
 
-    if (!container) return;
+    // ---------------------------------------------------------
+    // OVERVIEW: MONTHLY ROYALTIES + ISSUED ACCOUNT FIGURES
+    // ---------------------------------------------------------
 
-    container.replaceChildren();
+    function renderOverviewRoyalties(financeData) {
+        const container = $("overview-royalty-summary");
+        if (!container) return;
 
-    const currencies = getFinanceCurrencies(
-        financeData.statements.filter(
-            statement => statement.status === "issued"
-        ),
-        financeData.payments,
-        financeData.paymentRequests,
-        financeData.advances
-    );
+        container.replaceChildren();
 
-    if (currencies.length === 0) {
-        container.appendChild(
-            createEmptyState(
-                "No royalty statements are currently available."
-            )
-        );
-        return;
-    }
+        if (monthlyRoyaltiesAvailable) {
+            const monthlyTotal = currentMonthlyRoyalties.reduce(
+                (sum, row) => sum + row.author_royalties_gbp,
+                0
+            );
 
-    currencies.forEach(function (currency) {
-        const figures = calculateFinanceSummary(
-            currency,
-            financeData
-        );
+            const monthlyGrid = make(
+                "div",
+                "finance-summary-grid"
+            );
 
-        const group = document.createElement("div");
-        group.className = "finance-account-currency";
+            monthlyGrid.appendChild(
+                createFinanceSummaryCard(
+                    "Reported Author Royalties",
+                    formatMoney(monthlyTotal, "GBP"),
+                    "Your share of reported book royalties. These figures are not issued statements or an available payment balance."
+                )
+            );
 
-        if (currencies.length > 1) {
-            const heading = document.createElement("h4");
-            heading.textContent = currency;
-            group.appendChild(heading);
+            container.appendChild(monthlyGrid);
+        } else {
+            container.appendChild(
+                createEmptyState(
+                    "Monthly royalty reporting is not currently available."
+                )
+            );
         }
 
-        const grid = document.createElement("div");
-        grid.className = "finance-summary-grid";
-
-        grid.appendChild(
-            createFinanceSummaryCard(
-                "Royalties Earned",
-                formatMoney(figures.royaltiesEarned, currency),
-                "Royalties shown on issued statements."
-            )
-        );
-
-        grid.appendChild(
-            createFinanceSummaryCard(
-                "Payments Made",
-                formatMoney(figures.totalPayments, currency),
-                "Payments recorded as paid."
-            )
-        );
-
-        grid.appendChild(
-            createFinanceSummaryCard(
-                "Payment Pending",
-                formatMoney(figures.pendingPayment, currency),
-                "Outstanding requests and payments being processed."
-            )
-        );
-
-        group.appendChild(grid);
-        container.appendChild(group);
-    });
-}
-    function renderFinance(financeData) {
-        statementCount.textContent =
-            String(
-                financeData.statements.length
-            );
-
-        paymentCount.textContent =
-            String(
-                financeData.payments.length
-            );
-
-        paymentRequestCount.textContent =
-            String(
-                financeData.paymentRequests.length
-            );
-
-        renderFinanceAccountSummary(
-            financeData
-        );
-
-        renderStatements(
-            financeData.statements,
-            financeData.statementLines
-        );
-
-        renderPayments(
-            financeData.payments,
-            financeData.paymentAllocations,
-            financeData.statements
-        );
-
-        renderPaymentRequests(
-            financeData.paymentRequests
-        );
-    }
-
-    function renderFinanceAccountSummary(
-        financeData
-    ) {
-        const existingSummary =
-            document.getElementById(
-                "finance-account-summary"
-            );
-
-        if (existingSummary) {
-            existingSummary.remove();
-        }
-
-        const statements =
+        const currencies = getFinanceCurrencies(
             financeData.statements.filter(
-                function (statement) {
-                    return (
-                        statement.status ===
-                        "issued"
-                    );
-                }
-            );
+                (statement) => statement.status === "issued"
+            ),
+            financeData.payments,
+            financeData.paymentRequests,
+            financeData.advances
+        );
 
-        const currencies =
-            getFinanceCurrencies(
-                statements,
-                financeData.payments,
-                financeData.paymentRequests,
-                financeData.advances
+        if (!currencies.length) {
+            container.appendChild(
+                createEmptyState(
+                    "No issued royalty statements are currently available."
+                )
             );
-
-        if (currencies.length === 0) {
             return;
         }
 
-        const summaryPanel =
-            createContentPanel(
-                "Account Summary",
-                "A current summary of royalties, advances and payments recorded against your author account."
+        currencies.forEach((currency) => {
+            const figures = calculateFinanceSummary(
+                currency,
+                financeData
             );
 
-        summaryPanel.id =
-            "finance-account-summary";
+            const group = make(
+                "div",
+                "finance-account-currency"
+            );
 
-        const summaryList =
-            document.createElement("div");
-
-        summaryList.className =
-            "finance-account-summary";
-
-        currencies.forEach(
-            function (currency) {
-                const figures =
-                    calculateFinanceSummary(
-                        currency,
-                        financeData
-                    );
-
-                const currencyBlock =
-                    document.createElement(
-                        "div"
-                    );
-
-                currencyBlock.className =
-                    "finance-account-currency";
-
-                if (
-                    currencies.length > 1
-                ) {
-                    const currencyHeading =
-                        document.createElement(
-                            "h4"
-                        );
-
-                    currencyHeading.className =
-                        "record-title";
-
-                    currencyHeading.textContent =
-                        currency;
-
-                    currencyBlock.appendChild(
-                        currencyHeading
-                    );
-                }
-
-                const grid =
-                    document.createElement(
-                        "div"
-                    );
-
-                grid.className =
-                    "finance-summary-grid";
-
-                grid.appendChild(
-                    createFinanceSummaryCard(
-                        "Royalties Earned",
-                        formatMoney(
-                            figures.royaltiesEarned,
-                            currency
-                        ),
-                        "Royalties recorded on issued statements before advance recoupment."
-                    )
-                );
-
-                grid.appendChild(
-                    createFinanceSummaryCard(
-                        "Advance Remaining",
-                        formatMoney(
-                            figures.advanceRemaining,
-                            currency
-                        ),
-                        figures.advanceRemaining > 0
-                            ? "Royalties continue to reduce the unrecouped advance balance."
-                            : "No unrecouped advance balance is currently recorded."
-                    )
-                );
-
-                grid.appendChild(
-                    createFinanceSummaryCard(
-                        "Balance Due",
-                        formatMoney(
-                            figures.balanceDue,
-                            currency
-                        ),
-                        figures.advanceRemaining > 0
-                            ? "No royalty payment is due while royalties are being applied against the advance."
-                            : "Issued payable royalties not already reserved or allocated to a live payment."
-                    )
-                );
-
-                grid.appendChild(
-                    createFinanceSummaryCard(
-                        "Pending Payment",
-                        formatMoney(
-                            figures.pendingPayment,
-                            currency
-                        ),
-                        "Payment value currently requested, approved or processing."
-                    )
-                );
-
-                grid.appendChild(
-                    createFinanceSummaryCard(
-                        "Total Payments",
-                        formatMoney(
-                            figures.totalPayments,
-                            currency
-                        ),
-                        "Payments recorded as paid."
-                    )
-                );
-
-                currencyBlock.appendChild(
-                    grid
-                );
-
-                currencyBlock.appendChild(
-                    createPaymentRequestPanel(
-                        currency,
-                        figures
-                    )
-                );
-
-                summaryList.appendChild(
-                    currencyBlock
+            if (currencies.length > 1) {
+                group.appendChild(
+                    make("h4", "", currency)
                 );
             }
+
+            const grid = make(
+                "div",
+                "finance-summary-grid"
+            );
+
+            grid.append(
+                createFinanceSummaryCard(
+                    "Royalties on Issued Statements",
+                    formatMoney(
+                        figures.royaltiesEarned,
+                        currency
+                    ),
+                    "Royalties recorded on issued statements."
+                ),
+                createFinanceSummaryCard(
+                    "Payments Made",
+                    formatMoney(
+                        figures.totalPayments,
+                        currency
+                    ),
+                    "Payments recorded as paid."
+                ),
+                createFinanceSummaryCard(
+                    "Payment Pending",
+                    formatMoney(
+                        figures.pendingPayment,
+                        currency
+                    ),
+                    "Outstanding requests and payments being processed."
+                )
+            );
+
+            group.appendChild(grid);
+            container.appendChild(group);
+        });
+    }
+
+    // ---------------------------------------------------------
+    // FINANCE DASHBOARD
+    // ---------------------------------------------------------
+
+    function renderFinance(data) {
+        setText(
+            elements.statementCount,
+            data.statements.length
+        );
+        setText(
+            elements.paymentCount,
+            data.payments.length
+        );
+        setText(
+            elements.paymentRequestCount,
+            data.paymentRequests.length
         );
 
-        summaryPanel.appendChild(
-            summaryList
+        renderFinanceAccountSummary(data);
+        renderMonthlyRoyalties();
+        renderStatements(
+            data.statements,
+            data.statementLines
         );
+        renderPayments(
+            data.payments,
+            data.paymentAllocations,
+            data.statements
+        );
+        renderPaymentRequests(data.paymentRequests);
+    }
+
+    function renderMonthlyRoyalties() {
+        $("author-monthly-royalties")?.remove();
+
+        const panel = createContentPanel(
+            "Monthly Book Royalties",
+            "Your share of royalties reported by book and month. These are reporting figures, not issued statements or amounts available to withdraw."
+        );
+
+        panel.id = "author-monthly-royalties";
+
+        if (!monthlyRoyaltiesAvailable) {
+            panel.appendChild(
+                createEmptyState(
+                    "Monthly royalty reporting is not currently available."
+                )
+            );
+        } else if (!currentMonthlyRoyalties.length) {
+            panel.appendChild(
+                createEmptyState(
+                    "No monthly book royalties have been reported for your account."
+                )
+            );
+        } else {
+            const total = currentMonthlyRoyalties.reduce(
+                (sum, row) => sum + row.author_royalties_gbp,
+                0
+            );
+
+            const units = currentMonthlyRoyalties.reduce(
+                (sum, row) => sum + row.net_units_sold,
+                0
+            );
+
+            const summary = make(
+                "div",
+                "finance-summary-grid"
+            );
+
+            summary.append(
+                createFinanceSummaryCard(
+                    "Total Reported Author Royalties",
+                    formatMoney(total, "GBP"),
+                    "Your royalty share across all reported months."
+                ),
+                createFinanceSummaryCard(
+                    "Net Units Reported",
+                    new Intl.NumberFormat("en-GB").format(units),
+                    "Net units in the royalty reports."
+                )
+            );
+
+            panel.appendChild(summary);
+
+            const byMonth = new Map();
+
+            currentMonthlyRoyalties.forEach((row) => {
+                const month = String(
+                    row.royalty_month || "Unknown month"
+                );
+
+                if (!byMonth.has(month)) {
+                    byMonth.set(month, []);
+                }
+
+                byMonth.get(month).push(row);
+            });
+
+            for (const [month, rows] of byMonth) {
+                const monthGroup = make(
+                    "div",
+                    "finance-account-currency"
+                );
+
+                monthGroup.appendChild(
+                    make(
+                        "h4",
+                        "record-title",
+                        formatMonth(month)
+                    )
+                );
+
+                const list = make("div", "record-list");
+
+                rows.forEach((row) => {
+                    const card = make(
+                        "article",
+                        "record-card"
+                    );
+
+                    const top = make(
+                        "div",
+                        "record-card-top"
+                    );
+
+                    top.append(
+                        make(
+                            "h5",
+                            "record-title",
+                            row.book_title
+                        ),
+                        createStatusBadge(
+                            formatLabel(row.reporting_status)
+                        )
+                    );
+
+                    const meta = make(
+                        "div",
+                        "record-meta"
+                    );
+
+                    meta.append(
+                        createInlineMeta(
+                            "Author royalties",
+                            formatMoney(
+                                row.author_royalties_gbp,
+                                "GBP"
+                            )
+                        ),
+                        createInlineMeta(
+                            "Net units",
+                            row.net_units_sold.toLocaleString("en-GB")
+                        )
+                    );
+
+                    card.append(top, meta);
+                    list.appendChild(card);
+                });
+
+                const monthTotal = rows.reduce(
+                    (sum, row) =>
+                        sum + row.author_royalties_gbp,
+                    0
+                );
+
+                monthGroup.append(
+                    list,
+                    make(
+                        "p",
+                        "record-description",
+                        "Monthly author royalty total: " +
+                            formatMoney(monthTotal, "GBP")
+                    )
+                );
+
+                panel.appendChild(monthGroup);
+            }
+        }
+
+        const accountSummary = $("finance-account-summary");
+
+        if (accountSummary?.parentNode) {
+            accountSummary.parentNode.insertBefore(
+                panel,
+                accountSummary
+            );
+            return;
+        }
 
         const statementsPanel =
-            statementList.closest(
-                ".content-panel"
-            );
+            elements.statementList?.closest(".content-panel");
 
-        if (
-            statementsPanel &&
-            statementsPanel.parentNode
-        ) {
+        if (statementsPanel?.parentNode) {
             statementsPanel.parentNode.insertBefore(
-                summaryPanel,
+                panel,
                 statementsPanel
             );
+        } else {
+            $("section-finance")?.appendChild(panel);
         }
     }
 
-    function createPaymentRequestPanel(
-        currency,
-        figures
-    ) {
-        const panel =
-            document.createElement("div");
+    function renderFinanceAccountSummary(data) {
+        $("finance-account-summary")?.remove();
 
-        panel.className =
-            "payment-request-control";
+        const currencies = getFinanceCurrencies(
+            data.statements.filter(
+                (row) => row.status === "issued"
+            ),
+            data.payments,
+            data.paymentRequests,
+            data.advances
+        );
 
-        const heading =
-            document.createElement("h4");
+        if (!currencies.length) return;
 
-        heading.className =
-            "record-title";
+        const panel = createContentPanel(
+            "Account Summary",
+            "Issued royalties, advances and payments recorded against your author account."
+        );
 
-        heading.textContent =
-            "Request Payment";
+        panel.id = "finance-account-summary";
 
-        panel.appendChild(heading);
+        const list = make(
+            "div",
+            "finance-account-summary"
+        );
 
-        const description =
-            document.createElement("p");
-
-        description.className =
-            "record-description";
-
-        if (figures.advanceRemaining > 0) {
-            description.textContent =
-                "Payment requests are not available while royalties are being applied against an unrecouped advance.";
-
-            panel.appendChild(
-                description
+        currencies.forEach((currency) => {
+            const figures = calculateFinanceSummary(
+                currency,
+                data
             );
 
+            const group = make(
+                "div",
+                "finance-account-currency"
+            );
+
+            if (currencies.length > 1) {
+                group.appendChild(
+                    make(
+                        "h4",
+                        "record-title",
+                        currency
+                    )
+                );
+            }
+
+            const grid = make(
+                "div",
+                "finance-summary-grid"
+            );
+
+            grid.append(
+                createFinanceSummaryCard(
+                    "Royalties Earned",
+                    formatMoney(
+                        figures.royaltiesEarned,
+                        currency
+                    ),
+                    "Royalties recorded on issued statements before advance recoupment."
+                ),
+                createFinanceSummaryCard(
+                    "Advance Remaining",
+                    formatMoney(
+                        figures.advanceRemaining,
+                        currency
+                    ),
+                    figures.advanceRemaining > 0
+                        ? "Royalties continue to reduce the unrecouped advance balance."
+                        : "No unrecouped advance balance is currently recorded."
+                ),
+                createFinanceSummaryCard(
+                    "Balance Due",
+                    formatMoney(
+                        figures.balanceDue,
+                        currency
+                    ),
+                    figures.advanceRemaining > 0
+                        ? "No royalty payment is due while royalties are being applied against an advance."
+                        : "Issued payable royalties not reserved or allocated to a live payment."
+                ),
+                createFinanceSummaryCard(
+                    "Pending Payment",
+                    formatMoney(
+                        figures.pendingPayment,
+                        currency
+                    ),
+                    "Payment value currently requested, approved or processing."
+                ),
+                createFinanceSummaryCard(
+                    "Total Payments",
+                    formatMoney(
+                        figures.totalPayments,
+                        currency
+                    ),
+                    "Payments recorded as paid."
+                )
+            );
+
+            group.append(
+                grid,
+                createPaymentRequestPanel(currency, figures)
+            );
+
+            list.appendChild(group);
+        });
+
+        panel.appendChild(list);
+
+        const statementsPanel =
+            elements.statementList?.closest(".content-panel");
+
+        if (statementsPanel?.parentNode) {
+            statementsPanel.parentNode.insertBefore(
+                panel,
+                statementsPanel
+            );
+        } else {
+            $("section-finance")?.appendChild(panel);
+        }
+    }
+
+    // ---------------------------------------------------------
+    // FINANCE CALCULATIONS
+    //
+    // Payment eligibility is based ONLY on issued statements.
+    // Monthly reporting is never added to the payable balance.
+    // ---------------------------------------------------------
+
+    function calculateFinanceSummary(currency, data) {
+        const statements = data.statements.filter(
+            (row) =>
+                row.status === "issued" &&
+                normaliseCurrency(row.currency) === currency
+        );
+
+        const advances = data.advances.filter(
+            (row) =>
+                normaliseCurrency(row.currency) === currency &&
+                !["cancelled", "superseded"].includes(row.status)
+        );
+
+        const royaltiesEarned = sumValues(
+            statements,
+            "total_royalty_amount"
+        );
+
+        const advanceRemaining = Math.max(
+            0,
+            sumValues(advances, "total_amount") -
+                sumValues(statements, "total_advance_applied")
+        );
+
+        const grossPayable = sumValues(
+            statements,
+            "amount_payable"
+        );
+
+        const livePaymentIds = new Set(
+            data.payments
+                .filter(
+                    (payment) =>
+                        normaliseCurrency(payment.currency) ===
+                            currency &&
+                        [
+                            "approved",
+                            "processing",
+                            "paid",
+                            "simulated"
+                        ].includes(payment.status)
+                )
+                .map((payment) => payment.id)
+        );
+
+        const issuedStatementIds = new Set(
+            statements.map((statement) => statement.id)
+        );
+
+        const allocatedAmount = data.paymentAllocations
+            .filter(
+                (allocation) =>
+                    livePaymentIds.has(allocation.payment_id) &&
+                    issuedStatementIds.has(allocation.statement_id)
+            )
+            .reduce(
+                (total, allocation) =>
+                    total + toNumber(allocation.amount),
+                0
+            );
+
+        const reservedRequestAmount = sumValues(
+            data.paymentRequests.filter(
+                (request) =>
+                    normaliseCurrency(request.currency) ===
+                        currency &&
+                    ["requested", "approved"].includes(
+                        request.status
+                    )
+            ),
+            "requested_amount"
+        );
+
+        const pendingPaymentAmount = sumValues(
+            data.payments.filter(
+                (payment) =>
+                    normaliseCurrency(payment.currency) ===
+                        currency &&
+                    ["approved", "processing"].includes(
+                        payment.status
+                    )
+            ),
+            "amount"
+        );
+
+        const totalPayments = sumValues(
+            data.payments.filter(
+                (payment) =>
+                    normaliseCurrency(payment.currency) ===
+                        currency &&
+                    payment.status === "paid"
+            ),
+            "amount"
+        );
+
+        return {
+            royaltiesEarned,
+            advanceRemaining,
+            balanceDue:
+                advanceRemaining > 0
+                    ? 0
+                    : Math.max(
+                        0,
+                        grossPayable -
+                            allocatedAmount -
+                            reservedRequestAmount
+                    ),
+            pendingPayment:
+                pendingPaymentAmount + reservedRequestAmount,
+            totalPayments
+        };
+    }
+
+    function getFinanceCurrencies(
+        statements,
+        payments,
+        requests,
+        advances
+    ) {
+        const currencies = new Set();
+
+        for (const records of [
+            statements,
+            payments,
+            requests,
+            advances
+        ]) {
+            records.forEach((record) => {
+                const currency = normaliseCurrency(
+                    record.currency
+                );
+
+                if (currency) currencies.add(currency);
+            });
+        }
+
+        return [...currencies].sort();
+    }
+
+    // ---------------------------------------------------------
+    // AUTHOR PAYMENT REQUESTS
+    // ---------------------------------------------------------
+
+    function createPaymentRequestPanel(currency, figures) {
+        const panel = make(
+            "div",
+            "payment-request-control"
+        );
+
+        panel.appendChild(
+            make("h4", "record-title", "Request Payment")
+        );
+
+        if (figures.advanceRemaining > 0) {
+            panel.appendChild(
+                make(
+                    "p",
+                    "record-description",
+                    "Payment requests are not available while royalties are being applied against an unrecouped advance."
+                )
+            );
             return panel;
         }
 
         if (figures.balanceDue <= 0) {
-            description.textContent =
-                "There is currently no balance available to request.";
-
             panel.appendChild(
-                description
+                make(
+                    "p",
+                    "record-description",
+                    "There is currently no balance available to request."
+                )
             );
-
             return panel;
         }
 
-        description.textContent =
-            "You can request up to " +
-            formatMoney(
-                figures.balanceDue,
-                currency
-            ) +
-            ".";
-
         panel.appendChild(
-            description
+            make(
+                "p",
+                "record-description",
+                "You can request up to " +
+                    formatMoney(figures.balanceDue, currency) +
+                    "."
+            )
         );
 
-        const form =
-            document.createElement("form");
+        const form = make(
+            "form",
+            "payment-request-form"
+        );
 
-        form.className =
-            "payment-request-form";
-
-        const field =
-            document.createElement("div");
-
-        field.className =
-            "payment-request-field";
-
-        const label =
-            document.createElement("label");
+        const field = make(
+            "div",
+            "payment-request-field"
+        );
 
         const inputId =
-            "payment-request-" +
-            currency.toLowerCase();
+            "payment-request-" + currency.toLowerCase();
 
-        label.setAttribute(
-            "for",
-            inputId
+        const label = make("label", "", "Amount");
+        label.htmlFor = inputId;
+
+        const input = document.createElement("input");
+
+        Object.assign(input, {
+            id: inputId,
+            name: "amount",
+            type: "number",
+            min: "0.01",
+            max: figures.balanceDue.toFixed(2),
+            step: "0.01",
+            value: figures.balanceDue.toFixed(2),
+            required: true,
+            inputMode: "decimal"
+        });
+
+        field.append(label, input);
+
+        const button = make(
+            "button",
+            "payment-request-button",
+            "Submit payment request"
         );
+        button.type = "submit";
 
-        label.textContent =
-            "Amount";
+        const message = make(
+            "p",
+            "payment-request-message"
+        );
+        message.hidden = true;
+        message.setAttribute("role", "status");
 
-        const input =
-            document.createElement("input");
+        form.append(field, button, message);
 
-        input.id =
-            inputId;
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
 
-        input.name =
-            "amount";
+            clearPaymentRequestMessage(message);
 
-        input.type =
-            "number";
+            const amount = Number(input.value);
 
-        input.min =
-            "0.01";
+            if (
+                !Number.isFinite(amount) ||
+                amount <= 0 ||
+                Math.round(amount * 100) !== amount * 100
+            ) {
+                showPaymentRequestMessage(
+                    message,
+                    "Enter a valid amount in pounds and pence.",
+                    true
+                );
+                return;
+            }
 
-        input.max =
-            figures.balanceDue.toFixed(2);
+            if (amount > figures.balanceDue) {
+                showPaymentRequestMessage(
+                    message,
+                    "The requested amount cannot exceed the current balance due.",
+                    true
+                );
+                return;
+            }
 
-        input.step =
-            "0.01";
+            input.disabled = true;
+            button.disabled = true;
+            button.textContent = "Submitting…";
 
-        input.value =
-            figures.balanceDue.toFixed(2);
+            try {
+                const { error } = await client.rpc(
+                    "create_payment_request",
+                    {
+                        p_requested_amount: amount,
+                        p_currency: currency
+                    }
+                );
 
-        input.required =
-            true;
+                if (error) throw error;
 
-        input.inputMode =
-            "decimal";
+                await refreshAuthorFinance();
+            } catch (error) {
+                console.error(
+                    "Payment request failed:",
+                    error
+                );
 
-        field.appendChild(label);
-        field.appendChild(input);
+                input.disabled = false;
+                button.disabled = false;
+                button.textContent =
+                    "Submit payment request";
 
-        const button =
-            document.createElement("button");
-
-        button.type =
-            "submit";
-
-        button.className =
-            "payment-request-button";
-
-        button.textContent =
-            "Submit payment request";
-
-        const message =
-            document.createElement("p");
-
-        message.className =
-            "payment-request-message";
-
-        message.hidden =
-            true;
-
-        form.appendChild(field);
-        form.appendChild(button);
-        form.appendChild(message);
-
-        form.addEventListener(
-            "submit",
-            function (event) {
-                handlePaymentRequestSubmit(
-                    event,
-                    currency,
-                    figures.balanceDue,
-                    input,
-                    button,
-                    message
+                showPaymentRequestMessage(
+                    message,
+                    getPaymentRequestErrorMessage(error),
+                    true
                 );
             }
-        );
+        });
 
         panel.appendChild(form);
-
         return panel;
-    }
-
-    async function handlePaymentRequestSubmit(
-        event,
-        currency,
-        maximumAmount,
-        input,
-        button,
-        message
-    ) {
-        event.preventDefault();
-
-        const requestedAmount =
-            Number(input.value);
-
-        clearPaymentRequestMessage(
-            message
-        );
-
-        if (
-            !Number.isFinite(
-                requestedAmount
-            ) ||
-            requestedAmount <= 0
-        ) {
-            showPaymentRequestMessage(
-                message,
-                "Enter a payment amount greater than zero.",
-                true
-            );
-
-            return;
-        }
-
-        if (
-            requestedAmount >
-            maximumAmount
-        ) {
-            showPaymentRequestMessage(
-                message,
-                "The requested amount cannot exceed the current balance due.",
-                true
-            );
-
-            return;
-        }
-
-        input.disabled =
-            true;
-
-        button.disabled =
-            true;
-
-        button.textContent =
-            "Submitting…";
-
-        try {
-            const {
-                error
-            } = await client.rpc(
-                "create_payment_request",
-                {
-                    p_requested_amount:
-                        requestedAmount,
-                    p_currency:
-                        currency
-                }
-            );
-
-            if (error) {
-                throw error;
-            }
-
-            showPaymentRequestMessage(
-                message,
-                "Payment request submitted successfully.",
-                false
-            );
-
-            await refreshAuthorFinance();
-
-        } catch (error) {
-            console.error(
-                "Payment request failed:",
-                error
-            );
-
-            input.disabled =
-                false;
-
-            button.disabled =
-                false;
-
-            button.textContent =
-                "Submit payment request";
-
-            showPaymentRequestMessage(
-                message,
-                getPaymentRequestErrorMessage(
-                    error
-                ),
-                true
-            );
-        }
     }
 
     async function handlePaymentRequestCancel(
@@ -3323,133 +2054,50 @@ function renderOverviewRoyalties(financeData) {
         button,
         message
     ) {
-        clearPaymentRequestMessage(
-            message
-        );
+        clearPaymentRequestMessage(message);
 
-        button.disabled =
-            true;
-
-        button.textContent =
-            "Cancelling…";
+        button.disabled = true;
+        button.textContent = "Cancelling…";
 
         try {
-            const { error } =
-                await client.rpc(
-                    "cancel_payment_request",
-                    {
-                        p_request_id:
-                            requestId
-                    }
-                );
-            if (error) {
-                throw error;
-            }
+            const { error } = await client.rpc(
+                "cancel_payment_request",
+                { p_request_id: requestId }
+            );
+
+            if (error) throw error;
 
             await refreshAuthorFinance();
-
         } catch (error) {
             console.error(
                 "Payment request cancellation failed:",
                 error
             );
 
-            button.disabled =
-                false;
-
-            button.textContent =
-                "Cancel request";
+            button.disabled = false;
+            button.textContent = "Cancel request";
 
             showPaymentRequestMessage(
                 message,
-                getPaymentRequestCancelErrorMessage(
-                    error
-                ),
+                getPaymentRequestCancelErrorMessage(error),
                 true
             );
         }
     }
 
-    function getPaymentRequestCancelErrorMessage(
-        error
-    ) {
-        const rawMessage =
-            error &&
-            error.message
-                ? String(
-                    error.message
-                )
-                : "";
-
-        const lowerMessage =
-            rawMessage.toLowerCase();
+    function getPaymentRequestErrorMessage(error) {
+        const message = String(
+            error?.message || ""
+        ).toLowerCase();
 
         if (
-            lowerMessage.includes(
-                "requested"
-            ) ||
-            lowerMessage.includes(
-                "cancel"
-            )
-        ) {
-            return "This payment request can no longer be cancelled. Please refresh your Author Desk.";
-        }
-
-        if (
-            lowerMessage.includes(
-                "desk"
-            ) ||
-            lowerMessage.includes(
-                "author"
-            ) ||
-            lowerMessage.includes(
-                "authenticated"
-            )
-        ) {
-            return "Your Author Desk could not authorise this cancellation. Please sign in again and retry.";
-        }
-
-        return "The payment request could not be cancelled. No changes have been made.";
-    }
-
-    function getPaymentRequestErrorMessage(
-        error
-    ) {
-        const rawMessage =
-            error &&
-            error.message
-                ? String(
-                    error.message
-                )
-                : "";
-
-        const lowerMessage =
-            rawMessage.toLowerCase();
-
-        if (
-            lowerMessage.includes(
-                "available"
-            ) ||
-            lowerMessage.includes(
-                "balance"
-            ) ||
-            lowerMessage.includes(
-                "exceed"
-            )
+            /available|balance|exceed/.test(message)
         ) {
             return "That amount is no longer available to request. Please refresh your Author Desk and try again.";
         }
 
         if (
-            lowerMessage.includes(
-                "desk"
-            ) ||
-            lowerMessage.includes(
-                "author"
-            ) ||
-            lowerMessage.includes(
-                "authenticated"
-            )
+            /desk|author|authenticated/.test(message)
         ) {
             return "Your Author Desk could not authorise this payment request. Please sign in again and retry.";
         }
@@ -3457,1351 +2105,1070 @@ function renderOverviewRoyalties(financeData) {
         return "The payment request could not be submitted. No payment request has been created.";
     }
 
-    function showPaymentRequestMessage(
-        element,
-        text,
-        isError
-    ) {
-        element.textContent =
-            text;
+    function getPaymentRequestCancelErrorMessage(error) {
+        const message = String(
+            error?.message || ""
+        ).toLowerCase();
 
-        element.hidden =
-            false;
-
-        element.classList.toggle(
-            "error",
-            isError
-        );
-
-        element.classList.toggle(
-            "success",
-            !isError
-        );
-    }
-
-    function clearPaymentRequestMessage(
-        element
-    ) {
-        element.textContent =
-            "";
-
-        element.hidden =
-            true;
-
-        element.classList.remove(
-            "error",
-            "success"
-        );
-    }
-
-    function calculateFinanceSummary(
-        currency,
-        financeData
-    ) {
-        const issuedStatements =
-            financeData.statements.filter(
-                function (statement) {
-                    return (
-                        statement.status ===
-                            "issued" &&
-                        normaliseCurrency(
-                            statement.currency
-                        ) === currency
-                    );
-                }
-            );
-
-        const activeAdvances =
-            financeData.advances.filter(
-                function (advance) {
-                    return (
-                        normaliseCurrency(
-                            advance.currency
-                        ) === currency &&
-                        advance.status !==
-                            "cancelled" &&
-                        advance.status !==
-                            "superseded"
-                    );
-                }
-            );
-
-        const royaltiesEarned =
-            sumValues(
-                issuedStatements,
-                "total_royalty_amount"
-            );
-
-        const totalAdvanceAmount =
-            sumValues(
-                activeAdvances,
-                "total_amount"
-            );
-
-        const advanceApplied =
-            sumValues(
-                issuedStatements,
-                "total_advance_applied"
-            );
-
-        const advanceRemaining =
-            Math.max(
-                0,
-                totalAdvanceAmount -
-                    advanceApplied
-            );
-
-        const grossPayable =
-            sumValues(
-                issuedStatements,
-                "amount_payable"
-            );
-
-        const livePaymentIds =
-            new Set(
-                financeData.payments
-                    .filter(
-                        function (payment) {
-                            return (
-                                normaliseCurrency(
-                                    payment.currency
-                                ) ===
-                                    currency &&
-                                (
-                                    payment.status === "approved" ||
-                                    payment.status === "processing" ||
-                                    payment.status === "paid" ||
-                                    payment.status === "simulated"
-                                )
-                            );
-                        }
-                    )
-                    .map(
-                        function (payment) {
-                            return (
-                                payment.id
-                            );
-                        }
-                    )
-            );
-
-        const issuedStatementIds =
-            new Set(
-                issuedStatements.map(
-                    function (
-                        statement
-                    ) {
-                        return (
-                            statement.id
-                        );
-                    }
-                )
-            );
-
-        const allocatedAmount =
-            financeData
-                .paymentAllocations
-                .filter(
-                    function (
-                        allocation
-                    ) {
-                        return (
-                            livePaymentIds.has(
-                                allocation.payment_id
-                            ) &&
-                            issuedStatementIds.has(
-                                allocation.statement_id
-                            )
-                        );
-                    }
-                )
-                .reduce(
-                    function (
-                        total,
-                        allocation
-                    ) {
-                        return (
-                            total +
-                            toNumber(
-                                allocation.amount
-                            )
-                        );
-                    },
-                    0
-                );
-
-        const reservedRequests =
-            financeData
-                .paymentRequests
-                .filter(
-                    function (request) {
-                        return (
-                            normaliseCurrency(
-                                request.currency
-                            ) ===
-                                currency &&
-                            (
-                                request.status ===
-                                    "requested" ||
-                                request.status ===
-                                    "approved"
-                            )
-                        );
-                    }
-                );
-
-        const reservedRequestAmount =
-            sumValues(
-                reservedRequests,
-                "requested_amount"
-            );
-
-        const pendingPayments =
-            financeData.payments.filter(
-                function (payment) {
-                    return (
-                        normaliseCurrency(
-                            payment.currency
-                        ) === currency &&
-                        (
-                            payment.status ===
-                                "approved" ||
-                            payment.status ===
-                                "processing"
-                        )
-                    );
-                }
-            );
-
-        const pendingPaymentAmount =
-            sumValues(
-                pendingPayments,
-                "amount"
-            );
-
-        const paidPayments =
-            financeData.payments.filter(
-                function (payment) {
-                    return (
-                        normaliseCurrency(
-                            payment.currency
-                        ) === currency &&
-                        payment.status ===
-                            "paid"
-                    );
-                }
-            );
-
-        const totalPayments =
-            sumValues(
-                paidPayments,
-                "amount"
-            );
-
-        const pendingPayment =
-            pendingPaymentAmount +
-            reservedRequestAmount;
-
-        const balanceDue =
-            advanceRemaining > 0
-                ? 0
-                : Math.max(
-                    0,
-                    grossPayable -
-                        allocatedAmount -
-                        reservedRequestAmount
-                );
-
-        return {
-            royaltiesEarned:
-                royaltiesEarned,
-
-            advanceRemaining:
-                advanceRemaining,
-
-            balanceDue:
-                balanceDue,
-
-            pendingPayment:
-                pendingPayment,
-
-            totalPayments:
-                totalPayments
-        };
-    }
-
-    function getFinanceCurrencies(
-        statements,
-        payments,
-        paymentRequests,
-        advances
-    ) {
-        const currencies =
-            new Set();
-
-        statements.forEach(
-            function (statement) {
-                addCurrency(
-                    currencies,
-                    statement.currency
-                );
-            }
-        );
-
-        payments.forEach(
-            function (payment) {
-                addCurrency(
-                    currencies,
-                    payment.currency
-                );
-            }
-        );
-
-        paymentRequests.forEach(
-            function (request) {
-                addCurrency(
-                    currencies,
-                    request.currency
-                );
-            }
-        );
-
-        advances.forEach(
-            function (advance) {
-                addCurrency(
-                    currencies,
-                    advance.currency
-                );
-            }
-        );
-
-        return Array.from(
-            currencies
-        ).sort();
-    }
-
-    function addCurrency(
-        currencies,
-        currency
-    ) {
-        const normalised =
-            normaliseCurrency(
-                currency
-            );
-
-        if (normalised) {
-            currencies.add(
-                normalised
-            );
-        }
-    }
-
-    function normaliseCurrency(
-        currency
-    ) {
-        if (!currency) {
-            return "";
+        if (/requested|cancel/.test(message)) {
+            return "This payment request can no longer be cancelled. Please refresh your Author Desk.";
         }
 
-        return String(currency)
-            .trim()
-            .toUpperCase();
+        if (/desk|author|authenticated/.test(message)) {
+            return "Your Author Desk could not authorise this cancellation. Please sign in again and retry.";
+        }
+
+        return "The payment request could not be cancelled. No changes have been made.";
     }
 
-    function sumValues(
-        records,
-        property
-    ) {
-        return records.reduce(
-            function (
-                total,
-                record
-            ) {
-                return (
-                    total +
-                    toNumber(
-                        record[property]
-                    )
-                );
-            },
-            0
-        );
-    }
+    // ---------------------------------------------------------
+    // STATEMENTS
+    // ---------------------------------------------------------
 
-    function toNumber(value) {
-        const number =
-            Number(value);
+    function renderStatements(statements, statementLines) {
+        const container = elements.statementList;
+        if (!container) return;
 
-        return Number.isFinite(
-            number
-        )
-            ? number
-            : 0;
-    }
+        container.replaceChildren();
 
-    function createFinanceSummaryCard(
-        label,
-        value,
-        description
-    ) {
-        const card =
-            document.createElement(
-                "article"
-            );
-
-        card.className =
-            "finance-summary-card";
-
-        const labelElement =
-            document.createElement(
-                "p"
-            );
-
-        labelElement.className =
-            "summary-label";
-
-        labelElement.textContent =
-            label;
-
-        const valueElement =
-            document.createElement(
-                "p"
-            );
-
-        valueElement.className =
-            "summary-value";
-
-        valueElement.textContent =
-            value;
-
-        const descriptionElement =
-            document.createElement(
-                "p"
-            );
-
-        descriptionElement.className =
-            "finance-summary-description";
-
-        descriptionElement.textContent =
-            description;
-
-        card.appendChild(
-            labelElement
-        );
-
-        card.appendChild(
-            valueElement
-        );
-
-        card.appendChild(
-            descriptionElement
-        );
-
-        return card;
-    }
-
-    function renderStatements(
-        statements,
-        statementLines
-    ) {
-        statementList.replaceChildren();
-
-        if (statements.length === 0) {
-            statementList.appendChild(
+        if (!statements.length) {
+            container.appendChild(
                 createEmptyState(
                     "No issued royalty statements are currently available."
                 )
             );
-
             return;
         }
 
-        statements.forEach(
-            function (statement) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
+        statements.forEach((statement) => {
+            const card = make("article", "record-card");
 
-                card.className =
-                    "record-card";
-
-                const top =
-                    document.createElement(
-                        "div"
-                    );
-
-                top.className =
-                    "record-card-top";
-
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
-
-                title.className =
-                    "record-title";
-
-                title.textContent =
+            card.appendChild(
+                createRecordHeading(
                     statement.statement_reference ||
-                    "Royalty Statement";
+                        "Royalty Statement",
+                    formatLabel(statement.status)
+                )
+            );
 
-                top.appendChild(title);
+            const meta = make("div", "record-meta");
 
-                top.appendChild(
-                    createStatusBadge(
-                        formatLabel(
-                            statement.status
-                        )
-                    )
-                );
-
-                card.appendChild(top);
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
-                if (
-                    statement.period_start &&
-                    statement.period_end
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Period",
-                            formatDate(
-                                statement.period_start
-                            ) +
-                            " – " +
-                            formatDate(
-                                statement.period_end
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    statement.issue_date
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Issued",
-                            formatDate(
-                                statement.issue_date
-                            )
-                        )
-                    );
-                }
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Royalties",
-                        formatMoney(
-                            statement.total_royalty_amount,
-                            statement.currency
-                        )
-                    )
-                );
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Adjustments",
-                        formatMoney(
-                            statement.total_adjustments,
-                            statement.currency
-                        )
-                    )
-                );
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Advance applied",
-                        formatMoney(
-                            statement.total_advance_applied,
-                            statement.currency
-                        )
-                    )
-                );
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Amount payable",
-                        formatMoney(
-                            statement.amount_payable,
-                            statement.currency
-                        )
-                    )
-                );
-
-                card.appendChild(meta);
-
-                const lines =
-                    statementLines.filter(
-                        function (line) {
-                            return (
-                                line.statement_id ===
-                                statement.id
-                            );
-                        }
-                    );
-
-                if (
-                    lines.length > 0
-                ) {
-                    const lineList =
-                        document.createElement(
-                            "div"
-                        );
-
-                    lineList.className =
-                        "record-list";
-
-                    lines.forEach(
-                        function (line) {
-                            const lineCard =
-                                document.createElement(
-                                    "div"
-                                );
-
-                            lineCard.className =
-                                "record-card";
-
-                            const lineTop =
-                                document.createElement(
-                                    "div"
-                                );
-
-                            lineTop.className =
-                                "record-card-top";
-
-                            const lineTitle =
-                                document.createElement(
-                                    "h5"
-                                );
-
-                            lineTitle.className =
-                                "record-title";
-
-                            lineTitle.textContent =
-                                line.description ||
-                                "Statement line " +
-                                    String(
-                                        line.line_number
-                                    );
-
-                            lineTop.appendChild(
-                                lineTitle
-                            );
-
-                            lineTop.appendChild(
-                                createStatusBadge(
-                                    formatLabel(
-                                        line.line_type
-                                    )
-                                )
-                            );
-
-                            lineCard.appendChild(
-                                lineTop
-                            );
-
-                            const lineMeta =
-                                document.createElement(
-                                    "div"
-                                );
-
-                            lineMeta.className =
-                                "record-meta";
-
-                            lineMeta.appendChild(
-                                createInlineMeta(
-                                    "Amount",
-                                    formatMoney(
-                                        line.amount,
-                                        statement.currency
-                                    )
-                                )
-                            );
-
-                            lineCard.appendChild(
-                                lineMeta
-                            );
-
-                            lineList.appendChild(
-                                lineCard
-                            );
-                        }
-                    );
-
-                    card.appendChild(
-                        lineList
-                    );
-                }
-
-                statementList.appendChild(
-                    card
+            if (statement.period_start && statement.period_end) {
+                appendMeta(
+                    meta,
+                    "Period",
+                    formatDate(statement.period_start) +
+                        " – " +
+                        formatDate(statement.period_end)
                 );
             }
-        );
+
+            if (statement.issue_date) {
+                appendMeta(
+                    meta,
+                    "Issued",
+                    formatDate(statement.issue_date)
+                );
+            }
+
+            [
+                ["Royalties", "total_royalty_amount"],
+                ["Adjustments", "total_adjustments"],
+                ["Advance applied", "total_advance_applied"],
+                ["Amount payable", "amount_payable"]
+            ].forEach(([label, field]) => {
+                appendMeta(
+                    meta,
+                    label,
+                    formatMoney(
+                        statement[field],
+                        statement.currency
+                    )
+                );
+            });
+
+            card.appendChild(meta);
+
+            const lines = statementLines.filter(
+                (line) => line.statement_id === statement.id
+            );
+
+            if (lines.length) {
+                const list = make("div", "record-list");
+
+                lines.forEach((line) => {
+                    const lineCard = make(
+                        "div",
+                        "record-card"
+                    );
+
+                    lineCard.append(
+                        createRecordHeading(
+                            line.description ||
+                                "Statement line " +
+                                    line.line_number,
+                            formatLabel(line.line_type),
+                            "h5"
+                        ),
+                        createMetaRow([
+                            [
+                                "Amount",
+                                formatMoney(
+                                    line.amount,
+                                    statement.currency
+                                )
+                            ]
+                        ])
+                    );
+
+                    list.appendChild(lineCard);
+                });
+
+                card.appendChild(list);
+            }
+
+            container.appendChild(card);
+        });
     }
+
+    // ---------------------------------------------------------
+    // PAYMENTS
+    // ---------------------------------------------------------
 
     function renderPayments(
         payments,
-        paymentAllocations,
+        allocations,
         statements
     ) {
-        paymentList.replaceChildren();
+        const container = elements.paymentList;
+        if (!container) return;
 
-        if (payments.length === 0) {
-            paymentList.appendChild(
+        container.replaceChildren();
+
+        if (!payments.length) {
+            container.appendChild(
                 createEmptyState(
                     "No payments are currently recorded."
                 )
             );
-
             return;
         }
 
-        payments.forEach(
-            function (payment) {
-                const card =
-                    document.createElement(
-                        "article"
-                    );
+        payments.forEach((payment) => {
+            const card = make("article", "record-card");
 
-                card.className =
-                    "record-card";
+            card.appendChild(
+                createRecordHeading(
+                    payment.payment_reference || "Payment",
+                    payment.status === "simulated"
+                        ? "Simulated — No Bank Transfer"
+                        : formatLabel(payment.status)
+                )
+            );
 
-                const top =
-                    document.createElement(
-                        "div"
-                    );
+            const meta = make("div", "record-meta");
 
-                top.className =
-                    "record-card-top";
+            appendMeta(
+                meta,
+                "Amount",
+                formatMoney(
+                    payment.amount,
+                    payment.currency
+                )
+            );
 
-                const title =
-                    document.createElement(
-                        "h4"
-                    );
-
-                title.className =
-                    "record-title";
-
-                title.textContent =
-                    payment.payment_reference ||
-                    "Payment";
-
-                top.appendChild(title);
-
-                
-                top.appendChild(
-                    createStatusBadge(
-                        payment.status === "simulated"
-                            ? "Simulated — No Bank Transfer"
-                            : formatLabel(payment.status)
-                    )
-                );
-
-
-                card.appendChild(top);
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-                meta.className =
-                    "record-meta";
-
-                meta.appendChild(
-                    createInlineMeta(
-                        "Amount",
-                        formatMoney(
-                            payment.amount,
-                            payment.currency
-                        )
-                    )
-                );
-
-                if (
-                    payment.requested_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Requested",
-                            formatDate(
-                                payment.requested_at
-                            )
-                        )
+            for (const [label, field] of [
+                ["Requested", "requested_at"],
+                ["Approved", "approved_at"],
+                ["Processing", "processing_at"],
+                ["Paid", "paid_at"],
+                ["Failed", "failed_at"],
+                ["Cancelled", "cancelled_at"]
+            ]) {
+                if (payment[field]) {
+                    appendMeta(
+                        meta,
+                        label,
+                        formatDate(payment[field])
                     );
                 }
-
-                if (
-                    payment.approved_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Approved",
-                            formatDate(
-                                payment.approved_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    payment.processing_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Processing",
-                            formatDate(
-                                payment.processing_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    payment.paid_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Paid",
-                            formatDate(
-                                payment.paid_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    payment.failed_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Failed",
-                            formatDate(
-                                payment.failed_at
-                            )
-                        )
-                    );
-                }
-
-                if (
-                    payment.cancelled_at
-                ) {
-                    meta.appendChild(
-                        createInlineMeta(
-                            "Cancelled",
-                            formatDate(
-                                payment.cancelled_at
-                            )
-                        )
-                    );
-                }
-
-                card.appendChild(meta);
-
-                const allocations =
-                    paymentAllocations.filter(
-                        function (
-                            allocation
-                        ) {
-                            return (
-                                allocation.payment_id ===
-                                payment.id
-                            );
-                        }
-                    );
-
-                if (
-                    allocations.length > 0
-                ) {
-                    const allocationList =
-                        document.createElement(
-                            "div"
-                        );
-
-                    allocationList.className =
-                        "record-list";
-
-                    allocations.forEach(
-                        function (
-                            allocation
-                        ) {
-                            const allocationCard =
-                                document.createElement(
-                                    "div"
-                                );
-
-                            allocationCard.className =
-                                "record-card";
-
-                            const statement =
-                                statements.find(
-                                    function (
-                                        statementRecord
-                                    ) {
-                                        return (
-                                            statementRecord.id ===
-                                            allocation.statement_id
-                                        );
-                                    }
-                                );
-
-                            const allocationTitle =
-                                document.createElement(
-                                    "h5"
-                                );
-
-                            allocationTitle.className =
-                                "record-title";
-
-                            allocationTitle.textContent =
-                                statement &&
-                                statement.statement_reference
-                                    ? statement.statement_reference
-                                    : "Statement allocation";
-
-                            allocationCard.appendChild(
-                                allocationTitle
-                            );
-
-                            const allocationMeta =
-                                document.createElement(
-                                    "div"
-                                );
-
-                            allocationMeta.className =
-                                "record-meta";
-
-                            allocationMeta.appendChild(
-                                createInlineMeta(
-                                    "Allocated",
-                                    formatMoney(
-                                        allocation.amount,
-                                        payment.currency
-                                    )
-                                )
-                            );
-
-                            allocationCard.appendChild(
-                                allocationMeta
-                            );
-
-                            allocationList.appendChild(
-                                allocationCard
-                            );
-                        }
-                    );
-
-                    card.appendChild(
-                        allocationList
-                    );
-                }
-
-                paymentList.appendChild(
-                    card
-                );
             }
-        );
+
+            card.appendChild(meta);
+
+            const paymentAllocations = allocations.filter(
+                (row) => row.payment_id === payment.id
+            );
+
+            if (paymentAllocations.length) {
+                const list = make("div", "record-list");
+
+                paymentAllocations.forEach((allocation) => {
+                    const statement = statements.find(
+                        (row) =>
+                            row.id === allocation.statement_id
+                    );
+
+                    const allocationCard = make(
+                        "div",
+                        "record-card"
+                    );
+
+                    allocationCard.append(
+                        make(
+                            "h5",
+                            "record-title",
+                            statement?.statement_reference ||
+                                "Statement allocation"
+                        ),
+                        createMetaRow([
+                            [
+                                "Allocated",
+                                formatMoney(
+                                    allocation.amount,
+                                    payment.currency
+                                )
+                            ]
+                        ])
+                    );
+
+                    list.appendChild(allocationCard);
+                });
+
+                card.appendChild(list);
+            }
+
+            container.appendChild(card);
+        });
     }
 
-    
-function renderPaymentRequests(
-    paymentRequests
-) {
-    paymentRequestList.replaceChildren();
+    // ---------------------------------------------------------
+    // PAYMENT REQUESTS AND BANK DETAILS
+    // ---------------------------------------------------------
 
-    if (paymentRequests.length === 0) {
-        paymentRequestList.appendChild(
-            createEmptyState(
-                "No payment requests are currently recorded."
-            )
-        );
-        return;
-    }
+    function renderPaymentRequests(requests) {
+        const container = elements.paymentRequestList;
+        if (!container) return;
 
-    paymentRequests.forEach(function (request) {
-        const card = document.createElement("article");
-        card.className = "record-card";
+        container.replaceChildren();
 
-        const top = document.createElement("div");
-        top.className = "record-card-top";
+        if (!requests.length) {
+            container.appendChild(
+                createEmptyState(
+                    "No payment requests are currently recorded."
+                )
+            );
+            return;
+        }
 
-        const title = document.createElement("h4");
-        title.className = "record-title";
-        title.textContent =
-            request.request_reference ||
-            "Payment Request";
+        requests.forEach((request) => {
+            const card = make("article", "record-card");
 
-        top.appendChild(title);
-        top.appendChild(
-            createStatusBadge(
-                formatLabel(request.status)
-            )
-        );
-        card.appendChild(top);
+            card.appendChild(
+                createRecordHeading(
+                    request.request_reference ||
+                        "Payment Request",
+                    formatLabel(request.status)
+                )
+            );
 
-        const meta = document.createElement("div");
-        meta.className = "record-meta";
+            const meta = make("div", "record-meta");
 
-        meta.appendChild(
-            createInlineMeta(
+            appendMeta(
+                meta,
                 "Amount",
                 formatMoney(
                     request.requested_amount,
                     request.currency
                 )
-            )
-        );
-
-        if (request.requested_at) {
-            meta.appendChild(
-                createInlineMeta(
-                    "Requested",
-                    formatDate(request.requested_at)
-                )
-            );
-        }
-
-        if (request.reviewed_at) {
-            meta.appendChild(
-                createInlineMeta(
-                    "Reviewed",
-                    formatDate(request.reviewed_at)
-                )
-            );
-        }
-
-        if (request.fulfilled_at) {
-            meta.appendChild(
-                createInlineMeta(
-                    "Fulfilled",
-                    formatDate(request.fulfilled_at)
-                )
-            );
-        }
-
-        card.appendChild(meta);
-
-        if (request.status === "requested") {
-            const detailsContainer =
-                document.createElement("div");
-
-            detailsContainer.className =
-                "payment-request-control";
-
-            detailsContainer.appendChild(
-                createEmptyState(
-                    "Checking payment details…"
-                )
             );
 
-            card.appendChild(detailsContainer);
-
-            loadPaymentDetailsStatus(
-                request.id,
-                detailsContainer
-            );
-
-            const actions = document.createElement("div");
-            actions.className = "payment-request-actions";
-
-            const cancelButton =
-                document.createElement("button");
-
-            cancelButton.type = "button";
-            cancelButton.className =
-                "payment-request-button";
-            cancelButton.textContent = "Cancel request";
-
-            const message = document.createElement("p");
-            message.className =
-                "payment-request-message";
-            message.hidden = true;
-
-            cancelButton.addEventListener(
-                "click",
-                function () {
-                    handlePaymentRequestCancel(
-                        request.id,
-                        cancelButton,
-                        message
+            for (const [label, field] of [
+                ["Requested", "requested_at"],
+                ["Reviewed", "reviewed_at"],
+                ["Fulfilled", "fulfilled_at"]
+            ]) {
+                if (request[field]) {
+                    appendMeta(
+                        meta,
+                        label,
+                        formatDate(request[field])
                     );
                 }
-            );
-
-            actions.appendChild(cancelButton);
-            actions.appendChild(message);
-            card.appendChild(actions);
-        }
-
-        paymentRequestList.appendChild(card);
-    });
-}
-
-async function loadPaymentDetailsStatus(
-    requestId,
-    container
-) {
-    try {
-        const { data, error } = await client
-            .from("payment_request_payment_details")
-            .select("payment_request_id")
-            .eq("payment_request_id", requestId)
-            .maybeSingle();
-
-        if (error) {
-            throw error;
-        }
-
-        if (!container.isConnected) {
-            return;
-        }
-
-        container.replaceChildren();
-
-        if (data) {
-            const confirmation =
-                document.createElement("p");
-
-            confirmation.className =
-                "record-description";
-
-            confirmation.textContent =
-                "Bank details have been securely submitted for this payment request.";
-
-            container.appendChild(confirmation);
-            return;
-        }
-
-        container.appendChild(
-            createPaymentDetailsForm(requestId)
-        );
-
-    } catch (error) {
-        console.error(
-            "Payment details status check failed:",
-            error
-        );
-
-        if (!container.isConnected) {
-            return;
-        }
-
-        container.replaceChildren();
-
-        container.appendChild(
-            createEmptyState(
-                "Payment details could not be checked. Please refresh the Author Desk."
-            )
-        );
-    }
-}
-
-function createPaymentDetailsForm(requestId) {
-    const form = document.createElement("form");
-    form.className = "payment-request-form";
-
-    const heading = document.createElement("h4");
-    heading.className = "record-title";
-    heading.textContent = "Bank details";
-
-    const description = document.createElement("p");
-    description.className = "record-description";
-    description.textContent =
-        "Enter the UK bank account details for this payment request.";
-
-    const fields = [
-        {
-            label: "Account holder name",
-            name: "accountHolder",
-            maxLength: 100,
-            placeholder: "Account holder name"
-        },
-        {
-            label: "Sort code",
-            name: "sortCode",
-            maxLength: 8,
-            placeholder: "00-00-00"
-        },
-        {
-            label: "Account number",
-            name: "accountNumber",
-            maxLength: 8,
-            placeholder: "12345678"
-        }
-    ];
-
-    const inputs = {};
-
-    fields.forEach(function (fieldDefinition) {
-        const field = document.createElement("div");
-        field.className = "payment-request-field";
-
-        const label = document.createElement("label");
-        const id =
-            "bank-" +
-            fieldDefinition.name +
-            "-" +
-            requestId;
-
-        label.htmlFor = id;
-        label.textContent = fieldDefinition.label;
-
-        const input = document.createElement("input");
-        input.id = id;
-        input.name = fieldDefinition.name;
-        input.type = "text";
-        input.required = true;
-        input.maxLength = fieldDefinition.maxLength;
-        input.placeholder = fieldDefinition.placeholder;
-        input.autocomplete = "off";
-
-        if (fieldDefinition.name !== "accountHolder") {
-            input.inputMode = "numeric";
-            input.spellcheck = false;
-        }
-
-        inputs[fieldDefinition.name] = input;
-
-        field.appendChild(label);
-        field.appendChild(input);
-        form.appendChild(field);
-    });
-
-    const button = document.createElement("button");
-    button.type = "submit";
-    button.className = "payment-request-button";
-    button.textContent = "Save bank details";
-
-    const message = document.createElement("p");
-    message.className = "payment-request-message";
-    message.hidden = true;
-    message.setAttribute("role", "status");
-
-    form.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        clearPaymentRequestMessage(message);
-
-        const accountHolder =
-            inputs.accountHolder.value.trim();
-
-        const sortCode =
-            inputs.sortCode.value.replace(/\D/g, "");
-
-        const accountNumber =
-            inputs.accountNumber.value.replace(/\D/g, "");
-
-        if (!accountHolder) {
-            showPaymentRequestMessage(
-                message,
-                "Enter the account holder name.",
-                true
-            );
-            return;
-        }
-
-        if (!/^\d{6}$/.test(sortCode)) {
-            showPaymentRequestMessage(
-                message,
-                "Enter a valid six-digit sort code.",
-                true
-            );
-            return;
-        }
-
-        if (!/^\d{8}$/.test(accountNumber)) {
-            showPaymentRequestMessage(
-                message,
-                "Enter an eight-digit account number.",
-                true
-            );
-            return;
-        }
-
-        button.disabled = true;
-        button.textContent = "Saving…";
-
-        Object.values(inputs).forEach(function (input) {
-            input.disabled = true;
-        });
-
-        try {
-            const { error } = await client.rpc(
-                "save_payment_request_payment_details",
-                {
-                    p_request_id: requestId,
-                    p_account_holder_name: accountHolder,
-                    p_sort_code: sortCode,
-                    p_account_number: accountNumber
-                }
-            );
-
-            if (error) {
-                throw error;
             }
 
-            inputs.accountHolder.value = "";
-            inputs.sortCode.value = "";
-            inputs.accountNumber.value = "";
+            card.appendChild(meta);
 
-            form.replaceChildren();
+            if (request.status === "requested") {
+                const details = make(
+                    "div",
+                    "payment-request-control"
+                );
 
-            const confirmation =
-                document.createElement("p");
+                details.appendChild(
+                    createEmptyState(
+                        "Checking payment details…"
+                    )
+                );
 
-            confirmation.className =
-                "record-description";
+                card.appendChild(details);
 
-            confirmation.textContent =
-                "Bank details saved successfully. Blackwood Publishing can now review this payment request.";
+                loadPaymentDetailsStatus(
+                    request.id,
+                    details
+                );
 
-            form.appendChild(confirmation);
+                const actions = make(
+                    "div",
+                    "payment-request-actions"
+                );
 
+                const button = make(
+                    "button",
+                    "payment-request-button",
+                    "Cancel request"
+                );
+                button.type = "button";
+
+                const message = make(
+                    "p",
+                    "payment-request-message"
+                );
+                message.hidden = true;
+
+                button.addEventListener("click", () => {
+                    handlePaymentRequestCancel(
+                        request.id,
+                        button,
+                        message
+                    );
+                });
+
+                actions.append(button, message);
+                card.appendChild(actions);
+            }
+
+            container.appendChild(card);
+        });
+    }
+
+    async function loadPaymentDetailsStatus(
+        requestId,
+        container
+    ) {
+        try {
+            const { data, error } = await client
+                .from("payment_request_payment_details")
+                .select("payment_request_id")
+                .eq("payment_request_id", requestId)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (!container.isConnected) return;
+
+            container.replaceChildren();
+
+            if (data) {
+                container.appendChild(
+                    make(
+                        "p",
+                        "record-description",
+                        "Bank details have been securely submitted for this payment request."
+                    )
+                );
+            } else {
+                container.appendChild(
+                    createPaymentDetailsForm(requestId)
+                );
+            }
         } catch (error) {
             console.error(
-                "Saving payment details failed:",
-                error &&
-                error.code
-                    ? error.code
-                    : "Request failed"
+                "Payment details status check failed:",
+                error
             );
 
-            Object.values(inputs).forEach(function (input) {
-                input.disabled = false;
-            });
+            if (!container.isConnected) return;
 
-            button.disabled = false;
-            button.textContent = "Save bank details";
-
-            showPaymentRequestMessage(
-                message,
-                "Bank details could not be saved. Please check your information and try again.",
-                true
+            container.replaceChildren(
+                createEmptyState(
+                    "Payment details could not be checked. Please refresh the Author Desk."
+                )
             );
         }
-    });
+    }
 
-    const wrapper = document.createElement("div");
+    function createPaymentDetailsForm(requestId) {
+        const wrapper = make("div");
 
-    wrapper.appendChild(heading);
-    wrapper.appendChild(description);
-    wrapper.appendChild(form);
+        wrapper.append(
+            make("h4", "record-title", "Bank details"),
+            make(
+                "p",
+                "record-description",
+                "Enter the UK bank account details for this payment request."
+            )
+        );
 
-    form.appendChild(button);
-    form.appendChild(message);
+        const form = make(
+            "form",
+            "payment-request-form"
+        );
 
-    return wrapper;
-}
+        const inputs = {};
+
+        [
+            {
+                name: "accountHolder",
+                label: "Account holder name",
+                maxLength: 100,
+                placeholder: "Account holder name"
+            },
+            {
+                name: "sortCode",
+                label: "Sort code",
+                maxLength: 8,
+                placeholder: "00-00-00"
+            },
+            {
+                name: "accountNumber",
+                label: "Account number",
+                maxLength: 8,
+                placeholder: "12345678"
+            }
+        ].forEach((definition) => {
+            const field = make(
+                "div",
+                "payment-request-field"
+            );
+
+            const id =
+                "bank-" +
+                definition.name +
+                "-" +
+                requestId;
+
+            const label = make(
+                "label",
+                "",
+                definition.label
+            );
+            label.htmlFor = id;
+
+            const input = document.createElement("input");
+
+            Object.assign(input, {
+                id,
+                name: definition.name,
+                type: "text",
+                required: true,
+                maxLength: definition.maxLength,
+                placeholder: definition.placeholder,
+                autocomplete: "off"
+            });
+
+            if (definition.name !== "accountHolder") {
+                input.inputMode = "numeric";
+                input.spellcheck = false;
+            }
+
+            inputs[definition.name] = input;
+
+            field.append(label, input);
+            form.appendChild(field);
+        });
+
+        const button = make(
+            "button",
+            "payment-request-button",
+            "Save bank details"
+        );
+        button.type = "submit";
+
+        const message = make(
+            "p",
+            "payment-request-message"
+        );
+        message.hidden = true;
+        message.setAttribute("role", "status");
+
+        form.append(button, message);
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            clearPaymentRequestMessage(message);
+
+            const accountHolder =
+                inputs.accountHolder.value.trim();
+
+            const sortCode =
+                inputs.sortCode.value.replace(/\D/g, "");
+
+            const accountNumber =
+                inputs.accountNumber.value.replace(/\D/g, "");
+
+            if (!accountHolder) {
+                showPaymentRequestMessage(
+                    message,
+                    "Enter the account holder name.",
+                    true
+                );
+                return;
+            }
+
+            if (!/^\d{6}$/.test(sortCode)) {
+                showPaymentRequestMessage(
+                    message,
+                    "Enter a valid six-digit sort code.",
+                    true
+                );
+                return;
+            }
+
+            if (!/^\d{8}$/.test(accountNumber)) {
+                showPaymentRequestMessage(
+                    message,
+                    "Enter an eight-digit account number.",
+                    true
+                );
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = "Saving…";
+
+            Object.values(inputs).forEach((input) => {
+                input.disabled = true;
+            });
+
+            try {
+                const { error } = await client.rpc(
+                    "save_payment_request_payment_details",
+                    {
+                        p_request_id: requestId,
+                        p_account_holder_name: accountHolder,
+                        p_sort_code: sortCode,
+                        p_account_number: accountNumber
+                    }
+                );
+
+                if (error) throw error;
+
+                Object.values(inputs).forEach((input) => {
+                    input.value = "";
+                });
+
+                form.replaceChildren(
+                    make(
+                        "p",
+                        "record-description",
+                        "Bank details saved successfully. Blackwood Publishing can now review this payment request."
+                    )
+                );
+            } catch (error) {
+                console.error(
+                    "Saving payment details failed:",
+                    error?.code || "Request failed"
+                );
+
+                Object.values(inputs).forEach((input) => {
+                    input.disabled = false;
+                });
+
+                button.disabled = false;
+                button.textContent = "Save bank details";
+
+                showPaymentRequestMessage(
+                    message,
+                    "Bank details could not be saved. Please check your information and try again.",
+                    true
+                );
+            }
+        });
+
+        wrapper.appendChild(form);
+        return wrapper;
+    }
+
+    // ---------------------------------------------------------
+    // PUBLISHING STAFF ATTENTION PANEL
+    // ---------------------------------------------------------
+
+    async function loadPublishingAttention() {
+        const container = elements.publishingAttentionList;
+        if (!container) return;
+
+        const [
+            requestsResponse,
+            authorsResponse,
+            detailsResponse
+        ] = await Promise.all([
+            client
+                .from("payment_requests")
+                .select(
+                    "id,author_id,request_reference,requested_amount,currency,status,requested_at"
+                )
+                .eq("status", "requested")
+                .order("requested_at", { ascending: true }),
+
+            client
+                .from("author_records")
+                .select("id,publishing_name"),
+
+            client
+                .from("payment_request_payment_details")
+                .select("payment_request_id")
+        ]);
+
+        for (const response of [
+            requestsResponse,
+            authorsResponse,
+            detailsResponse
+        ]) {
+            if (response.error) throw response.error;
+        }
+
+        const requests = requestsResponse.data || [];
+        const authors = authorsResponse.data || [];
+
+        const requestsWithDetails = new Set(
+            (detailsResponse.data || []).map(
+                (row) => row.payment_request_id
+            )
+        );
+
+        container.replaceChildren();
+
+        if (!requests.length) {
+            container.appendChild(
+                createEmptyState(
+                    "No items currently require attention."
+                )
+            );
+            return;
+        }
+
+        requests.forEach((request) => {
+            const author = authors.find(
+                (row) => row.id === request.author_id
+            );
+
+            const card = make("article", "record-card");
+
+            card.append(
+                createRecordHeading(
+                    request.request_reference ||
+                        "Payment Request",
+                    "Requested"
+                ),
+                make(
+                    "p",
+                    "record-description",
+                    author?.publishing_name || "Author"
+                ),
+                createMetaRow([
+                    [
+                        "Amount",
+                        formatMoney(
+                            request.requested_amount,
+                            request.currency
+                        )
+                    ],
+                    [
+                        "Requested",
+                        formatDate(request.requested_at)
+                    ]
+                ])
+            );
+
+            const isDavidTestRequest =
+                request.author_id ===
+                    "579da283-3a1f-4947-8b53-ba5d54aad939" &&
+                request.request_reference ===
+                    "TEST-DAVID-REQUEST-001";
+
+            const isProtectedTestRequest =
+                request.request_reference ===
+                "PR-20260929203327379-d46d923a";
+
+            if (isDavidTestRequest) {
+                card.appendChild(
+                    createSimulationControl(request)
+                );
+            }
+
+            const hasDetails = requestsWithDetails.has(
+                request.id
+            );
+
+            card.appendChild(
+                make(
+                    "p",
+                    "record-description",
+                    hasDetails
+                        ? "Bank details: Submitted — ready for staff review."
+                        : "Bank details: Awaiting author submission."
+                )
+            );
+
+            if (hasDetails && !isDavidTestRequest) {
+                card.appendChild(
+                    createStaffBankDetailsReview(request.id)
+                );
+
+                if (isProtectedTestRequest) {
+                    card.appendChild(
+                        make(
+                            "p",
+                            "record-description",
+                            "Test request — payment recording disabled."
+                        )
+                    );
+                } else {
+                    card.appendChild(
+                        createManualPaymentForm(request)
+                    );
+                }
+            }
+
+            container.appendChild(card);
+        });
+    }
+
+    function createSimulationControl(request) {
+        const panel = make(
+            "div",
+            "payment-request-control"
+        );
+
+        panel.appendChild(
+            make(
+                "p",
+                "record-description",
+                "SIMULATION ONLY — No bank transfer will occur. This records a test transaction, not a real payment."
+            )
+        );
+
+        const button = make(
+            "button",
+            "payment-request-button",
+            "Record Simulated Payment"
+        );
+        button.type = "button";
+
+        const message = make(
+            "p",
+            "payment-request-message"
+        );
+        message.hidden = true;
+        message.setAttribute("role", "status");
+
+        button.addEventListener("click", async () => {
+            const confirmed = window.confirm(
+                "TEST ONLY: Record a simulated £25 payment for David Stewart? NO bank transfer will occur."
+            );
+
+            if (!confirmed) return;
+
+            button.disabled = true;
+            button.textContent = "Recording simulation…";
+
+            try {
+                const { error } = await client.rpc(
+                    "record_simulated_author_payment",
+                    { p_request_id: request.id }
+                );
+
+                if (error) throw error;
+
+                showPaymentRequestMessage(
+                    message,
+                    "Simulated payment recorded. No money transferred.",
+                    false
+                );
+
+                window.location.reload();
+            } catch (error) {
+                console.error(
+                    "Simulated payment failed:",
+                    error
+                );
+
+                showPaymentRequestMessage(
+                    message,
+                    "Simulation failed. Please check the request and try again.",
+                    true
+                );
+
+                button.disabled = false;
+                button.textContent =
+                    "Record Simulated Payment";
+            }
+        });
+
+        panel.append(button, message);
+        return panel;
+    }
+
+    function createStaffBankDetailsReview(requestId) {
+        const wrapper = make("div");
+
+        const button = make(
+            "button",
+            "payment-request-button",
+            "Review bank details"
+        );
+        button.type = "button";
+
+        const panel = make(
+            "div",
+            "payment-request-control"
+        );
+        panel.hidden = true;
+
+        let reviewOpen = false;
+
+        button.addEventListener("click", async () => {
+            if (reviewOpen) {
+                panel.replaceChildren();
+                panel.hidden = true;
+                reviewOpen = false;
+                button.textContent = "Review bank details";
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = "Loading…";
+
+            try {
+                const { data, error } = await client
+                    .from("payment_request_payment_details")
+                    .select(
+                        "account_holder_name,sort_code,account_number"
+                    )
+                    .eq("payment_request_id", requestId)
+                    .single();
+
+                if (error) throw error;
+
+                panel.replaceChildren(
+                    make(
+                        "h4",
+                        "record-title",
+                        "Bank details for payment"
+                    ),
+                    createMetaRow([
+                        [
+                            "Account holder",
+                            data.account_holder_name
+                        ],
+                        ["Sort code", data.sort_code],
+                        [
+                            "Account number",
+                            data.account_number
+                        ]
+                    ])
+                );
+
+                panel.hidden = false;
+                reviewOpen = true;
+                button.textContent = "Hide bank details";
+            } catch (error) {
+                console.error(
+                    "Staff payment details review failed:",
+                    error?.code || "Request failed"
+                );
+
+                panel.replaceChildren(
+                    make(
+                        "p",
+                        "payment-request-message error",
+                        "Bank details could not be loaded. Please retry."
+                    )
+                );
+
+                panel.hidden = false;
+                button.textContent = "Review bank details";
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        wrapper.append(button, panel);
+        return wrapper;
+    }
+
+    function createManualPaymentForm(request) {
+        const panel = make(
+            "div",
+            "payment-request-control"
+        );
+
+        panel.append(
+            make(
+                "h4",
+                "record-title",
+                "Record Completed Payment"
+            ),
+            make(
+                "p",
+                "record-description",
+                "Only complete this form after the bank transfer has been sent through Blackwood Publishing's bank."
+            )
+        );
+
+        const form = make(
+            "form",
+            "payment-request-form"
+        );
+
+        const methodField = make(
+            "div",
+            "payment-request-field"
+        );
+
+        const methodId = "payment-method-" + request.id;
+        const methodLabel = make(
+            "label",
+            "",
+            "Payment method"
+        );
+        methodLabel.htmlFor = methodId;
+
+        const methodSelect = document.createElement("select");
+        methodSelect.id = methodId;
+        methodSelect.required = true;
+
+        [
+            ["", "Select payment method"],
+            ["FASTER PAYMENTS", "Faster Payments"],
+            ["BACS", "BACS"],
+            ["OTHER BANK TRANSFER", "Other bank transfer"]
+        ].forEach(([value, text]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = text;
+            methodSelect.appendChild(option);
+        });
+
+        methodField.append(methodLabel, methodSelect);
+
+        const referenceField = make(
+            "div",
+            "payment-request-field"
+        );
+
+        const referenceId = "bank-reference-" + request.id;
+        const referenceLabel = make(
+            "label",
+            "",
+            "Bank transaction reference"
+        );
+        referenceLabel.htmlFor = referenceId;
+
+        const referenceInput = document.createElement("input");
+
+        Object.assign(referenceInput, {
+            id: referenceId,
+            type: "text",
+            required: true,
+            maxLength: 100,
+            autocomplete: "off"
+        });
+
+        referenceField.append(
+            referenceLabel,
+            referenceInput
+        );
+
+        const confirmationLabel = make(
+            "label",
+            "payment-confirmation-label"
+        );
+
+        const confirmationCheckbox =
+            document.createElement("input");
+
+        confirmationCheckbox.type = "checkbox";
+        confirmationCheckbox.required = true;
+
+        confirmationLabel.append(
+            confirmationCheckbox,
+            make(
+                "span",
+                "",
+                "I confirm that this payment has already been sent through Blackwood Publishing's bank."
+            )
+        );
+
+        const button = make(
+            "button",
+            "payment-request-button",
+            "Record completed payment"
+        );
+        button.type = "submit";
+
+        const message = make(
+            "p",
+            "payment-request-message"
+        );
+        message.hidden = true;
+        message.setAttribute("role", "status");
+
+        form.append(
+            methodField,
+            referenceField,
+            confirmationLabel,
+            button,
+            message
+        );
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            if (
+                !confirmationCheckbox.checked ||
+                !methodSelect.value ||
+                !referenceInput.value.trim()
+            ) {
+                return;
+            }
+
+            const confirmed = window.confirm(
+                "Confirm that " +
+                    formatMoney(
+                        request.requested_amount,
+                        request.currency
+                    ) +
+                    " has ALREADY been transferred through your bank to this author. Recording this payment will update the financial records. Continue?"
+            );
+
+            if (!confirmed) return;
+
+            methodSelect.disabled = true;
+            referenceInput.disabled = true;
+            confirmationCheckbox.disabled = true;
+
+            try {
+                await recordCompletedPayment(
+                    request.id,
+                    methodSelect.value,
+                    referenceInput.value.trim(),
+                    button,
+                    message
+                );
+            } finally {
+                methodSelect.disabled = false;
+                referenceInput.disabled = false;
+                confirmationCheckbox.disabled = false;
+            }
+        });
+
+        panel.appendChild(form);
+        return panel;
+    }
+
     async function recordCompletedPayment(
         requestId,
         paymentMethod,
@@ -4809,8 +3176,7 @@ function createPaymentDetailsForm(requestId) {
         button,
         message
     ) {
-        message.hidden = true;
-        message.textContent = "";
+        clearPaymentRequestMessage(message);
 
         button.disabled = true;
         button.textContent = "Recording payment…";
@@ -4825,407 +3191,375 @@ function createPaymentDetailsForm(requestId) {
                 }
             );
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
-            message.textContent =
-                "Completed bank transfer recorded successfully.";
-            message.className =
-                "payment-request-message success";
-            message.hidden = false;
+            showPaymentRequestMessage(
+                message,
+                "Completed bank transfer recorded successfully.",
+                false
+            );
 
             window.location.reload();
-
         } catch (error) {
             console.error(
                 "Recording completed payment failed:",
                 error
             );
 
-            message.textContent =
-                "Payment could not be recorded. Please check the request and try again.";
-            message.className =
-                "payment-request-message error";
-            message.hidden = false;
-
+            showPaymentRequestMessage(
+                message,
+                "Payment could not be recorded. Please check the request and try again.",
+                true
+            );
         } finally {
             button.disabled = false;
             button.textContent = "Record completed payment";
         }
     }
+
+    // ---------------------------------------------------------
+    // SHARED DOM HELPERS
+    // ---------------------------------------------------------
+
+    function make(tag, className = "", text = null) {
+        const element = document.createElement(tag);
+
+        if (className) {
+            element.className = className;
+        }
+
+        if (text !== null && text !== undefined) {
+            element.textContent = String(text);
+        }
+
+        return element;
+    }
+
+    function setText(element, value) {
+        if (element) {
+            element.textContent = String(value ?? "");
+        }
+    }
+
+    function createRecordHeading(
+        title,
+        status,
+        headingTag = "h4"
+    ) {
+        const top = make("div", "record-card-top");
+
+        top.append(
+            make(headingTag, "record-title", title),
+            createStatusBadge(status)
+        );
+
+        return top;
+    }
+
+    function createMetaRow(items) {
+        const meta = make("div", "record-meta");
+
+        items.forEach(([label, value]) => {
+            appendMeta(meta, label, value);
+        });
+
+        return meta;
+    }
+
+    function appendMeta(container, label, value) {
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return;
+        }
+
+        container.appendChild(
+            createInlineMeta(label, value)
+        );
+    }
+
     function createSummaryRecord(
         label,
         value,
         className
     ) {
-        const card =
-            document.createElement(
-                "article"
-            );
+        const card = make("article", className);
 
-        card.className =
-            className;
-
-        const labelElement =
-            document.createElement(
-                "p"
-            );
-
-        labelElement.className =
-            "summary-label";
-
-        labelElement.textContent =
-            label;
-
-        const valueElement =
-            document.createElement(
-                "p"
-            );
-
-        valueElement.className =
-            "summary-value";
-
-        valueElement.textContent =
-            value ||
-            "Not recorded";
-
-        card.appendChild(
-            labelElement
-        );
-
-        card.appendChild(
-            valueElement
+        card.append(
+            make("p", "summary-label", label),
+            make(
+                "p",
+                "summary-value",
+                value || "Not recorded"
+            )
         );
 
         return card;
     }
 
-    function createContentPanel(
-        title,
-        intro
-    ) {
-        const panel =
-            document.createElement(
-                "section"
-            );
+    function createContentPanel(title, intro) {
+        const panel = make("section", "content-panel");
 
-        panel.className =
-            "content-panel";
-
-        const heading =
-            document.createElement(
-                "h3"
-            );
-
-        heading.textContent =
-            title;
-
-        panel.appendChild(
-            heading
-        );
+        panel.appendChild(make("h3", "", title));
 
         if (intro) {
-            const paragraph =
-                document.createElement(
-                    "p"
-                );
-
-            paragraph.className =
-                "panel-intro";
-
-            paragraph.textContent =
-                intro;
-
             panel.appendChild(
-                paragraph
+                make("p", "panel-intro", intro)
             );
         }
 
         return panel;
     }
 
-    function createEmptyState(
-        message
-    ) {
-        const emptyState =
-            document.createElement(
-                "div"
-            );
-
-        emptyState.className =
-            "empty-state";
-
-        emptyState.textContent =
-            message;
-
-        return emptyState;
+    function createEmptyState(message) {
+        return make("div", "empty-state", message);
     }
 
-    function createStatusBadge(
-        value
-    ) {
-        const badge =
-            document.createElement(
-                "span"
-            );
-
-        badge.className =
-            "status-badge";
-
-        badge.textContent =
-            value ||
-            "Not recorded";
-
-        return badge;
+    function createStatusBadge(value) {
+        return make(
+            "span",
+            "status-badge",
+            value || "Not recorded"
+        );
     }
 
-    function createMetaItem(
-        label,
-        value
-    ) {
-        const wrapper =
-            document.createElement(
-                "div"
-            );
+    function createMetaItem(label, value) {
+        const wrapper = make("div");
 
-        const labelElement =
-            document.createElement(
-                "span"
-            );
-
-        labelElement.className =
-            "meta-label";
-
-        labelElement.textContent =
-            label;
-
-        const valueElement =
-            document.createElement(
-                "span"
-            );
-
-        valueElement.className =
-            "meta-value";
-
-        valueElement.textContent =
-            value ||
-            "Not recorded";
-
-        wrapper.appendChild(
-            labelElement
-        );
-
-        wrapper.appendChild(
-            valueElement
-        );
-
-        return wrapper;
-    }
-
-    function createInlineMeta(
-        label,
-        value
-    ) {
-        const wrapper =
-            document.createElement(
-                "span"
-            );
-
-        const strong =
-            document.createElement(
-                "strong"
-            );
-
-        strong.textContent =
-            label + ": ";
-
-        wrapper.appendChild(
-            strong
-        );
-
-        wrapper.appendChild(
-            document.createTextNode(
-                value ||
-                "Not recorded"
+        wrapper.append(
+            make("span", "meta-label", label),
+            make(
+                "span",
+                "meta-value",
+                value || "Not recorded"
             )
         );
 
         return wrapper;
     }
 
-    function showSection(
-        sectionName
-    ) {
-        navButtons.forEach(
-            function (button) {
-                button.classList.toggle(
-                    "active",
-                    button.dataset.section ===
-                        sectionName
-                );
-            }
+    function createInlineMeta(label, value) {
+        const wrapper = make("span");
+        const strong = make(
+            "strong",
+            "",
+            label + ": "
         );
 
-        deskSections.forEach(
-            function (section) {
-                section.classList.toggle(
-                    "active",
-                    section.id ===
-                        "section-" +
-                            sectionName
-                );
-            }
+        wrapper.append(
+            strong,
+            document.createTextNode(
+                value === null ||
+                value === undefined ||
+                value === ""
+                    ? "Not recorded"
+                    : String(value)
+            )
         );
+
+        return wrapper;
+    }
+
+    function createFinanceSummaryCard(
+        label,
+        value,
+        description
+    ) {
+        const card = make(
+            "article",
+            "finance-summary-card"
+        );
+
+        card.append(
+            make("p", "summary-label", label),
+            make("p", "summary-value", value),
+            make(
+                "p",
+                "finance-summary-description",
+                description
+            )
+        );
+
+        return card;
+    }
+
+    function showPaymentRequestMessage(
+        element,
+        message,
+        isError
+    ) {
+        element.textContent = message;
+        element.hidden = false;
+        element.classList.toggle("error", isError);
+        element.classList.toggle("success", !isError);
+    }
+
+    function clearPaymentRequestMessage(element) {
+        element.textContent = "";
+        element.hidden = true;
+        element.classList.remove("error", "success");
+    }
+
+    // ---------------------------------------------------------
+    // NAVIGATION, AUTH AND FORMATTING
+    // ---------------------------------------------------------
+
+    function showSection(sectionName) {
+        navButtons.forEach((button) => {
+            button.classList.toggle(
+                "active",
+                button.dataset.section === sectionName
+            );
+        });
+
+        deskSections.forEach((section) => {
+            section.classList.toggle(
+                "active",
+                section.id === "section-" + sectionName
+            );
+        });
     }
 
     async function handleSignOut() {
-        signOutButton.disabled =
-            true;
+        const button = elements.signOutButton;
+        if (!button) return;
 
-        signOutButton.textContent =
-            "Signing out…";
+        button.disabled = true;
+        button.textContent = "Signing out…";
 
         try {
-            const { error } =
-                await client.auth.signOut();
+            const { error } = await client.auth.signOut();
 
-            if (error) {
-                throw error;
-            }
+            if (error) throw error;
 
-            desk.hidden =
-                true;
+            currentAuthor = null;
+            currentBooks = [];
+            currentMonthlyRoyalties = [];
+            monthlyRoyaltiesAvailable = false;
+
+            elements.desk.hidden = true;
 
             showAccessMessage(
                 "Signed out",
                 "You have been signed out of the Author Desk."
             );
-
         } catch (error) {
             console.error(
                 "Author Desk sign-out failed:",
                 error
             );
 
-            signOutButton.disabled =
-                false;
-
-            signOutButton.textContent =
-                "Sign out";
+            button.disabled = false;
+            button.textContent = "Sign out";
         }
     }
 
-    function showAccessMessage(
-        title,
-        message
-    ) {
-        loadingPanel.hidden =
-            true;
+    function showAccessMessage(title, message) {
+        if (elements.loadingPanel) {
+            elements.loadingPanel.hidden = true;
+        }
 
-        desk.hidden =
-            true;
+        if (elements.desk) {
+            elements.desk.hidden = true;
+        }
 
-        accessTitle.textContent =
-            title;
+        setText(elements.accessTitle, title);
+        setText(elements.accessMessage, message);
 
-        accessMessage.textContent =
-            message;
-
-        accessPanel.hidden =
-            false;
+        if (elements.accessPanel) {
+            elements.accessPanel.hidden = false;
+        }
     }
 
     function formatLabel(value) {
-        if (!value) {
-            return "Not recorded";
-        }
+        if (!value) return "Not recorded";
 
         return String(value)
-            .replace(
-                /_/g,
-                " "
-            )
-            .replace(
-                /\b\w/g,
-                function (
-                    character
-                ) {
-                    return character.toUpperCase();
-                }
+            .replace(/_/g, " ")
+            .replace(/\b\w/g, (character) =>
+                character.toUpperCase()
             );
     }
 
     function formatDate(value) {
-        if (!value) {
-            return "Not recorded";
-        }
+        if (!value) return "Not recorded";
 
-        const raw =
-            String(value);
+        const raw = String(value);
 
-        const date =
-            /^\d{4}-\d{2}-\d{2}$/.test(
-                raw
-            )
-                ? new Date(
-                    raw +
-                    "T12:00:00"
-                )
-                : new Date(raw);
+        const date = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+            ? new Date(raw + "T12:00:00")
+            : new Date(raw);
 
-        if (
-            Number.isNaN(
-                date.getTime()
-            )
-        ) {
+        if (Number.isNaN(date.getTime())) {
             return raw;
         }
 
-        return new Intl.DateTimeFormat(
-            "en-GB",
-            {
-                day: "numeric",
-                month: "long",
-                year: "numeric"
-            }
-        ).format(date);
+        return new Intl.DateTimeFormat("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }).format(date);
     }
 
-    function formatMoney(
-        value,
-        currency
-    ) {
-        const amount =
-            Number(value);
+    function formatMonth(value) {
+        if (!value) return "Unknown month";
 
-        if (
-            !Number.isFinite(
-                amount
-            ) ||
-            !currency
-        ) {
-            return String(value);
+        const raw = String(value);
+        const match = raw.match(/^(\d{4})-(\d{2})/);
+
+        if (!match) return raw;
+
+        const date = new Date(
+            Number(match[1]),
+            Number(match[2]) - 1,
+            1
+        );
+
+        if (Number.isNaN(date.getTime())) {
+            return raw;
+        }
+
+        return new Intl.DateTimeFormat("en-GB", {
+            month: "long",
+            year: "numeric"
+        }).format(date);
+    }
+
+    function formatMoney(value, currency) {
+        const amount = Number(value);
+
+        if (!Number.isFinite(amount) || !currency) {
+            return String(value ?? "Not recorded");
         }
 
         try {
-            return new Intl.NumberFormat(
-                "en-GB",
-                {
-                    style:
-                        "currency",
-                    currency:
-                        currency
-                }
-            ).format(amount);
-
+            return new Intl.NumberFormat("en-GB", {
+                style: "currency",
+                currency
+            }).format(amount);
         } catch (error) {
-            return (
-                currency +
-                " " +
-                amount.toFixed(2)
-            );
+            return currency + " " + amount.toFixed(2);
         }
     }
 
+    function normaliseCurrency(currency) {
+        return currency
+            ? String(currency).trim().toUpperCase()
+            : "";
+    }
+
+    function toNumber(value) {
+        const number = Number(value);
+        return Number.isFinite(number) ? number : 0;
+    }
+
+    function sumValues(records, property) {
+        return records.reduce(
+            (sum, record) =>
+                sum + toNumber(record[property]),
+            0
+        );
+    }
 })();
