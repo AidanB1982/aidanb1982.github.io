@@ -2404,7 +2404,7 @@
             "publishing_targets"
         ]);
 
-        if (!allowed.has(table) {
+        if (!allowed.has(table)) {
             return;
         }
 
