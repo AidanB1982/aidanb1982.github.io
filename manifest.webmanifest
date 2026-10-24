@@ -1,0 +1,31 @@
+{
+  "id": "/pages/members.html",
+  "name": "Blackwood Publishing Members",
+  "short_name": "Blackwood",
+  "description": "Your Blackwood Publishing members portal, reading library and exclusive member features.",
+  "start_url": "/pages/members.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#171b25",
+  "theme_color": "#171b25",
+  "icons": [
+    {
+      "src": "/assets/blackwood-app-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/blackwood-app-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/blackwood-app-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
