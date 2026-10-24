@@ -326,8 +326,9 @@ async function refresh(version = accessVersion) {
             "id,title_id,format,isbn,asin"],
 
         
+        
         ["royalties", "publishing_kdp_royalties",
-            "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency,average_offer_price"],
+            "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency,average_offer_price,average_manufacturing_cost,average_delivery_cost"],
 
         ["pages", "publishing_kdp_page_reads",
             "id,edition_id,reading_month,pages_read,pages_listened,total_pages,estimated_royalty_gbp"],
@@ -937,6 +938,56 @@ function renderRetailSales() {
         }
     }
 
+
+function calculateAmazonCosts(rows) {
+    const retail = calculateRetailSales(rows).estimatedValue;
+
+    let manufacturing = 0;
+    let delivery = 0;
+    let royalties = 0;
+
+    for (const row of rows) {
+        const copies = number(row.net_units_sold);
+
+        manufacturing +=
+            copies * number(row.average_manufacturing_cost);
+
+        delivery +=
+            copies * number(row.average_delivery_cost);
+
+        royalties += number(row.royalty_amount);
+    }
+
+    return {
+        retail,
+        manufacturing,
+        delivery,
+        royalties,
+        remainder: retail - manufacturing - delivery - royalties
+    };
+}
+
+function renderAmazonCosts() {
+    const result = calculateAmazonCosts(filteredRoyalties());
+    const selectedCurrency = currency();
+
+    $("sr-amazon-retail").textContent =
+        money(result.retail, selectedCurrency);
+
+    $("sr-amazon-print").textContent =
+        money(result.manufacturing, selectedCurrency);
+
+    $("sr-amazon-delivery").textContent =
+        money(result.delivery, selectedCurrency);
+
+    $("sr-amazon-royalties").textContent =
+        money(result.royalties, selectedCurrency);
+
+    $("sr-amazon-remainder").textContent =
+        money(result.remainder, selectedCurrency);
+}
+    
+    
     function renderFinancialYears() {
         const years = [...$("sr-year").options]
             .map(option => Number(option.value));
@@ -1245,6 +1296,7 @@ function renderRetailSales() {
                 : selectedFormat()}`;
 
         renderRetailSales();
+        renderAmazonCosts();
         renderKPIs();
         renderMonthly();
         renderFormats();
