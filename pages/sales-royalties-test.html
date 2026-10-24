@@ -119,47 +119,53 @@
             <p id="sr-period-label" class="sr-muted"></p>
         </section>
 
-        <section aria-labelledby="sr-kpi-title">
+        
+        <section class="sr-panel" aria-labelledby="sr-retail-heading">
             <div class="sr-section-heading">
                 <div>
-                    <p class="sr-kicker">Executive Overview</p>
-                    <h2 id="sr-kpi-title">Publishing KPIs</h2>
+                    <p class="sr-kicker">Retail Sales Intelligence</p>
+                    <h2 id="sr-retail-heading">Estimated KDP Retail Sales</h2>
                 </div>
             </div>
 
             <div class="sr-kpi-grid">
                 <article class="sr-kpi">
-                    <span>KDP royalties</span>
-                    <strong id="sr-kpi-royalties">—</strong>
-                    <small>Confirmed KDP royalty report values</small>
+                    <span>Estimated retail sales value</span>
+                    <strong id="sr-retail-value">—</strong>
+                    <small>
+                        Net copies × reported average offer price,
+                        where positive
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
-                    <span>KDP net copies</span>
-                    <strong id="sr-kpi-copies">—</strong>
-                    <small id="sr-kpi-copy-detail">Sales less refunds</small>
+                    <span>Price exception rows</span>
+                    <strong id="sr-retail-exceptions">—</strong>
+                    <small>
+                        Royalty-bearing rows with zero or missing
+                        offer prices
+                    </small>
                 </article>
+
                 <article class="sr-kpi">
-                    <span>Kindle+ estimate</span>
-                    <strong id="sr-kpi-ku">—</strong>
-                    <small>Estimated only; not confirmed income</small>
-                </article>
-                <article class="sr-kpi">
-                    <span>Recorded expenses</span>
-                    <strong id="sr-kpi-expenses">—</strong>
-                    <small>Expenses entered into Department 03</small>
-                </article>
-                <article class="sr-kpi">
-                    <span>Previous month</span>
-                    <strong id="sr-kpi-previous">—</strong>
-                    <small>KDP royalty comparison</small>
-                </article>
-                <article class="sr-kpi">
-                    <span>Month-on-month</span>
-                    <strong id="sr-kpi-growth">—</strong>
-                    <small>Latest two reported KDP months</small>
+                    <span>Copies affected</span>
+                    <strong id="sr-retail-exception-copies">—</strong>
+                    <small>
+                        Copies excluded from the retail estimate
+                    </small>
                 </article>
             </div>
+
+            <p class="sr-warning">
+                Retail sales values are estimates based on KDP's
+                reported average offer prices, not confirmed
+                customer-paid turnover or publisher income.
+                Price exceptions are excluded rather than assigned
+                an invented price. Refund valuation and tax
+                treatment may differ from actual transactions.
+            </p>
         </section>
+
 
         <div class="sr-two-columns">
             <section class="sr-panel" aria-labelledby="sr-trend-title">
