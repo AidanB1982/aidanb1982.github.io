@@ -1454,3 +1454,164 @@ body.sub-page .blackwood-nav {
     }
 
 }
+
+/* ==========================================
+   BLACKWOOD MOBILE NAVIGATION
+   Simple header only — desktop preserved
+========================================== */
+
+.blackwood-mobile-toggle[hidden] {
+    display: none;
+}
+
+@media (max-width: 760px) {
+
+    body.sub-page .simple-header {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 14px 18px;
+        background: #17100c;
+    }
+
+    body.sub-page .simple-header .header-inner {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    body.sub-page .simple-header .logo img {
+        width: 105px;
+        height: auto;
+    }
+
+    body.sub-page .simple-header .blackwood-mobile-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        padding: 0;
+        border: 1px solid rgba(214, 177, 129, 0.45);
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.3);
+        color: #efe7dc;
+        cursor: pointer;
+    }
+
+    .blackwood-mobile-toggle-lines {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .blackwood-mobile-toggle-lines span {
+        display: block;
+        width: 21px;
+        height: 2px;
+        background: #efe7dc;
+        border-radius: 2px;
+    }
+
+    body.sub-page .simple-header .blackwood-nav {
+        display: none;
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 0;
+        margin: 0;
+        padding: 10px 0;
+        border-top: 1px solid rgba(214, 177, 129, 0.2);
+        white-space: normal;
+    }
+
+    body.sub-page .simple-header.mobile-menu-open .blackwood-nav {
+        display: flex;
+    }
+
+    body.sub-page .simple-header .blackwood-nav > a,
+    body.sub-page .simple-header .blackwood-nav-item > .blackwood-nav-link {
+        display: flex;
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        color: #efe7dc;
+        opacity: 1;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+        text-align: left;
+    }
+
+    body.sub-page .simple-header .blackwood-nav-item {
+        display: block;
+        width: 100%;
+    }
+
+    body.sub-page .simple-header .blackwood-dropdown {
+        display: none !important;
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+        margin: 0 !important;
+        padding: 4px 0 8px 12px !important;
+        transform: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        border: 0 !important;
+        border-left: 1px solid rgba(214, 177, 129, 0.25) !important;
+        box-shadow: none !important;
+        background: rgba(0, 0, 0, 0.2) !important;
+    }
+
+    body.sub-page .simple-header .blackwood-nav-item.is-open > .blackwood-dropdown {
+        display: block !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    body.sub-page .simple-header .blackwood-dropdown a {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px !important;
+        white-space: normal !important;
+        font-size: 11px !important;
+        line-height: 1.5;
+    }
+
+    body.sub-page .simple-header .blackwood-mobile-toggle:focus-visible,
+    body.sub-page .simple-header .blackwood-nav-link:focus-visible {
+        outline: 2px solid #d6b181;
+        outline-offset: 3px;
+    }
+}
+
+@media (min-width: 761px) {
+    .blackwood-mobile-toggle {
+        display: none !important;
+    }
+}
