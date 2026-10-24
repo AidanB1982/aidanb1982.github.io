@@ -1,0 +1,564 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blackwood KDP Paperback Import</title>
+<style>
+  :root {
+    color-scheme: dark;
+    font-family: system-ui, sans-serif;
+  }
+  body {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+    background: #10151b;
+    color: #f0f3f7;
+  }
+  h1 { color: #e4bb70; }
+  p { line-height: 1.6; color: #cbd3dc; }
+  textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 230px;
+    padding: 15px;
+    background: #1b242e;
+    color: #f0f3f7;
+    border: 1px solid #586575;
+    border-radius: 8px;
+    font: 12px/1.5 monospace;
+    resize: vertical;
+  }
+  button {
+    margin: 14px 10px 14px 0;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 7px;
+    background: #e4bb70;
+    color: #171717;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #status {
+    white-space: pre-wrap;
+    margin: 16px 0;
+    line-height: 1.7;
+  }
+  .error { color: #ff9292; }
+  .success { color: #8be1b2; }
+  #sqlOutput { min-height: 320px; }
+</style>
+</head>
+<body>
+
+<h1>Blackwood KDP Paperback Import</h1>
+
+<p>
+  Paste the complete original KDP paperback report below,
+  including its header row. This tool validates every row
+  and generates one transactional Supabase SQL import.
+</p>
+
+<label for="reportInput">Original KDP paperback report</label>
+<textarea id="reportInput" spellcheck="false"
+  placeholder="Royalty Date&#9;Order Date&#9;Title&#9;Author Name&#9;ISBN&#9;Marketplace..."></textarea>
+
+<button id="generateButton">Generate SQL</button>
+<button id="copyButton" disabled>Copy SQL</button>
+
+<div id="status" role="status"></div>
+
+<label for="sqlOutput">Generated Supabase SQL</label>
+<textarea id="sqlOutput" readonly spellcheck="false"></textarea>
+
+<script>
+"use strict";
+
+const REPORT_NAME = "KDP Paperback Royalties - Import 01";
+
+const EXPECTED_HEADERS = [
+  "Royalty Date",
+  "Order Date",
+  "Title",
+  "Author Name",
+  "ISBN",
+  "Marketplace",
+  "Royalty Type",
+  "Transaction Type",
+  "Units Sold",
+  "Units Refunded",
+  "Net Units Sold",
+  "Avg. List Price without tax",
+  "Avg. Offer Price without tax",
+  "Avg. Manufacturing Cost",
+  "Royalty",
+  "Currency",
+  "ASIN"
+];
+
+const VERIFIED_ISBNS = new Set([
+  "9798184588353",
+  "9798190410419",
+  "9798180289186",
+  "9798244522365",
+  "9798286003952",
+  "9798283385891",
+  "9781919555522",
+  "9798182488075",
+  "9798265794413"
+]);
+
+const input = document.getElementById("reportInput");
+const output = document.getElementById("sqlOutput");
+const status = document.getElementById("status");
+const generateButton = document.getElementById("generateButton");
+const copyButton = document.getElementById("copyButton");
+
+function sqlString(value) {
+  return "'" + String(value).replaceAll("'", "''") + "'";
+}
+
+function sqlNumber(value, field, rowNumber, allowNegative = false) {
+  const text = String(value).trim();
+
+  if (!/^-?\d+(?:\.\d+)?$/.test(text)) {
+    throw new Error(
+      `Row ${rowNumber}: Invalid ${field}: ${text}`
+    );
+  }
+
+  const number = Number(text);
+
+  if (!Number.isFinite(number)) {
+    throw new Error(
+      `Row ${rowNumber}: Non-finite ${field}`
+    );
+  }
+
+  if (!allowNegative && number < 0) {
+    throw new Error(
+      `Row ${rowNumber}: Negative ${field}`
+    );
+  }
+
+  return text;
+}
+
+function sqlInteger(value, field, rowNumber) {
+  const text = String(value).trim();
+
+  if (!/^\d+$/.test(text) ||
+      !Number.isSafeInteger(Number(text))) {
+    throw new Error(
+      `Row ${rowNumber}: Invalid ${field}: ${text}`
+    );
+  }
+
+  return text;
+}
+
+function sqlMonth(value, field, rowNumber) {
+  const text = String(value).trim();
+
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(text)) {
+    throw new Error(
+      `Row ${rowNumber}: Invalid ${field}: ${text}`
+    );
+  }
+
+  return sqlString(text + "-01");
+}
+
+function parseReport(text) {
+  const lines = text
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .filter(line => line.trim() !== "");
+
+  if (lines.length < 2) {
+    throw new Error(
+      "Paste the complete report, including the header."
+    );
+  }
+
+  const headers = lines[0].split("\t").map(s => s.trim());
+
+  if (
+    headers.length !== EXPECTED_HEADERS.length ||
+    headers.some((header, index) =>
+      header !== EXPECTED_HEADERS[index]
+    )
+  ) {
+    throw new Error(
+      "The report header does not match the expected " +
+      "17-column KDP paperback export. " +
+      "Please paste the original tab-separated report."
+    );
+  }
+
+  return lines.slice(1).map((line, index) => {
+    const rowNumber = index + 1;
+    const cells = line.split("\t").map(s => s.trim());
+
+    if (cells.length !== EXPECTED_HEADERS.length) {
+      throw new Error(
+        `Row ${rowNumber}: Expected 17 columns, ` +
+        `found ${cells.length}.`
+      );
+    }
+
+    const [
+      royaltyDate,
+      orderDate,
+      title,
+      author,
+      isbn,
+      marketplace,
+      royaltyType,
+      transactionType,
+      unitsSold,
+      unitsRefunded,
+      netUnits,
+      listPrice,
+      offerPrice,
+      manufacturingCost,
+      royalty,
+      currency,
+      asin
+    ] = cells;
+
+    if (!VERIFIED_ISBNS.has(isbn)) {
+      throw new Error(
+        `Row ${rowNumber}: ISBN ${isbn} was not ` +
+        "among the nine verified paperback ISBNs."
+      );
+    }
+
+    if (!title || !author || !marketplace ||
+        !royaltyType || !transactionType || !asin) {
+      throw new Error(
+        `Row ${rowNumber}: A required source field is empty.`
+      );
+    }
+
+    if (!/^[A-Z]{3}$/.test(currency)) {
+      throw new Error(
+        `Row ${rowNumber}: Invalid currency ${currency}`
+      );
+    }
+
+    const sold = Number(
+      sqlInteger(unitsSold, "Units Sold", rowNumber)
+    );
+
+    const refunded = Number(
+      sqlInteger(unitsRefunded, "Units Refunded", rowNumber)
+    );
+
+    const net = Number(
+      sqlInteger(netUnits, "Net Units Sold", rowNumber)
+    );
+
+    if (sold - refunded !== net) {
+      throw new Error(
+        `Row ${rowNumber}: Net units do not reconcile.`
+      );
+    }
+
+    const values = [
+      String(rowNumber),
+      sqlMonth(royaltyDate, "Royalty Date", rowNumber),
+      sqlMonth(orderDate, "Order Date", rowNumber),
+      sqlString(isbn),
+      sqlString(asin),
+      sqlString(marketplace),
+      sqlString(royaltyType),
+      sqlString(transactionType),
+      String(sold),
+      String(refunded),
+      sqlNumber(listPrice, "List Price", rowNumber),
+      sqlNumber(offerPrice, "Offer Price", rowNumber),
+      sqlNumber(
+        manufacturingCost,
+        "Manufacturing Cost",
+        rowNumber
+      ),
+      sqlNumber(royalty, "Royalty", rowNumber, true),
+      sqlString(currency)
+    ];
+
+    return {
+      values,
+      currency,
+      net,
+      royaltyCents: Math.round(Number(royalty) * 100)
+    };
+  });
+}
+
+function generateSQL(rows) {
+  const tuples = rows.map(
+    row => "    (" + row.values.join(", ") + ")"
+  ).join(",\n");
+
+  const totals = new Map();
+
+  for (const row of rows) {
+    const current = totals.get(row.currency) || {
+      rows: 0,
+      units: 0,
+      cents: 0
+    };
+
+    current.rows++;
+    current.units += row.net;
+    current.cents += row.royaltyCents;
+
+    totals.set(row.currency, current);
+  }
+
+  const checks = [...totals.entries()].map(
+    ([currency, total]) =>
+      `    (${sqlString(currency)}, ${total.rows}, ` +
+      `${total.units}, ${(total.cents / 100).toFixed(2)})`
+  ).join(",\n");
+
+  const report = sqlString(REPORT_NAME);
+
+  return `-- BLACKWOOD PUBLISHING UK
+-- DEPARTMENT 03: KDP PAPERBACK IMPORT 01
+-- Generated from original KDP source rows.
+-- Preserves repeated transactions and currencies.
+-- Transactional: errors roll back the entire import.
+
+BEGIN;
+
+CREATE TEMP TABLE kdp_paperback_source (
+    source_row_number integer PRIMARY KEY,
+    royalty_month date NOT NULL,
+    order_month date NOT NULL,
+    isbn text NOT NULL,
+    asin text NOT NULL,
+    marketplace text NOT NULL,
+    royalty_type text NOT NULL,
+    transaction_type text NOT NULL,
+    units_sold integer NOT NULL,
+    units_refunded integer NOT NULL,
+    average_list_price numeric(12,4),
+    average_offer_price numeric(12,4),
+    average_manufacturing_cost numeric(12,4),
+    royalty_amount numeric(14,4) NOT NULL,
+    currency text NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO kdp_paperback_source VALUES
+${tuples};
+
+CREATE TEMP TABLE kdp_paperback_expected (
+    currency text PRIMARY KEY,
+    expected_rows integer NOT NULL,
+    expected_units integer NOT NULL,
+    expected_royalties numeric(14,4) NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO kdp_paperback_expected VALUES
+${checks};
+
+DO $$
+DECLARE
+    v_existing integer;
+    v_unmatched integer;
+    v_mismatches integer;
+BEGIN
+
+    SELECT count(*)
+    INTO v_existing
+    FROM public.publishing_kdp_royalties
+    WHERE source_report = ${report};
+
+    IF v_existing > 0 THEN
+        RAISE EXCEPTION
+            'Paperback report already imported: % rows exist. No changes made.',
+            v_existing;
+    END IF;
+
+    SELECT count(*)
+    INTO v_unmatched
+    FROM kdp_paperback_source s
+    WHERE (
+        SELECT count(*)
+        FROM public.publishing_editions e
+        WHERE e.isbn = s.isbn
+          AND e.format = 'paperback'
+    ) <> 1;
+
+    IF v_unmatched > 0 THEN
+        RAISE EXCEPTION
+            '% source rows lack exactly one paperback edition match.',
+            v_unmatched;
+    END IF;
+
+    INSERT INTO public.publishing_kdp_royalties (
+        edition_id,
+        format,
+        royalty_month,
+        order_month,
+        asin,
+        isbn,
+        marketplace,
+        royalty_type,
+        transaction_type,
+        units_sold,
+        units_refunded,
+        average_list_price,
+        average_offer_price,
+        average_manufacturing_cost,
+        royalty_amount,
+        currency,
+        source_report,
+        source_row_number
+    )
+    SELECT
+        e.id,
+        'paperback',
+        s.royalty_month,
+        s.order_month,
+        s.asin,
+        s.isbn,
+        s.marketplace,
+        s.royalty_type,
+        s.transaction_type,
+        s.units_sold,
+        s.units_refunded,
+        s.average_list_price,
+        s.average_offer_price,
+        s.average_manufacturing_cost,
+        s.royalty_amount,
+        s.currency,
+        ${report},
+        s.source_row_number
+    FROM kdp_paperback_source s
+    JOIN public.publishing_editions e
+      ON e.isbn = s.isbn
+     AND e.format = 'paperback';
+
+    WITH actual AS (
+        SELECT
+            currency,
+            count(*)::integer AS rows_count,
+            sum(net_units_sold)::integer AS units_count,
+            sum(royalty_amount) AS royalty_total
+        FROM public.publishing_kdp_royalties
+        WHERE source_report = ${report}
+        GROUP BY currency
+    )
+    SELECT count(*)
+    INTO v_mismatches
+    FROM kdp_paperback_expected x
+    FULL JOIN actual a USING (currency)
+    WHERE x.currency IS NULL
+       OR a.currency IS NULL
+       OR x.expected_rows <> a.rows_count
+       OR x.expected_units <> a.units_count
+       OR x.expected_royalties <> a.royalty_total;
+
+    IF v_mismatches > 0 THEN
+        RAISE EXCEPTION
+            'Paperback totals verification failed for % currencies.',
+            v_mismatches;
+    END IF;
+
+    RAISE NOTICE
+        'Paperback import verified: % source rows, % currencies.',
+        (SELECT count(*) FROM kdp_paperback_source),
+        (SELECT count(*) FROM kdp_paperback_expected);
+
+END
+$$;
+
+COMMIT;
+
+-- FINAL VERIFICATION: CURRENCIES REMAIN SEPARATE
+
+SELECT
+    currency,
+    count(*) AS report_rows,
+    sum(net_units_sold) AS net_copies,
+    sum(royalty_amount) AS royalties
+FROM public.publishing_kdp_royalties
+WHERE source_report = ${report}
+GROUP BY currency
+ORDER BY currency;
+`;
+}
+
+generateButton.addEventListener("click", () => {
+  output.value = "";
+  copyButton.disabled = true;
+  status.className = "";
+
+  try {
+    const rows = parseReport(input.value);
+
+    if (rows.length === 0) {
+      throw new Error("No report rows found.");
+    }
+
+    const totals = new Map();
+
+    for (const row of rows) {
+      const current = totals.get(row.currency) || {
+        units: 0,
+        cents: 0
+      };
+
+      current.units += row.net;
+      current.cents += row.royaltyCents;
+      totals.set(row.currency, current);
+    }
+
+    output.value = generateSQL(rows);
+    copyButton.disabled = false;
+    status.className = "success";
+
+    const breakdown = [...totals.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([currency, total]) =>
+        `${currency}: ${total.units} net copies, ` +
+        `${(total.cents / 100).toFixed(2)} royalties`
+      )
+      .join("\n");
+
+    status.textContent =
+      `Validated ${rows.length} original report rows.\n` +
+      `Currencies: ${totals.size}\n\n` +
+      breakdown +
+      "\n\nSQL generated successfully. No database " +
+      "changes have been made yet.";
+
+  } catch (error) {
+    status.className = "error";
+    status.textContent = "Validation stopped: " + error.message;
+  }
+});
+
+copyButton.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(output.value);
+    status.textContent += "\n\nSQL copied to clipboard.";
+  } catch {
+    output.focus();
+    output.select();
+    status.textContent +=
+      "\n\nSelect and copy the SQL manually.";
+  }
+});
+</script>
+
+</body>
+</html>
