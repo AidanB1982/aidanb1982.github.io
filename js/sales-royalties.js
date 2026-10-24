@@ -360,16 +360,17 @@
         } catch (error) {
     if (version !== accessVersion) return;
 
-    console.error("Department 03 load error:", error);
+    console.error("Department 03 error stack:", error?.stack);
 
     loaded = false;
 
     const details = [
-        error?.message,
-        error?.details,
-        error?.hint,
-        error?.code
-    ].filter(Boolean).join(" | ");
+    error?.message,
+    error?.stack?.split("\n")[1]?.trim(),
+    error?.details,
+    error?.hint,
+    error?.code
+].filter(Boolean).join(" | ");
 
     status(
         "Financial data loading error: " +
