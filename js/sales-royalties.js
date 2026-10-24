@@ -325,8 +325,9 @@ async function refresh(version = accessVersion) {
         ["editions", "publishing_editions",
             "id,title_id,format,isbn,asin"],
 
+        
         ["royalties", "publishing_kdp_royalties",
-            "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency"],
+            "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency,average_offer_price"],
 
         ["pages", "publishing_kdp_page_reads",
             "id,edition_id,reading_month,pages_read,pages_listened,total_pages,estimated_royalty_gbp"],
@@ -600,6 +601,44 @@ function populateFilters() {
             date.getMonth() + 1
         ).padStart(2, "0")}`;
     }
+    
+function calculateRetailSales(rows) {
+    let estimatedValue = 0;
+    let exceptionRows = 0;
+    let exceptionCopies = 0;
+
+    for (const row of rows) {
+        const offerPrice = number(row.average_offer_price);
+        const netCopies = number(row.net_units_sold);
+        const royalty = number(row.royalty_amount);
+
+        if (offerPrice > 0) {
+            estimatedValue += netCopies * offerPrice;
+        } else if (royalty > 0) {
+            exceptionRows += 1;
+            exceptionCopies += netCopies;
+        }
+    }
+
+    return {
+        estimatedValue,
+        exceptionRows,
+        exceptionCopies
+    };
+}
+
+function renderRetailSales() {
+    const result = calculateRetailSales(filteredRoyalties());
+
+    $("sr-retail-value").textContent =
+        money(result.estimatedValue, currency());
+
+    $("sr-retail-exceptions").textContent =
+        integer(result.exceptionRows);
+
+    $("sr-retail-exception-copies").textContent =
+        integer(result.exceptionCopies);
+}
 
     function renderKPIs() {
         const rows = filteredRoyalties();
@@ -1205,6 +1244,7 @@ function populateFilters() {
                 ? "All formats"
                 : selectedFormat()}`;
 
+        renderRetailSales();
         renderKPIs();
         renderMonthly();
         renderFormats();
