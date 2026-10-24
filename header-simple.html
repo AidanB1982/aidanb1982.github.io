@@ -1,13 +1,40 @@
+
 <header class="simple-header">
     <div class="header-inner">
 
         <div class="logo">
-            <a href="/index.html" aria-label="Blackwood Publishing home">
-                <img src="/assets/logo1.png" alt="Blackwood Publishing Logo">
+            <a
+                href="/index.html"
+                aria-label="Blackwood Publishing home"
+            >
+                <img
+                    src="/assets/logo1.png"
+                    alt="Blackwood Publishing Logo"
+                >
             </a>
         </div>
 
-        <nav class="nav-inline" aria-label="Main navigation">
+        <!-- Mobile navigation toggle -->
+        <button
+            class="blackwood-mobile-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-controls="blackwood-main-navigation"
+            aria-expanded="false"
+            hidden
+        >
+            <span class="blackwood-mobile-toggle-lines" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+
+        <nav
+            id="blackwood-main-navigation"
+            class="nav-inline"
+            aria-label="Main navigation"
+        >
             <a href="/index.html">Home</a>
             <a href="/pages/start-here.html">Start Here</a>
             <a href="/pages/holdfast.html">New Releases</a>
