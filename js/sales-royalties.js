@@ -599,13 +599,11 @@
             render();
 
             status(
-                "Dashboard loaded successfully. " +
-                `${integer(data.royalties.length)} ` +
-                "Amazon royalty rows, " +
-                `${integer(data.pages.length)} ` +
-                "Kindle Unlimited rows, " +
-                `${integer(data.expenses.length)} expenses."
-            );
+    "Dashboard loaded successfully. " +
+    `$DIL0 Amazon royalty rows, ` +
+    `$DIL1 Kindle Unlimited rows, ` +
+    `$DIL2 expenses.`
+);
 
         } catch (error) {
             if (version !== accessVersion) return;
