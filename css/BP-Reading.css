@@ -299,12 +299,12 @@ select:focus-visible {
 
 .page-turn-overlay.turn-next .page-turn-sheet {
   transform-origin: left center;
-  animation: bp-page-next 520ms ease-in-out both;
+  animation: bp-page-next 900ms ease-in-out both;
 }
 
 .page-turn-overlay.turn-prev .page-turn-sheet {
   transform-origin: right center;
-  animation: bp-page-prev 520ms ease-in-out both;
+  animation: bp-page-prev 900ms ease-in-out both;
 }
 
 @keyframes bp-page-next {
