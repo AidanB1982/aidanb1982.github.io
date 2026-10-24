@@ -36,7 +36,7 @@ const allowedThemes = [
   "night"
 ];
 
-const PAGE_TURN_DURATION = 520;
+const PAGE_TURN_DURATION = 900;
 
 function loadSavedState() {
   try {
