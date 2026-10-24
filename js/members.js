@@ -1138,7 +1138,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                         My Bookshelf
                     </a>
                     
-                    ${
+                                        ${
                         BlackwoodMembersState.hasAuthorDeskAccess
                             ? `
                                 <a href="/pages/authordesk.html" class="circle-button circle-button-secondary">
@@ -1147,36 +1147,33 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                             `
                             : ""
                     }
-                    
+
                     ${
                         isAdminProfile(member)
                             ? `
-                                ${
-    isAdminProfile(member)
-        ? `
-            <a
-                href="/pages/behind-files-admin.html"
-                class="circle-button circle-button-primary"
-            >
-                Blackwood Management Hub
-            </a>
+                                <a
+                                    href="/pages/behind-files-admin.html"
+                                    class="circle-button circle-button-primary"
+                                >
+                                    Blackwood Management Hub
+                                </a>
 
-            <a
-                href="#circle-admin-reward-desk"
-                class="circle-button circle-button-secondary"
-            >
-                Admin Reward Desk
-            </a>
+                                <a
+                                    href="#circle-admin-reward-desk"
+                                    class="circle-button circle-button-secondary"
+                                >
+                                    Admin Reward Desk
+                                </a>
 
-            <a
-                href="#blackwood-arc-shield-watch-root"
-                class="circle-button circle-button-secondary"
-            >
-                ARC Shield Watch
-            </a>
-        `
-        : ""
-}
+                                <a
+                                    href="#blackwood-arc-shield-watch-root"
+                                    class="circle-button circle-button-secondary"
+                                >
+                                    ARC Shield Watch
+                                </a>
+                            `
+                            : ""
+                    }
 
                 </div>
             </div>
