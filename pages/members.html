@@ -1,32 +1,380 @@
 
-{
-  "id": "/pages/members.html",
-  "name": "Blackwood Publishing Members",
-  "short_name": "Blackwood",
-  "description": "The Archivists — your private Blackwood Publishing reader community.",
-  "start_url": "/pages/members.html",
-  "scope": "/",
-  "display": "standalone",
-  "background_color": "#171b25",
-  "theme_color": "#171b25",
-  "icons": [
-    {
-      "src": "/assets/blackwood-app-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/blackwood-app-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/assets/blackwood-app-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ]
-}
+<!DOCTYPE html>
+<html lang="en-GB" class="no-js">
+<head>
+    <!-- Google tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+
+        document.documentElement.classList.remove("no-js");
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>The Archivists | Blackwood Publishing</title>
+
+    <meta
+        name="description"
+        content="The Archivists is the private reader community of Blackwood Publishing, with Reader Records, Archive Points, rewards, private dispatches, ARC access for approved readers, and personal reading records."
+    >
+
+    <link rel="icon" href="/assets/favicon.png" type="image/png">
+
+    <!-- =========================
+         BLACKWOOD MEMBERS PWA
+         ========================= -->
+
+    <link
+        rel="manifest"
+        href="/manifest.webmanifest"
+    >
+
+    <meta
+        name="theme-color"
+        content="#171b25"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="default"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Blackwood"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="/assets/blackwood-app-180.png"
+    >
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/header.css?v=20260930">
+    <link rel="stylesheet" href="/css/styles.css?v=20260911">
+    <link rel="stylesheet" href="/css/members.css?v=20260945">
+    <link rel="stylesheet" href="/css/member-arc-profile.css?v=20260931">
+    <link rel="stylesheet" href="/css/member-bookshelf.css?v=20260911">
+    <link rel="stylesheet" href="/css/member-arc-shield-watch.css?v=20261016">
+
+    <!-- JS -->
+    <script src="/js/header.js?v=20260930" defer></script>
+    <script src="/js/member-arc-profile.js?v=20260930" defer></script>
+    <script src="/js/member-bookshelf.js?v=20260912" defer></script>
+    <script src="/js/members.js?v=20260943" defer></script>
+    <script src="/js/member-arc-shield-watch.js?v=20261016" defer></script>
+</head>
+
+<body class="members-page sub-page">
+
+    <a class="skip-link" href="#blackwood-circle-app">
+        Skip to content
+    </a>
+
+    <div id="header-placeholder"></div>
+
+    <main>
+
+        <!-- =========================
+             SIGNED-OUT HERO
+             ========================= -->
+
+        <section
+            class="about-hero about-hero-circle circle-signed-out-only"
+            aria-labelledby="blackwood-circle-title"
+        >
+
+            <div class="about-hero-overlay"></div>
+
+            <div class="about-hero-content fade-in">
+
+                <p class="about-intro-line">
+                    Private Reader Access
+                </p>
+
+                <h1 id="blackwood-circle-title">
+                    The Archivists
+                </h1>
+
+                <p class="about-intro-line">
+                    Reader Records. Private files. Archive rewards. Dispatches from Blackwood.
+                </p>
+
+                <p class="about-intro-line circle-hero-note">
+                    Sign in to enter your Private Archive and access your reader record,
+                    rewards, files, and other Archivist material.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PUBLIC EXPLAINER
+             ========================= -->
+
+        <section
+            class="circle-public-explainer circle-signed-out-only"
+            aria-labelledby="circle-how-title"
+        >
+
+            <div class="circle-public-explainer-inner">
+
+                <div class="circle-public-heading">
+
+                    <p class="circle-kicker">
+                        The Archivists
+                    </p>
+
+                    <h2 id="circle-how-title">
+                        Read. Record. Earn. Return.
+                    </h2>
+
+                    <p>
+                        The Archivists is Blackwood Publishing's private reader community.
+                        Create your Reader Record, collect Archive Points through eligible
+                        Blackwood activity, access private material, and redeem available
+                        rewards through the Blackwood Store.
+                    </p>
+
+                </div>
+
+
+                <!-- =========================
+                     HOW IT WORKS
+                     ========================= -->
+
+                <div class="circle-public-grid">
+
+                    <article class="circle-public-card">
+
+                        <span class="circle-public-number">
+                            01
+                        </span>
+
+                        <h3>
+                            Become an Archivist
+                        </h3>
+
+                        <p>
+                            Create your free Reader Record to access the Private Archive
+                            and keep track of your points, rewards, redemptions,
+                            reading activity, and private Blackwood updates.
+                        </p>
+
+                    </article>
+
+
+                    <article class="circle-public-card">
+
+                        <span class="circle-public-number">
+                            02
+                        </span>
+
+                        <h3>
+                            Build Your Record
+                        </h3>
+
+                        <p>
+                            Submit Reader Records, purchase through the Blackwood Store,
+                            respond to private dispatches, and take part in eligible
+                            Blackwood activity to build your Archive Points total.
+                        </p>
+
+                    </article>
+
+
+                    <article class="circle-public-card">
+
+                        <span class="circle-public-number">
+                            03
+                        </span>
+
+                        <h3>
+                            Keep Your Collection
+                        </h3>
+
+                        <p>
+                            Keep a private record of the Blackwood books you own or have read,
+                            with personal notes alongside each title.
+                        </p>
+
+                    </article>
+
+                </div>
+
+
+                <!-- =========================
+                     ARCHIVE POINTS
+                     ========================= -->
+
+                <div
+                    class="circle-earning-panel"
+                    aria-label="Archive Points guide"
+                >
+
+                    <div class="circle-earning-row">
+
+                        <strong>
+                            +25 points
+                        </strong>
+
+                        <span>
+                            Welcome bonus when you become an Archivist.
+                        </span>
+
+                    </div>
+
+
+                    <div class="circle-earning-row">
+
+                        <strong>
+                            +10 points
+                        </strong>
+
+                        <span>
+                            Submit a Reader Record while signed in.
+                        </span>
+
+                    </div>
+
+
+                    <div class="circle-earning-row">
+
+                        <strong>
+                            +5 points
+                        </strong>
+
+                        <span>
+                            React to a Behind the Files dispatch.
+                            One points award per file.
+                        </span>
+
+                    </div>
+
+
+                    <div class="circle-earning-row">
+
+                        <strong>
+                            100 points
+                        </strong>
+
+                        <span>
+                            Redeem for an available Archive reward.
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     PUBLIC ACTIONS
+                     ========================= -->
+
+                <div class="circle-public-actions">
+
+                    <a
+                        class="circle-button circle-button-primary"
+                        href="#blackwood-circle-app"
+                    >
+                        Sign In / Become an Archivist
+                    </a>
+
+                    <a
+                        class="circle-button circle-button-secondary"
+                        href="/pages/reader-records.html"
+                    >
+                        Submit a Reader Record
+                    </a>
+
+                    <a
+                        class="circle-button circle-button-secondary"
+                        href="/pages/store.html"
+                    >
+                        Visit the Blackwood Store
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PRIVATE ARCHIVE APP
+
+             Internal IDs and classes retain
+             their existing names so the
+             working member system is not
+             disturbed.
+             ========================= -->
+
+        <div id="blackwood-circle-app">
+
+            <section class="circle-loading">
+
+                <p class="circle-kicker">
+                    Private Archive
+                </p>
+
+                <h1>
+                    Opening the Archive...
+                </h1>
+
+                <p>
+                    Your Reader Record is being retrieved.
+                </p>
+
+            </section>
+
+        </div>
+
+
+        <!-- =========================
+             NO JAVASCRIPT
+             ========================= -->
+
+        <noscript>
+
+            <section class="circle-error">
+
+                <p class="circle-kicker">
+                    Private Archive
+                </p>
+
+                <h1>
+                    JavaScript is required
+                </h1>
+
+                <p>
+                    The Private Archive uses secure reader login.
+                    Please enable JavaScript in your browser to access your Reader Record.
+                </p>
+
+            </section>
+
+        </noscript>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+</body>
+</html>
