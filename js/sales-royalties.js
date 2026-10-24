@@ -358,15 +358,26 @@
             );
 
         } catch (error) {
-            if (version !== accessVersion) return;
-            console.error("Department 03 load error:", error);
-            loaded = false;
-            status(
-                "Unable to load all financial records. " +
-                "Dashboard figures are unavailable until the error is resolved."
-            );
-            clearOutputs();
-        }
+    if (version !== accessVersion) return;
+
+    console.error("Department 03 load error:", error);
+
+    loaded = false;
+
+    const details = [
+        error?.message,
+        error?.details,
+        error?.hint,
+        error?.code
+    ].filter(Boolean).join(" | ");
+
+    status(
+        "Financial data loading error: " +
+        (details || "Unknown error. Check the browser console.")
+    );
+
+    clearOutputs();
+}
     }
 
     function clearOutputs() {
