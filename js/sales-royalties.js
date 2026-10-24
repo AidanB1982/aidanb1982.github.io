@@ -298,7 +298,7 @@
             const response = await db
                 .from(table)
                 .select(columns)
-                .order("created_at", { ascending: true })
+                .order("id", { ascending: true })
                 .range(offset, offset + pageSize - 1);
 
             if (response.error) throw response.error;
