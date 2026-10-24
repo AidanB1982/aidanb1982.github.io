@@ -342,8 +342,25 @@
             // Sequential loading keeps error messages specific
             // and avoids unnecessary simultaneous database requests.
             for (const [key, table, columns] of specs) {
-                data[key] = await fetchAll(table, columns, version);
-            }
+    console.log("Department 03: loading", table);
+
+    const rows = await fetchAll(table, columns, version);
+
+    if (!Array.isArray(rows)) {
+        throw new Error(
+            `Expected an array from ${table}, received ${typeof rows}`
+        );
+    }
+
+    data[key] = rows;
+
+    console.log(
+        "Department 03: loaded",
+        table,
+        rows.length,
+        "records"
+    );
+}
 
             if (version !== accessVersion) return;
 
