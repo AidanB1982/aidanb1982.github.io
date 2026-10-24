@@ -1,0 +1,617 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blackwood KDP eBook Royalty Import</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+  body {
+    max-width: 1100px;
+    margin: 36px auto;
+    padding: 0 20px;
+    background: #111820;
+    color: #eef2f6;
+  }
+  h1 { color: #e4bb70; }
+  p { color: #cbd3dc; line-height: 1.6; }
+  label { display: block; margin-top: 16px; font-weight: 600; }
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 230px;
+    margin-top: 8px;
+    padding: 14px;
+    background: #1d2732;
+    color: #f3f6fa;
+    border: 1px solid #657485;
+    border-radius: 8px;
+    font: 12px/1.5 monospace;
+    resize: vertical;
+  }
+  #sqlOutput { min-height: 330px; }
+  input[type=file] { display: block; margin-top: 10px; }
+  button {
+    margin: 15px 10px 15px 0;
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 7px;
+    background: #e4bb70;
+    color: #151515;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  #status { white-space: pre-wrap; line-height: 1.7; }
+  .success { color: #9be7b9; }
+  .error { color: #ff9e9e; }
+</style>
+</head>
+<body>
+
+<h1>Blackwood KDP eBook Royalty Import</h1>
+
+<p>
+  Paste the complete original KDP eBook royalty report,
+  including its column headings, or choose a TSV/text file.
+  Processing happens locally in your browser.
+</p>
+
+<label for="reportFile">Choose report file (optional)</label>
+<input type="file" id="reportFile" accept=".tsv,.txt,.csv">
+
+<label for="reportInput">Original KDP report</label>
+<textarea id="reportInput" spellcheck="false"
+  placeholder="Royalty Date&#9;Title&#9;Author Name&#9;ASIN..."></textarea>
+
+<button id="generateButton">Generate SQL</button>
+<button id="copyButton" disabled>Copy SQL</button>
+
+<div id="status" role="status"></div>
+
+<label for="sqlOutput">Supabase import SQL</label>
+<textarea id="sqlOutput" readonly spellcheck="false"></textarea>
+
+<script>
+"use strict";
+
+const SOURCE_REPORT = "KDP eBook Royalties - Import 01";
+
+const VERIFIED_ASINS = new Set([
+  "B0FCPCG6WJ",
+  "B0FD1732H7",
+  "B0FPSCY7SW",
+  "B0FPSG8GX4",
+  "B0FQRD3NJV",
+  "B0H3C64H11",
+  "B0H4759GPF",
+  "B0H6T9565F"
+]);
+
+const EXPECTED_HEADERS = [
+  "Royalty Date",
+  "Title",
+  "Author Name",
+  "ASIN",
+  "Marketplace",
+  "Royalty Type",
+  "Transaction Type",
+  "Units Sold",
+  "Units Refunded",
+  "Net Units Sold",
+  "Avg. List Price without tax",
+  "Avg. Offer Price without tax",
+  "Avg. File Size (MB)",
+  "Avg. Delivery Cost",
+  "Royalty",
+  "Currency"
+];
+
+const input = document.getElementById("reportInput");
+const file = document.getElementById("reportFile");
+const output = document.getElementById("sqlOutput");
+const status = document.getElementById("status");
+const copyButton = document.getElementById("copyButton");
+
+function quote(value) {
+  return "'" + String(value).replaceAll("'", "''") + "'";
+}
+
+function parseInteger(value, rowNumber, field) {
+  const text = String(value).trim();
+
+  if (!/^\d+$/.test(text) ||
+      !Number.isSafeInteger(Number(text))) {
+    throw new Error(
+      `Row ${rowNumber}: invalid ${field}: ${value}`
+    );
+  }
+
+  return Number(text);
+}
+
+function parseDecimal(value, rowNumber, field, nullable = false) {
+  const text = String(value).trim();
+
+  if (nullable && (text === "" || text === "N/A")) {
+    return null;
+  }
+
+  if (!/^-?\d+(?:\.\d+)?$/.test(text)) {
+    throw new Error(
+      `Row ${rowNumber}: invalid ${field}: ${value}`
+    );
+  }
+
+  const number = Number(text);
+
+  if (!Number.isFinite(number)) {
+    throw new Error(
+      `Row ${rowNumber}: invalid numeric value in ${field}`
+    );
+  }
+
+  return text;
+}
+
+function sqlNumber(value) {
+  return value === null ? "NULL" : value;
+}
+
+function parseReport(text) {
+  const lines = text
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .filter(line => line.trim() !== "");
+
+  if (lines.length < 2) {
+    throw new Error(
+      "Please paste the report header and all data rows."
+    );
+  }
+
+  const header = lines[0]
+    .split("\t")
+    .map(cell => cell.trim().replace(/\s+/g, " "));
+
+  if (
+    header.length !== EXPECTED_HEADERS.length ||
+    header.some((value, index) =>
+      value !== EXPECTED_HEADERS[index]
+    )
+  ) {
+    throw new Error(
+      "Unexpected report headers. " +
+      "This tool requires the original 16-column " +
+      "tab-separated KDP eBook report."
+    );
+  }
+
+  const rows = [];
+
+  for (const line of lines.slice(1)) {
+    const cells = line.split("\t").map(cell => cell.trim());
+    const rowNumber = rows.length + 1;
+
+    if (cells.length !== 16) {
+      throw new Error(
+        `Row ${rowNumber}: expected 16 columns, ` +
+        `found ${cells.length}.`
+      );
+    }
+
+    const month = cells[0];
+    const asin = cells[3];
+    const marketplace = cells[4];
+    const royaltyType = cells[5];
+    const transactionType = cells[6];
+
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) {
+      throw new Error(
+        `Row ${rowNumber}: invalid royalty month ${month}`
+      );
+    }
+
+    if (!VERIFIED_ASINS.has(asin)) {
+      throw new Error(
+        `Row ${rowNumber}: unverified ASIN ${asin}`
+      );
+    }
+
+    if (!/^Amazon\.[a-z.]+$/i.test(marketplace)) {
+      throw new Error(
+        `Row ${rowNumber}: invalid marketplace ${marketplace}`
+      );
+    }
+
+    if (!["35%", "70%"].includes(royaltyType)) {
+      throw new Error(
+        `Row ${rowNumber}: unexpected royalty type ${royaltyType}`
+      );
+    }
+
+    const allowedTransactions = [
+      "Standard",
+      "Pre Order",
+      "Kindle Countdown Deals",
+      "Free - Promotion"
+    ];
+
+    if (!allowedTransactions.includes(transactionType)) {
+      throw new Error(
+        `Row ${rowNumber}: unexpected transaction type ${transactionType}`
+      );
+    }
+
+    const sold = parseInteger(cells[7], rowNumber, "Units Sold");
+    const refunded = parseInteger(
+      cells[8], rowNumber, "Units Refunded"
+    );
+
+    const netText = cells[9];
+
+    if (!/^-?\d+$/.test(netText) ||
+        !Number.isSafeInteger(Number(netText))) {
+      throw new Error(
+        `Row ${rowNumber}: invalid Net Units Sold ${netText}`
+      );
+    }
+
+    const net = Number(netText);
+
+    if (sold - refunded !== net) {
+      throw new Error(
+        `Row ${rowNumber}: sold minus refunded ` +
+        "does not equal net units."
+      );
+    }
+
+    const listPrice = parseDecimal(
+      cells[10], rowNumber, "List Price", true
+    );
+
+    const offerPrice = parseDecimal(
+      cells[11], rowNumber, "Offer Price", true
+    );
+
+    const fileSize = parseDecimal(
+      cells[12], rowNumber, "File Size", true
+    );
+
+    const deliveryCost = parseDecimal(
+      cells[13], rowNumber, "Delivery Cost", true
+    );
+
+    const royalty = parseDecimal(
+      cells[14], rowNumber, "Royalty"
+    );
+
+    const currency = cells[15];
+
+    if (!/^[A-Z]{3}$/.test(currency)) {
+      throw new Error(
+        `Row ${rowNumber}: invalid currency ${currency}`
+      );
+    }
+
+    if (
+      transactionType === "Free - Promotion" &&
+      Number(royalty) !== 0
+    ) {
+      throw new Error(
+        `Row ${rowNumber}: free promotion has a nonzero royalty.`
+      );
+    }
+
+    rows.push({
+      number: rowNumber,
+      month: month + "-01",
+      asin,
+      marketplace,
+      royaltyType,
+      transactionType,
+      sold,
+      refunded,
+      net,
+      listPrice,
+      offerPrice,
+      fileSize,
+      deliveryCost,
+      royalty,
+      currency
+    });
+  }
+
+  return rows;
+}
+
+function buildSQL(rows) {
+  const currencies = [...new Set(rows.map(row => row.currency))].sort();
+
+  const expected = currencies.map(currency => {
+    const selected = rows.filter(row => row.currency === currency);
+
+    return {
+      currency,
+      rows: selected.length,
+      net: selected.reduce((sum, row) => sum + row.net, 0),
+      royalty: selected.reduce(
+        (sum, row) => sum + Number(row.royalty), 0
+      ).toFixed(4)
+    };
+  });
+
+  const values = rows.map(row => `    (
+      ${row.number},
+      ${quote(row.month)},
+      ${quote(row.asin)},
+      ${quote(row.marketplace)},
+      ${quote(row.royaltyType)},
+      ${quote(row.transactionType)},
+      ${row.sold},
+      ${row.refunded},
+      ${sqlNumber(row.listPrice)},
+      ${sqlNumber(row.offerPrice)},
+      ${sqlNumber(row.fileSize)},
+      ${sqlNumber(row.deliveryCost)},
+      ${row.royalty},
+      ${quote(row.currency)}
+    )`).join(",\n");
+
+  const expectedValues = expected.map(item => `    (
+      ${quote(item.currency)},
+      ${item.rows},
+      ${item.net},
+      ${item.royalty}
+    )`).join(",\n");
+
+  return `-- BLACKWOOD PUBLISHING UK
+-- DEPARTMENT 03: KDP EBOOK ROYALTIES
+-- Original report rows: ${rows.length}
+-- Source: ${SOURCE_REPORT}
+-- No changes to other reports.
+-- Transactional import with per-currency checks.
+
+BEGIN;
+
+CREATE TEMP TABLE ebook_source (
+    source_row_number integer PRIMARY KEY,
+    royalty_month date NOT NULL,
+    asin text NOT NULL,
+    marketplace text NOT NULL,
+    royalty_type text NOT NULL,
+    transaction_type text NOT NULL,
+    units_sold integer NOT NULL,
+    units_refunded integer NOT NULL,
+    average_list_price numeric(12,4),
+    average_offer_price numeric(12,4),
+    average_file_size_mb numeric(12,4),
+    average_delivery_cost numeric(12,4),
+    royalty_amount numeric(14,4) NOT NULL,
+    currency text NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO ebook_source (
+    source_row_number,
+    royalty_month,
+    asin,
+    marketplace,
+    royalty_type,
+    transaction_type,
+    units_sold,
+    units_refunded,
+    average_list_price,
+    average_offer_price,
+    average_file_size_mb,
+    average_delivery_cost,
+    royalty_amount,
+    currency
+)
+VALUES
+${values};
+
+CREATE TEMP TABLE ebook_expected (
+    currency text PRIMARY KEY,
+    report_rows integer NOT NULL,
+    net_units integer NOT NULL,
+    royalties numeric(14,4) NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO ebook_expected (
+    currency, report_rows, net_units, royalties
+)
+VALUES
+${expectedValues};
+
+DO $$
+DECLARE
+    v_existing integer;
+    v_unmatched integer;
+    v_mismatch integer;
+BEGIN
+
+    SELECT count(*)
+    INTO v_existing
+    FROM public.publishing_kdp_royalties
+    WHERE source_report = ${quote(SOURCE_REPORT)};
+
+    IF v_existing <> 0 THEN
+        RAISE EXCEPTION
+            'This eBook report is already imported (% rows).',
+            v_existing;
+    END IF;
+
+    SELECT count(*)
+    INTO v_unmatched
+    FROM ebook_source s
+    WHERE (
+        SELECT count(*)
+        FROM public.publishing_editions e
+        WHERE e.asin = s.asin
+          AND e.format = 'ebook'
+    ) <> 1;
+
+    IF v_unmatched <> 0 THEN
+        RAISE EXCEPTION
+            '% rows do not match exactly one ebook edition.',
+            v_unmatched;
+    END IF;
+
+    INSERT INTO public.publishing_kdp_royalties (
+        edition_id,
+        format,
+        royalty_month,
+        order_month,
+        asin,
+        isbn,
+        marketplace,
+        royalty_type,
+        transaction_type,
+        units_sold,
+        units_refunded,
+        average_list_price,
+        average_offer_price,
+        average_file_size_mb,
+        average_delivery_cost,
+        average_manufacturing_cost,
+        royalty_amount,
+        currency,
+        source_report,
+        source_row_number
+    )
+    SELECT
+        e.id,
+        'ebook',
+        s.royalty_month,
+        NULL,
+        s.asin,
+        NULL,
+        s.marketplace,
+        s.royalty_type,
+        s.transaction_type,
+        s.units_sold,
+        s.units_refunded,
+        s.average_list_price,
+        s.average_offer_price,
+        s.average_file_size_mb,
+        s.average_delivery_cost,
+        NULL,
+        s.royalty_amount,
+        s.currency,
+        ${quote(SOURCE_REPORT)},
+        s.source_row_number
+    FROM ebook_source s
+    JOIN public.publishing_editions e
+      ON e.asin = s.asin
+     AND e.format = 'ebook';
+
+    SELECT count(*)
+    INTO v_mismatch
+    FROM ebook_expected x
+    FULL JOIN (
+        SELECT
+            currency,
+            count(*) AS report_rows,
+            sum(net_units_sold) AS net_units,
+            sum(royalty_amount) AS royalties
+        FROM public.publishing_kdp_royalties
+        WHERE source_report = ${quote(SOURCE_REPORT)}
+        GROUP BY currency
+    ) a USING (currency)
+    WHERE x.currency IS NULL
+       OR a.currency IS NULL
+       OR x.report_rows <> a.report_rows
+       OR x.net_units <> a.net_units
+       OR x.royalties <> a.royalties;
+
+    IF v_mismatch <> 0 THEN
+        RAISE EXCEPTION
+            'Per-currency verification failed (% mismatches).',
+            v_mismatch;
+    END IF;
+
+    RAISE NOTICE
+        'KDP eBook import verified: ${rows.length} rows.';
+
+END
+$$;
+
+COMMIT;
+
+-- FINAL READ-ONLY VERIFICATION
+
+SELECT
+    currency,
+    count(*) AS report_rows,
+    sum(units_sold) AS units_sold,
+    sum(units_refunded) AS units_refunded,
+    sum(net_units_sold) AS net_copies,
+    sum(royalty_amount) AS royalties
+FROM public.publishing_kdp_royalties
+WHERE source_report = ${quote(SOURCE_REPORT)}
+GROUP BY currency
+ORDER BY currency;
+`;
+}
+
+file.addEventListener("change", async () => {
+  const selected = file.files[0];
+  if (!selected) return;
+
+  try {
+    input.value = await selected.text();
+    status.className = "success";
+    status.textContent = "Report loaded. Ready to generate SQL.";
+  } catch (error) {
+    status.className = "error";
+    status.textContent = error.message;
+  }
+});
+
+document.getElementById("generateButton")
+  .addEventListener("click", () => {
+    output.value = "";
+    copyButton.disabled = true;
+
+    try {
+      const rows = parseReport(input.value);
+      const currencies = [...new Set(
+        rows.map(row => row.currency)
+      )].sort();
+
+      output.value = buildSQL(rows);
+      copyButton.disabled = false;
+
+      status.className = "success";
+      status.textContent =
+        `Validated ${rows.length} report rows.\n` +
+        `Currencies: ${currencies.join(", ")}\n` +
+        `Net copies: ${rows.reduce(
+          (sum, row) => sum + row.net, 0
+        )}\n` +
+        "SQL generated successfully.\n" +
+        "No database changes have been made.";
+    } catch (error) {
+      status.className = "error";
+      status.textContent =
+        "Validation stopped: " + error.message;
+    }
+  });
+
+copyButton.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(output.value);
+    status.textContent += "\nSQL copied.";
+  } catch {
+    output.focus();
+    output.select();
+    status.textContent +=
+      "\nSelect and copy the SQL manually.";
+  }
+});
+</script>
+</body>
+</html>
