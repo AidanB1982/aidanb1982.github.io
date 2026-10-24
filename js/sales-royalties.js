@@ -460,97 +460,110 @@ try {
         });
     }
 
-    function populateFilters() {
-        const yearSelect = $("sr-year");
-        const current = yearSelect.value;
-        const now = new Date();
-        const thisFY = fyStart(dateOnly(now));
+    
+function populateFilters() {
+    const today = dateOnly(new Date());
+    const thisFY = fyStart(today);
 
-        const dates = [
-            ...data.royalties.map(row => row.royalty_month),
-            ...data.pages.map(row => row.reading_month),
-            ...data.lines.map(row => row.reporting_month),
-            ...data.expenses.map(row => row.expense_date)
-        ].filter(Boolean);
+    const dates = [
+        ...data.royalties.map(row => row.royalty_month),
+        ...data.pages.map(row => row.reading_month),
+        ...data.lines.map(row => row.reporting_month),
+        ...data.expenses.map(row => row.expense_date)
+    ].filter(Boolean);
 
-        const earliest = dates.length
-            ? Math.min(...dates.map(fyStart))
-            : thisFY;
+    const earliest = dates.length
+        ? Math.min(thisFY, ...dates.map(fyStart))
+        : thisFY;
 
-        const latest = Math.max(
-            thisFY,
-            ...dates.map(fyStart)
+    const latest = dates.length
+        ? Math.max(thisFY, ...dates.map(fyStart))
+        : thisFY;
+
+    // Financial year selector
+    const yearSelect = $("sr-year");
+    const previousYear = yearSelect.value;
+
+    const yearOptions = [];
+
+    for (let year = latest; year >= earliest; year--) {
+        yearOptions.push(
+            new Option(labelFY(year), String(year))
         );
+    }
 
-        yearSelect.replaceChildren();
+    yearSelect.replaceChildren(...yearOptions);
 
-        for (let year = latest; year >= earliest; year--) {
-            const option = new Option(labelFY(year), String(year));
-            yearSelect.add(option);
-        }
+    const validYears = yearOptions.map(option => option.value);
 
-        yearSelect.value = [...yearSelect.options]
-            .some(option => option.value === current)
-            ? current
-            : String(latest);
+    yearSelect.value = validYears.includes(previousYear)
+        ? previousYear
+        : String(thisFY);
 
-        const currencies = new Set([
-            ...CURRENCIES,
-            ...data.royalties.map(row => row.currency),
-            ...data.batches.map(row => row.currency),
-            ...data.expenses.map(row => row.currency)
-        ]);
+    // Reporting currency selector
+    const currencySelect = $("sr-currency");
+    const previousCurrency = currencySelect.value || "GBP";
 
-        const currencySelect = $("sr-currency");
-        const previousCurrency = currencySelect.value || "GBP";
+    const currencies = [...new Set([
+        ...CURRENCIES,
+        ...data.royalties.map(row => row.currency),
+        ...data.batches.map(row => row.currency),
+        ...data.expenses.map(row => row.currency)
+    ])].filter(Boolean).sort();
 
-        currencySelect.replaceChildren();
+    currencySelect.replaceChildren(
+        ...currencies.map(code => new Option(code, code))
+    );
 
-        [...currencies].sort().forEach(code => {
-            currencySelect.add(new Option(code, code));
-        });
+    currencySelect.value = currencies.includes(previousCurrency)
+        ? previousCurrency
+        : "GBP";
 
-        currencySelect.value = currencies.has(previousCurrency)
-            ? previousCurrency
-            : "GBP";
+    // Book selector
+    const books = [...data.titles].sort(
+        (a, b) => a.title.localeCompare(b.title)
+    );
 
-        const titleSelect = $("sr-title-filter");
-        const oldTitle = titleSelect.value || "all";
+    const titleSelect = $("sr-title-filter");
+    const previousTitle = titleSelect.value || "all";
 
-        titleSelect.replaceChildren(new Option("All books", "all"));
+    titleSelect.replaceChildren(
+        new Option("All books", "all"),
+        ...books.map(book => new Option(book.title, book.id))
+    );
 
-        [...data.titles]
-            .sort((a, b) => a.title.localeCompare(b.title))
-            .forEach(book => {
-                titleSelect.add(new Option(book.title, book.id));
-            });
-
-        titleSelect.value = [...titleSelect.options]
-            .some(option => option.value === oldTitle)
-            ? oldTitle
+    titleSelect.value =
+        previousTitle === "all" ||
+        books.some(book => book.id === previousTitle)
+            ? previousTitle
             : "all";
 
-        ["sr-expense-title", "sr-budget-title", "sr-target-title"]
-            .forEach(id => {
-                const select = $(id);
-                const oldValue = select.value;
+    // Financial record forms
+    const formSelectors = [
+        "sr-expense-title",
+        "sr-budget-title",
+        "sr-target-title"
+    ];
 
-                while (select.options.length > 1) {
-                    select.remove(1);
-                }
+    for (const id of formSelectors) {
+        const select = $(id);
+        const previousValue = select.value;
 
-                [...data.titles]
-                    .sort((a, b) => a.title.localeCompare(b.title))
-                    .forEach(book => {
-                        select.add(new Option(book.title, book.id));
-                    });
+        const firstLabel = id === "sr-target-title"
+            ? "All books"
+            : "Business-wide";
 
-                if ([...select.options]
-                    .some(option => option.value === oldValue)) {
-                    select.value = oldValue;
-                }
-            });
+        select.replaceChildren(
+            new Option(firstLabel, ""),
+            ...books.map(book => new Option(book.title, book.id))
+        );
+
+        select.value = books.some(book => book.id === previousValue)
+            ? previousValue
+            : "";
     }
+}
+
 
     function filteredRoyalties(range = selectedRange()) {
         return data.royalties.filter(row =>
