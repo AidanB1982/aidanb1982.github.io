@@ -113,6 +113,7 @@ function integer(value, row, field) {
   return Number(text);
 }
 
+
 function parseMarkdown(text) {
   const lines = text
     .replace(/^\uFEFF/, "")
@@ -123,7 +124,9 @@ function parseMarkdown(text) {
 
   if (lines.length < 3) {
     throw new Error(
-      "The file does not contain a complete Markdown table."
+      "No complete Markdown table found. " +
+      "Please select the original .md file " +
+      "or paste the full table, including its header."
     );
   }
 
