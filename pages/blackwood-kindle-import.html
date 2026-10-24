@@ -114,55 +114,75 @@ function integer(value, row, field) {
 }
 
 
+
 function parseMarkdown(text) {
   const lines = text
     .replace(/^\uFEFF/, "")
     .replace(/\r\n?/g, "\n")
     .split("\n")
     .map(line => line.trim())
-    .filter(line => line.startsWith("|"));
+    .filter(Boolean);
 
-  if (lines.length < 3) {
+  if (lines.length < 2) {
     throw new Error(
-      "No complete Markdown table found. " +
-      "Please select the original .md file " +
-      "or paste the full table, including its header."
+      "The report needs a header and at least one data row."
     );
   }
 
-  const split = line => {
-    const trimmed = line.replace(/^\|/, "").replace(/\|$/, "");
-    return trimmed.split("|").map(cell =>
-      cell.trim().replace(/&nbsp;/g, " ")
-    );
-  };
+  // Accept both original tab-separated KDP reports
+  // and Markdown tables.
+  const isMarkdown = lines[0].startsWith("|");
 
-  const header = split(lines[0]);
+  function splitLine(line) {
+    if (isMarkdown) {
+      return line
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map(value => value.trim());
+    }
+
+    return line
+      .split("\t")
+      .map(value => value.trim());
+  }
+
+  const header = splitLine(lines[0]);
+
+  const expectedHeaders = [
+    "Date",
+    "Title",
+    "Author Name",
+    "eBook ASIN",
+    "Audiobook ASIN",
+    "Audible ASIN",
+    "Marketplace",
+    "Kindle+ Pages Read",
+    "Kindle+ Pages Listened",
+    "Total Kindle+ Pages Read and Listened"
+  ];
 
   if (
-    header.length !== 10 ||
-    header[0] !== "Date" ||
-    header[3] !== "eBook ASIN" ||
-    header[6] !== "Marketplace" ||
-    !header[7].includes("Pages Read") ||
-    !header[8].includes("Pages Listened") ||
-    !header[9].includes("Total Kindle+")
+    header.length !== expectedHeaders.length ||
+    header.some((value, index) =>
+      value.replace(/\s+/g, " ") !== expectedHeaders[index]
+    )
   ) {
     throw new Error(
-      "Unexpected report columns. Expected the " +
-      "10-column Kindle+ Markdown export."
+      "Unexpected report headers. " +
+      "Expected the original 10-column Kindle+ report."
     );
   }
 
   const rows = [];
 
   for (const line of lines.slice(1)) {
-    const cells = split(line);
-
-    if (cells.every(cell => /^:?-{3,}:?$/.test(cell))) {
+    // Skip Markdown separator rows.
+    if (isMarkdown && /^\|?[\s|:-]+\|?$/.test(line)) {
       continue;
     }
 
+    const cells = splitLine(line);
     const rowNumber = rows.length + 1;
 
     if (cells.length !== 10) {
@@ -176,9 +196,7 @@ function parseMarkdown(text) {
     const asin = cells[3];
     const marketplace = cells[6];
 
-    if (
-      !/^\d{4}-(0[1-9]|1[0-2])-01$/.test(date)
-    ) {
+    if (!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(date)) {
       throw new Error(
         `Row ${rowNumber}: invalid reading month ${date}`
       );
@@ -190,18 +208,28 @@ function parseMarkdown(text) {
       );
     }
 
-    if (!marketplace.startsWith("Amazon.")) {
+    if (!/^Amazon\.[a-z.]+$/i.test(marketplace)) {
       throw new Error(
         `Row ${rowNumber}: invalid marketplace ${marketplace}`
       );
     }
 
-    const pages = integer(cells[7], rowNumber, "pages read");
-    const listened = integer(
-      cells[8], rowNumber, "pages listened"
+    const pages = integer(
+      cells[7],
+      rowNumber,
+      "pages read"
     );
+
+    const listened = integer(
+      cells[8],
+      rowNumber,
+      "pages listened"
+    );
+
     const reportedTotal = integer(
-      cells[9], rowNumber, "reported total"
+      cells[9],
+      rowNumber,
+      "reported total"
     );
 
     if (pages + listened !== reportedTotal) {
@@ -221,12 +249,13 @@ function parseMarkdown(text) {
     });
   }
 
-  if (!rows.length) {
+  if (rows.length === 0) {
     throw new Error("No report data rows found.");
   }
 
   return rows;
 }
+
 
 function buildSQL(rows) {
   const totalPages = rows.reduce(
