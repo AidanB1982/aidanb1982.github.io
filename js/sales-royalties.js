@@ -5,19 +5,18 @@
 // BLACKWOOD PUBLISHING
 // DEPARTMENT 03 — SALES & ROYALTIES
 //
-// KDP book royalties:
-//   publishing_kdp_royalties_gbp
+// Data sources:
+// - publishing_kdp_royalties_gbp
+// - publishing_kdp_page_reads
+// - publishing_kdp_monthly_ku_gbp
+// - publishing_kdp_monthly_adjustments
 //
-// KU page activity and book-level estimates:
-//   publishing_kdp_page_reads
+// Management adjustments are added once to combined KDP
+// royalties when All books / All formats are selected.
+// Original book royalties and KU figures remain unchanged.
 //
-// Reconciled monthly KU:
-//   publishing_kdp_monthly_ku_gbp
-//
-// IMPORTANT:
-// Confirmed UK KU is used as the provisional management
-// amount for its month. This is not a confirmed worldwide
-// royalty total. Book-specific KU remains estimated.
+// Confirmed UK KU is a provisional management figure,
+// not a confirmed worldwide royalty total.
 // ============================================================
 
 (function () {
@@ -27,6 +26,7 @@
 
     const AMAZON_VIEW = "publishing_kdp_royalties_gbp";
     const KU_VIEW = "publishing_kdp_monthly_ku_gbp";
+    const ADJUSTMENTS_TABLE = "publishing_kdp_monthly_adjustments";
 
     const CATEGORIES = [
         "cover_design", "editing", "proofreading",
@@ -51,6 +51,7 @@
         royalties: [],
         pages: [],
         kuMonthly: [],
+        adjustments: [],
         batches: [],
         lines: [],
         links: [],
@@ -71,7 +72,10 @@
     };
 
     const sum = (rows, key) =>
-        rows.reduce((total, row) => total + number(row[key]), 0);
+        rows.reduce(
+            (total, row) => total + number(row[key]),
+            0
+        );
 
     function escapeHtml(value) {
         return String(value ?? "")
@@ -137,23 +141,31 @@
         }
 
         const monthNumber = Number(month);
-        const calendarYear = monthNumber >= 4 ? year : year + 1;
+        const calendarYear =
+            monthNumber >= 4 ? year : year + 1;
 
         return {
-            start: `${calendarYear}-${String(monthNumber).padStart(2, "0")}-01`,
-            end: dateOnly(new Date(calendarYear, monthNumber, 0))
+            start:
+                `${calendarYear}-` +
+                `${String(monthNumber).padStart(2, "0")}-01`,
+            end: dateOnly(
+                new Date(calendarYear, monthNumber, 0)
+            )
         };
     }
 
     function inRange(date, range) {
         return Boolean(
-            date && date >= range.start && date <= range.end
+            date &&
+            date >= range.start &&
+            date <= range.end
         );
     }
 
     function overlaps(start, end, range) {
         return Boolean(
-            start && end &&
+            start &&
+            end &&
             start <= range.end &&
             end >= range.start
         );
@@ -182,11 +194,15 @@
     }
 
     function titleMap() {
-        return new Map(data.titles.map(row => [row.id, row]));
+        return new Map(
+            data.titles.map(row => [row.id, row])
+        );
     }
 
     function editionMap() {
-        return new Map(data.editions.map(row => [row.id, row]));
+        return new Map(
+            data.editions.map(row => [row.id, row])
+        );
     }
 
     function titleName(id) {
@@ -196,15 +212,22 @@
     }
 
     function royaltyTitle(row) {
-        return editionMap().get(row.edition_id)?.title_id || null;
+        return (
+            editionMap().get(row.edition_id)?.title_id ||
+            null
+        );
     }
 
     function matchesRoyaltyScope(row) {
         return (
-            (selectedTitle() === "all" ||
-                royaltyTitle(row) === selectedTitle()) &&
-            (selectedFormat() === "all" ||
-                row.format === selectedFormat())
+            (
+                selectedTitle() === "all" ||
+                royaltyTitle(row) === selectedTitle()
+            ) &&
+            (
+                selectedFormat() === "all" ||
+                row.format === selectedFormat()
+            )
         );
     }
 
@@ -212,17 +235,23 @@
         const edition = editionMap().get(row.edition_id);
 
         return (
-            (selectedTitle() === "all" ||
-                edition?.title_id === selectedTitle()) &&
-            (selectedFormat() === "all" ||
-                selectedFormat() === "ebook")
+            (
+                selectedTitle() === "all" ||
+                edition?.title_id === selectedTitle()
+            ) &&
+            (
+                selectedFormat() === "all" ||
+                selectedFormat() === "ebook"
+            )
         );
     }
 
     function matchesExpenseScope(row) {
         return (
-            (selectedTitle() === "all" ||
-                row.title_id === selectedTitle()) &&
+            (
+                selectedTitle() === "all" ||
+                row.title_id === selectedTitle()
+            ) &&
             selectedFormat() === "all"
         );
     }
@@ -250,22 +279,26 @@
     }
 
     // ========================================================
-    // RECONCILED KU
+    // RECONCILED KINDLE UNLIMITED
     // ========================================================
 
     function canUseMonthlyKU() {
-        // Confirmed marketplace payments cannot be reliably
-        // allocated to individual books.
         return (
             selectedTitle() === "all" &&
-            (selectedFormat() === "all" ||
-                selectedFormat() === "ebook")
+            (
+                selectedFormat() === "all" ||
+                selectedFormat() === "ebook"
+            )
         );
     }
 
     function kuForRange(range, pageRows = null) {
         const pages = pageRows || filteredPages(range);
-        const estimated = sum(pages, "estimated_royalty_gbp");
+
+        const estimated = sum(
+            pages,
+            "estimated_royalty_gbp"
+        );
 
         if (!canUseMonthlyKU()) {
             return {
@@ -282,31 +315,29 @@
         );
 
         const monthlyKeys = new Set(
-            months.map(row => monthKey(row.royalty_month))
+            months.map(row =>
+                monthKey(row.royalty_month)
+            )
         );
 
-        // Include estimates for months that do not yet
-        // appear in the reconciled monthly view.
         const uncoveredEstimate = sum(
             pages.filter(row =>
-                !monthlyKeys.has(monthKey(row.reading_month))
+                !monthlyKeys.has(
+                    monthKey(row.reading_month)
+                )
             ),
             "estimated_royalty_gbp"
         );
 
-        const income =
-            sum(months, "reported_ku_gbp") +
-            uncoveredEstimate;
-
-        const adjustment =
-            sum(months, "adjustment_gbp");
-
         return {
-            income,
-            adjustment,
+            income:
+                sum(months, "reported_ku_gbp") +
+                uncoveredEstimate,
+            adjustment: sum(months, "adjustment_gbp"),
             estimated,
             confirmedMonths: months.filter(row =>
-                row.reporting_status === "confirmed_uk_only"
+                row.reporting_status ===
+                "confirmed_uk_only"
             ).length,
             source: "monthly_reconciled"
         };
@@ -318,19 +349,57 @@
         }
 
         if (result.confirmedMonths > 0) {
-            return "Includes confirmed UK KU; worldwide provisional";
+            return (
+                "Includes confirmed UK KU; " +
+                "worldwide provisional"
+            );
         }
 
         return "Estimated KU royalties";
     }
 
     // ========================================================
-    // AUTHENTICATION AND DATA LOADING
+    // MANAGEMENT RECONCILIATION ADJUSTMENTS
+    // ========================================================
+
+    function canUseManagementAdjustments() {
+        // These are business-wide amounts.
+        // Do not allocate them to a specific book or format.
+        return (
+            selectedTitle() === "all" &&
+            selectedFormat() === "all"
+        );
+    }
+
+    function monthlyAdjustment(range) {
+        if (!canUseManagementAdjustments()) {
+            return 0;
+        }
+
+        return sum(
+            data.adjustments.filter(row =>
+                inRange(row.royalty_month, range)
+            ),
+            "adjustment_gbp"
+        );
+    }
+
+    function managementAdjustmentText(amount) {
+        return amount
+            ? `Management reconciliation: ${money(amount)}`
+            : "No management adjustment";
+    }
+
+    // ========================================================
+    // AUTHENTICATION
     // ========================================================
 
     function status(message) {
         const element = $("sr-status");
-        if (element) element.textContent = message;
+
+        if (element) {
+            element.textContent = message;
+        }
     }
 
     function lock() {
@@ -349,15 +418,21 @@
     }
 
     async function loadLibrary() {
-        if (window.supabase?.createClient) return;
+        if (window.supabase?.createClient) {
+            return;
+        }
 
         await new Promise((resolve, reject) => {
             const script = document.createElement("script");
+
             script.src = CDN;
             script.onload = resolve;
             script.onerror = () => reject(
-                new Error("Supabase library could not be loaded.")
+                new Error(
+                    "Supabase library could not be loaded."
+                )
             );
+
             document.head.appendChild(script);
         });
     }
@@ -366,15 +441,24 @@
         const version = ++accessVersion;
 
         lock();
-        accessMessage("Checking administrator permissions...");
+        accessMessage(
+            "Checking administrator permissions..."
+        );
 
         try {
             const userResult = await db.auth.getUser();
 
-            if (version !== accessVersion) return;
+            if (version !== accessVersion) {
+                return;
+            }
 
-            if (userResult.error || !userResult.data.user) {
-                accessMessage("Please sign in through The Archivists.");
+            if (
+                userResult.error ||
+                !userResult.data.user
+            ) {
+                accessMessage(
+                    "Please sign in through The Archivists."
+                );
                 return;
             }
 
@@ -384,15 +468,24 @@
                 .eq("id", userResult.data.user.id)
                 .maybeSingle();
 
-            if (version !== accessVersion) return;
-            if (profile.error) throw profile.error;
+            if (version !== accessVersion) {
+                return;
+            }
+
+            if (profile.error) {
+                throw profile.error;
+            }
 
             const isAdmin =
                 profile.data?.is_admin === true ||
-                String(profile.data?.is_admin).toLowerCase() === "true";
+                String(
+                    profile.data?.is_admin
+                ).toLowerCase() === "true";
 
             if (!isAdmin) {
-                accessMessage("Access denied. Blackwood management only.");
+                accessMessage(
+                    "Access denied. Blackwood management only."
+                );
                 return;
             }
 
@@ -400,36 +493,66 @@
             await refresh(version);
 
         } catch (error) {
-            if (version !== accessVersion) return;
+            if (version !== accessVersion) {
+                return;
+            }
 
-            console.error("Department 03 access error:", error);
+            console.error(
+                "Department 03 access error:",
+                error
+            );
+
             lock();
-            accessMessage("Unable to verify management access.");
+            accessMessage(
+                "Unable to verify management access."
+            );
         }
     }
 
-    async function fetchAll(table, columns, version, orderBy = "id") {
+    // ========================================================
+    // DATA LOADING
+    // ========================================================
+
+    async function fetchAll(
+        table,
+        columns,
+        version,
+        orderBy = "id"
+    ) {
         const results = [];
         const pageSize = 500;
         let offset = 0;
 
         while (true) {
             if (version !== accessVersion) {
-                throw new Error("Access changed while loading.");
+                throw new Error(
+                    "Access changed while loading."
+                );
             }
 
             const response = await db
                 .from(table)
                 .select(columns)
-                .order(orderBy, { ascending: true })
-                .range(offset, offset + pageSize - 1);
+                .order(orderBy, {
+                    ascending: true
+                })
+                .range(
+                    offset,
+                    offset + pageSize - 1
+                );
 
-            if (response.error) throw response.error;
+            if (response.error) {
+                throw response.error;
+            }
 
             const rows = response.data || [];
+
             results.push(...rows);
 
-            if (rows.length < pageSize) break;
+            if (rows.length < pageSize) {
+                break;
+            }
+
             offset += pageSize;
         }
 
@@ -438,7 +561,10 @@
 
     async function refresh(version = accessVersion) {
         loaded = false;
-        status("Loading live Blackwood financial records...");
+
+        status(
+            "Loading live Blackwood financial records..."
+        );
 
         const specs = [
             [
@@ -455,13 +581,21 @@
                 "royalties",
                 AMAZON_VIEW,
                 [
-                    "id", "edition_id", "format", "royalty_month",
-                    "units_sold", "units_refunded", "net_units_sold",
-                    "original_currency", "average_offer_price_gbp",
+                    "id",
+                    "edition_id",
+                    "format",
+                    "royalty_month",
+                    "units_sold",
+                    "units_refunded",
+                    "net_units_sold",
+                    "original_currency",
+                    "average_offer_price_gbp",
                     "average_manufacturing_cost_gbp",
                     "average_delivery_cost_gbp",
-                    "royalty_amount_gbp", "retail_sales_gbp",
-                    "manufacturing_total_gbp", "delivery_total_gbp",
+                    "royalty_amount_gbp",
+                    "retail_sales_gbp",
+                    "manufacturing_total_gbp",
+                    "delivery_total_gbp",
                     "estimated_amazon_retained_gbp"
                 ].join(",")
             ],
@@ -469,8 +603,12 @@
                 "pages",
                 "publishing_kdp_page_reads",
                 [
-                    "id", "edition_id", "reading_month",
-                    "pages_read", "pages_listened", "total_pages",
+                    "id",
+                    "edition_id",
+                    "reading_month",
+                    "pages_read",
+                    "pages_listened",
+                    "total_pages",
                     "estimated_royalty_gbp"
                 ].join(",")
             ],
@@ -488,20 +626,45 @@
                 "royalty_month"
             ],
             [
+                "adjustments",
+                ADJUSTMENTS_TABLE,
+                [
+                    "royalty_month",
+                    "adjustment_gbp",
+                    "target_total_gbp",
+                    "notes"
+                ].join(","),
+                "royalty_month"
+            ],
+            [
                 "batches",
                 "sales_report_batches",
-                "id,platform,report_name,period_start,period_end,currency"
+                [
+                    "id",
+                    "platform",
+                    "report_name",
+                    "period_start",
+                    "period_end",
+                    "currency"
+                ].join(",")
             ],
             [
                 "lines",
                 "sales_report_lines",
                 [
-                    "id", "batch_id", "reporting_month",
-                    "net_quantity", "gross_quantity",
-                    "returned_quantity", "reversed_quantity",
-                    "orders_count", "net_compensation",
-                    "payment_received_date", "payment_amount",
-                    "order_date", "product_title"
+                    "id",
+                    "batch_id",
+                    "reporting_month",
+                    "net_quantity",
+                    "gross_quantity",
+                    "returned_quantity",
+                    "reversed_quantity",
+                    "orders_count",
+                    "net_compensation",
+                    "payment_received_date",
+                    "payment_amount",
+                    "order_date",
+                    "product_title"
                 ].join(",")
             ],
             [
@@ -513,27 +676,48 @@
                 "expenses",
                 "publishing_expenses",
                 [
-                    "id", "expense_date", "category", "description",
-                    "amount", "currency", "title_id", "edition_id",
-                    "supplier", "notes", "created_at"
+                    "id",
+                    "expense_date",
+                    "category",
+                    "description",
+                    "amount",
+                    "currency",
+                    "title_id",
+                    "edition_id",
+                    "supplier",
+                    "notes",
+                    "created_at"
                 ].join(",")
             ],
             [
                 "budgets",
                 "publishing_budgets",
                 [
-                    "id", "period_start", "period_end", "category",
-                    "budget_amount", "currency", "title_id",
-                    "notes", "created_at"
+                    "id",
+                    "period_start",
+                    "period_end",
+                    "category",
+                    "budget_amount",
+                    "currency",
+                    "title_id",
+                    "notes",
+                    "created_at"
                 ].join(",")
             ],
             [
                 "targets",
                 "publishing_targets",
                 [
-                    "id", "period_start", "period_end", "metric",
-                    "target_value", "currency", "title_id", "format",
-                    "notes", "created_at"
+                    "id",
+                    "period_start",
+                    "period_end",
+                    "metric",
+                    "target_value",
+                    "currency",
+                    "title_id",
+                    "format",
+                    "notes",
+                    "created_at"
                 ].join(",")
             ]
         ];
@@ -541,7 +725,10 @@
         try {
             const incoming = {};
 
-            for (const [key, table, columns, orderBy] of specs) {
+            for (
+                const [key, table, columns, orderBy]
+                of specs
+            ) {
                 status(`Loading ${table}...`);
 
                 incoming[key] = await fetchAll(
@@ -557,9 +744,12 @@
                 );
             }
 
-            if (version !== accessVersion) return;
+            if (version !== accessVersion) {
+                return;
+            }
 
             Object.assign(data, incoming);
+
             validateAmazonData();
             populateFilters();
 
@@ -568,17 +758,28 @@
 
             status(
                 "Dashboard loaded successfully. " +
-                `${integer(data.royalties.length)} Amazon royalty rows, ` +
-                `${integer(data.pages.length)} KU page-read rows, ` +
-                `${integer(data.kuMonthly.length)} reconciled KU months, ` +
+                `${integer(data.royalties.length)} ` +
+                "Amazon royalty rows, " +
+                `${integer(data.pages.length)} ` +
+                "KU page-read rows, " +
+                `${integer(data.kuMonthly.length)} ` +
+                "reconciled KU months, " +
+                `${integer(data.adjustments.length)} ` +
+                "management adjustments, " +
                 `${integer(data.expenses.length)} expenses.`
             );
 
         } catch (error) {
-            if (version !== accessVersion) return;
+            if (version !== accessVersion) {
+                return;
+            }
 
             loaded = false;
-            console.error("Department 03 load error:", error);
+
+            console.error(
+                "Department 03 load error:",
+                error
+            );
 
             status(
                 "Department 03 error: " +
@@ -598,7 +799,8 @@
                 row.royalty_amount_gbp === undefined
             ) {
                 throw new Error(
-                    "Amazon GBP view contains an incomplete royalty record."
+                    "Amazon GBP view contains an " +
+                    "incomplete royalty record."
                 );
             }
         }
@@ -610,7 +812,21 @@
                 row.reported_ku_gbp === undefined
             ) {
                 throw new Error(
-                    "Monthly KU view contains an incomplete record."
+                    "Monthly KU view contains an " +
+                    "incomplete record."
+                );
+            }
+        }
+
+        for (const row of data.adjustments) {
+            if (
+                !row.royalty_month ||
+                row.adjustment_gbp === null ||
+                row.adjustment_gbp === undefined
+            ) {
+                throw new Error(
+                    "Management adjustment table " +
+                    "contains an incomplete record."
                 );
             }
         }
@@ -618,31 +834,52 @@
 
     function clearOutputs() {
         const valueIds = [
-            "sr-retail-value", "sr-retail-exceptions",
-            "sr-retail-exception-copies", "sr-amazon-retail",
-            "sr-amazon-print", "sr-amazon-delivery",
-            "sr-amazon-royalties", "sr-amazon-pages",
-            "sr-amazon-combined", "sr-amazon-remainder",
-            "sr-income-total", "sr-cost-of-sales-total",
-            "sr-reconciliation-ku", "sr-reconciliation-balance",
-            "sr-kpi-royalties", "sr-kpi-copies", "sr-kpi-ku",
-            "sr-kpi-expenses", "sr-kpi-previous", "sr-kpi-growth"
+            "sr-retail-value",
+            "sr-retail-exceptions",
+            "sr-retail-exception-copies",
+            "sr-amazon-retail",
+            "sr-amazon-print",
+            "sr-amazon-delivery",
+            "sr-amazon-royalties",
+            "sr-amazon-pages",
+            "sr-amazon-combined",
+            "sr-amazon-remainder",
+            "sr-income-total",
+            "sr-cost-of-sales-total",
+            "sr-reconciliation-ku",
+            "sr-reconciliation-balance",
+            "sr-kpi-royalties",
+            "sr-kpi-copies",
+            "sr-kpi-ku",
+            "sr-kpi-expenses",
+            "sr-kpi-previous",
+            "sr-kpi-growth"
         ];
 
         for (const id of valueIds) {
-            if ($(id)) $(id).textContent = "—";
+            if ($(id)) {
+                $(id).textContent = "—";
+            }
         }
 
         const containers = [
-            "sr-monthly-chart", "sr-format-chart", "sr-top-books",
-            "sr-platform-summary", "sr-financial-years",
-            "sr-expense-list", "sr-budget-list", "sr-target-list",
-            "sr-profit-list", "sr-monthly-reconciliation",
+            "sr-monthly-chart",
+            "sr-format-chart",
+            "sr-top-books",
+            "sr-platform-summary",
+            "sr-financial-years",
+            "sr-expense-list",
+            "sr-budget-list",
+            "sr-target-list",
+            "sr-profit-list",
+            "sr-monthly-reconciliation",
             "sr-monthly-reconciliation-total"
         ];
 
         for (const id of containers) {
-            if ($(id)) $(id).replaceChildren();
+            if ($(id)) {
+                $(id).replaceChildren();
+            }
         }
     }
 
@@ -651,19 +888,38 @@
         const thisFY = fyStart(today);
 
         const dates = [
-            ...data.royalties.map(row => row.royalty_month),
-            ...data.pages.map(row => row.reading_month),
-            ...data.kuMonthly.map(row => row.royalty_month),
-            ...data.lines.map(row => row.reporting_month),
-            ...data.expenses.map(row => row.expense_date)
+            ...data.royalties.map(
+                row => row.royalty_month
+            ),
+            ...data.pages.map(
+                row => row.reading_month
+            ),
+            ...data.kuMonthly.map(
+                row => row.royalty_month
+            ),
+            ...data.adjustments.map(
+                row => row.royalty_month
+            ),
+            ...data.lines.map(
+                row => row.reporting_month
+            ),
+            ...data.expenses.map(
+                row => row.expense_date
+            )
         ].filter(Boolean);
 
         const earliest = dates.length
-            ? Math.min(thisFY, ...dates.map(fyStart))
+            ? Math.min(
+                thisFY,
+                ...dates.map(fyStart)
+            )
             : thisFY;
 
         const latest = dates.length
-            ? Math.max(thisFY, ...dates.map(fyStart))
+            ? Math.max(
+                thisFY,
+                ...dates.map(fyStart)
+            )
             : thisFY;
 
         const yearSelect = $("sr-year");
@@ -671,39 +927,62 @@
 
         const options = [];
 
-        for (let year = latest; year >= earliest; year--) {
-            options.push(new Option(labelFY(year), String(year)));
+        for (
+            let year = latest;
+            year >= earliest;
+            year--
+        ) {
+            options.push(
+                new Option(
+                    labelFY(year),
+                    String(year)
+                )
+            );
         }
 
         yearSelect.replaceChildren(...options);
 
-        const validYears = options.map(option => option.value);
+        const validYears = options.map(
+            option => option.value
+        );
 
-        yearSelect.value = validYears.includes(previousYear)
-            ? previousYear
-            : String(thisFY);
+        yearSelect.value =
+            validYears.includes(previousYear)
+                ? previousYear
+                : String(thisFY);
 
         const currencySelect = $("sr-currency");
+
         currencySelect.replaceChildren(
-            new Option("GBP — Sterling", "GBP")
+            new Option(
+                "GBP — Sterling",
+                "GBP"
+            )
         );
+
         currencySelect.value = "GBP";
 
-        const books = [...data.titles].sort((a, b) =>
-            a.title.localeCompare(b.title)
+        const books = [...data.titles].sort(
+            (a, b) =>
+                a.title.localeCompare(b.title)
         );
 
         const titleSelect = $("sr-title-filter");
-        const previousTitle = titleSelect.value || "all";
+        const previousTitle =
+            titleSelect.value || "all";
 
         titleSelect.replaceChildren(
             new Option("All books", "all"),
-            ...books.map(book => new Option(book.title, book.id))
+            ...books.map(book =>
+                new Option(book.title, book.id)
+            )
         );
 
         titleSelect.value =
             previousTitle === "all" ||
-            books.some(book => book.id === previousTitle)
+            books.some(
+                book => book.id === previousTitle
+            )
                 ? previousTitle
                 : "all";
 
@@ -722,12 +1001,19 @@
                         : "Business-wide",
                     ""
                 ),
-                ...books.map(book => new Option(book.title, book.id))
+                ...books.map(book =>
+                    new Option(
+                        book.title,
+                        book.id
+                    )
+                )
             );
 
             select.value = books.some(
                 book => book.id === previousValue
-            ) ? previousValue : "";
+            )
+                ? previousValue
+                : "";
         }
     }
 
@@ -741,37 +1027,87 @@
         let exceptionCopies = 0;
 
         for (const row of rows) {
-            const offerPrice = number(row.average_offer_price_gbp);
-            const netCopies = number(row.net_units_sold);
-            const royalty = number(row.royalty_amount_gbp);
+            const offerPrice = number(
+                row.average_offer_price_gbp
+            );
 
-            estimatedValue += number(row.retail_sales_gbp);
+            const netCopies = number(
+                row.net_units_sold
+            );
 
-            if (offerPrice <= 0 && royalty > 0) {
+            const royalty = number(
+                row.royalty_amount_gbp
+            );
+
+            estimatedValue += number(
+                row.retail_sales_gbp
+            );
+
+            if (
+                offerPrice <= 0 &&
+                royalty > 0
+            ) {
                 exceptionRows++;
                 exceptionCopies += netCopies;
             }
         }
 
-        return { estimatedValue, exceptionRows, exceptionCopies };
+        return {
+            estimatedValue,
+            exceptionRows,
+            exceptionCopies
+        };
     }
 
     function calculateAmazonCosts(rows) {
         return {
-            retail: sum(rows, "retail_sales_gbp"),
-            manufacturing: sum(rows, "manufacturing_total_gbp"),
-            delivery: sum(rows, "delivery_total_gbp"),
-            royalties: sum(rows, "royalty_amount_gbp"),
-            retained: sum(rows, "estimated_amazon_retained_gbp")
+            retail: sum(
+                rows,
+                "retail_sales_gbp"
+            ),
+            manufacturing: sum(
+                rows,
+                "manufacturing_total_gbp"
+            ),
+            delivery: sum(
+                rows,
+                "delivery_total_gbp"
+            ),
+            royalties: sum(
+                rows,
+                "royalty_amount_gbp"
+            ),
+            retained: sum(
+                rows,
+                "estimated_amazon_retained_gbp"
+            )
         };
     }
 
-    function calculateReconciliation(royaltyRows, pageRows, range) {
-        const amazon = calculateAmazonCosts(royaltyRows);
-        const ku = kuForRange(range, pageRows);
+    function calculateReconciliation(
+        royaltyRows,
+        pageRows,
+        range
+    ) {
+        const amazon = calculateAmazonCosts(
+            royaltyRows
+        );
+
+        const ku = kuForRange(
+            range,
+            pageRows
+        );
 
         const pageIncome = ku.income;
-        const totalIncome = amazon.retail + pageIncome;
+
+        // Business-wide adjustment, applied exactly once.
+        const managementAdjustment =
+            monthlyAdjustment(range);
+
+        const totalIncome =
+            amazon.retail +
+            pageIncome +
+            managementAdjustment;
 
         const totalCosts =
             amazon.manufacturing +
@@ -779,18 +1115,19 @@
             amazon.retained;
 
         const combinedRoyalties =
-            amazon.royalties + pageIncome;
+            amazon.royalties +
+            pageIncome +
+            managementAdjustment;
 
-        // The original Amazon view's retained-cost estimate
-        // may not reconcile exactly with the independent
-        // royalty figure. Keep that difference visible.
-        const balance = totalIncome - totalCosts;
+        const balance =
+            totalIncome - totalCosts;
 
         return {
             ...amazon,
             pageIncome,
             kuAdjustment: ku.adjustment,
             kuStatus: kuStatusText(ku),
+            managementAdjustment,
             totalIncome,
             totalCosts,
             combinedRoyalties,
@@ -799,7 +1136,9 @@
     }
 
     function renderRetailSales() {
-        const result = calculateRetailSales(filteredRoyalties());
+        const result = calculateRetailSales(
+            filteredRoyalties()
+        );
 
         $("sr-retail-value").textContent =
             money(result.estimatedValue);
@@ -826,20 +1165,28 @@
             "sr-amazon-delivery": result.delivery,
             "sr-amazon-royalties": result.royalties,
             "sr-amazon-pages": result.pageIncome,
-            "sr-amazon-combined": result.combinedRoyalties,
+            "sr-amazon-combined":
+                result.combinedRoyalties,
             "sr-amazon-remainder": result.retained,
             "sr-income-total": result.totalIncome,
-            "sr-cost-of-sales-total": result.totalCosts,
-            "sr-reconciliation-ku": result.pageIncome,
-            "sr-reconciliation-balance": result.balance
+            "sr-cost-of-sales-total":
+                result.totalCosts,
+            "sr-reconciliation-ku":
+                result.pageIncome,
+            "sr-reconciliation-balance":
+                result.balance
         };
 
-        for (const [id, value] of Object.entries(values)) {
+        for (
+            const [id, value]
+            of Object.entries(values)
+        ) {
             $(id).textContent = money(value);
         }
 
         const difference = Math.abs(
-            result.balance - result.combinedRoyalties
+            result.balance -
+            result.combinedRoyalties
         );
 
         if (difference > 0.01) {
@@ -849,25 +1196,57 @@
             );
         }
 
-        $("sr-amazon-pages").title = result.kuStatus;
-        $("sr-reconciliation-ku").title = result.kuStatus;
+        $("sr-amazon-pages").title =
+            result.kuStatus;
+
+        $("sr-reconciliation-ku").title =
+            result.kuStatus;
 
         if (result.kuAdjustment) {
             $("sr-amazon-pages").title +=
-                `; includes ${money(result.kuAdjustment)} KENP adjustment`;
+                "; includes " +
+                money(result.kuAdjustment) +
+                " KENP adjustment";
         }
+
+        $("sr-amazon-combined").title =
+            managementAdjustmentText(
+                result.managementAdjustment
+            );
+
+        $("sr-income-total").title =
+            managementAdjustmentText(
+                result.managementAdjustment
+            );
+
+        $("sr-reconciliation-balance").title =
+            managementAdjustmentText(
+                result.managementAdjustment
+            );
     }
+
+    // ========================================================
+    // FINANCIAL YEAR MONTHS
+    // ========================================================
 
     function financialYearMonths(year) {
         return MONTHS.map((label, index) => {
-            const month = ((index + 3) % 12) + 1;
-            const calendarYear = index < 9 ? year : year + 1;
+            const month =
+                ((index + 3) % 12) + 1;
+
+            const calendarYear =
+                index < 9 ? year : year + 1;
+
             const key =
                 `${calendarYear}-` +
                 String(month).padStart(2, "0");
 
             const end = dateOnly(
-                new Date(calendarYear, month, 0)
+                new Date(
+                    calendarYear,
+                    month,
+                    0
+                )
             );
 
             return {
@@ -882,9 +1261,17 @@
         });
     }
 
+    // ========================================================
+    // MONTHLY RECONCILIATION TABLE
+    // ========================================================
+
     function renderMonthlyReconciliation() {
-        const year = Number($("sr-year").value);
-        const monthFilter = $("sr-month").value;
+        const year = Number(
+            $("sr-year").value
+        );
+
+        const monthFilter =
+            $("sr-month").value;
 
         const monthly = financialYearMonths(year)
             .filter(item =>
@@ -903,17 +1290,58 @@
         $("sr-monthly-reconciliation").innerHTML =
             monthly.map(row => `
                 <tr>
-                    <td>${escapeHtml(row.label)}</td>
-                    <td class="sr-number">${money(row.retail)}</td>
-                    <td class="sr-number" title="${escapeHtml(row.kuStatus)}">
+                    <td>
+                        ${escapeHtml(row.label)}
+                    </td>
+
+                    <td class="sr-number">
+                        ${money(row.retail)}
+                    </td>
+
+                    <td
+                        class="sr-number"
+                        title="${escapeHtml(row.kuStatus)}"
+                    >
                         ${money(row.pageIncome)}
                     </td>
-                    <td class="sr-number">${money(row.totalIncome)}</td>
-                    <td class="sr-number">${money(row.manufacturing)}</td>
-                    <td class="sr-number">${money(row.delivery)}</td>
-                    <td class="sr-number">${money(row.retained)}</td>
-                    <td class="sr-number">${money(row.totalCosts)}</td>
-                    <td class="sr-number">${money(row.combinedRoyalties)}</td>
+
+                    <td
+                        class="sr-number"
+                        title="${escapeHtml(
+                            managementAdjustmentText(
+                                row.managementAdjustment
+                            )
+                        )}"
+                    >
+                        ${money(row.totalIncome)}
+                    </td>
+
+                    <td class="sr-number">
+                        ${money(row.manufacturing)}
+                    </td>
+
+                    <td class="sr-number">
+                        ${money(row.delivery)}
+                    </td>
+
+                    <td class="sr-number">
+                        ${money(row.retained)}
+                    </td>
+
+                    <td class="sr-number">
+                        ${money(row.totalCosts)}
+                    </td>
+
+                    <td
+                        class="sr-number"
+                        title="${escapeHtml(
+                            managementAdjustmentText(
+                                row.managementAdjustment
+                            )
+                        )}"
+                    >
+                        ${money(row.combinedRoyalties)}
+                    </td>
                 </tr>
             `).join("");
 
@@ -928,14 +1356,52 @@
         $("sr-monthly-reconciliation-total").innerHTML = `
             <tr>
                 <th>Total</th>
-                <th class="sr-number">${money(totals.retail)}</th>
-                <th class="sr-number">${money(totals.pageIncome)}</th>
-                <th class="sr-number">${money(totals.totalIncome)}</th>
-                <th class="sr-number">${money(totals.manufacturing)}</th>
-                <th class="sr-number">${money(totals.delivery)}</th>
-                <th class="sr-number">${money(totals.retained)}</th>
-                <th class="sr-number">${money(totals.totalCosts)}</th>
-                <th class="sr-number">${money(totals.combinedRoyalties)}</th>
+
+                <th class="sr-number">
+                    ${money(totals.retail)}
+                </th>
+
+                <th class="sr-number">
+                    ${money(totals.pageIncome)}
+                </th>
+
+                <th
+                    class="sr-number"
+                    title="${escapeHtml(
+                        managementAdjustmentText(
+                            totals.managementAdjustment
+                        )
+                    )}"
+                >
+                    ${money(totals.totalIncome)}
+                </th>
+
+                <th class="sr-number">
+                    ${money(totals.manufacturing)}
+                </th>
+
+                <th class="sr-number">
+                    ${money(totals.delivery)}
+                </th>
+
+                <th class="sr-number">
+                    ${money(totals.retained)}
+                </th>
+
+                <th class="sr-number">
+                    ${money(totals.totalCosts)}
+                </th>
+
+                <th
+                    class="sr-number"
+                    title="${escapeHtml(
+                        managementAdjustmentText(
+                            totals.managementAdjustment
+                        )
+                    )}"
+                >
+                    ${money(totals.combinedRoyalties)}
+                </th>
             </tr>
         `;
     }
@@ -946,29 +1412,46 @@
 
     function renderKPIs() {
         const range = selectedRange();
+
         const rows = filteredRoyalties(range);
         const pages = filteredPages(range);
         const expenses = filteredExpenses(range);
+
         const ku = kuForRange(range, pages);
 
+        // Source book royalties remain unadjusted.
         $("sr-kpi-royalties").textContent =
-            money(sum(rows, "royalty_amount_gbp"));
+            money(
+                sum(rows, "royalty_amount_gbp")
+            );
 
         $("sr-kpi-copies").textContent =
-            integer(sum(rows, "net_units_sold"));
+            integer(
+                sum(rows, "net_units_sold")
+            );
 
         $("sr-kpi-copy-detail").textContent =
             `${integer(sum(rows, "units_sold"))} sold · ` +
             `${integer(sum(rows, "units_refunded"))} refunded`;
 
-        $("sr-kpi-ku").textContent = money(ku.income);
-        $("sr-kpi-ku").title = kuStatusText(ku);
+        // KU remains separate from management adjustments.
+        $("sr-kpi-ku").textContent =
+            money(ku.income);
+
+        $("sr-kpi-ku").title =
+            kuStatusText(ku);
 
         $("sr-kpi-expenses").textContent =
-            money(sum(expenses, "amount"));
+            money(
+                sum(expenses, "amount")
+            );
 
         const months = [
-            ...new Set(rows.map(row => monthKey(row.royalty_month)))
+            ...new Set(
+                rows.map(row =>
+                    monthKey(row.royalty_month)
+                )
+            )
         ].filter(Boolean).sort();
 
         if (!months.length) {
@@ -977,26 +1460,36 @@
             return;
         }
 
-        const latest = months[months.length - 1];
-        const prior = previousMonth(latest);
+        const latest =
+            months[months.length - 1];
+
+        const prior =
+            previousMonth(latest);
 
         const currentTotal = sum(
-            rows.filter(row => monthKey(row.royalty_month) === latest),
+            rows.filter(row =>
+                monthKey(row.royalty_month) === latest
+            ),
             "royalty_amount_gbp"
         );
 
         const previousTotal = sum(
-            rows.filter(row => monthKey(row.royalty_month) === prior),
+            rows.filter(row =>
+                monthKey(row.royalty_month) === prior
+            ),
             "royalty_amount_gbp"
         );
 
-        $("sr-kpi-previous").textContent = money(previousTotal);
+        $("sr-kpi-previous").textContent =
+            money(previousTotal);
 
         $("sr-kpi-growth").textContent =
             previousTotal > 0
                 ? `${decimal(
-                    (currentTotal - previousTotal) /
-                    previousTotal * 100
+                    (
+                        (currentTotal - previousTotal) /
+                        previousTotal
+                    ) * 100
                 )}%`
                 : "N/A";
     }
@@ -1005,26 +1498,49 @@
     // CHARTS
     // ========================================================
 
-    function barRow(label, value, maximum, display) {
+    function barRow(
+        label,
+        value,
+        maximum,
+        display
+    ) {
         const width = maximum > 0
-            ? Math.max(0, Math.min(100, value / maximum * 100))
+            ? Math.max(
+                0,
+                Math.min(
+                    100,
+                    value / maximum * 100
+                )
+            )
             : 0;
 
         return `
             <div class="sr-bar-row">
-                <span class="sr-bar-label">${escapeHtml(label)}</span>
-                <span class="sr-bar-track">
-                    <span class="sr-bar-fill"
-                          style="width:${width}%"></span>
+                <span class="sr-bar-label">
+                    ${escapeHtml(label)}
                 </span>
-                <span class="sr-bar-value">${escapeHtml(display)}</span>
+
+                <span class="sr-bar-track">
+                    <span
+                        class="sr-bar-fill"
+                        style="width:${width}%"
+                    ></span>
+                </span>
+
+                <span class="sr-bar-value">
+                    ${escapeHtml(display)}
+                </span>
             </div>
         `;
     }
 
     function renderMonthly() {
-        const year = Number($("sr-year").value);
-        const monthFilter = $("sr-month").value;
+        const year = Number(
+            $("sr-year").value
+        );
+
+        const monthFilter =
+            $("sr-month").value;
 
         const monthly = financialYearMonths(year)
             .filter(item =>
@@ -1032,65 +1548,74 @@
                 Number(monthFilter) === item.month
             )
             .map(item => {
-                const bookRoyalties = sum(
-                    filteredRoyalties(item.range),
-                    "royalty_amount_gbp"
-                );
-
-                const ku = kuForRange(
-                    item.range,
-                    filteredPages(item.range)
-                );
+                const result =
+                    calculateReconciliation(
+                        filteredRoyalties(item.range),
+                        filteredPages(item.range),
+                        item.range
+                    );
 
                 return {
                     label: item.label,
-                    value: bookRoyalties + ku.income
+                    value: result.combinedRoyalties
                 };
             });
 
         const max = Math.max(
             0,
-            ...monthly.map(item => Math.max(0, item.value))
+            ...monthly.map(item =>
+                Math.max(0, item.value)
+            )
         );
 
-        $("sr-monthly-chart").innerHTML = monthly.map(item =>
-            barRow(
-                item.label,
-                Math.max(0, item.value),
-                max,
-                money(item.value)
-            )
-        ).join("");
+        $("sr-monthly-chart").innerHTML =
+            monthly.map(item =>
+                barRow(
+                    item.label,
+                    Math.max(0, item.value),
+                    max,
+                    money(item.value)
+                )
+            ).join("");
     }
 
     function renderFormats() {
         const rows = filteredRoyalties();
 
         const values = [
-            "ebook", "paperback", "hardcover"
+            "ebook",
+            "paperback",
+            "hardcover"
         ].map(format => ({
-            label: format === "ebook"
-                ? "eBook"
-                : format[0].toUpperCase() + format.slice(1),
+            label:
+                format === "ebook"
+                    ? "eBook"
+                    : format[0].toUpperCase() +
+                      format.slice(1),
             value: sum(
-                rows.filter(row => row.format === format),
+                rows.filter(row =>
+                    row.format === format
+                ),
                 "net_units_sold"
             )
         }));
 
         const max = Math.max(
             0,
-            ...values.map(item => Math.max(0, item.value))
+            ...values.map(item =>
+                Math.max(0, item.value)
+            )
         );
 
-        $("sr-format-chart").innerHTML = values.map(item =>
-            barRow(
-                item.label,
-                Math.max(0, item.value),
-                max,
-                integer(item.value)
-            )
-        ).join("");
+        $("sr-format-chart").innerHTML =
+            values.map(item =>
+                barRow(
+                    item.label,
+                    Math.max(0, item.value),
+                    max,
+                    integer(item.value)
+                )
+            ).join("");
     }
 
     function renderTopBooks() {
@@ -1098,34 +1623,60 @@
 
         for (const row of filteredRoyalties()) {
             const id = royaltyTitle(row);
-            if (!id) continue;
+
+            if (!id) {
+                continue;
+            }
 
             if (!totals.has(id)) {
-                totals.set(id, { copies: 0, royalties: 0 });
+                totals.set(id, {
+                    copies: 0,
+                    royalties: 0
+                });
             }
 
             const item = totals.get(id);
-            item.copies += number(row.net_units_sold);
-            item.royalties += number(row.royalty_amount_gbp);
+
+            item.copies += number(
+                row.net_units_sold
+            );
+
+            item.royalties += number(
+                row.royalty_amount_gbp
+            );
         }
 
         const sorted = [...totals.entries()]
-            .sort((a, b) => b[1].copies - a[1].copies)
+            .sort(
+                (a, b) =>
+                    b[1].copies - a[1].copies
+            )
             .slice(0, 15);
 
-        $("sr-top-books").innerHTML = sorted.length
-            ? sorted.map(([id, item]) => `
-                <tr>
-                    <td>${escapeHtml(titleName(id))}</td>
-                    <td class="sr-number">${integer(item.copies)}</td>
-                    <td class="sr-number">${money(item.royalties)}</td>
-                </tr>
-            `).join("")
-            : `
-                <tr>
-                    <td colspan="3">No KDP sales in this period.</td>
-                </tr>
-            `;
+        $("sr-top-books").innerHTML =
+            sorted.length
+                ? sorted.map(([id, item]) => `
+                    <tr>
+                        <td>
+                            ${escapeHtml(titleName(id))}
+                        </td>
+
+                        <td class="sr-number">
+                            ${integer(item.copies)}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(item.royalties)}
+                        </td>
+                    </tr>
+                `).join("")
+                : `
+                    <tr>
+                        <td colspan="3">
+                            No KDP sales in this period.
+                        </td>
+                    </tr>
+                `;
     }
 
     // ========================================================
@@ -1137,11 +1688,15 @@
             item.sales_line_id === line.id
         );
 
-        if (!link) return null;
+        if (!link) {
+            return null;
+        }
 
         return (
             link.title_id ||
-            editionMap().get(link.edition_id)?.title_id ||
+            editionMap().get(
+                link.edition_id
+            )?.title_id ||
             null
         );
     }
@@ -1152,13 +1707,21 @@
         const format = selectedFormat();
 
         const batches = new Map(
-            data.batches.map(row => [row.id, row])
+            data.batches.map(row => [
+                row.id,
+                row
+            ])
         );
 
         const lines = data.lines.filter(line => {
-            const batch = batches.get(line.batch_id);
+            const batch = batches.get(
+                line.batch_id
+            );
 
-            if (!batch || batch.currency !== "GBP") {
+            if (
+                !batch ||
+                batch.currency !== "GBP"
+            ) {
                 return false;
             }
 
@@ -1176,70 +1739,139 @@
 
                 if (
                     !link?.edition_id ||
-                    editionMap().get(link.edition_id)?.format !== format
+                    editionMap().get(
+                        link.edition_id
+                    )?.format !== format
                 ) {
                     return false;
                 }
             }
 
-            const effectiveDate = batch.platform === "tide"
-                ? line.payment_received_date
-                : line.reporting_month;
+            const effectiveDate =
+                batch.platform === "tide"
+                    ? line.payment_received_date
+                    : line.reporting_month;
 
-            return inRange(effectiveDate, range);
+            return inRange(
+                effectiveDate,
+                range
+            );
         });
 
         const kdpBooks = sum(
-            filteredRoyalties(),
+            filteredRoyalties(range),
             "royalty_amount_gbp"
         );
 
-        const ku = kuForRange(range, filteredPages(range));
+        const ku = kuForRange(
+            range,
+            filteredPages(range)
+        );
+
+        const adjustment =
+            monthlyAdjustment(range);
+
+        const combinedKdp =
+            kdpBooks +
+            ku.income +
+            adjustment;
 
         const ingram = sum(
             lines.filter(line =>
-                batches.get(line.batch_id)?.platform === "ingramspark"
+                batches.get(
+                    line.batch_id
+                )?.platform === "ingramspark"
             ),
             "net_compensation"
         );
 
         const tide = sum(
             lines.filter(line =>
-                batches.get(line.batch_id)?.platform === "tide"
+                batches.get(
+                    line.batch_id
+                )?.platform === "tide"
             ),
             "payment_amount"
         );
 
         const shopify = lines.filter(line =>
-            batches.get(line.batch_id)?.platform === "shopify"
+            batches.get(
+                line.batch_id
+            )?.platform === "shopify"
         );
 
         $("sr-platform-summary").innerHTML = `
             <div class="sr-record-list">
                 <div class="sr-record">
                     <strong>Amazon KDP</strong>
-                    <p>${money(kdpBooks)} book royalties</p>
-                    <p>${money(ku.income)} KU royalties and adjustments</p>
-                    <p><strong>${money(kdpBooks + ku.income)}</strong>
-                       combined KDP royalties</p>
-                    <p>${escapeHtml(kuStatusText(ku))}</p>
+
+                    <p>
+                        ${money(kdpBooks)}
+                        book royalties
+                    </p>
+
+                    <p>
+                        ${money(ku.income)}
+                        KU royalties and adjustments
+                    </p>
+
+                    ${
+                        adjustment !== 0
+                            ? `
+                                <p>
+                                    ${money(adjustment)}
+                                    management reconciliation
+                                </p>
+                            `
+                            : ""
+                    }
+
+                    <p>
+                        <strong>
+                            ${money(combinedKdp)}
+                        </strong>
+                        combined KDP royalties
+                    </p>
+
+                    <p>
+                        ${escapeHtml(
+                            kuStatusText(ku)
+                        )}
+                    </p>
                 </div>
 
                 <div class="sr-record">
                     <strong>IngramSpark</strong>
-                    <p>${money(ingram)} reported compensation</p>
+
+                    <p>
+                        ${money(ingram)}
+                        reported compensation
+                    </p>
                 </div>
 
                 <div class="sr-record">
                     <strong>Shopify</strong>
-                    <p>${integer(sum(shopify, "net_quantity"))}
-                       net product units</p>
-                    <p>Revenue not calculated from average order value.</p>
+
+                    <p>
+                        ${integer(
+                            sum(shopify, "net_quantity")
+                        )}
+                        net product units
+                    </p>
+
+                    <p>
+                        Revenue not calculated
+                        from average order value.
+                    </p>
                 </div>
 
                 <div class="sr-record">
                     <strong>Tide</strong>
-                    <p>${money(tide)} customer payments</p>
+
+                    <p>
+                        ${money(tide)}
+                        customer payments
+                    </p>
                 </div>
             </div>
         `;
@@ -1250,35 +1882,89 @@
     // ========================================================
 
     function renderFinancialYears() {
-        const years = [...$("sr-year").options].map(option =>
+        const years = [
+            ...$("sr-year").options
+        ].map(option =>
             Number(option.value)
         );
 
-        $("sr-financial-years").innerHTML = years.map(year => {
-            const range = fyRange(year);
-            const royalties = filteredRoyalties(range);
-            const pages = filteredPages(range);
-            const expenses = filteredExpenses(range);
-            const ku = kuForRange(range, pages);
+        $("sr-financial-years").innerHTML =
+            years.map(year => {
+                const range = fyRange(year);
 
-            return `
-                <tr>
-                    <td>${labelFY(year)}</td>
-                    <td class="sr-number">
-                        ${integer(sum(royalties, "net_units_sold"))}
-                    </td>
-                    <td class="sr-number">
-                        ${money(sum(royalties, "royalty_amount_gbp"))}
-                    </td>
-                    <td class="sr-number" title="${escapeHtml(kuStatusText(ku))}">
-                        ${money(ku.income)}
-                    </td>
-                    <td class="sr-number">
-                        ${money(sum(expenses, "amount"))}
-                    </td>
-                </tr>
-            `;
-        }).join("");
+                const royalties =
+                    filteredRoyalties(range);
+
+                const pages =
+                    filteredPages(range);
+
+                const expenses =
+                    filteredExpenses(range);
+
+                const ku =
+                    kuForRange(range, pages);
+
+                const adjustment =
+                    monthlyAdjustment(range);
+
+                const bookRoyalties = sum(
+                    royalties,
+                    "royalty_amount_gbp"
+                );
+
+                return `
+                    <tr>
+                        <td>
+                            ${labelFY(year)}
+                        </td>
+
+                        <td class="sr-number">
+                            ${integer(
+                                sum(
+                                    royalties,
+                                    "net_units_sold"
+                                )
+                            )}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(bookRoyalties)}
+
+                            ${
+                                adjustment !== 0
+                                    ? `
+                                        <small
+                                            style="
+                                                display:block;
+                                                font-size:10px;
+                                                color:var(--sr-muted);
+                                            "
+                                        >
+                                            ${money(adjustment)}
+                                            management adjustment
+                                        </small>
+                                    `
+                                    : ""
+                            }
+                        </td>
+
+                        <td
+                            class="sr-number"
+                            title="${escapeHtml(
+                                kuStatusText(ku)
+                            )}"
+                        >
+                            ${money(ku.income)}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(
+                                sum(expenses, "amount")
+                            )}
+                        </td>
+                    </tr>
+                `;
+            }).join("");
     }
 
     // ========================================================
@@ -1286,110 +1972,213 @@
     // ========================================================
 
     function renderExpenses() {
-        const rows = [...filteredExpenses()].sort((a, b) =>
-            b.expense_date.localeCompare(a.expense_date)
+        const rows = [
+            ...filteredExpenses()
+        ].sort(
+            (a, b) =>
+                b.expense_date.localeCompare(
+                    a.expense_date
+                )
         );
 
-        $("sr-expense-list").innerHTML = rows.length
-            ? rows.map(row => `
-                <tr>
-                    <td>${escapeHtml(row.expense_date)}</td>
-                    <td>${escapeHtml(row.category.replace(/_/g, " "))}</td>
-                    <td>${escapeHtml(row.description)}</td>
-                    <td>${escapeHtml(titleName(row.title_id))}</td>
-                    <td class="sr-number">
-                        ${money(row.amount, row.currency)}
-                    </td>
-                    <td>
-                        <button
-                            class="sr-delete"
-                            type="button"
-                            data-delete-table="publishing_expenses"
-                            data-delete-id="${escapeHtml(row.id)}"
-                        >Delete</button>
-                    </td>
-                </tr>
-            `).join("")
-            : `
-                <tr>
-                    <td colspan="6">
-                        No recorded expenses for these filters.
-                    </td>
-                </tr>
-            `;
+        $("sr-expense-list").innerHTML =
+            rows.length
+                ? rows.map(row => `
+                    <tr>
+                        <td>
+                            ${escapeHtml(
+                                row.expense_date
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                row.category.replace(
+                                    /_/g,
+                                    " "
+                                )
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                row.description
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                titleName(row.title_id)
+                            )}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(
+                                row.amount,
+                                row.currency
+                            )}
+                        </td>
+
+                        <td>
+                            <button
+                                class="sr-delete"
+                                type="button"
+                                data-delete-table="publishing_expenses"
+                                data-delete-id="${escapeHtml(row.id)}"
+                            >
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `).join("")
+                : `
+                    <tr>
+                        <td colspan="6">
+                            No recorded expenses
+                            for these filters.
+                        </td>
+                    </tr>
+                `;
     }
+
+    // ========================================================
+    // BUDGETS
+    // ========================================================
 
     function renderBudgets() {
         const range = selectedRange();
 
         const rows = data.budgets.filter(row =>
             row.currency === "GBP" &&
-            overlaps(row.period_start, row.period_end, range) &&
-            (selectedTitle() === "all" ||
-                row.title_id === selectedTitle())
+            overlaps(
+                row.period_start,
+                row.period_end,
+                range
+            ) &&
+            (
+                selectedTitle() === "all" ||
+                row.title_id === selectedTitle()
+            )
         );
 
-        $("sr-budget-list").innerHTML = rows.length
-            ? rows.map(row => {
-                const matchingExpenses = data.expenses.filter(expense =>
-                    expense.currency === row.currency &&
-                    expense.category === row.category &&
-                    inRange(expense.expense_date, {
-                        start: row.period_start,
-                        end: row.period_end
-                    }) &&
-                    (row.title_id
-                        ? expense.title_id === row.title_id
-                        : !expense.title_id)
-                );
+        $("sr-budget-list").innerHTML =
+            rows.length
+                ? rows.map(row => {
+                    const matchingExpenses =
+                        data.expenses.filter(expense =>
+                            expense.currency ===
+                                row.currency &&
+                            expense.category ===
+                                row.category &&
+                            inRange(
+                                expense.expense_date,
+                                {
+                                    start: row.period_start,
+                                    end: row.period_end
+                                }
+                            ) &&
+                            (
+                                row.title_id
+                                    ? expense.title_id ===
+                                        row.title_id
+                                    : !expense.title_id
+                            )
+                        );
 
-                const spent = sum(matchingExpenses, "amount");
+                    const spent = sum(
+                        matchingExpenses,
+                        "amount"
+                    );
 
-                const percent = number(row.budget_amount) > 0
-                    ? spent / number(row.budget_amount) * 100
-                    : 0;
+                    const percent =
+                        number(row.budget_amount) > 0
+                            ? (
+                                spent /
+                                number(row.budget_amount)
+                            ) * 100
+                            : 0;
 
-                return `
-                    <article class="sr-record">
-                        <div class="sr-record-top">
-                            <strong>
-                                ${escapeHtml(row.category.replace(/_/g, " "))}
-                            </strong>
-                            <button
-                                class="sr-delete"
-                                type="button"
-                                data-delete-table="publishing_budgets"
-                                data-delete-id="${escapeHtml(row.id)}"
-                            >Delete</button>
-                        </div>
+                    return `
+                        <article class="sr-record">
+                            <div class="sr-record-top">
+                                <strong>
+                                    ${escapeHtml(
+                                        row.category.replace(
+                                            /_/g,
+                                            " "
+                                        )
+                                    )}
+                                </strong>
 
-                        <p>${escapeHtml(titleName(row.title_id))}</p>
-                        <p>
-                            ${escapeHtml(row.period_start)}
-                            to ${escapeHtml(row.period_end)}
-                        </p>
-                        <p>
-                            ${money(spent, row.currency)} recorded /
-                            ${money(row.budget_amount, row.currency)} budgeted
-                        </p>
-                        <div class="sr-progress">
-                            <span style="width:${
-                                Math.min(100, Math.max(0, percent))
-                            }%"></span>
-                        </div>
-                        <p>${decimal(percent)}% of budget recorded</p>
-                    </article>
+                                <button
+                                    class="sr-delete"
+                                    type="button"
+                                    data-delete-table="publishing_budgets"
+                                    data-delete-id="${escapeHtml(row.id)}"
+                                >
+                                    Delete
+                                </button>
+                            </div>
+
+                            <p>
+                                ${escapeHtml(
+                                    titleName(row.title_id)
+                                )}
+                            </p>
+
+                            <p>
+                                ${escapeHtml(
+                                    row.period_start
+                                )}
+                                to
+                                ${escapeHtml(
+                                    row.period_end
+                                )}
+                            </p>
+
+                            <p>
+                                ${money(
+                                    spent,
+                                    row.currency
+                                )}
+                                recorded /
+                                ${money(
+                                    row.budget_amount,
+                                    row.currency
+                                )}
+                                budgeted
+                            </p>
+
+                            <div class="sr-progress">
+                                <span
+                                    style="width:${
+                                        Math.min(
+                                            100,
+                                            Math.max(
+                                                0,
+                                                percent
+                                            )
+                                        )
+                                    }%"
+                                ></span>
+                            </div>
+
+                            <p>
+                                ${decimal(percent)}%
+                                of budget recorded
+                            </p>
+                        </article>
+                    `;
+                }).join("")
+                : `
+                    <p class="sr-muted">
+                        No budgets for this selection.
+                    </p>
                 `;
-            }).join("")
-            : `
-                <p class="sr-muted">
-                    No budgets for this selection.
-                </p>
-            `;
     }
 
     // ========================================================
-    // TARGETS
+    // TARGET CALCULATIONS
     // ========================================================
 
     function actualForTarget(row) {
@@ -1398,55 +2187,98 @@
             end: row.period_end
         };
 
-        const royaltyRows = data.royalties.filter(item =>
-            inRange(item.royalty_month, range) &&
-            (!row.title_id || royaltyTitle(item) === row.title_id) &&
-            (!row.format || item.format === row.format)
+        const royaltyRows = data.royalties.filter(
+            item =>
+                inRange(
+                    item.royalty_month,
+                    range
+                ) &&
+                (
+                    !row.title_id ||
+                    royaltyTitle(item) === row.title_id
+                ) &&
+                (
+                    !row.format ||
+                    item.format === row.format
+                )
         );
 
         if (row.metric === "net_copies") {
-            return sum(royaltyRows, "net_units_sold");
+            return sum(
+                royaltyRows,
+                "net_units_sold"
+            );
         }
 
         if (row.metric === "royalties") {
-            if (row.currency !== "GBP") return null;
+            if (row.currency !== "GBP") {
+                return null;
+            }
 
-            return sum(royaltyRows, "royalty_amount_gbp");
+            // This target measures source book royalties.
+            // Business-wide adjustments are not assigned
+            // to individual books or royalty targets.
+            return sum(
+                royaltyRows,
+                "royalty_amount_gbp"
+            );
         }
 
         if (row.metric === "kindle_pages") {
-            if (row.format && row.format !== "ebook") {
+            if (
+                row.format &&
+                row.format !== "ebook"
+            ) {
                 return 0;
             }
 
             return sum(
                 data.pages.filter(item =>
-                    inRange(item.reading_month, range) &&
-                    (!row.title_id ||
-                        editionMap().get(item.edition_id)?.title_id ===
-                            row.title_id)
+                    inRange(
+                        item.reading_month,
+                        range
+                    ) &&
+                    (
+                        !row.title_id ||
+                        editionMap().get(
+                            item.edition_id
+                        )?.title_id === row.title_id
+                    )
                 ),
                 "total_pages"
             );
         }
 
         if (row.metric === "direct_receipts") {
-            if (row.format) return null;
+            if (row.format) {
+                return null;
+            }
 
             const batches = new Map(
-                data.batches.map(item => [item.id, item])
+                data.batches.map(item => [
+                    item.id,
+                    item
+                ])
             );
 
             return sum(
                 data.lines.filter(line => {
-                    const batch = batches.get(line.batch_id);
+                    const batch = batches.get(
+                        line.batch_id
+                    );
 
                     return (
                         batch?.platform === "tide" &&
                         batch.currency === row.currency &&
-                        inRange(line.payment_received_date, range) &&
-                        (!row.title_id ||
-                            reportLineTitleId(line) === row.title_id)
+                        inRange(
+                            line.payment_received_date,
+                            range
+                        ) &&
+                        (
+                            !row.title_id ||
+                            reportLineTitleId(line) ===
+                                row.title_id
+                        )
                     );
                 }),
                 "payment_amount"
@@ -1461,81 +2293,139 @@
 
         const rows = data.targets.filter(row =>
             row.currency === "GBP" &&
-            overlaps(row.period_start, row.period_end, range) &&
-            (selectedTitle() === "all" ||
-                row.title_id === selectedTitle()) &&
-            (selectedFormat() === "all" ||
-                row.format === selectedFormat())
+            overlaps(
+                row.period_start,
+                row.period_end,
+                range
+            ) &&
+            (
+                selectedTitle() === "all" ||
+                row.title_id === selectedTitle()
+            ) &&
+            (
+                selectedFormat() === "all" ||
+                row.format === selectedFormat()
+            )
         );
 
-        $("sr-target-list").innerHTML = rows.length
-            ? rows.map(row => {
-                const actual = actualForTarget(row);
+        $("sr-target-list").innerHTML =
+            rows.length
+                ? rows.map(row => {
+                    const actual =
+                        actualForTarget(row);
 
-                const percent =
-                    actual !== null && number(row.target_value) > 0
-                        ? actual / number(row.target_value) * 100
-                        : 0;
+                    const percent =
+                        actual !== null &&
+                        number(row.target_value) > 0
+                            ? (
+                                actual /
+                                number(row.target_value)
+                            ) * 100
+                            : 0;
 
-                const isMoney = [
-                    "royalties", "direct_receipts", "profit"
-                ].includes(row.metric);
+                    const isMoney = [
+                        "royalties",
+                        "direct_receipts",
+                        "profit"
+                    ].includes(row.metric);
 
-                const display = value =>
-                    isMoney
-                        ? money(value, row.currency)
-                        : integer(value);
+                    const display = value =>
+                        isMoney
+                            ? money(
+                                value,
+                                row.currency
+                            )
+                            : integer(value);
 
-                return `
-                    <article class="sr-record">
-                        <div class="sr-record-top">
-                            <strong>
-                                ${escapeHtml(row.metric.replace(/_/g, " "))}
-                            </strong>
-                            <button
-                                class="sr-delete"
-                                type="button"
-                                data-delete-table="publishing_targets"
-                                data-delete-id="${escapeHtml(row.id)}"
-                            >Delete</button>
-                        </div>
+                    return `
+                        <article class="sr-record">
+                            <div class="sr-record-top">
+                                <strong>
+                                    ${escapeHtml(
+                                        row.metric.replace(
+                                            /_/g,
+                                            " "
+                                        )
+                                    )}
+                                </strong>
 
-                        <p>
-                            ${escapeHtml(titleName(row.title_id))}
-                            · ${escapeHtml(row.format || "All formats")}
-                        </p>
+                                <button
+                                    class="sr-delete"
+                                    type="button"
+                                    data-delete-table="publishing_targets"
+                                    data-delete-id="${escapeHtml(row.id)}"
+                                >
+                                    Delete
+                                </button>
+                            </div>
 
-                        <p>
-                            ${escapeHtml(row.period_start)}
-                            to ${escapeHtml(row.period_end)}
-                        </p>
+                            <p>
+                                ${escapeHtml(
+                                    titleName(row.title_id)
+                                )}
+                                ·
+                                ${escapeHtml(
+                                    row.format || "All formats"
+                                )}
+                            </p>
 
-                        <p>
-                            ${actual === null
-                                ? "Actual result not yet available"
-                                : `${display(actual)} /
-                                   ${display(row.target_value)} target`}
-                        </p>
+                            <p>
+                                ${escapeHtml(
+                                    row.period_start
+                                )}
+                                to
+                                ${escapeHtml(
+                                    row.period_end
+                                )}
+                            </p>
 
-                        <div class="sr-progress">
-                            <span style="width:${
-                                Math.min(100, Math.max(0, percent))
-                            }%"></span>
-                        </div>
+                            <p>
+                                ${
+                                    actual === null
+                                        ? "Actual result not yet available"
+                                        : `
+                                            ${display(actual)}
+                                            /
+                                            ${display(
+                                                row.target_value
+                                            )}
+                                            target
+                                        `
+                                }
+                            </p>
 
-                        <p>
-                            ${actual === null
-                                ? "Pending"
-                                : `${decimal(percent)}% achieved`}
-                        </p>
-                    </article>
+                            <div class="sr-progress">
+                                <span
+                                    style="width:${
+                                        Math.min(
+                                            100,
+                                            Math.max(
+                                                0,
+                                                percent
+                                            )
+                                        )
+                                    }%"
+                                ></span>
+                            </div>
+
+                            <p>
+                                ${
+                                    actual === null
+                                        ? "Pending"
+                                        : `
+                                            ${decimal(percent)}%
+                                            achieved
+                                        `
+                                }
+                            </p>
+                        </article>
+                    `;
+                }).join("")
+                : `
+                    <p class="sr-muted">
+                        No targets for this selection.
+                    </p>
                 `;
-            }).join("")
-            : `
-                <p class="sr-muted">
-                    No targets for this selection.
-                </p>
-            `;
     }
 
     // ========================================================
@@ -1547,16 +2437,22 @@
 
         const expenses = data.expenses.filter(row =>
             row.currency === "GBP" &&
-            inRange(row.expense_date, selectedRange())
+            inRange(
+                row.expense_date,
+                selectedRange()
+            )
         );
 
-        const ids = selectedTitle() === "all"
-            ? data.titles.map(book => book.id)
-            : [selectedTitle()];
+        const ids =
+            selectedTitle() === "all"
+                ? data.titles.map(book => book.id)
+                : [selectedTitle()];
 
         const rows = ids.map(id => {
             const earned = sum(
-                royalties.filter(row => royaltyTitle(row) === id),
+                royalties.filter(row =>
+                    royaltyTitle(row) === id
+                ),
                 "royalty_amount_gbp"
             );
 
@@ -1565,35 +2461,61 @@
                     row.title_id === id ||
                     (
                         row.edition_id &&
-                        editionMap().get(row.edition_id)?.title_id === id
+                        editionMap().get(
+                            row.edition_id
+                        )?.title_id === id
                     )
                 ),
                 "amount"
             );
 
-            return { id, earned, costs };
+            return {
+                id,
+                earned,
+                costs
+            };
         })
-        .filter(item => item.earned || item.costs)
-        .sort((a, b) => b.earned - a.earned);
+        .filter(item =>
+            item.earned || item.costs
+        )
+        .sort(
+            (a, b) =>
+                b.earned - a.earned
+        );
 
-        $("sr-profit-list").innerHTML = rows.length
-            ? rows.map(row => `
-                <tr>
-                    <td>${escapeHtml(titleName(row.id))}</td>
-                    <td class="sr-number">${money(row.earned)}</td>
-                    <td class="sr-number">${money(row.costs)}</td>
-                    <td class="sr-number">
-                        ${money(row.earned - row.costs)}
-                    </td>
-                </tr>
-            `).join("")
-            : `
-                <tr>
-                    <td colspan="4">
-                        No book-level records for this selection.
-                    </td>
-                </tr>
-            `;
+        $("sr-profit-list").innerHTML =
+            rows.length
+                ? rows.map(row => `
+                    <tr>
+                        <td>
+                            ${escapeHtml(
+                                titleName(row.id)
+                            )}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(row.earned)}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(row.costs)}
+                        </td>
+
+                        <td class="sr-number">
+                            ${money(
+                                row.earned - row.costs
+                            )}
+                        </td>
+                    </tr>
+                `).join("")
+                : `
+                    <tr>
+                        <td colspan="4">
+                            No book-level records
+                            for this selection.
+                        </td>
+                    </tr>
+                `;
     }
 
     // ========================================================
@@ -1601,19 +2523,35 @@
     // ========================================================
 
     function render() {
-        if (!loaded) return;
+        if (!loaded) {
+            return;
+        }
 
         const range = selectedRange();
-        const ku = kuForRange(range, filteredPages(range));
+
+        const ku = kuForRange(
+            range,
+            filteredPages(range)
+        );
+
+        const adjustment =
+            monthlyAdjustment(range);
 
         $("sr-period-label").textContent =
             `Showing ${range.start} to ${range.end}` +
             " · GBP · " +
-            (selectedFormat() === "all"
-                ? "All formats"
-                : selectedFormat()) +
+            (
+                selectedFormat() === "all"
+                    ? "All formats"
+                    : selectedFormat()
+            ) +
             " · " +
-            kuStatusText(ku);
+            kuStatusText(ku) +
+            (
+                adjustment !== 0
+                    ? ` · ${money(adjustment)} management adjustment`
+                    : ""
+            );
 
         renderRetailSales();
         renderAmazonCosts();
@@ -1640,16 +2578,24 @@
             "sr-budget-category"
         ]) {
             const select = $(id);
+
             select.replaceChildren();
 
             for (const category of CATEGORIES) {
                 const label = category
                     .replace(/_/g, " ")
-                    .replace(/\b\w/g, character =>
-                        character.toUpperCase()
+                    .replace(
+                        /\b\w/g,
+                        character =>
+                            character.toUpperCase()
                     );
 
-                select.add(new Option(label, category));
+                select.add(
+                    new Option(
+                        label,
+                        category
+                    )
+                );
             }
         }
 
@@ -1659,10 +2605,13 @@
             "sr-target-currency"
         ]) {
             const select = $(id);
+
             select.replaceChildren();
 
             for (const code of CURRENCIES) {
-                select.add(new Option(code, code));
+                select.add(
+                    new Option(code, code)
+                );
             }
 
             select.value = "GBP";
@@ -1670,37 +2619,66 @@
     }
 
     function setFormDates() {
-        const today = dateOnly(new Date());
-        const range = fyRange(fyStart(today));
+        const today = dateOnly(
+            new Date()
+        );
+
+        const range = fyRange(
+            fyStart(today)
+        );
 
         $("sr-expense-date").value = today;
 
-        for (const type of ["budget", "target"]) {
-            $(`sr-${type}-start`).value = range.start;
-            $(`sr-${type}-end`).value = range.end;
+        for (const type of [
+            "budget",
+            "target"
+        ]) {
+            $(`sr-${type}-start`).value =
+                range.start;
+
+            $(`sr-${type}-end`).value =
+                range.end;
         }
     }
 
-    async function insertRecord(table, record, messageId, form) {
+    async function insertRecord(
+        table,
+        record,
+        messageId,
+        form
+    ) {
         const message = $(messageId);
-        const button = form.querySelector('[type="submit"]');
+
+        const button = form.querySelector(
+            '[type="submit"]'
+        );
 
         button.disabled = true;
         message.textContent = "Saving...";
 
         try {
-            const response = await db.from(table).insert(record);
+            const response = await db
+                .from(table)
+                .insert(record);
 
-            if (response.error) throw response.error;
+            if (response.error) {
+                throw response.error;
+            }
 
-            message.textContent = "Saved successfully.";
+            message.textContent =
+                "Saved successfully.";
+
             await refresh();
 
         } catch (error) {
-            console.error("Financial record save error:", error);
+            console.error(
+                "Financial record save error:",
+                error
+            );
 
             message.textContent =
-                "Unable to save: " + error.message;
+                "Unable to save: " +
+                error.message;
 
         } finally {
             button.disabled = false;
@@ -1712,22 +2690,38 @@
             "submit",
             async event => {
                 event.preventDefault();
-                if (!loaded) return;
+
+                if (!loaded) {
+                    return;
+                }
 
                 await insertRecord(
                     "publishing_expenses",
                     {
-                        expense_date: $("sr-expense-date").value,
-                        category: $("sr-expense-category").value,
+                        expense_date:
+                            $("sr-expense-date").value,
+                        category:
+                            $("sr-expense-category").value,
                         description:
-                            $("sr-expense-description").value.trim(),
-                        amount: Number($("sr-expense-amount").value),
-                        currency: $("sr-expense-currency").value,
-                        title_id: $("sr-expense-title").value || null,
+                            $("sr-expense-description")
+                                .value.trim(),
+                        amount:
+                            Number(
+                                $("sr-expense-amount").value
+                            ),
+                        currency:
+                            $("sr-expense-currency").value,
+                        title_id:
+                            $("sr-expense-title").value ||
+                            null,
                         supplier:
-                            $("sr-expense-supplier").value.trim() || null,
+                            $("sr-expense-supplier")
+                                .value.trim() ||
+                            null,
                         notes:
-                            $("sr-expense-notes").value.trim() || null
+                            $("sr-expense-notes")
+                                .value.trim() ||
+                            null
                     },
                     "sr-expense-message",
                     event.currentTarget
@@ -1739,10 +2733,16 @@
             "submit",
             async event => {
                 event.preventDefault();
-                if (!loaded) return;
 
-                const start = $("sr-budget-start").value;
-                const end = $("sr-budget-end").value;
+                if (!loaded) {
+                    return;
+                }
+
+                const start =
+                    $("sr-budget-start").value;
+
+                const end =
+                    $("sr-budget-end").value;
 
                 if (end < start) {
                     $("sr-budget-message").textContent =
@@ -1755,11 +2755,17 @@
                     {
                         period_start: start,
                         period_end: end,
-                        category: $("sr-budget-category").value,
+                        category:
+                            $("sr-budget-category").value,
                         budget_amount:
-                            Number($("sr-budget-amount").value),
-                        currency: $("sr-budget-currency").value,
-                        title_id: $("sr-budget-title").value || null
+                            Number(
+                                $("sr-budget-amount").value
+                            ),
+                        currency:
+                            $("sr-budget-currency").value,
+                        title_id:
+                            $("sr-budget-title").value ||
+                            null
                     },
                     "sr-budget-message",
                     event.currentTarget
@@ -1771,10 +2777,16 @@
             "submit",
             async event => {
                 event.preventDefault();
-                if (!loaded) return;
 
-                const start = $("sr-target-start").value;
-                const end = $("sr-target-end").value;
+                if (!loaded) {
+                    return;
+                }
+
+                const start =
+                    $("sr-target-start").value;
+
+                const end =
+                    $("sr-target-end").value;
 
                 if (end < start) {
                     $("sr-target-message").textContent =
@@ -1787,12 +2799,20 @@
                     {
                         period_start: start,
                         period_end: end,
-                        metric: $("sr-target-metric").value,
+                        metric:
+                            $("sr-target-metric").value,
                         target_value:
-                            Number($("sr-target-value").value),
-                        currency: $("sr-target-currency").value,
-                        title_id: $("sr-target-title").value || null,
-                        format: $("sr-target-format").value || null
+                            Number(
+                                $("sr-target-value").value
+                            ),
+                        currency:
+                            $("sr-target-currency").value,
+                        title_id:
+                            $("sr-target-title").value ||
+                            null,
+                        format:
+                            $("sr-target-format").value ||
+                            null
                     },
                     "sr-target-message",
                     event.currentTarget
@@ -1806,7 +2826,9 @@
     // ========================================================
 
     async function deleteRecord(table, id) {
-        if (!loaded) return;
+        if (!loaded) {
+            return;
+        }
 
         const allowed = new Set([
             "publishing_expenses",
@@ -1814,7 +2836,9 @@
             "publishing_targets"
         ]);
 
-        if (!allowed.has(table)) return;
+        if (!allowed.has(table)) {
+            return;
+        }
 
         if (!window.confirm(
             "Permanently delete this financial record?"
@@ -1829,19 +2853,29 @@
                 .eq("id", id)
                 .select("id");
 
-            if (response.error) throw response.error;
+            if (response.error) {
+                throw response.error;
+            }
 
             if (!response.data?.length) {
                 throw new Error(
-                    "No record was deleted. Check administrator access."
+                    "No record was deleted. " +
+                    "Check administrator access."
                 );
             }
 
             await refresh();
 
         } catch (error) {
-            console.error("Delete failed:", error);
-            window.alert("Delete failed: " + error.message);
+            console.error(
+                "Delete failed:",
+                error
+            );
+
+            window.alert(
+                "Delete failed: " +
+                error.message
+            );
         }
     }
 
@@ -1857,25 +2891,39 @@
             "sr-title-filter",
             "sr-format"
         ]) {
-            $(id).addEventListener("change", render);
+            $(id).addEventListener(
+                "change",
+                render
+            );
         }
 
-        $("sr-refresh").addEventListener("click", () => {
-            if (db) verifyAccess();
-        });
+        $("sr-refresh").addEventListener(
+            "click",
+            () => {
+                if (db) {
+                    verifyAccess();
+                }
+            }
+        );
 
-        document.addEventListener("click", event => {
-            const button = event.target.closest(
-                "[data-delete-table][data-delete-id]"
-            );
+        document.addEventListener(
+            "click",
+            event => {
+                const button =
+                    event.target.closest(
+                        "[data-delete-table][data-delete-id]"
+                    );
 
-            if (!button) return;
+                if (!button) {
+                    return;
+                }
 
-            deleteRecord(
-                button.dataset.deleteTable,
-                button.dataset.deleteId
-            );
-        });
+                deleteRecord(
+                    button.dataset.deleteTable,
+                    button.dataset.deleteId
+                );
+            }
+        );
 
         bindForms();
     }
@@ -1889,7 +2937,9 @@
             !$("sr-access-screen") ||
             !$("sr-admin-content")
         ) {
-            console.error("Department 03 page elements missing.");
+            console.error(
+                "Department 03 page elements missing."
+            );
             return;
         }
 
@@ -1898,75 +2948,108 @@
         setFormDates();
         bindEvents();
 
-        if (typeof loadHeader === "function") {
+        if (
+            typeof loadHeader === "function"
+        ) {
             Promise.resolve()
-                .then(() => loadHeader("simple"))
+                .then(() =>
+                    loadHeader("simple")
+                )
                 .catch(error => {
-                    console.warn("Header could not load:", error);
+                    console.warn(
+                        "Header could not load:",
+                        error
+                    );
                 });
         }
 
         try {
-            accessMessage("Connecting to Blackwood management...");
+            accessMessage(
+                "Connecting to Blackwood management..."
+            );
 
             await loadLibrary();
 
-            if (!window.supabase?.createClient) {
+            if (
+                !window.supabase?.createClient
+            ) {
                 throw new Error(
                     "Supabase client library is unavailable."
                 );
             }
 
-            db = window.supabase.createClient(URL, KEY, {
-                auth: {
-                    persistSession: true,
-                    autoRefreshToken: true,
-                    detectSessionInUrl: true
+            db = window.supabase.createClient(
+                URL,
+                KEY,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
+                    }
                 }
-            });
-
-            console.log(
-                "Department 03: Supabase client initialised."
             );
 
-            db.auth.onAuthStateChange(event => {
-                console.log(
-                    "Department 03 auth event:",
-                    event
-                );
+            console.log(
+                "Department 03: " +
+                "Supabase client initialised."
+            );
 
-                if (event === "SIGNED_OUT") {
-                    ++accessVersion;
-                    lock();
-
-                    accessMessage(
-                        "Your session has ended. Please sign in again."
+            db.auth.onAuthStateChange(
+                event => {
+                    console.log(
+                        "Department 03 auth event:",
+                        event
                     );
-                    return;
-                }
 
-                if (
-                    event === "SIGNED_IN" ||
-                    event === "USER_UPDATED"
-                ) {
-                    window.setTimeout(() => {
-                        verifyAccess();
-                    }, 0);
+                    if (
+                        event === "SIGNED_OUT"
+                    ) {
+                        ++accessVersion;
+                        lock();
+
+                        accessMessage(
+                            "Your session has ended. " +
+                            "Please sign in again."
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        event === "SIGNED_IN" ||
+                        event === "USER_UPDATED"
+                    ) {
+                        window.setTimeout(
+                            () => {
+                                verifyAccess();
+                            },
+                            0
+                        );
+                    }
                 }
-            });
+            );
 
             await verifyAccess();
 
         } catch (error) {
-            console.error("Department 03 startup error:", error);
+            console.error(
+                "Department 03 startup error:",
+                error
+            );
+
             lock();
 
             accessMessage(
-                "Unable to initialise the financial dashboard: " +
+                "Unable to initialise the " +
+                "financial dashboard: " +
                 error.message
             );
         }
     }
 
-    window.addEventListener("load", initialize);
+    window.addEventListener(
+        "load",
+        initialize
+    );
 })();
