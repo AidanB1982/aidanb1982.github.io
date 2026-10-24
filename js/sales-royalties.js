@@ -715,50 +715,71 @@ function renderRetailSales() {
         `;
     }
 
-    function renderMonthly() {
-        const year = Number($("sr-year").value);
-        const rows = filteredRoyalties(fyRange(year));
-        const monthFilter = $("sr-month").value;
+    
+function renderMonthly() {
+    const year = Number($("sr-year").value);
+    const range = fyRange(year);
 
-        const monthly = [];
+    const royaltyRows = filteredRoyalties(range);
+    const pageRows = filteredPages(range);
 
-        for (let index = 0; index < 12; index++) {
-            const calendarMonth = ((index + 3) % 12) + 1;
-            const calendarYear = index < 9 ? year : year + 1;
-            const key = `${calendarYear}-${String(
-                calendarMonth
-            ).padStart(2, "0")}`;
+    const monthFilter = $("sr-month").value;
+    const selectedCurrency = currency();
 
-            if (monthFilter !== "all" &&
-                Number(monthFilter) !== calendarMonth) {
-                continue;
-            }
+    const monthly = [];
 
-            monthly.push({
-                label: MONTHS[index],
-                value: sum(
-                    rows.filter(row =>
-                        monthKey(row.royalty_month) === key
-                    ),
-                    "royalty_amount"
-                )
-            });
+    for (let index = 0; index < 12; index++) {
+        const calendarMonth = ((index + 3) % 12) + 1;
+        const calendarYear = index < 9 ? year : year + 1;
+
+        if (
+            monthFilter !== "all" &&
+            Number(monthFilter) !== calendarMonth
+        ) {
+            continue;
         }
 
-        const max = Math.max(
-            0,
-            ...monthly.map(item => Math.max(0, item.value))
+        const key = `${calendarYear}-${String(
+            calendarMonth
+        ).padStart(2, "0")}`;
+
+        const bookRoyalties = sum(
+            royaltyRows.filter(row =>
+                monthKey(row.royalty_month) === key
+            ),
+            "royalty_amount"
         );
 
-        $("sr-monthly-chart").innerHTML = monthly.map(item =>
-            barRow(
-                item.label,
-                Math.max(0, item.value),
-                max,
-                money(item.value, currency())
+        const pageRoyalties = selectedCurrency === "GBP"
+            ? sum(
+                pageRows.filter(row =>
+                    monthKey(row.reading_month) === key
+                ),
+                "estimated_royalty_gbp"
             )
-        ).join("");
+            : 0;
+
+        monthly.push({
+            label: MONTHS[index],
+            value: bookRoyalties + pageRoyalties
+        });
     }
+
+    const max = Math.max(
+        0,
+        ...monthly.map(item => Math.max(0, item.value))
+    );
+
+    $("sr-monthly-chart").innerHTML = monthly.map(item =>
+        barRow(
+            item.label,
+            Math.max(0, item.value),
+            max,
+            money(item.value, selectedCurrency)
+        )
+    ).join("");
+}
+
 
     function renderFormats() {
         const rows = filteredRoyalties();
