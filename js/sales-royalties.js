@@ -371,15 +371,44 @@ async function refresh(version = accessVersion) {
 
         if (version !== accessVersion) return;
 
-        loaded = true;
+        
+loaded = true;
 
-        status("Database records loaded. Preparing dashboard...");
+status("Database records loaded. Preparing dashboard...");
 
-        populateFilters();
+console.log("Department 03 data check:", {
+    titles: data.titles?.length,
+    editions: data.editions?.length,
+    royalties: data.royalties?.length,
+    pages: data.pages?.length,
+    batches: data.batches?.length,
+    lines: data.lines?.length,
+    links: data.links?.length,
+    expenses: data.expenses?.length,
+    budgets: data.budgets?.length,
+    targets: data.targets?.length
+});
 
-        status("Calculating dashboard figures...");
+try {
+    populateFilters();
+} catch (error) {
+    throw new Error(
+        "populateFilters failed: " + error.message,
+        { cause: error }
+    );
+}
 
-        render();
+status("Calculating dashboard figures...");
+
+try {
+    render();
+} catch (error) {
+    throw new Error(
+        "render failed: " + error.message,
+        { cause: error }
+    );
+}
+
 
         status(
             "Dashboard loaded successfully. " +
