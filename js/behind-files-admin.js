@@ -761,7 +761,3 @@
             .replace(/'/g, "&#039;");
     }
 })();
-
-
-
-Js next my friend, shall we do the old and new code?
