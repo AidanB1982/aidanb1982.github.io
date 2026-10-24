@@ -20,11 +20,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Behind the Files Admin | Blackwood Publishing</title>
+    <title>Blackwood Management Hub | Blackwood Publishing</title>
 
     <meta
         name="description"
-        content="Private Behind the Files drafting desk for Blackwood Circle updates."
+        content="Private management headquarters for Blackwood Publishing."
     >
 
     <link rel="icon" href="/assets/favicon.png" type="image/png">
@@ -45,16 +45,7 @@
 
     <div id="header-placeholder"></div>
 
-    <!--
-        ACCESS SCREEN
-
-        Visible until the JavaScript verifies:
-        1. An active Supabase login
-        2. The member_profiles.is_admin permission
-
-        The drafting interface below stays hidden until
-        the administrator has been verified.
-    -->
+    <!-- ACCESS SCREEN -->
     <section
         id="bfa-access-screen"
         class="bfa-wrap"
@@ -90,335 +81,523 @@
         </div>
     </section>
 
-    <!--
-        ADMIN EDITOR
-
-        Hidden by default.
-
-        The new behind-files-admin.js will remove
-        the hidden attribute only after confirming
-        member_profiles.is_admin === true.
-    -->
+    <!-- ADMIN-ONLY CONTENT -->
     <main
         class="bfa-wrap"
         id="bfa-admin-content"
         hidden
     >
 
+        <!-- MANAGEMENT HUB INTRODUCTION -->
         <section class="bfa-hero" aria-labelledby="bfa-title">
 
             <p class="bfa-kicker">
-                Private Blackwood Desk
+                Private Publishing Headquarters
             </p>
 
             <h1 id="bfa-title">
-                Behind the Files Admin
+                Blackwood Management Hub
             </h1>
 
             <p>
-                Draft weekly Circle updates, production notes, ARC notices,
-                cover previews, and private Blackwood dispatches for the
-                member archive.
+                Your private headquarters for editorial dispatches,
+                publishing operations, inventory, sales, author records,
+                and production planning.
+            </p>
+
+            <p>
+                <a
+                    href="/pages/members.html"
+                    class="bfa-button"
+                >
+                    Return to The Archivists
+                </a>
             </p>
 
         </section>
 
-        <p class="bfa-warning">
-            This page prepares entries for
-            <strong>/data/BFA.json</strong>.
-            It does not save directly to GitHub.
-            Generate the post JSON, copy it, and paste it into the
-            <strong>posts</strong> array.
-        </p>
-
+        <!-- DEPARTMENT DIRECTORY -->
         <section
-            class="bfa-desk"
-            aria-label="Behind the Files drafting desk"
+            class="bfa-panel"
+            aria-labelledby="bfa-management-departments-title"
+            style="margin-bottom: 28px;"
         >
+            <div class="bfa-panel-inner">
 
-            <!-- DRAFTING FORM -->
-            <section
-                class="bfa-panel"
-                aria-labelledby="bfa-form-title"
-            >
-                <div class="bfa-panel-inner">
+                <p class="bfa-card-kicker">
+                    Management Directory
+                </p>
 
-                    <p class="bfa-card-kicker">
-                        Draft File
-                    </p>
+                <h2 id="bfa-management-departments-title">
+                    Publishing Departments
+                </h2>
 
-                    <h2 id="bfa-form-title">
-                        Create a Circle Update
-                    </h2>
+                <p>
+                    One headquarters. Every part of the Blackwood
+                    publishing operation, brought together as each
+                    department is developed.
+                </p>
 
-                    <form
-                        class="bfa-form"
-                        id="bfa-form"
+                <div
+                    style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                        gap: 16px;
+                        margin-top: 24px;
+                    "
+                >
+
+                    <!-- ACTIVE DEPARTMENT -->
+                    <article
+                        style="
+                            border: 1px solid #a66a38;
+                            border-radius: 12px;
+                            padding: 22px;
+                            background: rgba(166, 106, 56, 0.10);
+                        "
                     >
-
-                        <div class="bfa-grid">
-
-                            <div class="bfa-field">
-                                <label for="bfa-post-title">
-                                    Title <strong>*</strong>
-                                </label>
-
-                                <input
-                                    id="bfa-post-title"
-                                    type="text"
-                                    maxlength="120"
-                                    placeholder="This Week at Blackwood"
-                                    required
-                                >
-                            </div>
-
-                            <div class="bfa-field">
-                                <label for="bfa-category">
-                                    Category
-                                </label>
-
-                                <select id="bfa-category">
-                                    <option value="Weekly Dispatch">Weekly Dispatch</option>
-                                    <option value="Production Note">Production Note</option>
-                                    <option value="Cover Preview">Cover Preview</option>
-                                    <option value="ARC Notice">ARC Notice</option>
-                                    <option value="Release Update">Release Update</option>
-                                    <option value="Fragment">Fragment</option>
-                                    <option value="Store Update">Store Update</option>
-                                    <option value="Circle Notice">Circle Notice</option>
-                                </select>
-                            </div>
-
-                            <div class="bfa-field">
-                                <label for="bfa-date">
-                                    Published Date
-                                </label>
-
-                                <input
-                                    id="bfa-date"
-                                    type="date"
-                                >
-                            </div>
-
-                            <div class="bfa-field">
-                                <label for="bfa-image">
-                                    Image URL
-                                </label>
-
-                                <input
-                                    id="bfa-image"
-                                    type="text"
-                                    placeholder="/assets/ArchiveFilesBG.png"
-                                >
-                            </div>
-
-                            <div class="bfa-field bfa-field-full">
-                                <label for="bfa-excerpt">
-                                    Short Excerpt
-                                </label>
-
-                                <textarea
-                                    id="bfa-excerpt"
-                                    maxlength="360"
-                                    placeholder="A short line for the carousel or dashboard preview."
-                                ></textarea>
-                            </div>
-
-                            <div class="bfa-field bfa-field-full">
-                                <label for="bfa-body">
-                                    Main Body <strong>*</strong>
-                                </label>
-
-                                <textarea
-                                    id="bfa-body"
-                                    placeholder="Write the full Behind the Files update here."
-                                    required
-                                ></textarea>
-                            </div>
-
-                        </div>
-
-                        <div class="bfa-checks">
-
-                            <label class="bfa-check">
-                                <input
-                                    id="bfa-published"
-                                    type="checkbox"
-                                    checked
-                                >
-
-                                <span>
-                                    Published
-                                </span>
-                            </label>
-
-                            <label class="bfa-check">
-                                <input
-                                    id="bfa-pinned"
-                                    type="checkbox"
-                                >
-
-                                <span>
-                                    Pinned / featured
-                                </span>
-                            </label>
-
-                        </div>
-
-                        <div class="bfa-actions">
-
-                            <button
-                                type="button"
-                                class="bfa-button primary"
-                                id="bfa-generate"
-                            >
-                                Generate JSON
-                            </button>
-
-                            <button
-                                type="button"
-                                class="bfa-button"
-                                id="bfa-copy"
-                            >
-                                Copy JSON
-                            </button>
-
-                            <button
-                                type="reset"
-                                class="bfa-button"
-                                id="bfa-reset"
-                            >
-                                Clear Draft
-                            </button>
-
-                        </div>
-
-                        <p
-                            class="bfa-status"
-                            id="bfa-status"
-                            aria-live="polite"
-                        ></p>
-
-                    </form>
-
-                    <div class="bfa-json-box">
-
-                        <p class="bfa-label">
-                            Generated Post JSON
+                        <p class="bfa-card-kicker">
+                            Operational
                         </p>
 
-                        <textarea
-                            class="bfa-json-output"
-                            id="bfa-json-output"
-                            readonly
-                            spellcheck="false"
-                            placeholder="Generate a post to see the JSON here."
-                        ></textarea>
+                        <h3>Behind the Files</h3>
 
-                    </div>
+                        <p>
+                            Create private dispatches, editorial updates,
+                            cover previews, ARC notices, and production notes.
+                        </p>
+
+                        <a
+                            href="#bfa-editor-department"
+                            class="bfa-button primary"
+                        >
+                            Open Editorial Desk
+                        </a>
+                    </article>
+
+                    <!-- FUTURE DEPARTMENT -->
+                    <article
+                        style="
+                            border: 1px solid rgba(166, 106, 56, 0.35);
+                            border-radius: 12px;
+                            padding: 22px;
+                        "
+                    >
+                        <p class="bfa-card-kicker">
+                            Coming Soon
+                        </p>
+
+                        <h3>Publishing Inventory</h3>
+
+                        <p>
+                            Manage titles, editions, ISBNs, stock records,
+                            and publishing assets.
+                        </p>
+
+                        <p class="bfa-muted">
+                            Department awaiting development
+                        </p>
+                    </article>
+
+                    <!-- FUTURE DEPARTMENT -->
+                    <article
+                        style="
+                            border: 1px solid rgba(166, 106, 56, 0.35);
+                            border-radius: 12px;
+                            padding: 22px;
+                        "
+                    >
+                        <p class="bfa-card-kicker">
+                            Coming Soon
+                        </p>
+
+                        <h3>Sales &amp; Royalties</h3>
+
+                        <p>
+                            Track publishing sales, royalty calculations,
+                            revenue summaries, and reporting.
+                        </p>
+
+                        <p class="bfa-muted">
+                            Department awaiting development
+                        </p>
+                    </article>
+
+                    <!-- FUTURE DEPARTMENT -->
+                    <article
+                        style="
+                            border: 1px solid rgba(166, 106, 56, 0.35);
+                            border-radius: 12px;
+                            padding: 22px;
+                        "
+                    >
+                        <p class="bfa-card-kicker">
+                            Coming Soon
+                        </p>
+
+                        <h3>Author Contracts</h3>
+
+                        <p>
+                            Organise author agreements, contract milestones,
+                            rights information, and important dates.
+                        </p>
+
+                        <p class="bfa-muted">
+                            Department awaiting development
+                        </p>
+                    </article>
+
+                    <!-- FUTURE DEPARTMENT -->
+                    <article
+                        style="
+                            border: 1px solid rgba(166, 106, 56, 0.35);
+                            border-radius: 12px;
+                            padding: 22px;
+                        "
+                    >
+                        <p class="bfa-card-kicker">
+                            Coming Soon
+                        </p>
+
+                        <h3>Production Planning</h3>
+
+                        <p>
+                            Follow publishing schedules, editorial stages,
+                            release milestones, and production timelines.
+                        </p>
+
+                        <p class="bfa-muted">
+                            Department awaiting development
+                        </p>
+                    </article>
 
                 </div>
+
+            </div>
+        </section>
+
+        <!-- FIRST LIVE DEPARTMENT -->
+        <section
+            id="bfa-editor-department"
+            aria-labelledby="bfa-editor-department-title"
+        >
+
+            <section class="bfa-hero">
+
+                <p class="bfa-kicker">
+                    Department 01 · Editorial
+                </p>
+
+                <h2 id="bfa-editor-department-title">
+                    Behind the Files
+                </h2>
+
+                <p>
+                    Draft weekly Circle updates, production notes,
+                    ARC notices, cover previews, and private Blackwood
+                    dispatches for the member archive.
+                </p>
+
             </section>
 
-            <!-- LIVE PREVIEW -->
-            <aside
-                class="bfa-panel"
-                aria-labelledby="bfa-preview-title"
+            <p class="bfa-warning">
+                This page prepares entries for
+                <strong>/data/BFA.json</strong>.
+                It does not save directly to GitHub.
+                Generate the post JSON, copy it, and paste it into the
+                <strong>posts</strong> array.
+            </p>
+
+            <section
+                class="bfa-desk"
+                aria-label="Behind the Files drafting desk"
             >
-                <div class="bfa-panel-inner">
 
-                    <p class="bfa-card-kicker">
-                        Preview
-                    </p>
+                <!-- DRAFTING FORM -->
+                <section
+                    class="bfa-panel"
+                    aria-labelledby="bfa-form-title"
+                >
+                    <div class="bfa-panel-inner">
 
-                    <h2 id="bfa-preview-title">
-                        Circle Display
-                    </h2>
+                        <p class="bfa-card-kicker">
+                            Draft File
+                        </p>
 
-                    <article class="bfa-preview-card">
+                        <h2 id="bfa-form-title">
+                            Create a Circle Update
+                        </h2>
 
-                        <img
-                            class="bfa-preview-image"
-                            id="bfa-preview-image"
-                            src="/assets/ArchiveFilesBG.png"
-                            alt=""
+                        <form
+                            class="bfa-form"
+                            id="bfa-form"
                         >
 
-                        <div class="bfa-preview-content">
+                            <div class="bfa-grid">
 
-                            <div class="bfa-preview-meta">
+                                <div class="bfa-field">
+                                    <label for="bfa-post-title">
+                                        Title <strong>*</strong>
+                                    </label>
 
-                                <span
-                                    class="bfa-status-pill"
-                                    id="bfa-preview-category"
-                                >
-                                    Weekly Dispatch
-                                </span>
+                                    <input
+                                        id="bfa-post-title"
+                                        type="text"
+                                        maxlength="120"
+                                        placeholder="This Week at Blackwood"
+                                        required
+                                    >
+                                </div>
 
-                                <span
-                                    class="bfa-status-pill"
-                                    id="bfa-preview-date"
-                                >
-                                    Filed today
-                                </span>
+                                <div class="bfa-field">
+                                    <label for="bfa-category">
+                                        Category
+                                    </label>
 
-                                <span
-                                    class="bfa-status-pill"
-                                    id="bfa-preview-pinned"
-                                    hidden
-                                >
-                                    Pinned
-                                </span>
+                                    <select id="bfa-category">
+                                        <option value="Weekly Dispatch">Weekly Dispatch</option>
+                                        <option value="Production Note">Production Note</option>
+                                        <option value="Cover Preview">Cover Preview</option>
+                                        <option value="ARC Notice">ARC Notice</option>
+                                        <option value="Release Update">Release Update</option>
+                                        <option value="Fragment">Fragment</option>
+                                        <option value="Store Update">Store Update</option>
+                                        <option value="Circle Notice">Circle Notice</option>
+                                    </select>
+                                </div>
+
+                                <div class="bfa-field">
+                                    <label for="bfa-date">
+                                        Published Date
+                                    </label>
+
+                                    <input
+                                        id="bfa-date"
+                                        type="date"
+                                    >
+                                </div>
+
+                                <div class="bfa-field">
+                                    <label for="bfa-image">
+                                        Image URL
+                                    </label>
+
+                                    <input
+                                        id="bfa-image"
+                                        type="text"
+                                        placeholder="/assets/ArchiveFilesBG.png"
+                                    >
+                                </div>
+
+                                <div class="bfa-field bfa-field-full">
+                                    <label for="bfa-excerpt">
+                                        Short Excerpt
+                                    </label>
+
+                                    <textarea
+                                        id="bfa-excerpt"
+                                        maxlength="360"
+                                        placeholder="A short line for the carousel or dashboard preview."
+                                    ></textarea>
+                                </div>
+
+                                <div class="bfa-field bfa-field-full">
+                                    <label for="bfa-body">
+                                        Main Body <strong>*</strong>
+                                    </label>
+
+                                    <textarea
+                                        id="bfa-body"
+                                        placeholder="Write the full Behind the Files update here."
+                                        required
+                                    ></textarea>
+                                </div>
 
                             </div>
 
-                            <h3 id="bfa-preview-heading">
-                                This Week at Blackwood
-                            </h3>
+                            <div class="bfa-checks">
+
+                                <label class="bfa-check">
+                                    <input
+                                        id="bfa-published"
+                                        type="checkbox"
+                                        checked
+                                    >
+
+                                    <span>
+                                        Published
+                                    </span>
+                                </label>
+
+                                <label class="bfa-check">
+                                    <input
+                                        id="bfa-pinned"
+                                        type="checkbox"
+                                    >
+
+                                    <span>
+                                        Pinned / featured
+                                    </span>
+                                </label>
+
+                            </div>
+
+                            <div class="bfa-actions">
+
+                                <button
+                                    type="button"
+                                    class="bfa-button primary"
+                                    id="bfa-generate"
+                                >
+                                    Generate JSON
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="bfa-button"
+                                    id="bfa-copy"
+                                >
+                                    Copy JSON
+                                </button>
+
+                                <button
+                                    type="reset"
+                                    class="bfa-button"
+                                    id="bfa-reset"
+                                >
+                                    Clear Draft
+                                </button>
+
+                            </div>
 
                             <p
-                                class="bfa-preview-excerpt"
-                                id="bfa-preview-excerpt"
+                                class="bfa-status"
+                                id="bfa-status"
+                                aria-live="polite"
+                            ></p>
+
+                        </form>
+
+                        <div class="bfa-json-box">
+
+                            <p class="bfa-label">
+                                Generated Post JSON
+                            </p>
+
+                            <textarea
+                                class="bfa-json-output"
+                                id="bfa-json-output"
+                                readonly
+                                spellcheck="false"
+                                placeholder="Generate a post to see the JSON here."
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- LIVE PREVIEW -->
+                <aside
+                    class="bfa-panel"
+                    aria-labelledby="bfa-preview-title"
+                >
+                    <div class="bfa-panel-inner">
+
+                        <p class="bfa-card-kicker">
+                            Preview
+                        </p>
+
+                        <h2 id="bfa-preview-title">
+                            Circle Display
+                        </h2>
+
+                        <article class="bfa-preview-card">
+
+                            <img
+                                class="bfa-preview-image"
+                                id="bfa-preview-image"
+                                src="/assets/ArchiveFilesBG.png"
+                                alt=""
                             >
-                                A short preview of the dispatch will appear here.
+
+                            <div class="bfa-preview-content">
+
+                                <div class="bfa-preview-meta">
+
+                                    <span
+                                        class="bfa-status-pill"
+                                        id="bfa-preview-category"
+                                    >
+                                        Weekly Dispatch
+                                    </span>
+
+                                    <span
+                                        class="bfa-status-pill"
+                                        id="bfa-preview-date"
+                                    >
+                                        Filed today
+                                    </span>
+
+                                    <span
+                                        class="bfa-status-pill"
+                                        id="bfa-preview-pinned"
+                                        hidden
+                                    >
+                                        Pinned
+                                    </span>
+
+                                </div>
+
+                                <h3 id="bfa-preview-heading">
+                                    This Week at Blackwood
+                                </h3>
+
+                                <p
+                                    class="bfa-preview-excerpt"
+                                    id="bfa-preview-excerpt"
+                                >
+                                    A short preview of the dispatch will appear here.
+                                </p>
+
+                                <div
+                                    class="bfa-preview-body"
+                                    id="bfa-preview-body"
+                                >
+                                    <p>
+                                        The full Behind the Files update will appear
+                                        here as you draft it.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                        <!-- EXISTING POSTS -->
+                        <div class="bfa-json-box">
+
+                            <p class="bfa-label">
+                                Current BFA.json Posts
                             </p>
 
                             <div
-                                class="bfa-preview-body"
-                                id="bfa-preview-body"
+                                class="bfa-existing-list"
+                                id="bfa-existing-list"
                             >
-                                <p>
-                                    The full Behind the Files update will appear
-                                    here as you draft it.
-                                </p>
+                                <article class="bfa-existing-item">
+                                    <p class="bfa-muted">
+                                        Loading existing files...
+                                    </p>
+                                </article>
                             </div>
 
                         </div>
 
-                    </article>
-
-                    <!-- EXISTING POSTS -->
-                    <div class="bfa-json-box">
-
-                        <p class="bfa-label">
-                            Current BFA.json Posts
-                        </p>
-
-                        <div
-                            class="bfa-existing-list"
-                            id="bfa-existing-list"
-                        >
-                            <article class="bfa-existing-item">
-                                <p class="bfa-muted">
-                                    Loading existing files...
-                                </p>
-                            </article>
-                        </div>
-
                     </div>
+                </aside>
 
-                </div>
-            </aside>
+            </section>
 
         </section>
 
