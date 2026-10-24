@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <!-- Google tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+
+        document.documentElement.classList.remove("no-js");
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Publishing Inventory | Blackwood Management Hub</title>
+
+    <meta
+        name="description"
+        content="Private publishing inventory for Blackwood Publishing management."
+    >
+
+    <link rel="icon" href="/assets/favicon.png" type="image/png">
+
+    <!-- EXISTING BLACKWOOD STYLES -->
+    <link rel="stylesheet" href="/css/header.css?v=20260924">
+    <link rel="stylesheet" href="/css/styles.css?v=20260910">
+    <link rel="stylesheet" href="/css/behind-files-admin.css?v=20261024">
+
+    <!-- NEW INVENTORY STYLES -->
+    <link rel="stylesheet" href="/css/publishing-inventory.css?v=20261024">
+
+    <!-- EXISTING HEADER -->
+    <script src="/js/header.js?v=20260924" defer></script>
+
+    <!-- NEW INVENTORY SCRIPT -->
+    <script src="/js/publishing-inventory.js?v=20261024" defer></script>
+</head>
+
+<body class="behind-files-admin-page">
+
+    <a class="skip-link" href="#pi-title">
+        Skip to content
+    </a>
+
+    <div id="header-placeholder"></div>
+
+    <!-- ACCESS VERIFICATION -->
+    <section
+        id="pi-access-screen"
+        class="bfa-wrap"
+        role="status"
+        aria-live="polite"
+    >
+        <div class="bfa-panel">
+            <div class="bfa-panel-inner">
+
+                <p class="bfa-card-kicker">
+                    Blackwood Management
+                </p>
+
+                <h1>Verifying Access</h1>
+
+                <p id="pi-access-message">
+                    Checking your Archivist credentials...
+                </p>
+
+                <p>
+                    <a
+                        href="/pages/behind-files-admin.html"
+                        class="bfa-button"
+                    >
+                        Return to Management Hub
+                    </a>
+                </p>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMINISTRATOR-ONLY INVENTORY -->
+    <main
+        id="pi-admin-content"
+        class="bfa-wrap"
+        hidden
+    >
+
+        <!-- PAGE INTRODUCTION -->
+        <section class="bfa-hero">
+
+            <p class="bfa-kicker">
+                Department 02 · Publishing Operations
+            </p>
+
+            <h1 id="pi-title">
+                Publishing Inventory
+            </h1>
+
+            <p>
+                Explore the Blackwood catalogue, including
+                individual editions, ISBNs, ASINs and
+                distribution records across Amazon KDP
+                and IngramSpark.
+            </p>
+
+            <p>
+                <a
+                    href="/pages/behind-files-admin.html"
+                    class="bfa-button"
+                >
+                    Return to Management Hub
+                </a>
+            </p>
+
+        </section>
+
+        <!-- LIVE CATALOGUE STATISTICS -->
+        <section
+            class="pi-stats"
+            aria-label="Publishing catalogue statistics"
+        >
+
+            <article class="pi-stat">
+                <span>Book Titles</span>
+                <strong id="pi-title-count">—</strong>
+            </article>
+
+            <article class="pi-stat">
+                <span>Individual Editions</span>
+                <strong id="pi-edition-count">—</strong>
+            </article>
+
+            <article class="pi-stat">
+                <span>Amazon KDP Listings</span>
+                <strong id="pi-kdp-count">—</strong>
+            </article>
+
+            <article class="pi-stat">
+                <span>IngramSpark Listings</span>
+                <strong id="pi-ingram-count">—</strong>
+            </article>
+
+        </section>
+
+        <!-- CATALOGUE -->
+        <section
+            class="bfa-panel"
+            aria-labelledby="pi-catalogue-title"
+        >
+            <div class="bfa-panel-inner">
+
+                <p class="bfa-card-kicker">
+                    Catalogue Register
+                </p>
+
+                <h2 id="pi-catalogue-title">
+                    Published Works &amp; Editions
+                </h2>
+
+                <div class="pi-toolbar">
+
+                    <label for="pi-search">
+                        Search catalogue
+                    </label>
+
+                    <input
+                        id="pi-search"
+                        type="search"
+                        placeholder="Search title, author, ISBN or ASIN..."
+                        autocomplete="off"
+                    >
+
+                </div>
+
+                <p
+                    id="pi-status"
+                    class="bfa-muted"
+                    role="status"
+                    aria-live="polite"
+                >
+                    Loading publishing catalogue...
+                </p>
+
+                <div
+                    id="pi-catalogue"
+                    class="pi-catalogue"
+                ></div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+</body>
+</html>
