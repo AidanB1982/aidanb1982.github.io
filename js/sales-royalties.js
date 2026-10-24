@@ -314,89 +314,104 @@
         return results;
     }
 
-    async function refresh(version = accessVersion) {
-        status("Loading live Blackwood financial records...");
+    
+async function refresh(version = accessVersion) {
+    status("Loading live Blackwood financial records...");
 
-        try {
-            const specs = [
-                ["titles", "publishing_titles", "id,title,author_name"],
-                ["editions", "publishing_editions", "id,title_id,format,isbn,asin"],
-                ["royalties", "publishing_kdp_royalties",
-                    "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency"],
-                ["pages", "publishing_kdp_page_reads",
-                    "id,edition_id,reading_month,pages_read,pages_listened,total_pages,estimated_royalty_gbp"],
-                ["batches", "sales_report_batches",
-                    "id,platform,report_name,period_start,period_end,currency"],
-                ["lines", "sales_report_lines",
-                    "id,batch_id,reporting_month,net_quantity,gross_quantity,returned_quantity,reversed_quantity,orders_count,net_compensation,payment_received_date,payment_amount,order_date,product_title"],
-                ["links", "sales_product_links",
-                    "id,sales_line_id,edition_id,title_id"],
-                ["expenses", "publishing_expenses",
-                    "id,expense_date,category,description,amount,currency,title_id,edition_id,supplier,notes,created_at"],
-                ["budgets", "publishing_budgets",
-                    "id,period_start,period_end,category,budget_amount,currency,title_id,notes,created_at"],
-                ["targets", "publishing_targets",
-                    "id,period_start,period_end,metric,target_value,currency,title_id,format,notes,created_at"]
-            ];
+    const specs = [
+        ["titles", "publishing_titles",
+            "id,title,author_name"],
 
-            // Sequential loading keeps error messages specific
-            // and avoids unnecessary simultaneous database requests.
-            for (const [key, table, columns] of specs) {
-    console.log("Department 03: loading", table);
+        ["editions", "publishing_editions",
+            "id,title_id,format,isbn,asin"],
 
-    const rows = await fetchAll(table, columns, version);
+        ["royalties", "publishing_kdp_royalties",
+            "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency"],
 
-    if (!Array.isArray(rows)) {
-        throw new Error(
-            `Expected an array from ${table}, received ${typeof rows}`
-        );
-    }
+        ["pages", "publishing_kdp_page_reads",
+            "id,edition_id,reading_month,pages_read,pages_listened,total_pages,estimated_royalty_gbp"],
 
-    data[key] = rows;
+        ["batches", "sales_report_batches",
+            "id,platform,report_name,period_start,period_end,currency"],
 
-    console.log(
-        "Department 03: loaded",
-        table,
-        rows.length,
-        "records"
-    );
-}
+        ["lines", "sales_report_lines",
+            "id,batch_id,reporting_month,net_quantity,gross_quantity,returned_quantity,reversed_quantity,orders_count,net_compensation,payment_received_date,payment_amount,order_date,product_title"],
 
-            if (version !== accessVersion) return;
+        ["links", "sales_product_links",
+            "id,sales_line_id,edition_id,title_id"],
 
-            loaded = true;
-            populateFilters();
-            render();
+        ["expenses", "publishing_expenses",
+            "id,expense_date,category,description,amount,currency,title_id,edition_id,supplier,notes,created_at"],
 
-            status(
-                `Live data loaded: ${integer(data.royalties.length)} ` +
-                `KDP royalty rows, ${integer(data.pages.length)} ` +
-                `Kindle+ rows and ${integer(data.expenses.length)} expenses.`
+        ["budgets", "publishing_budgets",
+            "id,period_start,period_end,category,budget_amount,currency,title_id,notes,created_at"],
+
+        ["targets", "publishing_targets",
+            "id,period_start,period_end,metric,target_value,currency,title_id,format,notes,created_at"]
+    ];
+
+    try {
+        for (const [key, table, columns] of specs) {
+            status(`Loading ${table}...`);
+
+            const rows = await fetchAll(table, columns, version);
+
+            if (!Array.isArray(rows)) {
+                throw new Error(
+                    `${table} returned an invalid response.`
+                );
+            }
+
+            data[key] = rows;
+
+            console.log(
+                `Department 03: ${table} loaded ${rows.length} records`
             );
+        }
 
-        } catch (error) {
-    if (version !== accessVersion) return;
+        if (version !== accessVersion) return;
 
-    console.error("Department 03 error stack:", error?.stack);
+        loaded = true;
 
-    loaded = false;
+        status("Database records loaded. Preparing dashboard...");
 
-    const details = [
-    error?.message,
-    error?.stack?.split("\n")[1]?.trim(),
-    error?.details,
-    error?.hint,
-    error?.code
-].filter(Boolean).join(" | ");
+        populateFilters();
 
-    status(
-        "Financial data loading error: " +
-        (details || "Unknown error. Check the browser console.")
-    );
+        status("Calculating dashboard figures...");
 
-    clearOutputs();
-}
+        render();
+
+        status(
+            "Dashboard loaded successfully. " +
+            `${integer(data.royalties.length)} KDP royalty rows, ` +
+            `${integer(data.pages.length)} Kindle+ rows, ` +
+            `${integer(data.expenses.length)} expenses.`
+        );
+
+    } catch (error) {
+        if (version !== accessVersion) return;
+
+        console.error("Department 03 load error:", error);
+
+        loaded = false;
+
+        const details = [
+            error?.message,
+            error?.stack?.split("\n")[1]?.trim(),
+            error?.details,
+            error?.hint,
+            error?.code
+        ].filter(Boolean).join(" | ");
+
+        status(
+            "Department 03 error: " +
+            (details || "Unknown error.")
+        );
+
+        clearOutputs();
     }
+}
+
 
     function clearOutputs() {
         document.querySelectorAll(
