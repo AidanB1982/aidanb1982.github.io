@@ -1,7 +1,9 @@
+
 // =========================
 // BLACKWOOD GLOBAL HEADER JS
-// Loads shared header/footer, dropdown nav, page effects,
-// footer signup, and Archivist access.
+// Shared header/footer, dropdown navigation,
+// mobile navigation, page effects, footer signup,
+// and Archivist access.
 // =========================
 
 (function () {
@@ -18,14 +20,20 @@
     // =========================
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initialiseBlackwoodLayout);
+        document.addEventListener(
+            "DOMContentLoaded",
+            initialiseBlackwoodLayout
+        );
     } else {
         initialiseBlackwoodLayout();
     }
 
     async function initialiseBlackwoodLayout() {
-        const hasHeaderPlaceholder = document.getElementById("header-placeholder");
-        const hasFooterPlaceholder = document.getElementById("footer-placeholder");
+        const hasHeaderPlaceholder =
+            document.getElementById("header-placeholder");
+
+        const hasFooterPlaceholder =
+            document.getElementById("footer-placeholder");
 
         if (hasHeaderPlaceholder || hasFooterPlaceholder) {
             const headerType = getHeaderTypeForCurrentPage();
@@ -76,18 +84,26 @@
         const file = fileMap[type] || "header.html";
 
         try {
-            const headerContainer = document.getElementById("header-placeholder");
-            const footerContainer = document.getElementById("footer-placeholder");
+            const headerContainer =
+                document.getElementById("header-placeholder");
+
+            const footerContainer =
+                document.getElementById("footer-placeholder");
 
             if (headerContainer) {
                 const headerHTML = await fetchSharedHtml(`/${file}`);
+
                 headerContainer.innerHTML = headerHTML;
+
                 initBlackwoodDropdownNav(headerContainer);
+                initBlackwoodMobileNav(headerContainer);
             }
 
             if (footerContainer) {
                 const footerHTML = await fetchSharedHtml("/footer.html");
+
                 footerContainer.innerHTML = footerHTML;
+
                 initFooterArchiveSignup(footerContainer);
             }
 
@@ -279,7 +295,7 @@
 
     // =========================
     // BLACKWOOD DROPDOWN NAV
-    // Works for both header.html and header-simple.html
+    // Works for both header types.
     // =========================
 
     function initBlackwoodDropdownNav(headerContainer) {
@@ -471,11 +487,11 @@
                     <a href="/pages/about.html" role="menuitem">
                         About Blackwood
                     </a>
-                    
+
                     <a href="/pages/submissions.html" role="menuitem">
                         Submissions
                     </a>
-                    
+
                     <a href="/pages/contact.html" role="menuitem">
                         Contact
                     </a>
@@ -550,10 +566,7 @@
 
                 closeAllDropdowns();
 
-                item.classList.toggle(
-                    "is-open",
-                    !isOpen
-                );
+                item.classList.toggle("is-open", !isOpen);
 
                 button.setAttribute(
                     "aria-expanded",
@@ -608,14 +621,132 @@
             });
         });
 
-        document.addEventListener(
-            "click",
-            closeAllDropdowns
-        );
+        document.addEventListener("click", closeAllDropdowns);
 
         existingNav.addEventListener("click", event => {
             event.stopPropagation();
         });
+    }
+
+    // =========================
+    // BLACKWOOD MOBILE NAVIGATION
+    // New: hamburger menu for simple header.
+    // =========================
+
+    function initBlackwoodMobileNav(headerContainer) {
+        if (!headerContainer) return;
+
+        const header =
+            headerContainer.querySelector(".simple-header");
+
+        const toggle =
+            headerContainer.querySelector(".blackwood-mobile-toggle");
+
+        const nav =
+            headerContainer.querySelector("#blackwood-main-navigation");
+
+        if (!header || !toggle || !nav) return;
+
+        const mobileQuery =
+            window.matchMedia("(max-width: 760px)");
+
+        function closeDropdowns() {
+            nav.querySelectorAll(
+                ".blackwood-nav-item.is-open"
+            ).forEach(item => {
+                item.classList.remove("is-open");
+
+                const button =
+                    item.querySelector(".blackwood-dropdown-toggle");
+
+                if (button) {
+                    button.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+                }
+            });
+        }
+
+        function setMenuOpen(open) {
+            const shouldOpen =
+                mobileQuery.matches && open;
+
+            header.classList.toggle(
+                "mobile-menu-open",
+                shouldOpen
+            );
+
+            toggle.setAttribute(
+                "aria-expanded",
+                String(shouldOpen)
+            );
+
+            toggle.setAttribute(
+                "aria-label",
+                shouldOpen
+                    ? "Close navigation menu"
+                    : "Open navigation menu"
+            );
+
+            if (!shouldOpen) {
+                closeDropdowns();
+            }
+        }
+
+        toggle.addEventListener("click", () => {
+            const isOpen =
+                header.classList.contains("mobile-menu-open");
+
+            setMenuOpen(!isOpen);
+        });
+
+        nav.addEventListener("click", event => {
+            if (event.target.closest("a")) {
+                setMenuOpen(false);
+            }
+        });
+
+        header.addEventListener("keydown", event => {
+            if (
+                event.key === "Escape" &&
+                header.classList.contains("mobile-menu-open")
+            ) {
+                event.preventDefault();
+
+                setMenuOpen(false);
+                toggle.focus();
+            }
+        });
+
+        document.addEventListener("click", event => {
+            if (
+                mobileQuery.matches &&
+                header.classList.contains("mobile-menu-open") &&
+                !header.contains(event.target)
+            ) {
+                setMenuOpen(false);
+            }
+        });
+
+        function handleViewportChange() {
+            setMenuOpen(false);
+        }
+
+        if (
+            typeof mobileQuery.addEventListener === "function"
+        ) {
+            mobileQuery.addEventListener(
+                "change",
+                handleViewportChange
+            );
+        } else {
+            mobileQuery.addListener(
+                handleViewportChange
+            );
+        }
+
+        setMenuOpen(false);
     }
 
     // =========================
@@ -656,10 +787,7 @@
             requestAnimationFrame(animate);
         }
 
-        window.addEventListener(
-            "mousemove",
-            updateMouse
-        );
+        window.addEventListener("mousemove", updateMouse);
 
         animate();
     }
@@ -672,74 +800,36 @@
         let ticking = false;
 
         function update() {
-            const featured =
-                document.querySelector(".featured");
-
-            const hero =
-                document.querySelector(".hero");
-
-            const works =
-                document.querySelector(".works");
+            const featured = document.querySelector(".featured");
+            const hero = document.querySelector(".hero");
+            const works = document.querySelector(".works");
 
             let progress = 0;
 
             if (featured) {
-                const rect =
-                    featured.getBoundingClientRect();
+                const rect = featured.getBoundingClientRect();
+                const start = window.innerHeight * 0.9;
+                const end = window.innerHeight * 0.3;
 
-                const start =
-                    window.innerHeight * 0.9;
+                progress = (start - rect.top) / (start - end);
+                progress = Math.max(0, Math.min(1, progress));
 
-                const end =
-                    window.innerHeight * 0.3;
-
-                progress =
-                    (start - rect.top) /
-                    (start - end);
-
-                progress =
-                    Math.max(
-                        0,
-                        Math.min(1, progress)
-                    );
-
-                featured.style.setProperty(
-                    "--fadeIn",
-                    progress
-                );
+                featured.style.setProperty("--fadeIn", progress);
             }
 
             if (hero) {
-                hero.style.setProperty(
-                    "--fadeOut",
-                    progress * 0.8
-                );
+                hero.style.setProperty("--fadeOut", progress * 0.8);
             }
 
             if (works) {
-                const rect =
-                    works.getBoundingClientRect();
+                const rect = works.getBoundingClientRect();
+                const start = window.innerHeight * 1.1;
+                const end = window.innerHeight * 0.5;
 
-                const start =
-                    window.innerHeight * 1.1;
+                let fade = (start - rect.top) / (start - end);
+                fade = Math.max(0, Math.min(1, fade));
 
-                const end =
-                    window.innerHeight * 0.5;
-
-                let fade =
-                    (start - rect.top) /
-                    (start - end);
-
-                fade =
-                    Math.max(
-                        0,
-                        Math.min(1, fade)
-                    );
-
-                works.style.setProperty(
-                    "--sectionFade",
-                    fade
-                );
+                works.style.setProperty("--sectionFade", fade);
             }
 
             ticking = false;
@@ -760,14 +850,12 @@
     // =========================
 
     function initEntity() {
-        const entity =
-            document.querySelector(".entity");
+        const entity = document.querySelector(".entity");
 
         if (!entity) return;
 
         function triggerEntity() {
-            const delay =
-                Math.random() * 9000 + 3000;
+            const delay = Math.random() * 9000 + 3000;
 
             setTimeout(() => {
                 entity.classList.add("active");
@@ -792,28 +880,20 @@
 
     function initFadeIn() {
         const elements =
-            document.querySelectorAll(
-                ".fade-in, .work"
-            );
+            document.querySelectorAll(".fade-in, .work");
 
         if (!elements.length) return;
 
-        const observer =
-            new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add(
-                            "visible"
-                        );
-
-                        observer.unobserve(
-                            entry.target
-                        );
-                    }
-                });
-            }, {
-                threshold: 0.2
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
             });
+        }, {
+            threshold: 0.2
+        });
 
         elements.forEach((element, index) => {
             element.style.transitionDelay =
@@ -828,38 +908,22 @@
     // =========================
 
     function initSpotlight() {
-        const works =
-            document.querySelector(".works");
+        const works = document.querySelector(".works");
 
         if (!works) return;
 
-        works.addEventListener(
-            "mousemove",
-            event => {
-                const rect =
-                    works.getBoundingClientRect();
+        works.addEventListener("mousemove", event => {
+            const rect = works.getBoundingClientRect();
 
-                const x =
-                    ((event.clientX - rect.left) /
-                        rect.width) *
-                    100;
+            const x =
+                ((event.clientX - rect.left) / rect.width) * 100;
 
-                const y =
-                    ((event.clientY - rect.top) /
-                        rect.height) *
-                    100;
+            const y =
+                ((event.clientY - rect.top) / rect.height) * 100;
 
-                works.style.setProperty(
-                    "--mouse-x",
-                    `${x}%`
-                );
-
-                works.style.setProperty(
-                    "--mouse-y",
-                    `${y}%`
-                );
-            }
-        );
+            works.style.setProperty("--mouse-x", `${x}%`);
+            works.style.setProperty("--mouse-y", `${y}%`);
+        });
     }
 
     // =========================
@@ -902,13 +966,11 @@
             const words = text.split(" ");
 
             words.forEach((word, index) => {
-                const span =
-                    document.createElement("span");
+                const span = document.createElement("span");
 
-                const clean =
-                    word
-                        .toLowerCase()
-                        .replace(/[.?]/g, "");
+                const clean = word
+                    .toLowerCase()
+                    .replace(/[.?]/g, "");
 
                 const emphasisWords = [
                     "remember",
@@ -929,8 +991,7 @@
                 }
 
                 span.textContent = `${word} `;
-                span.style.animationDelay =
-                    `${index * 0.2}s`;
+                span.style.animationDelay = `${index * 0.2}s`;
 
                 element.appendChild(span);
             });
@@ -942,56 +1003,36 @@
             let index;
 
             do {
-                index =
-                    Math.floor(
-                        Math.random() *
-                        fragments.length
-                    );
+                index = Math.floor(
+                    Math.random() * fragments.length
+                );
             } while (index === lastIndex);
 
             lastIndex = index;
 
-            const element =
-                fragments[index];
+            const element = fragments[index];
 
-            const quote =
-                quotes[
-                    Math.floor(
-                        Math.random() *
-                        quotes.length
-                    )
-                ];
+            const quote = quotes[
+                Math.floor(Math.random() * quotes.length)
+            ];
 
             const side =
-                Math.random() < 0.5
-                    ? "left"
-                    : "right";
+                Math.random() < 0.5 ? "left" : "right";
 
-            const top =
-                Math.random() * 70 + 10;
-
-            const offset =
-                Math.random() * 10 + 5;
+            const top = Math.random() * 70 + 10;
+            const offset = Math.random() * 10 + 5;
 
             if (side === "left") {
-                element.style.left =
-                    `${offset}%`;
-
-                element.style.right =
-                    "auto";
+                element.style.left = `${offset}%`;
+                element.style.right = "auto";
             } else {
-                element.style.right =
-                    `${offset}%`;
-
-                element.style.left =
-                    "auto";
+                element.style.right = `${offset}%`;
+                element.style.left = "auto";
             }
 
-            element.style.top =
-                `${top}%`;
+            element.style.top = `${top}%`;
 
-            const rotation =
-                (Math.random() - 0.5) * 6;
+            const rotation = (Math.random() - 0.5) * 6;
 
             element.style.setProperty(
                 "--rot",
@@ -1008,78 +1049,47 @@
         function loopFragments() {
             updateFragment();
 
-            const next =
-                Math.random() * 2000 + 1500;
+            const next = Math.random() * 2000 + 1500;
 
-            setTimeout(
-                loopFragments,
-                next
-            );
+            setTimeout(loopFragments, next);
         }
 
         function triggerWatcher() {
-            const text =
-                quotes[
-                    Math.floor(
-                        Math.random() *
-                        quotes.length
-                    )
-                ];
+            const text = quotes[
+                Math.floor(Math.random() * quotes.length)
+            ];
 
-            renderText(
-                watcher,
-                text
-            );
+            renderText(watcher, text);
 
             watcher.style.opacity = 1;
 
             function move(event) {
                 const x =
-                    (
-                        event.clientX /
-                        window.innerWidth -
-                        0.5
-                    ) * 40;
+                    (event.clientX / window.innerWidth - 0.5) * 40;
 
                 const y =
-                    (
-                        event.clientY /
-                        window.innerHeight -
-                        0.5
-                    ) * 40;
+                    (event.clientY / window.innerHeight - 0.5) * 40;
 
                 watcher.style.transform =
                     `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
             }
 
-            document.addEventListener(
-                "mousemove",
-                move
-            );
+            document.addEventListener("mousemove", move);
 
-            const glitchInterval =
-                setInterval(() => {
-                    watcher.classList.add(
-                        "glitch"
-                    );
-
-                    setTimeout(() => {
-                        watcher.classList.remove(
-                            "glitch"
-                        );
-                    }, 120);
-
-                }, Math.random() * 2000 + 1000);
-
-            setTimeout(() => {
-                watcher.classList.add(
-                    "decay"
-                );
+            const glitchInterval = setInterval(() => {
+                watcher.classList.add("glitch");
 
                 setTimeout(() => {
-                    watcher.classList.remove(
-                        "decay"
-                    );
+                    watcher.classList.remove("glitch");
+                }, 120);
+
+            }, Math.random() * 2000 + 1000);
+
+            setTimeout(() => {
+                watcher.classList.add("decay");
+
+                setTimeout(() => {
+                    watcher.classList.remove("decay");
                 }, 700);
 
             }, Math.random() * 2500 + 1500);
@@ -1087,14 +1097,9 @@
             setTimeout(() => {
                 watcher.style.opacity = 0;
 
-                document.removeEventListener(
-                    "mousemove",
-                    move
-                );
+                document.removeEventListener("mousemove", move);
 
-                clearInterval(
-                    glitchInterval
-                );
+                clearInterval(glitchInterval);
 
             }, 4000);
         }
@@ -1117,9 +1122,7 @@
 
     function initReviewRotator() {
         const containers =
-            document.querySelectorAll(
-                ".review-snippet"
-            );
+            document.querySelectorAll(".review-snippet");
 
         if (!containers.length) return;
 
@@ -1203,29 +1206,24 @@
 
         containers.forEach(container => {
             if (
-                container.classList.contains(
-                    "static-review"
-                )
+                container.classList.contains("static-review")
             ) {
                 return;
             }
 
-            const book =
-                container.dataset.book;
+            const book = container.dataset.book;
 
-            const activeReviews =
-                reviews[book] || [
-                    {
-                        text: "Each book feels like a place you shouldn’t have found.",
-                        source: "Reader Review"
-                    }
-                ];
+            const activeReviews = reviews[book] || [
+                {
+                    text: "Each book feels like a place you shouldn’t have found.",
+                    source: "Reader Review"
+                }
+            ];
 
             let index = 0;
 
             function showReview(reviewIndex) {
-                const review =
-                    activeReviews[reviewIndex];
+                const review = activeReviews[reviewIndex];
 
                 container.style.opacity = 0;
 
@@ -1238,42 +1236,24 @@
                     `;
 
                     container.style.opacity = 1;
-
                 }, 300);
             }
 
             function rotate() {
-                index =
-                    (index + 1) %
-                    activeReviews.length;
-
+                index = (index + 1) % activeReviews.length;
                 showReview(index);
             }
 
             showReview(index);
 
             if (activeReviews.length > 1) {
-                setInterval(
-                    rotate,
-                    5000
-                );
+                setInterval(rotate, 5000);
             }
         });
     }
 
     // =========================
     // ARCHIVIST ACCESS
-    // Smart top-right reader access link
-    //
-    // Signed out:
-    // The Archivists
-    //
-    // Signed in:
-    // My Archive · points
-    //
-    // Internal Circle names are deliberately retained
-    // so existing CSS, Supabase and integration hooks
-    // continue to work unchanged.
     // =========================
 
     const CIRCLE_ACCESS_CONFIG = {
@@ -1299,70 +1279,52 @@
 
         circleAccessStarted = true;
 
-        const circleLink =
-            getOrCreateCircleAccessLink();
+        const circleLink = getOrCreateCircleAccessLink();
 
         renderCircleSignedOut(circleLink);
-
-        startCircleSessionWatcher(
-            circleLink
-        );
+        startCircleSessionWatcher(circleLink);
     }
 
     function getOrCreateCircleAccessLink() {
         const existingLink =
-            document.querySelector(
-                ".blackwood-circle-access"
-            );
+            document.querySelector(".blackwood-circle-access");
 
         if (existingLink) {
             return existingLink;
         }
 
-        const circleLink =
-            document.createElement("a");
+        const circleLink = document.createElement("a");
 
-        circleLink.className =
-            "blackwood-circle-access";
-
-        circleLink.href =
-            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+        circleLink.className = "blackwood-circle-access";
+        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
 
         circleLink.setAttribute(
             "aria-label",
             "Open The Archivists reader area"
         );
 
-        document.body.appendChild(
-            circleLink
-        );
+        document.body.appendChild(circleLink);
 
         return circleLink;
     }
 
-    async function startCircleSessionWatcher(
-        circleLink
-    ) {
+    async function startCircleSessionWatcher(circleLink) {
         try {
             await loadCircleSupabaseLibrary();
 
-            circleClient =
-                window.supabase.createClient(
-                    CIRCLE_ACCESS_CONFIG.supabaseUrl,
-                    CIRCLE_ACCESS_CONFIG.supabaseKey,
-                    {
-                        auth: {
-                            persistSession: true,
-                            autoRefreshToken: true,
-                            detectSessionInUrl: true
-                        }
+            circleClient = window.supabase.createClient(
+                CIRCLE_ACCESS_CONFIG.supabaseUrl,
+                CIRCLE_ACCESS_CONFIG.supabaseKey,
+                {
+                    auth: {
+                        persistSession: true,
+                        autoRefreshToken: true,
+                        detectSessionInUrl: true
                     }
-                );
+                }
+            );
 
-            const {
-                data,
-                error
-            } =
+            const { data, error } =
                 await circleClient.auth.getSession();
 
             if (error) {
@@ -1383,14 +1345,9 @@
                 }
             );
 
-            window.addEventListener(
-                "focus",
-                () => {
-                    refreshCircleAccess(
-                        circleLink
-                    );
-                }
-            );
+            window.addEventListener("focus", () => {
+                refreshCircleAccess(circleLink);
+            });
 
         } catch (error) {
             console.warn(
@@ -1398,22 +1355,15 @@
                 error
             );
 
-            renderCircleSignedOut(
-                circleLink
-            );
+            renderCircleSignedOut(circleLink);
         }
     }
 
-    async function refreshCircleAccess(
-        circleLink
-    ) {
+    async function refreshCircleAccess(circleLink) {
         if (!circleClient) return;
 
         try {
-            const {
-                data,
-                error
-            } =
+            const { data, error } =
                 await circleClient.auth.getSession();
 
             if (error) {
@@ -1437,44 +1387,25 @@
         circleLink,
         session
     ) {
-        const currentRefreshId =
-            ++circleRefreshId;
+        const currentRefreshId = ++circleRefreshId;
 
-        if (
-            !session ||
-            !session.user
-        ) {
-            renderCircleSignedOut(
-                circleLink
-            );
-
+        if (!session || !session.user) {
+            renderCircleSignedOut(circleLink);
             return;
         }
 
-        renderCircleLoading(
-            circleLink
-        );
+        renderCircleLoading(circleLink);
 
         try {
-            const {
-                data,
-                error
-            } =
-                await circleClient
-                    .from("member_profiles")
-                    .select(
-                        "display_name, reader_name, points_total, member_tier"
-                    )
-                    .eq(
-                        "id",
-                        session.user.id
-                    )
-                    .maybeSingle();
+            const { data, error } = await circleClient
+                .from("member_profiles")
+                .select(
+                    "display_name, reader_name, points_total, member_tier"
+                )
+                .eq("id", session.user.id)
+                .maybeSingle();
 
-            if (
-                currentRefreshId !==
-                circleRefreshId
-            ) {
+            if (currentRefreshId !== circleRefreshId) {
                 return;
             }
 
@@ -1482,10 +1413,7 @@
                 throw error;
             }
 
-            renderCircleSignedIn(
-                circleLink,
-                data || {}
-            );
+            renderCircleSignedIn(circleLink, data || {});
 
         } catch (error) {
             console.warn(
@@ -1493,36 +1421,26 @@
                 error
             );
 
-            if (
-                currentRefreshId ===
-                circleRefreshId
-            ) {
-                renderCircleSignedIn(
-                    circleLink,
-                    {}
-                );
+            if (currentRefreshId === circleRefreshId) {
+                renderCircleSignedIn(circleLink, {});
             }
         }
     }
 
-    function renderCircleSignedOut(
-        circleLink
-    ) {
+    function renderCircleSignedOut(circleLink) {
         circleLink.classList.remove(
             "is-signed-in",
             "is-loading"
         );
 
-        circleLink.href =
-            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
 
         circleLink.setAttribute(
             "aria-label",
             "Open The Archivists reader area"
         );
 
-        circleLink.title =
-            "The Archivists";
+        circleLink.title = "The Archivists";
 
         circleLink.innerHTML = `
             <span
@@ -1536,15 +1454,10 @@
         `;
     }
 
-    function renderCircleLoading(
-        circleLink
-    ) {
-        circleLink.classList.add(
-            "is-loading"
-        );
+    function renderCircleLoading(circleLink) {
+        circleLink.classList.add("is-loading");
 
-        circleLink.href =
-            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
 
         circleLink.setAttribute(
             "aria-label",
@@ -1563,38 +1476,25 @@
         `;
     }
 
-    function renderCircleSignedIn(
-        circleLink,
-        profile
-    ) {
-        const points =
-            Number(
-                profile.points_total || 0
-            );
+    function renderCircleSignedIn(circleLink, profile) {
+        const points = Number(profile.points_total || 0);
 
         const pointsLabel =
             points === 1
                 ? "1 pt"
                 : `${points} pts`;
 
-        circleLink.classList.remove(
-            "is-loading"
-        );
+        circleLink.classList.remove("is-loading");
+        circleLink.classList.add("is-signed-in");
 
-        circleLink.classList.add(
-            "is-signed-in"
-        );
-
-        circleLink.href =
-            CIRCLE_ACCESS_CONFIG.membersPageUrl;
+        circleLink.href = CIRCLE_ACCESS_CONFIG.membersPageUrl;
 
         circleLink.setAttribute(
             "aria-label",
             `Open your Private Archive. ${pointsLabel} in Archive Points.`
         );
 
-        circleLink.title =
-            `My Archive · ${pointsLabel}`;
+        circleLink.title = `My Archive · ${pointsLabel}`;
 
         circleLink.innerHTML = `
             <span
@@ -1613,92 +1513,67 @@
     }
 
     function loadCircleSupabaseLibrary() {
-        return new Promise(
-            (resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            if (
+                window.supabase &&
+                typeof window.supabase.createClient === "function"
+            ) {
+                resolve();
+                return;
+            }
 
+            const existingScript = document.querySelector(
+                "script[data-blackwood-supabase]"
+            );
+
+            if (existingScript) {
+                existingScript.addEventListener(
+                    "load",
+                    () => resolve(),
+                    { once: true }
+                );
+
+                existingScript.addEventListener(
+                    "error",
+                    () => reject(
+                        new Error("Supabase could not be loaded.")
+                    ),
+                    { once: true }
+                );
+
+                return;
+            }
+
+            const script = document.createElement("script");
+
+            script.src = CIRCLE_ACCESS_CONFIG.supabaseCdn;
+            script.async = true;
+            script.defer = true;
+            script.dataset.blackwoodSupabase = "true";
+
+            script.onload = () => {
                 if (
                     window.supabase &&
-                    typeof window.supabase.createClient ===
-                        "function"
+                    typeof window.supabase.createClient === "function"
                 ) {
                     resolve();
-                    return;
-                }
-
-                const existingScript =
-                    document.querySelector(
-                        "script[data-blackwood-supabase]"
-                    );
-
-                if (existingScript) {
-                    existingScript.addEventListener(
-                        "load",
-                        () => resolve(),
-                        {
-                            once: true
-                        }
-                    );
-
-                    existingScript.addEventListener(
-                        "error",
-                        () =>
-                            reject(
-                                new Error(
-                                    "Supabase could not be loaded."
-                                )
-                            ),
-                        {
-                            once: true
-                        }
-                    );
-
-                    return;
-                }
-
-                const script =
-                    document.createElement(
-                        "script"
-                    );
-
-                script.src =
-                    CIRCLE_ACCESS_CONFIG.supabaseCdn;
-
-                script.async = true;
-                script.defer = true;
-
-                script.dataset.blackwoodSupabase =
-                    "true";
-
-                script.onload = () => {
-                    if (
-                        window.supabase &&
-                        typeof window.supabase
-                            .createClient ===
-                            "function"
-                    ) {
-                        resolve();
-                    } else {
-                        reject(
-                            new Error(
-                                "Supabase loaded, but createClient was unavailable."
-                            )
-                        );
-                    }
-                };
-
-                script.onerror = () => {
+                } else {
                     reject(
                         new Error(
-                            "Supabase could not be loaded."
+                            "Supabase loaded, but createClient was unavailable."
                         )
                     );
-                };
+                }
+            };
 
-                document.head.appendChild(
-                    script
+            script.onerror = () => {
+                reject(
+                    new Error("Supabase could not be loaded.")
                 );
-            }
-        );
+            };
+
+            document.head.appendChild(script);
+        });
     }
 
 })();
