@@ -599,3 +599,31 @@ select:focus-visible {
     animation: none;
   }
 }
+
+/* =====================================================
+   BP READING — INTERACTIVE PAGE DRAG
+   ===================================================== */
+
+.page-turn-overlay.turn-dragging {
+  display: block;
+  pointer-events: none;
+  perspective: 1200px;
+}
+
+.page-turn-overlay.turn-dragging .page-turn-sheet {
+  animation: none !important;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+/* Keep the EPUB's page surface responsive to touch. */
+.epub-viewer {
+  touch-action: pan-y;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-turn-overlay.turn-dragging .page-turn-sheet {
+    transition: none !important;
+  }
+}
