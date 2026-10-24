@@ -5,6 +5,12 @@ import {
   createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
+/* =====================================================
+   BLACKWOOD PUBLISHING — BP READING
+   Administrator testing edition
+   EPUB.js reader with interactive page turning
+   ===================================================== */
+
 const SUPABASE_URL =
   "https://bmnlynjldlnxfvunqbqq.supabase.co";
 
@@ -23,6 +29,13 @@ const BOOK = {
 const STORAGE_KEY =
   "bp-reading-gualachulain-v1";
 
+const PAGE_TURN_DURATION = 900;
+const TOUCH_EDGE_FRACTION = 0.22;
+const MOUSE_EDGE_FRACTION = 0.18;
+const DRAG_START_DISTANCE = 9;
+const DRAG_COMPLETE_FRACTION = 0.42;
+const FLICK_VELOCITY = 0.55;
+
 const supabase = createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
@@ -36,7 +49,9 @@ const allowedThemes = [
   "night"
 ];
 
-const PAGE_TURN_DURATION = 900;
+const reducedMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+);
 
 function loadSavedState() {
   try {
@@ -44,8 +59,7 @@ function loadSavedState() {
       localStorage.getItem(STORAGE_KEY)
     );
 
-    return value &&
-      typeof value === "object"
+    return value && typeof value === "object"
       ? value
       : {};
   } catch {
@@ -60,10 +74,9 @@ const state = {
     ? saved.theme
     : "parchment",
 
-  fontSize:
-    Number.isFinite(saved.fontSize)
-      ? Math.max(15, Math.min(30, saved.fontSize))
-      : 19,
+  fontSize: Number.isFinite(saved.fontSize)
+    ? Math.max(15, Math.min(30, saved.fontSize))
+    : 19,
 
   position:
     typeof saved.position === "string" &&
@@ -71,19 +84,17 @@ const state = {
       ? saved.position
       : null,
 
-  progress:
-    Number.isFinite(saved.progress)
-      ? Math.max(0, Math.min(100, saved.progress))
-      : 0,
+  progress: Number.isFinite(saved.progress)
+    ? Math.max(0, Math.min(100, saved.progress))
+    : 0,
 
-  bookmarks:
-    Array.isArray(saved.bookmarks)
-      ? saved.bookmarks.filter(
-          value =>
-            typeof value === "string" &&
-            value.startsWith("epubcfi(")
-        )
-      : [],
+  bookmarks: Array.isArray(saved.bookmarks)
+    ? saved.bookmarks.filter(
+        value =>
+          typeof value === "string" &&
+          value.startsWith("epubcfi(")
+      )
+    : [],
 
   hasStarted: saved.hasStarted === true,
 
@@ -96,8 +107,29 @@ const state = {
   currentCfi: null,
   currentLocation: null,
   locationsReady: false,
-  openingId: 0
+  openingId: 0,
+
+  gesture: null,
+  suppressClickUntil: 0,
+  turnSequence: 0
 };
+
+/* =====================================================
+   GENERAL HELPERS
+   ===================================================== */
+
+function clamp(value, minimum, maximum) {
+  return Math.max(
+    minimum,
+    Math.min(maximum, value)
+  );
+}
+
+function delay(milliseconds) {
+  return new Promise(resolve => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
 
 function saveState() {
   try {
@@ -135,9 +167,14 @@ function setControlsVisible(visible) {
 
 function showLibraryError(message) {
   const element = $("library-error");
+
   element.textContent = message;
   element.hidden = !message;
 }
+
+/* =====================================================
+   LIBRARY
+   ===================================================== */
 
 function renderLibrary() {
   const grid = $("book-grid");
@@ -191,7 +228,10 @@ function renderLibrary() {
 
   button.disabled = state.isLoading;
 
-  button.addEventListener("click", openBook);
+  button.addEventListener(
+    "click",
+    () => void openBook()
+  );
 
   card.append(
     cover,
@@ -205,7 +245,9 @@ function renderLibrary() {
   grid.appendChild(card);
 }
 
-/* ADMIN AUTHENTICATION */
+/* =====================================================
+   ADMIN AUTHENTICATION
+   ===================================================== */
 
 async function verifyBPReadingAdmin() {
   const {
@@ -238,7 +280,9 @@ async function verifyBPReadingAdmin() {
   return user;
 }
 
-/* PROTECTED EPUB DELIVERY */
+/* =====================================================
+   PROTECTED EPUB DELIVERY
+   ===================================================== */
 
 async function fetchProtectedEpub() {
   const {
@@ -259,15 +303,18 @@ async function fetchProtectedEpub() {
     `${SUPABASE_URL}/functions/v1/bp-reading-deliver-epub`,
     {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json",
         "Authorization":
           `Bearer ${session.access_token}`,
         "apikey": SUPABASE_ANON_KEY
       },
+
       body: JSON.stringify({
         editionId: EDITION_ID
       }),
+
       cache: "no-store"
     }
   );
@@ -283,7 +330,7 @@ async function fetchProtectedEpub() {
         message = payload.error;
       }
     } catch {
-      // Preserve generic message.
+      // Keep generic error.
     }
 
     throw new Error(message);
@@ -324,7 +371,9 @@ async function fetchProtectedEpub() {
   return bytes;
 }
 
-/* READING THEMES */
+/* =====================================================
+   READING THEMES
+   ===================================================== */
 
 function registerThemes(rendition) {
   rendition.themes.register(
@@ -384,12 +433,12 @@ function applyReaderPreferences() {
   );
 }
 
-/* BOOKMARKS */
+/* =====================================================
+   BOOKMARKS
+   ===================================================== */
 
 function getCurrentCfi() {
-  const location = state.currentLocation;
-
-  return location?.start?.cfi ||
+  return state.currentLocation?.start?.cfi ||
     state.currentCfi ||
     null;
 }
@@ -413,7 +462,9 @@ function updateBookmarkButton() {
   $("bookmark").disabled = !current;
 }
 
-/* READING PROGRESS */
+/* =====================================================
+   READING PROGRESS
+   ===================================================== */
 
 function updateReaderProgress() {
   const location = state.currentLocation;
@@ -422,10 +473,14 @@ function updateReaderProgress() {
     $("reader-progress").textContent =
       "Preparing…";
 
-    $("previous").disabled = true;
-    $("next").disabled = true;
-    $("page-arrow-left").disabled = true;
-    $("page-arrow-right").disabled = true;
+    for (const id of [
+      "previous",
+      "next",
+      "page-arrow-left",
+      "page-arrow-right"
+    ]) {
+      $(id).disabled = true;
+    }
 
     updateBookmarkButton();
     return;
@@ -434,15 +489,13 @@ function updateReaderProgress() {
   const start = location.start || {};
   const displayed = start.displayed || {};
 
-  const page =
-    Number.isFinite(displayed.page)
-      ? displayed.page
-      : null;
+  const page = Number.isFinite(displayed.page)
+    ? displayed.page
+    : null;
 
-  const total =
-    Number.isFinite(displayed.total)
-      ? displayed.total
-      : null;
+  const total = Number.isFinite(displayed.total)
+    ? displayed.total
+    : null;
 
   let label = "";
 
@@ -457,12 +510,10 @@ function updateReaderProgress() {
       );
 
     if (Number.isFinite(fraction)) {
-      state.progress = Math.max(
+      state.progress = clamp(
+        Math.round(fraction * 100),
         0,
-        Math.min(
-          100,
-          Math.round(fraction * 100)
-        )
+        100
       );
     }
 
@@ -546,60 +597,623 @@ async function prepareLocations(book, openingId) {
   }
 }
 
-/* PAGE-TURN ANIMATION */
+/* =====================================================
+   PAGE-TURN VISUAL ENGINE
 
-function playPageTurn(direction) {
-  const overlay = $("page-turn-overlay");
+   Uses the existing decorative page-turn overlay.
+   A finger drag controls the sheet rotation.
+   EPUB navigation occurs only after commitment.
+   ===================================================== */
 
-  if (
-    window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches
-  ) {
-    return Promise.resolve();
-  }
-
-  overlay.classList.remove(
-    "turn-next",
-    "turn-prev"
-  );
-
-  overlay.hidden = false;
-
-  // Force reflow so consecutive animations restart.
-  void overlay.offsetWidth;
-
-  overlay.classList.add(
-    direction > 0
-      ? "turn-next"
-      : "turn-prev"
-  );
-
-  return new Promise(resolve => {
-    window.setTimeout(() => {
-      overlay.classList.remove(
-        "turn-next",
-        "turn-prev"
-      );
-
-      overlay.hidden = true;
-      resolve();
-    }, PAGE_TURN_DURATION);
-  });
+function getPageTurnElements() {
+  return {
+    overlay: $("page-turn-overlay"),
+    sheet: $("page-turn-sheet")
+  };
 }
 
 function resetPageTurn() {
-  const overlay = $("page-turn-overlay");
+  const { overlay, sheet } =
+    getPageTurnElements();
+
+  overlay.hidden = true;
 
   overlay.classList.remove(
     "turn-next",
-    "turn-prev"
+    "turn-prev",
+    "turn-dragging"
   );
 
-  overlay.hidden = true;
+  sheet.style.transition = "";
+  sheet.style.transform = "";
+  sheet.style.opacity = "";
+  sheet.style.transformOrigin = "";
+
+  state.gesture = null;
 }
 
-/* OPEN BOOK */
+function prepareTurnSheet(direction) {
+  const { overlay, sheet } =
+    getPageTurnElements();
+
+  overlay.hidden = false;
+
+  overlay.classList.remove(
+    "turn-next",
+    "turn-prev",
+    "turn-dragging"
+  );
+
+  overlay.classList.add("turn-dragging");
+
+  sheet.style.transition = "none";
+
+  sheet.style.transformOrigin =
+    direction > 0
+      ? "left center"
+      : "right center";
+
+  sheet.style.transform = "rotateY(0deg)";
+  sheet.style.opacity = "0.95";
+}
+
+function setTurnProgress(direction, progress) {
+  const { sheet } = getPageTurnElements();
+
+  const fraction = clamp(progress, 0, 1);
+
+  const angle =
+    (direction > 0 ? -180 : 180) * fraction;
+
+  sheet.style.transform =
+    `rotateY(${angle}deg)`;
+
+  sheet.style.opacity = String(
+    0.95 - fraction * 0.95
+  );
+}
+
+async function settleTurnSheet(
+  direction,
+  startProgress,
+  complete
+) {
+  if (reducedMotion.matches) {
+    return;
+  }
+
+  const { sheet } = getPageTurnElements();
+
+  const destination = complete ? 1 : 0;
+
+  const remaining = Math.abs(
+    destination - startProgress
+  );
+
+  const duration = clamp(
+    Math.round(PAGE_TURN_DURATION * remaining),
+    180,
+    PAGE_TURN_DURATION
+  );
+
+  sheet.style.transition =
+    `transform ${duration}ms cubic-bezier(.22,.7,.2,1), ` +
+    `opacity ${duration}ms ease`;
+
+  // Allow the browser to register the starting transform.
+  void sheet.offsetWidth;
+
+  setTurnProgress(direction, destination);
+
+  await delay(duration + 30);
+}
+
+async function playPageTurn(direction) {
+  if (reducedMotion.matches) {
+    return;
+  }
+
+  prepareTurnSheet(direction);
+
+  await settleTurnSheet(
+    direction,
+    0,
+    true
+  );
+}
+
+/* =====================================================
+   PAGE NAVIGATION
+   ===================================================== */
+
+function canTurn(direction) {
+  if (
+    !state.rendition ||
+    !state.isOpen ||
+    state.isLoading ||
+    state.isNavigating ||
+    !state.currentLocation
+  ) {
+    return false;
+  }
+
+  if (
+    direction > 0 &&
+    state.currentLocation.atEnd === true
+  ) {
+    return false;
+  }
+
+  if (
+    direction < 0 &&
+    state.currentLocation.atStart === true
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+async function changePage(
+  direction,
+  options = {}
+) {
+  if (!canTurn(direction)) {
+    resetPageTurn();
+    return;
+  }
+
+  const openingId = state.openingId;
+  const turnSequence = ++state.turnSequence;
+
+  state.isNavigating = true;
+  updateReaderProgress();
+
+  const isCurrentTurn = () =>
+    state.isOpen &&
+    openingId === state.openingId &&
+    turnSequence === state.turnSequence;
+
+  try {
+    if (options.fromGesture) {
+      const progress = clamp(
+        options.progress || 0,
+        0,
+        1
+      );
+
+      await settleTurnSheet(
+        direction,
+        progress,
+        true
+      );
+    } else {
+      await playPageTurn(direction);
+    }
+
+    if (!isCurrentTurn()) {
+      return;
+    }
+
+    // The actual EPUB page advances only after
+    // the visual turning sheet has completed.
+    if (direction > 0) {
+      await state.rendition.next();
+    } else {
+      await state.rendition.prev();
+    }
+  } catch (error) {
+    if (isCurrentTurn()) {
+      console.error(
+        "Page navigation failed:",
+        error
+      );
+
+      showStatus(
+        "Unable to turn the page."
+      );
+    }
+  } finally {
+    if (isCurrentTurn()) {
+      resetPageTurn();
+
+      state.isNavigating = false;
+      updateReaderProgress();
+    }
+  }
+}
+
+/* =====================================================
+   TOUCH GESTURES
+
+   The reader content is inside an EPUB.js iframe.
+   We register handlers on each EPUB document.
+
+   Only gestures starting near the page edges
+   begin a physical page turn.
+
+   Central text selection and ordinary links
+   are left alone.
+   ===================================================== */
+
+function getReadingWidth() {
+  return Math.max(
+    1,
+    $("epub-viewer").getBoundingClientRect().width
+  );
+}
+
+function getPageDirection(
+  x,
+  width,
+  pointerType
+) {
+  const fraction =
+    pointerType === "mouse"
+      ? MOUSE_EDGE_FRACTION
+      : TOUCH_EDGE_FRACTION;
+
+  if (x <= width * fraction) {
+    return -1;
+  }
+
+  if (x >= width * (1 - fraction)) {
+    return 1;
+  }
+
+  return 0;
+}
+
+function isInteractiveTarget(target) {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  return Boolean(
+    target.closest(
+      "a, button, input, textarea, select, " +
+      "[contenteditable='true']"
+    )
+  );
+}
+
+function registerPageGestures(contents) {
+  const doc = contents.document;
+
+  if (!doc || doc.__bpReadingGesturesInstalled) {
+    return;
+  }
+
+  doc.__bpReadingGesturesInstalled = true;
+
+  const iframe = contents.iframe ||
+    doc.defaultView?.frameElement;
+
+  if (!iframe) {
+    return;
+  }
+
+  const getCoordinates = event => {
+    const frameRect =
+      iframe.getBoundingClientRect();
+
+    return {
+      x: event.clientX,
+      y: event.clientY,
+      width: Math.max(1, frameRect.width)
+    };
+  };
+
+  const begin = event => {
+    if (
+      !state.isOpen ||
+      state.isLoading ||
+      state.isNavigating ||
+      state.gesture ||
+      event.isPrimary === false ||
+      (event.pointerType === "mouse" &&
+        event.button !== 0)
+    ) {
+      return;
+    }
+
+    if (isInteractiveTarget(event.target)) {
+      return;
+    }
+
+    const point = getCoordinates(event);
+
+    const direction = getPageDirection(
+      point.x,
+      point.width,
+      event.pointerType
+    );
+
+    if (!direction || !canTurn(direction)) {
+      return;
+    }
+
+    // Mouse users click to turn pages.
+    // Touch users drag the page.
+    if (event.pointerType === "mouse") {
+      return;
+    }
+
+    state.gesture = {
+      pointerId: event.pointerId,
+      direction,
+      startX: point.x,
+      startY: point.y,
+      lastX: point.x,
+      lastTime: performance.now(),
+      velocity: 0,
+      progress: 0,
+      active: false,
+      cancelled: false,
+      width: point.width
+    };
+  };
+
+  const move = event => {
+    const gesture = state.gesture;
+
+    if (
+      !gesture ||
+      event.pointerId !== gesture.pointerId
+    ) {
+      return;
+    }
+
+    const point = getCoordinates(event);
+
+    const dx = point.x - gesture.startX;
+    const dy = point.y - gesture.startY;
+
+    const towardTurn =
+      gesture.direction > 0
+        ? -dx
+        : dx;
+
+    if (!gesture.active) {
+      if (
+        Math.abs(dx) < DRAG_START_DISTANCE &&
+        Math.abs(dy) < DRAG_START_DISTANCE
+      ) {
+        return;
+      }
+
+      // Do not hijack predominantly vertical
+      // movements or drags away from the page.
+      if (
+        Math.abs(dy) > Math.abs(dx) ||
+        towardTurn <= 0
+      ) {
+        state.gesture = null;
+        return;
+      }
+
+      gesture.active = true;
+
+      prepareTurnSheet(
+        gesture.direction
+      );
+    }
+
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+    const now = performance.now();
+    const elapsed = Math.max(
+      1,
+      now - gesture.lastTime
+    );
+
+    const movement =
+      point.x - gesture.lastX;
+
+    const signedMovement =
+      gesture.direction > 0
+        ? -movement
+        : movement;
+
+    const instantVelocity =
+      signedMovement / elapsed;
+
+    gesture.velocity =
+      gesture.velocity * 0.65 +
+      instantVelocity * 0.35;
+
+    gesture.lastX = point.x;
+    gesture.lastTime = now;
+
+    gesture.progress = clamp(
+      towardTurn / (gesture.width * 0.8),
+      0,
+      1
+    );
+
+    setTurnProgress(
+      gesture.direction,
+      gesture.progress
+    );
+  };
+
+  const finish = async (
+    event,
+    cancelled = false
+  ) => {
+    const gesture = state.gesture;
+
+    if (
+      !gesture ||
+      event.pointerId !== gesture.pointerId
+    ) {
+      return;
+    }
+
+    state.gesture = null;
+
+    if (!gesture.active) {
+      return;
+    }
+
+    state.suppressClickUntil =
+      performance.now() + 500;
+
+    const shouldComplete =
+      !cancelled &&
+      (
+        gesture.progress >=
+          DRAG_COMPLETE_FRACTION ||
+        (
+          gesture.progress >= 0.08 &&
+          gesture.velocity >= FLICK_VELOCITY
+        )
+      );
+
+    if (shouldComplete) {
+      // The gesture no longer owns the pointer.
+      // Navigation now owns the animation.
+      await changePage(
+        gesture.direction,
+        {
+          fromGesture: true,
+          progress: gesture.progress
+        }
+      );
+    } else {
+      // Cancelled or insufficient drag:
+      // gently return the sheet to its edge.
+      state.isNavigating = true;
+      updateReaderProgress();
+
+      const openingId = state.openingId;
+      const turnSequence = ++state.turnSequence;
+
+      try {
+        await settleTurnSheet(
+          gesture.direction,
+          gesture.progress,
+          false
+        );
+      } finally {
+        if (
+          openingId === state.openingId &&
+          turnSequence === state.turnSequence
+        ) {
+          resetPageTurn();
+
+          state.isNavigating = false;
+          updateReaderProgress();
+        }
+      }
+    }
+  };
+
+  const click = event => {
+    if (
+      performance.now() <
+      state.suppressClickUntil
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    if (
+      !state.isOpen ||
+      state.isNavigating ||
+      isInteractiveTarget(event.target)
+    ) {
+      return;
+    }
+
+    // On laptops, clicking either edge turns
+    // the page using the 900 ms animation.
+    if (
+      !window.matchMedia(
+        "(hover: hover) and (pointer: fine)"
+      ).matches
+    ) {
+      return;
+    }
+
+    const point = getCoordinates(event);
+
+    const direction = getPageDirection(
+      point.x,
+      point.width,
+      "mouse"
+    );
+
+    if (!direction || !canTurn(direction)) {
+      return;
+    }
+
+    const selection =
+      doc.getSelection?.()?.toString() || "";
+
+    if (selection.trim()) {
+      return;
+    }
+
+    event.preventDefault();
+
+    void changePage(direction);
+  };
+
+  doc.addEventListener(
+    "pointerdown",
+    begin,
+    { passive: true }
+  );
+
+  doc.addEventListener(
+    "pointermove",
+    move,
+    { passive: false }
+  );
+
+  doc.addEventListener(
+    "pointerup",
+    event => {
+      void finish(event);
+    }
+  );
+
+  doc.addEventListener(
+    "pointercancel",
+    event => {
+      void finish(event, true);
+    }
+  );
+
+  doc.addEventListener(
+    "click",
+    click,
+    true
+  );
+
+  doc.addEventListener(
+    "keydown",
+    event => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+
+        if (!$("reader-controls").hidden) {
+          setControlsVisible(false);
+        } else {
+          closeBook();
+        }
+      }
+    }
+  );
+}
+
+/* =====================================================
+   OPEN BOOK
+   ===================================================== */
 
 async function openBook() {
   if (
@@ -702,24 +1316,10 @@ async function openBook() {
       }
     );
 
+    // Register for each EPUB document as it loads.
     rendition.hooks.content.register(
       contents => {
-        contents.document.addEventListener(
-          "keydown",
-          event => {
-            if (event.key === "Escape") {
-              event.preventDefault();
-
-              if (
-                !$("reader-controls").hidden
-              ) {
-                setControlsVisible(false);
-              } else {
-                closeBook();
-              }
-            }
-          }
-        );
+        registerPageGestures(contents);
       }
     );
 
@@ -740,6 +1340,7 @@ async function openBook() {
       );
 
       state.position = null;
+
       await rendition.display();
     }
 
@@ -791,10 +1392,13 @@ async function openBook() {
   }
 }
 
-/* CLOSE BOOK */
+/* =====================================================
+   CLOSE BOOK
+   ===================================================== */
 
 function closeBook() {
   ++state.openingId;
+  ++state.turnSequence;
 
   state.isOpen = false;
   state.isLoading = false;
@@ -847,57 +1451,9 @@ function closeBook() {
   renderLibrary();
 }
 
-/* PAGE NAVIGATION */
-
-async function changePage(direction) {
-  if (
-    !state.rendition ||
-    state.isNavigating ||
-    state.isLoading ||
-    !state.isOpen
-  ) {
-    return;
-  }
-
-  const location = state.currentLocation;
-
-  if (
-    (direction > 0 && location?.atEnd) ||
-    (direction < 0 && location?.atStart)
-  ) {
-    return;
-  }
-
-  state.isNavigating = true;
-  updateReaderProgress();
-
-  try {
-    // Animate and navigate together.
-    await Promise.all([
-      playPageTurn(direction),
-
-      direction > 0
-        ? state.rendition.next()
-        : state.rendition.prev()
-    ]);
-  } catch (error) {
-    console.error(
-      "Page navigation failed:",
-      error
-    );
-
-    showStatus(
-      "Unable to turn the page."
-    );
-  } finally {
-    resetPageTurn();
-
-    state.isNavigating = false;
-    updateReaderProgress();
-  }
-}
-
-/* BUTTON EVENTS */
+/* =====================================================
+   BUTTON EVENTS
+   ===================================================== */
 
 $("back-to-library").addEventListener(
   "click",
@@ -1024,7 +1580,9 @@ $("bookmark").addEventListener(
   }
 );
 
-/* KEYBOARD */
+/* =====================================================
+   KEYBOARD
+   ===================================================== */
 
 document.addEventListener(
   "keydown",
@@ -1043,7 +1601,9 @@ document.addEventListener(
   }
 );
 
-/* ADMIN GATE */
+/* =====================================================
+   ADMIN GATE
+   ===================================================== */
 
 async function initialise() {
   renderLibrary();
