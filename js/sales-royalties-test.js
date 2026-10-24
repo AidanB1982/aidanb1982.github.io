@@ -326,7 +326,7 @@ async function refresh(version = accessVersion) {
             "id,title_id,format,isbn,asin"],
 
         ["royalties", "publishing_kdp_royalties",
-            "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,royalty_amount,currency"],
+    "id,edition_id,format,royalty_month,units_sold,units_refunded,net_units_sold,average_list_price,average_offer_price,royalty_amount,currency,transaction_type,marketplace"],
 
         ["pages", "publishing_kdp_page_reads",
             "id,edition_id,reading_month,pages_read,pages_listened,total_pages,estimated_royalty_gbp"],
