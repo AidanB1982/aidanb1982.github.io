@@ -1296,7 +1296,7 @@ function renderAmazonCosts() {
                 : selectedFormat()}`;
 
         renderRetailSales();
-        
+        renderAmazonCosts();
         renderKPIs();
         renderMonthly();
         renderFormats();
