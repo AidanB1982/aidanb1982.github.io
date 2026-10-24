@@ -135,7 +135,7 @@
                 </div>
                 <div id="documents-rights-content"></div>
             </section>
-
+        
             <section id="section-finance" class="desk-section">
                 <div class="section-heading">
                     <p class="section-kicker">Statements &amp; Payments</p>
@@ -160,7 +160,52 @@
                         <p class="summary-note">Payment requests recorded against your author account.</p>
                     </article>
                 </div>
+                <section
+    id="monthly-royalties-panel"
+    class="content-panel monthly-royalties-panel"
+    aria-labelledby="monthly-royalties-heading"
+>
+    <div class="monthly-royalties-heading">
+        <div>
+            <p class="section-kicker">
+                Amazon KDP Reporting
+            </p>
 
+            <h3 id="monthly-royalties-heading">
+                Monthly Book Royalties
+            </h3>
+
+            <p class="panel-intro">
+                Estimated royalties attributable to your books,
+                based on available Amazon KDP reporting.
+                These figures are separate from formal royalty
+                statements and payments.
+            </p>
+        </div>
+
+        <span class="monthly-royalties-label">
+            Reporting only
+        </span>
+    </div>
+
+    <div
+        id="monthly-royalties-content"
+        aria-live="polite"
+        aria-busy="true"
+    >
+        <div class="empty-state">
+            Loading monthly royalty reporting…
+        </div>
+    </div>
+
+    <p class="monthly-royalties-disclaimer">
+        These figures are provisional reporting estimates,
+        not issued royalty statements or amounts currently
+        payable. Kindle Unlimited and other adjustments
+        may be subject to reconciliation. Publisher-wide
+        adjustments are not allocated to individual authors.
+    </p>
+</section>
                 <section class="content-panel">
                     <h3>Royalty Statements</h3>
                     <p class="panel-intro">Formal royalty statements issued by Blackwood Publishing.</p>
