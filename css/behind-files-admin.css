@@ -15,6 +15,10 @@
     --bfa-shadow: 0 24px 72px rgba(0, 0, 0, 0.52);
 }
 
+/* =========================
+   PAGE BACKGROUND
+   ========================= */
+
 body.behind-files-admin-page {
     min-height: 100vh;
     overflow-x: hidden;
@@ -25,12 +29,85 @@ body.behind-files-admin-page {
             rgba(0, 0, 0, 0.74) 38%,
             rgba(0, 0, 0, 0.94) 100%
         ),
-        radial-gradient(circle at top center, rgba(196, 122, 44, 0.13), transparent 34%),
-        radial-gradient(circle at 82% 16%, rgba(61, 121, 136, 0.1), transparent 28%),
+        radial-gradient(
+            circle at top center,
+            rgba(196, 122, 44, 0.13),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 82% 16%,
+            rgba(61, 121, 136, 0.1),
+            transparent 28%
+        ),
         url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
         #050505;
+
     color: var(--bfa-text);
 }
+
+/* =========================
+   ADMIN ACCESS PROTECTION
+   ========================= */
+
+/*
+   Respect the hidden attribute.
+
+   The admin editor is hidden by default in HTML.
+   JavaScript reveals it only after verifying
+   the signed-in user's Supabase admin permission.
+*/
+
+[hidden] {
+    display: none !important;
+}
+
+/*
+   Verification and access-denied screen.
+   Uses the same Blackwood panel styling
+   as the Behind the Files drafting desk.
+*/
+
+#bfa-access-screen {
+    min-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#bfa-access-screen .bfa-panel {
+    width: min(100%, 620px);
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#bfa-access-screen .bfa-panel-inner {
+    padding: clamp(28px, 5vw, 52px);
+}
+
+#bfa-access-screen h1 {
+    margin: 12px 0 18px;
+    color: var(--bfa-cream);
+    font-size: clamp(32px, 5vw, 54px);
+    line-height: 1.08;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+}
+
+#bfa-access-message {
+    max-width: 440px;
+    margin: 0 auto 26px;
+    color: rgba(239, 231, 220, 0.76);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+#bfa-access-screen .bfa-button {
+    margin-top: 4px;
+}
+
+/* =========================
+   MAIN LAYOUT
+   ========================= */
 
 .bfa-wrap {
     width: min(100%, 1240px);
@@ -38,6 +115,10 @@ body.behind-files-admin-page {
     margin: 0 auto;
     padding: 132px 24px 90px;
 }
+
+/* =========================
+   HERO
+   ========================= */
 
 .bfa-hero {
     max-width: 860px;
@@ -76,6 +157,10 @@ body.behind-files-admin-page {
     line-height: 1.7;
 }
 
+/* =========================
+   INFORMATION WARNING
+   ========================= */
+
 .bfa-warning {
     max-width: 920px;
     margin: 0 auto 26px;
@@ -83,13 +168,21 @@ body.behind-files-admin-page {
     border: 1px solid rgba(196, 122, 44, 0.22);
     border-radius: 8px;
     background:
-        linear-gradient(90deg, rgba(196, 122, 44, 0.09), transparent),
+        linear-gradient(
+            90deg,
+            rgba(196, 122, 44, 0.09),
+            transparent
+        ),
         rgba(0, 0, 0, 0.5);
     color: rgba(239, 231, 220, 0.7);
     font-size: 13.5px;
     line-height: 1.6;
     text-align: center;
 }
+
+/* =========================
+   DESK GRID
+   ========================= */
 
 .bfa-desk {
     display: grid;
@@ -98,12 +191,24 @@ body.behind-files-admin-page {
     align-items: start;
 }
 
+/* =========================
+   PANELS
+   ========================= */
+
 .bfa-panel {
     border: 1px solid var(--bfa-border);
     border-radius: 10px;
     background:
-        radial-gradient(circle at top left, rgba(196, 122, 44, 0.1), transparent 32%),
-        linear-gradient(180deg, var(--bfa-panel-soft), rgba(255, 255, 255, 0.012)),
+        radial-gradient(
+            circle at top left,
+            rgba(196, 122, 44, 0.1),
+            transparent 32%
+        ),
+        linear-gradient(
+            180deg,
+            var(--bfa-panel-soft),
+            rgba(255, 255, 255, 0.012)
+        ),
         var(--bfa-panel);
     box-shadow: var(--bfa-shadow);
 }
@@ -119,6 +224,10 @@ body.behind-files-admin-page {
     line-height: 1.08;
     font-weight: 400;
 }
+
+/* =========================
+   FORM
+   ========================= */
 
 .bfa-form {
     display: grid;
@@ -151,6 +260,10 @@ body.behind-files-admin-page {
     color: var(--bfa-copper-soft);
     font-weight: 400;
 }
+
+/* =========================
+   INPUTS
+   ========================= */
 
 .bfa-field input,
 .bfa-field select,
@@ -198,6 +311,10 @@ body.behind-files-admin-page {
     color: var(--bfa-cream);
 }
 
+/* =========================
+   CHECKBOXES
+   ========================= */
+
 .bfa-checks {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -220,6 +337,10 @@ body.behind-files-admin-page {
     accent-color: var(--bfa-copper);
 }
 
+/* =========================
+   BUTTONS
+   ========================= */
+
 .bfa-actions {
     display: flex;
     flex-wrap: wrap;
@@ -238,7 +359,11 @@ body.behind-files-admin-page {
     border: 1px solid rgba(196, 122, 44, 0.7);
     border-radius: 4px;
     background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.22), rgba(196, 122, 44, 0.08)),
+        linear-gradient(
+            180deg,
+            rgba(196, 122, 44, 0.22),
+            rgba(196, 122, 44, 0.08)
+        ),
         rgba(0, 0, 0, 0.48);
     color: var(--bfa-copper-soft);
     font-family: Arial, Helvetica, sans-serif;
@@ -264,10 +389,18 @@ body.behind-files-admin-page {
 
 .bfa-button.primary {
     background:
-        linear-gradient(180deg, rgba(196, 122, 44, 0.38), rgba(196, 122, 44, 0.16)),
+        linear-gradient(
+            180deg,
+            rgba(196, 122, 44, 0.38),
+            rgba(196, 122, 44, 0.16)
+        ),
         rgba(82, 42, 18, 0.82);
     color: #fff4e7;
 }
+
+/* =========================
+   STATUS MESSAGES
+   ========================= */
 
 .bfa-status {
     min-height: 20px;
@@ -285,6 +418,10 @@ body.behind-files-admin-page {
     color: var(--bfa-error);
 }
 
+/* =========================
+   LIVE PREVIEW
+   ========================= */
+
 .bfa-preview-card {
     overflow: hidden;
     border: 1px solid rgba(196, 122, 44, 0.2);
@@ -298,7 +435,11 @@ body.behind-files-admin-page {
     aspect-ratio: 16 / 7;
     object-fit: cover;
     background:
-        radial-gradient(circle at center, rgba(196, 122, 44, 0.16), transparent 44%),
+        radial-gradient(
+            circle at center,
+            rgba(196, 122, 44, 0.16),
+            transparent 44%
+        ),
         #060606;
     border-bottom: 1px solid rgba(196, 122, 44, 0.16);
 }
@@ -356,6 +497,10 @@ body.behind-files-admin-page {
     margin-bottom: 0;
 }
 
+/* =========================
+   JSON OUTPUT
+   ========================= */
+
 .bfa-json-box {
     margin-top: 16px;
 }
@@ -375,6 +520,10 @@ body.behind-files-admin-page {
     line-height: 1.55;
     resize: vertical;
 }
+
+/* =========================
+   EXISTING POSTS
+   ========================= */
 
 .bfa-existing-list {
     display: grid;
@@ -408,6 +557,10 @@ body.behind-files-admin-page {
     color: var(--bfa-muted);
 }
 
+/* =========================
+   TABLET
+   ========================= */
+
 @media (max-width: 980px) {
     .bfa-desk {
         grid-template-columns: 1fr;
@@ -417,6 +570,10 @@ body.behind-files-admin-page {
         padding-top: 118px;
     }
 }
+
+/* =========================
+   MOBILE
+   ========================= */
 
 @media (max-width: 700px) {
     .bfa-wrap {
@@ -439,5 +596,13 @@ body.behind-files-admin-page {
 
     .bfa-preview-content {
         padding: 17px;
+    }
+
+    #bfa-access-screen {
+        min-height: 65vh;
+    }
+
+    #bfa-access-screen .bfa-panel-inner {
+        padding: 28px 20px;
     }
 }
