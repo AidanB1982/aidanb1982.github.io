@@ -1,0 +1,452 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blackwood Kindle+ Import</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+  body {
+    max-width: 1100px;
+    margin: 35px auto;
+    padding: 0 20px;
+    background: #10151b;
+    color: #eef2f6;
+  }
+  h1 { color: #e4bb70; }
+  p { color: #cbd3dc; line-height: 1.6; }
+  input, textarea, button { font: inherit; }
+  input[type=file] { display: block; margin: 15px 0; }
+  textarea {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 230px;
+    padding: 14px;
+    border: 1px solid #637181;
+    border-radius: 8px;
+    background: #1b242e;
+    color: #f0f3f7;
+    font: 12px/1.5 monospace;
+    resize: vertical;
+  }
+  button {
+    margin: 15px 10px 15px 0;
+    padding: 12px 18px;
+    background: #e4bb70;
+    color: #181818;
+    border: 0;
+    border-radius: 7px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  #status { white-space: pre-wrap; line-height: 1.7; }
+  .success { color: #91e6b7; }
+  .error { color: #ff9d9d; }
+  #sqlOutput { min-height: 300px; }
+</style>
+</head>
+<body>
+
+<h1>Blackwood Kindle+ Page Reads Import</h1>
+
+<p>
+  Select the original Markdown report, or paste its
+  complete Markdown table into the box.
+  All processing happens locally in your browser.
+</p>
+
+<label for="reportFile">Choose Markdown report</label>
+<input type="file" id="reportFile" accept=".md,.txt,.csv">
+
+<label for="reportInput">Original report</label>
+<textarea id="reportInput" spellcheck="false"
+  placeholder="| Date | Title | Author Name | eBook ASIN | ..."></textarea>
+
+<button id="generateButton">Generate SQL</button>
+<button id="copyButton" disabled>Copy SQL</button>
+
+<div id="status" role="status"></div>
+
+<label for="sqlOutput">Supabase import SQL</label>
+<textarea id="sqlOutput" readonly spellcheck="false"></textarea>
+
+<script>
+"use strict";
+
+const SOURCE_REPORT = "KDP Kindle+ Page Reads - Import 01";
+const RATE = "0.00292000";
+
+const VERIFIED_ASINS = new Set([
+  "B0FCPCG6WJ",
+  "B0FD1732H7",
+  "B0FPSCY7SW",
+  "B0FPSG8GX4",
+  "B0FQRD3NJV",
+  "B0H3C64H11",
+  "B0H4759GPF",
+  "B0H6T9565F"
+]);
+
+const input = document.getElementById("reportInput");
+const file = document.getElementById("reportFile");
+const output = document.getElementById("sqlOutput");
+const status = document.getElementById("status");
+const copy = document.getElementById("copyButton");
+
+function quote(value) {
+  return "'" + String(value).replaceAll("'", "''") + "'";
+}
+
+function integer(value, row, field) {
+  const text = String(value).trim().replaceAll(",", "");
+
+  if (!/^\d+$/.test(text) ||
+      !Number.isSafeInteger(Number(text))) {
+    throw new Error(
+      `Row ${row}: invalid ${field}: ${value}`
+    );
+  }
+
+  return Number(text);
+}
+
+function parseMarkdown(text) {
+  const lines = text
+    .replace(/^\uFEFF/, "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line.startsWith("|"));
+
+  if (lines.length < 3) {
+    throw new Error(
+      "The file does not contain a complete Markdown table."
+    );
+  }
+
+  const split = line => {
+    const trimmed = line.replace(/^\|/, "").replace(/\|$/, "");
+    return trimmed.split("|").map(cell =>
+      cell.trim().replace(/&nbsp;/g, " ")
+    );
+  };
+
+  const header = split(lines[0]);
+
+  if (
+    header.length !== 10 ||
+    header[0] !== "Date" ||
+    header[3] !== "eBook ASIN" ||
+    header[6] !== "Marketplace" ||
+    !header[7].includes("Pages Read") ||
+    !header[8].includes("Pages Listened") ||
+    !header[9].includes("Total Kindle+")
+  ) {
+    throw new Error(
+      "Unexpected report columns. Expected the " +
+      "10-column Kindle+ Markdown export."
+    );
+  }
+
+  const rows = [];
+
+  for (const line of lines.slice(1)) {
+    const cells = split(line);
+
+    if (cells.every(cell => /^:?-{3,}:?$/.test(cell))) {
+      continue;
+    }
+
+    const rowNumber = rows.length + 1;
+
+    if (cells.length !== 10) {
+      throw new Error(
+        `Row ${rowNumber}: expected 10 columns, ` +
+        `found ${cells.length}.`
+      );
+    }
+
+    const date = cells[0];
+    const asin = cells[3];
+    const marketplace = cells[6];
+
+    if (
+      !/^\d{4}-(0[1-9]|1[0-2])-01$/.test(date)
+    ) {
+      throw new Error(
+        `Row ${rowNumber}: invalid reading month ${date}`
+      );
+    }
+
+    if (!VERIFIED_ASINS.has(asin)) {
+      throw new Error(
+        `Row ${rowNumber}: unverified ASIN ${asin}`
+      );
+    }
+
+    if (!marketplace.startsWith("Amazon.")) {
+      throw new Error(
+        `Row ${rowNumber}: invalid marketplace ${marketplace}`
+      );
+    }
+
+    const pages = integer(cells[7], rowNumber, "pages read");
+    const listened = integer(
+      cells[8], rowNumber, "pages listened"
+    );
+    const reportedTotal = integer(
+      cells[9], rowNumber, "reported total"
+    );
+
+    if (pages + listened !== reportedTotal) {
+      throw new Error(
+        `Row ${rowNumber}: page totals do not reconcile.`
+      );
+    }
+
+    rows.push({
+      number: rowNumber,
+      date,
+      asin,
+      marketplace,
+      pages,
+      listened,
+      total: reportedTotal
+    });
+  }
+
+  if (!rows.length) {
+    throw new Error("No report data rows found.");
+  }
+
+  return rows;
+}
+
+function buildSQL(rows) {
+  const totalPages = rows.reduce(
+    (sum, row) => sum + row.total, 0
+  );
+
+  const tuples = rows.map(row => `    (
+      ${row.number},
+      ${quote(row.date)},
+      ${quote(row.asin)},
+      ${quote(row.marketplace)},
+      ${row.pages},
+      ${row.listened}
+    )`).join(",\n");
+
+  return `-- BLACKWOOD PUBLISHING UK
+-- DEPARTMENT 03: KINDLE+ PAGE READS IMPORT
+-- Source: ${SOURCE_REPORT}
+-- Original rows: ${rows.length}
+-- Original pages: ${totalPages}
+-- Estimated GBP per page: ${RATE}
+-- Re-running this import is blocked.
+-- All changes are transactional.
+
+BEGIN;
+
+CREATE TEMP TABLE kindle_source (
+    source_row_number integer PRIMARY KEY,
+    reading_month date NOT NULL,
+    ebook_asin text NOT NULL,
+    marketplace text NOT NULL,
+    pages_read integer NOT NULL,
+    pages_listened integer NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO kindle_source (
+    source_row_number,
+    reading_month,
+    ebook_asin,
+    marketplace,
+    pages_read,
+    pages_listened
+)
+VALUES
+${tuples};
+
+DO $$
+DECLARE
+    v_existing integer;
+    v_unmatched integer;
+    v_rows integer;
+    v_pages bigint;
+    v_bad_rates integer;
+BEGIN
+
+    SELECT count(*)
+    INTO v_existing
+    FROM public.publishing_kdp_page_reads
+    WHERE source_report = ${quote(SOURCE_REPORT)};
+
+    IF v_existing <> 0 THEN
+        RAISE EXCEPTION
+            'Kindle+ report already exists: % rows. No changes made.',
+            v_existing;
+    END IF;
+
+    SELECT count(*)
+    INTO v_unmatched
+    FROM kindle_source s
+    WHERE (
+        SELECT count(*)
+        FROM public.publishing_editions e
+        WHERE e.asin = s.ebook_asin
+          AND e.format = 'ebook'
+    ) <> 1;
+
+    IF v_unmatched <> 0 THEN
+        RAISE EXCEPTION
+            '% Kindle+ rows lack exactly one matching ebook edition.',
+            v_unmatched;
+    END IF;
+
+    INSERT INTO public.publishing_kdp_page_reads (
+        edition_id,
+        reading_month,
+        ebook_asin,
+        marketplace,
+        pages_read,
+        pages_listened,
+        estimated_gbp_per_page,
+        source_report,
+        source_row_number
+    )
+    SELECT
+        e.id,
+        s.reading_month,
+        s.ebook_asin,
+        s.marketplace,
+        s.pages_read,
+        s.pages_listened,
+        ${RATE},
+        ${quote(SOURCE_REPORT)},
+        s.source_row_number
+    FROM kindle_source s
+    JOIN public.publishing_editions e
+      ON e.asin = s.ebook_asin
+     AND e.format = 'ebook';
+
+    SELECT
+        count(*),
+        coalesce(sum(total_pages), 0),
+        count(*) FILTER (
+            WHERE estimated_gbp_per_page <> ${RATE}
+        )
+    INTO
+        v_rows,
+        v_pages,
+        v_bad_rates
+    FROM public.publishing_kdp_page_reads
+    WHERE source_report = ${quote(SOURCE_REPORT)};
+
+    IF v_rows <> ${rows.length} THEN
+        RAISE EXCEPTION
+            'Row verification failed: expected ${rows.length}, found %.',
+            v_rows;
+    END IF;
+
+    IF v_pages <> ${totalPages} THEN
+        RAISE EXCEPTION
+            'Page verification failed: expected ${totalPages}, found %.',
+            v_pages;
+    END IF;
+
+    IF v_bad_rates <> 0 THEN
+        RAISE EXCEPTION
+            'Estimated royalty rate verification failed.';
+    END IF;
+
+    RAISE NOTICE
+        'Kindle+ verified: % rows, % pages.',
+        v_rows,
+        v_pages;
+
+END
+$$;
+
+COMMIT;
+
+-- FINAL READ-ONLY VERIFICATION
+
+SELECT
+    to_char(reading_month, 'YYYY-MM') AS month,
+    count(*) AS report_rows,
+    sum(total_pages) AS total_pages,
+    round(
+        sum(estimated_royalty_gbp),
+        2
+    ) AS estimated_royalties_gbp
+FROM public.publishing_kdp_page_reads
+WHERE source_report = ${quote(SOURCE_REPORT)}
+GROUP BY reading_month
+ORDER BY reading_month DESC;
+`;
+}
+
+file.addEventListener("change", async () => {
+  const selected = file.files[0];
+
+  if (!selected) return;
+
+  try {
+    input.value = await selected.text();
+    status.className = "success";
+    status.textContent =
+      "File loaded locally. Ready to generate SQL.";
+  } catch (error) {
+    status.className = "error";
+    status.textContent =
+      "Could not read file: " + error.message;
+  }
+});
+
+document.getElementById("generateButton")
+  .addEventListener("click", () => {
+    output.value = "";
+    copy.disabled = true;
+
+    try {
+      const rows = parseMarkdown(input.value);
+      const total = rows.reduce(
+        (sum, row) => sum + row.total, 0
+      );
+      const months = new Set(
+        rows.map(row => row.date)
+      ).size;
+
+      output.value = buildSQL(rows);
+      copy.disabled = false;
+      status.className = "success";
+      status.textContent =
+        `Validated ${rows.length} original rows.\n` +
+        `Reading months: ${months}\n` +
+        `Total pages: ${total.toLocaleString()}\n` +
+        `Estimated GBP: £${(total * 0.00292).toFixed(2)}\n\n` +
+        "SQL ready. No database changes have been made.";
+    } catch (error) {
+      status.className = "error";
+      status.textContent =
+        "Validation stopped: " + error.message;
+    }
+  });
+
+copy.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(output.value);
+    status.textContent += "\n\nSQL copied.";
+  } catch {
+    output.focus();
+    output.select();
+    status.textContent +=
+      "\n\nPlease copy the selected SQL manually.";
+  }
+});
+</script>
+</body>
+</html>
