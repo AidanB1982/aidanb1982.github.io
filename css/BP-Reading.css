@@ -723,3 +723,19 @@ input:focus-visible, a:focus-visible { outline: 2px solid #a9844c; outline-offse
   .book-details .eyebrow { font-size: 8px; letter-spacing: .1em; margin-top: 0; }
   .book-description { min-height: 0; font-size: 11px; }
 }
+.reading-offer { display: flex; gap: 40px; justify-content: space-between; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--border); }
+.reading-offer h2 { font-weight: normal; font-size: 30px; }
+.reading-offer p { max-width: 650px; line-height: 1.7; }
+.library-tools { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; margin: 24px 0; }
+.library-tools label { display: grid; gap: 8px; font: 11px Arial,sans-serif; color: var(--muted); }
+.library-tools input,.library-tools select { min-height: 44px; border: 1px solid var(--border); border-radius: 6px; padding: 10px; background: var(--panel); color: var(--text); font: 12px Arial,sans-serif; }
+.reader-watermark { position: absolute; left: 50%; transform: translateX(-50%); top: max(25px,env(safe-area-inset-top)); color: var(--ink); font: 8px Arial,sans-serif; letter-spacing: .08em; opacity: .3; pointer-events: none; white-space: nowrap; }
+.selection-tools { position: fixed; z-index: 35; bottom: 90px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #8885; border-radius: 10px; background: var(--page); color: var(--ink); box-shadow: 0 8px 30px #0003; max-width: calc(100% - 24px); font: 11px Arial,sans-serif; }
+.selection-tools span { white-space: nowrap; }
+.notebook-card { border-top: 1px solid #8884; margin-top: 24px; padding-top: 12px; }
+.notebook-card blockquote { margin: 16px 0; border-left: 2px solid #a9844c; padding-left: 16px; font: 16px/1.6 Georgia,serif; }
+.notebook-card label { display: grid; gap: 10px; font: 11px Arial,sans-serif; margin-top: 16px; }
+.notebook-card textarea { box-sizing: border-box; width: 100%; min-height: 90px; resize: vertical; padding: 12px; color: inherit; background: transparent; border: 1px solid #8885; border-radius: 6px; font: 14px/1.6 Georgia,serif; }
+.notebook-actions { display: flex; gap: 10px; margin-top: 12px; }
+#notebook-list { margin-top: 24px; line-height: 1.7; }
+@media(max-width:600px) { .reading-offer { flex-direction: column; align-items: start; gap: 0; } .library-tools { gap: 12px; } .library-tools label:first-child { width: 100%; } .selection-tools span { display: none; } }

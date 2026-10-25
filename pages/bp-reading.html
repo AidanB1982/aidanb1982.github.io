@@ -13,7 +13,7 @@
 
 
 
-  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261025">
+  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261026">
 </head>
 
 <body>
@@ -41,6 +41,12 @@
       </p>
     </header>
 
+    <section id="reading-membership-offer" class="reading-offer" aria-label="BP Reading membership">
+      <div><p class="eyebrow">THE BLACKWOOD COLLECTION</p><h2>One membership. Every story.</h2><p>£10.99 per year for access to all available Blackwood reading editions. Or buy a title for £1.99 for permanent access inside BP Reading.</p></div>
+      <div><p class="device-note">Read inside BP Reading. No file downloads.<br>Refund requests must be made within 7 days of purchase. After this period, membership payments are non-refundable, subject to your statutory rights.<br>Cancel renewal at any time; access continues until your paid period ends.<br>Membership checkout is being connected.</p><button class="control" id="subscribe-reading" type="button">Subscribe — £10.99 per year</button><button class="control" id="check-reading-payment" type="button" hidden>Check payment</button><p class="device-note" id="reading-payment-status" role="status" aria-live="polite"></p></div>
+    </section>
+    <p id="reading-sync-status" class="device-note" role="status" aria-live="polite">Checking reading sync…</p>
+    <div class="library-tools"><label>Find your next read<input id="library-search" type="search" placeholder="Title, author or series"></label><label>Reading status<select id="library-status"><option value="all">All books</option><option value="reading">In progress</option><option value="unread">Unread</option><option value="finished">Finished</option></select></label><label>Sort by<select id="library-sort"><option value="series">Series order</option><option value="title">Title</option></select></label><button class="control" id="load-synced" type="button">Load synced place</button></div>
     <div class="shelf-heading"><h2>Your library</h2><span>Private reading edition</span></div>
     <section
       class="book-grid"
@@ -57,8 +63,8 @@
 
     <p class="library-note">
       Administrator testing edition.
-      Gualachulain is currently the only book
-      connected to BP Reading.
+      Only approved editions connected to protected delivery appear here.
+      Public membership access remains closed until payment verification is ready.
     </p>
 
   </main>
@@ -166,6 +172,7 @@
       <div class="control-group">
         <button class="control" id="open-contents" type="button">Contents</button>
         <button class="control" id="open-appearance" type="button">Aa <span class="sr-only">Appearance</span></button>
+        <button class="control" id="open-notebook" type="button">Notebook</button>
         <button class="control" id="open-search" type="button">Search</button>
         <button class="control" id="open-bookmarks" type="button">Saved places</button>
         <button class="control" id="reader-fullscreen" type="button">Full screen</button>
@@ -181,6 +188,7 @@
       </div>
     </header>
 
+    <div class="reader-watermark" id="reader-watermark" aria-hidden="true"></div>
     <div class="quiet-progress" aria-hidden="true"><span id="quiet-chapter">Your reading room</span><span id="quiet-percent"></span></div>
     <dialog id="reader-panel" aria-labelledby="reader-panel-title">
       <div class="panel-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="reader-panel-title">Reading settings</h2></div><button class="control" id="close-panel" aria-label="Close panel" type="button">✕</button></div>
@@ -219,9 +227,10 @@
         <label class="setting">Page width<select id="reader-width"><option value="620">Intimate</option><option value="760">Balanced</option><option value="920">Expansive</option></select></label>
         <label class="setting">Text alignment<select id="reader-alignment"><option value="left">Left aligned</option><option value="justify">Justified</option></select></label>
         <label class="setting">Page turns<select id="reader-motion"><option value="gentle">Gentle turn</option><option value="instant">Instant</option></select></label>
-        <p class="device-note">Your appearance settings and reading place are saved on this device. They do not sync between devices yet.</p>
+        <p class="device-note">Your reading place, saved passages and preferences are saved on this device. Check the library sync status to see whether Supabase syncing is connected.</p>
       </section>
       <section id="panel-contents" hidden><p class="panel-intro">Find your next chapter.</p><nav id="chapter-list" aria-label="Book chapters"></nav></section>
+      <section id="panel-notebook" hidden><p class="panel-intro">A private companion to your reading.</p><p class="device-note">Select text in the book to save a highlight and add a note. Use the button below for a note about your current page.</p><button class="control" id="add-page-note" type="button">Note on this page</button><div id="notebook-list"></div></section>
       <section id="panel-search" hidden>
         <p class="panel-intro">Find a line. Return to a moment.</p>
         <form id="book-search-form"><label for="book-search">Search this book</label><div class="search-fields"><input id="book-search" type="search" required minlength="2" maxlength="120" placeholder="A word or phrase…"><button class="control" type="submit">Find</button></div></form>
@@ -229,6 +238,9 @@
       </section>
       <section id="panel-bookmarks" hidden><p class="panel-intro">The places you wanted to keep.</p><div id="bookmark-list"></div></section>
     </dialog>
+    <div id="selection-tools" class="selection-tools" hidden>
+      <span>Keep this passage</span><button class="control" id="save-highlight" type="button">Highlight &amp; note</button><button class="control" id="dismiss-selection" type="button" aria-label="Dismiss selection">✕</button>
+    </div>
     <!-- BOTTOM CONTROLS -->
 
     <nav
@@ -280,7 +292,7 @@
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js?v=20261025"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261026"></script>
 
 </body>
 </html>

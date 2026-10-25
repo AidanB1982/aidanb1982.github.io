@@ -5,6 +5,9 @@ import {
   createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
+import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261026";
+import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
+
 /* =====================================================
    BLACKWOOD PUBLISHING — BP READING
    Administrator testing edition
@@ -17,16 +20,27 @@ const SUPABASE_URL =
 const SUPABASE_ANON_KEY =
   "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0";
 
-const EDITION_ID = 2;
+let EDITION_ID = 2;
 
-const BOOK = {
+let BOOK = {
   id: "BLACKWOOD-BOOK-001-EPUB",
+  editionId: 2,
+  author: "Aidan Blackwood",
+  cover: "/assets/book7.png",
+  series: "The Cursed Bothies",
+  seriesOrder: 2,
   title: "Gualachulain",
   description:
     "Blackwood Publishing — administrator reading edition."
 };
 
 let STORAGE_KEY = "bp-reading-gualachulain-v1";
+let activeUser = null;
+let checkoutController = null;
+let readingAccount = null;
+let libraryBooks = [BOOK];
+let switchingEdition = false;
+let sessionEpoch = 0;
 
 const PAGE_TURN_DURATION = 180;
 const TOUCH_EDGE_FRACTION = 0.22;
@@ -130,26 +144,16 @@ function delay(milliseconds) {
   });
 }
 
+function snapshot() {
+  return {theme:state.theme,fontSize:state.fontSize,position:state.position,progress:state.progress,
+    bookmarks:state.bookmarks,hasStarted:state.hasStarted,appearance:{...appearance},bookmarkDetails,
+    annotations,readingPace};
+}
 function saveState() {
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        appearance,
-        bookmarkDetails,
-        theme: state.theme,
-        fontSize: state.fontSize,
-        position: state.position,
-        progress: state.progress,
-        bookmarks: state.bookmarks,
-        hasStarted: state.hasStarted
-      })
-    );
-  } catch {
-    showStatus(
-      "Unable to save reading progress on this device."
-    );
-  }
+  const payload = snapshot();
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); }
+  catch { showStatus("Unable to save reading data on this device."); }
+  readingAccount?.schedule(payload);
 }
 
 let statusTimer;
@@ -182,78 +186,97 @@ function showLibraryError(message) {
    ===================================================== */
 
 function renderLibrary() {
-  const grid = $("book-grid");
-  grid.replaceChildren();
-
-  const card = document.createElement("article");
-  card.className = "book-card";
-
-  const cover = document.createElement("div");
-  cover.className = "book-cover";
-
-  const coverImage = document.createElement("img");
-  coverImage.src = "/assets/book7.png";
-  coverImage.alt = "Gualachulain book cover";
-  coverImage.loading = "lazy";
-
-  cover.appendChild(coverImage);
-
-  const heading = document.createElement("h2");
-  heading.textContent = BOOK.title;
-
-  const description = document.createElement("p");
-  description.className = "book-description";
-  description.textContent = BOOK.description;
-
-  const progressLabel = document.createElement("p");
-  progressLabel.className = "progress-label";
-
-  progressLabel.textContent = state.hasStarted
-    ? `${state.progress}% complete`
-    : "Not started";
-
-  const track = document.createElement("div");
-  track.className = "progress-track";
-
-  const fill = document.createElement("div");
-  fill.className = "progress-fill";
-  fill.style.width = `${state.progress}%`;
-
-  track.appendChild(fill);
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "open-book";
-
-  button.textContent = state.isLoading
-    ? "Opening…"
-    : state.hasStarted
-      ? "Continue Reading"
-      : "Read Book";
-
-  button.disabled = state.isLoading;
-
-  button.addEventListener(
-    "click",
-    () => void openBook()
-  );
-
-  const details = document.createElement("div");
-  details.className = "book-details";
-  const eyebrow = document.createElement("p");
-  eyebrow.className = "eyebrow";
-  eyebrow.textContent = state.hasStarted ? "PICK UP WHERE YOU LEFT OFF" : "YOUR NEXT CHAPTER AWAITS";
-  details.append(eyebrow, heading, description, progressLabel, track, button);
-  card.append(cover, details);
-
-  grid.appendChild(card);
+  const grid = $("book-grid"); grid.replaceChildren();
+  const query = $("library-search").value.trim().toLowerCase();
+  const filter = $("library-status").value;
+  const books = libraryBooks.map(book => {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(`bp-reading:${activeUser?.id}:edition:${book.editionId}:v2`)) || {}; } catch {}
+    const progress = Number.isFinite(saved.progress) ? clamp(saved.progress,0,100) : 0;
+    return {...book, progress, started:saved.hasStarted === true};
+  }).filter(book => `${book.title} ${book.author} ${book.series}`.toLowerCase().includes(query)
+    && (filter === 'all' || (filter === 'finished' ? book.progress >= 100 : filter === 'unread' ? !book.started : book.started && book.progress < 100)));
+  books.sort((a,b) => $('library-sort').value === 'title' ? a.title.localeCompare(b.title) : String(a.series).localeCompare(String(b.series)) || (a.seriesOrder || 0) - (b.seriesOrder || 0) || a.title.localeCompare(b.title));
+  if (!books.length) { grid.textContent = 'No books match these filters.'; return; }
+  for (const book of books) {
+    const card = document.createElement('article'); card.className = 'book-card';
+    const cover = document.createElement('div'); cover.className = 'book-cover';
+    const image = document.createElement('img'); image.src = book.cover; image.alt = book.title + ' cover'; image.loading = 'lazy'; cover.append(image);
+    const details = document.createElement('div'); details.className = 'book-details';
+    const eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = book.started ? 'PICK UP WHERE YOU LEFT OFF' : 'YOUR NEXT CHAPTER AWAITS';
+    const heading = document.createElement('h2'); heading.textContent = book.title;
+    const meta = document.createElement('p'); meta.className = 'book-description'; meta.textContent = [book.author, book.series, book.seriesOrder ? 'Book ' + book.seriesOrder : ''].filter(Boolean).join(' · ');
+    const description = document.createElement('p'); description.className = 'book-description'; description.textContent = book.description;
+    const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = book.started ? `${book.progress}% complete` : 'Not started';
+    const track = document.createElement('div'); track.className = 'progress-track'; const fill = document.createElement('div'); fill.className = 'progress-fill'; fill.style.width = book.progress + '%'; track.append(fill);
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = switchingEdition || state.isLoading;
+    button.onclick = () => {if (book.canRead) void openEdition(book); else {$('subscribe-reading').focus();$('reading-payment-status').textContent='An active membership or purchase of this title is required to read it.';}};
+    details.append(eyebrow,heading,meta,description,progress,track,button); card.append(cover,details); grid.append(card);
+  }
+}
+function reportSync(text) { $('reading-sync-status').textContent = text; }
+async function connectEdition(book) {
+  readingAccount?.stop();
+  EDITION_ID = book.editionId; BOOK = book;
+  STORAGE_KEY = `bp-reading:${activeUser.id}:edition:${EDITION_ID}:v2`;
+  restorePreferences(loadSavedState());
+  const account = new ReadingAccount(supabase,activeUser.id,EDITION_ID,reportSync);
+  readingAccount = account;
+  const remote = await account.load();
+  if (readingAccount !== account || account.stopped) return;
+  if (remote) restorePreferences(remote);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot())); } catch {}
+}
+async function openEdition(book) {
+  if (!activeUser || !book.canRead || switchingEdition || state.isOpen) return;
+  const epoch = sessionEpoch;
+  switchingEdition = true; renderLibrary();
+  try {
+    await readingAccount?.flush();
+    await connectEdition(book);
+    if (!activeUser || epoch !== sessionEpoch) return;
+    $('reader-book-title').textContent = BOOK.title;
+    $('epub-viewer').setAttribute('aria-label',BOOK.title + ' book pages');
+    await openBook();
+  } catch {showLibraryError('This reading edition could not be prepared. Please reload and try again.');}
+  finally {switchingEdition = false; renderLibrary();}
+}
+async function loadReadingCatalogue() {
+  const user = activeUser;
+  if (!user) return;
+  try {
+    const {data,error} = await supabase.from('bp_reading_catalog').select('edition_id,title,author,description,cover_url,series,series_order').eq('available',true);
+    if (error) throw error;
+    if (activeUser?.id !== user.id) return;
+    if (Array.isArray(data)) libraryBooks = data.map(row => ({editionId:row.edition_id,id:String(row.edition_id),title:row.title,author:row.author || '',description:row.description || '',cover:safeCover(row.cover_url),series:row.series || '',seriesOrder:row.series_order}));
+    const states = await supabase.from('bp_reading_state').select('edition_id,payload').eq('user_id',activeUser.id);
+    if (!states.error && Array.isArray(states.data)) {
+      for (const row of states.data) {
+        const key = `bp-reading:${activeUser.id}:edition:${row.edition_id}:v2`;
+        const pending = localStorage.getItem(`bp-reading-outbox:${activeUser.id}:${row.edition_id}`);
+        if (!pending && row.payload && typeof row.payload === 'object') localStorage.setItem(key,JSON.stringify(row.payload));
+      }
+    }
+  } catch { if (!user.isAdmin) libraryBooks = []; }
+  if (activeUser?.id !== user.id) return;
+  const checked = await Promise.all(libraryBooks.map(async book => {
+    if (user.isAdmin) return {...book,canRead:true};
+    try {const access = await supabase.rpc('bp_reading_can_read',{p_edition_id:book.editionId});return {...book,canRead:!access.error && access.data === true};}
+    catch {return {...book,canRead:false};}
+  }));
+  if (activeUser?.id === user.id) libraryBooks=checked;
+}
+window.addEventListener('bp-reading-membership-confirmed',async()=>{if(activeUser){await loadReadingCatalogue();renderLibrary();}});
+function safeCover(value) {
+  if (typeof value !== 'string') return '/assets/book7.png';
+  try { const url = new URL(value,location.origin); return url.protocol === 'https:' || url.origin === location.origin ? url.href : '/assets/book7.png'; } catch {return '/assets/book7.png';}
 }
 
 /* =====================================================
    ADMIN AUTHENTICATION
    ===================================================== */
 
-async function verifyBPReadingAdmin() {
+async function verifyBPReadingUser() {
   const {
     data: { user },
     error: authError
@@ -272,16 +295,7 @@ async function verifyBPReadingAdmin() {
     .eq("id", user.id)
     .single();
 
-  if (
-    profileError ||
-    profile?.is_admin !== true
-  ) {
-    throw new Error(
-      "Administrator access required"
-    );
-  }
-
-  return user;
+  return {...user,isAdmin:!profileError && profile?.is_admin === true};
 }
 
 /* =====================================================
@@ -538,6 +552,8 @@ function updateReaderProgress() {
   $("reader-progress").textContent = label;
   $("quiet-percent").textContent = state.locationsReady ? `${state.progress}% complete` : label;
   $("quiet-chapter").textContent = chapterName(start.href);
+  const estimate = chapterTimeRemaining();
+  if (estimate) $("reader-progress").textContent += " · " + estimate;
   $("reader-seek").disabled = !state.locationsReady;
   $("reader-seek").value = state.progress;
   $("seek-value").value = state.progress + '%';
@@ -580,6 +596,7 @@ function handleRelocation(location) {
   state.currentCfi = cfi;
   state.position = cfi;
   state.hasStarted = true;
+  sampleReadingPace();
 
   updateReaderProgress();
   saveState();
@@ -1277,7 +1294,7 @@ async function openBook() {
     }
 
     $("reader-loading").textContent =
-      "Opening Gualachulain…";
+      `Opening ${BOOK.title}…`;
 
     if (typeof window.ePub !== "function" || !window.JSZip) throw new Error("The reading engine could not load. Check your connection and reload this page.");
     const book = window.ePub(bytes);
@@ -1306,6 +1323,13 @@ async function openBook() {
 
     state.rendition = rendition;
 
+    rendition.on('selected', (cfi, contents) => {
+      const selected = contents.window.getSelection()?.toString().trim();
+      if (!selected || !cfi || selected.length > 4000) return;
+      selectedPassage = {cfi,quote:selected,chapter:chapterName()};
+      $('selection-tools').hidden = false;
+    });
+    rendition.on('rendered', () => { renderHighlights(); });
     registerThemes(rendition);
     applyReaderPreferences();
 
@@ -1332,6 +1356,7 @@ async function openBook() {
     rendition.hooks.content.register(
       contents => {
         registerPageGestures(contents);
+        renderPageWatermark(contents);
       }
     );
 
@@ -1370,6 +1395,7 @@ async function openBook() {
 
     updateReaderProgress();
     saveState();
+    renderHighlights();
     renderLibrary();
 
     void prepareLocations(
@@ -1394,7 +1420,7 @@ async function openBook() {
     closeBook();
 
     showLibraryError(
-      `Unable to open Gualachulain: ${message}`
+      `Unable to open ${BOOK.title}: ${message}`
     );
   } finally {
     if (openingId === state.openingId) {
@@ -1410,6 +1436,7 @@ async function openBook() {
 
 function closeBook() {
   closePanel();
+  $('selection-tools').hidden = true; selectedPassage = null; lastPageSample = null;
   if (document.fullscreenElement === $('reader')) void document.exitFullscreen().catch(() => {});
   ++searchVersion;
   $('search-results').replaceChildren();
@@ -1441,6 +1468,7 @@ function closeBook() {
   }
 
   state.rendition = null;
+  highlightedCfis.clear();
 
   if (state.book) {
     try {
@@ -1483,13 +1511,116 @@ let previousPlace = null;
 let panelTrigger = null;
 let chapterItems = [];
 let searchVersion = 0;
+let annotations = [];
+let readingPace = {wpm:220,samples:0};
+let lastPageSample = null;
+let selectedPassage = null;
+const highlightedCfis = new Set();
+function validAnnotation(item) {
+  return item && typeof item.id === 'string' && typeof item.cfi === 'string' && item.cfi.startsWith('epubcfi(')
+    && typeof item.quote === 'string' && item.quote.length <= 4000 && typeof item.note === 'string' && item.note.length <= 6000
+    && typeof item.chapter === 'string' && item.chapter.length <= 500;
+}
+function renderPageWatermark(contents) {
+  const doc = contents.document;
+  if (!doc?.body || doc.getElementById('bp-personal-copy')) return;
+  const mark = doc.createElement('div'); mark.id = 'bp-personal-copy'; mark.setAttribute('aria-hidden','true');
+  mark.textContent = $('reader-watermark').textContent;
+  mark.style.cssText = 'position:fixed;bottom:2px;right:8px;font:8px Arial,sans-serif;letter-spacing:.04em;opacity:.22;pointer-events:none;z-index:100;color:inherit;';
+  doc.body.append(mark);
+}
+function renderHighlights() {
+  if (!state.rendition) return;
+  for (const item of annotations) {
+    if (!item.quote || highlightedCfis.has(item.cfi)) continue;
+    try {
+      state.rendition.annotations.highlight(item.cfi,{id:item.id},() => {openPanel('notebook',$('open-notebook'));},'bp-saved-highlight', {fill:'#bf9c54','fill-opacity':'0.3','mix-blend-mode':'multiply'});
+      highlightedCfis.add(item.cfi);
+    } catch { /* Saved text remains available in the notebook if an edition changed. */ }
+  }
+}
+function renderNotebook() {
+  const host = $('notebook-list'); host.replaceChildren();
+  if (!annotations.length) {host.textContent = 'Your notebook is waiting. Keep a passage or leave a thought on your current page.'; return;}
+  for (const item of annotations.slice().reverse()) {
+    const card = document.createElement('article'); card.className = 'notebook-card';
+    const title = document.createElement('button'); title.className = 'chapter-link'; title.type = 'button'; title.textContent = item.chapter || 'Saved page'; title.onclick = () => void jumpTo(item.cfi);
+    const quote = document.createElement('blockquote'); quote.textContent = item.quote;
+    const label = document.createElement('label'); label.textContent = 'Your private note';
+    const input = document.createElement('textarea'); input.maxLength = 6000; input.rows = 3; input.value = item.note; label.append(input);
+    const actions = document.createElement('div'); actions.className = 'notebook-actions';
+    const save = document.createElement('button'); save.type = 'button'; save.className = 'control'; save.textContent = 'Save note';
+    save.onclick = () => {item.note = input.value.trim(); saveState(); save.textContent = 'Saved';};
+    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'control'; remove.textContent = 'Delete';
+    remove.onclick = () => {
+      if (!confirm('Delete this saved passage and note?')) return;
+      annotations = annotations.filter(a => a.id !== item.id);
+      if (!annotations.some(a => a.cfi === item.cfi && a.quote)) {
+        try {state.rendition?.annotations.remove(item.cfi,'highlight');} catch {}
+        highlightedCfis.delete(item.cfi);
+      }
+      saveState(); renderNotebook();
+    };
+    actions.append(save,remove); card.append(title); if (item.quote) card.append(quote); card.append(label,actions); host.append(card);
+  }
+}
+function addAnnotation(passage) {
+  if (!passage?.cfi || annotations.length >= 500) {showStatus('This notebook can hold up to 500 saved places.'); return;}
+  annotations.push({id:crypto.randomUUID(),cfi:passage.cfi,quote:passage.quote || '',note:'',chapter:passage.chapter || chapterName(),createdAt:new Date().toISOString()});
+  $('selection-tools').hidden = true; selectedPassage = null;
+  saveState(); renderHighlights();
+  if ($('reader-panel').open) renderNotebook(); else openPanel('notebook',$('open-notebook'));
+}
+function pageWordEstimate() {
+  const content = state.rendition?.getContents()?.[0];
+  const text = content?.document?.body?.textContent || '';
+  const total = state.currentLocation?.start?.displayed?.total || 1;
+  return Math.max(20,text.trim().split(/\s+/u).length / total);
+}
+function sampleReadingPace() {
+  const now = performance.now();
+  const cfi = getCurrentCfi();
+  const chapter = state.currentLocation?.start?.href;
+  if (!cfi || !state.isOpen || document.hidden) {lastPageSample = null; return;}
+  if (lastPageSample && lastPageSample.cfi === cfi) return;
+  if (lastPageSample && lastPageSample.chapter === chapter && !state.isLoading) {
+    const seconds = (now - lastPageSample.time) / 1000;
+    if (seconds >= 8 && seconds <= 180) {
+      const measured = lastPageSample.words / seconds * 60;
+      if (measured >= 60 && measured <= 700) {readingPace.wpm = readingPace.samples ? readingPace.wpm * .8 + measured * .2 : measured; readingPace.samples++;}
+    }
+  }
+  lastPageSample = {cfi,chapter,time:now,words:pageWordEstimate()};
+}
+function chapterTimeRemaining() {
+  const displayed = state.currentLocation?.start?.displayed;
+  if (!displayed?.total || !displayed.page) return '';
+  const minutes = Math.ceil(Math.max(0,displayed.total-displayed.page) * pageWordEstimate() / readingPace.wpm);
+  return `${minutes < 1 ? '<1' : minutes} min left in chapter${readingPace.samples < 3 ? ' (estimate)' : ''}`;
+}
+$('save-highlight').onclick = () => addAnnotation(selectedPassage);
+$('dismiss-selection').onclick = () => {$('selection-tools').hidden = true; selectedPassage = null;};
+$('add-page-note').onclick = () => {const cfi = getCurrentCfi(); if (cfi) addAnnotation({cfi,chapter:chapterName()});};
+for (const id of ['library-search','library-status','library-sort']) $(id).addEventListener(id === 'library-search' ? 'input' : 'change',renderLibrary);
+$('load-synced').onclick = async () => {
+  if (!readingAccount || state.isOpen || switchingEdition) return;
+  if (!confirm('Load this book’s synced reading data? Any unsynced local changes for this book will be replaced.')) return;
+  try {const data = await readingAccount.useServerCopy(); restorePreferences(data); localStorage.setItem(STORAGE_KEY,JSON.stringify(snapshot())); renderLibrary();} catch (e) {reportSync(e.message);}
+};
+document.addEventListener('visibilitychange', () => {lastPageSample = null; if (document.hidden) void readingAccount?.flush();});
+window.addEventListener('online', () => void readingAccount?.flush());
+
 function restorePreferences(stored) {
   state.theme = allowedThemes.includes(stored.theme) ? stored.theme : 'parchment';
   state.fontSize = Number.isFinite(stored.fontSize) ? clamp(stored.fontSize, 15, 30) : 19;
   state.position = typeof stored.position === 'string' && stored.position.startsWith('epubcfi(') ? stored.position : null;
+  annotations = Array.isArray(stored.annotations) ? stored.annotations.filter(validAnnotation).slice(0,500) : [];
+  readingPace = stored.readingPace && Number.isFinite(stored.readingPace.wpm) ? {wpm:clamp(stored.readingPace.wpm,60,700),samples:clamp(Number(stored.readingPace.samples)||0,0,100)} : {wpm:220,samples:0};
+  lastPageSample = null;
   state.progress = Number.isFinite(stored.progress) ? clamp(stored.progress, 0, 100) : 0;
   state.bookmarks = Array.isArray(stored.bookmarks) ? stored.bookmarks.filter(c => typeof c === 'string' && c.startsWith('epubcfi(')) : [];
   state.hasStarted = stored.hasStarted === true;
+  Object.assign(appearance, {font:'literary',spacing:'1.7',width:'760',alignment:'left',motion:'gentle'});
   const options = {font: Object.keys(fontFamilies), spacing: ['1.5','1.7','1.9'], width: ['620','760','920'], alignment: ['left','justify'], motion: ['gentle','instant']};
   for (const key of Object.keys(options)) {
     if (options[key].includes(stored.appearance?.[key])) appearance[key] = stored.appearance[key];
@@ -1510,9 +1641,11 @@ function closePanel() {
 function openPanel(kind, trigger) {
   if (!state.isOpen || state.isLoading) return;
   panelTrigger = trigger;
-  for (const name of ['appearance','contents','bookmarks','search']) $('panel-' + name).hidden = name !== kind;
-  $('reader-panel-title').textContent = {appearance:'Your perfect page',contents:'Inside this book',bookmarks:'Saved places',search:'Between the lines'}[kind];
+  lastPageSample = null;
+  for (const name of ['appearance','contents','bookmarks','search','notebook']) $('panel-' + name).hidden = name !== kind;
+  $('reader-panel-title').textContent = {appearance:'Your perfect page',contents:'Inside this book',bookmarks:'Saved places',search:'Between the lines',notebook:'Your private notebook'}[kind];
   if (kind === 'bookmarks') renderBookmarks();
+  if (kind === 'notebook') renderNotebook();
   if (kind === 'contents') {
     const current = String(state.currentLocation?.start?.href || '').split('#')[0];
     $('chapter-list').querySelectorAll('button').forEach((button, i) => {
@@ -1543,6 +1676,7 @@ function renderContents() {
 async function jumpTo(target, remember = true) {
   if (!state.rendition || state.isNavigating || state.isLoading) return;
   const current = getCurrentCfi();
+  lastPageSample = null;
   const opening = state.openingId;
   state.isNavigating = true; updateReaderProgress();
   try {
@@ -1574,7 +1708,7 @@ function handleReadingKeys(event) {
     event.preventDefault(); void changePage(['ArrowRight','PageDown'].includes(event.key) ? 1 : -1);
   }
 }
-for (const name of ['contents','appearance','bookmarks','search']) $('open-' + name).onclick = event => openPanel(name, event.currentTarget);
+for (const name of ['contents','appearance','bookmarks','search','notebook']) $('open-' + name).onclick = event => openPanel(name, event.currentTarget);
 $('close-panel').onclick = closePanel;
 $('reader-panel').addEventListener('click', event => {if (event.target === $('reader-panel')) {const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) closePanel();}});
 for (const [key, id] of Object.entries({font:'reader-font',spacing:'reader-spacing',width:'reader-width',alignment:'reader-alignment',motion:'reader-motion'})) {
@@ -1646,9 +1780,11 @@ $('bookmark').addEventListener('click', () => {
 });
 supabase.auth.onAuthStateChange(event => {
   if (event === 'SIGNED_OUT') {
+    sessionEpoch++; readingAccount?.stop(); checkoutController?.stop(); activeUser = null;
     closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
     $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
-    state.bookmarks = []; bookmarkDetails = {}; $('chapter-list').replaceChildren(); $('bookmark-list').replaceChildren();
+    state.bookmarks = []; bookmarkDetails = {}; annotations = [];
+    $('chapter-list').replaceChildren(); $('bookmark-list').replaceChildren(); $('notebook-list').replaceChildren();
   }
 });
 
@@ -1813,19 +1949,26 @@ document.addEventListener(
    ===================================================== */
 
 async function initialise() {
+  const epoch = sessionEpoch;
   renderLibrary();
 
   try {
-    const user = await verifyBPReadingAdmin();
-    STORAGE_KEY = `bp-reading:${user.id}:edition:${EDITION_ID}:v2`;
-    const stored = loadSavedState();
-    restorePreferences(stored);
+    const user = await verifyBPReadingUser();
+    if (epoch !== sessionEpoch) return;
+    activeUser = user;
+    $("reading-membership-offer").hidden = user.isAdmin;
+    checkoutController = initializeReadingCheckout(supabase,{button:$("subscribe-reading"),status:$("reading-payment-status"),retry:$("check-reading-payment")});
+    $('reader-watermark').textContent = 'Personal reading copy · Reader ' + user.id.slice(0,8).toUpperCase();
+    await loadReadingCatalogue();
+    if (!activeUser || epoch !== sessionEpoch) return;
+    await connectEdition(BOOK);
+    if (!activeUser || epoch !== sessionEpoch) return;
     renderLibrary();
     $("reader-access").hidden = true;
     $("library").hidden = false;
 
     document.documentElement.classList.add(
-      "bp-admin-verified"
+      "bp-reader-verified"
     );
   } catch (error) {
     console.warn(
@@ -1833,7 +1976,7 @@ async function initialise() {
       error.message
     );
 
-    $("access-message").textContent = "Your library could not be opened. Sign in through The Archivists with an administrator account, then try again.";
+    $("access-message").textContent = "Your library could not be opened. Sign in through The Archivists, then try again.";
   }
 }
 

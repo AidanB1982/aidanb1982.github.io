@@ -1048,6 +1048,14 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                 <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
             </div>
 
+            <section class="circle-reader-record-cta" aria-labelledby="circle-bp-reading-title">
+                <div>
+                    <h2 id="circle-bp-reading-title">The Blackwood Reading Room</h2>
+                    <p>Open BP Reading to explore the collection, continue your books, and keep your private reading notebook.</p>
+                </div>
+                <a href="/pages/bp-reading.html" class="circle-reader-record-button">Open BP Reading</a>
+            </section>
+
             <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
                 <div>
                     <h2 id="circle-reader-record-cta-title">Leave a Reader Record</h2>

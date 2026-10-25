@@ -26,6 +26,17 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
    document.dispatchEvent(event); return event.defaultPrevented;
  })), 'book clipboard deterrents');
 
+
+ await bookFrame.evaluate(() => {
+   const paragraph = document.querySelector('p'); const range = document.createRange();
+   range.setStart(paragraph.firstChild,0); range.setEnd(paragraph.firstChild,40);
+   const selection = window.getSelection();selection.removeAllRanges();selection.addRange(range);
+   document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+ });
+ await page.waitForFunction(()=>!document.getElementById('selection-tools').hidden);
+ await page.locator('#save-highlight').click();assert(await page.locator('#notebook-list blockquote').count()===1,'selected text highlight');
+ await page.locator('#notebook-list textarea').fill('Highlight note');await page.getByRole('button',{name:'Save note',exact:true}).click();await page.locator('#close-panel').click();
+ await bookFrame.evaluate(()=>window.getSelection().removeAllRanges());
  await page.locator('#reader-menu-toggle').click();
  await page.locator('#open-contents').click();assert(await page.locator('#chapter-list button').count()===2,'contents');
  await page.getByRole('button',{name:'The Second Chapter',exact:true}).click();
@@ -43,8 +54,14 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  await page.keyboard.press('ArrowRight');await page.waitForTimeout(400);
  const after=await page.evaluate(()=>JSON.parse(localStorage.getItem('bp-reading:reader-test:edition:2:v2')).position);assert(before!==after,'keyboard page turn');
  await page.locator('#open-search').click();await page.locator('#book-search').fill('water');await page.locator('#book-search-form button').click();await page.waitForFunction(()=>!document.getElementById('search-status').textContent.includes('Searching'));assert((await page.locator('#search-results button').count())>0,'search results');await page.locator('#search-results button').first().click();await page.waitForTimeout(300);
+
+ await page.locator('#open-notebook').click();await page.locator('#add-page-note').click();await page.locator('#notebook-list textarea').first().fill('A private reading note');await page.getByRole('button',{name:'Save note',exact:true}).first().click();await page.locator('#close-panel').click();
+ assert((await page.locator('#reader-watermark').textContent()).includes('Reader'),'personal watermark');
+ assert((await page.locator('#reading-sync-status').textContent()).includes('Device-only'),'honest missing-backend status');
  await page.locator('#back-to-library').click();await page.reload();await page.getByRole('button',{name:'Continue Reading',exact:true}).click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
  assert(await page.locator('#reader').getAttribute('data-theme')==='night','settings restored');
+ await page.locator('#reader-menu-toggle').click();await page.locator('#open-notebook').click();assert((await page.locator('#notebook-list textarea').evaluateAll(nodes=>nodes.map(n=>n.value))).includes('A private reading note'),'notebook restored');await page.locator('#close-panel').click();await page.locator('#reader-menu-toggle').click();
+
  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);await page.locator('#reader-menu-toggle').click();await page.locator('#open-appearance').click();
  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'mobile viewport');
  await page.screenshot({path:`${TEST_DIR}/mobile.png`});await page.locator('#close-panel').click();

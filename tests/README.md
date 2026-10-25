@@ -30,3 +30,47 @@ dependency, and screenshot directory (default /tmp/blackwood-reading-test).
 Live protected-book delivery and real-device touch gestures still need acceptance
 testing in a signed-in account. Reading data remains device-local and the library
 remains the existing administrator-only Gualachulain edition.
+
+BP Reading service foundations
+
+- `node tests/reading-account.mjs` checks the sync client's persistent outbox,
+  conflict detection, explicit server reload, device-only fallback and in-flight edits.
+- With `@electric-sql/pglite` available to Node, `node tests/reading-schema.cjs`
+  executes the SQL migration in an isolated embedded PostgreSQL instance. It tests
+  subscription expiry, title purchases across replacement editions, revocation,
+  denied self-grants, private state RLS, concurrency and payload limits. Supabase
+  Auth is represented by a minimal test schema. No real project is accessed.
+- The browser smoke test also checks device-only notes and personal watermarks.
+
+Deployment prerequisites and remaining service work are in
+`docs/bp-reading-service.md`. These foundations do not activate paid access.
+- `node tests/reading-library.cjs` uses the same EPUB/dependency fixtures and
+  Playwright settings. It tests a two-book catalogue, author filtering, edition
+  switching, cloud snapshot writes, restoring notes after clearing the device
+  cache, and notebook isolation between editions. Its Supabase server is mocked;
+  this is not a live-project test.
+
+- `node tests/reading-delivery.mjs` exercises the TypeScript delivery handler with
+  Node 24's built-in type stripping and mocked Supabase clients. It verifies the
+  legacy admin path, disabled customer gate, caller-JWT entitlement checks,
+  explicit exact-file release approvals, malformed requests, CORS, no-store
+  headers, and denial before Storage access. It does not deploy the Deno entry
+  point or contact the real project.
+
+Membership popup and payment foundations
+
+- `node tests/reading-create-checkout.mjs`: exact annual plan and fixed variant,
+  GBP price checks, authenticated checkout binding and both disabled launch gates.
+- `node tests/reading-popup.mjs`: popup failures, retained website, no access from
+  closing the window, server-confirmed status and refund handling.
+- `node tests/reading-shopify-webhook.mjs`: raw-body signatures, expected shop,
+  authoritative order facts, offer checks, verified timestamps and refund routing.
+- The embedded PostgreSQL test also applies the second migration and exercises
+  server-only grants, private checkout polling, leap days, duplicate notifications,
+  renewal dates, refunds and replay after refunds.
+- Set READING_CUSTOMER_TEST=1 when running reading-library.cjs to exercise a
+  non-admin paid reader. READING_LOCKED_TEST=1 tests a signed-in nonmember whose
+  protected books remain locked. These use mocked entitlement responses.
+
+The Deno entry points and real Shopify GraphQL responses require staging checks;
+these local tests do not establish that payment credentials or webhooks are live.
