@@ -5,7 +5,7 @@ import {
   createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
-import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261026";
+import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261028";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
 /* =====================================================

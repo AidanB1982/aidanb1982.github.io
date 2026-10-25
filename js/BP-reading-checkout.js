@@ -1,4 +1,24 @@
 /* Popup closure and checkout return URLs never grant access. Only a server-paid intent does. */
+async function checkoutFailureMessage(error) {
+  const fallback='Subscription checkout could not be prepared. No payment has been requested. Please try again or contact Blackwood Publishing.';
+  let payload;
+  try {
+    const response=error?.context;
+    if(response?.clone)payload=await response.clone().json();
+    else if(response?.json)payload=await response.json();
+  }catch {return fallback;}
+  const message=payload?.error || payload?.message || payload?.msg;
+  const messages={
+    'Membership checkout is not ready yet.':'Checkout is still closed for this account. During testing, BP_READING_TEST_USER_ID must match your signed-in member profile, and the latest checkout function must be deployed.',
+    'Annual subscription checkout is not configured.':'The annual checkout settings are incomplete. Check the shop domain, Storefront token and annual selling-plan setting in Supabase.',
+    'Your session could not be verified.':'Your sign-in session could not be verified. Sign out, sign back in and try again.',
+    'Sign in to BP Reading before subscribing.':'Sign in to BP Reading before subscribing.',
+    'Invalid JWT':'The checkout service rejected your sign-in token. Sign out and sign in again; if it continues, check the function authentication configuration.',
+    'Invalid checkout action.':'The checkout page and function versions do not match. Refresh the page and confirm the latest checkout function is deployed.'
+  };
+  return typeof message==='string'&&Object.hasOwn(messages,message)?messages[message]:fallback;
+}
+
 export function initializeReadingCheckout(client, {button, status, retry}, platform = window) {
   let stopped = false, busy = false, intentId = null, popup = null, timer = null, deadline = 0, checkoutUrl = null;
   const say = text => {status.textContent = text;};
@@ -41,11 +61,13 @@ export function initializeReadingCheckout(client, {button, status, retry}, platf
     if (!popup) {say('Your browser blocked the checkout popup. Allow popups for this site, then try again.');return;}
     try {popup.opener=null;popup.document.title='Preparing BP Reading checkout';popup.document.body.textContent='Preparing secure Shopify checkout…';} catch {}
     busy=true;button.disabled=true;retry.hidden=true;say('Preparing your annual membership checkout…');
+    let failureMessage='Subscription checkout is not ready yet. No payment has been requested. Please try again once the service is connected.';
     try {
       if (!client.functions?.invoke) throw Error('Checkout is not connected yet.');
       const {data,error} = await client.functions.invoke('bp-reading-create-checkout',{body:{}});
       if (stopped) {popup?.close();return;}
-      if (error || !data?.intentId || !data?.checkoutUrl) throw Error('Checkout is not connected yet.');
+      if (error) {failureMessage=await checkoutFailureMessage(error);throw Error('Checkout request failed');}
+      if (!data?.intentId || !data?.checkoutUrl) throw Error('Checkout is not connected yet.');
       const target = new URL(data.checkoutUrl);
       if (target.protocol!=='https:') throw Error('Invalid secure checkout URL.');
       intentId=data.intentId;checkoutUrl=target.href;
@@ -55,7 +77,7 @@ export function initializeReadingCheckout(client, {button, status, retry}, platf
       retry.hidden=false;deadline=Date.now()+5*60*1000;void check();
     } catch {
       popup?.close();busy=false;button.disabled=false;
-      say('Subscription checkout is not ready yet. No payment has been requested. Please try again once the service is connected.');
+      say(failureMessage);
     }
   });
   retry.addEventListener('click',()=>{deadline=Date.now()+60000;void check();});
