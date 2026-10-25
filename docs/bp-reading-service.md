@@ -166,3 +166,13 @@ The admin setup checker can make an authenticated GET to the checkout function;
 405 is the expected read-only response and confirms handler startup without
 creating a cart. It also reports an older deployed handler or missing browser
 CORS headers. Deploying source in GitHub alone does not update Edge Functions.
+
+Webhook diagnostics now log every handled reply with a fixed status/reason and
+verification failures with a phase (order lookup, payment status/currency/amount,
+annual selling plan, checkout binding, timestamp, test-account approval or
+membership persistence). Shopify GraphQL errors expose only codes and field
+names, not raw response bodies. A shop-domain mismatch logs validated public
+hostnames so renamed myshopify aliases can be diagnosed without weakening shop
+or HMAC validation. Successful boot is distinct from payment processing success.
+If an already-paid checkout remains pending, inspect this webhook's delivery
+status and reason; do not ask the reader to pay a second time.

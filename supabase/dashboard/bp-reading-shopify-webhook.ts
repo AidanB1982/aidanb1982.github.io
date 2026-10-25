@@ -14,15 +14,23 @@ type Dependencies = {
   allowTestPayment(intentId:string):Promise<boolean>;
   applyPayment(intentId:string,paymentId:string,paidAt:string):Promise<void>;
   revokePayment(paymentId:string):Promise<void>;
-  log(message:string):void;
+  log(message:string,level?:'info'|'error'):void;
 };
 export function createShopifyWebhook(deps:Dependencies) {
   return async(request:Request):Promise<Response>=>{
-    const json=(status:number,message:string)=>Response.json({message},{status,headers:{'Cache-Control':'no-store'}});
+    const json=(status:number,message:string)=>{
+      deps.log('BP_READING_WEBHOOK_REPLY_'+status+'_'+message.replace(/[^A-Za-z0-9]+/g,'_').toUpperCase(),status>=400?'error':'info');
+      return Response.json({message},{status,headers:{'Cache-Control':'no-store'}});
+    };
     if(request.method!=='POST')return json(405,'Method not allowed');
     const secret=deps.env('SHOPIFY_WEBHOOK_SECRET'),shop=deps.env('SHOPIFY_STORE_DOMAIN');
     if(!secret||!shop)return json(503,'Webhook is not configured');
-    if(request.headers.get('X-Shopify-Shop-Domain')?.toLowerCase()!==shop.toLowerCase())return json(401,'Unverified shop');
+    const receivedShop=(request.headers.get('X-Shopify-Shop-Domain')||'').trim().toLowerCase();
+    if(receivedShop!==shop.trim().toLowerCase()) {
+      const safeDomain=(value:string)=>/^[a-z0-9][a-z0-9-]{0,62}\.myshopify\.com$/.test(value)?value:'[invalid domain]';
+      deps.log('BP_READING_WEBHOOK_SHOP_MISMATCH expected='+safeDomain(shop.trim().toLowerCase())+' received='+safeDomain(receivedShop));
+      return json(401,'Unverified shop');
+    }
     const raw=await request.arrayBuffer();
     if(raw.byteLength>1024*1024)return json(413,'Payload too large');
     try {
@@ -40,22 +48,39 @@ export function createShopifyWebhook(deps:Dependencies) {
     const gid=topic==='orders/paid'&&typeof event.admin_graphql_api_id==='string'?event.admin_graphql_api_id:
       typeof numeric==='number'&&Number.isSafeInteger(numeric)&&numeric>0?`gid://shopify/Order/${numeric}`:'';
     if(!/^gid:\/\/shopify\/Order\/\d+$/.test(gid))return json(400,'Invalid order');
+    let phase='ORDER_LOOKUP';
     try {
       // Re-query Shopify's Admin API. Never use a browser or webhook header as paid_at.
       const order=await deps.loadOrder(gid);
+      phase='ORDER_IDENTITY';
       if(order.id!==gid)throw Error('Order identity mismatch');
+      phase='PAYMENT_PROVENANCE';
       if(typeof order.test!=='boolean')throw Error('Payment provenance is missing');
       const paymentId=`${order.test?'shopify-test':'shopify'}:${shop}:${gid}`;
       if(order.financialStatus==='REFUNDED') {await deps.revokePayment(paymentId);return json(200,'Refund recorded');}
       if(topic==='refunds/create'||order.financialStatus==='PARTIALLY_REFUNDED') {deps.log('Partial refund requires membership review.');return json(200,'Refund received for review');}
       if(order.variantId!=='gid://shopify/ProductVariant/60163522265433')return json(200,'Not a reader membership order');
       const plan=deps.env('SHOPIFY_READING_SELLING_PLAN_ID')??'gid://shopify/SellingPlan/697040896345';
-      if(order.financialStatus!=='PAID'||order.currency!=='GBP'||order.quantity!==1||order.lineCount!==1||Number(order.lineAmount)!==10.99||order.sellingPlanId!==plan)throw Error('Paid annual offer could not be verified');
-      if(!order.intentId||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(order.intentId)||!order.paidAt||!Number.isFinite(Date.parse(order.paidAt)))throw Error('Checkout binding or payment time is missing');
-      if(order.test&&!await deps.allowTestPayment(order.intentId)){deps.log('Simulated payment ignored: designated test-account approval is missing.');return json(200,'Test payment not enabled for this account');}
-      await deps.applyPayment(order.intentId,paymentId,order.paidAt);
+      for(const [reason,valid] of [
+        ['PAYMENT_STATUS',order.financialStatus==='PAID'],
+        ['CURRENCY',order.currency==='GBP'],
+        ['QUANTITY',order.quantity===1],
+        ['LINE_COUNT',order.lineCount===1],
+        ['ANNUAL_AMOUNT',Number(order.lineAmount)===10.99],
+        ['SELLING_PLAN',order.sellingPlanId===plan],
+        ['CHECKOUT_REFERENCE',Boolean(order.intentId&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(order.intentId))],
+        ['PAYMENT_TIMESTAMP',Boolean(order.paidAt&&Number.isFinite(Date.parse(order.paidAt)))]
+      ] as const) {if(!valid){phase=reason;throw Error('VERIFICATION_FAILED');}}
+      phase='TEST_ACCOUNT_APPROVAL';
+      if(order.test&&!await deps.allowTestPayment(order.intentId!)){deps.log('Simulated payment ignored: designated test-account approval is missing.');return json(200,'Test payment not enabled for this account');}
+      phase='MEMBERSHIP_SAVE';
+      await deps.applyPayment(order.intentId!,paymentId,order.paidAt!);
       return json(200,'Membership payment recorded');
-    } catch {deps.log('Reader payment verification failed; no access was granted.');return json(503,'Payment verification is pending');}
+    } catch(error) {
+      const code=error instanceof Error&&/^[A-Z0-9_]{1,300}$/.test(error.message)?error.message:'VERIFICATION_FAILED';
+      deps.log('BP_READING_WEBHOOK_FAILED phase='+phase+' code='+code);
+      return json(503,'Payment verification is pending');
+    }
   };
 }
 
@@ -101,7 +126,7 @@ function service(){
   return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
 }
 Deno.serve(createShopifyWebhook({
-  env:name=>Deno.env.get(name),log:message=>console.error(message),
+  env:name=>Deno.env.get(name),log:(message,level='error')=>{if(level==='info')console.info(message);else console.error(message);},
   async loadOrder(id):Promise<PaidOrder>{
     const shop=Deno.env.get('SHOPIFY_STORE_DOMAIN')||'',token=await getAdminToken();
     if(!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop)||!token)throw Error('Missing Shopify configuration');
@@ -109,9 +134,15 @@ Deno.serve(createShopifyWebhook({
     const lookup=(accessToken:string)=>fetch(`https://${shop}/admin/api/2026-10/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Access-Token':accessToken},body:JSON.stringify({query,variables:{id}}),signal:AbortSignal.timeout(20000)});
     let response=await lookup(token);
     if(response.status===401)response=await lookup(await getAdminToken(true));
-    if(!response.ok)throw Error('Shopify could not verify the order');
+    if(!response.ok)throw Error('SHOPIFY_ORDER_HTTP_'+response.status);
     const result=await response.json(),order=result.data?.order;
-    if(result.errors?.length||!order)throw Error('Order verification failed');
+    if(result.errors?.length) {
+      // Report only schema/scope codes and field names, never response bodies.
+      const codes=[...new Set(result.errors.map((e:{extensions?:{code?:unknown}})=>e.extensions?.code).filter((c:unknown)=>typeof c==='string'&&/^[A-Za-z_]{1,60}$/.test(c as string)))];
+      const paths=[...new Set(result.errors.flatMap((e:{path?:unknown})=>Array.isArray(e.path)?e.path.filter(p=>typeof p==='string'&&/^[A-Za-z_]{1,60}$/.test(p)):[]))];
+      throw Error(('SHOPIFY_ORDER_GRAPHQL_'+(codes.join('_')||'ERROR')+'_'+paths.slice(0,8).join('_')).toUpperCase().slice(0,300));
+    }
+    if(!order)throw Error('SHOPIFY_ORDER_NOT_FOUND');
     const lines=order.lineItems?.nodes||[],line=lines[0];
     const attributes=[...(order.customAttributes||[]),...(line?.customAttributes||[])];
     const intent=attributes.find((a:{key:string})=>a.key==='bp_reading_intent'||a.key==='_bp_reading_intent')?.value;
@@ -124,6 +155,6 @@ Deno.serve(createShopifyWebhook({
     const {data,error}=await service().from('bp_reading_checkout_intents').select('user_id').eq('id',intent).maybeSingle();
     return !error&&data?.user_id===tester;
   },
-  async applyPayment(intent,payment,date){const {error}=await service().rpc('bp_reading_apply_membership_payment',{p_intent_id:intent,p_payment_id:payment,p_paid_at:date});if(error)throw Error('Membership update failed');},
+  async applyPayment(intent,payment,date){const {error}=await service().rpc('bp_reading_apply_membership_payment',{p_intent_id:intent,p_payment_id:payment,p_paid_at:date});if(error)throw Error('MEMBERSHIP_SAVE_'+(/^[A-Za-z0-9_]{1,40}$/.test(error.code||'')?error.code:'FAILED'));},
   async revokePayment(payment){const {error}=await service().rpc('bp_reading_revoke_membership_payment',{p_payment_id:payment});if(error)throw Error('Refund update failed');}
 }));

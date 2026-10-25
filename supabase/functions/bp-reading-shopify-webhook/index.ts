@@ -9,7 +9,7 @@ function service(){
   return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
 }
 Deno.serve(createShopifyWebhook({
-  env:name=>Deno.env.get(name),log:message=>console.error(message),
+  env:name=>Deno.env.get(name),log:(message,level='error')=>{if(level==='info')console.info(message);else console.error(message);},
   async loadOrder(id):Promise<PaidOrder>{
     const shop=Deno.env.get('SHOPIFY_STORE_DOMAIN')||'',token=await getAdminToken();
     if(!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop)||!token)throw Error('Missing Shopify configuration');
@@ -17,9 +17,15 @@ Deno.serve(createShopifyWebhook({
     const lookup=(accessToken:string)=>fetch(`https://${shop}/admin/api/2026-10/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Access-Token':accessToken},body:JSON.stringify({query,variables:{id}}),signal:AbortSignal.timeout(20000)});
     let response=await lookup(token);
     if(response.status===401)response=await lookup(await getAdminToken(true));
-    if(!response.ok)throw Error('Shopify could not verify the order');
+    if(!response.ok)throw Error('SHOPIFY_ORDER_HTTP_'+response.status);
     const result=await response.json(),order=result.data?.order;
-    if(result.errors?.length||!order)throw Error('Order verification failed');
+    if(result.errors?.length) {
+      // Report only schema/scope codes and field names, never response bodies.
+      const codes=[...new Set(result.errors.map((e:{extensions?:{code?:unknown}})=>e.extensions?.code).filter((c:unknown)=>typeof c==='string'&&/^[A-Za-z_]{1,60}$/.test(c as string)))];
+      const paths=[...new Set(result.errors.flatMap((e:{path?:unknown})=>Array.isArray(e.path)?e.path.filter(p=>typeof p==='string'&&/^[A-Za-z_]{1,60}$/.test(p)):[]))];
+      throw Error(('SHOPIFY_ORDER_GRAPHQL_'+(codes.join('_')||'ERROR')+'_'+paths.slice(0,8).join('_')).toUpperCase().slice(0,300));
+    }
+    if(!order)throw Error('SHOPIFY_ORDER_NOT_FOUND');
     const lines=order.lineItems?.nodes||[],line=lines[0];
     const attributes=[...(order.customAttributes||[]),...(line?.customAttributes||[])];
     const intent=attributes.find((a:{key:string})=>a.key==='bp_reading_intent'||a.key==='_bp_reading_intent')?.value;
@@ -32,6 +38,6 @@ Deno.serve(createShopifyWebhook({
     const {data,error}=await service().from('bp_reading_checkout_intents').select('user_id').eq('id',intent).maybeSingle();
     return !error&&data?.user_id===tester;
   },
-  async applyPayment(intent,payment,date){const {error}=await service().rpc('bp_reading_apply_membership_payment',{p_intent_id:intent,p_payment_id:payment,p_paid_at:date});if(error)throw Error('Membership update failed');},
+  async applyPayment(intent,payment,date){const {error}=await service().rpc('bp_reading_apply_membership_payment',{p_intent_id:intent,p_payment_id:payment,p_paid_at:date});if(error)throw Error('MEMBERSHIP_SAVE_'+(/^[A-Za-z0-9_]{1,40}$/.test(error.code||'')?error.code:'FAILED'));},
   async revokePayment(payment){const {error}=await service().rpc('bp_reading_revoke_membership_payment',{p_payment_id:payment});if(error)throw Error('Refund update failed');}
 }));
