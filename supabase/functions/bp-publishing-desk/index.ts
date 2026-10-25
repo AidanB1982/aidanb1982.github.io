@@ -1,7 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
-import {createPublishingDesk,assignmentFailure,aiProviderFailure} from './handler.ts';
+import {createPublishingDesk,assignmentFailure,aiProviderFailure,PublishingDeskError} from './handler.ts';
 import {createOutlookMailer} from './outlook.ts';
+import {createMetaPublisher} from '../bp-social-publish/meta.ts';
 const auth={persistSession:false,autoRefreshToken:false};
 function env(name:string){return Deno.env.get(name)||'';}
 function service(){const url=env('SUPABASE_URL'),key=env('SUPABASE_SERVICE_ROLE_KEY');if(!url||!key)throw Error('CONFIG');return createClient(url,key,{auth});}
@@ -10,6 +11,7 @@ async function rows(table:string,select:string,filters:Record<string,string|bool
  const all=[];for(let start=0;start<10000;start+=500){let query=service().from(table).select(select);for(const [key,value] of Object.entries(filters))query=query.eq(key,value);const data=check(await query.order('id').range(start,start+499)) as any[];all.push(...data);if(data.length<500)return all;}throw Error('TOO_MANY_ROWS');
 }
 const mailer=createOutlookMailer(env);
+const social=createMetaPublisher(env);
 Deno.serve(createPublishingDesk({
  async authenticate(token){
   const url=env('SUPABASE_URL'),key=env('SUPABASE_ANON_KEY');if(!url||!key)throw Error('CONFIG');
@@ -17,6 +19,7 @@ Deno.serve(createPublishingDesk({
   const profile=await service().from('member_profiles').select('is_admin').eq('id',data.user.id).maybeSingle();
   return {id:data.user.id,admin:!profile.error&&profile.data?.is_admin===true};
  },
+ async socialCheck(){try{return await social.check();}catch(error){throw new PublishingDeskError(503,error instanceof Error?error.message:'Meta connection check failed.','META_CONNECTION');}},
  async overview(){
   const [campaigns,profiles,assignments,noticeRows]=await Promise.all([
    rows('arc_files','id,title,author_name,is_active,downloads_open_at,downloads_close_at'),
@@ -24,8 +27,9 @@ Deno.serve(createPublishingDesk({
    rows('arc_file_assignments','id,member_id,arc_file_id,status,review_due_date,download_count,review_link,created_at,application_id'),
    rows('bp_arc_notices','id,assignment_id,kind,state')
   ]);
+  const readiness=await service().from('bp_marketing_posts').select('delivery_mode').limit(1);
   const linked=new Set(assignments.filter(a=>typeof a.application_id==='string'&&a.application_id.trim()).map(a=>a.member_id));
-  return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active').map(p=>({...p,application_reference_available:linked.has(p.id)})),assignments:assignments.map(({application_id,...assignment})=>assignment),notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY'))};
+  return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active').map(p=>({...p,application_reference_available:linked.has(p.id)})),assignments:assignments.map(({application_id,...assignment})=>assignment),notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY')),socialSchedulerReady:!readiness.error,socialConfigured:social.configured(),socialEnabled:env('BP_SOCIAL_PUBLISHING_ENABLED')==='true'};
  },
  async assign(fileId,members,due,applicationRefs){const result=await service().rpc('bp_arc_assign_campaign_v2',{p_file_id:fileId,p_members:members,p_due:due,p_application_refs:applicationRefs});if(result.error)throw assignmentFailure(result.error);return result.data;},
  async createBatch(admin,fileId,kind,recipients){return check(await service().from('bp_arc_mail_batches').insert({created_by:admin,arc_file_id:fileId,kind,recipients}).select('*').single()) as any;},

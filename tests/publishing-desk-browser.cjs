@@ -9,7 +9,8 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
   const people=[{id:'00000000-0000-0000-0000-000000000001',email:'admin@example.invalid',reader_name:'Admin',application_reference_available:true,is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000002',email:'reader@example.invalid',reader_name:'Reader',application_reference_available:true,is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000003',email:'unlinked@example.invalid',reader_name:'Unlinked reader',application_reference_available:false,is_arc_member:true,member_status:'active'}];
   const client={auth:{getUser:async()=>({data:{user:{id:people[0].id}}}),getSession:async()=>({data:{session:null}}),onAuthStateChange:fn=>{window.mockAuthCallbacks.push(fn);}},from(table){return {select(){return this},eq(){return this},order(){return this},range:async()=>({data:window.mockPosts}),maybeSingle:async()=>({data:{is_admin:!window.mockDenied}})};},functions:{async invoke(name,{body}){
    window.mockCalls.push(body);
-   if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:false}};
+   if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:false,socialSchedulerReady:true,socialConfigured:true,socialEnabled:false}};
+   if(body.action==='social-check')return {data:{pageName:'Blackwood Publishing',instagramConnected:true,instagramUsername:'blackwood',enabled:false}};
    if(body.action==='assign'&&window.mockAssignFailure)return {error:{context:{json:async()=>({error:'This ARC campaign is inactive or closed.'})}}};
    if(body.action==='assign'){let created=0,retained=0,blocked=[];for(const id of body.members){
     const person=people.find(p=>p.id===id);
@@ -49,32 +50,31 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  assert((await page.locator('#ops-preview-text').textContent()).includes('Gualachulain'));
  assert.equal(await page.evaluate(()=>window.mockCalls.filter(c=>c.action==='send').length),0,'preview never sends email');
  await page.locator('#ops-send').click();await page.waitForFunction(()=>document.getElementById('ops-status').textContent.includes('3 notice(s) submitted'));
- assert(await page.locator('#ops-generate').isEnabled(),'earlier missing-key status does not block a fresh server attempt');
- await page.locator('#ops-ai-title-input').fill('Gualachulain');await page.selectOption('#ops-ai-channel','TikTok');await page.locator('#ops-ai-facts').fill('Aidan Blackwood. The Cursed Bothies, Book 2.');
- await page.evaluate(()=>window.mockAIFailure=true);await page.locator('#ops-generate').click();
- await page.waitForFunction(()=>document.getElementById('ops-ai-status').textContent.includes('Configure OPENAI_API_KEY'));
- assert(await page.locator('#ops-generate').isEnabled(),'failed connection remains retryable');
- await page.evaluate(()=>window.mockAIFailure=false);await page.locator('#ops-generate').click();
- await page.waitForFunction(()=>document.getElementById('ops-ai-output').value.includes('Shot list'));
- assert((await page.locator('#ops-ai-status').textContent()).includes('AI draft ready'),'draft result is visible beside the AI form');
- await page.locator('#ops-use-draft').click();assert.equal(await page.locator('#ops-post-channel').inputValue(),'TikTok');
+ assert(await page.locator('#ops-ai').isHidden(),'AI assistant is benched');
+ await page.locator('#ops-social-check').click();await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Connected to Blackwood Publishing'));
+ assert((await page.locator('#ops-social-state').textContent()).includes('paused'));
+ await page.locator('#ops-post-title').fill('Gualachulain announcement');await page.selectOption('#ops-post-channel','TikTok');await page.locator('#ops-post-content').fill('My own approved caption.');
  await page.locator('#ops-post-time').fill('2099-10-01T10:00');await page.selectOption('#ops-post-status','scheduled');await page.getByRole('button',{name:'Save content',exact:true}).click();
  await page.waitForSelector('.ops-post');assert((await page.locator('.ops-post').textContent()).includes('TikTok'));
  assert.equal(await page.locator('.ops-calendar-day').count(),42,'monthly calendar');
+ await page.locator('#ops-new-post').click();await page.locator('#ops-post-title').fill('Facebook book news');await page.locator('#ops-post-content').fill('Approved book news.');await page.selectOption('#ops-post-delivery','automatic');await page.selectOption('#ops-post-channel','Instagram');await page.locator('#ops-post-time').fill('2099-10-01T11:00');await page.selectOption('#ops-post-status','scheduled');
+ await page.getByRole('button',{name:'Save content',exact:true}).click();await page.waitForFunction(()=>document.getElementById('ops-post-status-message').textContent.includes('Instagram needs a public JPEG'));
+ await page.selectOption('#ops-post-channel','Facebook');await page.getByRole('button',{name:'Save content',exact:true}).click();await page.waitForFunction(()=>document.getElementById('ops-post-status-message').textContent.includes('saved for automatic delivery'));
+ assert.equal(await page.evaluate(()=>window.mockPosts.filter(p=>p.delivery_mode==='automatic').length),1,'automatic delivery explicitly opted in');
  await page.getByRole('button',{name:'Plan monthly newsletter',exact:true}).click();assert.equal(await page.locator('#ops-post-channel').inputValue(),'Email');assert.equal(await page.locator('#ops-post-cadence').inputValue(),'monthly');
  const dates=await page.evaluate(()=>{const first=window.BlackwoodOperations.helpers.monthAfter('2027-01-31T10:00:00',31),second=window.BlackwoodOperations.helpers.monthAfter(first,31);return [first.getDate(),second.getDate()];});assert.deepEqual(dates,[28,31],'monthly cadence handles short months without losing original day');
  const exported=await page.evaluate(()=>window.BlackwoodOperations.helpers.ics(window.mockPosts));assert(exported.includes('BEGIN:VEVENT'));assert(exported.includes('DTSTART:20991001T100000Z'));assert(exported.includes('manual publishing'));
  // A token refresh must preserve unsaved editorial work; sign-out must clear it.
- await page.locator('#ops-ai-facts').fill('Unsaved factual brief');
+ await page.locator('#ops-post-content').fill('Unsaved newsletter copy');
  await page.evaluate(()=>window.mockAuthCallbacks.forEach(cb=>cb('TOKEN_REFRESHED')));
  await page.waitForFunction(()=>!document.getElementById('ops-controls').disabled);
- assert.equal(await page.locator('#ops-ai-facts').inputValue(),'Unsaved factual brief');
+ assert.equal(await page.locator('#ops-post-content').inputValue(),'Unsaved newsletter copy');
  await page.setViewportSize({width:390,height:844});await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await page.waitForFunction(()=>document.documentElement.scrollWidth<=innerWidth+1);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'mobile desk has no page overflow');
- await page.locator('#ops-ai').screenshot({path:OUT+'/publishing-assistant-mobile.png'});
+ await page.locator('#ops-calendar').screenshot({path:OUT+'/publishing-scheduler-mobile.png'});
  await page.evaluate(()=>window.mockAuthCallbacks.forEach(cb=>cb('SIGNED_OUT')));
  assert(await page.locator('#bfa-admin-content').isHidden());assert.equal(await page.locator('#ops-readers tr').count(),0);assert.equal(await page.locator('#ops-ai-facts').inputValue(),'');
  await page.evaluate(()=>{window.mockDenied=true;window.mockAuthCallbacks.forEach(cb=>cb('SIGNED_IN'));});
  await page.waitForFunction(()=>document.getElementById('bfa-access-title').textContent==='Access Denied');
  assert(await page.locator('#bfa-admin-content').isHidden(),'non-admin cannot open tools');
- assert.deepEqual(errors,[]);console.log('PASS full admin gate, ARC assignment/preview/send workflow, AI-to-calendar drafting, social scheduling, monthly newsletter, calendar export, mobile layout and session changes (mock services)');await browser.close();
+ assert.deepEqual(errors,[]);console.log('PASS full admin gate, ARC assignment/preview/send workflow, benched AI, Meta connection, explicit social scheduling, monthly newsletter, calendar export, mobile layout and session changes (mock services)');await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});

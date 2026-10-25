@@ -10,12 +10,13 @@ export type Campaign={id:number;title:string;author_name?:string;is_active:boole
 export type Reader={id:string;email:string;display_name?:string;reader_name?:string;is_arc_member:boolean;member_status:string;application_reference_available?:boolean};
 export type Assignment={id:number;member_id:string;arc_file_id:number;status:string;review_due_date?:string;download_count:number;review_link?:string;created_at?:string};
 export type Notice={assignment_id:number;kind:string;state:string};
-export type Overview={campaigns:Campaign[];readers:Reader[];assignments:Assignment[];notices:Notice[];mailConfigured:boolean;aiConfigured:boolean};
+export type Overview={campaigns:Campaign[];readers:Reader[];assignments:Assignment[];notices:Notice[];mailConfigured:boolean;aiConfigured:boolean;socialSchedulerReady?:boolean;socialConfigured?:boolean;socialEnabled?:boolean};
 export type Recipient={assignmentId:number;memberId:string;email:string;name:string;subject:string;text:string};
 export type Batch={id:string;created_by:string;arc_file_id:number;kind:string;recipients:Recipient[];created_at:string};
 export type DeskDeps={
  authenticate(token:string):Promise<{id:string;admin:boolean}|null>;
  overview():Promise<Overview>;
+ socialCheck?:()=>Promise<unknown>;
  assign(fileId:number,members:string[],due:string,applicationRefs:Record<string,string>):Promise<unknown>;
  createBatch(admin:string,fileId:number,kind:string,recipients:Recipient[]):Promise<Batch>;
  batch(id:string):Promise<Batch|null>;
@@ -62,6 +63,7 @@ export function createPublishingDesk(deps:DeskDeps){return async(request:Request
   let body;try{body=JSON.parse(raw);}catch{return json(400,{error:'Invalid JSON.'});}
   if(!body||typeof body!=='object'||Array.isArray(body))return json(400,{error:'Invalid request.'});
   const now=deps.now?.()??Date.now();
+  if(body.action==='social-check'){if(!deps.socialCheck)return json(503,{error:'Deploy the updated publishing desk function to check Meta.'});return json(200,await deps.socialCheck());}
   if(body.action==='overview')return json(200,await deps.overview());
   if(body.action==='generate'){
    const brief={title:body.title,author:body.author||'',channel:body.channel,facts:body.facts,task:body.task};

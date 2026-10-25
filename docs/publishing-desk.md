@@ -12,7 +12,7 @@ page. They use the existing Supabase `member_profiles.is_admin` permission.
   `aidan@blackwoodpublishing.co.uk`, sent individually through Microsoft Graph.
 - A server-side notification ledger, separate from download counts. Only readers
   with a current assignment, no download and no filed review receive these notices.
-- An AI drafting assistant using supplied, approved book facts. TikTok drafts can
+- A retained AI drafting assistant, currently hidden while AI is paused, using supplied, approved book facts. TikTok drafts can
   include a hook, script and shot list. Drafts are reviewed before use.
 - A Supabase-backed planning calendar for Facebook, Instagram, TikTok, Email and
   Behind the Files; draft/approved/scheduled/published-manually states; UTC calendar
@@ -127,17 +127,16 @@ These are assignment-specific ARC notices, not a subscription to general marketi
 
 ## Social publishing and the monthly mailing list
 
-The scheduler currently stores plans and editorial states. It does **not** automatically
-post to Facebook, Instagram or TikTok, or send the monthly newsletter. “Published
-manually” is recorded only when an administrator explicitly chooses it and saves.
-Exported calendar slots are reminders, not social API jobs. Monthly preparation creates
-an unsaved draft for review; it is not an automatic recurring send.
+Facebook and Instagram automatic publishing is implemented, but requires the Meta
+credentials, new SQL migration, Edge deployments and background schedule described in
+[meta-social-scheduler.md](meta-social-scheduler.md). Existing plans remain manual.
+The AI form is hidden while AI work is paused. Manual authoring needs no AI key.
 
-Automatic publication is a separate connection step requiring the actual accounts,
-permissions and assets: a Facebook Page, the associated Instagram professional account,
-authorised TikTok Content Posting access and video assets, plus the mailing platform.
-The site already has a MailerLite signup form. Keep the newsletter's subscribed audience
-and unsubscribe footer in that platform; do not substitute the ARC reader roster.
+Facebook supports text and single-image posts. Instagram supports one public JPEG
+image with a caption. TikTok, video/Reels, carousels and the monthly newsletter remain
+manual plans. Monthly preparation creates an unsaved draft; it does not send or recur
+automatically. The existing MailerLite signup audience and unsubscribe handling remain
+separate from the ARC team roster.
 
 Public BP Reading navigation and its checkout/customer launch flags remain unchanged.
 KDP term dates do not trigger publication or assignment automatically.
@@ -151,7 +150,7 @@ KDP term dates do not trigger publication or assignment automatically.
   permissions, duplicate assignment protection, retained reviews, monthly slots,
   optimistic editing, notice claims and AI rate limits.
 - `node tests/publishing-desk-browser.cjs`: actual admin-auth integration and UI with
-  mocked Supabase/provider responses; assign/preview/send, AI-to-calendar, monthly
+  mocked Supabase/provider responses; assign/preview/send, paused AI, manual/automatic authoring, monthly
   preparation, calendar export, mobile layout and session lifecycle.
 - `node tests/arc-profile-current.cjs`: actual ARC-profile UI with mocked services;
   current Supabase campaign, retained history and admin book filtering.

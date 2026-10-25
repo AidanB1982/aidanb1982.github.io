@@ -12,12 +12,12 @@
   const escape=value=>String(value||'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
   const stamp=value=>new Date(value).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
   const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Blackwood Publishing//Content Desk//EN','CALSCALE:GREGORIAN'];
-  for(const p of records.filter(p=>p.status==='scheduled'&&Number.isFinite(Date.parse(p.scheduled_at))))lines.push('BEGIN:VEVENT','UID:'+p.id+'@blackwoodpublishing.co.uk','DTSTAMP:'+stamp(Date.now()),'DTSTART:'+stamp(p.scheduled_at),'DTEND:'+stamp(Date.parse(p.scheduled_at)+900000),'SUMMARY:'+escape(p.title),'DESCRIPTION:'+escape(p.channel+' — manual publishing\n'+p.content),'END:VEVENT');
+  for(const p of records.filter(p=>p.status==='scheduled'&&Number.isFinite(Date.parse(p.scheduled_at))))lines.push('BEGIN:VEVENT','UID:'+p.id+'@blackwoodpublishing.co.uk','DTSTAMP:'+stamp(Date.now()),'DTSTART:'+stamp(p.scheduled_at),'DTEND:'+stamp(Date.parse(p.scheduled_at)+900000),'SUMMARY:'+escape(p.title),'DESCRIPTION:'+escape(p.channel+(p.delivery_mode==='automatic'?' — automatic delivery':' — manual publishing')+'\n'+p.content),'END:VEVENT');
   lines.push('END:VCALENDAR');
   return lines.map(line=>{let result='',part='',size=0;for(const c of line){const n=new TextEncoder().encode(c).length;if(size+n>73){result+=part+'\r\n ';part='';size=1;}part+=c;size+=n;}return result+part;}).join('\r\n')+'\r\n';
  }
  function invalidatePreview(){preview=null;$('ops-email-preview').hidden=true;$('ops-preview-person').replaceChildren();$('ops-preview-text').textContent='';}
- function lock(){epoch++;$('ops-controls').disabled=true;client=null;owner=null;data=null;posts=[];editing=null;selected.clear();invalidatePreview();$('ops-readers').replaceChildren();$('ops-posts').replaceChildren();$('ops-calendar-grid').replaceChildren();$('ops-ai-output').value='';$('ops-ai-status').textContent='';$('ops-ai-form').reset();$('ops-post-form').reset();$('ops-campaign').innerHTML='<option value="">Choose an ARC book</option>';$('ops-send-status').textContent='';$('ops-selection-state').textContent='Choose an ARC campaign to select readers.';$('ops-arc-status').textContent='';status('Sign in as an administrator to use this desk.');}
+ function lock(){epoch++;$('ops-controls').disabled=true;client=null;owner=null;data=null;posts=[];editing=null;selected.clear();invalidatePreview();$('ops-readers').replaceChildren();$('ops-posts').replaceChildren();$('ops-calendar-grid').replaceChildren();$('ops-ai-output').value='';$('ops-ai-status').textContent='';$('ops-post-status-message').textContent='';$('ops-social-state').textContent='Meta connection not checked.';$('ops-ai-form').reset();$('ops-post-form').reset();$('ops-campaign').innerHTML='<option value="">Choose an ARC book</option>';$('ops-send-status').textContent='';$('ops-selection-state').textContent='Choose an ARC campaign to select readers.';$('ops-arc-status').textContent='';status('Sign in as an administrator to use this desk.');}
  async function invoke(body){
   if(!client)throw Error('Administrator sign-in is required.');const version=epoch;
   const {data:result,error}=await client.functions.invoke('bp-publishing-desk',{body});
@@ -34,6 +34,8 @@
   $('ops-campaign').value=old;
   $('ops-mail-state').textContent=data.mailConfigured?'Outlook credentials configured · aidan@blackwoodpublishing.co.uk. A test send is still needed to verify mailbox permissions.':'Outlook is not connected. Assignment and preview tools work once the function is deployed; sending needs Microsoft app credentials and mailbox consent.';
   $('ops-ai-state').textContent=data.aiConfigured?'AI drafting is connected. Review all facts and copy before publishing.':'AI drafting needs OPENAI_API_KEY in Supabase. You can still write and schedule content manually.';
+  $('ops-post-delivery').querySelector('[value=automatic]').disabled=data.socialSchedulerReady!==true;
+  $('ops-social-state').textContent=data.socialSchedulerReady!==true?'Apply the social scheduler SQL and deploy the updated desk function before enabling automatic delivery. Manual planning remains available.':data.socialConfigured?(data.socialEnabled?'Meta credentials configured. Automatic publishing switch is on; use the connection check to verify the account.':'Meta credentials configured. Automatic publishing is paused until setup is complete.'):'Meta is not connected. Manual planning is available; automatic posting needs the Meta credentials and background schedule.';
   renderReaders();
  }
  function campaign(){return data?.campaigns.find(c=>c.id===Number($('ops-campaign').value));}
@@ -103,26 +105,36 @@
   for(let start=0;start<10000;start+=500){const response=await client.from('bp_marketing_posts').select('*').order('created_at',{ascending:false}).range(start,start+499);if(version!==epoch)return;if(response.error)throw Error('Content storage is not available. Apply the publishing-desk migration first.');result.push(...response.data);if(response.data.length<500){posts=result;renderCalendar();return;}}
   throw Error('Too many posts to load safely.');
  }
- function newPost(){editing=null;$('ops-post-form').reset();$('ops-post-time').dataset.anchor='';copyCount();}
+ function newPost(){editing=null;$('ops-post-status-message').textContent='';$('ops-post-form').reset();$('ops-post-time').dataset.anchor='';copyCount();}
  function editPost(p){
+  if(p.delivery_mode==='automatic'&&['processing','unknown','published'].includes(p.delivery_state)){status('This automatic delivery is locked. Check its status and the social account before taking further action.');return;}
   editing=p;for(const [field,id] of Object.entries({title:'title',book_title:'book',channel:'channel',content:'content',status:'status',cadence:'cadence',media_url:'media'}))$('ops-post-'+id).value=p[field]||'';
+  $('ops-post-delivery').value=p.delivery_mode||'manual';
   $('ops-post-time').value=p.scheduled_at?local(p.scheduled_at):'';$('ops-post-time').dataset.anchor=p.cadence_anchor||'';copyCount();moveTo($('ops-post-form'));
  }
  function payload(){
   const time=$('ops-post-time').value;let scheduled_at=null;
   if(time){const date=new Date(time);if(!Number.isFinite(date.getTime())||local(date)!==time)throw Error('Choose a valid local date and time.');scheduled_at=date.toISOString();}
   const media_url=$('ops-post-media').value.trim();if(media_url&&new URL(media_url).protocol!=='https:')throw Error('Use an HTTPS media URL.');
-  const p={title:$('ops-post-title').value.trim(),book_title:$('ops-post-book').value.trim(),channel:$('ops-post-channel').value,content:$('ops-post-content').value.trim(),status:$('ops-post-status').value,scheduled_at,cadence:$('ops-post-cadence').value,media_url,cadence_anchor:Number($('ops-post-time').dataset.anchor)||(scheduled_at?new Date(scheduled_at).getDate():1)};
+  const p={delivery_mode:$('ops-post-delivery').value,title:$('ops-post-title').value.trim(),book_title:$('ops-post-book').value.trim(),channel:$('ops-post-channel').value,content:$('ops-post-content').value.trim(),status:$('ops-post-status').value,scheduled_at,cadence:$('ops-post-cadence').value,media_url,cadence_anchor:Number($('ops-post-time').dataset.anchor)||(scheduled_at?new Date(scheduled_at).getDate():1)};
   if(p.cadence==='monthly'&&p.channel!=='Email')throw Error('Monthly mailing-list cadence is for Email.');
   if(p.status==='scheduled'&&(!scheduled_at||Date.parse(scheduled_at)<=Date.now()))throw Error('Choose a future publishing slot.');
+  if(p.delivery_mode==='automatic'){
+   if(data?.socialSchedulerReady!==true)throw Error('Apply the social scheduler SQL and deploy the updated desk function first.');
+   if(!['Facebook','Instagram'].includes(p.channel))throw Error('Automatic publishing currently supports Facebook and Instagram only.');
+   if(p.status==='published')throw Error('Automatic publication is confirmed by the publisher. Choose Scheduled instead.');
+   if(p.channel==='Instagram'&&(!p.media_url||p.content.length>2200))throw Error('Instagram needs a public JPEG image URL and a caption of at most 2200 characters.');
+  }
   return p;
  }
+ const postStatus=text=>{status(text);$('ops-post-status-message').textContent=text;};
+ $('ops-social-check').onclick=()=>operation(async()=>{const result=await invoke({action:'social-check'});$('ops-social-state').textContent='Connected to '+result.pageName+(result.instagramConnected?' · Instagram '+(result.instagramUsername||'account'):' · No linked Instagram professional account')+'. '+(result.enabled?'Automatic publishing switch is on. Confirm the background schedule is installed.':'Automatic publishing is paused.');},text=>{$('ops-social-state').textContent=text;});
  $('ops-post-form').onsubmit=e=>{e.preventDefault();void operation(async()=>{
   if(!client)throw Error('Administrator sign-in required.');const value=payload(),version=epoch;
   const response=await client.rpc('bp_marketing_save_post',{p_id:editing?.id||null,p_revision:editing?.revision||0,p_payload:value});
-  if(version!==epoch)return;if(response.error)throw Error(response.error.code==='40001'?'This post changed in another session. Reload content before editing.':response.error.code==='23505'?'A monthly mailing-list item already exists for this month. Edit the existing item.':'Content could not be saved. Check required fields, storage and permissions.');
-  if(value.scheduled_at)$('ops-month').value=local(value.scheduled_at).slice(0,7);newPost();await loadPosts();status('Content saved. Scheduled items are publishing reminders until the channel is connected.');
- });};
+  if(version!==epoch)return;if(response.error)throw Error(response.error.code==='40001'?'This post changed in another session. Reload content before editing.':response.error.code==='55000'?'This automatic delivery is locked. Reload content and check its publication status before taking further action.':response.error.code==='23505'?'A monthly mailing-list item already exists for this month. Edit the existing item.':'Content could not be saved. Check required fields, storage and permissions.');
+  if(value.scheduled_at)$('ops-month').value=local(value.scheduled_at).slice(0,7);newPost();await loadPosts();postStatus(value.delivery_mode==='automatic'?'Content saved for automatic delivery. Publishing requires the enabled Meta worker and background schedule.':'Content saved as a manual publishing plan.');
+ },postStatus);};
  $('ops-new-post').onclick=newPost;
  $('ops-post-time').oninput=()=>{$('ops-post-time').dataset.anchor='';};
  function copyCount(){const n=$('ops-post-content').value.length;const channel=$('ops-post-channel').value;$('ops-copy-count').textContent=n+' characters'+(['Instagram','TikTok'].includes(channel)&&n>2200?' — shorten the final caption before publishing; this field may also contain script or shot notes.':'');}
@@ -133,7 +145,7 @@
   const month=$('ops-month').value;if(!/^\d{4}-\d{2}$/.test(month))return;
   const [year,number]=month.split('-').map(Number),first=new Date(year,number-1,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
   const visible=filtered(),due=visible.filter(p=>p.status==='scheduled'&&Date.parse(p.scheduled_at)<=Date.now()).length;
-  $('ops-calendar-summary').textContent=`${visible.length} saved item(s) · ${due} due for manual publishing. Monthly email slots remain drafts until you schedule them.`;
+  $('ops-calendar-summary').textContent=`${visible.length} saved item(s) · ${due} scheduled item(s) due. Monthly email slots remain drafts until you schedule them.`;
   const grid=$('ops-calendar-grid');grid.replaceChildren();
   for(let day=0;day<42;day++){
    const date=new Date(start);date.setDate(start.getDate()+day);const key=local(date).slice(0,10),box=document.createElement('div');box.className='ops-calendar-day'+(date.getMonth()!==number-1?' outside':'')+(key===local(Date.now()).slice(0,10)?' today':'');box.textContent=date.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'});
@@ -143,17 +155,18 @@
   for(const p of visible.filter(p=>!p.scheduled_at||local(p.scheduled_at).slice(0,7)===month).sort((a,b)=>(Date.parse(a.scheduled_at)||0)-(Date.parse(b.scheduled_at)||0))){
    const card=document.createElement('article');card.className='ops-post'+(p.status==='scheduled'&&Date.parse(p.scheduled_at)<=Date.now()?' due':'');
    const title=document.createElement('h4');title.textContent=p.title;
-   const meta=document.createElement('p');meta.textContent=[p.channel,p.status==='published'?'Published manually':p.status,p.scheduled_at?new Date(p.scheduled_at).toLocaleString():'No date',p.cadence==='monthly'?'Monthly mailing list':''].filter(Boolean).join(' · ');
+   const meta=document.createElement('p');meta.textContent=[p.channel,p.delivery_mode==='automatic'?'Automatic · '+(p.delivery_state||p.status):(p.status==='published'?'Published manually':p.status),p.scheduled_at?new Date(p.scheduled_at).toLocaleString():'No date',p.cadence==='monthly'?'Monthly mailing list':''].filter(Boolean).join(' · ');
    const text=document.createElement('pre');text.textContent=p.content;
    const buttons=document.createElement('div');buttons.className='ops-actions';
    const button=(label,fn)=>{const b=document.createElement('button');b.type='button';b.className='bfa-button';b.textContent=label;b.onclick=fn;buttons.append(b);};
-   button('Edit item',()=>editPost(p));button('Copy content',()=>operation(async()=>{await navigator.clipboard.writeText(p.content);status('Content copied for manual publication.');}));
-   if(p.status!=='published')button('Mark published manually',()=>{editPost(p);$('ops-post-status').value='published';status('Check this item, then save to record that you published it.');});
+   const locked=p.delivery_mode==='automatic'&&['processing','unknown','published'].includes(p.delivery_state);
+   if(!locked)button('Edit item',()=>editPost(p));button('Copy content',()=>operation(async()=>{await navigator.clipboard.writeText(p.content);status('Content copied for manual publication.');}));
+   if(p.status!=='published'&&!locked&&p.delivery_mode!=='automatic')button('Mark published manually',()=>{editPost(p);$('ops-post-status').value='published';status('Check this item, then save to record that you published it.');});
    if(p.channel==='Email'&&p.cadence==='monthly'&&p.scheduled_at)button('Prepare next month',()=>{
     const date=monthAfter(p.scheduled_at,p.cadence_anchor);
     if(posts.some(post=>post.channel==='Email'&&post.cadence==='monthly'&&post.scheduled_at&&local(post.scheduled_at).slice(0,7)===local(date).slice(0,7))){status('A monthly mailing-list item already exists for that month. Edit the existing item.');return;}
     editPost({...p,id:null,revision:0,status:'draft',scheduled_at:date.toISOString()});editing=null;status('Next month prepared as an unsaved draft. Review and save it.');
-   });card.append(title,meta,text,buttons);list.append(card);
+   });card.append(title,meta,text);if(p.delivery_error){const error=document.createElement('p');error.textContent=p.delivery_error;card.append(error);}if(p.provider_post_id){const receipt=document.createElement('p');receipt.textContent='Platform post ID: '+p.provider_post_id;card.append(receipt);}card.append(buttons);list.append(card);
   }
  }
  $('ops-month').onchange=renderCalendar;$('ops-channel-filter').onchange=renderCalendar;

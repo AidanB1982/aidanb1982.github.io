@@ -163,9 +163,9 @@ Publishing Operations
 - `python3 scripts/bundle-edge-functions.py --check` validates the single-file deployment.
 
 Setup and live limitations are in `docs/publishing-desk.md`. These tests send no real
-mail and do not publish social content. The calendar currently plans manual publishing;
-Outlook and AI need server credentials, and automatic social/newsletter publication
-requires their account integrations.
+mail and do not publish social content. The calendar retains manual planning and adds explicit automatic Facebook/Instagram
+delivery, requiring the Meta setup and background worker described in
+`docs/meta-social-scheduler.md`. TikTok and newsletter delivery remain manual.
 
 
 ARC assignment coverage applies all three migrations, including historical repair
@@ -175,3 +175,14 @@ duplicates, old reviews/downloads remain intact and no personal copies or refere
 are created by the grant. Revoked records are never silently reactivated; unapproved
 members and direct browser RPC access are rejected. Browser tests cover selecting the
 whole team, granting access without reference input, visible failures and email preview.
+
+
+`node --test tests/social-publisher.mjs` checks Meta account reads, Facebook feed/photo
+publication, Instagram container readiness, redacted provider errors and ambiguous
+outcomes, plus worker authentication, the pause switch and recorded acknowledgements.
+These are mocked API calls, not real social posts. The schema test also applies the
+social migration and checks opt-in queueing, due-time claims, concurrent/repeated claim
+safety, cancellation, admin/service permissions, published receipts and lost-worker
+quarantine. The browser test covers the hidden AI form, Meta check and manual versus
+automatic authoring. Live credentials and one controlled test per platform are still
+needed to verify the external account integration.

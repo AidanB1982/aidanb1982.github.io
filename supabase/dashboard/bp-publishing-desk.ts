@@ -15,12 +15,13 @@ export type Campaign={id:number;title:string;author_name?:string;is_active:boole
 export type Reader={id:string;email:string;display_name?:string;reader_name?:string;is_arc_member:boolean;member_status:string;application_reference_available?:boolean};
 export type Assignment={id:number;member_id:string;arc_file_id:number;status:string;review_due_date?:string;download_count:number;review_link?:string;created_at?:string};
 export type Notice={assignment_id:number;kind:string;state:string};
-export type Overview={campaigns:Campaign[];readers:Reader[];assignments:Assignment[];notices:Notice[];mailConfigured:boolean;aiConfigured:boolean};
+export type Overview={campaigns:Campaign[];readers:Reader[];assignments:Assignment[];notices:Notice[];mailConfigured:boolean;aiConfigured:boolean;socialSchedulerReady?:boolean;socialConfigured?:boolean;socialEnabled?:boolean};
 export type Recipient={assignmentId:number;memberId:string;email:string;name:string;subject:string;text:string};
 export type Batch={id:string;created_by:string;arc_file_id:number;kind:string;recipients:Recipient[];created_at:string};
 export type DeskDeps={
  authenticate(token:string):Promise<{id:string;admin:boolean}|null>;
  overview():Promise<Overview>;
+ socialCheck?:()=>Promise<unknown>;
  assign(fileId:number,members:string[],due:string,applicationRefs:Record<string,string>):Promise<unknown>;
  createBatch(admin:string,fileId:number,kind:string,recipients:Recipient[]):Promise<Batch>;
  batch(id:string):Promise<Batch|null>;
@@ -67,6 +68,7 @@ export function createPublishingDesk(deps:DeskDeps){return async(request:Request
   let body;try{body=JSON.parse(raw);}catch{return json(400,{error:'Invalid JSON.'});}
   if(!body||typeof body!=='object'||Array.isArray(body))return json(400,{error:'Invalid request.'});
   const now=deps.now?.()??Date.now();
+  if(body.action==='social-check'){if(!deps.socialCheck)return json(503,{error:'Deploy the updated publishing desk function to check Meta.'});return json(200,await deps.socialCheck());}
   if(body.action==='overview')return json(200,await deps.overview());
   if(body.action==='generate'){
    const brief={title:body.title,author:body.author||'',channel:body.channel,facts:body.facts,task:body.task};
@@ -152,6 +154,47 @@ export function createOutlookMailer(env:(name:string)=>string,transport:typeof f
  return {configured,ready,send};
 }
 
+export type SocialPost={id:string;channel:string;content:string;media_url:string;delivery_claim:string};
+export type SocialResult={state:'published'|'failed'|'unknown';providerId:string|null;message:string|null};
+export class MetaError extends Error {ambiguous:boolean;constructor(message:string,ambiguous=false){super(message);this.ambiguous=ambiguous;}}
+export function createMetaPublisher(env:(name:string)=>string|undefined,transport:typeof fetch=fetch,pause:(ms:number)=>Promise<void>=ms=>new Promise(resolve=>setTimeout(resolve,ms))){
+ const config=()=>{const token=env('META_PAGE_ACCESS_TOKEN')||'',page=env('META_PAGE_ID')||'',version=env('META_GRAPH_VERSION')||'v24.0';if(!token||!/^\d+$/.test(page)||!/^v\d+\.\d+$/.test(version))throw new MetaError('Meta is not configured. Add META_PAGE_ACCESS_TOKEN and META_PAGE_ID in Supabase.');return {token,page,version};};
+ async function graph(path:string,method='GET',fields?:Record<string,string>){
+  const {token,version}=config();let response:Response;
+  try{response=await transport(`https://graph.facebook.com/${version}/${path}`,{method,headers:{Authorization:'Bearer '+token,...(method==='POST'?{'Content-Type':'application/x-www-form-urlencoded'}:{})},body:method==='POST'?new URLSearchParams(fields):undefined,redirect:'error',signal:AbortSignal.timeout(20000)});}catch{throw new MetaError('Meta did not confirm the request. Check the social account before retrying.',method==='POST');}
+  let data:any;try{data=await response.json();}catch{throw new MetaError('Meta returned an unreadable response. Check the social account before retrying.',method==='POST');}
+  if(!response.ok||data.error){const code=data.error?.code;if(method==='POST'&&(response.status>=500||code===1||code===2))throw new MetaError('Meta did not confirm publication. Check the social account before retrying.',true);throw new MetaError(code===190?'The Meta access token expired or is invalid. Update it in Supabase.':code===10||code===200?'Meta denied publishing permission. Check app permissions and Page access.':response.status===429?'Meta is rate limiting requests. Try scheduling again later.':'Meta rejected the request. Check image format, account permissions and platform restrictions.',method==='POST'&&(response.status>=500||code===1||code===2));}
+  return data;
+ }
+ async function account(){const {page}=config();const data=await graph(page+'?fields=id,name,instagram_business_account{id,username}');if(String(data.id)!==page)throw new MetaError('The configured Facebook Page could not be verified.');return data;}
+ return {
+  configured(){try{config();return true;}catch{return false;}},
+  async check(){const a=await account();return {pageName:typeof a.name==='string'?a.name:'Facebook Page',instagramUsername:a.instagram_business_account?.username||null,instagramConnected:Boolean(a.instagram_business_account?.id),enabled:env('BP_SOCIAL_PUBLISHING_ENABLED')==='true'};},
+  async publish(post:SocialPost):Promise<SocialResult>{
+   try{
+    config();if(!['Facebook','Instagram'].includes(post.channel)||!post.content?.trim())throw new MetaError('Only Facebook and Instagram posts with a caption are supported.');
+    if(post.media_url){let url:URL;try{url=new URL(post.media_url);}catch{throw new MetaError('Use a public HTTPS image URL.');}if(url.protocol!=='https:'||url.username||url.password)throw new MetaError('Use a public HTTPS image URL.');}
+    let data:any;
+    if(post.channel==='Facebook'){
+     const {page}=config();data=post.media_url?await graph(page+'/photos','POST',{url:post.media_url,caption:post.content,published:'true'}):await graph(page+'/feed','POST',{message:post.content});
+     const id=data.post_id||data.id;if(typeof id!=='string'||!id)throw new MetaError('Meta accepted the request without returning a post ID. Check the Page.',true);
+     return {state:'published',providerId:id,message:null};
+    }
+    if(!post.media_url||post.content.length>2200)throw new MetaError('Instagram needs a public JPEG image URL and a caption of at most 2200 characters.');
+    const a=await account(),ig=a.instagram_business_account?.id;if(!/^\d+$/.test(String(ig||'')))throw new MetaError('No Instagram professional account is linked to the configured Facebook Page.');
+    const container=await graph(ig+'/media','POST',{image_url:post.media_url,caption:post.content});
+    if(!/^\d+$/.test(String(container.id||'')))throw new MetaError('Instagram did not return a media container. No publish request was made.');
+    let ready=false;
+    for(let attempt=0;attempt<4;attempt++){const state=await graph(container.id+'?fields=status_code');if(state.status_code==='FINISHED'){ready=true;break;}if(['ERROR','EXPIRED'].includes(state.status_code))throw new MetaError('Instagram could not process this image. Check its JPEG format and public URL.');await pause(1000);}
+    if(!ready)throw new MetaError('Instagram did not finish preparing this image. No publish request was made. Try scheduling it again later.');
+    data=await graph(ig+'/media_publish','POST',{creation_id:container.id});
+    if(typeof data.id!=='string'||!data.id)throw new MetaError('Instagram did not return a published post ID. Check the account before retrying.',true);
+    return {state:'published',providerId:data.id,message:null};
+   }catch(error){return {state:error instanceof MetaError?(error.ambiguous?'unknown':'failed'):'unknown',providerId:null,message:error instanceof MetaError?error.message:'Social publication failed before confirmation. Check the account before retrying.'};}
+  }
+ };
+}
+
 const auth={persistSession:false,autoRefreshToken:false};
 function env(name:string){return Deno.env.get(name)||'';}
 function service(){const url=env('SUPABASE_URL'),key=env('SUPABASE_SERVICE_ROLE_KEY');if(!url||!key)throw Error('CONFIG');return createClient(url,key,{auth});}
@@ -160,6 +203,7 @@ async function rows(table:string,select:string,filters:Record<string,string|bool
  const all=[];for(let start=0;start<10000;start+=500){let query=service().from(table).select(select);for(const [key,value] of Object.entries(filters))query=query.eq(key,value);const data=check(await query.order('id').range(start,start+499)) as any[];all.push(...data);if(data.length<500)return all;}throw Error('TOO_MANY_ROWS');
 }
 const mailer=createOutlookMailer(env);
+const social=createMetaPublisher(env);
 Deno.serve(createPublishingDesk({
  async authenticate(token){
   const url=env('SUPABASE_URL'),key=env('SUPABASE_ANON_KEY');if(!url||!key)throw Error('CONFIG');
@@ -167,6 +211,7 @@ Deno.serve(createPublishingDesk({
   const profile=await service().from('member_profiles').select('is_admin').eq('id',data.user.id).maybeSingle();
   return {id:data.user.id,admin:!profile.error&&profile.data?.is_admin===true};
  },
+ async socialCheck(){try{return await social.check();}catch(error){throw new PublishingDeskError(503,error instanceof Error?error.message:'Meta connection check failed.','META_CONNECTION');}},
  async overview(){
   const [campaigns,profiles,assignments,noticeRows]=await Promise.all([
    rows('arc_files','id,title,author_name,is_active,downloads_open_at,downloads_close_at'),
@@ -174,8 +219,9 @@ Deno.serve(createPublishingDesk({
    rows('arc_file_assignments','id,member_id,arc_file_id,status,review_due_date,download_count,review_link,created_at,application_id'),
    rows('bp_arc_notices','id,assignment_id,kind,state')
   ]);
+  const readiness=await service().from('bp_marketing_posts').select('delivery_mode').limit(1);
   const linked=new Set(assignments.filter(a=>typeof a.application_id==='string'&&a.application_id.trim()).map(a=>a.member_id));
-  return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active').map(p=>({...p,application_reference_available:linked.has(p.id)})),assignments:assignments.map(({application_id,...assignment})=>assignment),notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY'))};
+  return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active').map(p=>({...p,application_reference_available:linked.has(p.id)})),assignments:assignments.map(({application_id,...assignment})=>assignment),notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY')),socialSchedulerReady:!readiness.error,socialConfigured:social.configured(),socialEnabled:env('BP_SOCIAL_PUBLISHING_ENABLED')==='true'};
  },
  async assign(fileId,members,due,applicationRefs){const result=await service().rpc('bp_arc_assign_campaign_v2',{p_file_id:fileId,p_members:members,p_due:due,p_application_refs:applicationRefs});if(result.error)throw assignmentFailure(result.error);return result.data;},
  async createBatch(admin,fileId,kind,recipients){return check(await service().from('bp_arc_mail_batches').insert({created_by:admin,arc_file_id:fileId,kind,recipients}).select('*').single()) as any;},

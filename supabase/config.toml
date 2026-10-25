@@ -1,4 +1,8 @@
 # Shopify authenticates this endpoint through its raw-body HMAC signature.
-# All other functions retain the platform's JWT verification default.
+# Browser-facing functions retain the platform's JWT verification default.
 [functions.bp-reading-shopify-webhook]
+verify_jwt = false
+
+# External cron authenticates with BP_SOCIAL_CRON_SECRET, never a browser session.
+[functions.bp-social-publish]
 verify_jwt = false

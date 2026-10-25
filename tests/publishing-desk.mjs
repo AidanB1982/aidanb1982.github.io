@@ -57,3 +57,8 @@ for(const code of ['AI_STORAGE','AI_NETWORK','AI_RESPONSE']){
  const result=await fixture({deps:{generate:async()=>{throw Error(code);}}}).request({action:'generate',title:'Book',channel:'Facebook',facts:'Approved facts',task:'Draft'});
  assert.equal(result.status,503);assert(!result.body.error.includes('Publishing desk request could not be completed'));
 }
+let connectionReads=0;
+let socialFixture=fixture({deps:{socialCheck:async()=>{connectionReads++;return {pageName:'Blackwood',instagramConnected:true,enabled:false};}}});
+assert.equal((await socialFixture.request({action:'social-check'})).body.pageName,'Blackwood');assert.equal(connectionReads,1);
+socialFixture=fixture({deps:{authenticate:async()=>({id:reader,admin:false}),socialCheck:async()=>{connectionReads++;return {};}}});
+assert.equal((await socialFixture.request({action:'social-check'})).status,403);assert.equal(connectionReads,1,'non-admin cannot inspect connected accounts');
