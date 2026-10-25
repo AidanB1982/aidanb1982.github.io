@@ -17,7 +17,11 @@ f=fixture({deps:{authenticate:async()=>({id:reader,admin:false})}});assert.equal
 f=fixture();assert.equal((await f.request({action:'overview'},{Authorization:'Bearer fixture',Origin:'https://wrong.invalid'})).status,403);
 assert.equal((await f.request({action:'assign',fileId:2,members:[reader],due:'2026-02-30'})).status,400);
 assert.equal((await f.request({action:'assign',fileId:2,members:[reader,reader],due:'2099-10-10'})).status,400);
-assert.equal((await f.request({action:'assign',fileId:2,members:[reader],due:'2099-10-10'})).status,200);assert.deepEqual(f.events.find(e=>e.assign).assign,[2,[reader],'2099-10-10']);
+assert.equal((await f.request({action:'assign',fileId:2,members:[reader],due:'2099-10-10'})).status,200);assert.deepEqual(f.events.find(e=>e.assign).assign,[2,[reader],'2099-10-10',{}]);
+assert.equal((await f.request({action:'assign',fileId:2,members:[reader],due:'2099-10-10',applicationRefs:{[reader]:'Approved-application-reference'}})).status,200);
+assert.deepEqual(f.events.filter(e=>e.assign).at(-1).assign[3],{[reader]:'Approved-application-reference'});
+assert.equal((await f.request({action:'assign',fileId:2,members:[reader],due:'2099-10-10',applicationRefs:{[admin]:'Wrong reader'}})).status,400);
+assert.equal((await f.request({action:'assign',fileId:2,members:[reader],due:'2099-10-10',applicationRefs:{[reader]:''}})).status,400);
 let preview=await f.request({action:'preview',fileId:2,members:[reader],kind:'available'});assert.equal(preview.status,200);assert.equal(preview.body.recipients.length,1);assert(preview.body.recipients[0].text.includes('/pages/members.html'));assert(!preview.body.recipients[0].text.includes('storage/'));
 let sent=await f.request({action:'send',batchId:preview.body.batchId});assert.equal(sent.body.results[0].state,'submitted');assert.equal(f.events.filter(e=>e.send).length,1);
 await f.request({action:'send',batchId:preview.body.batchId});assert.equal(f.events.filter(e=>e.send).length,1,'replay cannot duplicate mail');

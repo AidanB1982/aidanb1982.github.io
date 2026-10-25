@@ -21,12 +21,13 @@ Deno.serve(createPublishingDesk({
   const [campaigns,profiles,assignments,noticeRows]=await Promise.all([
    rows('arc_files','id,title,author_name,is_active,downloads_open_at,downloads_close_at'),
    rows('member_profiles','id,email,display_name,reader_name,is_arc_member,member_status',{is_arc_member:true,member_status:'active'}),
-   rows('arc_file_assignments','id,member_id,arc_file_id,status,review_due_date,download_count,review_link,created_at'),
+   rows('arc_file_assignments','id,member_id,arc_file_id,status,review_due_date,download_count,review_link,created_at,application_id'),
    rows('bp_arc_notices','id,assignment_id,kind,state')
   ]);
-  return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active'),assignments,notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY'))};
+  const linked=new Set(assignments.filter(a=>typeof a.application_id==='string'&&a.application_id.trim()).map(a=>a.member_id));
+  return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active').map(p=>({...p,application_reference_available:linked.has(p.id)})),assignments:assignments.map(({application_id,...assignment})=>assignment),notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY'))};
  },
- async assign(fileId,members,due){const result=await service().rpc('bp_arc_assign_campaign',{p_file_id:fileId,p_members:members,p_due:due});if(result.error)throw assignmentFailure(result.error);return result.data;},
+ async assign(fileId,members,due,applicationRefs){const result=await service().rpc('bp_arc_assign_campaign_v2',{p_file_id:fileId,p_members:members,p_due:due,p_application_refs:applicationRefs});if(result.error)throw assignmentFailure(result.error);return result.data;},
  async createBatch(admin,fileId,kind,recipients){return check(await service().from('bp_arc_mail_batches').insert({created_by:admin,arc_file_id:fileId,kind,recipients}).select('*').single()) as any;},
  async batch(id){return check(await service().from('bp_arc_mail_batches').select('*').eq('id',id).maybeSingle()) as any;},
  async mailReady(){await mailer.ready();},

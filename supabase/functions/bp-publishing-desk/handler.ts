@@ -1,5 +1,5 @@
 export type Campaign={id:number;title:string;author_name?:string;is_active:boolean;downloads_open_at?:string;downloads_close_at?:string};
-export type Reader={id:string;email:string;display_name?:string;reader_name?:string;is_arc_member:boolean;member_status:string};
+export type Reader={id:string;email:string;display_name?:string;reader_name?:string;is_arc_member:boolean;member_status:string;application_reference_available?:boolean};
 export type Assignment={id:number;member_id:string;arc_file_id:number;status:string;review_due_date?:string;download_count:number;review_link?:string;created_at?:string};
 export type Notice={assignment_id:number;kind:string;state:string};
 export type Overview={campaigns:Campaign[];readers:Reader[];assignments:Assignment[];notices:Notice[];mailConfigured:boolean;aiConfigured:boolean};
@@ -8,7 +8,7 @@ export type Batch={id:string;created_by:string;arc_file_id:number;kind:string;re
 export type DeskDeps={
  authenticate(token:string):Promise<{id:string;admin:boolean}|null>;
  overview():Promise<Overview>;
- assign(fileId:number,members:string[],due:string):Promise<unknown>;
+ assign(fileId:number,members:string[],due:string,applicationRefs:Record<string,string>):Promise<unknown>;
  createBatch(admin:string,fileId:number,kind:string,recipients:Recipient[]):Promise<Batch>;
  batch(id:string):Promise<Batch|null>;
  mailReady():Promise<void>;
@@ -26,9 +26,9 @@ export function assignmentFailure(error:{code?:string;message?:string}){
  const code=error.code||'';
  if(code==='23502'&&String(error.message).includes('application_id'))return new PublishingDeskError(409,'A selected reader has no linked ARC application reference. The assignment batch was rolled back. Link that reader’s ARC application before assigning the book.','ARC_APPLICATION_MISSING');
  if(code==='23505')return new PublishingDeskError(409,'An existing ARC record conflicts with this assignment. The batch was rolled back; existing assignments have been retained. Check the ARC assignment constraints.','ARC_ASSIGNMENT_CONFLICT');
- if(code==='PGRST202'||code==='42883')return new PublishingDeskError(503,'The ARC assignment database function could not be found. Check that the publishing-desk migration was applied.','ARC_FUNCTION_MISSING');
- if(code==='42501')return new PublishingDeskError(503,'The server lacks permission to assign ARC readers. Check the service_role execute grant for bp_arc_assign_campaign.','ARC_ASSIGNMENT_PERMISSION');
- const expected=['Choose 1 to 200 distinct ARC members','Choose a current or future review due date','This ARC campaign is inactive or closed','Some selected readers are not active ARC team members'];
+ if(code==='PGRST202'||code==='42883')return new PublishingDeskError(503,'The ARC assignment database function could not be found. Apply the ARC assignment repair migration before retrying.','ARC_FUNCTION_MISSING');
+ if(code==='42501')return new PublishingDeskError(503,'The server lacks permission to assign ARC readers. Check the service_role execute grant for bp_arc_assign_campaign_v2.','ARC_ASSIGNMENT_PERMISSION');
+ const expected=['Choose 1 to 200 distinct ARC members','Choose a current or future review due date','This ARC campaign is inactive or closed','Some selected readers are not active ARC team members','Provide valid ARC application references'];
  if(code==='P0001'&&expected.includes(error.message||''))return new PublishingDeskError(409,error.message!,'ARC_ASSIGNMENT_REJECTED');
  return new PublishingDeskError(503,'The database rejected the ARC assignment request'+(/^[A-Z0-9]{5}$/.test(code)?' ('+code+')':'')+'. No successful assignment is being claimed.','ARC_ASSIGNMENT_FAILED');
 }
@@ -91,7 +91,9 @@ export function createPublishingDesk(deps:DeskDeps){return async(request:Request
   if(body.action==='assign'){
    if(!validDate(body.due)||body.due<new Date(now).toISOString().slice(0,10))return json(400,{error:'Choose a current or future review due date.'});
    if(campaign.is_active!==true||(campaign.downloads_close_at&&Date.parse(campaign.downloads_close_at)<=now))return json(409,{error:'This campaign is inactive or closed.'});
-   return json(200,{result:await deps.assign(campaign.id,body.members,body.due)});
+   const refs=body.applicationRefs??{};
+   if(!refs||typeof refs!=='object'||Array.isArray(refs)||Object.entries(refs).some(([id,ref])=>!body.members.includes(id)||typeof ref!=='string'||!ref.trim()||ref.trim().length>200))return json(400,{error:'Use the real application reference for each selected reader, up to 200 characters.'});
+   return json(200,{result:await deps.assign(campaign.id,body.members,body.due,refs)});
   }
   if(!available(campaign,now))return json(409,{error:'The ARC download window is not open. Assignments may be prepared before release, but notices wait until it opens.'});
   if(body.kind&&!['available','reminder'].includes(body.kind))return json(400,{error:'Choose an available notice or reminder.'});

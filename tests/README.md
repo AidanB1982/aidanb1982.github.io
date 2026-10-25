@@ -166,3 +166,11 @@ Setup and live limitations are in `docs/publishing-desk.md`. These tests send no
 mail and do not publish social content. The calendar currently plans manual publishing;
 Outlook and AI need server credentials, and automatic social/newsletter publication
 requires their account integrations.
+
+
+ARC assignment repair coverage applies the follow-up migration as well. The schema
+test reproduces a roster with 1 existing assignment, 8 ready readers and 11 missing
+application references: ready readers are assigned without losing the others, genuine
+provided links complete the remainder, conflicting reader references are blocked and
+replays preserve reviews/download counts. Browser tests cover ready-only selection,
+partial results, blocked-reader display and entering a real reference before retrying.

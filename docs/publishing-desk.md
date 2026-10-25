@@ -32,14 +32,18 @@ steps explicit.
 Run `supabase/diagnostics/publishing-desk-preflight.sql` in the SQL Editor first.
 It reads schema metadata only. Check that the existing ARC IDs are numeric, member IDs
 are UUIDs and the listed fields exist. The existing `application_id` is copied from
-that reader's most recent assignment when a new assignment is created. If an ARC
-reader has no prior assignment and your live schema requires an application reference,
-that application must be linked before assigning; the transaction will fail instead
-of partially assigning a team.
+that reader's most recent assignment when a new assignment is created. If no genuine
+reference exists, the repaired workflow reports that reader as needing a link and
+continues with ready readers. It never invents application IDs.
 
 Then run `supabase/migrations/20261028_publishing_desk.sql` once. It adds new tables and
 functions without deleting or replacing existing ARC files or reviews. It does not
 send mail, assign anyone or publish content merely by being applied.
+
+Also apply `supabase/migrations/20261029_arc_assignment_references.sql`. If the original
+migration is already installed, run only this new repair migration; do not rerun the
+original table-creation script. The repair adds `bp_arc_assign_campaign_v2` and keeps a
+compatible wrapper for older callers. It does not itself create book assignments.
 
 ## 2. Supabase function
 
@@ -178,5 +182,22 @@ merely to deploy these diagnostic messages.
 `supabase/diagnostics/arc-assignment-readiness.sql` is a read-only aggregate check for
 the Gualachulain campaign, active ARC team, existing assignments and missing application
 references. It does not assign anyone, send mail or expose recipient addresses.
-A missing application reference can abort the existing transaction; it is not evidence
-that selection failed. Link the legitimate application reference before retrying.
+On the original function, a missing application reference can abort the entire
+transaction. Apply the repair migration and redeploy the latest generated function
+bundle to use the corrected workflow.
+
+The repaired result reports **created**, **existing** and **blocked** counts separately.
+For a roster with one existing assignment, eight ready readers and eleven missing
+references, selecting everyone creates the eight valid assignments and lists the eleven
+blocked readers. Repeating the action preserves existing assignments and reviews.
+
+Use **Select ready readers** to focus on those already linked. For a missing reader,
+copy their real **Application ID** from the original approved ARC application into the
+field in their reader row, select them and assign again. This links that reference as
+part of the new book assignment. It does not create a new legacy application or update
+the application sheet. No random values are generated. If there is no approved legacy
+application, complete that onboarding first. A reference already associated with another
+reader, or entered for multiple selected readers, is blocked instead of silently reused.
+
+Application references are never automatically included in AI briefs or email bodies.
+The overview supplies a linkage flag to the admin UI without returning reference values.

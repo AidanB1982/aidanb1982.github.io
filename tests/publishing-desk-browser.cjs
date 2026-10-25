@@ -6,14 +6,19 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  await page.route('https://**/*',r=>r.abort());
  await page.addInitScript(()=>{
   window.mockPosts=[];window.mockAssignments=[{id:1,member_id:'00000000-0000-0000-0000-000000000002',arc_file_id:1,status:'active',download_count:0,review_due_date:'2026-09-14'},{id:2,member_id:'00000000-0000-0000-0000-000000000001',arc_file_id:2,status:'active',download_count:0}];window.mockCalls=[];window.mockAuthCallbacks=[];
-  const people=[{id:'00000000-0000-0000-0000-000000000001',email:'admin@example.invalid',reader_name:'Admin',is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000002',email:'reader@example.invalid',reader_name:'Reader',is_arc_member:true,member_status:'active'}];
+  const people=[{id:'00000000-0000-0000-0000-000000000001',email:'admin@example.invalid',reader_name:'Admin',application_reference_available:true,is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000002',email:'reader@example.invalid',reader_name:'Reader',application_reference_available:true,is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000003',email:'unlinked@example.invalid',reader_name:'Unlinked reader',application_reference_available:false,is_arc_member:true,member_status:'active'}];
   const client={auth:{getUser:async()=>({data:{user:{id:people[0].id}}}),getSession:async()=>({data:{session:null}}),onAuthStateChange:fn=>{window.mockAuthCallbacks.push(fn);}},from(table){return {select(){return this},eq(){return this},order(){return this},range:async()=>({data:window.mockPosts}),maybeSingle:async()=>({data:{is_admin:!window.mockDenied}})};},functions:{async invoke(name,{body}){
    window.mockCalls.push(body);
    if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:true}};
    if(body.action==='assign'&&window.mockAssignFailure)return {error:{context:{json:async()=>({error:'A selected reader has no linked ARC application reference.'})}}};
-   if(body.action==='assign'){let created=0,retained=0;for(const id of body.members){if(window.mockAssignments.some(a=>a.member_id===id&&a.arc_file_id===body.fileId))retained++;else{window.mockAssignments.push({id:3,member_id:id,arc_file_id:body.fileId,status:'active',download_count:0,review_due_date:body.due});created++;}}return {data:{result:[{created_count:created,existing_count:retained}]}};}
-   if(body.action==='preview')return {data:{batchId:'00000000-0000-0000-0000-000000000010',recipients:people.map(p=>({name:p.reader_name,email:p.email,subject:'Gualachulain is ready',text:'Open your protected ARC profile.'}))}};
-   if(body.action==='send')return {data:{results:[{state:'submitted'},{state:'submitted'}],remaining:0}};
+   if(body.action==='assign'){let created=0,retained=0,blocked=[];for(const id of body.members){
+    const person=people.find(p=>p.id===id);
+    if(window.mockAssignments.some(a=>a.member_id===id&&a.arc_file_id===body.fileId))retained++;
+    else if(!person.application_reference_available&&!body.applicationRefs?.[id])blocked.push({member_id:id,reason:'missing_application_reference'});
+    else{window.mockAssignments.push({id:Math.max(...window.mockAssignments.map(a=>a.id))+1,member_id:id,arc_file_id:body.fileId,status:'active',download_count:0,review_due_date:body.due});person.application_reference_available=true;created++;}
+   }return {data:{result:[{created_count:created,existing_count:retained,blocked_count:blocked.length,blocked_readers:blocked}]}};}
+   if(body.action==='preview')return {data:{batchId:'00000000-0000-0000-0000-000000000010',recipients:people.filter(p=>window.mockAssignments.some(a=>a.member_id===p.id&&a.arc_file_id===body.fileId)).map(p=>({name:p.reader_name,email:p.email,subject:'Gualachulain is ready',text:'Open your protected ARC profile.'}))}};
+   if(body.action==='send')return {data:{results:[{state:'submitted'},{state:'submitted'},{state:'submitted'}],remaining:0}};
    if(body.action==='generate')return {data:{draft:'Hook: A quiet place.\nShot list: Trees, a book, a turning page.\nCaption: Discover Gualachulain.'}};
   }},async rpc(name,args){const existing=window.mockPosts.find(p=>p.id===args.p_id);const row={...args.p_payload,id:existing?.id||crypto.randomUUID(),revision:(existing?.revision||0)+1,created_at:new Date().toISOString()};window.mockPosts=window.mockPosts.filter(p=>p.id!==row.id);window.mockPosts.push(row);return {data:row};}};
   window.supabase={createClient:()=>client};window.mockClient=client;
@@ -23,9 +28,10 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  assert(await page.getByRole('heading',{name:'Behind the Files',exact:true}).count()>0,'existing editorial desk preserved');
  await page.locator('#ops-select').click();assert((await page.locator('#ops-arc-status').textContent()).includes('Choose an ARC campaign'));
  await page.selectOption('#ops-campaign','2');await page.locator('#ops-select').click();
- assert.equal(await page.locator('#ops-readers input:checked').count(),2,'select team visibly checks every reader');
- assert((await page.locator('#ops-selection-state').textContent()).includes('2 of 2 reader(s) selected for Gualachulain. 1 need a new assignment'));
+ assert.equal(await page.locator('#ops-readers input:checked').count(),3,'select team visibly checks every reader');
+ assert((await page.locator('#ops-selection-state').textContent()).includes('3 of 3 reader(s) selected for Gualachulain. 1 ready for a new assignment; 1 need an application reference; 1 already have an assignment record'));
  assert.equal(await page.evaluate(()=>window.mockCalls.filter(c=>c.action==='assign').length),0,'selection itself does not mutate records');
+ await page.locator('#ops-select-ready').click();assert.equal(await page.locator('#ops-readers input[type=checkbox]:checked').count(),2,'ready selection excludes the unlinked reader');await page.locator('#ops-select').click();
  const above=await page.evaluate(()=>document.getElementById('ops-assign').compareDocumentPosition(document.querySelector('.ops-table-wrap'))&Node.DOCUMENT_POSITION_FOLLOWING);assert(above,'assign action stays above the reader table');
  await page.locator('#ops-due').fill('');await page.locator('#ops-assign').click();
  await page.waitForFunction(()=>document.getElementById('ops-arc-status').textContent.includes('Choose a review due date'));
@@ -36,12 +42,21 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  assert((await page.locator('#ops-readers').textContent()).includes('Needs assignment'),'reader has not silently inherited the new book');
  await page.locator('#ops-due').fill('2099-10-10');await page.locator('#ops-assign').click();
  await page.waitForFunction(()=>document.getElementById('ops-arc-status').textContent.includes('1 new assignment'));
- assert((await page.locator('#ops-selection-state').textContent()).includes('0 need a new assignment'));
+ assert((await page.locator('#ops-arc-status').textContent()).includes('1 reader(s) still need'));
+ assert((await page.locator('#ops-blocked-readers').textContent()).includes('Unlinked reader'));
+ assert.equal(await page.evaluate(()=>window.mockAssignments.filter(a=>a.arc_file_id===2).length),2,'ready reader is assigned despite another missing application');
+ await page.locator('#ops-preview').click();await page.waitForSelector('#ops-email-preview');assert.equal(await page.locator('#ops-preview-person option').count(),2,'blocked reader excluded from email preview');
+ await page.getByRole('textbox',{name:'ARC application reference for Unlinked reader',exact:true}).fill('Original-approved-application-C');
+ assert(await page.locator('#ops-email-preview').isHidden(),'changing application link invalidates old preview');
+ await page.locator('#ops-assign').click();await page.waitForFunction(()=>document.getElementById('ops-arc-status').textContent.includes('2 existing record(s) retained. Preview recipients next.'));
+ assert.equal(await page.evaluate(()=>window.mockAssignments.filter(a=>a.arc_file_id===2).length),3,'remaining reader assigned after a genuine application reference is provided');
+ assert.equal(await page.getByRole('textbox',{name:'ARC application reference for Unlinked reader',exact:true}).count(),0,'completed link input removed');
+ assert((await page.locator('#ops-selection-state').textContent()).includes('0 need an application reference; 3 already have an assignment record'));
  assert.equal(await page.evaluate(()=>window.mockAssignments.filter(a=>a.arc_file_id===1).length),1,'old ARC record retained');
  await page.locator('#ops-preview').click();await page.waitForSelector('#ops-email-preview');
  assert((await page.locator('#ops-preview-text').textContent()).includes('Gualachulain'));
  assert.equal(await page.evaluate(()=>window.mockCalls.filter(c=>c.action==='send').length),0,'preview never sends email');
- await page.locator('#ops-send').click();await page.waitForFunction(()=>document.getElementById('ops-status').textContent.includes('2 notice(s) submitted'));
+ await page.locator('#ops-send').click();await page.waitForFunction(()=>document.getElementById('ops-status').textContent.includes('3 notice(s) submitted'));
  await page.locator('#ops-ai-title-input').fill('Gualachulain');await page.selectOption('#ops-ai-channel','TikTok');await page.locator('#ops-ai-facts').fill('Aidan Blackwood. The Cursed Bothies, Book 2.');await page.locator('#ops-generate').click();
  await page.waitForFunction(()=>document.getElementById('ops-ai-output').value.includes('Shot list'));
  await page.locator('#ops-use-draft').click();assert.equal(await page.locator('#ops-post-channel').inputValue(),'TikTok');

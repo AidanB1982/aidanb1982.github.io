@@ -48,5 +48,31 @@ const {readFileSync}=require('node:fs');const assert=require('node:assert/strict
  for(let i=0;i<30;i++)assert.equal((await as('service_role',admin,'select bp_operations_consume_ai($1) as ok',[admin])).rows[0].ok,true);
  assert.equal((await as('service_role',admin,'select bp_operations_consume_ai($1) as ok',[admin])).rows[0].ok,false);
  await assert.rejects(()=>as('authenticated',admin,'select * from bp_arc_mail_batches'),e=>e.code==='42501');
+ await db.exec(readFileSync('supabase/migrations/20261029_arc_assignment_references.sql','utf8'));
+ await assert.rejects(()=>as('authenticated',admin,'select * from bp_arc_assign_campaign_v2(2,$1,$2,$3)',[[linked,unlinked],'2099-10-10',{}]),e=>e.code==='42501');
+ const repaired=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(2,$1,$2,$3)',[[linked,unlinked],'2099-10-10',{}])).rows[0];
+ assert.equal(repaired.created_count,1);assert.equal(repaired.blocked_count,1);assert.equal(repaired.blocked_readers[0].member_id,unlinked);
+ assert.equal((await db.query('select application_id from arc_file_assignments where member_id=$1 and arc_file_id=2',[linked])).rows[0].application_id,'C');
+ const supplied=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(2,$1,$2,$3)',[[unlinked],'2099-10-10',{[unlinked]:'Approved-application-D'}])).rows[0];assert.equal(supplied.created_count,1);assert.equal(supplied.blocked_count,0);
+ assert.equal((await db.query('select application_id from arc_file_assignments where member_id=$1 and arc_file_id=2',[unlinked])).rows[0].application_id,'Approved-application-D');
+ // Reproduce the live roster: one existing title assignment, eight linked readers, eleven missing links.
+ const ids=Array.from({length:20},(_,i)=>'10000000-0000-0000-0000-'+String(i+1).padStart(12,'0'));
+ await db.query("insert into arc_files(title,is_active) values('Roster fixture',true)");
+ for(let i=0;i<ids.length;i++){
+  await db.query("insert into member_profiles values($1,false,true,'active')",[ids[i]]);
+  if(i===0)await db.query("insert into arc_file_assignments(member_id,arc_file_id,application_id,status,download_count,review_link) values($1,3,'Already-approved','active',7,'https://review.invalid/retained')",[ids[i]]);
+  else if(i<=8)await db.query("insert into arc_file_assignments(member_id,arc_file_id,application_id,status) values($1,1,$2,'active')",[ids[i],'Approved-'+i]);
+ }
+ const partial=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(3,$1,$2,$3)',[ids,'2099-10-10',{}])).rows[0];
+ assert.equal(partial.created_count,8);assert.equal(partial.existing_count,1);assert.equal(partial.blocked_count,11);assert.equal(partial.blocked_readers.length,11);
+ assert.equal((await db.query('select count(*) as count from arc_file_assignments where arc_file_id=3')).rows[0].count,9);
+ const realRefs=Object.fromEntries(ids.slice(9).map((id,i)=>[id,'Provided-approved-reference-'+i]));
+ const completed=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(3,$1,$2,$3)',[ids,'2099-10-10',realRefs])).rows[0];assert.equal(completed.created_count,11);assert.equal(completed.existing_count,9);assert.equal(completed.blocked_count,0);
+ const replay=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(3,$1,$2,$3)',[ids,'2099-10-10',realRefs])).rows[0];assert.equal(replay.created_count,0);assert.equal(replay.existing_count,20);
+ assert.equal((await db.query('select count(*) as count from arc_file_assignments where arc_file_id=3')).rows[0].count,20);
+ const oldCopy=(await db.query('select download_count,review_link from arc_file_assignments where member_id=$1 and arc_file_id=3',[ids[0]])).rows[0];assert.equal(oldCopy.download_count,7);assert.equal(oldCopy.review_link,'https://review.invalid/retained');
+ const conflictReader='20000000-0000-0000-0000-000000000001';await db.query("insert into member_profiles values($1,false,true,'active')",[conflictReader]);
+ const conflict=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(3,$1,$2,$3)',[[conflictReader],'2099-10-10',{[conflictReader]:'Already-approved'}])).rows[0];assert.equal(conflict.created_count,0);assert.equal(conflict.blocked_readers[0].reason,'application_reference_conflict');
+ const compatible=(await as('service_role',admin,'select * from bp_arc_assign_campaign(3,$1,$2)',[[conflictReader],'2099-10-10'])).rows[0];assert.equal(compatible.created_count,0,'legacy caller skips missing references safely');
  console.log('PASS actual publishing migration: admin-only calendar, concurrency, scheduled dates, monthly cadence, ARC assignment/history preservation, notice claims and AI rate limit');await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});
