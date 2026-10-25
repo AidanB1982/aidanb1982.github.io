@@ -10,6 +10,6 @@ with campaign as (
 select (select count(*) from campaign) as matching_campaigns,
  count(*) as active_arc_team,
  count(*) filter(where already_assigned) as already_assigned_gualachulain,
- count(*) filter(where not already_assigned and has_application_reference) as ready_for_new_assignment,
- count(*) filter(where not already_assigned and not has_application_reference) as missing_application_reference
+ count(*) filter(where not already_assigned) as ready_for_new_assignment,
+ count(*) filter(where not already_assigned and not has_application_reference) as missing_legacy_metadata_not_required_for_access
 from team;

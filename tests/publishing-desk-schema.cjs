@@ -74,5 +74,28 @@ const {readFileSync}=require('node:fs');const assert=require('node:assert/strict
  const conflictReader='20000000-0000-0000-0000-000000000001';await db.query("insert into member_profiles values($1,false,true,'active')",[conflictReader]);
  const conflict=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(3,$1,$2,$3)',[[conflictReader],'2099-10-10',{[conflictReader]:'Already-approved'}])).rows[0];assert.equal(conflict.created_count,0);assert.equal(conflict.blocked_readers[0].reason,'application_reference_conflict');
  const compatible=(await as('service_role',admin,'select * from bp_arc_assign_campaign(3,$1,$2)',[[conflictReader],'2099-10-10'])).rows[0];assert.equal(compatible.created_count,0,'legacy caller skips missing references safely');
+ // Current flow: access first, personalised issuance only when the download service runs.
+ await db.exec(readFileSync('supabase/migrations/20261030_arc_access_without_legacy_application.sql','utf8'));
+ await db.query("insert into arc_files(title,is_active) values('Access-first fixture',true)");
+ for(const id of ids.slice(0,9))await db.query("insert into arc_file_assignments(member_id,arc_file_id,application_id,status,download_count,review_link) values($1,4,'','active',5,'https://review.invalid/preserved')",[id]);
+ // Remove legacy metadata on the remaining readers to reproduce the actual blocker.
+ await db.query("update arc_file_assignments set application_id='' where member_id=any($1)",[ids.slice(9)]);
+ const beforeHistory=(await db.query('select * from arc_file_assignments where arc_file_id<>4 order by id')).rows;
+ const granted=(await as('service_role',admin,'select * from bp_arc_assign_campaign_v2(4,$1,$2,$3)',[ids,'2099-10-10',{}])).rows[0];
+ assert.equal(granted.created_count,11);assert.equal(granted.existing_count,9);assert.equal(granted.blocked_count,0);
+ const copies=(await db.query('select * from arc_file_assignments where arc_file_id=4 order by id')).rows;
+ assert.equal(copies.length,20);assert(copies.every(a=>a.status==='active'));
+ assert(copies.slice(9).every(a=>a.application_id===''&&a.watermarked_storage_path===''&&a.download_count===0),'grant creates neither fake references nor personalised copies');
+ assert(copies.slice(0,9).every(a=>a.download_count===5&&a.review_link==='https://review.invalid/preserved'),'existing book records retained');
+ assert.deepEqual((await db.query('select * from arc_file_assignments where arc_file_id<>4 order by id')).rows,beforeHistory,'previous campaigns untouched');
+ const repeated=(await as('service_role',admin,'select * from bp_arc_assign_campaign(4,$1,$2)',[ids,'2099-10-10'])).rows[0];assert.equal(repeated.created_count,0);assert.equal(repeated.existing_count,20);
+ await db.query("update arc_file_assignments set status='revoked' where arc_file_id=4 and member_id=$1",[ids[0]]);
+ await as('service_role',admin,'select * from bp_arc_grant_campaign(4,$1,$2)',[[ids[0]],'2099-10-10']);
+ assert.equal((await db.query('select status from arc_file_assignments where arc_file_id=4 and member_id=$1',[ids[0]])).rows[0].status,'revoked','grant never silently reactivates revoked records');
+ await assert.rejects(()=>as('authenticated',admin,'select * from bp_arc_grant_campaign(4,$1,$2)',[ids,'2099-10-10']),e=>e.code==='42501');
+ await db.query("update member_profiles set is_arc_member=false where id=$1",[conflictReader]);
+ await assert.rejects(()=>as('service_role',admin,'select * from bp_arc_grant_campaign(4,$1,$2)',[[conflictReader],'2099-10-10']),/not active ARC/);
+ await db.query('update arc_files set is_active=false where id=4');
+ await assert.rejects(()=>as('service_role',admin,'select * from bp_arc_grant_campaign(4,$1,$2)',[ids,'2099-10-10']),/inactive or closed/);
  console.log('PASS actual publishing migration: admin-only calendar, concurrency, scheduled dates, monthly cadence, ARC assignment/history preservation, notice claims and AI rate limit');await db.close();
 })().catch(e=>{console.error(e);process.exit(1)});

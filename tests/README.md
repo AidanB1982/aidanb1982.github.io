@@ -168,9 +168,10 @@ Outlook and AI need server credentials, and automatic social/newsletter publicat
 requires their account integrations.
 
 
-ARC assignment repair coverage applies the follow-up migration as well. The schema
-test reproduces a roster with 1 existing assignment, 8 ready readers and 11 missing
-application references: ready readers are assigned without losing the others, genuine
-provided links complete the remainder, conflicting reader references are blocked and
-replays preserve reviews/download counts. Browser tests cover ready-only selection,
-partial results, blocked-reader display and entering a real reference before retrying.
+ARC assignment coverage applies all three migrations, including historical repair
+behavior. The latest regression reproduces nine existing records and eleven readers
+without legacy application metadata: all eleven receive access, replay creates no
+duplicates, old reviews/downloads remain intact and no personal copies or references
+are created by the grant. Revoked records are never silently reactivated; unapproved
+members and direct browser RPC access are rejected. Browser tests cover selecting the
+whole team, granting access without reference input, visible failures and email preview.

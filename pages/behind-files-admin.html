@@ -37,8 +37,8 @@
 
     <!-- JS -->
     <script src="/js/header.js?v=20261104" defer></script>
-    <link rel="stylesheet" href="/css/publishing-desk.css?v=20261107">
-    <script src="/js/publishing-desk.js?v=20261107" defer></script>
+    <link rel="stylesheet" href="/css/publishing-desk.css?v=20261108">
+    <script src="/js/publishing-desk.js?v=20261108" defer></script>
     <script src="/js/behind-files-admin.js?v=20261105" defer></script>
     <link rel="stylesheet" href="/css/site-polish.css?v=20261102">
 </head>
@@ -297,15 +297,14 @@
   <nav class="ops-tabs" aria-label="Publishing tools"><a href="#ops-arc">ARC launch desk</a><a href="#ops-ai">AI assistant</a><a href="#ops-calendar">Content scheduler</a></nav>
   <section id="ops-arc" class="ops-section" aria-labelledby="ops-arc-title">
    <h3 id="ops-arc-title">Let your ARC team know</h3>
-   <p>Choose a book, assign selected team members, then preview their private email notices. Existing assignments and reviews are retained.</p>
+   <p>Choose a book and grant access to approved ARC team members, then preview their email notices. Each reader’s personalised reference is generated automatically when they download. Existing assignments and reviews are retained.</p>
    <div class="ops-fields"><label>ARC campaign<select id="ops-campaign"><option value="">Loading campaigns…</option></select></label><label>Review due for new assignments<input id="ops-due" type="date" required></label><label>Notice type<select id="ops-kind"><option value="available">New ARC available</option><option value="reminder">One follow-up for readers who have not downloaded</option></select></label></div>
    <p id="ops-campaign-state"></p><p id="ops-mail-state">Outlook connection not checked.</p>
-   <p class="ops-workflow">1. Choose the book and review deadline → 2. Select readers → 3. Assign the book → 4. Preview and send the email.</p>
-   <div class="ops-actions"><button type="button" id="ops-select" class="bfa-button">Select eligible team</button><button type="button" id="ops-select-ready" class="bfa-button">Select ready readers</button><button type="button" id="ops-clear" class="bfa-button">Clear selection</button><button type="button" id="ops-refresh" class="bfa-button">Refresh assignments</button></div>
+   <p class="ops-workflow">1. Choose the book and review deadline → 2. Select readers → 3. Grant book access → 4. Preview and send the email.</p>
+   <div class="ops-actions"><button type="button" id="ops-select" class="bfa-button">Select eligible team</button><button type="button" id="ops-clear" class="bfa-button">Clear selection</button><button type="button" id="ops-refresh" class="bfa-button">Refresh assignments</button></div>
    <p id="ops-selection-state" role="status" aria-live="polite">Choose an ARC campaign to select readers.</p>
-   <div class="ops-actions"><button type="button" id="ops-assign" class="bfa-button primary">Assign selected readers</button><button type="button" id="ops-preview" class="bfa-button">Preview email recipients</button></div>
+   <div class="ops-actions"><button type="button" id="ops-assign" class="bfa-button primary">Grant selected readers access</button><button type="button" id="ops-preview" class="bfa-button">Preview email recipients</button></div>
    <p id="ops-arc-status" role="status" aria-live="polite"></p>
-   <div id="ops-blocked-readers" hidden></div>
    <div class="ops-table-wrap"><table><thead><tr><th scope="col">Select</th><th scope="col">Reader</th><th scope="col">This book</th><th scope="col">Notice</th></tr></thead><tbody id="ops-readers"></tbody></table></div>
 
    <section id="ops-email-preview" hidden aria-label="ARC email preview"><h4>Check the exact recipients and message</h4><label>Recipient preview<select id="ops-preview-person"></select></label><pre id="ops-preview-text"></pre><p>Each notice goes separately from aidan@blackwoodpublishing.co.uk. The email links to the protected ARC profile; it contains no book attachment or direct file link.</p><button type="button" id="ops-send" class="bfa-button primary">Send these ARC notices</button><p id="ops-send-status" role="status" aria-live="polite"></p></section>

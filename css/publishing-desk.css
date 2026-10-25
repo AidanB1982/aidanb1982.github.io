@@ -35,7 +35,3 @@
 
 #ops-selection-state,.ops-workflow { color:#d6b181; font:13px/1.8 Arial,sans-serif; }
 #ops-arc-status:not(:empty) { padding:14px; border:1px solid #d4b88b55; border-radius:7px; font:13px/1.8 Arial,sans-serif; }
-
-.ops-desk .ops-application-link { min-width:180px; margin:10px 0 4px; font-size:12px; }
-#ops-blocked-readers { border:1px solid #d4b88b55; padding:16px; margin-bottom:18px; border-radius:7px; }
-#ops-blocked-readers a { text-decoration:underline; text-underline-offset:3px; }

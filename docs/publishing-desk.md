@@ -31,19 +31,20 @@ steps explicit.
 
 Run `supabase/diagnostics/publishing-desk-preflight.sql` in the SQL Editor first.
 It reads schema metadata only. Check that the existing ARC IDs are numeric, member IDs
-are UUIDs and the listed fields exist. The existing `application_id` is copied from
-that reader's most recent assignment when a new assignment is created. If no genuine
-reference exists, the repaired workflow reports that reader as needing a link and
-continues with ready readers. It never invents application IDs.
+are UUIDs and the listed fields exist.
 
-Then run `supabase/migrations/20261028_publishing_desk.sql` once. It adds new tables and
-functions without deleting or replacing existing ARC files or reviews. It does not
-send mail, assign anyone or publish content merely by being applied.
+For a new installation, run migrations `20261028_publishing_desk.sql`,
+`20261029_arc_assignment_references.sql`, then
+`20261030_arc_access_without_legacy_application.sql` in order.
+If the first two are already installed, run only the new `20261030` migration.
+It preserves the deployed function's RPC interface, so no Edge Function redeployment
+is required for this access repair. Applying SQL alone does not assign or email anyone.
 
-Also apply `supabase/migrations/20261029_arc_assignment_references.sql`. If the original
-migration is already installed, run only this new repair migration; do not rerun the
-original table-creation script. The repair adds `bp_arc_assign_campaign_v2` and keeps a
-compatible wrapper for older callers. It does not itself create book assignments.
+An approved active ARC member needs an active book assignment. Historical
+`application_id` is optional metadata: reuse an existing value when available,
+otherwise store an empty string, as supported by the existing schema and delivery
+function. The existing download service calls `create_arc_issuance` to create or reuse
+the forensic reference on download. Grants never generate references or personal files.
 
 ## 2. Supabase function
 
@@ -106,7 +107,7 @@ its own billing/usage limits. Planning and manual drafting work without an AI ke
 1. Choose **Gualachulain** in the ARC launch desk. Verify its campaign is active and
    that the download window is open.
 2. Select the intended active ARC team members and a review due date. Click
-   **Assign selected readers**. Existing rows are retained rather than reset.
+   **Grant selected readers access**. Existing rows are retained rather than reset.
 3. Start with one test reader you control. Click **Preview email recipients** and
    check their exact address, title and message. This step sends nothing.
 4. Click **Send these ARC notices**. Confirm the message arrives and the protected
@@ -165,39 +166,18 @@ account, social accounts or MailerLite. Live setup, actual delivery and channel
 permissions must be verified after configuration. No existing reader has been assigned
 or emailed by these development tests.
 
-### If assigning readers appears to do nothing
+### Granting the team access
 
-The selection count and assignment result are displayed above the reader table beside
-**Assign selected readers**. Selecting the team ticks boxes; the separate assignment
-action writes the new book assignments. A review due date is required. A confirmed
-result shows new and retained record counts, followed by a refreshed list.
+Choose Gualachulain, click **Select eligible team**, set a future review due date,
+and click **Grant selected readers access**. The result shows new and retained
+assignment counts and refreshes the list. With nine existing records and eleven
+remaining readers, the expected result is eleven new assignments and nine retained.
+Existing reviews, downloads, personal copies and revoked records remain unchanged.
 
-If the function rejects the request, the same area shows its error. Redeploy the
-updated generated `bp-publishing-desk.ts` bundle to receive specific assignment
-errors, including a missing application reference, conflicting legacy constraint,
-missing database function or service-role execute permission. Raw database row details
-are not returned to the browser. No SQL or mailbox permission change is required
-merely to deploy these diagnostic messages.
+Apply the `20261030` migration if readers still report missing application references.
+The read-only `supabase/diagnostics/arc-assignment-readiness.sql` counts the team and
+book assignments without exposing addresses or issuing copies.
 
-`supabase/diagnostics/arc-assignment-readiness.sql` is a read-only aggregate check for
-the Gualachulain campaign, active ARC team, existing assignments and missing application
-references. It does not assign anyone, send mail or expose recipient addresses.
-On the original function, a missing application reference can abort the entire
-transaction. Apply the repair migration and redeploy the latest generated function
-bundle to use the corrected workflow.
-
-The repaired result reports **created**, **existing** and **blocked** counts separately.
-For a roster with one existing assignment, eight ready readers and eleven missing
-references, selecting everyone creates the eight valid assignments and lists the eleven
-blocked readers. Repeating the action preserves existing assignments and reviews.
-
-Use **Select ready readers** to focus on those already linked. For a missing reader,
-copy their real **Application ID** from the original approved ARC application into the
-field in their reader row, select them and assign again. This links that reference as
-part of the new book assignment. It does not create a new legacy application or update
-the application sheet. No random values are generated. If there is no approved legacy
-application, complete that onboarding first. A reference already associated with another
-reader, or entered for multiple selected readers, is blocked instead of silently reused.
-
-Application references are never automatically included in AI briefs or email bodies.
-The overview supplies a linkage flag to the admin UI without returning reference values.
+After access is granted, use **Preview recipients**, check the message, then send.
+Granting access never sends email automatically. Personalised issuance references
+remain the responsibility of the existing protected download service.
