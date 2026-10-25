@@ -95,3 +95,9 @@ without explicit test-account approval and retain test receipt provenance.
 Generated dashboard bundles can be checked with
 `python3 scripts/bundle-edge-functions.py --check`; they use the same tested
 handlers and require only one index.ts paste per function.
+
+- `node tests/reading-reconcile-order.mjs` exercises authenticated admin recovery
+  against the same payment verifier as signed webhooks. It checks denied
+  non-admins, exact order-name lookup, unpaid/zero-value orders, missing checkout
+  bindings, test-account restrictions and ignored browser entitlement assertions.
+  Real Shopify order lookup remains a deployed acceptance test.

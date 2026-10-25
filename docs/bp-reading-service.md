@@ -34,7 +34,7 @@ These are one-time transactional migrations, not scripts to rerun over already-c
 - `bp-reading-create-checkout`: validates the account, creates a bound intent, creates the Shopify Storefront cart with variant and annual plan, verifies the returned allocation and GBP subtotal, and records the cart before returning its checkout URL.
 - `bp-reading-shopify-webhook`: verifies Shopify's HMAC over the unchanged request body and expected shop domain. For `orders/paid`, it re-queries the order/transactions through the Admin API, verifies the single membership line, annual plan and paid GBP offer, resolves the checkout reference, and uses a successful sale/capture's processed timestamp for the access period. For a verified full refund, it revokes that receipt and recalculates access without removing another valid paid period. Partial refunds are logged for manual review; they do not automatically rewrite the membership period.
 
-`supabase/config.toml` disables platform JWT checking **only** for the Shopify webhook: Shopify authenticates with its raw-body signature. All user-facing functions retain normal JWT verification. The webhook has three editor files: `index.ts`, `handler.ts`, and `shopify-auth.ts`. Keep all three together when deploying. The token helper caches tokens only until shortly before expiry and retries an unauthorized order lookup once with a fresh token. These changes do not change Storefront checkout token requirements. Function handlers have dependency-injected tests; their Deno/Shopify adapters still require live staging validation.
+`supabase/config.toml` disables platform JWT checking **only** for the Shopify webhook: Shopify authenticates with its raw-body signature. All user-facing functions retain normal JWT verification. The modular webhook now uses `index.ts`, `handler.ts`, `shopify-auth.ts`, and `shopify-service.ts`. For dashboard deployment, use its generated single-file version instead of managing these imports manually. The token helper caches tokens only until shortly before expiry and retries an unauthorized order lookup once with a fresh token. These changes do not change Storefront checkout token requirements. Function handlers have dependency-injected tests; their Deno/Shopify adapters still require live staging validation.
 
 ## Runtime configuration (server-side only)
 
@@ -184,3 +184,27 @@ Shopify's original hostname after a rename. It accepts no other alias or wildcar
 HMAC, authoritative Admin API order verification, offer checks and test-account
 restrictions remain mandatory. Keep SHOPIFY_STORE_DOMAIN stable so receipt
 identities stay consistent; this fix does not require changing that secret.
+
+
+## Recover an already-paid order without another payment
+
+Deploy `bp-reading-reconcile-order` with JWT verification enabled. Its generated
+single-file source is `supabase/dashboard/bp-reading-reconcile-order.ts`.
+The reader's admin-only **Recover an existing membership payment** form accepts
+an exact order name (such as #1017), numeric Admin API ID, or Shopify admin URL.
+The server independently validates the Supabase user and member_profiles admin
+flag. Names are resolved through an Admin API query with status:any so archived
+orders can be found; it requires one exact name match, not customer email.
+
+Recovery and signed webhooks share verifyAndApplyReadingOrder and the same
+Shopify service adapter. Both re-query authoritative paid status, actual amount,
+annual plan, test flag, processed payment time and original checkout reference.
+The browser cannot choose a recipient, expiry, amount or payment-success flag.
+Test-account approval remains required for simulated payments. The existing
+receipt function keeps retries idempotent; recovery does not charge, fulfil,
+refund, or create a new Shopify order. It only records a verified existing
+payment and its original purchase-date-based access period.
+
+Manual recovery establishes entitlement for that order; it does not prove that
+automatic webhook delivery has been repaired. Keep public launch disabled until
+a signed Shopify delivery is accepted and the initial/renewal tests pass.

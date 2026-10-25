@@ -1784,7 +1784,7 @@ supabase.auth.onAuthStateChange(event => {
     closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
     $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
     state.bookmarks = []; bookmarkDetails = {}; annotations = [];
-    $('reading-setup-result').textContent='';$('check-reading-setup').hidden=true;$('preview-reading-checkout').hidden=true;
+    $('reading-setup-result').textContent='';$('check-reading-setup').hidden=true;$('preview-reading-checkout').hidden=true;$('reading-reconcile-form').hidden=true;
     $('chapter-list').replaceChildren(); $('bookmark-list').replaceChildren(); $('notebook-list').replaceChildren();
   }
 });
@@ -1949,6 +1949,34 @@ document.addEventListener(
    ADMIN GATE
    ===================================================== */
 
+$('reading-reconcile-form').onsubmit=async event=>{
+  event.preventDefault();
+  if(!activeUser?.isAdmin)return;
+  const value=$('reading-reconcile-order').value.trim();
+  let body;
+  if(/^#[0-9]{1,20}$/.test(value))body={orderName:value};
+  else {
+    const urlId=/^https:\/\/admin\.shopify\.com\/store\/[^/]+\/orders\/([0-9]+)(?:[/?#]|$)/.exec(value)?.[1];
+    const id=urlId||(/^[0-9]{1,25}$/.test(value)?value:null);
+    if(!id){$('reading-setup-result').textContent='Enter an order number such as #1017, a numeric Shopify order ID, or its admin URL.';return;}
+    body={orderId:id};
+  }
+  const button=$('reading-reconcile-submit'),output=$('reading-setup-result');
+  button.disabled=true;output.textContent='Verifying the existing Shopify order. No new payment is being created…';
+  try {
+    const {data,error}=await supabase.functions.invoke('bp-reading-reconcile-order',{body});
+    if(!activeUser?.isAdmin)return;
+    let result=data;
+    if(error?.context?.clone)try{result=await error.context.clone().json();}catch{}
+    if(!result)throw Error();
+    const summary=typeof result.message==='string'?result.message:typeof result.error==='string'?result.error:'Order verification did not complete.';
+    const phase=typeof result.phase==='string'&&/^[A-Z_]{1,60}$/.test(result.phase)?' Check: '+result.phase+'.':'';
+    const code=typeof result.code==='string'&&/^[A-Z0-9_]{1,300}$/.test(result.code)?' Detail: '+result.code+'.':'';
+    output.textContent=summary+phase+code+(summary==='Membership payment recorded'?' Return to the test-member window and click Check payment or refresh the library.':' No new payment has been made.');
+  }catch{if(activeUser?.isAdmin)output.textContent='Order recovery is unavailable. Confirm bp-reading-reconcile-order is deployed with JWT verification on. Do not repeat the payment.';}
+  finally{button.disabled=false;}
+};
+
 $('preview-reading-checkout').onclick=async()=>{
   if(!activeUser?.isAdmin)return;
   if(!confirm('This opens a REAL Shopify checkout for £10.99 per year. Inspect it only; do not complete payment during this preview. Continue?'))return;
@@ -1993,6 +2021,7 @@ async function initialise() {
     $("reading-membership-offer").hidden = user.isAdmin;
     $("check-reading-setup").hidden = !user.isAdmin;
     $("preview-reading-checkout").hidden = !user.isAdmin;
+    $("reading-reconcile-form").hidden = !user.isAdmin;
     checkoutController = initializeReadingCheckout(supabase,{button:$("subscribe-reading"),status:$("reading-payment-status"),retry:$("check-reading-payment")});
     $('reader-watermark').textContent = 'Personal reading copy · Reader ' + user.id.slice(0,8).toUpperCase();
     await loadReadingCatalogue();
