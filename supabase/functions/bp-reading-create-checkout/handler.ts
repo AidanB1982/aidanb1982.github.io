@@ -40,7 +40,7 @@ export function createCheckoutHandler(deps: Dependencies) {
       preview=body.action==='admin_preview';
       if(preview) {
         if(!await deps.isAdmin(user))return json(403,{error:'Administrator access is required to preview checkout.'});
-      }else if(deps.env('BP_READING_CHECKOUT_ENABLED')!=='true'||deps.env('BP_READING_CUSTOMER_ACCESS')!=='true')return json(503,{error:'Membership checkout is not ready yet.'});
+      }else if(deps.env('BP_READING_TEST_USER_ID')!==user && (deps.env('BP_READING_CHECKOUT_ENABLED')!=='true'||deps.env('BP_READING_CUSTOMER_ACCESS')!=='true'))return json(503,{error:'Membership checkout is not ready yet.'});
       stage='CHECKOUT_RECORD';
       intentId=await deps.createIntent(user);
       stage='SHOPIFY_CART_REQUEST';

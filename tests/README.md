@@ -86,3 +86,12 @@ these local tests do not establish that payment credentials or webhooks are live
 The checkout handler test additionally checks that the explicit admin preview
 works with both launch flags disabled, non-admin previews are denied before any
 cart/intent is created, and the ordinary customer checkout remains disabled.
+
+Controlled payment tests use an exact server-configured test profile while both
+public launch flags stay false. Checkout tests cover that user's exception and
+other users' continued denial. Delivery tests require the tester's normal paid
+entitlement and approved file. Webhook tests ensure simulated orders are ignored
+without explicit test-account approval and retain test receipt provenance.
+Generated dashboard bundles can be checked with
+`python3 scripts/bundle-edge-functions.py --check`; they use the same tested
+handlers and require only one index.ts paste per function.

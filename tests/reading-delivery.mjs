@@ -4,7 +4,7 @@ const origin = 'https://blackwoodpublishing.co.uk';
 function fixture(overrides={}) {
   const config = {isAdmin:true,enabled:false,entitled:false,release:true,file:true,edition:true,format:'ebook',status:'admin_testing',...overrides};
   const operations=[];
-  const env={SUPABASE_URL:'https://test.invalid',SUPABASE_ANON_KEY:'anon-fixture',SUPABASE_SERVICE_ROLE_KEY:'server-fixture',BP_READING_CUSTOMER_ACCESS:config.enabled?'true':'false'};
+  const env={SUPABASE_URL:'https://test.invalid',SUPABASE_ANON_KEY:'anon-fixture',SUPABASE_SERVICE_ROLE_KEY:'server-fixture',BP_READING_CUSTOMER_ACCESS:config.enabled?'true':'false',BP_READING_TEST_USER_ID:config.tester};
   const handler = createReadingHandler({env:name=>env[name],log:()=>{},createClient:(url,key,options)=>({
     auth:{getUser:async token=>config.badToken?{data:{user:null},error:{}}:{data:{user:{id:'verified-user'}}}},
     from(table) { const filters={}; return {select(){return this;},eq(k,v){filters[k]=v;return this;},async maybeSingle(){operations.push({table,filters});
@@ -28,6 +28,10 @@ for(const config of [{isAdmin:false},{badToken:true},{isAdmin:false,enabled:true
   if(!config.invalidZip)assert.equal(result.operations.some(op=>op.download),false,'denied request never fetches file');
 }
 result=await request({isAdmin:false,enabled:true,entitled:true});assert.equal(result.response.status,200,'paid reader with explicit file release');assert.equal(result.operations.some(op=>op.download),true);
+result=await request({isAdmin:false,enabled:false,tester:'verified-user',entitled:false});assert.equal(result.response.status,403,'tester still needs a paid entitlement');
+result=await request({isAdmin:false,enabled:false,tester:'verified-user',entitled:true,release:false});assert.equal(result.response.status,403,'tester still needs an approved file release');
+result=await request({isAdmin:false,enabled:false,tester:'verified-user',entitled:true});assert.equal(result.response.status,200,'paid tester can read with public launch closed');
+result=await request({isAdmin:false,enabled:false,tester:'another-user',entitled:true});assert.equal(result.response.status,403,'other paid users remain launch-gated');
 for(const body of [{editionId:'2'},{editionId:-1},{editionId:2.5},{editionId:Number.MAX_SAFE_INTEGER+1},[],null,'{bad']){result=await request({},body);assert.equal(result.response.status,400);assert.equal(result.operations.length,0);}
 result=await request({},'x'.repeat(4097));assert.equal(result.response.status,413);
 result=await request({},undefined,{Origin:'https://untrusted.invalid'});assert.equal(result.response.status,403);assert.equal(result.response.headers.has('Access-Control-Allow-Origin'),false);

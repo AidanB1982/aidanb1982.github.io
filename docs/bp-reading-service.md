@@ -109,3 +109,49 @@ checkout is real: inspect £10.99 GBP, annual renewal, and no shipping, then clo
 it without completing payment. This is not a sandbox transaction and does not
 replace a controlled initial-payment/renewal acceptance test. Checkout failures
 log a fixed stage name without credential values.
+
+## Controlled Shopify test-mode acceptance
+
+Read-only checks and the admin checkout preview have passed in the owner's live
+setup. They establish connectivity and cart configuration, not paid access.
+The owner selected Shopify test mode for payment testing. No test window has
+been specified yet; do not enable test mode until the owner is ready for a quiet
+period, because it affects normal live store payment checkout.
+
+Deploy the updated checkout, delivery and webhook functions before testing.
+For dashboard deployment, `supabase/dashboard/` contains generated single-file
+versions: replace the matching function's index.ts with the complete bundle.
+No local handler imports are required by these bundles. Keep JWT verification
+on for checkout and delivery, off only for the signed Shopify webhook. Generate
+or verify bundles with `python3 scripts/bundle-edge-functions.py [--check]`.
+
+Use a separate, non-admin member account. Put that profile's id into the secure
+server setting BP_READING_TEST_USER_ID. Keep BP_READING_CUSTOMER_ACCESS and
+BP_READING_CHECKOUT_ENABLED false. Only the exact authenticated test account can
+use the customer checkout route while launch is closed. Delivery still requires
+a paid entitlement and an explicitly approved private file release; the test
+exception grants no admin privileges, free books, or bypass of file checks.
+
+During the scheduled Shopify test-mode window, set BP_READING_TEST_PAYMENTS=true.
+The webhook verifies Shopify's authoritative Order.test flag. Simulated payments
+are accepted only for a checkout bound to the designated member and while that
+explicit test setting is true. Simulated receipts use a shopify-test: prefix;
+normal receipts retain the shopify: prefix. Other accounts' simulated payments
+do not grant access. Refunds can still revoke the simulated receipt after the
+accept-test setting has been disabled.
+
+Before entering payment details, confirm Shopify is actually in test mode and
+use only the test instructions/cards for that gateway. Never use real card data
+in a presumed sandbox. Verify: initially locked book; successful simulated annual
+purchase; signed webhook; receipt; access date 12 calendar months from processed
+payment; book access and syncing as a non-admin; cancellation preserving the
+paid period; simulated full refund removing receipt-backed access. A renewal
+also needs a verifiable account reference using the subscription app's supported
+test billing tools. Do not assume a successful first order proves renewal.
+
+After testing, switch Shopify back to normal live payments, set
+BP_READING_TEST_PAYMENTS=false, remove BP_READING_TEST_USER_ID, and revoke any
+remaining simulated receipts through the server-only revocation function (or
+verify that the test refund did so). Keep both public launch flags false until
+all acceptance results are reviewed. No live paid test or test-mode activation
+has been performed from this workspace.
