@@ -11,26 +11,29 @@
 
   <title>BP Reading | Blackwood Publishing</title>
 
-  <style>
-    html:not(.bp-admin-verified) body {
-      visibility: hidden;
-    }
-  </style>
 
-  <link rel="stylesheet" href="/css/BP-Reading.css">
+
+  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261025">
 </head>
 
 <body>
+  <noscript><p class="access-card">Please enable JavaScript to open your protected reading library.</p></noscript>
 
+  <section id="reader-access" class="access-card" role="status">
+    <div class="brand">BLACKWOOD</div><p class="eyebrow">Your private reading room</p>
+    <h1>A little space to disappear.</h1><p id="access-message">Preparing your library and checking your access…</p>
+    <a href="/pages/members.html">Return to The Archivists</a>
+  </section>
+  <script>setTimeout(function () { var message = document.getElementById('access-message'); if (message && !document.getElementById('reader-access').hidden) message.textContent = 'Still connecting. If your library does not open, check your connection and reload this page.'; }, 15000);</script>
   <!-- LIBRARY -->
 
-  <main class="library" id="library">
+  <main class="library" id="library" hidden>
 
     <header class="library-header">
       <div class="brand">BLACKWOOD</div>
       <div class="brand-subtitle">BP READING</div>
 
-      <h1>My Library</h1>
+      <p class="eyebrow">THE BLACKWOOD READING ROOM</p><h1>Stories worth staying in.</h1>
 
       <p class="library-intro">
         Your books. Your stories. Your place to
@@ -38,6 +41,7 @@
       </p>
     </header>
 
+    <div class="shelf-heading"><h2>Your library</h2><span>Private reading edition</span></div>
     <section
       class="book-grid"
       id="book-grid"
@@ -142,7 +146,7 @@
       aria-controls="reader-controls"
       aria-expanded="false"
       hidden>
-      ☰ Menu
+      Reading menu
     </button>
 
     <!-- TOP CONTROLS -->
@@ -160,8 +164,29 @@
       </button>
 
       <div class="control-group">
+        <button class="control" id="open-contents" type="button">Contents</button>
+        <button class="control" id="open-appearance" type="button">Aa <span class="sr-only">Appearance</span></button>
+        <button class="control" id="open-search" type="button">Search</button>
+        <button class="control" id="open-bookmarks" type="button">Saved places</button>
+        <button class="control" id="reader-fullscreen" type="button">Full screen</button>
 
         <button
+          class="control"
+          id="bookmark"
+          type="button"
+          aria-pressed="false">
+          ☆ Bookmark
+        </button>
+
+      </div>
+    </header>
+
+    <div class="quiet-progress" aria-hidden="true"><span id="quiet-chapter">Your reading room</span><span id="quiet-percent"></span></div>
+    <dialog id="reader-panel" aria-labelledby="reader-panel-title">
+      <div class="panel-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="reader-panel-title">Reading settings</h2></div><button class="control" id="close-panel" aria-label="Close panel" type="button">✕</button></div>
+      <section id="panel-appearance" hidden>
+        <p class="panel-intro">A page that feels like yours.</p>
+        <div class="appearance-basics">        <button
           class="control"
           id="font-smaller"
           type="button"
@@ -188,17 +213,22 @@
 
         </select>
 
-        <button
-          class="control"
-          id="bookmark"
-          type="button"
-          aria-pressed="false">
-          ☆ Bookmark
-        </button>
-
-      </div>
-    </header>
-
+</div>
+        <label class="setting">Typeface<select id="reader-font"><option value="literary">Literary · Georgia</option><option value="classic">Classic · Palatino</option><option value="clean">Clean · Sans serif</option></select></label>
+        <label class="setting">Line spacing<select id="reader-spacing"><option value="1.5">Compact</option><option value="1.7">Comfortable</option><option value="1.9">Generous</option></select></label>
+        <label class="setting">Page width<select id="reader-width"><option value="620">Intimate</option><option value="760">Balanced</option><option value="920">Expansive</option></select></label>
+        <label class="setting">Text alignment<select id="reader-alignment"><option value="left">Left aligned</option><option value="justify">Justified</option></select></label>
+        <label class="setting">Page turns<select id="reader-motion"><option value="gentle">Gentle turn</option><option value="instant">Instant</option></select></label>
+        <p class="device-note">Your appearance settings and reading place are saved on this device. They do not sync between devices yet.</p>
+      </section>
+      <section id="panel-contents" hidden><p class="panel-intro">Find your next chapter.</p><nav id="chapter-list" aria-label="Book chapters"></nav></section>
+      <section id="panel-search" hidden>
+        <p class="panel-intro">Find a line. Return to a moment.</p>
+        <form id="book-search-form"><label for="book-search">Search this book</label><div class="search-fields"><input id="book-search" type="search" required minlength="2" maxlength="120" placeholder="A word or phrase…"><button class="control" type="submit">Find</button></div></form>
+        <p id="search-status" role="status" aria-live="polite"></p><div id="search-results"></div>
+      </section>
+      <section id="panel-bookmarks" hidden><p class="panel-intro">The places you wanted to keep.</p><div id="bookmark-list"></div></section>
+    </dialog>
     <!-- BOTTOM CONTROLS -->
 
     <nav
@@ -229,6 +259,11 @@
 
     </nav>
 
+    <div id="reading-scrubber" class="reading-scrubber" hidden>
+      <label for="reader-seek">Move through book <output id="seek-value">0%</output></label>
+      <input id="reader-seek" type="range" min="0" max="100" value="0" disabled>
+      <button class="control" id="return-position" type="button" hidden>Return to previous place</button>
+    </div>
     <div
       class="reader-status"
       id="reader-status"
@@ -240,12 +275,12 @@
 
   <!-- EPUB DEPENDENCIES -->
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261025"></script>
 
 </body>
 </html>

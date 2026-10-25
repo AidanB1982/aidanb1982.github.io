@@ -26,10 +26,9 @@ const BOOK = {
     "Blackwood Publishing — administrator reading edition."
 };
 
-const STORAGE_KEY =
-  "bp-reading-gualachulain-v1";
+let STORAGE_KEY = "bp-reading-gualachulain-v1";
 
-const PAGE_TURN_DURATION = 900;
+const PAGE_TURN_DURATION = 180;
 const TOUCH_EDGE_FRACTION = 0.22;
 const MOUSE_EDGE_FRACTION = 0.18;
 const DRAG_START_DISTANCE = 9;
@@ -67,7 +66,7 @@ function loadSavedState() {
   }
 }
 
-const saved = loadSavedState();
+const saved = {};
 
 const state = {
   theme: allowedThemes.includes(saved.theme)
@@ -136,6 +135,8 @@ function saveState() {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
+        appearance,
+        bookmarkDetails,
         theme: state.theme,
         fontSize: state.fontSize,
         position: state.position,
@@ -151,11 +152,15 @@ function saveState() {
   }
 }
 
+let statusTimer;
 function showStatus(message) {
+  clearTimeout(statusTimer);
   $("reader-status").textContent = message;
+  if (message) statusTimer = setTimeout(() => {$("reader-status").textContent = "";}, 6000);
 }
 
 function setControlsVisible(visible) {
+  $("reading-scrubber").hidden = !visible;
   $("reader-controls").hidden = !visible;
   $("reader-bottom").hidden = !visible;
 
@@ -233,14 +238,13 @@ function renderLibrary() {
     () => void openBook()
   );
 
-  card.append(
-    cover,
-    heading,
-    description,
-    progressLabel,
-    track,
-    button
-  );
+  const details = document.createElement("div");
+  details.className = "book-details";
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "eyebrow";
+  eyebrow.textContent = state.hasStarted ? "PICK UP WHERE YOU LEFT OFF" : "YOUR NEXT CHAPTER AWAITS";
+  details.append(eyebrow, heading, description, progressLabel, track, button);
+  card.append(cover, details);
 
   grid.appendChild(card);
 }
@@ -424,7 +428,11 @@ function applyReaderPreferences() {
     return;
   }
 
+  document.querySelector('.reading-column').style.maxWidth = appearance.width + 'px';
   state.rendition.themes.select(state.theme);
+  state.rendition.themes.override('font-family', fontFamilies[appearance.font], true);
+  state.rendition.themes.override('line-height', appearance.spacing, true);
+  state.rendition.themes.override('text-align', appearance.alignment, true);
 
   state.rendition.themes.fontSize(
     `${Math.round(
@@ -517,7 +525,7 @@ function updateReaderProgress() {
       );
     }
 
-    label = `${state.progress}% complete`;
+    label = `${state.progress}% complete${page && total ? ` · ${page}/${total} in chapter` : ""}`;
   } else if (
     page !== null &&
     total !== null
@@ -528,6 +536,11 @@ function updateReaderProgress() {
   }
 
   $("reader-progress").textContent = label;
+  $("quiet-percent").textContent = state.locationsReady ? `${state.progress}% complete` : label;
+  $("quiet-chapter").textContent = chapterName(start.href);
+  $("reader-seek").disabled = !state.locationsReady;
+  $("reader-seek").value = state.progress;
+  $("seek-value").value = state.progress + '%';
 
   const previousDisabled =
     state.isNavigating ||
@@ -775,7 +788,9 @@ async function changePage(
     turnSequence === state.turnSequence;
 
   try {
-    if (options.fromGesture) {
+    if (appearance.motion === "instant" || reducedMotion.matches) {
+      resetPageTurn();
+    } else if (options.fromGesture) {
       const progress = clamp(
         options.progress || 0,
         0,
@@ -885,6 +900,16 @@ function registerPageGestures(contents) {
   }
 
   doc.__bpReadingGesturesInstalled = true;
+
+  // Browser deterrents only: screenshots and deliberate extraction cannot be blocked.
+  // Scope to EPUB documents; library/search/settings keep normal clipboard access.
+  for (const type of ["copy", "cut", "paste", "contextmenu"]) {
+    doc.addEventListener(type, event => {
+      event.preventDefault();
+      showStatus("Copying from this reading edition is disabled.");
+    }, true);
+  }
+
 
  
   const getCoordinates = event => {
@@ -1128,16 +1153,8 @@ function registerPageGestures(contents) {
       return;
     }
 
-    // On laptops, clicking either edge turns
-    // the page using the 900 ms animation.
-    if (
-      !window.matchMedia(
-        "(hover: hover) and (pointer: fine)"
-      ).matches
-    ) {
-      return;
-    }
-
+    const selection = doc.getSelection?.()?.toString() || "";
+    if (selection.trim()) return;
     const point = getCoordinates(event);
 
     const direction = getPageDirection(
@@ -1146,16 +1163,8 @@ function registerPageGestures(contents) {
       "mouse"
     );
 
-    if (!direction || !canTurn(direction)) {
-      return;
-    }
-
-    const selection =
-      doc.getSelection?.()?.toString() || "";
-
-    if (selection.trim()) {
-      return;
-    }
+    if (!direction) { setControlsVisible($("reader-controls").hidden); return; }
+    if (!canTurn(direction)) return;
 
     event.preventDefault();
 
@@ -1197,6 +1206,7 @@ function registerPageGestures(contents) {
   doc.addEventListener(
     "keydown",
     event => {
+      handleReadingKeys(event);
       if (event.key === "Escape") {
         event.preventDefault();
 
@@ -1269,10 +1279,13 @@ async function openBook() {
     $("reader-loading").textContent =
       "Opening Gualachulain…";
 
+    if (typeof window.ePub !== "function" || !window.JSZip) throw new Error("The reading engine could not load. Check your connection and reload this page.");
     const book = window.ePub(bytes);
     state.book = book;
 
     await book.ready;
+    await book.loaded.navigation;
+    if (openingId === state.openingId) renderContents();
 
     if (openingId !== state.openingId) {
       return;
@@ -1396,6 +1409,14 @@ async function openBook() {
    ===================================================== */
 
 function closeBook() {
+  closePanel();
+  if (document.fullscreenElement === $('reader')) void document.exitFullscreen().catch(() => {});
+  ++searchVersion;
+  $('search-results').replaceChildren();
+  $('book-search-form').reset();
+  $('search-status').textContent = '';
+  previousPlace = null;
+  $("return-position").hidden = true;
   ++state.openingId;
   ++state.turnSequence;
 
@@ -1449,6 +1470,187 @@ function closeBook() {
   saveState();
   renderLibrary();
 }
+
+/* Reader workspace: device-local preferences and navigation. */
+const fontFamilies = {
+  literary: "Georgia, 'Times New Roman', serif",
+  classic: "Palatino, 'Palatino Linotype', 'Book Antiqua', serif",
+  clean: "Arial, Helvetica, sans-serif"
+};
+const appearance = {font: 'literary', spacing: '1.7', width: '760', alignment: 'left', motion: 'gentle'};
+let bookmarkDetails = {};
+let previousPlace = null;
+let panelTrigger = null;
+let chapterItems = [];
+let searchVersion = 0;
+function restorePreferences(stored) {
+  state.theme = allowedThemes.includes(stored.theme) ? stored.theme : 'parchment';
+  state.fontSize = Number.isFinite(stored.fontSize) ? clamp(stored.fontSize, 15, 30) : 19;
+  state.position = typeof stored.position === 'string' && stored.position.startsWith('epubcfi(') ? stored.position : null;
+  state.progress = Number.isFinite(stored.progress) ? clamp(stored.progress, 0, 100) : 0;
+  state.bookmarks = Array.isArray(stored.bookmarks) ? stored.bookmarks.filter(c => typeof c === 'string' && c.startsWith('epubcfi(')) : [];
+  state.hasStarted = stored.hasStarted === true;
+  const options = {font: Object.keys(fontFamilies), spacing: ['1.5','1.7','1.9'], width: ['620','760','920'], alignment: ['left','justify'], motion: ['gentle','instant']};
+  for (const key of Object.keys(options)) {
+    if (options[key].includes(stored.appearance?.[key])) appearance[key] = stored.appearance[key];
+  }
+  bookmarkDetails = stored.bookmarkDetails && typeof stored.bookmarkDetails === 'object' && !Array.isArray(stored.bookmarkDetails) ? stored.bookmarkDetails : {};
+  for (const [key, id] of Object.entries({font:'reader-font',spacing:'reader-spacing',width:'reader-width',alignment:'reader-alignment',motion:'reader-motion'})) $(id).value = appearance[key];
+}
+function chapterName(href = state.currentLocation?.start?.href) {
+  const path = String(href || '').split('#')[0];
+  return chapterItems.find(c => c.href.split('#')[0] === path)?.label || BOOK.title;
+}
+function closePanel() {
+  if ($('reader-panel').open) {
+    $('reader-panel').close();
+    panelTrigger?.focus();
+  }
+}
+function openPanel(kind, trigger) {
+  if (!state.isOpen || state.isLoading) return;
+  panelTrigger = trigger;
+  for (const name of ['appearance','contents','bookmarks','search']) $('panel-' + name).hidden = name !== kind;
+  $('reader-panel-title').textContent = {appearance:'Your perfect page',contents:'Inside this book',bookmarks:'Saved places',search:'Between the lines'}[kind];
+  if (kind === 'bookmarks') renderBookmarks();
+  if (kind === 'contents') {
+    const current = String(state.currentLocation?.start?.href || '').split('#')[0];
+    $('chapter-list').querySelectorAll('button').forEach((button, i) => {
+      if (chapterItems[i]?.href.split('#')[0] === current) button.setAttribute('aria-current', 'location');
+      else button.removeAttribute('aria-current');
+    });
+  }
+  $('reader-panel').showModal();
+  $('close-panel').focus();
+}
+function renderContents() {
+  chapterItems = [];
+  const list = $('chapter-list'); list.replaceChildren();
+  function walk(items, depth = 0) {
+    for (const item of items || []) {
+      if (typeof item.href !== 'string') continue;
+      const label = String(item.label || 'Untitled chapter').trim();
+      chapterItems.push({href:item.href, label});
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'chapter-link'; button.textContent = label;
+      button.style.paddingLeft = (16 + Math.min(depth, 5) * 16) + 'px';
+      button.onclick = () => void jumpTo(item.href);
+      list.append(button); walk(item.subitems, depth + 1);
+    }
+  }
+  walk(state.book?.navigation?.toc);
+  if (!chapterItems.length) list.textContent = 'This edition does not include a chapter list.';
+}
+async function jumpTo(target, remember = true) {
+  if (!state.rendition || state.isNavigating || state.isLoading) return;
+  const current = getCurrentCfi();
+  const opening = state.openingId;
+  state.isNavigating = true; updateReaderProgress();
+  try {
+    await state.rendition.display(target);
+    if (opening !== state.openingId) return;
+    if (remember && current) { previousPlace = current; $('return-position').hidden = false; }
+    closePanel();
+  } catch { showStatus('That place could not be opened. Your reading position has been kept.'); }
+  finally { if (opening === state.openingId) {state.isNavigating = false; updateReaderProgress();} }
+}
+function renderBookmarks() {
+  const list = $('bookmark-list'); list.replaceChildren();
+  if (!state.bookmarks.length) {list.textContent = 'No saved places yet. Tap Bookmark while reading to keep a page here.'; return;}
+  state.bookmarks.forEach((cfi, i) => {
+    const row = document.createElement('div'); row.className = 'saved-place';
+    const jump = document.createElement('button'); jump.type = 'button'; jump.className = 'chapter-link';
+    const detail = bookmarkDetails[cfi];
+    jump.textContent = typeof detail?.label === 'string' ? detail.label : `Saved place ${i + 1}`;
+    const sub = document.createElement('small'); sub.textContent = typeof detail?.progress === 'number' ? `${detail.progress}% through the book` : 'Open this page'; jump.append(sub);
+    jump.onclick = () => void jumpTo(cfi);
+    const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'control'; remove.textContent = 'Remove'; remove.setAttribute('aria-label', 'Remove ' + jump.textContent);
+    remove.onclick = () => {state.bookmarks = state.bookmarks.filter(c => c !== cfi); delete bookmarkDetails[cfi]; saveState(); updateBookmarkButton(); renderBookmarks();};
+    row.append(jump, remove); list.append(row);
+  });
+}
+function handleReadingKeys(event) {
+  if (!state.isOpen || $('reader-panel').open || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.target?.closest?.('input,select,textarea,[contenteditable]')) return;
+  if (['ArrowRight','PageDown','ArrowLeft','PageUp'].includes(event.key)) {
+    event.preventDefault(); void changePage(['ArrowRight','PageDown'].includes(event.key) ? 1 : -1);
+  }
+}
+for (const name of ['contents','appearance','bookmarks','search']) $('open-' + name).onclick = event => openPanel(name, event.currentTarget);
+$('close-panel').onclick = closePanel;
+$('reader-panel').addEventListener('click', event => {if (event.target === $('reader-panel')) {const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) closePanel();}});
+for (const [key, id] of Object.entries({font:'reader-font',spacing:'reader-spacing',width:'reader-width',alignment:'reader-alignment',motion:'reader-motion'})) {
+  $(id).onchange = () => {
+    appearance[key] = $(id).value;
+    applyReaderPreferences();
+    if (key === 'width') state.rendition?.resize();
+    saveState();
+  };
+}
+$('book-search-form').onsubmit = async event => {
+  event.preventDefault();
+  const query = $('book-search').value.trim();
+  if (query.length < 2 || !state.book || state.isLoading) return;
+  const version = ++searchVersion;
+  const book = state.book;
+  const output = $('search-results'); output.replaceChildren();
+  $('search-status').textContent = 'Searching your book…';
+  let count = 0;
+  try {
+    // Search an independently loaded XML document without unloading visible content.
+    for (const section of book.spine.spineItems) {
+      if (version !== searchVersion || book !== state.book) return;
+      const response = await book.load(section.url);
+      if (version !== searchVersion || book !== state.book) return;
+      const original = section.document;
+      const originalContents = section.contents;
+      let found;
+      try {
+        section.document = response;
+        section.contents = response.documentElement;
+        found = section.find(query);
+      } finally {
+        section.document = original;
+        section.contents = originalContents;
+      }
+      for (const result of found) {
+        if (count >= 100) break;
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'chapter-link';
+        button.textContent = result.excerpt;
+        button.onclick = () => void jumpTo(result.cfi);
+        output.append(button); count++;
+      }
+      if (count >= 100) break;
+    }
+    if (version === searchVersion) $('search-status').textContent = count ? `${count === 100 ? 'First ' : ''}${count} matching passages` : 'No matching passages. Try another word or phrase.';
+  } catch {
+    if (version === searchVersion) $('search-status').textContent = 'Search could not finish. Please try again.';
+  }
+};
+$('reader-fullscreen').onclick = async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else if ($('reader').requestFullscreen) await $('reader').requestFullscreen();
+    else showStatus('Full screen is not supported by this browser. The reader already fills your window.');
+  } catch {showStatus('Full screen is unavailable in this browser.');}
+};
+document.addEventListener('fullscreenchange', () => {$('reader-fullscreen').textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen'; state.rendition?.resize();});
+$('reader-seek').oninput = () => {$('seek-value').value = $('reader-seek').value + '%';};
+$('reader-seek').onchange = () => {
+  if (!state.locationsReady || !state.book) return;
+  const target = state.book.locations.cfiFromPercentage(Number($('reader-seek').value) / 100);
+  if (target) void jumpTo(target);
+};
+$('return-position').onclick = async () => {if (previousPlace) {await jumpTo(previousPlace, false); previousPlace = null; $('return-position').hidden = true;}};
+$('bookmark').addEventListener('click', () => {
+  const cfi = getCurrentCfi();
+  if (cfi) {bookmarkDetails[cfi] = {label:chapterName(),progress:state.progress}; saveState();}
+});
+supabase.auth.onAuthStateChange(event => {
+  if (event === 'SIGNED_OUT') {
+    closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
+    $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
+    state.bookmarks = []; bookmarkDetails = {}; $('chapter-list').replaceChildren(); $('bookmark-list').replaceChildren();
+  }
+});
 
 /* =====================================================
    BUTTON EVENTS
@@ -1586,6 +1788,12 @@ $("bookmark").addEventListener(
 document.addEventListener(
   "keydown",
   event => {
+    if (event.key === "Escape" && $("reader-panel").open) {
+      event.preventDefault();
+      closePanel();
+      return;
+    }
+    handleReadingKeys(event);
     if (!state.isOpen) {
       return;
     }
@@ -1608,7 +1816,13 @@ async function initialise() {
   renderLibrary();
 
   try {
-    await verifyBPReadingAdmin();
+    const user = await verifyBPReadingAdmin();
+    STORAGE_KEY = `bp-reading:${user.id}:edition:${EDITION_ID}:v2`;
+    const stored = loadSavedState();
+    restorePreferences(stored);
+    renderLibrary();
+    $("reader-access").hidden = true;
+    $("library").hidden = false;
 
     document.documentElement.classList.add(
       "bp-admin-verified"
@@ -1619,9 +1833,7 @@ async function initialise() {
       error.message
     );
 
-    window.location.replace(
-      "/pages/members.html"
-    );
+    $("access-message").textContent = "Your library could not be opened. Sign in through The Archivists with an administrator account, then try again.";
   }
 }
 
