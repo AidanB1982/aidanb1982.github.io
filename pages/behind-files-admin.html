@@ -37,7 +37,9 @@
 
     <!-- JS -->
     <script src="/js/header.js?v=20261104" defer></script>
-    <script src="/js/behind-files-admin.js?v=20261025" defer></script>
+    <link rel="stylesheet" href="/css/publishing-desk.css?v=20261105">
+    <script src="/js/publishing-desk.js?v=20261105" defer></script>
+    <script src="/js/behind-files-admin.js?v=20261105" defer></script>
     <link rel="stylesheet" href="/css/site-polish.css?v=20261102">
 </head>
 
@@ -280,10 +282,44 @@
                         <a href="/pages/production-planner.html" class="bfa-button">Open Production Planner</a>
                     </article>
 
+                    <article style="border:1px solid #a66a38;border-radius:12px;padding:22px;background:#a66a381a"><p class="bfa-card-kicker">Publishing Operations</p><h3>ARC, AI &amp; Content</h3><p>Assign advance copies, prepare Outlook notices and plan Facebook, Instagram, TikTok and monthly newsletters.</p><a href="#publishing-operations" class="bfa-button">Open Publishing Operations</a></article>
                 </div>
 
             </div>
         </section>
+
+<section class="bfa-panel ops-desk" id="publishing-operations" aria-labelledby="ops-heading">
+ <div class="bfa-panel-inner">
+  <p class="bfa-card-kicker">Publishing Operations</p><h2 id="ops-heading">ARC launches, your AI assistant &amp; content calendar</h2>
+  <p>Prepare the next book, reach its readers and plan the month ahead.</p>
+  <p id="ops-status" role="status" aria-live="polite">The desk will open after administrator verification.</p>
+  <fieldset id="ops-controls" disabled aria-label="Publishing operations">
+  <nav class="ops-tabs" aria-label="Publishing tools"><a href="#ops-arc">ARC launch desk</a><a href="#ops-ai">AI assistant</a><a href="#ops-calendar">Content scheduler</a></nav>
+  <section id="ops-arc" class="ops-section" aria-labelledby="ops-arc-title">
+   <h3 id="ops-arc-title">Let your ARC team know</h3>
+   <p>Choose a book, assign selected team members, then preview their private email notices. Existing assignments and reviews are retained.</p>
+   <div class="ops-fields"><label>ARC campaign<select id="ops-campaign"><option value="">Loading campaigns…</option></select></label><label>Review due for new assignments<input id="ops-due" type="date" required></label><label>Notice type<select id="ops-kind"><option value="available">New ARC available</option><option value="reminder">One follow-up for readers who have not downloaded</option></select></label></div>
+   <p id="ops-campaign-state"></p><p id="ops-mail-state">Outlook connection not checked.</p>
+   <div class="ops-actions"><button type="button" id="ops-select" class="bfa-button">Select eligible team</button><button type="button" id="ops-clear" class="bfa-button">Clear selection</button><button type="button" id="ops-refresh" class="bfa-button">Refresh assignments</button></div>
+   <div class="ops-table-wrap"><table><thead><tr><th scope="col">Select</th><th scope="col">Reader</th><th scope="col">This book</th><th scope="col">Notice</th></tr></thead><tbody id="ops-readers"></tbody></table></div>
+   <div class="ops-actions"><button type="button" id="ops-assign" class="bfa-button">Assign selected readers</button><button type="button" id="ops-preview" class="bfa-button">Preview email recipients</button></div>
+   <section id="ops-email-preview" hidden aria-label="ARC email preview"><h4>Check the exact recipients and message</h4><label>Recipient preview<select id="ops-preview-person"></select></label><pre id="ops-preview-text"></pre><p>Each notice goes separately from aidan@blackwoodpublishing.co.uk. The email links to the protected ARC profile; it contains no book attachment or direct file link.</p><button type="button" id="ops-send" class="bfa-button primary">Send these ARC notices</button><p id="ops-send-status" role="status" aria-live="polite"></p></section>
+  </section>
+  <section id="ops-ai" class="ops-section" aria-labelledby="ops-ai-title">
+   <h3 id="ops-ai-title">Your editorial assistant</h3><p>Draft from your own book facts. Review every suggestion before using it. Keep reader contact details out of the brief.</p><p id="ops-ai-state"></p>
+   <form id="ops-ai-form"><div class="ops-fields"><label>Book title<input id="ops-ai-title-input" maxlength="300" required></label><label>Author<input id="ops-ai-author" maxlength="300"></label><label>Channel<select id="ops-ai-channel"><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>Email</option><option>Behind the Files</option><option>Other</option></select></label></div><label>Verified facts, blurb and approved links<textarea id="ops-ai-facts" rows="5" maxlength="8000" required placeholder="Only facts you can publish. Include a release date or price only if confirmed."></textarea></label><label>What should the assistant draft?<input id="ops-ai-task" maxlength="1000" value="Introduce this book with an atmospheric hook and a clear invitation to read." required></label><button type="submit" class="bfa-button" id="ops-generate">Generate draft</button></form>
+   <label>AI draft — review and edit<textarea id="ops-ai-output" rows="10" maxlength="12000"></textarea></label><div class="ops-actions"><button type="button" id="ops-use-draft" class="bfa-button">Use in content scheduler</button><button type="button" id="ops-copy-draft" class="bfa-button">Copy draft</button></div>
+  </section>
+  <section id="ops-calendar" class="ops-section" aria-labelledby="ops-calendar-title">
+   <h3 id="ops-calendar-title">Plan your publishing month</h3><p>Facebook, Instagram, TikTok and your monthly mailing list. Dates are planned publishing slots. Social accounts and MailerLite are not connected for automatic publication; use Copy and mark items published after sending them.</p>
+   <p id="ops-timezone"></p>
+   <form id="ops-post-form"><div class="ops-fields"><label>Internal post title<input id="ops-post-title" maxlength="200" required></label><label>Book<input id="ops-post-book" maxlength="300"></label><label>Channel<select id="ops-post-channel"><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>Email</option><option>Behind the Files</option><option>Other</option></select></label><label>Planned date and time<input id="ops-post-time" type="datetime-local"></label><label>State<select id="ops-post-status"><option value="draft">Draft</option><option value="approved">Approved</option><option value="scheduled">Scheduled — manual publishing</option><option value="published">Published manually</option></select></label><label>Cadence<select id="ops-post-cadence"><option value="none">One-off</option><option value="monthly">Monthly mailing list</option></select></label></div><label>Approved public image/video URL (optional)<input id="ops-post-media" type="url" maxlength="2000" placeholder="https://…"></label><label>Caption, email or video script<textarea id="ops-post-content" maxlength="12000" rows="7" required></textarea></label><p id="ops-copy-count"></p><div class="ops-actions"><button type="submit" class="bfa-button primary">Save content</button><button type="button" id="ops-new-post" class="bfa-button">New item</button><button type="button" id="ops-monthly" class="bfa-button">Plan monthly newsletter</button></div></form>
+   <div class="ops-fields ops-calendar-tools"><label>Month<input type="month" id="ops-month"></label><label>Filter channel<select id="ops-channel-filter"><option value="all">All channels</option><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>Email</option><option>Behind the Files</option><option>Other</option></select></label><button type="button" class="bfa-button" id="ops-export">Export scheduled slots (.ics)</button><button type="button" class="bfa-button" id="ops-reload-posts">Reload content</button></div>
+   <p id="ops-calendar-summary"></p><div class="ops-calendar" id="ops-calendar-grid" aria-label="Monthly content calendar"></div><div id="ops-posts"></div>
+  </section>
+  </fieldset>
+ </div>
+</section>
 
         <!-- FIRST LIVE DEPARTMENT -->
         <section

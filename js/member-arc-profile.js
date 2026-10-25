@@ -426,12 +426,11 @@
                     </div>
                 </div>
 
-                <div
-                    class="arc-profile-status-panel"
-                    aria-label="ARC profile status"
-                >
-                    ${renderReadOnlyFields(readOnly)}
-                </div>
+                <div data-arc-live-summary aria-live="polite"><p>Checking your current ARC assignments…</p></div>
+                <details class="arc-profile-details"><summary class="arc-profile-details-summary">Application record and previous ARC details</summary>
+                  <p>These are historical application details. Your current assigned books and due dates are shown above and in your ARC Vault.</p>
+                  <div class="arc-profile-status-panel" aria-label="Historical ARC application details">${renderReadOnlyFields(readOnly)}</div>
+                </details>
 
                 ${renderArcWelcomePoster(applicationStatus)}
 
@@ -634,6 +633,11 @@
             const assignments =
                 await fetchArcAssignments(session);
 
+            const current=window.BlackwoodArcCampaignSummary.summarize(assignments);
+            const live=root.querySelector('[data-arc-live-summary]');
+            if(live)live.innerHTML=current.latest
+                ? `<section class="arc-current-card"><p class="arc-profile-kicker">YOUR CURRENT ARC</p><h3>${escapeHtml(current.title)}</h3><p>${current.due?'Review due '+escapeHtml(current.due):'No review due date recorded.'}</p><p>${current.pending.length} review${current.pending.length===1?'':'s'} still to file. Your other assignments remain in the vault below.</p></section>`
+                : '<p>No outstanding ARC assignments. New books will appear here when assigned to your account.</p>';
             if (!assignments.length) {
                 vaultRoot.innerHTML =
                     renderArcVaultEmpty();
@@ -650,6 +654,8 @@
             );
 
         } catch (error) {
+            const live=root.querySelector('[data-arc-live-summary]');
+            if(live)live.textContent='Current ARC assignments could not be verified. Refresh to try again.';
             console.warn(
                 "Blackwood ARC Vault failed:",
                 error
@@ -2469,6 +2475,8 @@
                 </summary>
 
                 <div class="arc-admin-body">
+                    <p><a class="arc-profile-button arc-profile-button-secondary" href="/pages/behind-files-admin.html#ops-arc">Assign a new ARC / email the team</a></p>
+                    <label class="arc-profile-field">Filter by ARC book<input type="search" data-arc-admin-book-search placeholder="For example, Gualachulain"></label>
 
                     <div
                         class="arc-admin-filters"
@@ -2630,6 +2638,7 @@
         return `
             <tr
                 data-arc-admin-row
+                data-arc-admin-book="${escapeAttribute(String(row.title||'').toLowerCase())}"
                 data-arc-admin-filter-type="${escapeAttribute(filterType)}"
                 data-arc-admin-status="${escapeAttribute(
                     String(reviewStatus).toLowerCase()
@@ -2870,6 +2879,7 @@
                             ) || "all";
 
                         let shownCount = 0;
+                        const query=String(adminRoot.querySelector('[data-arc-admin-book-search]')?.value||'').trim().toLowerCase();
 
                         filterButtons.forEach(
                             function (filterButton) {
@@ -2886,7 +2896,7 @@
                                     doesArcAdminRowMatchFilter(
                                         row,
                                         selectedFilter
-                                    );
+                                    ) && String(row.getAttribute('data-arc-admin-book')||'').includes(query);
 
                                 row.hidden =
                                     !shouldShow;
@@ -2921,6 +2931,10 @@
                 );
             }
         );
+        adminRoot.querySelector('[data-arc-admin-book-search]')?.addEventListener('input',()=>{
+            const current=filterButtons.find(button=>button.classList.contains('is-active'))||filterButtons[0];
+            current.click();
+        });
     }
 
 

@@ -891,7 +891,8 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                     title,
                     slug,
                     author_name,
-                    is_active
+                    is_active,
+                    downloads_close_at
                 )
             `)
             .eq("member_id", memberId)
@@ -1266,9 +1267,8 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             : [];
 
         const isArcMember = isArcMemberProfile(member);
-        const activeAssignments = assignments.filter(function (assignment) {
-            return String(assignment.status || "active").toLowerCase() === "active";
-        });
+        const current=window.BlackwoodArcCampaignSummary.summarize(assignments);
+        const activeAssignments=current.active;
 
         const reviewFiledCount = activeAssignments.filter(function (assignment) {
             return looksLikeUrl(assignment.review_link || "");
@@ -1277,14 +1277,6 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
         const downloadedCount = activeAssignments.filter(function (assignment) {
             return Number(assignment.download_count || 0) > 0;
         }).length;
-
-        const nextDueAssignment = activeAssignments
-            .filter(function (assignment) {
-                return Boolean(assignment.review_due_date);
-            })
-            .sort(function (a, b) {
-                return String(a.review_due_date).localeCompare(String(b.review_due_date));
-            })[0] || null;
 
         if (!isArcMember) {
             return {
@@ -1314,12 +1306,12 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             ? "1 opened"
             : `${downloadedCount} opened`;
 
-        const dueLine = nextDueAssignment
-            ? `Next review due ${formatDate(nextDueAssignment.review_due_date)}.`
-            : "No review due date recorded.";
+        const dueLine = current.due
+            ? `Current ARC review due ${formatDate(current.due)}.`
+            : current.latest ? "No review due date recorded for your current ARC." : "All assigned reviews filed.";
 
         return {
-            headline: activeLabel,
+            headline: current.title || activeLabel,
             shortLine: `${downloadLabel} · ${reviewLabel}`,
             detail: `${dueLine} ${downloadLabel}. ${reviewLabel}.`
         };

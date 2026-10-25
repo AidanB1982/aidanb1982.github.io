@@ -1,0 +1,34 @@
+.ops-desk { margin-block:32px; }
+.ops-desk [hidden] { display:none !important; }
+.ops-tabs,.ops-actions { display:flex; flex-wrap:wrap; gap:12px; margin:20px 0; }
+.ops-tabs a { padding:10px 16px; border:1px solid #d4b88b55; border-radius:7px; }
+.ops-section { padding:28px 0; border-top:1px solid #d4b88b33; scroll-margin-top:30px; }
+.ops-section h3 { font-size:clamp(24px,3vw,32px); font-weight:normal; }
+.ops-desk label { display:grid; gap:8px; font:13px/1.7 Arial,sans-serif; margin-bottom:16px; }
+.ops-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; align-items:end; }
+.ops-desk :is(input,select,textarea) { box-sizing:border-box; width:100%; min-width:0; padding:12px; border:1px solid #d4b88b55; border-radius:7px; background:#171310; color:#f0e5d7; font:14px/1.6 Arial,sans-serif; color-scheme:dark; }
+.ops-desk textarea { resize:vertical; }
+.ops-desk button { cursor:pointer; }
+.ops-desk button:disabled { cursor:wait; opacity:.5; }
+.ops-desk :is(a,button,input,select,textarea):focus-visible { outline:2px solid #d4b88b; outline-offset:3px; }
+.ops-table-wrap { overflow:auto; margin:20px 0; }
+.ops-desk table { border-collapse:collapse; width:100%; min-width:600px; text-align:left; font:13px/1.7 Arial,sans-serif; }
+.ops-desk th,.ops-desk td { padding:12px; border-bottom:1px solid #d4b88b25; vertical-align:top; }
+.ops-desk td small { display:block; opacity:.7; overflow-wrap:anywhere; }
+.ops-desk input[type=checkbox] { width:20px; height:20px; min-height:20px; }
+#ops-email-preview { padding:20px; border:1px solid #d4b88b55; border-radius:10px; }
+.ops-desk pre { white-space:pre-wrap; overflow-wrap:anywhere; font:14px/1.8 Georgia,serif; }
+#ops-status,#ops-send-status { padding:14px; border:1px solid #d4b88b33; border-radius:7px; font:13px/1.7 Arial,sans-serif; }
+.ops-calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin:20px 0; }
+.ops-calendar-day { min-height:90px; padding:8px; border:1px solid #d4b88b33; border-radius:6px; font:12px/1.6 Arial,sans-serif; }
+.ops-calendar-day button { display:block; width:100%; margin-top:5px; padding:5px; border:0; border-radius:3px; background:#d4b88b20; color:inherit; text-align:left; overflow-wrap:anywhere; font:11px/1.5 Arial,sans-serif; }
+.ops-calendar-day.today { border-color:#d4b88b; }
+.ops-calendar-day.outside { opacity:.45; }
+.ops-post { border:1px solid #d4b88b33; border-radius:8px; padding:18px; margin:16px 0; }
+.ops-post h4 { margin:0; font-size:20px; }
+.ops-post pre { max-height:160px; overflow:auto; }
+.ops-post.due { border-color:#d4b88b; }
+.ops-calendar-tools { margin-top:36px; }
+@media(max-width:600px){.ops-calendar-day { min-height:70px; padding:4px; font-size:10px; }.ops-calendar-day button { font-size:9px; }.ops-desk .bfa-panel-inner { padding:18px; }.ops-tabs a { flex:1 1 auto; text-align:center; }}
+
+#ops-controls { min-width:0; border:0; margin:0; padding:0; }

@@ -4,6 +4,7 @@ import re
 import sys
 root = Path(__file__).resolve().parents[1]
 functions = {
+    'bp-publishing-desk': ['handler.ts', 'outlook.ts'],
     'bp-reading-create-checkout': ['handler.ts'],
     'bp-reading-deliver-epub': ['handler.ts'],
     'bp-reading-shopify-webhook': ['handler.ts', 'shopify-auth.ts', 'shopify-service.ts'],

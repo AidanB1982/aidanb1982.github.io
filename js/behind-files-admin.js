@@ -189,7 +189,7 @@
     async function verifyAdminAccess() {
         const checkVersion = ++accessCheckVersion;
 
-        lockAdminEditor();
+        lockAdminEditor(false);
 
         showAccessMessage(
             "Verifying Access",
@@ -259,6 +259,7 @@
                 );
 
             if (!isAdmin) {
+                lockAdminEditor();
                 showAccessMessage(
                     "Access Denied",
                     "This area is reserved for Blackwood Publishing management."
@@ -268,6 +269,7 @@
 
             unlockAdminEditor();
             window.BlackwoodPlanner?.activate(user.id);
+            window.BlackwoodOperations?.activate(user.id,supabaseClient);
 
         } catch (error) {
             if (checkVersion !== accessCheckVersion) {
@@ -288,8 +290,10 @@
         }
     }
 
-    function lockAdminEditor() {
+    function lockAdminEditor(clearOperations = true) {
         window.BlackwoodPlanner?.lock();
+        if(clearOperations)window.BlackwoodOperations?.lock();
+        else window.BlackwoodOperations?.suspend();
         const adminContent =
             document.getElementById("bfa-admin-content");
 

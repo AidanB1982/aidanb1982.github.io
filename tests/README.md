@@ -149,3 +149,20 @@ their removal during full-screen reading and restoration on return. Site layout
 checks confirm BP Reading has no link in the public header or footer during the
 publisher's navigation hold. This does not validate KDP withdrawal or change
 any access/checkout launch gate.
+
+Publishing Operations
+
+- `node tests/publishing-desk.mjs` exercises the admin handler and Microsoft Graph
+  transport with mocks, and checks current ARC campaign selection.
+- `node tests/publishing-desk-schema.cjs` applies the actual new migration to a PGlite
+  fixture with legacy ARC records. It checks RLS, retained reviews, assignment/notice
+  deduplication, calendar conflicts, monthly newsletter slots and the AI rate limit.
+- `node tests/publishing-desk-browser.cjs` uses the real existing admin gate and UI with
+  mocked services; `node tests/arc-profile-current.cjs` checks the real profile rendering.
+  They use the existing BASE_URL, CHROMIUM_PATH, READING_TEST_DIR and Playwright setup.
+- `python3 scripts/bundle-edge-functions.py --check` validates the single-file deployment.
+
+Setup and live limitations are in `docs/publishing-desk.md`. These tests send no real
+mail and do not publish social content. The calendar currently plans manual publishing;
+Outlook and AI need server credentials, and automatic social/newsletter publication
+requires their account integrations.
