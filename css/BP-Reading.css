@@ -642,7 +642,7 @@ body { background: radial-gradient(ellipse at 80% 0, #42463544, transparent 55%)
 .brand { font-size: 15px; letter-spacing: .32em; }
 .brand-subtitle { font-size: 9px; margin-top: 10px; }
 .library-header .eyebrow { margin-top: 64px; }
-.library h1 { font-size: clamp(42px, 6vw, 76px); letter-spacing: -.035em; max-width: 700px; margin: 16px 0; line-height: 1.05; }
+.library h1 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -.035em; max-width: 700px; margin: 16px 0; line-height: 1.12; }
 .library-intro { max-width: 480px; font-size: 17px; }
 .shelf-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin: 24px 0; }
 .shelf-heading h2 { font-size: 22px; font-weight: normal; }
@@ -739,3 +739,6 @@ input:focus-visible, a:focus-visible { outline: 2px solid #a9844c; outline-offse
 .notebook-actions { display: flex; gap: 10px; margin-top: 12px; }
 #notebook-list { margin-top: 24px; line-height: 1.7; }
 @media(max-width:600px) { .reading-offer { flex-direction: column; align-items: start; gap: 0; } .library-tools { gap: 12px; } .library-tools label:first-child { width: 100%; } .selection-tools span { display: none; } }
+
+.membership-summary { padding: 16px 20px; margin: 24px 0; border: 1px solid var(--border); border-radius: 6px; background: #d4b88b0a; }
+.membership-summary p { margin: 0; color: var(--copper); font: 13px/1.7 Arial, sans-serif; }

@@ -2,7 +2,11 @@ const {chromium} = require('playwright');
 const assert = require('node:assert/strict');
 const TEST_DIR = process.env.READING_TEST_DIR || '/tmp/blackwood-reading-test';
 const CUSTOMER_TEST = process.env.READING_CUSTOMER_TEST === '1';
-const LOCKED_TEST = process.env.READING_LOCKED_TEST === '1';
+const EXPIRED_TEST=process.env.READING_EXPIRED_TEST==='1';
+const REVOKED_TEST=process.env.READING_REVOKED_TEST==='1';
+const PURCHASE_TEST=process.env.READING_PURCHASE_TEST==='1';
+const LOCKED_TEST = process.env.READING_LOCKED_TEST === '1'||EXPIRED_TEST||REVOKED_TEST;
+const MEMBERSHIP_ROWS=CUSTOMER_TEST||EXPIRED_TEST||REVOKED_TEST?[{access_until:new Date(Date.now()+(EXPIRED_TEST?-1:1)*365*86400000).toISOString(),revoked_at:REVOKED_TEST?new Date().toISOString():null}]:[];
 const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
 (async()=> {
   const browser = await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
@@ -14,11 +18,12 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
       export function createClient(){
         function rows(table,filters){
           if(table==='bp_reading_catalog') return [{edition_id:2,title:'Gualachulain',author:'Aidan Blackwood',series:'The Cursed Bothies',series_order:2,cover_url:'/assets/book7.png'}, {edition_id:3,title:'Fixture Title',author:'Test Author',series:'Test Series',series_order:1,cover_url:'/assets/book7.png'}];
+          if(table==='bp_reading_memberships') return ${JSON.stringify(MEMBERSHIP_ROWS)};
           if(table==='bp_reading_state') {let rows=JSON.parse(localStorage.getItem('mock-cloud')||'{}');return Object.entries(rows).filter(([id])=>!filters.edition_id||id==filters.edition_id).map(([id,row])=>({edition_id:Number(id),...row}));}
           return [];
         }
         return {auth:{getUser:async()=>({data:{user:{id:'library-test'}}}),getSession:async()=>({data:{session:{access_token:'test'}}}),onAuthStateChange:()=>{}},
-          from(table){const filters={};return {select(){return this},eq(key,value){filters[key]=value;return this},single:async()=>({data:{is_admin:${CUSTOMER_TEST || LOCKED_TEST ? 'false' : 'true'}}}),maybeSingle:async()=>({data:rows(table,filters)[0]||null}),then(resolve,reject){return Promise.resolve({data:rows(table,filters)}).then(resolve,reject)}}},
+          from(table){const filters={};return {select(){return this},eq(key,value){filters[key]=value;return this},single:async()=>({data:{is_admin:${CUSTOMER_TEST || LOCKED_TEST || PURCHASE_TEST ? 'false' : 'true'}}}),maybeSingle:async()=>({data:rows(table,filters)[0]||null}),then(resolve,reject){return Promise.resolve({data:rows(table,filters)}).then(resolve,reject)}}},
           async rpc(name,args){if(name==='bp_reading_can_read')return {data:${LOCKED_TEST ? 'false' : 'true'}};const cloud=JSON.parse(localStorage.getItem('mock-cloud')||'{}');const row=cloud[args.p_edition_id];if((row?.revision||0)!==args.p_expected_revision)return {error:{code:'40001'}};cloud[args.p_edition_id]={payload:args.p_payload,revision:(row?.revision||0)+1};localStorage.setItem('mock-cloud',JSON.stringify(cloud));return {data:cloud[args.p_edition_id].revision};}
         };
       }`});
@@ -30,7 +35,11 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   await page.goto(`${BASE_URL}/pages/bp-reading.html`);
   await page.waitForFunction(()=>!document.getElementById('library').hidden);
   assert.equal(await page.locator('.book-card').count(),2);
-  assert.equal(await page.locator('#reading-membership-offer').isVisible(),CUSTOMER_TEST||LOCKED_TEST,'admin bypass hides subscription offer');
+  assert.equal(await page.locator('#reading-membership-offer').isVisible(),!CUSTOMER_TEST&&(LOCKED_TEST||PURCHASE_TEST),'only active annual members and admins hide the subscription offer');
+  if(CUSTOMER_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Annual membership active.*Reading access through/);
+  if(!CUSTOMER_TEST&&!LOCKED_TEST&&!PURCHASE_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Administrator access/);
+  if(CUSTOMER_TEST||PURCHASE_TEST)assert.equal(await page.getByRole('button',{name:'Read Book',exact:true}).count(),2);
+  const titleSize=await page.locator('.library h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));assert(titleSize<=48,'compact library title');
   if (LOCKED_TEST) {
     assert.equal(await page.getByRole('button',{name:'Subscribe to read',exact:true}).count(),2);
     await page.locator('.open-book').first().click();

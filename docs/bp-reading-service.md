@@ -208,3 +208,15 @@ payment and its original purchase-date-based access period.
 Manual recovery establishes entitlement for that order; it does not prove that
 automatic webhook delivery has been repaired. Keep public launch disabled until
 a signed Shopify delivery is accepted and the initial/renewal tests pass.
+
+
+Library membership presentation reads the signed-in member's own membership row,
+using its future paid-through date and revocation status. Active annual members
+see their access-through date instead of a Subscribe offer. A purchased title
+alone does not hide the annual offer. Admin access remains independent. Unknown
+membership status disables subscription creation until verified, avoiding an
+accidental second subscription. Initial load, payment confirmation and window
+focus refresh membership state. These UI rules do not replace server delivery
+checks. The old exact error “Administrator access is required.” comes from the
+previous administrator-only Edge Function; deploy the current generated
+bp-reading-deliver-epub.ts into the matching function with JWT verification on.

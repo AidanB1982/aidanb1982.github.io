@@ -36,6 +36,7 @@ let BOOK = {
 
 let STORAGE_KEY = "bp-reading-gualachulain-v1";
 let activeUser = null;
+let membershipStatus={known:false,active:false,expiresAt:null};
 let checkoutController = null;
 let readingAccount = null;
 let libraryBooks = [BOOK];
@@ -241,9 +242,42 @@ async function openEdition(book) {
   } catch {showLibraryError('This reading edition could not be prepared. Please reload and try again.');}
   finally {switchingEdition = false; renderLibrary();}
 }
+function renderReadingMembership() {
+  const user=activeUser;
+  if(!user)return;
+  const summary=$('reading-membership-summary'),text=$('reading-membership-text');
+  $('reading-membership-offer').hidden=user.isAdmin||membershipStatus.active;
+  summary.hidden=false;
+  if(user.isAdmin)text.textContent='Administrator access · No subscription is required.';
+  else if(!membershipStatus.known)text.textContent='Your membership status could not be verified. Refresh to check it before starting another subscription.';
+  else if(membershipStatus.active) {
+    const until=new Date(membershipStatus.expiresAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+    text.textContent='Annual membership active · Reading access through '+until+'.';
+  }else if(membershipStatus.expiresAt)text.textContent='No active annual membership. Purchased books remain available in your library.';
+  else summary.hidden=true;
+  if(!user.isAdmin&&!membershipStatus.known)$('subscribe-reading').disabled=true;
+  else if(!user.isAdmin&&!membershipStatus.active)$('subscribe-reading').disabled=false;
+}
+async function refreshReadingMembership() {
+  const user=activeUser;
+  if(!user)return;
+  if(user.isAdmin) {membershipStatus={known:true,active:false,expiresAt:null};renderReadingMembership();return;}
+  try {
+    const {data,error}=await supabase.from('bp_reading_memberships').select('access_until,revoked_at').eq('user_id',user.id).maybeSingle();
+    if(error)throw error;
+    if(activeUser?.id!==user.id)return;
+    const expiresAt=typeof data?.access_until==='string'&&Number.isFinite(Date.parse(data.access_until))?data.access_until:null;
+    membershipStatus={known:true,active:Boolean(expiresAt&&!data.revoked_at&&Date.parse(expiresAt)>Date.now()),expiresAt};
+  }catch {if(activeUser?.id!==user.id)return;membershipStatus={known:false,active:false,expiresAt:null};}
+  renderReadingMembership();
+}
+window.addEventListener('focus',()=>{if(activeUser)void refreshReadingMembership();});
+
 async function loadReadingCatalogue() {
   const user = activeUser;
   if (!user) return;
+  await refreshReadingMembership();
+  if(activeUser?.id!==user.id)return;
   try {
     const {data,error} = await supabase.from('bp_reading_catalog').select('edition_id,title,author,description,cover_url,series,series_order').eq('available',true);
     if (error) throw error;
@@ -345,7 +379,9 @@ async function fetchProtectedEpub() {
       const payload = await response.json();
 
       if (typeof payload.error === "string") {
-        message = payload.error;
+        message = payload.error === 'Administrator access is required.'
+          ? 'This book’s delivery service is not yet enabled for members. Please contact Blackwood Publishing.'
+          : payload.error;
       }
     } catch {
       // Keep generic error.
@@ -1781,6 +1817,8 @@ $('bookmark').addEventListener('click', () => {
 supabase.auth.onAuthStateChange(event => {
   if (event === 'SIGNED_OUT') {
     sessionEpoch++; readingAccount?.stop(); checkoutController?.stop(); activeUser = null;
+    membershipStatus={known:false,active:false,expiresAt:null};
+    $('reading-membership-summary').hidden=true;$('reading-membership-text').textContent='';
     closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
     $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
     state.bookmarks = []; bookmarkDetails = {}; annotations = [];

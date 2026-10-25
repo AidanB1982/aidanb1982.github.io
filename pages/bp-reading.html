@@ -13,7 +13,7 @@
 
 
 
-  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261026">
+  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261030">
 </head>
 
 <body>
@@ -41,6 +41,7 @@
       </p>
     </header>
 
+    <section id="reading-membership-summary" class="membership-summary" role="status" aria-live="polite" hidden><p id="reading-membership-text"></p></section>
     <section id="reading-membership-offer" class="reading-offer" aria-label="BP Reading membership">
       <div><p class="eyebrow">THE BLACKWOOD COLLECTION</p><h2>One membership. Every story.</h2><p>£10.99 per year for access to all available Blackwood reading editions. Or buy a title for £1.99 for permanent access inside BP Reading.</p></div>
       <div><p class="device-note">Read inside BP Reading. No file downloads.<br>Refund requests must be made within 7 days of purchase. After this period, membership payments are non-refundable, subject to your statutory rights.<br>Cancel renewal at any time; access continues until your paid period ends.<br>Membership checkout is being connected.</p><button class="control" id="subscribe-reading" type="button">Subscribe — £10.99 per year</button><button class="control" id="check-reading-payment" type="button" hidden>Check payment</button><p class="device-note" id="reading-payment-status" role="status" aria-live="polite"></p></div>
@@ -54,7 +55,7 @@
       <button class="control" id="reading-reconcile-submit" type="submit">Verify existing order</button>
       <p class="device-note">Administrator recovery checks Shopify's saved payment and original reader account. It does not charge again or change fulfilment.</p>
     </form>
-    <div class="shelf-heading"><h2>Your library</h2><span>Private reading edition</span></div>
+    <div class="shelf-heading"><h2>Your library</h2><span>Your collection</span></div>
     <section
       class="book-grid"
       id="book-grid"
@@ -69,9 +70,7 @@
     </p>
 
     <p class="library-note">
-      Administrator testing edition.
-      Only approved editions connected to protected delivery appear here.
-      Public membership access remains closed until payment verification is ready.
+      Only approved reading editions appear here. Your reading place and private notebook are linked to your account.
     </p>
 
   </main>
@@ -299,7 +298,7 @@
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js?v=20261029"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261030"></script>
 
 </body>
 </html>

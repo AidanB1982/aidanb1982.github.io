@@ -101,3 +101,10 @@ handlers and require only one index.ts paste per function.
   non-admins, exact order-name lookup, unpaid/zero-value orders, missing checkout
   bindings, test-account restrictions and ignored browser entitlement assertions.
   Real Shopify order lookup remains a deployed acceptance test.
+
+Membership presentation is covered by reading-library.cjs: the active subscriber
+mode hides the annual offer and shows the paid-through date; individual-book
+owners retain the offer; expired/revoked modes show locked books and the offer;
+administrators have no subscription requirement. Use READING_PURCHASE_TEST=1,
+READING_EXPIRED_TEST=1 or READING_REVOKED_TEST=1 for those cases. The browser test
+also checks the compact headline size and exercises actual EPUB rendering.
