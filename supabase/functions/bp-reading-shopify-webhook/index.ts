@@ -1,6 +1,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
 import {createShopifyWebhook,type PaidOrder} from './handler.ts';
+import {createAdminTokenProvider} from './shopify-auth.ts';
+const getAdminToken=createAdminTokenProvider(name=>Deno.env.get(name));
 function service(){
   const url=Deno.env.get('SUPABASE_URL'),key=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   if(!url||!key)throw Error('Missing server configuration');
@@ -9,10 +11,12 @@ function service(){
 Deno.serve(createShopifyWebhook({
   env:name=>Deno.env.get(name),log:message=>console.error(message),
   async loadOrder(id):Promise<PaidOrder>{
-    const shop=Deno.env.get('SHOPIFY_STORE_DOMAIN')||'',token=Deno.env.get('SHOPIFY_ADMIN_ACCESS_TOKEN');
+    const shop=Deno.env.get('SHOPIFY_STORE_DOMAIN')||'',token=await getAdminToken();
     if(!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop)||!token)throw Error('Missing Shopify configuration');
     const query=`query ReadingPaidOrder($id:ID!){order(id:$id){id displayFinancialStatus currencyCode customAttributes{key value} lineItems(first:2){nodes{quantity variant{id} sellingPlan{sellingPlanId} discountedTotalSet{shopMoney{amount currencyCode}} customAttributes{key value}}} transactions(first:100){kind status processedAt}}}`;
-    const response=await fetch(`https://${shop}/admin/api/2026-10/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Access-Token':token},body:JSON.stringify({query,variables:{id}}),signal:AbortSignal.timeout(20000)});
+    const lookup=(accessToken:string)=>fetch(`https://${shop}/admin/api/2026-10/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Access-Token':accessToken},body:JSON.stringify({query,variables:{id}}),signal:AbortSignal.timeout(20000)});
+    let response=await lookup(token);
+    if(response.status===401)response=await lookup(await getAdminToken(true));
     if(!response.ok)throw Error('Shopify could not verify the order');
     const result=await response.json(),order=result.data?.order;
     if(result.errors?.length||!order)throw Error('Order verification failed');

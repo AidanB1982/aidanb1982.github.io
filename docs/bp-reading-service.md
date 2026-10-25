@@ -34,7 +34,7 @@ These are one-time transactional migrations, not scripts to rerun over already-c
 - `bp-reading-create-checkout`: validates the account, creates a bound intent, creates the Shopify Storefront cart with variant and annual plan, verifies the returned allocation and GBP subtotal, and records the cart before returning its checkout URL.
 - `bp-reading-shopify-webhook`: verifies Shopify's HMAC over the unchanged request body and expected shop domain. For `orders/paid`, it re-queries the order/transactions through the Admin API, verifies the single membership line, annual plan and paid GBP offer, resolves the checkout reference, and uses a successful sale/capture's processed timestamp for the access period. For a verified full refund, it revokes that receipt and recalculates access without removing another valid paid period. Partial refunds are logged for manual review; they do not automatically rewrite the membership period.
 
-`supabase/config.toml` disables platform JWT checking **only** for the Shopify webhook: Shopify authenticates with its raw-body signature. All user-facing functions retain normal JWT verification. Function handlers have dependency-injected tests; their Deno/Shopify adapters still require live staging validation.
+`supabase/config.toml` disables platform JWT checking **only** for the Shopify webhook: Shopify authenticates with its raw-body signature. All user-facing functions retain normal JWT verification. The webhook has three editor files: `index.ts`, `handler.ts`, and `shopify-auth.ts`. Keep all three together when deploying. The token helper caches tokens only until shortly before expiry and retries an unauthorized order lookup once with a fresh token. These changes do not change Storefront checkout token requirements. Function handlers have dependency-injected tests; their Deno/Shopify adapters still require live staging validation.
 
 ## Runtime configuration (server-side only)
 
@@ -46,7 +46,9 @@ Configure securely in Supabase function secrets:
 |---|---|
 | `SHOPIFY_STORE_DOMAIN` | Verified canonical `*.myshopify.com` shop. Must match the signed webhook's shop header. |
 | `SHOPIFY_STOREFRONT_TOKEN` | Token for that shop with the supported product, selling-plan and cart permissions. |
-| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Server-only Admin API access to verify orders, transactions and selling-plan allocations. Check required read-order permissions, including older-order access if refunds outside Shopify's default order window must be handled. |
+| `SHOPIFY_CLIENT_ID` | Client ID of the installed, own-store Dev Dashboard app. |
+| `SHOPIFY_CLIENT_SECRET` | Server-only Client Secret for that app. The webhook exchanges these through the client-credentials grant and refreshes expiring Admin API tokens automatically. The app and store must meet Shopify’s own-organization eligibility rules. |
+| `SHOPIFY_ADMIN_ACCESS_TOKEN` | Optional legacy fallback if client credentials are not configured. Do not rely on manually pasted short-lived tokens for production. |
 | `SHOPIFY_WEBHOOK_SECRET` | Signing secret belonging to the configured Shopify webhook integration. |
 | `SHOPIFY_READING_SELLING_PLAN_ID` | Optional override; default is `gid://shopify/SellingPlan/697040896345`. |
 | `BP_READING_CUSTOMER_ACCESS` | Keep unset/false until protected delivery and entitlements pass staging tests. |

@@ -74,3 +74,7 @@ Membership popup and payment foundations
 
 The Deno entry points and real Shopify GraphQL responses require staging checks;
 these local tests do not establish that payment credentials or webhooks are live.
+- `node tests/reading-shopify-auth.mjs` tests server-side app authentication,
+  expiry refresh, concurrent requests, forced refresh and credential rotation
+  using mocked OAuth responses. Live app eligibility and permissions still need
+  verification after secure Supabase configuration.
