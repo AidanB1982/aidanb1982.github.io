@@ -1,4 +1,4 @@
-// Runs the actual migration in embedded PostgreSQL, using a minimal Supabase auth fixture.
+// Runs the actual migration in embedded PostgreSQL, using a minimal Supabase auth/member-profile fixture.
 const {PGlite} = require('@electric-sql/pglite');
 const {readFileSync} = require('node:fs');
 const assert = require('node:assert/strict');
@@ -10,6 +10,7 @@ const assert = require('node:assert/strict');
     create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
     grant usage on schema auth to authenticated,anon;
     insert into auth.users values ('00000000-0000-0000-0000-000000000001'),('00000000-0000-0000-0000-000000000002');`);
+  await db.exec('create table public.member_profiles(id uuid primary key references auth.users(id),is_admin boolean not null default false); insert into public.member_profiles(id) select id from auth.users;');
   await db.exec(readFileSync('supabase/migrations/20261025_bp_reading.sql','utf8'));
   const user1 = '00000000-0000-0000-0000-000000000001';
   const user2 = '00000000-0000-0000-0000-000000000002';
@@ -80,5 +81,21 @@ const assert = require('node:assert/strict');
   await apply(intent1,'shopify-order-1','2024-02-29T13:15:00Z');
   assert.equal((await asUser(user1,`select * from public.bp_reading_checkout_status('${intent1}')`)).rows[0].status,'refunded','old paid event cannot resurrect refunded access');
   console.log('PASS payment ledger: server-only grants, private status polling, purchase-date + 12 months, leap days, idempotency, renewal and refund recalculation');
+
+  const orphan='00000000-0000-0000-0000-000000000003';
+  await db.exec(`insert into auth.users values ('${orphan}'); insert into public.bp_reading_memberships(user_id,access_until) values ('${orphan}',now())`);
+  const profileMigration=readFileSync('supabase/migrations/20261027_bp_reading_member_profiles.sql','utf8');
+  await assert.rejects(()=>db.exec(profileMigration),/no matching member_profiles/);
+  await db.exec('rollback');
+  assert.equal((await db.query(`select count(*)::int as count from public.bp_reading_memberships where user_id='${orphan}'`)).rows[0].count,1,'failed migration preserves orphaned records');
+  await db.exec(`insert into public.member_profiles(id) values ('${orphan}')`);
+  const before=await db.query('select user_id,edition_id,payload from public.bp_reading_state order by user_id');
+  await db.exec(profileMigration);
+  assert.deepEqual((await db.query('select user_id,edition_id,payload from public.bp_reading_state order by user_id')).rows,before.rows,'existing notes and progress preserved');
+  assert.equal((await db.query("select count(*)::int as count from pg_constraint where contype='f' and confrelid='public.member_profiles'::regclass and conrelid in ('public.bp_reading_memberships'::regclass,'public.bp_reading_purchases'::regclass,'public.bp_reading_state'::regclass,'public.bp_reading_checkout_intents'::regclass)")).rows[0].count,4);
+  const noProfile='00000000-0000-0000-0000-000000000004';
+  await db.exec(`insert into auth.users values ('${noProfile}')`);
+  await denied(()=>db.query(`insert into public.bp_reading_checkout_intents(user_id) values ('${noProfile}')`),'23503');
+  console.log('PASS member_profiles ownership: all four links, preserved reader data, safe orphan rollback and prevention of checkout without a member profile');
   await db.close();
 })().catch(e=>{console.error(e);process.exitCode=1;});

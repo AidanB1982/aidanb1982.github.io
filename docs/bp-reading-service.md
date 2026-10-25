@@ -24,6 +24,8 @@ Apply in order, first in staging:
 1. `supabase/migrations/20261025_bp_reading.sql`: stable titles, approved edition metadata, explicit private-file release approvals, memberships, permanent purchases and private reader snapshots. It seeds only the existing Gualachulain edition ID 2. No customer file releases or paid entitlements are seeded.
 2. `supabase/migrations/20261026_bp_reading_checkout.sql`: server-owned checkout intents, idempotent payment receipts, private status polling, calendar-year grants and full-refund recalculation. The browser cannot call payment-grant/revocation functions or directly modify receipts or access dates.
 
+3. `supabase/migrations/20261027_bp_reading_member_profiles.sql`: links all reader/account ownership fields to the existing `public.member_profiles.id`. Existing reading state and payment records are preserved. The migration stops if a record has no member profile; link that profile before retrying rather than deleting reader data. The existing site already uses `member_profiles.id = auth.uid()`; signed JWTs still determine ownership, and `is_admin` still controls the admin bypass. No profile or admin flag is automatically created.
+
 These are one-time transactional migrations, not scripts to rerun over already-created tables. Existing publishing tables are not altered. Permanent purchases belong to a stable book ID, so replacement EPUB editions can retain access. Snapshots remain edition-specific.
 
 ## Edge Functions
