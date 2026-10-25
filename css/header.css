@@ -1391,7 +1391,7 @@ body.sub-page .blackwood-nav {
 
 @media (max-width: 760px) {
 
-    body.sub-page .simple-header {
+    body .simple-header {
         position: relative;
         top: auto;
         left: auto;
@@ -1409,7 +1409,7 @@ body.sub-page .blackwood-nav {
             );
     }
 
-    body.sub-page .simple-header .header-inner {
+    body .simple-header .header-inner {
         width: 100%;
         max-width: 100%;
 
@@ -1421,19 +1421,19 @@ body.sub-page .blackwood-nav {
         gap: 14px;
     }
 
-    body.sub-page .simple-header .logo {
+    body .simple-header .logo {
         display: flex;
         justify-content: center;
     }
 
-    body.sub-page .simple-header .logo img {
+    body .simple-header .logo img {
         width: 112px;
         max-width: 100%;
         height: auto;
     }
 
-    body.sub-page .simple-header .nav-inline,
-    body.sub-page .simple-header .blackwood-nav {
+    body .simple-header .nav-inline,
+    body .simple-header .blackwood-nav {
         width: 100%;
         max-width: 100%;
 
@@ -1447,7 +1447,7 @@ body.sub-page .blackwood-nav {
         margin: 0;
     }
 
-    body.sub-page .simple-header .blackwood-nav-link {
+    body .simple-header .blackwood-nav-link {
         font-size: 10px;
         letter-spacing: 1.3px;
         line-height: 1.5;
@@ -1466,7 +1466,7 @@ body.sub-page .blackwood-nav {
 
 @media (max-width: 760px) {
 
-    body.sub-page .simple-header {
+    body .simple-header {
         position: relative;
         top: auto;
         left: auto;
@@ -1476,7 +1476,7 @@ body.sub-page .blackwood-nav {
         background: #17100c;
     }
 
-    body.sub-page .simple-header .header-inner {
+    body .simple-header .header-inner {
         position: relative;
         display: flex;
         flex-direction: row;
@@ -1488,12 +1488,12 @@ body.sub-page .blackwood-nav {
         max-width: 100%;
     }
 
-    body.sub-page .simple-header .logo img {
+    body .simple-header .logo img {
         width: 105px;
         height: auto;
     }
 
-    body.sub-page .simple-header .blackwood-mobile-toggle {
+    body .simple-header .blackwood-mobile-toggle {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -1523,7 +1523,7 @@ body.sub-page .blackwood-nav {
         border-radius: 2px;
     }
 
-    body.sub-page .simple-header .blackwood-nav {
+    body .simple-header .blackwood-nav {
         display: none;
         flex: 0 0 100%;
         width: 100%;
@@ -1539,12 +1539,12 @@ body.sub-page .blackwood-nav {
         white-space: normal;
     }
 
-    body.sub-page .simple-header.mobile-menu-open .blackwood-nav {
+    body .simple-header.mobile-menu-open .blackwood-nav {
         display: flex;
     }
 
-    body.sub-page .simple-header .blackwood-nav > a,
-    body.sub-page .simple-header .blackwood-nav-item > .blackwood-nav-link {
+    body .simple-header .blackwood-nav > a,
+    body .simple-header .blackwood-nav-item > .blackwood-nav-link {
         display: flex;
         width: 100%;
         min-height: 44px;
@@ -1559,12 +1559,12 @@ body.sub-page .blackwood-nav {
         text-align: left;
     }
 
-    body.sub-page .simple-header .blackwood-nav-item {
+    body .simple-header .blackwood-nav-item {
         display: block;
         width: 100%;
     }
 
-    body.sub-page .simple-header .blackwood-dropdown {
+    body .simple-header .blackwood-dropdown {
         display: none !important;
         position: static !important;
         top: auto !important;
@@ -1585,7 +1585,7 @@ body.sub-page .blackwood-nav {
         background: rgba(0, 0, 0, 0.2) !important;
     }
 
-    body.sub-page .simple-header .blackwood-nav-item.is-open > .blackwood-dropdown {
+    body .simple-header .blackwood-nav-item.is-open > .blackwood-dropdown {
         display: block !important;
         transform: none !important;
         opacity: 1 !important;
@@ -1593,7 +1593,7 @@ body.sub-page .blackwood-nav {
         pointer-events: auto !important;
     }
 
-    body.sub-page .simple-header .blackwood-dropdown a {
+    body .simple-header .blackwood-dropdown a {
         display: block;
         width: 100%;
         box-sizing: border-box;
@@ -1603,8 +1603,8 @@ body.sub-page .blackwood-nav {
         line-height: 1.5;
     }
 
-    body.sub-page .simple-header .blackwood-mobile-toggle:focus-visible,
-    body.sub-page .simple-header .blackwood-nav-link:focus-visible {
+    body .simple-header .blackwood-mobile-toggle:focus-visible,
+    body .simple-header .blackwood-nav-link:focus-visible {
         outline: 2px solid #d6b181;
         outline-offset: 3px;
     }

@@ -17,7 +17,8 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
     if (url.includes('esm.sh/')) return route.fulfill({contentType:'application/javascript',body:`
       export function createClient(){
         function rows(table,filters){
-          if(table==='bp_reading_catalog') return [{edition_id:2,title:'Gualachulain',author:'Aidan Blackwood',series:'The Cursed Bothies',series_order:2,cover_url:'/assets/book7.png'}, {edition_id:3,title:'Fixture Title',author:'Test Author',series:'Test Series',series_order:1,cover_url:'/assets/book7.png'}];
+          if(table==='bp_reading_catalog') return [{edition_id:2,book_id:'gualachulain',title:'Gualachulain',author:'Aidan Blackwood',series:'The Cursed Bothies',series_order:2,cover_url:'/assets/book7.png'}, {edition_id:3,book_id:'fixture',title:'Fixture Title',author:'Test Author',series:'Test Series',series_order:1,cover_url:'/assets/book7.png'}];
+          if(table==='bp_reading_purchases')return ${PURCHASE_TEST?JSON.stringify([{book_id:'gualachulain',revoked_at:null}]):'[]'};
           if(table==='bp_reading_memberships'){const rows=${JSON.stringify(MEMBERSHIP_ROWS)};if(localStorage.getItem('mock-membership-revoked')==='yes')rows.forEach(row=>row.revoked_at=new Date().toISOString());return rows;}
           if(table==='bp_reading_state') {let rows=JSON.parse(localStorage.getItem('mock-cloud')||'{}');return Object.entries(rows).filter(([id])=>!filters.edition_id||id==filters.edition_id).map(([id,row])=>({edition_id:Number(id),...row}));}
           return [];
@@ -46,16 +47,18 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   }
   if(!CUSTOMER_TEST&&!LOCKED_TEST&&!PURCHASE_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Administrator access/);
   if(CUSTOMER_TEST||PURCHASE_TEST)assert.equal(await page.getByRole('button',{name:'Read Book',exact:true}).count(),2);
+  if(PURCHASE_TEST)assert.equal(await page.locator('.book-card').filter({has:page.getByRole('heading',{name:'Gualachulain',exact:true})}).locator('.book-badge').first().textContent(),'Owned','verified permanent purchase label');
+  if(CUSTOMER_TEST)assert.equal(await page.locator('.book-badge').first().textContent(),'Included','membership inclusion label');
   const titleSize=await page.locator('.library h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));assert(titleSize<=28,'compact library title');
   if (LOCKED_TEST) {
     assert.equal(await page.getByRole('button',{name:'Subscribe to read',exact:true}).count(),2);
-    await page.locator('.open-book').first().click();
+    await page.locator('#book-grid .open-book').first().click();
     assert.equal(await page.locator('#reader').isVisible(),false);
     assert.match(await page.locator('#library-error').textContent(),/membership or purchase/);
     console.log('PASS signed-in nonmember sees subscription route and cannot open protected books');await browser.close();return;
   }
   await page.locator('#library-search').fill('Test Author');assert.equal(await page.locator('.book-card').count(),1);
-  await page.locator('.open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
+  await page.locator('#book-grid .open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
   assert.equal(await page.locator('#reader-book-title').textContent(),'Fixture Title','selected edition title');
   await page.frameLocator('#epub-viewer iframe').locator('p').first().waitFor({state:'visible'});
   const frame=page.frames().find(frame=>frame.parentFrame());
@@ -71,11 +74,19 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   await page.waitForTimeout(1400);
   await page.evaluate(()=>{for(const key of Object.keys(localStorage)) if(key.startsWith('bp-reading:')||key.startsWith('bp-reading-outbox:')) localStorage.removeItem(key);});
   await page.reload();await page.waitForFunction(()=>!document.getElementById('library').hidden);
-  await page.locator('#library-search').fill('Fixture Title');await page.locator('.open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
+  await page.locator('#library-search').fill('Fixture Title');await page.locator('#book-grid .open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
   await page.locator('#reader-menu-toggle').click();await page.locator('#open-notebook').click();
   assert.equal(await page.locator('#notebook-list textarea').inputValue(),'Synced private note','server restore without device cache');
   await page.locator('#close-panel').click();await page.locator('#back-to-library').click();
-  await page.locator('#library-search').fill('Gualachulain');await page.locator('.open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
+  await page.locator('#library-search').fill('Gualachulain');await page.locator('#book-grid .open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
   await page.locator('#reader-menu-toggle').click();await page.locator('#open-notebook').click();assert.equal(await page.locator('#notebook-list textarea').count(),0,'notebook isolated per edition');
+  await page.locator('#close-panel').click();await page.locator('#back-to-library').click();
+  await page.evaluate(()=>{
+    const key='bp-reading:library-test:edition:2:v2',saved=JSON.parse(localStorage.getItem(key));
+    saved.progress=100;saved.hasStarted=true;localStorage.setItem(key,JSON.stringify(saved));
+    document.getElementById('library-search').value='';document.getElementById('library-search').dispatchEvent(new Event('input'));
+  });
+  assert.equal(await page.locator('.book-badge.finished').count(),1,'finished title has a status badge');
+  assert.equal(await page.locator('#continue-reading h2').textContent(),'Fixture Title','resume excludes completed books');
   assert.deepEqual(errors,[]);console.log('PASS multi-book catalogue, author filtering, edition selection, Supabase snapshot sync, server restoration and per-edition notebook isolation (mock server, real EPUB)');await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});

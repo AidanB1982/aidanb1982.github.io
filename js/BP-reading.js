@@ -116,6 +116,8 @@ const state = {
     : [],
 
   hasStarted: saved.hasStarted === true,
+  lastChapter: typeof saved.lastChapter === "string" ? saved.lastChapter.slice(0,500) : "",
+  lastReadAt: Number.isFinite(saved.lastReadAt) ? saved.lastReadAt : 0,
 
   isOpen: false,
   isLoading: false,
@@ -153,7 +155,7 @@ function delay(milliseconds) {
 function snapshot() {
   return {theme:state.theme,fontSize:state.fontSize,position:state.position,progress:state.progress,
     bookmarks:state.bookmarks,hasStarted:state.hasStarted,appearance:{...appearance},bookmarkDetails,
-    annotations,readingPace};
+    annotations,readingPace,lastChapter:state.lastChapter,lastReadAt:state.lastReadAt};
 }
 function saveState() {
   const payload = snapshot();
@@ -169,7 +171,27 @@ function showStatus(message) {
   if (message) statusTimer = setTimeout(() => {$("reader-status").textContent = "";}, 6000);
 }
 
+let chromeTimer;
+function wakeReaderChrome() {
+  if (!state.isOpen) return;
+  $('reader').dataset.chrome = 'awake';
+  clearTimeout(chromeTimer);
+  chromeTimer = setTimeout(() => {
+    if (!state.isOpen) return;
+    // Keep controls available while someone uses a panel or keyboard focus.
+    if ($('reader-panel').open || document.activeElement?.closest('.reader-controls,.reader-bottom,.reading-scrubber,#reader-menu-toggle,#reader-panel')) {
+      wakeReaderChrome(); return;
+    }
+    setControlsVisible(false);
+    $('reader').dataset.chrome = 'quiet';
+  }, 4000);
+}
+$('reader').addEventListener('pointermove', wakeReaderChrome, {passive:true});
+$('reader').addEventListener('pointerdown', wakeReaderChrome, {passive:true});
+$('reader').addEventListener('focusin', wakeReaderChrome);
+document.addEventListener('keydown', () => { if(state.isOpen) wakeReaderChrome(); });
 function setControlsVisible(visible) {
+  if (visible) wakeReaderChrome();
   $("reading-scrubber").hidden = !visible;
   $("reader-controls").hidden = !visible;
   $("reader-bottom").hidden = !visible;
@@ -195,12 +217,14 @@ function renderLibrary() {
   const grid = $("book-grid"); grid.replaceChildren();
   const query = $("library-search").value.trim().toLowerCase();
   const filter = $("library-status").value;
-  const books = libraryBooks.map(book => {
+  const collection = libraryBooks.map(book => {
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(`bp-reading:${activeUser?.id}:edition:${book.editionId}:v2`)) || {}; } catch {}
     const progress = Number.isFinite(saved.progress) ? clamp(saved.progress,0,100) : 0;
-    return {...book, progress, started:saved.hasStarted === true};
-  }).filter(book => `${book.title} ${book.author} ${book.series}`.toLowerCase().includes(query)
+    return {...book, progress, started:saved.hasStarted === true,lastChapter:typeof saved.lastChapter==='string'?saved.lastChapter.slice(0,500):'',lastReadAt:Number.isFinite(saved.lastReadAt)?saved.lastReadAt:0};
+  });
+  renderContinueReading(collection);
+  const books=collection.filter(book => `${book.title} ${book.author} ${book.series}`.toLowerCase().includes(query)
     && (filter === 'all' || (filter === 'finished' ? book.progress >= 100 : filter === 'unread' ? !book.started : book.started && book.progress < 100)));
   books.sort((a,b) => $('library-sort').value === 'title' ? a.title.localeCompare(b.title) : String(a.series).localeCompare(String(b.series)) || (a.seriesOrder || 0) - (b.seriesOrder || 0) || a.title.localeCompare(b.title));
   if (!books.length) { grid.textContent = 'No books match these filters.'; return; }
@@ -217,8 +241,28 @@ function renderLibrary() {
     const track = document.createElement('div'); track.className = 'progress-track'; const fill = document.createElement('div'); fill.className = 'progress-fill'; fill.style.width = book.progress + '%'; track.append(fill);
     const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = switchingEdition || state.isLoading;
     button.onclick = () => {if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
-    details.append(eyebrow,heading,meta,description,progress,track,button); card.append(cover,details); grid.append(card);
+    const badges=document.createElement('div');badges.className='book-badges';
+    const access=document.createElement('span');access.className='book-badge';access.textContent=!book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
+    if(book.progress>=100){const finished=document.createElement('span');finished.className='book-badge finished';finished.textContent='Finished';badges.append(finished);}
+    track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
+    details.append(badges,eyebrow,heading,meta,description,progress,track,button); card.append(cover,details); grid.append(card);
   }
+}
+function renderContinueReading(collection) {
+  const host=$('continue-reading');host.replaceChildren();
+  const book=collection.filter(book=>book.canRead&&book.started&&book.progress<100).sort((a,b)=>b.lastReadAt-a.lastReadAt)[0];
+  host.hidden=!book;
+  if(!book)return;
+  const image=document.createElement('img');image.src=book.cover;image.alt=book.title+' cover';
+  const details=document.createElement('div');
+  const eyebrow=document.createElement('p');eyebrow.className='eyebrow';eyebrow.textContent='CONTINUE READING';
+  const title=document.createElement('h2');title.textContent=book.title;
+  const meta=document.createElement('p');meta.className='resume-meta';meta.textContent=book.author;
+  const chapter=document.createElement('p');chapter.className='resume-chapter';chapter.textContent=book.lastChapter||'Your saved place is waiting.';
+  const progress=document.createElement('progress');progress.max=100;progress.value=book.progress;progress.setAttribute('aria-label',book.title+' reading progress');
+  const label=document.createElement('span');label.className='resume-percent';label.textContent=book.progress+'% complete';
+  const button=document.createElement('button');button.type='button';button.className='open-book';button.textContent='Return to your book';button.disabled=switchingEdition||state.isLoading;button.onclick=()=>void openEdition(book);
+  details.append(eyebrow,title,meta,chapter,progress,label,button);host.append(image,details);
 }
 function reportSync(text) { $('reading-sync-status').textContent = text; }
 async function connectEdition(book) {
@@ -261,6 +305,7 @@ function renderReadingMembership() {
     else if(!offer.isConnected)summary.after(offer);
   }
   summary.hidden=false;
+  $('reading-account-heading').textContent=user.isAdmin?'Your reading access':'Your reading membership';
   if(user.isAdmin)text.textContent='Administrator access · No subscription is required.';
   else if(!membershipStatus.known)text.textContent='Your membership status could not be verified. Refresh to check it before starting another subscription.';
   else if(membershipStatus.active) {
@@ -294,10 +339,10 @@ async function loadReadingCatalogue() {
   await refreshReadingMembership();
   if(activeUser?.id!==user.id)return;
   try {
-    const {data,error} = await supabase.from('bp_reading_catalog').select('edition_id,title,author,description,cover_url,series,series_order').eq('available',true);
+    const {data,error} = await supabase.from('bp_reading_catalog').select('edition_id,book_id,title,author,description,cover_url,series,series_order').eq('available',true);
     if (error) throw error;
     if (activeUser?.id !== user.id) return;
-    if (Array.isArray(data)) libraryBooks = data.map(row => ({editionId:row.edition_id,id:String(row.edition_id),title:row.title,author:row.author || '',description:row.description || '',cover:safeCover(row.cover_url),series:row.series || '',seriesOrder:row.series_order}));
+    if (Array.isArray(data)) libraryBooks = data.map(row => ({editionId:row.edition_id,id:String(row.edition_id),bookId:row.book_id,title:row.title,author:row.author || '',description:row.description || '',cover:safeCover(row.cover_url),series:row.series || '',seriesOrder:row.series_order}));
     const states = await supabase.from('bp_reading_state').select('edition_id,payload').eq('user_id',activeUser.id);
     if (!states.error && Array.isArray(states.data)) {
       for (const row of states.data) {
@@ -308,6 +353,11 @@ async function loadReadingCatalogue() {
     }
   } catch { if (!user.isAdmin) libraryBooks = []; }
   if (activeUser?.id !== user.id) return;
+  // Labels describe verified purchases; they never grant access.
+  let purchases=[];
+  try {const result=await supabase.from('bp_reading_purchases').select('book_id,revoked_at').eq('user_id',user.id);if(!result.error&&Array.isArray(result.data))purchases=result.data.filter(row=>!row.revoked_at).map(row=>row.book_id);}catch {}
+  if(activeUser?.id!==user.id)return;
+  libraryBooks=libraryBooks.map(book=>({...book,owned:purchases.includes(book.bookId)}));
   const checked = await Promise.all(libraryBooks.map(async book => {
     if (user.isAdmin) return {...book,canRead:true};
     try {const access = await supabase.rpc('bp_reading_can_read',{p_edition_id:book.editionId});return {...book,canRead:!access.error && access.data === true};}
@@ -488,6 +538,10 @@ function registerThemes(rendition) {
 function applyReaderPreferences() {
   $("reader").dataset.theme = state.theme;
   $("reading-theme").value = state.theme;
+  document.querySelectorAll('[data-reading-theme]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.readingTheme===state.theme)));
+  const preview=$('type-preview');
+  preview.style.fontFamily=fontFamilies[appearance.font];preview.style.lineHeight=appearance.spacing;preview.style.fontSize=state.fontSize+'px';
+  preview.dataset.theme=state.theme;
 
   if (!state.rendition) {
     return;
@@ -551,7 +605,7 @@ $('reader-display-check').onclick=()=>{
   const body=doc?.body?.cloneNode(true);
   body?.querySelectorAll('script,style,#bp-personal-copy').forEach(node=>node.remove());
   report.textContent=[
-    'Reader build: 20261101',
+    'Reader build: 20261102',
     'Library headline size: '+getComputedStyle(document.querySelector('.library h1')).fontSize,
     'Subscription offer in page: '+Boolean($('reading-membership-offer')?.isConnected),
     'Membership: '+(membershipStatus.known?(membershipStatus.active?'active':'inactive'):'unverified'),
@@ -709,6 +763,8 @@ function handleRelocation(location) {
   state.currentCfi = cfi;
   state.position = cfi;
   state.hasStarted = true;
+  state.lastChapter = chapterName(location.start.href);
+  state.lastReadAt = Date.now();
   sampleReadingPace();
 
   updateReaderProgress();
@@ -1023,6 +1079,9 @@ function isInteractiveTarget(target) {
 }
 
 function registerPageGestures(contents) {
+  contents.document.addEventListener("pointermove",wakeReaderChrome,{passive:true});
+  contents.document.addEventListener("pointerdown",wakeReaderChrome,{passive:true});
+  contents.document.addEventListener("keydown",wakeReaderChrome);
   const doc = contents.document;
 
   if (!doc || doc.__bpReadingGesturesInstalled) {
@@ -1509,6 +1568,7 @@ async function openBook() {
 
     state.isLoading = false;
     state.hasStarted = true;
+    wakeReaderChrome();
 
     $("reader-page-arrows").hidden = false;
     $("reader-menu-toggle").hidden = false;
@@ -1569,6 +1629,7 @@ function closeBook() {
   ++state.openingId;
   ++state.turnSequence;
 
+  clearTimeout(chromeTimer);
   state.isOpen = false;
   state.isLoading = false;
   state.isNavigating = false;
@@ -1736,6 +1797,8 @@ function restorePreferences(stored) {
   state.progress = Number.isFinite(stored.progress) ? clamp(stored.progress, 0, 100) : 0;
   state.bookmarks = Array.isArray(stored.bookmarks) ? stored.bookmarks.filter(c => typeof c === 'string' && c.startsWith('epubcfi(')) : [];
   state.hasStarted = stored.hasStarted === true;
+  state.lastChapter=typeof stored.lastChapter==='string'?stored.lastChapter.slice(0,500):'';
+  state.lastReadAt=Number.isFinite(stored.lastReadAt)?stored.lastReadAt:0;
   Object.assign(appearance, {font:'literary',spacing:'1.7',width:'760',alignment:'left',motion:'gentle'});
   const options = {font: Object.keys(fontFamilies), spacing: ['1.5','1.7','1.9'], width: ['620','760','920'], alignment: ['left','justify'], motion: ['gentle','instant']};
   for (const key of Object.keys(options)) {
@@ -1831,7 +1894,7 @@ for (const [key, id] of Object.entries({font:'reader-font',spacing:'reader-spaci
   $(id).onchange = () => {
     appearance[key] = $(id).value;
     applyReaderPreferences();
-    if (key === 'width') state.rendition?.resize();
+    if (key === 'width') resizeReaderViewport();
     saveState();
   };
 }
@@ -1980,6 +2043,10 @@ $("font-larger").addEventListener(
   }
 );
 
+document.querySelectorAll('[data-reading-theme]').forEach(button=>button.addEventListener('click',()=>{
+  $('reading-theme').value=button.dataset.readingTheme;
+  $('reading-theme').dispatchEvent(new Event('change'));
+}));
 $("reading-theme").addEventListener(
   "change",
   event => {

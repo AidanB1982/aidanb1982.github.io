@@ -438,6 +438,7 @@
                     role="menu"
                     aria-label="Reading"
                 >
+                    <a href="/pages/bp-reading.html" role="menuitem">BP Reading</a>
                     <a href="/pages/reading-lists.html" role="menuitem">
                         Recommended Reads
                     </a>
@@ -527,7 +528,12 @@
                     </a>
                 </div>
             </div>
+            <a href="/pages/members.html" class="blackwood-nav-link blackwood-account-link">My account</a>
         `;
+
+        existingNav.querySelectorAll("a[href]").forEach(link => {
+            if (new URL(link.href).pathname === window.location.pathname) link.setAttribute("aria-current", "page");
+        });
 
         const dropdownItems =
             existingNav.querySelectorAll(".has-dropdown");

@@ -28,8 +28,8 @@ node tests/bp-reading.cjs
 CHROMIUM_PATH and BASE_URL work as above. READING_TEST_DIR changes the fixture,
 dependency, and screenshot directory (default /tmp/blackwood-reading-test).
 Live protected-book delivery and real-device touch gestures still need acceptance
-testing in a signed-in account. Reading data remains device-local and the library
-remains the existing administrator-only Gualachulain edition.
+testing in a signed-in account. This test mocks an administrator account and uses a generated book; it does not
+establish live customer access.
 
 BP Reading service foundations
 
@@ -117,3 +117,19 @@ reader font/colour. Reader tests also check that the entire subscription-offer
 node is absent for active members, restored on revocation, and removed again on
 reactivation. The headline is capped at 28px. The full reader smoke test covers
 selection, themes, resized pages, navigation, search and saved-position reload.
+
+
+Visual polish checks
+
+`node tests/site-polish.cjs` uses the same BASE_URL, CHROMIUM_PATH and
+READING_TEST_DIR settings as the reader tests. It checks shared stylesheet loading,
+page overflow and mobile account navigation on nine representative pages at
+1440px and 390px widths, and saves screenshots. External services are blocked;
+it does not submit forms, place orders or verify live payment behaviour.
+
+The reader smoke test also checks idle controls, waking controls with pointer
+movement, visual theme selection, the live appearance preview and reopening a
+book from Continue reading. Its repeated forward/backward turns check visible
+prose and stable pagination across chapter boundaries. The library test checks
+membership inclusion, verified ownership and completed-book badges, and excludes
+completed books from the resume feature. These run against mocked Supabase data.
