@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';import {readFileSync} from 'node:fs';
-import {createPublishingDesk,assignmentFailure} from '../supabase/functions/bp-publishing-desk/handler.ts';
+import {createPublishingDesk,assignmentFailure,aiProviderFailure} from '../supabase/functions/bp-publishing-desk/handler.ts';
 import {createOutlookMailer} from '../supabase/functions/bp-publishing-desk/outlook.ts';
 const admin='00000000-0000-0000-0000-000000000001',reader='00000000-0000-0000-0000-000000000002';
 const campaign={id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true};
@@ -46,3 +46,14 @@ mailStatus=503;assert.equal(await mailer.send({email:'reader@example.invalid',su
 const context={window:{}};vm.runInNewContext(readFileSync('js/arc-campaign-summary.js','utf8'),context);
 const summary=context.window.BlackwoodArcCampaignSummary.summarize([{id:1,status:'active',created_at:'2026-09-01',review_due_date:'2026-09-14',arc_files:{title:'The Crossing'}},{id:2,status:'active',created_at:'2026-10-25',review_due_date:'2026-11-10',arc_files:[{title:'Gualachulain'}]}]);assert.equal(summary.title,'Gualachulain');assert.equal(summary.due,'2026-11-10');assert.equal(summary.pending.length,2,'older outstanding review retained');
 console.log('PASS administrator gates, exact assignment targeting, preview/send lifecycle, replay safety, release windows, changed recipients, ambiguous delivery, Outlook transport and current ARC selection');
+
+for(const [status,code,expected,wording] of [[401,'private-provider-data','AI_AUTH','rejected the API key'],[403,null,'AI_PERMISSION','permission'],[404,null,'AI_MODEL','model'],[429,'insufficient_quota','AI_QUOTA','billing'],[429,'rate_limit_exceeded','AI_RATE','rate limiting'],[500,'private-provider-data','AI_PROVIDER','provider']]){
+ const error=aiProviderFailure(status,code);assert.equal(error.message,expected);
+ const fixtureWithError=fixture({deps:{generate:async()=>{throw error;}}});
+ const result=await fixtureWithError.request({action:'generate',title:'Book',channel:'Facebook',facts:'Approved facts',task:'Draft'});
+ assert.equal(result.status,503);assert(result.body.error.includes(wording));assert(!JSON.stringify(result.body).includes('private-provider-data'));
+}
+for(const code of ['AI_STORAGE','AI_NETWORK','AI_RESPONSE']){
+ const result=await fixture({deps:{generate:async()=>{throw Error(code);}}}).request({action:'generate',title:'Book',channel:'Facebook',facts:'Approved facts',task:'Draft'});
+ assert.equal(result.status,503);assert(!result.body.error.includes('Publishing desk request could not be completed'));
+}
