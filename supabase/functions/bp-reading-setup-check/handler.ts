@@ -53,11 +53,29 @@ export function createSetupCheck(deps:Dependencies) {
    try {
     const query='query ReaderProduct { productByHandle(handle:"bp-reading-annual-membership") { id variants(first:10) { nodes { id } } sellingPlanGroups(first:10) { nodes { sellingPlans(first:10) { nodes { id } } } } } }';
     const r=await deps.fetch(`https://${shop}/api/2026-10/graphql.json`,{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':storefrontToken},body:JSON.stringify({query}),signal:AbortSignal.timeout(15000)});
-    const p=r.ok?await r.json():null,product=p?.data?.productByHandle;
-    const variant=product?.variants?.nodes?.some((v:{id:string})=>v.id==='gid://shopify/ProductVariant/60163522265433');
-    const expectedPlan=deps.env('SHOPIFY_READING_SELLING_PLAN_ID')??'gid://shopify/SellingPlan/697040896345';
-    const plan=product?.sellingPlanGroups?.nodes?.some((g:{sellingPlans:{nodes:{id:string}[]}})=>g.sellingPlans.nodes.some(s=>s.id===expectedPlan));
-    add('Storefront subscription access',Boolean(product&&variant&&plan&&!p.errors?.length),product&&variant&&plan?'The membership variant and annual selling plan are visible to this token.':'The token could not read the membership variant and annual plan. Check its scopes and product publication.');
+    if(!r.ok) {
+      add('Storefront subscription access',false,`Shopify returned HTTP ${r.status}. ${r.status===401?'The token was rejected for this shop. Use the Headless public Storefront token.':r.status===403?'The shop denied Storefront access. Check token permissions and channel restrictions.':'Shopify did not accept the Storefront request.'}`);
+    }else {
+      const p=await r.json(),product=p?.data?.productByHandle;
+      const errors=Array.isArray(p?.errors)?p.errors:[];
+      if(errors.length) {
+        // Never echo response bodies, credential values or arbitrary error text.
+        const codes=[...new Set(errors.map((e:{extensions?:{code?:unknown}})=>e.extensions?.code).filter((code:unknown)=>typeof code==='string'&&/^[A-Za-z_]{1,60}$/.test(code as string)))];
+        const paths=[...new Set(errors.flatMap((e:{path?:unknown})=>Array.isArray(e.path)?e.path.filter(part=>typeof part==='string'&&/^[A-Za-z_]{1,60}$/.test(part)):[]))];
+        add('Storefront subscription access',false,`Shopify GraphQL rejected the query. Codes: ${codes.join(', ')||'not supplied'}. Fields: ${paths.join(', ')||'not supplied'}. Check the Headless Storefront permissions.`);
+      }else if(!product) {
+        add('Storefront subscription access',false,'Token accepted, but the membership product is not visible. Publish bp-reading-annual-membership to the Headless storefront associated with this token.');
+      }else {
+        const variant=product.variants?.nodes?.some((v:{id:string})=>v.id==='gid://shopify/ProductVariant/60163522265433');
+        const expectedPlan=deps.env('SHOPIFY_READING_SELLING_PLAN_ID')??'gid://shopify/SellingPlan/697040896345';
+        const planIds=(product.sellingPlanGroups?.nodes||[]).flatMap((g:{sellingPlans?:{nodes?:{id:string}[]}})=>(g.sellingPlans?.nodes||[]).map(s=>s.id)).filter((id:unknown)=>typeof id==='string'&&/^gid:\/\/shopify\/SellingPlan\/\d+$/.test(id as string));
+        if(!variant)add('Storefront subscription access',false,'Membership product visible, but variant 60163522265433 was not returned. Check the product/variant selected for BP Reading.');
+        else if(!/^gid:\/\/shopify\/SellingPlan\/\d+$/.test(expectedPlan))add('Storefront subscription access',false,'Product and variant visible, but SHOPIFY_READING_SELLING_PLAN_ID must use the full gid://shopify/SellingPlan/NUMBER format.');
+        else if(!planIds.length)add('Storefront subscription access',false,'Product and variant visible, but no selling plans were returned. Check unauthenticated_read_selling_plans and that the annual plan is attached to this product.');
+        else if(!planIds.includes(expectedPlan))add('Storefront subscription access',false,'Product and variant visible, but the configured annual plan was not found. Visible public plan IDs: '+planIds.slice(0,10).join(', '));
+        else add('Storefront subscription access',true,'The membership variant and annual selling plan are visible to this token.');
+      }
+    }
    }catch{add('Storefront subscription access',false,'Storefront permissions or connectivity could not be verified.');}
   }
   add('Webhook signing configuration',Boolean(deps.env('SHOPIFY_WEBHOOK_SECRET')),'Only secret presence is checked; a signed Shopify event is still needed to verify delivery.');
