@@ -1,0 +1,26 @@
+#production-planner { margin-bottom: 28px; scroll-margin-top: 30px; }
+.planner-toolbar, .planner-fields { display: flex; flex-wrap: wrap; gap: 14px; margin: 20px 0; align-items: end; }
+.planner-fields > label { flex: 1 1 220px; }
+#production-planner label { display: grid; gap: 6px; color: var(--bfa-cream); }
+#production-planner input, #production-planner select { box-sizing: border-box; width: 100%; padding: 10px; color: var(--bfa-cream); background: #151515; border: 1px solid var(--bfa-border-strong); border-radius: 4px; font: inherit; color-scheme: dark; }
+#production-planner input[type=file] { max-width: 220px; font-size: .8rem; }
+#production-planner button { cursor: pointer; }
+#production-planner :focus-visible { outline: 2px solid var(--bfa-copper-soft); outline-offset: 3px; }
+#planner-form { border-block: 1px solid var(--bfa-border-strong); padding-block: 20px; margin-block: 24px; }
+#planner-status { color: var(--bfa-copper-soft); }
+.planner-scroll { overflow-x: auto; max-width: 100%; }
+.planner-stage-table { width: 100%; min-width: 760px; border-collapse: collapse; }
+.planner-stage-table th { text-align: left; }
+.planner-stage-table td, .planner-stage-table th { padding: 8px; }
+.planner-project { padding-block: 24px; border-top: 1px solid var(--bfa-border); }
+.planner-project h3 { color: var(--bfa-cream); }
+.planner-gantt { min-width: 700px; }
+.planner-axis, .planner-gantt-row { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--bfa-border); }
+.planner-axis { color: var(--bfa-copper-soft); }
+.planner-track { background: repeating-linear-gradient(to right, transparent 0, transparent calc(10% - 1px), #ffffff12 calc(10% - 1px), #ffffff12 10%); }
+.planner-track span { display: block; font-size: .85rem; margin-top: 5px; }
+.planner-bar { height: 18px; min-width: 2px; border-radius: 3px; background: #8b8b8b; }
+.planner-in-progress { background: #d6b181; }
+.planner-blocked { background: #e58c82; }
+.planner-complete { background: #86bba0; }
+.planner-legend { font-size: .85rem; }

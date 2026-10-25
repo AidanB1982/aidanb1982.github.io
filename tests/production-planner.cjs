@@ -1,0 +1,36 @@
+const { chromium } = require('playwright');
+const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
+(async()=>{
+const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH ? {executablePath:process.env.CHROMIUM_PATH} : {}),args:['--no-sandbox']}); const page=await browser.newPage();
+await page.route('https://**/*',r=>r.abort());
+await page.route('**/js/behind-files-admin.js*',r=>r.abort());
+await page.route('**/js/header.js*',r=>r.abort());
+await page.goto(`${BASE_URL}/pages/production-planner.html`);
+await page.evaluate(()=>{ document.getElementById('bfa-admin-content').hidden=false; window.BlackwoodPlanner.activate('test-admin'); });
+await page.getByRole('button',{name:'New project',exact:true}).click();
+await page.locator('[name=author]').fill('Author A'); await page.locator('[name=book]').fill('Test Book'); await page.locator('[name=title]').fill('Paperback');
+for(const row of await page.locator('#planner-stages tr').all()) {await row.locator('[data-field=start]').fill('2026-10-01');await row.locator('[data-field=end]').fill('2026-10-10');}
+await page.locator('#planner-stages tr').first().locator('select').selectOption('Complete');
+await page.locator('#planner-stages tr').nth(1).locator('select').selectOption('Blocked');
+await page.getByRole('button',{name:'Save project',exact:true}).click();
+const assert=(v,m)=>{if(!v)throw Error(m)};
+assert((await page.locator('#planner-projects').innerText()).includes('Current: Editing (Blocked) · Next: Author review'),'current/next');
+assert(await page.locator('.planner-bar').count()===7,'gantt bars');
+await page.evaluate(()=>window.BlackwoodPlanner.activate('test-admin'));
+assert(await page.locator('.planner-project').count()===1,'reload persistence');
+await page.locator('#planner-filter').fill('other');assert(await page.locator('.planner-project').count()===0,'filter');await page.locator('#planner-filter').fill('');
+await page.getByRole('button',{name:'Edit project',exact:true}).click();
+await page.locator('#planner-stages tr').first().locator('[data-field=end]').fill('2026-09-01');
+await page.getByRole('button',{name:'Save project',exact:true}).click();assert((await page.locator('#planner-status').innerText()).includes('finish on or after'),'invalid date');
+await page.getByRole('button',{name:'Cancel',exact:true}).click();
+const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export backup',exact:true}).click();const d=await download;await d.saveAs('/tmp/planner-backup.json');
+await page.evaluate(()=>window.BlackwoodPlanner.activate('other-admin'));assert(await page.locator('.planner-project').count()===0,'account separation');
+page.on('dialog',d=>d.accept());await page.locator('#planner-import').setInputFiles('/tmp/planner-backup.json');await page.waitForFunction(()=>document.querySelectorAll('.planner-project').length===1);
+await page.locator('#planner-import').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{"version":1,"projects":[{}]}')});await page.waitForFunction(()=>document.getElementById('planner-status').textContent.includes('Could not restore'));
+assert(await page.locator('.planner-project').count()===1,'bad import preserves records');
+await page.getByRole('button',{name:'Delete project',exact:true}).click();assert(await page.locator('.planner-project').count()===0,'delete');
+await page.evaluate(()=>window.BlackwoodPlanner.activate('test-admin'));await page.evaluate(()=>window.BlackwoodPlanner.lock());assert(await page.locator('#planner-projects').innerText()==='','sign-out clearing');
+await page.evaluate(()=>window.BlackwoodPlanner.activate('test-admin'));await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),'mobile overflow');
+console.log('PASS: create, stages, Gantt, current/next, persistence, filter, invalid dates, export/restore, invalid import, account separation, delete, sign-out clearing, mobile width');
+await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

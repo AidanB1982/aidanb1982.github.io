@@ -267,6 +267,7 @@
             }
 
             unlockAdminEditor();
+            window.BlackwoodPlanner?.activate(user.id);
 
         } catch (error) {
             if (checkVersion !== accessCheckVersion) {
@@ -288,6 +289,7 @@
     }
 
     function lockAdminEditor() {
+        window.BlackwoodPlanner?.lock();
         const adminContent =
             document.getElementById("bfa-admin-content");
 
@@ -315,7 +317,9 @@
         }
 
         if (!editorInitialized) {
-            const success = initBehindFilesAdmin();
+            const success = adminContent.dataset.adminTool === "production-planner"
+                ? Boolean(window.BlackwoodPlanner)
+                : initBehindFilesAdmin();
 
             if (!success) {
                 showAccessMessage(

@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <!-- Google tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1WN8PBHBW4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag("config", "G-1WN8PBHBW4");
+
+        document.documentElement.classList.remove("no-js");
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Production Planner | Blackwood Publishing</title>
+
+    <meta
+        name="description"
+        content="Private book production planning for Blackwood Publishing."
+    >
+
+    <link rel="icon" href="/assets/favicon.png" type="image/png">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/header.css?v=20260924">
+    <link rel="stylesheet" href="/css/styles.css?v=20260910">
+    <link rel="stylesheet" href="/css/behind-files-admin.css?v=20261025">
+
+
+    <link rel="stylesheet" href="/css/production-planner.css?v=20261025">
+
+    <!-- JS -->
+    <script src="/js/header.js?v=20260924" defer></script>
+    <script src="/js/production-planner.js?v=20261025" defer></script>
+    <script src="/js/behind-files-admin.js?v=20261025" defer></script>
+</head>
+
+<body class="behind-files-admin-page">
+
+    <a class="skip-link" href="#planner-title">Skip to content</a>
+
+    <div id="header-placeholder"></div>
+
+    <!-- ACCESS SCREEN -->
+    <section
+        id="bfa-access-screen"
+        class="bfa-wrap"
+        role="status"
+        aria-live="polite"
+        aria-labelledby="bfa-access-title"
+    >
+        <div class="bfa-panel">
+            <div class="bfa-panel-inner">
+
+                <p class="bfa-card-kicker">
+                    Blackwood Management
+                </p>
+
+                <h1 id="bfa-access-title">
+                    Verifying Access
+                </h1>
+
+                <p id="bfa-access-message">
+                    Checking your Archivist credentials...
+                </p>
+
+                <p>
+                    <a
+                        href="/pages/members.html"
+                        class="bfa-button"
+                    >
+                        Return to The Archivists
+                    </a>
+                </p>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ADMIN-ONLY CONTENT -->
+    <main
+        class="bfa-wrap"
+        id="bfa-admin-content"
+        data-admin-tool="production-planner"
+        hidden
+    >
+
+        <p><a class="bfa-button" href="/pages/behind-files-admin.html">Back to Management Hub</a></p>
+        <section id="production-planner" class="bfa-panel" aria-labelledby="planner-title">
+            <div class="bfa-panel-inner">
+                <p class="bfa-card-kicker">Production Planning · Manual workspace</p>
+                <h2 id="planner-title">Book projects &amp; timelines</h2>
+                <p>Plan several projects for each author and book. Stages run in the order you enter them; the first unfinished stage is current.</p>
+                <p class="bfa-warning">Saved only in this browser for your signed-in account. Export backups regularly. Plans are not yet shared with Author Desk. Do not store confidential contracts or financial information here.</p>
+                <div class="planner-toolbar">
+                    <button type="button" id="planner-new" class="bfa-button">New project</button>
+                    <button type="button" id="planner-export" class="bfa-button">Export backup</button>
+                    <label class="bfa-button">Restore backup <input id="planner-import" type="file" accept="application/json,.json"></label>
+                    <label>Filter by author or book <input id="planner-filter" type="search"></label>
+                </div>
+                <p id="planner-status" role="status" aria-live="polite"></p>
+                <form id="planner-form" hidden>
+                    <h3 id="planner-form-title">New project</h3>
+                    <div class="planner-fields">
+                        <label>Author name <input name="author" required maxlength="160"></label>
+                        <label>Book title <input name="book" required maxlength="200"></label>
+                        <label>Project name <input name="title" required maxlength="200" placeholder="e.g. Paperback production"></label>
+                        <label>Author record ID (optional) <input name="authorId" maxlength="100"></label>
+                        <label>Book record ID (optional) <input name="bookId" maxlength="100"></label>
+                    </div>
+                    <p>Record IDs can link this plan to catalogue records when shared storage is added. They do not grant author access.</p>
+                    <h4>Stages in workflow order</h4>
+                    <div class="planner-scroll"><table class="planner-stage-table"><thead><tr><th scope="col">Stage</th><th scope="col">Start</th><th scope="col">Finish</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead><tbody id="planner-stages"></tbody></table></div>
+                    <div class="planner-toolbar">
+                        <button type="button" id="planner-add-stage" class="bfa-button">Add stage</button>
+                        <button type="submit" class="bfa-button primary">Save project</button>
+                        <button type="button" id="planner-cancel" class="bfa-button">Cancel</button>
+                    </div>
+                </form>
+                <div id="planner-projects"></div>
+            </div>
+        </section>
+
+    </main>
+    <div id="footer-placeholder"></div>
+</body>
+</html>
