@@ -606,3 +606,59 @@ body.behind-files-admin-page {
         padding: 28px 20px;
     }
 }
+
+/* Management directory: keep labels and actions inside every card. */
+.bfa-departments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.bfa-department {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: clamp(18px, 2.2vw, 24px);
+    border: 1px solid rgba(166, 106, 56, 0.35);
+    border-radius: 12px;
+}
+
+.bfa-department--active {
+    border-color: #a66a38;
+    background: rgba(166, 106, 56, 0.10);
+}
+
+.bfa-department > .bfa-card-kicker {
+    min-height: 2.8em;
+    margin: 0 0 12px;
+    line-height: 1.4;
+}
+
+.bfa-department > h3 {
+    margin: 0 0 16px;
+    line-height: 1.3;
+}
+
+.bfa-department > p:not(.bfa-card-kicker) {
+    margin: 0 0 20px;
+    line-height: 1.65;
+}
+
+.bfa-department > .bfa-button {
+    width: 100%;
+    min-height: 48px;
+    margin-top: auto;
+    padding: 12px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+    letter-spacing: 0.12em;
+    text-align: center;
+}
+
+.bfa-department > .bfa-muted:last-child {
+    margin-top: auto;
+    margin-bottom: 0;
+}
