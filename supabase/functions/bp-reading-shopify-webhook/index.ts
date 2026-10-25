@@ -27,7 +27,7 @@ Deno.serve(createShopifyWebhook({
     return {id:order.id,test:order.test,financialStatus:order.displayFinancialStatus,currency:order.currencyCode,intentId:intent||null,variantId:line?.variant?.id||null,sellingPlanId:line?.sellingPlan?.sellingPlanId||null,quantity:line?.quantity||0,lineCount:lines.length,lineAmount:line?.discountedTotalSet?.shopMoney?.amount||'',paidAt:paid[0]||null};
   },
   async allowTestPayment(intent){
-    const tester=Deno.env.get('BP_READING_TEST_USER_ID');
+    const tester=(Deno.env.get('BP_READING_TEST_USER_ID')||'').trim().toLowerCase();
     if(Deno.env.get('BP_READING_TEST_PAYMENTS')!=='true'||!tester)return false;
     const {data,error}=await service().from('bp_reading_checkout_intents').select('user_id').eq('id',intent).maybeSingle();
     return !error&&data?.user_id===tester;

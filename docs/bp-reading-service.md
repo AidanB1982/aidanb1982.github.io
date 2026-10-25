@@ -155,3 +155,14 @@ remaining simulated receipts through the server-only revocation function (or
 verify that the test refund did so). Keep both public launch flags false until
 all acceptance results are reviewed. No live paid test or test-mode activation
 has been performed from this workspace.
+
+Checkout rejection diagnostics use fixed reason codes and a
+`X-BP-Reading-Checkout: controlled-test-v2` capability header. The closed-public
+checkout path logs TEST_ACCOUNT_NOT_CONFIGURED or TEST_ACCOUNT_MISMATCH without
+printing a profile ID, JWT or secret. Test-user environment values are normalized
+for surrounding whitespace and UUID letter case across checkout, delivery and
+test-payment authorization. Other identities still cannot use the exception.
+The admin setup checker can make an authenticated GET to the checkout function;
+405 is the expected read-only response and confirms handler startup without
+creating a cart. It also reports an older deployed handler or missing browser
+CORS headers. Deploying source in GitHub alone does not update Edge Functions.

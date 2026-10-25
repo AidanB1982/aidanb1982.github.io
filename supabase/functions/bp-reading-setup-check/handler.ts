@@ -78,6 +78,21 @@ export function createSetupCheck(deps:Dependencies) {
     }
    }catch{add('Storefront subscription access',false,'Storefront permissions or connectivity could not be verified.');}
   }
+  const api=deps.env('SUPABASE_URL'),apiKey=deps.env('SUPABASE_ANON_KEY');
+  if(api&&apiKey) {
+    try {
+      // GET is rejected before authentication/business logic in every supplied
+      // checkout version. No intent, cart, charge or membership can be created.
+      const r=await deps.fetch(api.replace(/\/$/,'')+'/functions/v1/bp-reading-create-checkout',{method:'GET',headers:{Authorization:`Bearer ${bearer}`,apikey:apiKey,Origin:'https://blackwoodpublishing.co.uk'},signal:AbortSignal.timeout(15000)});
+      if(r.status===405) {
+        const current=r.headers.get('X-BP-Reading-Checkout')==='controlled-test-v2';
+        add('Checkout function version',current,current?'The controlled-test handler is running and correctly rejected a read-only GET.':'The checkout function runs, but it is an older handler. Redeploy its latest single-file dashboard version.');
+        add('Checkout browser access',r.headers.get('Access-Control-Allow-Origin')==='https://blackwoodpublishing.co.uk','Checking that the checkout response permits the production website.');
+      }else {
+        add('Checkout function version',false,`Checkout endpoint returned HTTP ${r.status} to a read-only GET. ${r.status===401||r.status===403?'The function gateway did not accept the administrator session.':r.status===404?'Check that the function is deployed in this project.':r.status===503?'The endpoint is unavailable; inspect runtime startup errors.':'Check its deployed source and function settings.'}`);
+      }
+    }catch{add('Checkout function version',false,'Supabase could not reach its checkout function.');}
+  }
   add('Webhook signing configuration',Boolean(deps.env('SHOPIFY_WEBHOOK_SECRET')),'Only secret presence is checked; a signed Shopify event is still needed to verify delivery.');
   // No cart creation, orders, charges, refunds, database writes or customer payloads.
   return json(200,{checks,billingTested:false,note:'Read-only setup check. A real initial-payment and renewal test is still required before launch.'});
