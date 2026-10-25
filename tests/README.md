@@ -82,3 +82,7 @@ these local tests do not establish that payment credentials or webhooks are live
   diagnostic performs read-only checks, denies non-admins and returns no secret
   values. Shopify responses are mocked; the deployed diagnostic performs the
   real read-only checks while launch flags remain disabled.
+
+The checkout handler test additionally checks that the explicit admin preview
+works with both launch flags disabled, non-admin previews are denied before any
+cart/intent is created, and the ordinary customer checkout remains disabled.

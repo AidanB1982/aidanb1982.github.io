@@ -1784,7 +1784,7 @@ supabase.auth.onAuthStateChange(event => {
     closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
     $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
     state.bookmarks = []; bookmarkDetails = {}; annotations = [];
-    $('reading-setup-result').textContent='';$('check-reading-setup').hidden=true;
+    $('reading-setup-result').textContent='';$('check-reading-setup').hidden=true;$('preview-reading-checkout').hidden=true;
     $('chapter-list').replaceChildren(); $('bookmark-list').replaceChildren(); $('notebook-list').replaceChildren();
   }
 });
@@ -1949,6 +1949,26 @@ document.addEventListener(
    ADMIN GATE
    ===================================================== */
 
+$('preview-reading-checkout').onclick=async()=>{
+  if(!activeUser?.isAdmin)return;
+  if(!confirm('This opens a REAL Shopify checkout for £10.99 per year. Inspect it only; do not complete payment during this preview. Continue?'))return;
+  const popup=window.open('about:blank','bp-reading-admin-preview','popup,width=620,height=820,resizable=yes,scrollbars=yes');
+  const button=$('preview-reading-checkout'),output=$('reading-setup-result');
+  if(!popup){output.textContent='Allow popups for this site, then try the checkout preview again.';return;}
+  try{popup.opener=null;popup.document.body.textContent='Preparing the annual checkout preview…';}catch{}
+  button.disabled=true;
+  try{
+    const result=await supabase.functions.invoke('bp-reading-create-checkout',{body:{action:'admin_preview'}});
+    if(!activeUser?.isAdmin){popup.close();return;}
+    if(result.error||!result.data?.checkoutUrl||result.data.preview!==true)throw Error();
+    const target=new URL(result.data.checkoutUrl);
+    if(target.protocol!=='https:')throw Error();
+    if(!popup.closed)popup.location.replace(target.href);
+    output.textContent='Annual checkout created with the verified £10.99 GBP plan. Check the price, yearly renewal and absence of shipping in Shopify. Do not complete payment during this preview.';
+  }catch{popup.close();if(activeUser?.isAdmin)output.textContent='Checkout preview failed. Check that bp-reading-create-checkout has the latest index.ts and handler.ts, then inspect its Supabase logs. Customer checkout remains disabled.';}
+  finally{button.disabled=false;}
+};
+
 $('check-reading-setup').onclick=async()=>{
   if(!activeUser?.isAdmin)return;
   const button=$('check-reading-setup'),output=$('reading-setup-result');
@@ -1972,6 +1992,7 @@ async function initialise() {
     activeUser = user;
     $("reading-membership-offer").hidden = user.isAdmin;
     $("check-reading-setup").hidden = !user.isAdmin;
+    $("preview-reading-checkout").hidden = !user.isAdmin;
     checkoutController = initializeReadingCheckout(supabase,{button:$("subscribe-reading"),status:$("reading-payment-status"),retry:$("check-reading-payment")});
     $('reader-watermark').textContent = 'Personal reading copy · Reader ' + user.id.slice(0,8).toUpperCase();
     await loadReadingCatalogue();

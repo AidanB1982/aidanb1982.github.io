@@ -91,3 +91,21 @@ The existing website's public Storefront token is in `js/store.js` under
 both Shopify domains have been confirmed to belong to the same store. Its
 subscription scopes and product publication still require the live diagnostic;
 do not assume a Buy Button token has every required permission.
+
+
+## Admin checkout preview before launch
+
+After the read-only setup report passes, update both files in the deployed
+`bp-reading-create-checkout` function. Keep JWT verification and both launch
+flags false. The signed-in admin can use **Preview annual checkout** in BP
+Reading to create a real Shopify cart with the exact annual plan. This bypass
+requires a server-verified member_profiles.is_admin flag; a browser action alone
+cannot enable it for customers. The normal Subscribe route remains launch-gated,
+including for administrators.
+
+The preview creates an account-bound checkout intent and Shopify cart, but does
+not charge or grant membership. Its confirmation explicitly warns that the
+checkout is real: inspect £10.99 GBP, annual renewal, and no shipping, then close
+it without completing payment. This is not a sandbox transaction and does not
+replace a controlled initial-payment/renewal acceptance test. Checkout failures
+log a fixed stage name without credential values.
