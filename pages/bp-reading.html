@@ -47,6 +47,7 @@
     </section>
     <p id="reading-sync-status" class="device-note" role="status" aria-live="polite">Checking reading sync…</p>
     <div class="library-tools"><label>Find your next read<input id="library-search" type="search" placeholder="Title, author or series"></label><label>Reading status<select id="library-status"><option value="all">All books</option><option value="reading">In progress</option><option value="unread">Unread</option><option value="finished">Finished</option></select></label><label>Sort by<select id="library-sort"><option value="series">Series order</option><option value="title">Title</option></select></label><button class="control" id="load-synced" type="button">Load synced place</button></div>
+    <button class="control" id="check-reading-setup" type="button" hidden>Check Shopify setup</button><pre id="reading-setup-result" class="device-note" role="status" aria-live="polite" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
     <div class="shelf-heading"><h2>Your library</h2><span>Private reading edition</span></div>
     <section
       class="book-grid"
@@ -292,7 +293,7 @@
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js?v=20261026"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261027"></script>
 
 </body>
 </html>

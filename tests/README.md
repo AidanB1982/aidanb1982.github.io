@@ -78,3 +78,7 @@ these local tests do not establish that payment credentials or webhooks are live
   expiry refresh, concurrent requests, forced refresh and credential rotation
   using mocked OAuth responses. Live app eligibility and permissions still need
   verification after secure Supabase configuration.
+- `node tests/reading-setup-check.mjs` verifies that the admin-only live setup
+  diagnostic performs read-only checks, denies non-admins and returns no secret
+  values. Shopify responses are mocked; the deployed diagnostic performs the
+  real read-only checks while launch flags remain disabled.

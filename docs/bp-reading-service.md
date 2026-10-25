@@ -73,3 +73,21 @@ Current blockers to live activation are the migrations/function deployment, cano
 ## Tests
 
 See `tests/README.md`. Browser tests use the actual EPUB.js renderer and a generated, copyright-free book, with Supabase mocked. Embedded PostgreSQL tests exercise the actual migrations, RLS, expiry, permanent purchases, calendar-year grants, idempotency, renewals and full-refund recalculation. Handler tests cover delivery, cart creation, webhook HMAC/offer verification and popup confirmation. None touches the live Supabase or Shopify account.
+
+## Read-only setup diagnostic
+
+Deploy `bp-reading-setup-check` with its `index.ts` and `handler.ts`, retaining JWT
+verification. Signed-in Supabase administrators can then use **Check Shopify
+setup** on BP Reading. The function independently checks the administrator flag,
+table availability without reading customer rows, app client-credentials access,
+Admin API scopes/schema, Storefront visibility of the exact membership variant
+and annual plan, and signing-secret presence. It returns no credential values.
+It creates no carts, payments, refunds or database rows. A green report is not a
+billing test or proof of webhook/renewal delivery; retain both launch flags as
+false until the full acceptance tests pass.
+
+The existing website's public Storefront token is in `js/store.js` under
+`storefrontAccessToken`. It can be tried first as SHOPIFY_STOREFRONT_TOKEN because
+both Shopify domains have been confirmed to belong to the same store. Its
+subscription scopes and product publication still require the live diagnostic;
+do not assume a Buy Button token has every required permission.

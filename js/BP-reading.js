@@ -1784,6 +1784,7 @@ supabase.auth.onAuthStateChange(event => {
     closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
     $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
     state.bookmarks = []; bookmarkDetails = {}; annotations = [];
+    $('reading-setup-result').textContent='';$('check-reading-setup').hidden=true;
     $('chapter-list').replaceChildren(); $('bookmark-list').replaceChildren(); $('notebook-list').replaceChildren();
   }
 });
@@ -1948,6 +1949,19 @@ document.addEventListener(
    ADMIN GATE
    ===================================================== */
 
+$('check-reading-setup').onclick=async()=>{
+  if(!activeUser?.isAdmin)return;
+  const button=$('check-reading-setup'),output=$('reading-setup-result');
+  button.disabled=true;output.textContent='Checking Shopify configuration without creating a checkout…';
+  try {
+    const {data,error}=await supabase.functions.invoke('bp-reading-setup-check',{body:{}});
+    if(!activeUser?.isAdmin)return;
+    if(error||!Array.isArray(data?.checks))throw Error();
+    output.textContent=data.checks.map(check=>`${check.ok?'PASS':'CHECK'} · ${check.name}: ${check.detail}`).join('\n')+'\n'+data.note;
+  }catch{if(activeUser?.isAdmin)output.textContent='Setup check is not available. Confirm the bp-reading-setup-check function is deployed and you are signed in as an administrator.';}
+  finally{button.disabled=false;}
+};
+
 async function initialise() {
   const epoch = sessionEpoch;
   renderLibrary();
@@ -1957,6 +1971,7 @@ async function initialise() {
     if (epoch !== sessionEpoch) return;
     activeUser = user;
     $("reading-membership-offer").hidden = user.isAdmin;
+    $("check-reading-setup").hidden = !user.isAdmin;
     checkoutController = initializeReadingCheckout(supabase,{button:$("subscribe-reading"),status:$("reading-payment-status"),retry:$("check-reading-payment")});
     $('reader-watermark').textContent = 'Personal reading copy · Reader ' + user.id.slice(0,8).toUpperCase();
     await loadReadingCatalogue();
