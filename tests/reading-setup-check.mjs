@@ -20,6 +20,6 @@ const req=()=>new Request('https://service.invalid',{method:'POST',headers:{Orig
 let f=fixture();let response=await f.handler(req());assert.equal(response.status,200);let data=await response.json();assert(data.checks.every(check=>check.ok));assert.equal(data.billingTested,false);assert(!JSON.stringify(data).includes('never-output'));assert.equal(f.calls.length,3);
 f=fixture({nonAdmin:true});response=await f.handler(req());assert.equal(response.status,403);assert.equal(f.calls.length,0);
 for(const config of [{badAuth:true},{hiddenProduct:true},{missingTables:true},{env:{SHOPIFY_STOREFRONT_TOKEN:''}},{env:{SHOPIFY_STORE_DOMAIN:''}}]) {
- f=fixture(config);response=await f.handler(req());data=await response.json();assert(data.checks.some(check=>!check.ok),JSON.stringify(config));assert(!JSON.stringify(data).includes('never-output'));
+ f=fixture(config);response=await f.handler(req());data=await response.json();assert(data.checks.some(check=>!check.ok),JSON.stringify(config));assert.equal(typeof data.note,'string');assert.equal(data.billingTested,false);assert(!JSON.stringify(data).includes('never-output'));
 }
 console.log('PASS admin-only setup check: no Shopify mutations, app authentication, permission/schema checks, annual plan visibility, missing configuration and secret-free reports');

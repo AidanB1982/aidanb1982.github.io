@@ -23,7 +23,7 @@ export function createSetupCheck(deps:Dependencies) {
   try {add('Database',await deps.checkDatabase(),'Required reader tables are checked without reading customer records.');}
   catch {add('Database',false,'Reader tables could not be verified.');}
   const shop=deps.env('SHOPIFY_STORE_DOMAIN')||'';
-  if(!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop))return json(200,{checks:[...checks,{name:'Shop domain',ok:false,detail:'SHOPIFY_STORE_DOMAIN is missing or invalid.'}]});
+  if(!/^[a-z0-9][a-z0-9-]*\.myshopify\.com$/.test(shop))return json(200,{checks:[...checks,{name:'Shop domain',ok:false,detail:'SHOPIFY_STORE_DOMAIN is missing or invalid.'}],billingTested:false,note:'Add the shop hostname in Supabase secrets, then run this read-only check again.'});
   const clientId=deps.env('SHOPIFY_CLIENT_ID'),clientSecret=deps.env('SHOPIFY_CLIENT_SECRET');
   let adminToken=deps.env('SHOPIFY_ADMIN_ACCESS_TOKEN');
   if(clientId&&clientSecret) {

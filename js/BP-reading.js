@@ -1957,7 +1957,7 @@ $('check-reading-setup').onclick=async()=>{
     const {data,error}=await supabase.functions.invoke('bp-reading-setup-check',{body:{}});
     if(!activeUser?.isAdmin)return;
     if(error||!Array.isArray(data?.checks))throw Error();
-    output.textContent=data.checks.map(check=>`${check.ok?'PASS':'CHECK'} · ${check.name}: ${check.detail}`).join('\n')+'\n'+data.note;
+    output.textContent=data.checks.map(check=>`${check.ok?'PASS':'CHECK'} · ${check.name}: ${check.detail}`).join('\n')+(typeof data.note==='string'?'\n'+data.note:'');
   }catch{if(activeUser?.isAdmin)output.textContent='Setup check is not available. Confirm the bp-reading-setup-check function is deployed and you are signed in as an administrator.';}
   finally{button.disabled=false;}
 };
