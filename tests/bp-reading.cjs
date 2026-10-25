@@ -18,6 +18,33 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  await page.getByRole('button',{name:'Read Book',exact:true}).click();
  await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
  await page.waitForFunction(()=>!document.getElementById('reader-seek').disabled);
+ // Repeated turns must retain visible prose, stable chapter sizes and progress.
+ const chapterWidths=new Map();
+ const checkPage=async()=>{
+   const visible=await page.locator('#epub-viewer').evaluate(viewer=>{
+     const frame=viewer.querySelector('iframe'),doc=frame.contentDocument;
+     const clip=viewer.getBoundingClientRect(),offset=frame.getBoundingClientRect();
+     const walker=doc.createTreeWalker(doc.body,NodeFilter.SHOW_TEXT);
+     let node,ink=false;
+     while(node=walker.nextNode()){
+       if(!node.textContent.trim()||node.parentElement.closest('style,script'))continue;
+       const range=doc.createRange();range.selectNodeContents(node);
+       for(const r of range.getClientRects())if(r.width>0&&r.height>0&&r.right+offset.left>clip.left&&r.left+offset.left<clip.right&&r.bottom+offset.top>clip.top&&r.top+offset.top<clip.bottom)ink=true;
+     }
+     return {ink,width:offset.width};
+   });
+   assert(visible.ink,'page contains prose within the visible reader viewport');
+   const chapter=await page.locator('#quiet-chapter').textContent();
+   if(chapterWidths.has(chapter))assert(chapterWidths.get(chapter)===visible.width,'chapter width stays stable across page turns');
+   else chapterWidths.set(chapter,visible.width);
+   return Number((await page.locator('#quiet-percent').textContent()).match(/[\d.]+/)[0]);
+ };
+ const initialProgress=await checkPage();
+ for(let i=0;i<11;i++){await page.keyboard.press('ArrowRight');await page.waitForTimeout(350);await checkPage();}
+ assert(chapterWidths.size===2,'forward turns cross the chapter boundary');
+ assert(await checkPage()>initialProgress,'completion advances with forward navigation');
+ for(let i=0;i<11;i++){await page.keyboard.press('ArrowLeft');await page.waitForTimeout(350);await checkPage();}
+ assert(await checkPage()===initialProgress,'backward turns restore the starting completion');
  await page.screenshot({path:`${TEST_DIR}/reading.png`});
  assert(await page.locator('#epub-viewer iframe').count()>0,'real EPUB iframe rendered');
  const bookFrame = page.frames().find(frame => frame.parentFrame());

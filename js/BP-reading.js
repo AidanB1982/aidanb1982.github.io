@@ -551,7 +551,7 @@ $('reader-display-check').onclick=()=>{
   const body=doc?.body?.cloneNode(true);
   body?.querySelectorAll('script,style,#bp-personal-copy').forEach(node=>node.remove());
   report.textContent=[
-    'Reader build: 20261031',
+    'Reader build: 20261101',
     'Library headline size: '+getComputedStyle(document.querySelector('.library h1')).fontSize,
     'Subscription offer in page: '+Boolean($('reading-membership-offer')?.isConnected),
     'Membership: '+(membershipStatus.known?(membershipStatus.active?'active':'inactive'):'unverified'),
@@ -1476,7 +1476,6 @@ async function openBook() {
       contents => {
         applyDocumentAppearance(contents);
         registerPageGestures(contents);
-        renderPageWatermark(contents);
       }
     );
 
@@ -1644,14 +1643,8 @@ function validAnnotation(item) {
     && typeof item.quote === 'string' && item.quote.length <= 4000 && typeof item.note === 'string' && item.note.length <= 6000
     && typeof item.chapter === 'string' && item.chapter.length <= 500;
 }
-function renderPageWatermark(contents) {
-  const doc = contents.document;
-  if (!doc?.body || doc.getElementById('bp-personal-copy')) return;
-  const mark = doc.createElement('div'); mark.id = 'bp-personal-copy'; mark.setAttribute('aria-hidden','true');
-  mark.textContent = $('reader-watermark').textContent;
-  mark.style.cssText = 'position:fixed;bottom:2px;right:8px;font:8px Arial,sans-serif;letter-spacing:.04em;opacity:.22;pointer-events:none;z-index:100;color:inherit;';
-  doc.body.append(mark);
-}
+// The personalised watermark lives on the reader shell. Fixed elements inside
+// EPUB columns inflate their scroll width on each pagination pass.
 function renderHighlights() {
   if (!state.rendition) return;
   for (const item of annotations) {
