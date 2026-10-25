@@ -38,7 +38,7 @@
     <!-- JS -->
     <script src="/js/header.js?v=20261104" defer></script>
     <link rel="stylesheet" href="/css/publishing-desk.css?v=20261108">
-    <script src="/js/publishing-desk.js?v=20261108" defer></script>
+    <script src="/js/publishing-desk.js?v=20261110" defer></script>
     <script src="/js/behind-files-admin.js?v=20261105" defer></script>
     <link rel="stylesheet" href="/css/site-polish.css?v=20261102">
 </head>
@@ -273,6 +273,7 @@
   <section id="ops-ai" class="ops-section" aria-labelledby="ops-ai-title">
    <h3 id="ops-ai-title">Your editorial assistant</h3><p>Draft from your own book facts. Review every suggestion before using it. Keep reader contact details out of the brief.</p><p id="ops-ai-state"></p>
    <form id="ops-ai-form"><div class="ops-fields"><label>Book title<input id="ops-ai-title-input" maxlength="300" required></label><label>Author<input id="ops-ai-author" maxlength="300"></label><label>Channel<select id="ops-ai-channel"><option>Facebook</option><option>Instagram</option><option>TikTok</option><option>Email</option><option>Behind the Files</option><option>Other</option></select></label></div><label>Verified facts, blurb and approved links<textarea id="ops-ai-facts" rows="5" maxlength="8000" required placeholder="Only facts you can publish. Include a release date or price only if confirmed."></textarea></label><label>What should the assistant draft?<input id="ops-ai-task" maxlength="1000" value="Introduce this book with an atmospheric hook and a clear invitation to read." required></label><button type="submit" class="bfa-button" id="ops-generate">Generate draft</button></form>
+   <p id="ops-ai-status" role="status" aria-live="polite"></p>
    <label>AI draft — review and edit<textarea id="ops-ai-output" rows="10" maxlength="12000"></textarea></label><div class="ops-actions"><button type="button" id="ops-use-draft" class="bfa-button">Use in content scheduler</button><button type="button" id="ops-copy-draft" class="bfa-button">Copy draft</button></div>
   </section>
   <section id="ops-calendar" class="ops-section" aria-labelledby="ops-calendar-title">

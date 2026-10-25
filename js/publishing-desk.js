@@ -17,7 +17,7 @@
   return lines.map(line=>{let result='',part='',size=0;for(const c of line){const n=new TextEncoder().encode(c).length;if(size+n>73){result+=part+'\r\n ';part='';size=1;}part+=c;size+=n;}return result+part;}).join('\r\n')+'\r\n';
  }
  function invalidatePreview(){preview=null;$('ops-email-preview').hidden=true;$('ops-preview-person').replaceChildren();$('ops-preview-text').textContent='';}
- function lock(){epoch++;$('ops-controls').disabled=true;client=null;owner=null;data=null;posts=[];editing=null;selected.clear();invalidatePreview();$('ops-readers').replaceChildren();$('ops-posts').replaceChildren();$('ops-calendar-grid').replaceChildren();$('ops-ai-output').value='';$('ops-ai-form').reset();$('ops-post-form').reset();$('ops-campaign').innerHTML='<option value="">Choose an ARC book</option>';$('ops-send-status').textContent='';$('ops-selection-state').textContent='Choose an ARC campaign to select readers.';$('ops-arc-status').textContent='';status('Sign in as an administrator to use this desk.');}
+ function lock(){epoch++;$('ops-controls').disabled=true;client=null;owner=null;data=null;posts=[];editing=null;selected.clear();invalidatePreview();$('ops-readers').replaceChildren();$('ops-posts').replaceChildren();$('ops-calendar-grid').replaceChildren();$('ops-ai-output').value='';$('ops-ai-status').textContent='';$('ops-ai-form').reset();$('ops-post-form').reset();$('ops-campaign').innerHTML='<option value="">Choose an ARC book</option>';$('ops-send-status').textContent='';$('ops-selection-state').textContent='Choose an ARC campaign to select readers.';$('ops-arc-status').textContent='';status('Sign in as an administrator to use this desk.');}
  async function invoke(body){
   if(!client)throw Error('Administrator sign-in is required.');const version=epoch;
   const {data:result,error}=await client.functions.invoke('bp-publishing-desk',{body});
@@ -34,7 +34,7 @@
   $('ops-campaign').value=old;
   $('ops-mail-state').textContent=data.mailConfigured?'Outlook credentials configured · aidan@blackwoodpublishing.co.uk. A test send is still needed to verify mailbox permissions.':'Outlook is not connected. Assignment and preview tools work once the function is deployed; sending needs Microsoft app credentials and mailbox consent.';
   $('ops-ai-state').textContent=data.aiConfigured?'AI drafting is connected. Review all facts and copy before publishing.':'AI drafting needs OPENAI_API_KEY in Supabase. You can still write and schedule content manually.';
-  $('ops-generate').disabled=!data.aiConfigured;renderReaders();
+  renderReaders();
  }
  function campaign(){return data?.campaigns.find(c=>c.id===Number($('ops-campaign').value));}
  function assignment(reader){return data?.assignments.filter(a=>a.member_id===reader.id&&a.arc_file_id===Number($('ops-campaign').value)).sort((a,b)=>b.id-a.id)[0];}
@@ -90,10 +90,12 @@
   const sent=results.filter(r=>r.state==='submitted').length,unknown=results.filter(r=>r.state==='unknown').length,failed=results.filter(r=>r.state==='failed').length;
   await loadOverview();arcStatus(`${sent} notice(s) submitted to Outlook; ${failed} failed; ${unknown} unconfirmed. Submission is not proof of delivery. Check Sent Items for unconfirmed requests before taking further action.`);
  },arcStatus);
+ const aiStatus=text=>{status(text);$('ops-ai-status').textContent=text;};
  $('ops-ai-form').onsubmit=e=>{e.preventDefault();void operation(async()=>{
+  aiStatus('Preparing your draft…');
   const result=await invoke({action:'generate',title:$('ops-ai-title-input').value.trim(),author:$('ops-ai-author').value.trim(),channel:$('ops-ai-channel').value,facts:$('ops-ai-facts').value.trim(),task:$('ops-ai-task').value.trim()});
-  $('ops-ai-output').value=result.draft;status('AI draft ready for your review. Nothing has been published.');
- });};
+  $('ops-ai-output').value=result.draft;aiStatus('AI draft ready for your review. Nothing has been published.');
+ },aiStatus);};
  $('ops-copy-draft').onclick=()=>operation(async()=>{await navigator.clipboard.writeText($('ops-ai-output').value);status('Draft copied.');});
  $('ops-use-draft').onclick=()=>{if(!$('ops-ai-output').value.trim()){status('Write or generate a draft first.');return;}newPost();$('ops-post-title').value=$('ops-ai-title-input').value+' · '+$('ops-ai-channel').value;$('ops-post-book').value=$('ops-ai-title-input').value;$('ops-post-channel').value=$('ops-ai-channel').value;$('ops-post-content').value=$('ops-ai-output').value;copyCount();moveTo($('ops-calendar'));};
  async function loadPosts(){

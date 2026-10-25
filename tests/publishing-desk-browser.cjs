@@ -9,7 +9,7 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
   const people=[{id:'00000000-0000-0000-0000-000000000001',email:'admin@example.invalid',reader_name:'Admin',application_reference_available:true,is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000002',email:'reader@example.invalid',reader_name:'Reader',application_reference_available:true,is_arc_member:true,member_status:'active'},{id:'00000000-0000-0000-0000-000000000003',email:'unlinked@example.invalid',reader_name:'Unlinked reader',application_reference_available:false,is_arc_member:true,member_status:'active'}];
   const client={auth:{getUser:async()=>({data:{user:{id:people[0].id}}}),getSession:async()=>({data:{session:null}}),onAuthStateChange:fn=>{window.mockAuthCallbacks.push(fn);}},from(table){return {select(){return this},eq(){return this},order(){return this},range:async()=>({data:window.mockPosts}),maybeSingle:async()=>({data:{is_admin:!window.mockDenied}})};},functions:{async invoke(name,{body}){
    window.mockCalls.push(body);
-   if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:true}};
+   if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:false}};
    if(body.action==='assign'&&window.mockAssignFailure)return {error:{context:{json:async()=>({error:'This ARC campaign is inactive or closed.'})}}};
    if(body.action==='assign'){let created=0,retained=0,blocked=[];for(const id of body.members){
     const person=people.find(p=>p.id===id);
@@ -18,6 +18,7 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
    }return {data:{result:[{created_count:created,existing_count:retained,blocked_count:blocked.length,blocked_readers:blocked}]}};}
    if(body.action==='preview')return {data:{batchId:'00000000-0000-0000-0000-000000000010',recipients:people.filter(p=>window.mockAssignments.some(a=>a.member_id===p.id&&a.arc_file_id===body.fileId)).map(p=>({name:p.reader_name,email:p.email,subject:'Gualachulain is ready',text:'Open your protected ARC profile.'}))}};
    if(body.action==='send')return {data:{results:[{state:'submitted'},{state:'submitted'},{state:'submitted'}],remaining:0}};
+   if(body.action==='generate'&&window.mockAIFailure)return {error:{context:{json:async()=>({error:'The AI assistant is not connected. Configure OPENAI_API_KEY in Supabase.'})}}};
    if(body.action==='generate')return {data:{draft:'Hook: A quiet place.\nShot list: Trees, a book, a turning page.\nCaption: Discover Gualachulain.'}};
   }},async rpc(name,args){const existing=window.mockPosts.find(p=>p.id===args.p_id);const row={...args.p_payload,id:existing?.id||crypto.randomUUID(),revision:(existing?.revision||0)+1,created_at:new Date().toISOString()};window.mockPosts=window.mockPosts.filter(p=>p.id!==row.id);window.mockPosts.push(row);return {data:row};}};
   window.supabase={createClient:()=>client};window.mockClient=client;
@@ -48,8 +49,14 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  assert((await page.locator('#ops-preview-text').textContent()).includes('Gualachulain'));
  assert.equal(await page.evaluate(()=>window.mockCalls.filter(c=>c.action==='send').length),0,'preview never sends email');
  await page.locator('#ops-send').click();await page.waitForFunction(()=>document.getElementById('ops-status').textContent.includes('3 notice(s) submitted'));
- await page.locator('#ops-ai-title-input').fill('Gualachulain');await page.selectOption('#ops-ai-channel','TikTok');await page.locator('#ops-ai-facts').fill('Aidan Blackwood. The Cursed Bothies, Book 2.');await page.locator('#ops-generate').click();
+ assert(await page.locator('#ops-generate').isEnabled(),'earlier missing-key status does not block a fresh server attempt');
+ await page.locator('#ops-ai-title-input').fill('Gualachulain');await page.selectOption('#ops-ai-channel','TikTok');await page.locator('#ops-ai-facts').fill('Aidan Blackwood. The Cursed Bothies, Book 2.');
+ await page.evaluate(()=>window.mockAIFailure=true);await page.locator('#ops-generate').click();
+ await page.waitForFunction(()=>document.getElementById('ops-ai-status').textContent.includes('Configure OPENAI_API_KEY'));
+ assert(await page.locator('#ops-generate').isEnabled(),'failed connection remains retryable');
+ await page.evaluate(()=>window.mockAIFailure=false);await page.locator('#ops-generate').click();
  await page.waitForFunction(()=>document.getElementById('ops-ai-output').value.includes('Shot list'));
+ assert((await page.locator('#ops-ai-status').textContent()).includes('AI draft ready'),'draft result is visible beside the AI form');
  await page.locator('#ops-use-draft').click();assert.equal(await page.locator('#ops-post-channel').inputValue(),'TikTok');
  await page.locator('#ops-post-time').fill('2099-10-01T10:00');await page.selectOption('#ops-post-status','scheduled');await page.getByRole('button',{name:'Save content',exact:true}).click();
  await page.waitForSelector('.ops-post');assert((await page.locator('.ops-post').textContent()).includes('TikTok'));
