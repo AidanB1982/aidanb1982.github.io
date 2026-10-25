@@ -438,7 +438,6 @@
                     role="menu"
                     aria-label="Reading"
                 >
-                    <a href="/pages/bp-reading.html" role="menuitem">BP Reading</a>
                     <a href="/pages/reading-lists.html" role="menuitem">
                         Recommended Reads
                     </a>
@@ -652,6 +651,10 @@
             headerContainer.querySelector("#blackwood-main-navigation");
 
         if (!header || !toggle || !nav) return;
+
+        // Progressive enhancement: the control becomes usable once handlers exist.
+        // The desktop media query keeps it out of the desktop layout.
+        toggle.hidden = false;
 
         const mobileQuery =
             window.matchMedia("(max-width: 760px)");

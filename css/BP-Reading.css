@@ -852,3 +852,13 @@ input:focus-visible, a:focus-visible { outline: 2px solid #a9844c; outline-offse
 .page-turn-sheet::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg,#00000012,transparent 35%,#ffffff12 75%,#00000020); }
 .page-turn-overlay[data-direction=previous] .page-turn-sheet::after { background:linear-gradient(270deg,#00000012,transparent 35%,#ffffff12 75%,#00000020); }
 .turn-page-snapshot { position:absolute; inset:0; overflow:hidden; pointer-events:none; user-select:none; }
+
+
+/* Shared publishing navigation frames the library, never the book canvas. */
+body.bp-reading-page:has(#reader:not([hidden])) > :is(#header-placeholder,#footer-placeholder,.skip-link,.blackwood-circle-access) {
+  display:none !important;
+}
+body.bp-reading-page:has(#reader:not([hidden])) { overflow:hidden; }
+body.bp-reading-page .simple-header {
+  position:relative; top:auto; left:auto; border-bottom:1px solid var(--border);
+}

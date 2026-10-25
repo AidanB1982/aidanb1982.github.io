@@ -15,12 +15,15 @@ const OUT=process.env.READING_TEST_DIR||'/tmp/blackwood-reading-test';
    await page.waitForSelector('.blackwood-account-link',{state:'attached'});
    await page.evaluate(()=>document.fonts.ready);
    assert.equal(await page.locator('link[href*="site-polish.css"]').count(),1,'shared finishing layer loaded');
+   assert.equal(await page.locator('#header-placeholder a[href="/pages/bp-reading.html"]').count(),0,'BP Reading withheld from public navigation');
+   await page.waitForSelector('#footer-placeholder .footer');
+   assert.equal(await page.locator('#footer-placeholder a[href="/pages/bp-reading.html"]').count(),0,'BP Reading withheld from public footer');
    const overflow=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
    if(overflow.scroll>overflow.width+1)console.log(await page.evaluate(()=>[...document.querySelectorAll('body *')].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+1||r.left< -1)&&getComputedStyle(el).position!=='fixed'}).slice(0,12).map(el=>({tag:el.tagName,class:el.className,width:el.getBoundingClientRect().width,left:el.getBoundingClientRect().left,right:el.getBoundingClientRect().right}))));
    assert(overflow.scroll<=overflow.width+1,`${path} at ${width}px overflows: ${JSON.stringify(overflow)}`);
    if(path==='/index.html'&&width===390){
     await page.getByRole('button',{name:'Reading',exact:true}).click();
-    const readingLink=page.getByRole('menuitem',{name:'BP Reading',exact:true});
+    const readingLink=page.getByRole('menuitem',{name:'Recommended Reads',exact:true});
     await readingLink.click({trial:true});
     const bounds=await readingLink.boundingBox();
     assert(bounds.x>=0&&bounds.x+bounds.width<=width,'home dropdown stays within mobile viewport');

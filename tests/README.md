@@ -142,3 +142,10 @@ page's prose and type size, queues rapid turns, and exercises forward/backward
 and cancelled swipes on an offset chapter. Reduced-motion and instant preferences
 must skip the curl. Set READING_MOBILE_TEST=1 to repeat at a 390px viewport. The
 snapshot stays outside the EPUB iframe so it cannot alter pagination geometry.
+
+
+The reader smoke test also checks the shared simple header/footer in the library,
+their removal during full-screen reading and restoration on return. Site layout
+checks confirm BP Reading has no link in the public header or footer during the
+publisher's navigation hold. This does not validate KDP withdrawal or change
+any access/checkout launch gate.

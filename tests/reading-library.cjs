@@ -61,7 +61,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   await page.locator('#book-grid .open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
   assert.equal(await page.locator('#reader-book-title').textContent(),'Fixture Title','selected edition title');
   await page.frameLocator('#epub-viewer iframe').locator('p').first().waitFor({state:'visible'});
-  const frame=page.frames().find(frame=>frame.parentFrame());
+  const frame=await (await page.locator('#epub-viewer iframe').elementHandle()).contentFrame();
   const visibleProse=await frame.evaluate(()=>{const p=document.querySelector('p');const style=getComputedStyle(p);return {text:p.textContent.length,color:style.color,font:style.fontFamily,height:p.getBoundingClientRect().height};});
   assert(visibleProse.text>20&&visibleProse.height>0,'actual prose is laid out');
   assert.equal(visibleProse.color,'rgb(48, 39, 31)','publisher colours cannot hide prose');

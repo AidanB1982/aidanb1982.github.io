@@ -50,7 +50,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  assert(await page.locator('#epub-viewer iframe').evaluate(frame=>frame.getBoundingClientRect().width)===layout.width,'snapshot never changes pagination width');
  // Swipe from a page that is already offset inside a long chapter.
  async function drag(direction,cancel=false){
-   const frame=page.frames().find(frame=>frame.parentFrame());
+   const frame=await (await page.locator('#epub-viewer iframe').elementHandle()).contentFrame();
    await frame.evaluate(({direction,cancel})=>{
      const viewer=parent.document.getElementById('epub-viewer').getBoundingClientRect();
      const offset=window.frameElement.getBoundingClientRect().left-viewer.left;

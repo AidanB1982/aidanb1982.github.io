@@ -242,3 +242,18 @@ computed text styles. It includes no book passages, credentials or member IDs.
 Use that report if a particular live EPUB still renders blank; the actual file
 may require separate inspection rather than assuming fixture success validates
 all publisher formats.
+
+
+### Public navigation hold
+
+BP Reading is intentionally omitted from the shared hero/simple header links,
+the JavaScript Reading dropdown and the public footer while the publisher
+completes the KDP transition. The direct protected reader page and signed-in
+member-area link remain available for testing. This is a navigation change;
+it does not publish titles, change entitlements or activate paid-access launch
+gates. Re-enable the public links only on the publisher's instruction, rather
+than automatically from the supplied KDP term dates.
+
+The library uses the existing `/header-simple.html` and `/footer.html` partials
+through `js/header.js`. Both, together with the floating account link, are hidden
+while a book is open and return when the reader goes back to the library.
