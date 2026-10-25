@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';import {readFileSync} from 'node:fs';
-import {createPublishingDesk} from '../supabase/functions/bp-publishing-desk/handler.ts';
+import {createPublishingDesk,assignmentFailure} from '../supabase/functions/bp-publishing-desk/handler.ts';
 import {createOutlookMailer} from '../supabase/functions/bp-publishing-desk/outlook.ts';
 const admin='00000000-0000-0000-0000-000000000001',reader='00000000-0000-0000-0000-000000000002';
 const campaign={id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true};
@@ -30,6 +30,9 @@ f=fixture({deps:{send:async()=>{throw Error('timeout');}}});preview=await f.requ
 f=fixture();preview=await f.request({action:'preview',fileId:2,members:[reader]});f.batches.get(preview.body.batchId).created_by=reader;assert.equal((await f.request({action:'send',batchId:preview.body.batchId})).status,404,'another administrator cannot use this preview');
 f=fixture();preview=await f.request({action:'preview',fileId:2,members:[reader]});f.batches.get(preview.body.batchId).created_at='2026-10-20T10:00:00Z';assert.equal((await f.request({action:'send',batchId:preview.body.batchId})).status,409,'expired previews cannot send');
 f=fixture();assert.equal((await f.request({action:'generate',title:'Book',channel:'TikTok',facts:'Approved facts',task:'Draft a video hook'})).body.draft,'A factual draft.');
+f=fixture({deps:{assign:async()=>{throw assignmentFailure({code:'23502',message:'null value in column "application_id" violates not-null constraint'});}}});let rejected=await f.request({action:'assign',fileId:2,members:[reader],due:'2099-10-10'});assert.equal(rejected.status,409);assert.equal(rejected.body.code,'ARC_APPLICATION_MISSING');
+assert.equal(assignmentFailure({code:'23505',message:'private database detail'}).code,'ARC_ASSIGNMENT_CONFLICT');
+assert(!assignmentFailure({code:'23503',message:'private database detail'}).message.includes('private database detail'),'raw database records are never echoed');
 let calls=[],mailStatus=202;const env={MICROSOFT_TENANT_ID:admin,MICROSOFT_CLIENT_ID:'client-fixture',MICROSOFT_CLIENT_SECRET:'secret-fixture'};
 const mailer=createOutlookMailer(name=>env[name]||'',async(url,options)=>{calls.push({url,options});return url.includes('/token')?Response.json({access_token:'server-token-fixture',expires_in:3600}):new Response(null,{status:mailStatus});});
 await Promise.all([mailer.ready(),mailer.ready()]);assert.equal(calls.length,1,'concurrent token refresh coalesces');

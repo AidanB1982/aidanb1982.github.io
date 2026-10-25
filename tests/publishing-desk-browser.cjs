@@ -10,6 +10,7 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
   const client={auth:{getUser:async()=>({data:{user:{id:people[0].id}}}),getSession:async()=>({data:{session:null}}),onAuthStateChange:fn=>{window.mockAuthCallbacks.push(fn);}},from(table){return {select(){return this},eq(){return this},order(){return this},range:async()=>({data:window.mockPosts}),maybeSingle:async()=>({data:{is_admin:!window.mockDenied}})};},functions:{async invoke(name,{body}){
    window.mockCalls.push(body);
    if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:true}};
+   if(body.action==='assign'&&window.mockAssignFailure)return {error:{context:{json:async()=>({error:'A selected reader has no linked ARC application reference.'})}}};
    if(body.action==='assign'){let created=0,retained=0;for(const id of body.members){if(window.mockAssignments.some(a=>a.member_id===id&&a.arc_file_id===body.fileId))retained++;else{window.mockAssignments.push({id:3,member_id:id,arc_file_id:body.fileId,status:'active',download_count:0,review_due_date:body.due});created++;}}return {data:{result:[{created_count:created,existing_count:retained}]}};}
    if(body.action==='preview')return {data:{batchId:'00000000-0000-0000-0000-000000000010',recipients:people.map(p=>({name:p.reader_name,email:p.email,subject:'Gualachulain is ready',text:'Open your protected ARC profile.'}))}};
    if(body.action==='send')return {data:{results:[{state:'submitted'},{state:'submitted'}],remaining:0}};
@@ -20,10 +21,22 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  await page.goto(BASE_URL+'/pages/behind-files-admin.html');
  await page.waitForFunction(()=>!document.getElementById('bfa-admin-content').hidden&&!document.getElementById('ops-controls').disabled);
  assert(await page.getByRole('heading',{name:'Behind the Files',exact:true}).count()>0,'existing editorial desk preserved');
+ await page.locator('#ops-select').click();assert((await page.locator('#ops-arc-status').textContent()).includes('Choose an ARC campaign'));
  await page.selectOption('#ops-campaign','2');await page.locator('#ops-select').click();
+ assert.equal(await page.locator('#ops-readers input:checked').count(),2,'select team visibly checks every reader');
+ assert((await page.locator('#ops-selection-state').textContent()).includes('2 of 2 reader(s) selected for Gualachulain. 1 need a new assignment'));
+ assert.equal(await page.evaluate(()=>window.mockCalls.filter(c=>c.action==='assign').length),0,'selection itself does not mutate records');
+ const above=await page.evaluate(()=>document.getElementById('ops-assign').compareDocumentPosition(document.querySelector('.ops-table-wrap'))&Node.DOCUMENT_POSITION_FOLLOWING);assert(above,'assign action stays above the reader table');
+ await page.locator('#ops-due').fill('');await page.locator('#ops-assign').click();
+ await page.waitForFunction(()=>document.getElementById('ops-arc-status').textContent.includes('Choose a review due date'));
+ await page.evaluate(()=>window.mockAssignFailure=true);await page.locator('#ops-due').fill('2099-10-10');await page.locator('#ops-assign').click();
+ await page.waitForFunction(()=>document.getElementById('ops-arc-status').textContent.includes('no linked ARC application'));
+ assert.equal(await page.evaluate(()=>window.mockAssignments.filter(a=>a.arc_file_id===2).length),1,'failed assignment never pretends records were updated');
+ await page.evaluate(()=>window.mockAssignFailure=false);
  assert((await page.locator('#ops-readers').textContent()).includes('Needs assignment'),'reader has not silently inherited the new book');
  await page.locator('#ops-due').fill('2099-10-10');await page.locator('#ops-assign').click();
- await page.waitForFunction(()=>document.getElementById('ops-status').textContent.includes('1 new assignment'));
+ await page.waitForFunction(()=>document.getElementById('ops-arc-status').textContent.includes('1 new assignment'));
+ assert((await page.locator('#ops-selection-state').textContent()).includes('0 need a new assignment'));
  assert.equal(await page.evaluate(()=>window.mockAssignments.filter(a=>a.arc_file_id===1).length),1,'old ARC record retained');
  await page.locator('#ops-preview').click();await page.waitForSelector('#ops-email-preview');
  assert((await page.locator('#ops-preview-text').textContent()).includes('Gualachulain'));

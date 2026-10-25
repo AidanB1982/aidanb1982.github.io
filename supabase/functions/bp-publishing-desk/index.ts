@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
-import {createPublishingDesk} from './handler.ts';
+import {createPublishingDesk,assignmentFailure} from './handler.ts';
 import {createOutlookMailer} from './outlook.ts';
 const auth={persistSession:false,autoRefreshToken:false};
 function env(name:string){return Deno.env.get(name)||'';}
@@ -26,7 +26,7 @@ Deno.serve(createPublishingDesk({
   ]);
   return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active'),assignments,notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY'))};
  },
- async assign(fileId,members,due){return check(await service().rpc('bp_arc_assign_campaign',{p_file_id:fileId,p_members:members,p_due:due}));},
+ async assign(fileId,members,due){const result=await service().rpc('bp_arc_assign_campaign',{p_file_id:fileId,p_members:members,p_due:due});if(result.error)throw assignmentFailure(result.error);return result.data;},
  async createBatch(admin,fileId,kind,recipients){return check(await service().from('bp_arc_mail_batches').insert({created_by:admin,arc_file_id:fileId,kind,recipients}).select('*').single()) as any;},
  async batch(id){return check(await service().from('bp_arc_mail_batches').select('*').eq('id',id).maybeSingle()) as any;},
  async mailReady(){await mailer.ready();},

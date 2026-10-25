@@ -160,3 +160,23 @@ These tests do not connect to the live Supabase project, Microsoft mailbox, Open
 account, social accounts or MailerLite. Live setup, actual delivery and channel
 permissions must be verified after configuration. No existing reader has been assigned
 or emailed by these development tests.
+
+### If assigning readers appears to do nothing
+
+The selection count and assignment result are displayed above the reader table beside
+**Assign selected readers**. Selecting the team ticks boxes; the separate assignment
+action writes the new book assignments. A review due date is required. A confirmed
+result shows new and retained record counts, followed by a refreshed list.
+
+If the function rejects the request, the same area shows its error. Redeploy the
+updated generated `bp-publishing-desk.ts` bundle to receive specific assignment
+errors, including a missing application reference, conflicting legacy constraint,
+missing database function or service-role execute permission. Raw database row details
+are not returned to the browser. No SQL or mailbox permission change is required
+merely to deploy these diagnostic messages.
+
+`supabase/diagnostics/arc-assignment-readiness.sql` is a read-only aggregate check for
+the Gualachulain campaign, active ARC team, existing assignments and missing application
+references. It does not assign anyone, send mail or expose recipient addresses.
+A missing application reference can abort the existing transaction; it is not evidence
+that selection failed. Link the legitimate application reference before retrying.

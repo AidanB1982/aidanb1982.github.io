@@ -8,8 +8,8 @@ const {readFileSync}=require('node:fs');const assert=require('node:assert/strict
  alter table member_profiles enable row level security;create policy self on member_profiles for select to authenticated using(id=auth.uid());grant select on member_profiles to authenticated;
  create table arc_files(id bigint generated always as identity primary key,title text,is_active boolean,downloads_open_at timestamptz,downloads_close_at timestamptz);
  insert into arc_files(title,is_active) values('The Crossing',true),('Gualachulain',true);
- create table arc_file_assignments(id bigint generated always as identity primary key,member_id uuid references member_profiles(id),arc_file_id bigint references arc_files(id),application_id text not null,status text,review_due_date date,download_count integer default 0,review_link text,created_at timestamptz default now());
- insert into arc_file_assignments(member_id,arc_file_id,application_id,status,download_count,review_link) values('${admin}',1,'A','active',7,'https://review.invalid/archived'),('${reader}',1,'B','active',0,null);
+ create table arc_file_assignments(id bigint generated always as identity primary key,member_id uuid references member_profiles(id),arc_file_id bigint references arc_files(id),application_id text not null,status text,review_due_date date,download_count integer default 0,review_link text not null default '',watermarked_storage_bucket text not null default 'arc-reader-copies',watermarked_storage_path text not null default '',created_at timestamptz default now());
+ insert into arc_file_assignments(member_id,arc_file_id,application_id,status,download_count,review_link) values('${admin}',1,'A','active',7,'https://review.invalid/archived'),('${reader}',1,'B','active',0,'');
  grant all on member_profiles,arc_files,arc_file_assignments to service_role;grant usage,select on all sequences in schema public to service_role;`);
  await db.exec(readFileSync('supabase/migrations/20261028_publishing_desk.sql','utf8'));
  async function as(role,id,sql,args=[]){await db.exec(`set role ${role};set request.jwt.claim.sub='${id}';`);try{return await db.query(sql,args);}finally{await db.exec('reset role');}}
@@ -30,6 +30,12 @@ const {readFileSync}=require('node:fs');const assert=require('node:assert/strict
  result=(await as('service_role',admin,'select * from bp_arc_assign_campaign(2,$1,$2)',[[admin,reader],'2099-10-10'])).rows[0];assert.equal(result.created_count,0);assert.equal(result.existing_count,2);
  const history=(await db.query('select * from arc_file_assignments where id=1')).rows[0];assert.equal(history.download_count,7);assert.equal(history.review_link,'https://review.invalid/archived');
  assert.equal((await db.query('select application_id from arc_file_assignments where member_id=$1 and arc_file_id=2',[reader])).rows[0].application_id,'B','existing application reference retained');
+ const newCopy=(await db.query('select watermarked_storage_bucket,watermarked_storage_path from arc_file_assignments where member_id=$1 and arc_file_id=2',[reader])).rows[0];assert.equal(newCopy.watermarked_storage_bucket,'arc-reader-copies');assert.equal(newCopy.watermarked_storage_path,'','new book never reuses another book’s personal file');
+ const linked='00000000-0000-0000-0000-000000000003',unlinked='00000000-0000-0000-0000-000000000004';
+ await db.query("insert into member_profiles values($1,false,true,'active'),($2,false,true,'active')",[linked,unlinked]);
+ await db.query("insert into arc_file_assignments(member_id,arc_file_id,application_id,status) values($1,1,'C','active')",[linked]);
+ await assert.rejects(()=>as('service_role',admin,'select * from bp_arc_assign_campaign(2,$1,$2)',[[linked,unlinked],'2099-10-10']),e=>e.code==='23502'&&e.message.includes('application_id'));
+ assert.equal((await db.query('select id from arc_file_assignments where arc_file_id=2 and member_id=any($1)',[[linked,unlinked]])).rows.length,0,'a missing required application reference rolls back the entire batch');
  const batch=(await db.query("insert into bp_arc_mail_batches(created_by,arc_file_id,kind,recipients) values($1,2,'available','[{}]') returning id",[admin])).rows[0].id;
  const batch2=(await db.query("insert into bp_arc_mail_batches(created_by,arc_file_id,kind,recipients) values($1,2,'available','[{}]') returning id",[admin])).rows[0].id;
  const notice=(await as('service_role',admin,"select * from bp_arc_claim_notice(3,'available',$1)",[batch])).rows[0];assert(notice.id);

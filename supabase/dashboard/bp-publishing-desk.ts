@@ -23,6 +23,20 @@ export type DeskDeps={
  generate(admin:string,brief:{title:string;author:string;channel:string;facts:string;task:string}):Promise<string>;
  now?:()=>number;
 };
+export class PublishingDeskError extends Error {
+ status:number;code:string;
+ constructor(status:number,message:string,code:string){super(message);this.status=status;this.code=code;this.name='PublishingDeskError';}
+}
+export function assignmentFailure(error:{code?:string;message?:string}){
+ const code=error.code||'';
+ if(code==='23502'&&String(error.message).includes('application_id'))return new PublishingDeskError(409,'A selected reader has no linked ARC application reference. The assignment batch was rolled back. Link that reader’s ARC application before assigning the book.','ARC_APPLICATION_MISSING');
+ if(code==='23505')return new PublishingDeskError(409,'An existing ARC record conflicts with this assignment. The batch was rolled back; existing assignments have been retained. Check the ARC assignment constraints.','ARC_ASSIGNMENT_CONFLICT');
+ if(code==='PGRST202'||code==='42883')return new PublishingDeskError(503,'The ARC assignment database function could not be found. Check that the publishing-desk migration was applied.','ARC_FUNCTION_MISSING');
+ if(code==='42501')return new PublishingDeskError(503,'The server lacks permission to assign ARC readers. Check the service_role execute grant for bp_arc_assign_campaign.','ARC_ASSIGNMENT_PERMISSION');
+ const expected=['Choose 1 to 200 distinct ARC members','Choose a current or future review due date','This ARC campaign is inactive or closed','Some selected readers are not active ARC team members'];
+ if(code==='P0001'&&expected.includes(error.message||''))return new PublishingDeskError(409,error.message!,'ARC_ASSIGNMENT_REJECTED');
+ return new PublishingDeskError(503,'The database rejected the ARC assignment request'+(/^[A-Z0-9]{5}$/.test(code)?' ('+code+')':'')+'. No successful assignment is being claimed.','ARC_ASSIGNMENT_FAILED');
+}
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 export const channels=['Facebook','Instagram','TikTok','Email','Behind the Files','Other'];
 export function available(c:Campaign,now:number){return c.is_active===true&&(!c.downloads_open_at||Date.parse(c.downloads_open_at)<=now)&&(!c.downloads_close_at||Date.parse(c.downloads_close_at)>now);}
@@ -100,7 +114,7 @@ export function createPublishingDesk(deps:DeskDeps){return async(request:Request
   if(!recipients.length)return json(409,{error:'No new notices to send. Check assignments, downloads, filed reviews and previous notification states. Use the reminder option for a separate follow-up.'});
   const batch=await deps.createBatch(user.id,campaign.id,kind,recipients);
   return json(200,{batchId:batch.id,recipients});
- }catch(error){const code=error instanceof Error?error.message:'';const messages:Record<string,string>={OUTLOOK_NOT_CONFIGURED:'Outlook is not connected. Configure the Microsoft tenant, app credentials and mailbox permissions in Supabase.',AI_NOT_CONFIGURED:'The AI assistant is not connected. Configure OPENAI_API_KEY in Supabase.',AI_LIMIT:'The hourly AI drafting limit has been reached. Try again later.',OUTLOOK_AUTH:'Outlook authentication failed. Check app consent and mailbox permissions.'};return json(503,{error:messages[code]||'Publishing desk request could not be completed. Check the migration, deployed function and server configuration.'});}
+ }catch(error){if(error instanceof PublishingDeskError)return json(error.status,{error:error.message,code:error.code});const code=error instanceof Error?error.message:'';const messages:Record<string,string>={OUTLOOK_NOT_CONFIGURED:'Outlook is not connected. Configure the Microsoft tenant, app credentials and mailbox permissions in Supabase.',AI_NOT_CONFIGURED:'The AI assistant is not connected. Configure OPENAI_API_KEY in Supabase.',AI_LIMIT:'The hourly AI drafting limit has been reached. Try again later.',OUTLOOK_AUTH:'Outlook authentication failed. Check app consent and mailbox permissions.'};return json(503,{error:messages[code]||'Publishing desk request could not be completed. Check the migration, deployed function and server configuration.'});}
 };}
 
 export function createOutlookMailer(env:(name:string)=>string,transport:typeof fetch=fetch,now:()=>number=Date.now){
@@ -152,7 +166,7 @@ Deno.serve(createPublishingDesk({
   ]);
   return {campaigns,readers:profiles.filter(p=>p.is_arc_member===true&&p.member_status==='active'),assignments,notices:noticeRows,mailConfigured:mailer.configured(),aiConfigured:Boolean(env('OPENAI_API_KEY'))};
  },
- async assign(fileId,members,due){return check(await service().rpc('bp_arc_assign_campaign',{p_file_id:fileId,p_members:members,p_due:due}));},
+ async assign(fileId,members,due){const result=await service().rpc('bp_arc_assign_campaign',{p_file_id:fileId,p_members:members,p_due:due});if(result.error)throw assignmentFailure(result.error);return result.data;},
  async createBatch(admin,fileId,kind,recipients){return check(await service().from('bp_arc_mail_batches').insert({created_by:admin,arc_file_id:fileId,kind,recipients}).select('*').single()) as any;},
  async batch(id){return check(await service().from('bp_arc_mail_batches').select('*').eq('id',id).maybeSingle()) as any;},
  async mailReady(){await mailer.ready();},
