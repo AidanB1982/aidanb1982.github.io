@@ -220,3 +220,25 @@ focus refresh membership state. These UI rules do not replace server delivery
 checks. The old exact error “Administrator access is required.” comes from the
 previous administrator-only Edge Function; deploy the current generated
 bp-reading-deliver-epub.ts into the matching function with JWT verification on.
+
+## Library and blank-page display update
+
+The complete pricing/terms/Subscribe section is detached from the active
+member/admin library, not merely a hidden button. It is restored for a verified
+inactive membership while retaining its event handlers; a revoked/expired paid
+checkout state resets before another subscription attempt. Unknown membership
+status keeps the offer hidden until verified. The headline is capped at 28px.
+
+The reader measures its visible viewport before EPUB rendering and observes
+later size changes. The loading indicator is removed before that measurement to
+avoid immediately recreating an iframe with a different flex size. Reader theme
+colours and fonts override conflicting publisher prose styles while retaining
+images, structure, emphasis and heading hierarchy. This was tested with normal
+and conflicting-colour fixture EPUBs, not the protected live book file.
+
+Reading menu → Display help produces a support report with the reader build,
+headline size, membership/offer state, viewport, paragraph/character counts and
+computed text styles. It includes no book passages, credentials or member IDs.
+Use that report if a particular live EPUB still renders blank; the actual file
+may require separate inspection rather than assuming fixture success validates
+all publisher formats.

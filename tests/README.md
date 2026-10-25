@@ -108,3 +108,12 @@ owners retain the offer; expired/revoked modes show locked books and the offer;
 administrators have no subscription requirement. Use READING_PURCHASE_TEST=1,
 READING_EXPIRED_TEST=1 or READING_REVOKED_TEST=1 for those cases. The browser test
 also checks the compact headline size and exercises actual EPUB rendering.
+
+Blank-page regression coverage: `tests/reading-fixture.py <folder>
+--publisher-colours` generates a book whose publisher CSS makes text match the
+parchment background. With the same pinned JS libraries in that folder, run the
+reader library browser test against it; it asserts visible prose and the chosen
+reader font/colour. Reader tests also check that the entire subscription-offer
+node is absent for active members, restored on revocation, and removed again on
+reactivation. The headline is capped at 28px. The full reader smoke test covers
+selection, themes, resized pages, navigation, search and saved-position reload.

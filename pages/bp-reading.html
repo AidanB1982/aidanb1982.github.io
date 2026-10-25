@@ -13,7 +13,7 @@
 
 
 
-  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261030">
+  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261031">
 </head>
 
 <body>
@@ -42,7 +42,7 @@
     </header>
 
     <section id="reading-membership-summary" class="membership-summary" role="status" aria-live="polite" hidden><p id="reading-membership-text"></p></section>
-    <section id="reading-membership-offer" class="reading-offer" aria-label="BP Reading membership">
+    <section id="reading-membership-offer" class="reading-offer" hidden aria-label="BP Reading membership">
       <div><p class="eyebrow">THE BLACKWOOD COLLECTION</p><h2>One membership. Every story.</h2><p>£10.99 per year for access to all available Blackwood reading editions. Or buy a title for £1.99 for permanent access inside BP Reading.</p></div>
       <div><p class="device-note">Read inside BP Reading. No file downloads.<br>Refund requests must be made within 7 days of purchase. After this period, membership payments are non-refundable, subject to your statutory rights.<br>Cancel renewal at any time; access continues until your paid period ends.<br>Membership checkout is being connected.</p><button class="control" id="subscribe-reading" type="button">Subscribe — £10.99 per year</button><button class="control" id="check-reading-payment" type="button" hidden>Check payment</button><p class="device-note" id="reading-payment-status" role="status" aria-live="polite"></p></div>
     </section>
@@ -181,6 +181,7 @@
         <button class="control" id="open-notebook" type="button">Notebook</button>
         <button class="control" id="open-search" type="button">Search</button>
         <button class="control" id="open-bookmarks" type="button">Saved places</button>
+        <button class="control" id="reader-display-check" type="button">Display help</button>
         <button class="control" id="reader-fullscreen" type="button">Full screen</button>
 
         <button
@@ -247,6 +248,7 @@
     <div id="selection-tools" class="selection-tools" hidden>
       <span>Keep this passage</span><button class="control" id="save-highlight" type="button">Highlight &amp; note</button><button class="control" id="dismiss-selection" type="button" aria-label="Dismiss selection">✕</button>
     </div>
+    <div id="reader-display-report" class="reader-display-report" role="status" aria-live="polite" hidden></div>
     <!-- BOTTOM CONTROLS -->
 
     <nav
@@ -298,7 +300,7 @@
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js?v=20261030"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261031"></script>
 
 </body>
 </html>

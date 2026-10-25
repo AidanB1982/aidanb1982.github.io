@@ -18,7 +18,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
       export function createClient(){
         function rows(table,filters){
           if(table==='bp_reading_catalog') return [{edition_id:2,title:'Gualachulain',author:'Aidan Blackwood',series:'The Cursed Bothies',series_order:2,cover_url:'/assets/book7.png'}, {edition_id:3,title:'Fixture Title',author:'Test Author',series:'Test Series',series_order:1,cover_url:'/assets/book7.png'}];
-          if(table==='bp_reading_memberships') return ${JSON.stringify(MEMBERSHIP_ROWS)};
+          if(table==='bp_reading_memberships'){const rows=${JSON.stringify(MEMBERSHIP_ROWS)};if(localStorage.getItem('mock-membership-revoked')==='yes')rows.forEach(row=>row.revoked_at=new Date().toISOString());return rows;}
           if(table==='bp_reading_state') {let rows=JSON.parse(localStorage.getItem('mock-cloud')||'{}');return Object.entries(rows).filter(([id])=>!filters.edition_id||id==filters.edition_id).map(([id,row])=>({edition_id:Number(id),...row}));}
           return [];
         }
@@ -35,21 +35,35 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   await page.goto(`${BASE_URL}/pages/bp-reading.html`);
   await page.waitForFunction(()=>!document.getElementById('library').hidden);
   assert.equal(await page.locator('.book-card').count(),2);
-  assert.equal(await page.locator('#reading-membership-offer').isVisible(),!CUSTOMER_TEST&&(LOCKED_TEST||PURCHASE_TEST),'only active annual members and admins hide the subscription offer');
+  assert.equal(await page.locator('#reading-membership-offer').count(),!CUSTOMER_TEST&&(LOCKED_TEST||PURCHASE_TEST)?1:0,'whole offer removed for active members and admins');
   if(CUSTOMER_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Annual membership active.*Reading access through/);
+  if(CUSTOMER_TEST) {
+    await page.evaluate(()=>{localStorage.setItem('mock-membership-revoked','yes');window.dispatchEvent(new Event('focus'));});
+    await page.waitForFunction(()=>document.getElementById('reading-membership-offer')?.isConnected===true);
+    assert.equal(await page.locator('#reading-membership-offer').isVisible(),true,'offer restored after revoked membership');
+    await page.evaluate(()=>{localStorage.removeItem('mock-membership-revoked');window.dispatchEvent(new Event('focus'));});
+    await page.waitForFunction(()=>!document.getElementById('reading-membership-offer'));
+  }
   if(!CUSTOMER_TEST&&!LOCKED_TEST&&!PURCHASE_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Administrator access/);
   if(CUSTOMER_TEST||PURCHASE_TEST)assert.equal(await page.getByRole('button',{name:'Read Book',exact:true}).count(),2);
-  const titleSize=await page.locator('.library h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));assert(titleSize<=48,'compact library title');
+  const titleSize=await page.locator('.library h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));assert(titleSize<=28,'compact library title');
   if (LOCKED_TEST) {
     assert.equal(await page.getByRole('button',{name:'Subscribe to read',exact:true}).count(),2);
     await page.locator('.open-book').first().click();
     assert.equal(await page.locator('#reader').isVisible(),false);
-    assert.match(await page.locator('#reading-payment-status').textContent(),/membership or purchase/);
+    assert.match(await page.locator('#library-error').textContent(),/membership or purchase/);
     console.log('PASS signed-in nonmember sees subscription route and cannot open protected books');await browser.close();return;
   }
   await page.locator('#library-search').fill('Test Author');assert.equal(await page.locator('.book-card').count(),1);
   await page.locator('.open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
   assert.equal(await page.locator('#reader-book-title').textContent(),'Fixture Title','selected edition title');
+  await page.frameLocator('#epub-viewer iframe').locator('p').first().waitFor({state:'visible'});
+  const frame=page.frames().find(frame=>frame.parentFrame());
+  const visibleProse=await frame.evaluate(()=>{const p=document.querySelector('p');const style=getComputedStyle(p);return {text:p.textContent.length,color:style.color,font:style.fontFamily,height:p.getBoundingClientRect().height};});
+  assert(visibleProse.text>20&&visibleProse.height>0,'actual prose is laid out');
+  assert.equal(visibleProse.color,'rgb(48, 39, 31)','publisher colours cannot hide prose');
+  assert.match(visibleProse.font,/Georgia/,'reader font overrides incompatible publisher font');
+
   await page.locator('#reader-menu-toggle').click();await page.locator('#open-notebook').click();await page.locator('#add-page-note').click();
   await page.locator('#notebook-list textarea').fill('Synced private note');await page.getByRole('button',{name:'Save note',exact:true}).click();await page.locator('#close-panel').click();
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('mock-cloud')||'{}')[3]?.payload.annotations?.[0]?.note==='Synced private note');

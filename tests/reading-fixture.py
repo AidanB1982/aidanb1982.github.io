@@ -11,4 +11,5 @@ with ZipFile(root / 'test.epub', 'w') as archive:
     archive.writestr('nav.xhtml', '<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops"><head><title>Contents</title></head><body><nav epub:type="toc"><ol><li><a href="one.xhtml">The First Chapter</a></li><li><a href="two.xhtml">The Second Chapter</a></li></ol></nav></body></html>')
     for name, title in [('one', 'The First Chapter'), ('two', 'The Second Chapter')]:
         paragraph = '<p>Beyond the trees, the light settled on the water. This is a test paragraph for the Blackwood reading room, where every page should feel calm and clear.</p>'
-        archive.writestr(name + '.xhtml', '<html xmlns="http://www.w3.org/1999/xhtml"><head><title>' + title + '</title></head><body><h1>' + title + '</h1>' + paragraph * 65 + '</body></html>')
+        hostile = '<style>p,h1{color:#eee0c5!important;background-color:#eee0c5!important;font-family:UnusablePublisherFont!important}</style>' if '--publisher-colours' in sys.argv else ''
+        archive.writestr(name + '.xhtml', '<html xmlns="http://www.w3.org/1999/xhtml"><head>' + hostile + '<title>' + title + '</title></head><body><h1>' + title + '</h1>' + paragraph * 65 + '</body></html>')

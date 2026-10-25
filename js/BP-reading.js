@@ -5,7 +5,7 @@ import {
   createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
-import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261028";
+import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261031";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
 /* =====================================================
@@ -37,6 +37,11 @@ let BOOK = {
 let STORAGE_KEY = "bp-reading-gualachulain-v1";
 let activeUser = null;
 let membershipStatus={known:false,active:false,expiresAt:null};
+let membershipOfferNode=null;
+let lastVerifiedMembershipActive=false;
+let readerSizeObserver=null;
+let readerResizeFrame=0;
+let readerLastSize="";
 let checkoutController = null;
 let readingAccount = null;
 let libraryBooks = [BOOK];
@@ -211,7 +216,7 @@ function renderLibrary() {
     const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = book.started ? `${book.progress}% complete` : 'Not started';
     const track = document.createElement('div'); track.className = 'progress-track'; const fill = document.createElement('div'); fill.className = 'progress-fill'; fill.style.width = book.progress + '%'; track.append(fill);
     const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = switchingEdition || state.isLoading;
-    button.onclick = () => {if (book.canRead) void openEdition(book); else {$('subscribe-reading').focus();$('reading-payment-status').textContent='An active membership or purchase of this title is required to read it.';}};
+    button.onclick = () => {if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
     details.append(eyebrow,heading,meta,description,progress,track,button); card.append(cover,details); grid.append(card);
   }
 }
@@ -246,7 +251,15 @@ function renderReadingMembership() {
   const user=activeUser;
   if(!user)return;
   const summary=$('reading-membership-summary'),text=$('reading-membership-text');
-  $('reading-membership-offer').hidden=user.isAdmin||membershipStatus.active;
+  const offer=membershipOfferNode||$('reading-membership-offer');
+  membershipOfferNode=offer;
+  const hideOffer=user.isAdmin||membershipStatus.active||!membershipStatus.known;
+  $('library').dataset.membership=user.isAdmin?'admin':membershipStatus.active?'active':membershipStatus.known?'inactive':'unknown';
+  if(offer) {
+    offer.hidden=hideOffer;
+    if(hideOffer)offer.remove();
+    else if(!offer.isConnected)summary.after(offer);
+  }
   summary.hidden=false;
   if(user.isAdmin)text.textContent='Administrator access · No subscription is required.';
   else if(!membershipStatus.known)text.textContent='Your membership status could not be verified. Refresh to check it before starting another subscription.';
@@ -255,8 +268,8 @@ function renderReadingMembership() {
     text.textContent='Annual membership active · Reading access through '+until+'.';
   }else if(membershipStatus.expiresAt)text.textContent='No active annual membership. Purchased books remain available in your library.';
   else summary.hidden=true;
-  if(!user.isAdmin&&!membershipStatus.known)$('subscribe-reading').disabled=true;
-  else if(!user.isAdmin&&!membershipStatus.active)$('subscribe-reading').disabled=false;
+  const subscribe=offer?.querySelector('#subscribe-reading');
+  if(subscribe&&!user.isAdmin)subscribe.disabled=!membershipStatus.known;
 }
 async function refreshReadingMembership() {
   const user=activeUser;
@@ -268,6 +281,8 @@ async function refreshReadingMembership() {
     if(activeUser?.id!==user.id)return;
     const expiresAt=typeof data?.access_until==='string'&&Number.isFinite(Date.parse(data.access_until))?data.access_until:null;
     membershipStatus={known:true,active:Boolean(expiresAt&&!data.revoked_at&&Date.parse(expiresAt)>Date.now()),expiresAt};
+    if(lastVerifiedMembershipActive&&!membershipStatus.active)checkoutController?.reset();
+    lastVerifiedMembershipActive=membershipStatus.active;
   }catch {if(activeUser?.id!==user.id)return;membershipStatus={known:false,active:false,expiresAt:null};}
   renderReadingMembership();
 }
@@ -484,12 +499,74 @@ function applyReaderPreferences() {
   state.rendition.themes.override('line-height', appearance.spacing, true);
   state.rendition.themes.override('text-align', appearance.alignment, true);
 
+  for(const contents of state.rendition.getContents()||[])applyDocumentAppearance(contents);
   state.rendition.themes.fontSize(
     `${Math.round(
       state.fontSize / 19 * 100
     )}%`
   );
 }
+
+function applyDocumentAppearance(contents) {
+  const doc=contents?.document;
+  if(!doc?.body)return;
+  const palette={parchment:['#eee0c5','#30271f'],day:['#fffdf7','#242424'],night:['#201c1a','#e9dfd2']}[state.theme];
+  doc.documentElement.style.setProperty('font-size',state.fontSize+'px','important');
+  for(const root of [doc.documentElement,doc.body]) {
+    root.style.setProperty('background-color',palette[0],'important');
+    root.style.setProperty('color',palette[1],'important');
+  }
+  doc.body.style.setProperty('font-size','1rem','important');
+  doc.body.style.setProperty('font-family',fontFamilies[appearance.font],'important');
+  doc.body.style.setProperty('line-height',appearance.spacing,'important');
+  // Publisher-specific colours must not make prose invisible in the chosen theme.
+  // Preserve images, SVG artwork, structure, emphasis and heading-size hierarchy.
+  for(const node of doc.body.querySelectorAll('p,span,li,blockquote,pre,td,th,h1,h2,h3,h4,h5,h6,em,strong,a')) {
+    node.style.setProperty('color',palette[1],'important');
+    node.style.setProperty('background-color','transparent','important');
+    node.style.setProperty('font-family',fontFamilies[appearance.font],'important');
+  }
+}
+function resizeReaderViewport() {
+  if(!state.rendition||!state.isOpen)return;
+  const rect=$('epub-viewer').getBoundingClientRect();
+  const width=Math.floor(rect.width),height=Math.floor(rect.height),key=width+'x'+height;
+  if(width>0&&height>0&&key!==readerLastSize){readerLastSize=key;state.rendition.resize(width,height);}
+}
+function observeReaderViewport() {
+  readerSizeObserver?.disconnect();
+  if(typeof ResizeObserver==='function') {
+    readerSizeObserver=new ResizeObserver(()=>{cancelAnimationFrame(readerResizeFrame);readerResizeFrame=requestAnimationFrame(resizeReaderViewport);});
+    readerSizeObserver.observe($('epub-viewer'));
+  }
+}
+window.addEventListener('resize',resizeReaderViewport);
+$('reader-display-check').onclick=()=>{
+  const report=$('reader-display-report');
+  if(!report.hidden){report.hidden=true;return;}
+  const contents=state.rendition?.getContents()?.[0],doc=contents?.document;
+  const frame=$('epub-viewer').querySelector('iframe'),rect=$('epub-viewer').getBoundingClientRect();
+  const textNode=doc?.querySelector('p,h1,h2,h3,li');
+  const style=textNode?contents.window.getComputedStyle(textNode):null;
+  const body=doc?.body?.cloneNode(true);
+  body?.querySelectorAll('script,style,#bp-personal-copy').forEach(node=>node.remove());
+  report.textContent=[
+    'Reader build: 20261031',
+    'Library headline size: '+getComputedStyle(document.querySelector('.library h1')).fontSize,
+    'Subscription offer in page: '+Boolean($('reading-membership-offer')?.isConnected),
+    'Membership: '+(membershipStatus.known?(membershipStatus.active?'active':'inactive'):'unverified'),
+    'Viewer: '+Math.round(rect.width)+' × '+Math.round(rect.height),
+    'EPUB frames: '+$('epub-viewer').querySelectorAll('iframe').length,
+    'Current section characters: '+(body?.textContent?.trim().length||0),
+    'Paragraphs: '+(doc?.querySelectorAll('p').length||0),
+    'Text colour: '+(style?.color||'no prose node'),
+    'Text size: '+(style?.fontSize||'unknown'),
+    'Text visibility: '+(style?style.display+' / '+style.visibility+' / opacity '+style.opacity:'unknown'),
+    'Frame visible: '+Boolean(frame&&frame.getBoundingClientRect().height>0),
+    'No book text or credentials are included in this report. Tap Display help to close.'
+  ].join('\n');
+  report.hidden=false;
+};
 
 /* =====================================================
    BOOKMARKS
@@ -1344,13 +1421,19 @@ async function openBook() {
       return;
     }
 
+    $("reader-loading").hidden = true;
+    document.querySelector('.reading-column').style.maxWidth=appearance.width+'px';
     $("epub-viewer").hidden = false;
 
+    await new Promise(resolve=>requestAnimationFrame(resolve));
+    const viewport=$('epub-viewer').getBoundingClientRect();
+    if(viewport.width<1||viewport.height<1)throw Error('The reading area has no visible size. Resize the window and reopen the book.');
+    readerLastSize=Math.floor(viewport.width)+'x'+Math.floor(viewport.height);
     const rendition = book.renderTo(
       "epub-viewer",
       {
-        width: "100%",
-        height: "100%",
+        width: Math.floor(viewport.width),
+        height: Math.floor(viewport.height),
         manager: "default",
         flow: "paginated",
         spread: "none"
@@ -1391,6 +1474,7 @@ async function openBook() {
     // Register for each EPUB document as it loads.
     rendition.hooks.content.register(
       contents => {
+        applyDocumentAppearance(contents);
         registerPageGestures(contents);
         renderPageWatermark(contents);
       }
@@ -1422,6 +1506,7 @@ async function openBook() {
     }
 
     $("reader-loading").hidden = true;
+    observeReaderViewport();
 
     state.isLoading = false;
     state.hasStarted = true;
@@ -1471,6 +1556,8 @@ async function openBook() {
    ===================================================== */
 
 function closeBook() {
+  readerSizeObserver?.disconnect();readerSizeObserver=null;cancelAnimationFrame(readerResizeFrame);readerLastSize='';
+  $('reader-display-report').hidden=true;
   closePanel();
   $('selection-tools').hidden = true; selectedPassage = null; lastPageSample = null;
   if (document.fullscreenElement === $('reader')) void document.exitFullscreen().catch(() => {});
@@ -1818,6 +1905,7 @@ supabase.auth.onAuthStateChange(event => {
   if (event === 'SIGNED_OUT') {
     sessionEpoch++; readingAccount?.stop(); checkoutController?.stop(); activeUser = null;
     membershipStatus={known:false,active:false,expiresAt:null};
+    lastVerifiedMembershipActive=false;
     $('reading-membership-summary').hidden=true;$('reading-membership-text').textContent='';
     closeBook(); $('library').hidden = true; $('reader-access').hidden = false;
     $('access-message').textContent = 'Your session has ended. Sign in through The Archivists to continue.';
@@ -2049,6 +2137,8 @@ $('check-reading-setup').onclick=async()=>{
 };
 
 async function initialise() {
+  const heading=document.querySelector('.library h1');
+  if(parseFloat(getComputedStyle(heading).fontSize)>28)heading.style.fontSize='28px';
   const epoch = sessionEpoch;
   renderLibrary();
 
@@ -2056,7 +2146,8 @@ async function initialise() {
     const user = await verifyBPReadingUser();
     if (epoch !== sessionEpoch) return;
     activeUser = user;
-    $("reading-membership-offer").hidden = user.isAdmin;
+    $("reading-membership-offer").hidden = true;
+    membershipOfferNode=$("reading-membership-offer");
     $("check-reading-setup").hidden = !user.isAdmin;
     $("preview-reading-checkout").hidden = !user.isAdmin;
     $("reading-reconcile-form").hidden = !user.isAdmin;

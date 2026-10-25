@@ -81,5 +81,5 @@ export function initializeReadingCheckout(client, {button, status, retry}, platf
     }
   });
   retry.addEventListener('click',()=>{deadline=Date.now()+60000;void check();});
-  return {stop(){stopped=true;stopPolling();button.disabled=true;if(popup && !popup.closed)popup.close();}};
+  return {reset(){stopPolling();busy=false;intentId=null;checkoutUrl=null;deadline=0;button.disabled=false;button.textContent='Subscribe — £10.99 per year';retry.hidden=true;say('');},stop(){stopped=true;stopPolling();button.disabled=true;if(popup && !popup.closed)popup.close();}};
 }
