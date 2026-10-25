@@ -26,7 +26,13 @@ export function createShopifyWebhook(deps:Dependencies) {
     const secret=deps.env('SHOPIFY_WEBHOOK_SECRET'),shop=deps.env('SHOPIFY_STORE_DOMAIN');
     if(!secret||!shop)return json(503,'Webhook is not configured');
     const receivedShop=(request.headers.get('X-Shopify-Shop-Domain')||'').trim().toLowerCase();
-    if(receivedShop!==shop.trim().toLowerCase()) {
+    const expectedShop=shop.trim().toLowerCase();
+    const allowedShops=new Set([expectedShop]);
+    // The owner confirmed these are two names for the SAME Shopify store.
+    // Shopify can identify a renamed shop by its original myshopify hostname.
+    const blackwoodAliases=['blackwoodpublishing.myshopify.com','vmbd0z-c6.myshopify.com'];
+    if(blackwoodAliases.includes(expectedShop))blackwoodAliases.forEach(alias=>allowedShops.add(alias));
+    if(!allowedShops.has(receivedShop)) {
       const safeDomain=(value:string)=>/^[a-z0-9][a-z0-9-]{0,62}\.myshopify\.com$/.test(value)?value:'[invalid domain]';
       deps.log('BP_READING_WEBHOOK_SHOP_MISMATCH expected='+safeDomain(shop.trim().toLowerCase())+' received='+safeDomain(receivedShop));
       return json(401,'Unverified shop');

@@ -176,3 +176,11 @@ hostnames so renamed myshopify aliases can be diagnosed without weakening shop
 or HMAC validation. Successful boot is distinct from payment processing success.
 If an already-paid checkout remains pending, inspect this webhook's delivery
 status and reason; do not ask the reader to pay a second time.
+
+The owner confirmed blackwoodpublishing.myshopify.com and
+vmbd0z-c6.myshopify.com are names of the same store. When configured for either,
+the webhook accepts either exact hostname in X-Shopify-Shop-Domain, including
+Shopify's original hostname after a rename. It accepts no other alias or wildcard.
+HMAC, authoritative Admin API order verification, offer checks and test-account
+restrictions remain mandatory. Keep SHOPIFY_STORE_DOMAIN stable so receipt
+identities stay consistent; this fix does not require changing that secret.
