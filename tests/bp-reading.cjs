@@ -83,6 +83,11 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  await page.locator('#return-position').click();
  await page.waitForFunction(()=>document.getElementById('quiet-chapter').textContent==='The First Chapter');
  await page.locator('#open-appearance').click();
+ for(const [theme,label,colour] of [['day','White','rgb(255, 255, 255)'],['parchment','Off-white','rgb(245, 240, 230)'],['night','Dark','rgb(32, 28, 26)']]){
+  const choice=page.locator('[data-reading-theme='+theme+']');assert((await choice.textContent()).includes(label),'clear page-colour label');await choice.click();
+  await page.waitForFunction(expected=>{const frame=document.querySelector('#epub-viewer iframe');return frame?.contentDocument?.body&&frame.contentWindow.getComputedStyle(frame.contentDocument.body).backgroundColor===expected;},colour);
+  assert(await choice.getAttribute('aria-pressed')==='true','selected page colour');
+ }
  await page.locator('[data-reading-theme=day]').click();
  assert(await page.locator('[data-reading-theme=day]').getAttribute('aria-pressed')==='true','visual theme selection');
  assert(await page.locator('#type-preview').getAttribute('data-theme')==='day','live theme preview');

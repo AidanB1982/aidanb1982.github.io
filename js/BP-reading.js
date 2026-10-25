@@ -493,7 +493,7 @@ function registerThemes(rendition) {
     "parchment",
     {
       body: {
-        background: "#eee0c5 !important",
+        background: "#f5f0e6 !important",
         color: "#30271f !important",
         "font-family":
           "Georgia, 'Times New Roman', serif !important",
@@ -506,7 +506,7 @@ function registerThemes(rendition) {
     "day",
     {
       body: {
-        background: "#fffdf7 !important",
+        background: "#ffffff !important",
         color: "#242424 !important",
         "font-family":
           "Georgia, 'Times New Roman', serif !important",
@@ -558,7 +558,7 @@ function applyReaderPreferences() {
 function applyDocumentAppearance(contents) {
   const doc=contents?.document;
   if(!doc?.body)return;
-  const palette={parchment:['#eee0c5','#30271f'],day:['#fffdf7','#242424'],night:['#201c1a','#e9dfd2']}[state.theme];
+  const palette={parchment:['#f5f0e6','#30271f'],day:['#ffffff','#242424'],night:['#201c1a','#e9dfd2']}[state.theme];
   doc.documentElement.style.setProperty('font-size',state.fontSize+'px','important');
   for(const root of [doc.documentElement,doc.body]) {
     root.style.setProperty('background-color',palette[0],'important');
@@ -1946,7 +1946,7 @@ $("reading-theme").addEventListener(
     applyReaderPreferences();
 
     showStatus(
-      `Theme: ${requested}`
+      `Page colour: ${{day:'White',parchment:'Off-white',night:'Dark'}[requested]}`
     );
   }
 );
