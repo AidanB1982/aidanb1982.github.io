@@ -133,3 +133,12 @@ book from Continue reading. Its repeated forward/backward turns check visible
 prose and stable pagination across chapter boundaries. The library test checks
 membership inclusion, verified ownership and completed-book badges, and excludes
 completed books from the resume feature. These run against mocked Supabase data.
+
+
+Fluid page turns: `node tests/reading-turns.cjs` uses the same real EPUB fixtures
+and mocked authentication/delivery as the reader smoke test. It pauses the visual
+curl to verify that the destination renders concurrently, checks the outgoing
+page's prose and type size, queues rapid turns, and exercises forward/backward
+and cancelled swipes on an offset chapter. Reduced-motion and instant preferences
+must skip the curl. Set READING_MOBILE_TEST=1 to repeat at a 390px viewport. The
+snapshot stays outside the EPUB iframe so it cannot alter pagination geometry.

@@ -48,7 +48,7 @@ let libraryBooks = [BOOK];
 let switchingEdition = false;
 let sessionEpoch = 0;
 
-const PAGE_TURN_DURATION = 180;
+const PAGE_TURN_DURATION = 280;
 const TOUCH_EDGE_FRACTION = 0.22;
 const MOUSE_EDGE_FRACTION = 0.18;
 const DRAG_START_DISTANCE = 9;
@@ -144,12 +144,6 @@ function clamp(value, minimum, maximum) {
     minimum,
     Math.min(maximum, value)
   );
-}
-
-function delay(milliseconds) {
-  return new Promise(resolve => {
-    window.setTimeout(resolve, milliseconds);
-  });
 }
 
 function snapshot() {
@@ -605,7 +599,7 @@ $('reader-display-check').onclick=()=>{
   const body=doc?.body?.cloneNode(true);
   body?.querySelectorAll('script,style,#bp-personal-copy').forEach(node=>node.remove());
   report.textContent=[
-    'Reader build: 20261102',
+    'Reader build: 20261103',
     'Library headline size: '+getComputedStyle(document.querySelector('.library h1')).fontSize,
     'Subscription offer in page: '+Boolean($('reading-membership-offer')?.isConnected),
     'Membership: '+(membershipStatus.known?(membershipStatus.active?'active':'inactive'):'unverified'),
@@ -725,13 +719,9 @@ function updateReaderProgress() {
   $("reader-seek").value = state.progress;
   $("seek-value").value = state.progress + '%';
 
-  const previousDisabled =
-    state.isNavigating ||
-    location.atStart === true;
+  const previousDisabled = location.atStart === true;
 
-  const nextDisabled =
-    state.isNavigating ||
-    location.atEnd === true;
+  const nextDisabled = location.atEnd === true;
 
   $("previous").disabled = previousDisabled;
   $("next").disabled = nextDisabled;
@@ -804,121 +794,74 @@ async function prepareLocations(book, openingId) {
    EPUB navigation occurs only after commitment.
    ===================================================== */
 
+let turnAnimation=null;
+let queuedTurn=0;
+let pageTurnActive=false;
 function getPageTurnElements() {
-  return {
-    overlay: $("page-turn-overlay"),
-    sheet: $("page-turn-sheet")
-  };
+  return {overlay:$('page-turn-overlay'),sheet:$('page-turn-sheet')};
 }
-
 function resetPageTurn() {
-  const { overlay, sheet } =
-    getPageTurnElements();
-
-  overlay.hidden = true;
-
-  overlay.classList.remove(
-    "turn-next",
-    "turn-prev",
-    "turn-dragging"
-  );
-
-  sheet.style.transition = "";
-  sheet.style.transform = "";
-  sheet.style.opacity = "";
-  sheet.style.transformOrigin = "";
-
-  state.gesture = null;
+  turnAnimation?.cancel();turnAnimation=null;
+  const {overlay,sheet}=getPageTurnElements();
+  overlay.hidden=true;overlay.classList.remove('turn-next','turn-prev','turn-dragging');
+  overlay.removeAttribute('style');sheet.removeAttribute('style');
+  sheet.querySelector('.turn-page-snapshot')?.remove();
+  state.gesture=null;
 }
-
+// Copy the outgoing page outside the EPUB iframe. The real renderer can advance
+// immediately beneath it without transforms changing its pagination geometry.
+function captureTurnPage() {
+  const viewer=$('epub-viewer'),frame=viewer.querySelector('iframe');
+  const doc=frame?.contentDocument;
+  if(!doc?.body)return;
+  const host=document.createElement('div');host.className='turn-page-snapshot';
+  host.setAttribute('inert','');host.setAttribute('aria-hidden','true');
+  const shadow=host.attachShadow({mode:'open'});
+  const root=doc.documentElement.cloneNode(true);
+  root.querySelectorAll('head,script,link,style,iframe,object,embed,form').forEach(node=>node.remove());
+  [root,...root.querySelectorAll('*')].forEach(node=>{
+    for(const attr of [...node.attributes])if(/^on/i.test(attr.name))node.removeAttribute(attr.name);
+  });
+  // rem units belong to the EPUB document, not the surrounding website.
+  const rem=parseFloat(frame.contentWindow.getComputedStyle(doc.documentElement).fontSize)||19;
+  const pixels=text=>text.replace(/(-?[\d.]+)rem\b/g,(_,number)=>(Number(number)*rem)+'px');
+  const styles=document.createElement('style');let css='';
+  for(const sheet of doc.styleSheets)try{css += [...sheet.cssRules].map(rule=>rule.cssText).join('\n');}catch{}
+  styles.textContent=pixels(css).replace(/:root\b/g,'html');
+  for(const node of [root,...root.querySelectorAll('[style]')])node.setAttribute('style',pixels(node.getAttribute('style')||''));
+  const clip=viewer.getBoundingClientRect(),bounds=frame.getBoundingClientRect();
+  Object.assign(root.style,{position:'absolute',margin:'0',left:(bounds.left-clip.left)+'px',top:(bounds.top-clip.top)+'px',width:bounds.width+'px',height:bounds.height+'px'});
+  shadow.append(styles,root);
+  $('page-turn-sheet').append(host);
+}
 function prepareTurnSheet(direction) {
-  const { overlay, sheet } =
-    getPageTurnElements();
-
-  overlay.hidden = false;
-
-  overlay.classList.remove(
-    "turn-next",
-    "turn-prev",
-    "turn-dragging"
-  );
-
-  overlay.classList.add("turn-dragging");
-
-  sheet.style.transition = "none";
-
-  sheet.style.transformOrigin =
-    direction > 0
-      ? "left center"
-      : "right center";
-
-  sheet.style.transform = "rotateY(0deg)";
-  sheet.style.opacity = "0.95";
+  const {overlay,sheet}=getPageTurnElements(),viewer=$('epub-viewer');
+  sheet.querySelector('.turn-page-snapshot')?.remove();
+  overlay.style.inset=viewer.offsetTop+'px auto auto '+viewer.offsetLeft+'px';
+  overlay.style.width=viewer.clientWidth+'px';overlay.style.height=viewer.clientHeight+'px';
+  overlay.hidden=false;overlay.classList.remove('turn-next','turn-prev');overlay.classList.add('turn-dragging');
+  overlay.dataset.direction=direction>0?'next':'previous';
+  sheet.style.transformOrigin=direction>0?'left center':'right center';
+  captureTurnPage();setTurnProgress(direction,0);
 }
-
-function setTurnProgress(direction, progress) {
-  const { sheet } = getPageTurnElements();
-
-  const fraction = clamp(progress, 0, 1);
-
-  const angle =
-    (direction > 0 ? -180 : 180) * fraction;
-
-  sheet.style.transform =
-    `rotateY(${angle}deg)`;
-
-  sheet.style.opacity = String(
-    0.95 - fraction * 0.95
-  );
+function setTurnProgress(direction,progress) {
+  const {sheet}=getPageTurnElements(),fraction=clamp(progress,0,1);
+  sheet.style.transform=`rotateY(${(direction>0?-90:90)*fraction}deg)`;
+  sheet.style.opacity='1'; // Paper stays opaque; the destination appears around its edge.
 }
-
-async function settleTurnSheet(
-  direction,
-  startProgress,
-  complete
-) {
-  if (reducedMotion.matches) {
-    return;
-  }
-
-  const { sheet } = getPageTurnElements();
-
-  const destination = complete ? 1 : 0;
-
-  const remaining = Math.abs(
-    destination - startProgress
-  );
-
-  const duration = clamp(
-    Math.round(PAGE_TURN_DURATION * remaining),
-    180,
-    PAGE_TURN_DURATION
-  );
-
-  sheet.style.transition =
-    `transform ${duration}ms cubic-bezier(.22,.7,.2,1), ` +
-    `opacity ${duration}ms ease`;
-
-  // Allow the browser to register the starting transform.
-  void sheet.offsetWidth;
-
-  setTurnProgress(direction, destination);
-
-  await delay(duration + 30);
-}
-
-async function playPageTurn(direction) {
-  if (reducedMotion.matches) {
-    return;
-  }
-
-  prepareTurnSheet(direction);
-
-  await settleTurnSheet(
-    direction,
-    0,
-    true
-  );
+async function settleTurnSheet(direction,startProgress,complete) {
+  if(reducedMotion.matches||appearance.motion==='instant')return;
+  const {sheet}=getPageTurnElements(),destination=complete?1:0;
+  const duration=clamp(Math.round(PAGE_TURN_DURATION*Math.abs(destination-startProgress)),70,PAGE_TURN_DURATION);
+  const from={transform:sheet.style.transform,opacity:sheet.style.opacity,offset:0};
+  setTurnProgress(direction,startProgress+(destination-startProgress)*.65);
+  const middle={transform:sheet.style.transform,opacity:sheet.style.opacity,offset:.65};
+  setTurnProgress(direction,destination);
+  const to={transform:sheet.style.transform,opacity:sheet.style.opacity,offset:1};
+  const animation=sheet.animate([from,middle,to],{duration,easing:'cubic-bezier(.2,.65,.3,1)',fill:'both'});
+  turnAnimation=animation;
+  try{await animation.finished;}catch{} // Closing a book cancels the visual immediately.
+  finally{if(turnAnimation===animation){animation.cancel();turnAnimation=null;}}
 }
 
 /* =====================================================
@@ -953,73 +896,33 @@ function canTurn(direction) {
   return true;
 }
 
-async function changePage(
-  direction,
-  options = {}
-) {
-  if (!canTurn(direction)) {
-    resetPageTurn();
+async function changePage(direction,options={}) {
+  if(state.isNavigating) {
+    // Retain one follow-up turn instead of dropping rapid taps or restarting a curl.
+    if(pageTurnActive)queuedTurn=direction;
     return;
   }
-
-  const openingId = state.openingId;
-  const turnSequence = ++state.turnSequence;
-
-  state.isNavigating = true;
-  updateReaderProgress();
-
-  const isCurrentTurn = () =>
-    state.isOpen &&
-    openingId === state.openingId &&
-    turnSequence === state.turnSequence;
-
+  if(!canTurn(direction))return;
+  const openingId=state.openingId,turnSequence=++state.turnSequence;
+  const isCurrent=()=>state.isOpen&&openingId===state.openingId&&turnSequence===state.turnSequence;
+  pageTurnActive=true;state.isNavigating=true;updateReaderProgress();
   try {
-    if (appearance.motion === "instant" || reducedMotion.matches) {
-      resetPageTurn();
-    } else if (options.fromGesture) {
-      const progress = clamp(
-        options.progress || 0,
-        0,
-        1
-      );
-
-      await settleTurnSheet(
-        direction,
-        progress,
-        true
-      );
-    } else {
-      await playPageTurn(direction);
+    let motion=Promise.resolve();
+    if(appearance.motion==='instant'||reducedMotion.matches)resetPageTurn();
+    else {
+      if(!options.fromGesture)prepareTurnSheet(direction);
+      motion=settleTurnSheet(direction,options.fromGesture?clamp(options.progress||0,0,1):0,true);
     }
-
-    if (!isCurrentTurn()) {
-      return;
-    }
-
-    // The actual EPUB page advances only after
-    // the visual turning sheet has completed.
-    if (direction > 0) {
-      await state.rendition.next();
-    } else {
-      await state.rendition.prev();
-    }
-  } catch (error) {
-    if (isCurrentTurn()) {
-      console.error(
-        "Page navigation failed:",
-        error
-      );
-
-      showStatus(
-        "Unable to turn the page."
-      );
-    }
+    // Render the destination during the curl, rather than after an artificial wait.
+    await Promise.all([direction>0?state.rendition.next():state.rendition.prev(),motion]);
+  } catch(error) {
+    queuedTurn=0;
+    if(isCurrent()){console.error('Page navigation failed:',error);showStatus('Unable to turn the page.');}
   } finally {
-    if (isCurrentTurn()) {
-      resetPageTurn();
-
-      state.isNavigating = false;
-      updateReaderProgress();
+    if(isCurrent()) {
+      resetPageTurn();pageTurnActive=false;state.isNavigating=false;updateReaderProgress();
+      const next=queuedTurn;queuedTurn=0;
+      if(next)void changePage(next);
     }
   }
 }
@@ -1036,13 +939,6 @@ async function changePage(
    Central text selection and ordinary links
    are left alone.
    ===================================================== */
-
-function getReadingWidth() {
-  return Math.max(
-    1,
-    $("epub-viewer").getBoundingClientRect().width
-  );
-}
 
 function getPageDirection(
   x,
@@ -1102,18 +998,11 @@ function registerPageGestures(contents) {
 
  
   const getCoordinates = event => {
-    const width = Math.max(
-      1,
-      doc.documentElement.clientWidth ||
-      doc.body?.clientWidth ||
-      getReadingWidth()
-    );
-  
-    return {
-      x: event.clientX,
-      y: event.clientY,
-      width
-    };
+    // An EPUB iframe spans the whole chapter. Gestures belong to the visible
+    // page, with the iframe's current horizontal offset accounted for.
+    const clip=$('epub-viewer').getBoundingClientRect();
+    const frame=doc.defaultView.frameElement.getBoundingClientRect();
+    return {x:event.clientX+frame.left-clip.left,y:event.clientY,width:Math.max(1,clip.width)};
   };
 
 
@@ -1207,9 +1096,7 @@ function registerPageGestures(contents) {
 
       gesture.active = true;
 
-      prepareTurnSheet(
-        gesture.direction
-      );
+      if(appearance.motion!=='instant'&&!reducedMotion.matches)prepareTurnSheet(gesture.direction);
     }
 
     if (event.cancelable) {
@@ -1246,10 +1133,7 @@ function registerPageGestures(contents) {
       1
     );
 
-    setTurnProgress(
-      gesture.direction,
-      gesture.progress
-    );
+    if(appearance.motion!=='instant'&&!reducedMotion.matches)setTurnProgress(gesture.direction,gesture.progress);
   };
 
   const finish = async (
@@ -1336,7 +1220,6 @@ function registerPageGestures(contents) {
 
     if (
       !state.isOpen ||
-      state.isNavigating ||
       isInteractiveTarget(event.target)
     ) {
       return;
@@ -1353,7 +1236,7 @@ function registerPageGestures(contents) {
     );
 
     if (!direction) { setControlsVisible($("reader-controls").hidden); return; }
-    if (!canTurn(direction)) return;
+    if (!canTurn(direction)&&!pageTurnActive) return;
 
     event.preventDefault();
 
@@ -1630,6 +1513,7 @@ function closeBook() {
   ++state.turnSequence;
 
   clearTimeout(chromeTimer);
+  queuedTurn=0;pageTurnActive=false;
   state.isOpen = false;
   state.isLoading = false;
   state.isNavigating = false;
