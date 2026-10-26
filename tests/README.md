@@ -186,3 +186,14 @@ safety, cancellation, admin/service permissions, published receipts and lost-wor
 quarantine. The browser test covers the hidden AI form, Meta check and manual versus
 automatic authoring. Live credentials and one controlled test per platform are still
 needed to verify the external account integration.
+
+## Author Desk overview
+
+`node tests/author-desk-insights.cjs` verifies read-only priorities, signed/superseded
+records, author/book scope, UK deadline boundaries and empty data. Run
+`node tests/author-desk-browser.cjs` against the existing local server with Playwright
+and the standard BASE_URL / CHROMIUM_PATH / READING_TEST_DIR environment. It exercises
+the actual Author Desk with mocked records: overview, book/stage search, production
+and document filters, navigation/focus, existing finance view, mobile sizes, sign-out
+and denied access. No migration, payment request or live author record is involved.
+See `docs/author-desk-overview.md` and `docs/website-roadmap.md`.

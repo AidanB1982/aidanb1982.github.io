@@ -1,0 +1,128 @@
+# Blackwood website to-do list
+
+Updated **26 October 2026** (UK). This separates published website work from features
+that still need live configuration, database changes or app-store setup.
+
+## Completed: Author Desk improvements, 26 October
+
+- [x] Put open author actions and overdue deadlines on the overview.
+- [x] Show author-visible documents marked as requiring a signature; omit signed and
+  visibly superseded documents from the pending list.
+- [x] Show upcoming recorded edition publication dates and recent production updates.
+- [x] Show each book's next recorded author action, without inventing a next stage or
+  completion percentage.
+- [x] Add direct navigation to the relevant production action or document record.
+- [x] Add book search by title, subtitle and internal reference, plus stage filtering.
+- [x] Filter Production by book and all/open/overdue/completed author actions.
+- [x] Filter Documents & Rights by book or general publishing records.
+- [x] Add mobile section navigation, accessible active-section/focus handling, and
+  section links that can be bookmarked.
+- [x] Improve responsive card layouts, empty states, deadline badges and print layout.
+- [x] Reuse one author/book lookup instead of repeating it during page opening.
+- [x] Check the read-only projections, UK date boundaries, author-scoped fixtures,
+  navigation and mobile layout. Financial processing functions were not changed.
+
+**No Supabase migration, new secret or Edge Function deployment is required for this
+batch.** Existing records, queries and permissions remain the data source. Seeing a
+document record is not an online signing or file-delivery workflow.
+
+## Existing foundations already in place
+
+- [x] Author Desk book/production records, documents/rights, statements, payments and
+  payment-request interfaces. Extend this system rather than create another desk.
+- [x] Protected BP Reading with saved reading settings, progress and bookmarks.
+- [x] White, Off-white and Dark reading backgrounds; browser “dark pages” can override
+  their appearance when that device setting is enabled.
+- [x] ARC assignment and Outlook-notice tooling in Behind the Files. Existing ARC
+  delivery still produces personalised downloadable copies; the in-reader replacement
+  below has not been built.
+- [x] Publishing department card layout tidied for desktop and mobile.
+- [x] AI assistant hidden at the owner's request; manual content authoring retained.
+- [x] Facebook/Instagram worker, explicit automatic scheduling and connection-check
+  code prepared. Live connection remains a separate, unfinished setup task.
+
+## Next: owner configuration and backend work
+
+### 1. Finish Meta connection and verify the scheduler
+
+- [ ] Confirm the social scheduler SQL has been applied to the live Supabase project.
+- [ ] Deploy the updated `bp-publishing-desk` and new `bp-social-publish` functions.
+- [ ] Use the existing Meta app to obtain the Blackwood Page ID and appropriate Page
+  access token, with access to its linked Instagram professional account.
+- [ ] Save server secrets, configure the Vault/cron request, and verify the read-only
+  connection while automatic publication remains paused.
+- [ ] Run one deliberately scheduled Facebook test and one Instagram image test.
+- [ ] Confirm delivery receipts and background execution, then enable regular posting.
+
+Instructions: [Meta scheduler setup](meta-social-scheduler.md). Never put tokens in
+chat or frontend files. Existing manual plans do not become automatic by deployment.
+TikTok, videos/Reels, carousels and monthly email delivery remain manual plans.
+
+### 2. Connect production planning to the existing Author Desk
+
+- [ ] Move/share the browser-only Gantt plans through properly scoped Supabase storage.
+- [ ] Map projects to actual author and book records, with author-visible milestones.
+- [ ] Keep current production records/history authoritative; define how planner updates
+  should change them before adding write operations.
+- [ ] Add confirmed next-stage dates once that shared workflow exists.
+
+The current Author Desk improvements show existing production records; they do not
+silently import the separate browser-local planner or imply that it is shared.
+
+### 3. Author approvals and documents
+
+- [ ] Add secure document viewing/delivery for the existing document registry.
+- [ ] Define and implement author proof/cover approvals and completion of author actions.
+- [ ] Add online agreement signing only after choosing its signing/audit workflow.
+- [ ] Confirm server-side permissions, immutable history and notifications for writes.
+- [ ] Add a book launch view after author-visible marketing/ARC reporting is defined.
+  The current marketing calendar is admin-only and should not be exposed wholesale.
+
+### 4. Protected ARC reading and notifications
+
+- [ ] Replace ARC EPUB download delivery with protected reading inside BP Reading/app.
+- [ ] Preserve existing issuance history; create/reuse the personalised reference on
+  first opening and keep personalised watermarks.
+- [ ] Track meaningful reading activity separately from file-download counters.
+- [ ] Add an in-account notifications inbox and book-specific links.
+- [ ] Add permission-based app push notifications to assigned readers when an ARC is ready.
+- [ ] Retain a visible in-account notice for readers who decline push notifications.
+
+This is a planned replacement, not a description of the current downloadable ARC flow.
+
+### 5. Android and iPhone app
+
+- [ ] Enrol in Google Play Console and Apple Developer Program; choose the correct
+  individual/organisation identity and complete required verification.
+- [ ] Confirm branding, privacy/support details and the first-release specification.
+- [ ] Build a shared reader app: existing-account sign-in, members area, Blackwood
+  bookshelf, protected reading, bookmarks and synced progress.
+- [ ] Keep purchases on the website; check current reader-app rules for each store and
+  region before including purchase links or prompts. No in-app checkout is planned.
+- [ ] Add on-device imports for personal EPUB/PDF files, separate from protected
+  Blackwood/ARC titles. Start with local personal files rather than automatic uploads.
+- [ ] Add push registration and release/ARC notices after the notification backend exists.
+- [ ] Test real Android/iPhone devices, accessibility and store submission requirements.
+
+### 6. Reading launch and payments
+
+- [ ] Confirm outstanding KDP exclusivity/withdrawal obligations before enabling public
+  Blackwood reading access or restoring the public navigation link.
+- [ ] Verify live initial payments, renewals, refunds, expiry and permanent book access.
+- [ ] Confirm test-mode settings and launch flags are appropriate before public launch.
+- [ ] Finish the £1.99 permanent in-reader purchase journey and its live payment tests
+  where outstanding. Administrator access remains based on existing Supabase grants.
+
+## Further improvements to review
+
+- [ ] Review existing book pages and public author pages before redesigning or duplicating
+  them; strengthen samples, series order, genuine reviews and clear reading/buying routes.
+- [ ] Attach verified cover artwork to Author Desk books using an agreed catalogue source.
+- [ ] Add a personalised members dashboard with relevant updates and continue-reading.
+- [ ] Add editorial genre/mood/series discovery, using approved book metadata rather than AI.
+- [ ] Connect TikTok posting through its own approved integration.
+- [ ] Connect monthly newsletters to the subscribed mailing audience and unsubscribe
+  handling; ARC assignment is not newsletter consent.
+- [ ] Review submissions, rights enquiries and trade information for completeness.
+- [ ] Continue mobile accessibility, performance and end-to-end permission checks.
+- [ ] Revisit AI drafting only if the owner chooses a provider and billing/data approach.

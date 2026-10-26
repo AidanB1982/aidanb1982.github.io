@@ -49,3 +49,9 @@ Some stories are meant to be read.
 Others are meant to be experienced.
 
 This site was built with that in mind.
+
+## Website development
+
+- [Website to-do list](docs/website-roadmap.md)
+- [Author Desk overview](docs/author-desk-overview.md)
+- [Meta scheduler setup](docs/meta-social-scheduler.md)

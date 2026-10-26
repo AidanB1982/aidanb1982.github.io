@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),{readFileSync}=require('node:fs');
+const context={};vm.createContext(context);vm.runInContext(readFileSync('js/author-desk-insights.js','utf8'),context);const h=context.BlackwoodAuthorInsights;
+const now=new Date('2026-10-26T10:00:00Z'),books=[{id:1},{id:2}];
+assert.equal(h.deadline('2026-10-25',now).label,'1 day overdue');assert.equal(h.deadline('2026-10-26',now).kind,'today');assert.equal(h.deadline('2026-10-27',now).label,'Due tomorrow');assert.equal(h.deadline(null,now).kind,'undated');assert.equal(h.dayKey('invalid'),null);
+assert.equal(h.dayKey('2026-06-01T23:30:00Z'),'2026-06-02','business dates use London time');assert.equal(h.deadline('2026-03-30',new Date('2026-03-28T12:00:00Z')).days,2,'day arithmetic survives British Summer Time');
+assert.equal(h.isOpen({status:'COMPLETED'}),false);assert.equal(h.isOpen({status:'cancelled'}),false);assert.equal(h.isOpen({status:'open',completed_at:'2026-10-01'}),false);
+const actions=[{id:2,book_id:1,title:'Proofs',due_at:'2026-11-01',status:'open'},{id:1,book_id:1,title:'Cover',due_at:'2026-10-20',status:'open'},{id:3,book_id:2,title:'Done',status:'completed'},{id:4,book_id:3,title:'Other author',status:'open'}];
+const production={actions,editions:[{id:1,book_id:1,publication_date:'2026-11-01'},{id:2,book_id:2,publication_date:'2026-10-01'},{id:3,book_id:1,publication_date:'2026-11-01',status:'cancelled'}],events:[{book_id:1,event_date:'2026-10-20'},{book_id:1,event_date:'2026-11-10'},{book_id:99,event_date:'2026-10-21'}]};
+const legal={documents:[{id:1,book_id:1,requires_signature:true},{id:2,book_id:1,supersedes_document_id:1,requires_signature:true,signed_at:'2026-10-01'},{id:3,book_id:null,requires_signature:true},{id:4,book_id:3,requires_signature:true}]};
+const model=h.build(books,production,legal,now);assert.equal(model.actions.length,2);assert.equal(model.actions[0].id,1);assert.equal(actions[0].id,2,'input records never sorted in place');assert.equal(model.overdue,1);assert.equal(model.signatures.length,1);assert.equal(model.signatures[0].id,3,'signed replacements remove historical signature prompts');assert.equal(model.upcoming.length,1);assert.equal(model.recent.length,1,'future and unrelated events are not recent activity');
+const empty=h.build([],{},{});assert.equal(empty.actions.length+empty.signatures.length+empty.upcoming.length+empty.recent.length,0);
+console.log('PASS read-only Author Desk priorities, record scope, completed/superseded records, upcoming dates and UK deadline boundaries');

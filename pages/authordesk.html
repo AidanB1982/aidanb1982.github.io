@@ -7,7 +7,7 @@
     <title>Author Desk | Blackwood Publishing</title>
     <meta name="robots" content="noindex, nofollow">
 
-    <link rel="stylesheet" href="/css/authordesk.css?v=20261012">
+    <link rel="stylesheet" href="/css/authordesk.css?v=20261114">
     <link rel="stylesheet" href="/css/site-polish.css?v=20261102">
 </head>
 <body>
@@ -64,6 +64,7 @@
         </aside>
 
         <div class="desk-main">
+            <label class="author-mobile-nav">Your workspace<select id="author-section-select"><option value="overview">Overview</option><option value="books">Books</option><option value="production">Production</option><option value="documents">Documents &amp; Rights</option><option value="finance">Statements &amp; Payments</option></select></label>
             <section id="section-overview" class="desk-section active">
                 <div class="section-heading">
                     <p class="section-kicker">Overview</p>
@@ -71,7 +72,7 @@
                     <p>This is the working record of your publishing relationship with Blackwood Publishing.</p>
                 </div>
 
-                <div class="summary-grid">
+                <div class="summary-grid author-overview-stats">
                     <article class="summary-card">
                         <p class="summary-label">Books</p>
                         <p id="book-count" class="summary-value">—</p>
@@ -83,12 +84,20 @@
                         <p class="summary-note">Current Author Record relationship status.</p>
                     </article>
                     <article class="summary-card">
-                        <p class="summary-label">Desk Access</p>
-                        <p class="summary-value">Active</p>
-                        <p class="summary-note">Your authenticated Author Desk access is enabled.</p>
+                        <p class="summary-label">Open actions</p>
+                        <p id="open-action-count" class="summary-value">—</p>
+                        <p id="open-action-note" class="summary-note">Actions recorded for your books.</p>
                     </article>
                 </div>
 
+                <section class="content-panel author-attention" aria-labelledby="author-attention-heading">
+                    <div class="author-panel-heading"><div><p class="section-kicker">Your next steps</p><h3 id="author-attention-heading">Needs your attention</h3></div><p id="author-attention-summary" class="panel-intro"></p></div>
+                    <div id="author-attention-list" class="author-priorities"></div>
+                </section>
+                <div class="author-overview-grid">
+                    <section class="content-panel" aria-labelledby="author-upcoming-heading"><h3 id="author-upcoming-heading">Publication dates</h3><p class="panel-intro">Upcoming dates recorded against your editions.</p><div id="author-upcoming-list"></div></section>
+                    <section class="content-panel" aria-labelledby="author-recent-heading"><h3 id="author-recent-heading">Latest production updates</h3><p class="panel-intro">The latest author-visible entries in your books’ history.</p><div id="author-recent-list"></div></section>
+                </div>
                 <section class="content-panel">
                     <h3>Your Royalties</h3>
                     <p class="panel-intro">A summary of your issued royalty statements, payments and outstanding requests.</p>
@@ -101,7 +110,7 @@
                 </section>
 
                 <section class="content-panel">
-                    <h3>Your books</h3>
+                    <div class="author-panel-heading"><h3>Your books at a glance</h3><button type="button" id="author-view-all-books" class="author-text-button">View all books →</button></div>
                     <p class="panel-intro">Current Book Records associated with your Author Desk account.</p>
                     <div id="overview-book-list" class="book-list"></div>
                 </section>
@@ -115,6 +124,7 @@
                 </div>
                 <section class="content-panel">
                     <h3>Your Book Records</h3>
+                    <div class="author-tools"><label>Find a book<input id="author-book-search" type="search" placeholder="Title or book reference" autocomplete="off"></label><label>Production stage<select id="author-book-stage"><option value="all">All stages</option></select></label><button type="button" id="author-book-clear" class="author-text-button">Clear filters</button></div><p id="author-book-results" class="panel-intro" role="status" aria-live="polite"></p>
                     <div id="books-book-list" class="book-list"></div>
                 </section>
             </section>
@@ -125,6 +135,7 @@
                     <h2>Production</h2>
                     <p>Current production position, editions, publishing milestones and actions associated with your books.</p>
                 </div>
+                <div class="author-tools"><label>Book<select id="author-production-book"><option value="all">All books</option></select></label><label>Author actions<select id="author-action-filter"><option value="all">All actions</option><option value="open">Open actions</option><option value="overdue">Overdue actions</option><option value="completed">Completed or closed actions</option></select></label></div>
                 <div id="production-content"></div>
             </section>
 
@@ -134,6 +145,7 @@
                     <h2>Documents &amp; Rights</h2>
                     <p>Author-visible publishing documents, agreements, rights records and rights history.</p>
                 </div>
+                <div class="author-tools"><label>Book or publishing record<select id="author-documents-book"><option value="all">All records</option><option value="general">General publishing records</option></select></label></div>
                 <div id="documents-rights-content"></div>
             </section>
         
@@ -273,6 +285,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/js/authordesk.js"></script>
+<script src="/js/author-desk-insights.js?v=20261114"></script>
+<script src="/js/authordesk.js?v=20261114"></script>
 </body>
 </html>

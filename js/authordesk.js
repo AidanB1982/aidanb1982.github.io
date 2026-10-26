@@ -80,6 +80,119 @@
 
     initialiseDesk();
 
+    // Read-only workspace enhancements, using the records already loaded above.
+    const insights = window.BlackwoodAuthorInsights;
+    let workspaceProduction = {actions:[], editions:[], events:[]};
+    let workspaceLegal = {documents:[], agreements:[], rights:[], rightsEvents:[]};
+    let workspaceModel = {actions:[], signatures:[], upcoming:[], recent:[]};
+
+    function workspaceDate(value) {return formatDate(insights.dayKey(value)||value);}
+    function deskButton(label, action) {
+        const button = make('button', 'author-text-button', label);
+        button.type = 'button';
+        button.addEventListener('click', action);
+        return button;
+    }
+    function focusRecord(id) {
+        const target = $(id);
+        if (!target) return;
+        target.tabIndex = -1;
+        target.focus({preventScroll:true});
+        target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+    }
+    function openBookProduction(bookId) {
+        $('author-production-book').value = String(bookId);
+        $('author-action-filter').value = 'all';
+        renderFilteredProduction();
+        showSection('production');
+        focusRecord('author-production-'+bookId);
+    }
+    function openBookDocuments(bookId, documentId) {
+        $('author-documents-book').value=bookId==null?'general':String(bookId);
+        renderFilteredDocuments();showSection('documents');
+        if(documentId!=null)focusRecord('author-document-'+documentId);
+    }
+    function renderFilteredDocuments() {
+        const choice=$('author-documents-book').value;
+        if(choice==='all'){renderDocumentsAndRights(currentBooks,workspaceLegal);return;}
+        const matches=row=>choice==='general'?row.book_id==null:String(row.book_id)===choice;
+        renderDocumentsAndRights(currentBooks.filter(book=>String(book.id)===choice),{
+            ...workspaceLegal,documents:workspaceLegal.documents.filter(matches),agreements:workspaceLegal.agreements.filter(matches),rights:workspaceLegal.rights.filter(matches)
+        });
+    }
+    function renderFilteredBooks() {
+        const query = $('author-book-search').value.trim().toLocaleLowerCase();
+        const stage = $('author-book-stage').value;
+        const books = currentBooks.filter(book => (stage==='all'||(book.production_stage||'unrecorded')===stage) &&
+            [book.title,book.subtitle,book.internal_reference].some(value=>String(value||'').toLocaleLowerCase().includes(query)));
+        renderBookList(elements.booksBookList, books);
+        $('author-book-results').textContent = `${books.length} of ${currentBooks.length} book${currentBooks.length===1?'':'s'} shown.`;
+        if(!books.length&&currentBooks.length) elements.booksBookList.replaceChildren(createEmptyState('No books match these filters. Try another title or clear the filters.'));
+    }
+    function renderFilteredProduction() {
+        const id = $('author-production-book').value;
+        renderProduction(currentBooks.filter(book=>id==='all'||String(book.id)===id), workspaceProduction);
+    }
+    function initialiseWorkspace(books, production, legal) {
+        workspaceProduction = production;
+        workspaceLegal = legal;
+        workspaceModel = insights.build(books, production, legal);
+        setText($('open-action-count'), workspaceModel.actions.length);
+        setText($('open-action-note'), workspaceModel.overdue ? `${workspaceModel.overdue} overdue. Check the next steps below.` : 'Your outstanding production actions.');
+        const stageSelect = $('author-book-stage');
+        stageSelect.replaceChildren(new Option('All stages','all'));
+        [...new Set(books.map(book=>book.production_stage||'unrecorded'))].sort().forEach(stage=>stageSelect.add(new Option(stage==='unrecorded'?'Not recorded':formatLabel(stage),stage)));
+        $('author-documents-book').replaceChildren(new Option('All records','all'),new Option('General publishing records','general'));
+        books.forEach(book=>$('author-documents-book').add(new Option(book.title||'Untitled Book Record',String(book.id))));
+        $('author-documents-book').onchange=renderFilteredDocuments;
+        $('author-production-book').replaceChildren(new Option('All books','all'));
+        books.forEach(book=>$('author-production-book').add(new Option(book.title||'Untitled Book Record',String(book.id))));
+        $('author-book-search').oninput=renderFilteredBooks;
+        $('author-book-stage').onchange=renderFilteredBooks;
+        $('author-book-clear').onclick=()=>{$('author-book-search').value='';stageSelect.value='all';renderFilteredBooks();$('author-book-search').focus();};
+        $('author-production-book').onchange=renderFilteredProduction;
+        $('author-action-filter').onchange=renderFilteredProduction;
+        $('author-view-all-books').onclick=()=>showSection('books');
+        $('author-section-select').onchange=event=>showSection(event.target.value);
+        if(!elements.publishingDeskNav.hidden&&!Array.from($('author-section-select').options).some(option=>option.value==='publishing'))$('author-section-select').add(new Option('Publishing Desk','publishing'));
+        const priorities = $('author-attention-list');priorities.replaceChildren();
+        const total = workspaceModel.actions.length+workspaceModel.signatures.length;
+        $('author-attention-summary').textContent = `${workspaceModel.actions.length} open action${workspaceModel.actions.length===1?'':'s'} · ${workspaceModel.signatures.length} document${workspaceModel.signatures.length===1?'':'s'} awaiting signature`;
+        const entries = [
+            ...workspaceModel.actions.map(action=>({record:action,kind:'action'})),
+            ...workspaceModel.signatures.map(record=>({record,kind:'document'}))
+        ];
+        entries.slice(0,6).forEach(({record,kind})=>{
+            const book=books.find(book=>book.id===record.book_id);
+            const card=make('article','author-priority');
+            const details=make('div');
+            details.append(make('p','author-priority-context',book?.title||'Your publishing documents'),make('h4','',record.title||formatLabel(record.action_type||record.document_type)));
+            if(kind==='action'){
+                const due=insights.deadline(record.due_at);
+                const badge=make('span','author-deadline '+due.kind,due.label);details.append(badge);
+                if(record.due_at)details.append(make('p','author-record-date',workspaceDate(record.due_at)));
+                card.append(details,deskButton('View action →',()=>{openBookProduction(record.book_id);focusRecord('author-action-'+record.id);}));
+            }else{
+                details.append(make('span','author-deadline','Signature required'));
+                card.append(details,deskButton('View document record →',()=>openBookDocuments(record.book_id,record.id)));
+            }
+            priorities.append(card);
+        });
+        if(!total)priorities.append(createEmptyState('No outstanding actions or unsigned current documents are recorded. Your books’ latest updates appear below.'));
+        if(total>6)priorities.append(make('p','panel-intro',`${total-6} more item(s) are available in Production and Documents & Rights.`));
+        function renderBriefList(id,records,build,empty){const list=$(id);list.replaceChildren();records.slice(0,4).forEach(record=>list.append(build(record)));if(!records.length)list.append(createEmptyState(empty));}
+        renderBriefList('author-upcoming-list',workspaceModel.upcoming,edition=>{
+            const book=books.find(b=>b.id===edition.book_id),card=make('article','author-brief');
+            card.append(make('p','author-record-date',workspaceDate(edition.publication_date)),make('h4','',book?.title||'Book edition'),make('p','',edition.edition_name||formatLabel(edition.format)),deskButton('View edition →',()=>openBookProduction(edition.book_id)));
+            return card;
+        },'No upcoming publication dates are recorded yet.');
+        renderBriefList('author-recent-list',workspaceModel.recent,event=>{
+            const book=books.find(b=>b.id===event.book_id),card=make('article','author-brief');
+            card.append(make('p','author-record-date',workspaceDate(event.event_date||event.created_at)),make('h4','',book?.title||'Book update'),make('p','',event.to_stage?'Moved to '+formatLabel(event.to_stage):formatLabel(event.event_type)),deskButton('View history →',()=>openBookProduction(event.book_id)));
+            return card;
+        },'New author-visible production updates will appear here.');
+    }
+
     // ---------------------------------------------------------
     // INITIALISATION
     // ---------------------------------------------------------
@@ -113,6 +226,8 @@
 
             currentAuthor = author;
 
+            const authorBookIds = await getAuthorBookIds(author.id);
+
             const [
                 books,
                 productionData,
@@ -121,8 +236,8 @@
                 royaltyResult,
                 staffResponse
             ] = await Promise.all([
-                loadBooks(author.id),
-                loadProductionData(author.id),
+                loadBooks(author.id, authorBookIds),
+                loadProductionData(author.id, authorBookIds),
                 loadLegalData(author.id),
                 loadFinanceData(author.id),
                 loadMonthlyRoyalties(),
@@ -207,8 +322,8 @@
         )];
     }
 
-    async function loadBooks(authorId) {
-        const ids = await getAuthorBookIds(authorId);
+    async function loadBooks(authorId, ids) {
+        ids = ids || await getAuthorBookIds(authorId);
 
         if (!ids.length) return [];
 
@@ -225,8 +340,8 @@
         return data || [];
     }
 
-    async function loadProductionData(authorId) {
-        const ids = await getAuthorBookIds(authorId);
+    async function loadProductionData(authorId, ids) {
+        ids = ids || await getAuthorBookIds(authorId);
 
         if (!ids.length) {
             return {
@@ -557,12 +672,15 @@
             formatLabel(author.relationship_status)
         );
 
-        renderBookList(elements.overviewBookList, books);
-        renderBookList(elements.booksBookList, books);
+        initialiseWorkspace(books, productionData, legalData);
+        renderBookList(elements.overviewBookList, books.slice(0,3));
+        renderFilteredBooks();
         renderProduction(books, productionData);
         renderDocumentsAndRights(books, legalData);
         renderFinance(financeData);
         renderOverviewRoyalties(financeData);
+        const requested = location.hash.slice(1);
+        showSection(requested || "overview", false);
     }
 
     function renderBookList(container, books) {
@@ -617,7 +735,12 @@
                 meta.appendChild(createMetaItem(label, value));
             });
 
-            card.append(top, meta);
+            const nextAction = workspaceModel.actions.find(action=>action.book_id===book.id);
+            const next = make('div','author-book-next');
+            next.append(make('p','summary-label','Next recorded action'),make('p','',nextAction?(nextAction.title||formatLabel(nextAction.action_type)):'No open author action recorded.'));
+            if(nextAction){const due=insights.deadline(nextAction.due_at);next.append(make('span','author-deadline '+due.kind,due.label));}
+            const controls=make('div','author-book-controls');controls.append(deskButton('View production →',()=>openBookProduction(book.id)),deskButton('Documents & rights →',()=>openBookDocuments(book.id)));
+            card.append(top, meta, next, controls);
             container.appendChild(card);
         });
     }
@@ -653,6 +776,7 @@
             );
 
             const wrapper = make("div", "production-book");
+            wrapper.id = "author-production-"+book.id;
             const heading = make(
                 "div",
                 "production-book-heading"
@@ -711,8 +835,13 @@
 
         const list = make("div", "action-list");
 
-        actions.forEach((action) => {
+        const filter=$('author-action-filter').value;
+        const visible=actions.filter(action=>filter==='all'||(filter==='open'&&insights.isOpen(action))||(filter==='completed'&&!insights.isOpen(action))||(filter==='overdue'&&insights.isOpen(action)&&insights.deadline(action.due_at).kind==='overdue'));
+        visible.sort((a,b)=>Number(!insights.isOpen(a))-Number(!insights.isOpen(b))||(insights.dayKey(a.due_at)||'9999').localeCompare(insights.dayKey(b.due_at)||'9999'));
+        if(!visible.length)list.append(createEmptyState('No actions match this filter for this book.'));
+        visible.forEach((action) => {
             const card = make("article", "action-card");
+            card.id = 'author-action-'+action.id;
             const top = make("div", "action-card-top");
 
             top.append(
@@ -738,6 +867,9 @@
 
             const meta = make("div", "record-meta");
 
+            if (action.due_at && insights.isOpen(action)) {
+                const due=insights.deadline(action.due_at);card.append(make('span','author-deadline '+due.kind,due.label));
+            }
             if (action.due_at) {
                 meta.appendChild(
                     createInlineMeta(
@@ -1052,6 +1184,7 @@
 
         documents.forEach((record) => {
             const card = make("article", "record-card");
+            card.id = "author-document-"+record.id;
             const top = make("div", "record-card-top");
 
             top.appendChild(
@@ -3406,7 +3539,9 @@
     // NAVIGATION, AUTH AND FORMATTING
     // ---------------------------------------------------------
 
-    function showSection(sectionName) {
+    function showSection(sectionName, focus=true) {
+        const target=$('section-'+sectionName);
+        if(!target || (sectionName==='publishing' && elements.publishingDeskNav.hidden))sectionName='overview';
         navButtons.forEach((button) => {
             button.classList.toggle(
                 "active",
@@ -3414,12 +3549,16 @@
             );
         });
 
+        navButtons.forEach(button=>{if(button.dataset.section===sectionName)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
         deskSections.forEach((section) => {
             section.classList.toggle(
                 "active",
                 section.id === "section-" + sectionName
             );
         });
+        $('author-section-select').value=sectionName;
+        try{history.replaceState(null,'','#'+sectionName);}catch{}
+        if(focus){const heading=$('section-'+sectionName).querySelector('.section-heading h2');if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});heading.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});}}
     }
 
     async function handleSignOut() {
