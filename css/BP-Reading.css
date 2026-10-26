@@ -862,3 +862,8 @@ body.bp-reading-page:has(#reader:not([hidden])) { overflow:hidden; }
 body.bp-reading-page .simple-header {
   position:relative; top:auto; left:auto; border-bottom:1px solid var(--border);
 }
+
+/* Comfortable native controls on phones without changing EPUB typography. */
+@media(max-width:760px) {
+ #reader-panel :is(select,input,textarea) { font-size:16px; min-height:44px; }
+}

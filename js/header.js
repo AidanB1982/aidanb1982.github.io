@@ -657,7 +657,7 @@
         toggle.hidden = false;
 
         const mobileQuery =
-            window.matchMedia("(max-width: 760px)");
+            window.matchMedia("(max-width: 1024px)");
 
         function closeDropdowns() {
             nav.querySelectorAll(
@@ -888,11 +888,13 @@
     // =========================
 
     function initFadeIn() {
-        const elements =
-            document.querySelectorAll(".fade-in, .work");
-
+        const elements = document.querySelectorAll(".fade-in, .work");
         if (!elements.length) return;
-
+        const immediate = window.matchMedia("(prefers-reduced-motion: reduce), (max-width: 1024px), (hover: none)").matches;
+        if (immediate || !("IntersectionObserver" in window)) {
+            elements.forEach(element => {element.classList.add("visible");element.classList.remove("bw-reveal-pending");element.style.transitionDelay="0ms";});
+            return;
+        }
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -900,15 +902,16 @@
                     observer.unobserve(entry.target);
                 }
             });
-        }, {
-            threshold: 0.2
-        });
-
-        elements.forEach((element, index) => {
-            element.style.transitionDelay =
-                `${index * 120}ms`;
-
-            observer.observe(element);
+        }, {threshold:0.01, rootMargin:"0px 0px -24px 0px"});
+        elements.forEach((element,index) => {
+            // Never hide content already on screen, and never accumulate seconds of delay.
+            if (element.classList.contains("visible") || element.getBoundingClientRect().top < window.innerHeight) {
+                element.classList.add("visible");
+            } else {
+                element.classList.add("bw-reveal-pending");
+                element.style.transitionDelay=`${Math.min(index,3)*40}ms`;
+                observer.observe(element);
+            }
         });
     }
 

@@ -197,3 +197,24 @@ the actual Author Desk with mocked records: overview, book/stage search, product
 and document filters, navigation/focus, existing finance view, mobile sizes, sign-out
 and denied access. No migration, payment request or live author record is involved.
 See `docs/author-desk-overview.md` and `docs/website-roadmap.md`.
+
+
+## Shared CSS and mobile audit
+
+Run `node tests/css-layout-audit.cjs` against the local static server using the same
+Playwright / CHROMIUM_PATH / BASE_URL setup as other browser tests. It audits 24 public
+routes at 1440, 768, 390 and 320px, writes diagnostic JSON to AUDIT_OUTPUT (default
+`/tmp/blackwood-css-layout-audit.json`) and fails on horizontal overflow, undersized
+primary controls or tablet/mobile input text below 16px. External services are mocked
+or blocked; this does not test real checkout, social embeds or customer accounts.
+
+`node tests/site-polish.cjs` exercises 17 routes at 1440, 1024, 768, 390 and 320px,
+including responsive menus, form sizing, primary controls and Community clipboard
+feedback. Additional touch portrait/landscape checks cover menu clipping and contact
+fields. Existing author/publishing/EPUB browser checks protect specialised interfaces.
+See `docs/css-mobile-audit.md` for findings and follow-up performance work.
+
+`node tests/site-motion.cjs` checks a tall desktop section enters the reveal state
+without requiring 20% of a multi-screen element to fit in the viewport. It also checks
+that the resulting transition stays brief. Mobile/reduced-motion/script-failure content
+visibility is covered by `site-polish.cjs`.

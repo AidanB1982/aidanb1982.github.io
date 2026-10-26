@@ -589,10 +589,12 @@
                         color: "rgba(216, 198, 173, 0.55)"
                     },
                     button: {
+                        "min-height": "44px",
+                        "line-height": "1.5",
                         "font-family": "Arial, Helvetica, sans-serif",
-                        "font-size": "10px",
+                        "font-size": "12px",
                         "font-weight": "700",
-                        "letter-spacing": "2px",
+                        "letter-spacing": "1px",
                         "text-transform": "uppercase",
                         "padding-top": "13px",
                         "padding-bottom": "13px",
@@ -607,17 +609,18 @@
                         ":focus": {
                             "background-color": "#d08a43"
                         },
-                        "border-radius": "0"
+                        "border-radius": "6px"
                     },
                     quantityInput: {
+                        "min-height": "44px",
                         "font-family": "Arial, Helvetica, sans-serif",
-                        "font-size": "13px",
+                        "font-size": "16px",
                         "padding-top": "13px",
                         "padding-bottom": "13px",
                         color: "#f1ece4",
                         "background-color": "#080808",
                         "border-color": "rgba(184, 115, 51, 0.35)",
-                        "border-radius": "0"
+                        "border-radius": "6px"
                     }
                 },
                 text: {
@@ -642,10 +645,12 @@
                         }
                     },
                     button: {
+                        "min-height": "44px",
+                        "line-height": "1.5",
                         "font-family": "Arial, Helvetica, sans-serif",
-                        "font-size": "10px",
+                        "font-size": "12px",
                         "font-weight": "700",
-                        "letter-spacing": "2px",
+                        "letter-spacing": "1px",
                         "text-transform": "uppercase",
                         color: "#0b0b0b",
                         "background-color": "#b87333",
@@ -656,7 +661,7 @@
                         ":focus": {
                             "background-color": "#d08a43"
                         },
-                        "border-radius": "0"
+                        "border-radius": "6px"
                     }
                 },
                 text: {
@@ -667,27 +672,32 @@
                 styles: {
                     label: {
                         "font-family": "Arial, Helvetica, sans-serif",
-                        "font-size": "10px",
+                        "font-size": "12px",
                         "letter-spacing": "1.8px",
                         "text-transform": "uppercase",
                         color: "#b87333"
                     },
                     select: {
+                        "min-height": "44px",
+                        "font-size": "16px",
+                        "padding": "10px 12px",
                         "font-family": "Georgia, Times New Roman, serif",
                         color: "#f1ece4",
                         "background-color": "#080808",
                         "border-color": "rgba(184, 115, 51, 0.35)",
-                        "border-radius": "0"
+                        "border-radius": "6px"
                     }
                 }
             },
             cart: {
                 styles: {
                     button: {
+                        "min-height": "44px",
+                        "line-height": "1.5",
                         "font-family": "Arial, Helvetica, sans-serif",
-                        "font-size": "10px",
+                        "font-size": "12px",
                         "font-weight": "700",
-                        "letter-spacing": "2px",
+                        "letter-spacing": "1px",
                         "text-transform": "uppercase",
                         "padding-top": "15px",
                         "padding-bottom": "15px",
@@ -700,7 +710,7 @@
                         ":focus": {
                             "background-color": "#d08a43"
                         },
-                        "border-radius": "0"
+                        "border-radius": "6px"
                     },
                     footer: {
                         "background-color": "#050505"
@@ -747,6 +757,8 @@
             toggle: {
                 styles: {
                     toggle: {
+                        "min-height": "44px",
+                        "min-width": "44px",
                         "font-family": "Arial, Helvetica, sans-serif",
                         "background-color": "#b87333",
                         ":hover": {

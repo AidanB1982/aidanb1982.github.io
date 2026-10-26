@@ -1464,7 +1464,7 @@ body.sub-page .blackwood-nav {
     display: none;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1024px) {
 
     body .simple-header {
         position: relative;
@@ -1610,7 +1610,7 @@ body.sub-page .blackwood-nav {
     }
 }
 
-@media (min-width: 761px) {
+@media (min-width: 1025px) {
     .blackwood-mobile-toggle {
         display: none !important;
     }

@@ -6,6 +6,11 @@
   --bw-line: #d4b88b30;
   --bw-radius: 8px;
   --bw-measure: 1160px;
+  --bw-gutter: clamp(18px, 4vw, 40px);
+  --bw-font-ui: Arial, Helvetica, sans-serif;
+  --bw-focus: #d4b88b;
+  --bw-placeholder: #aaa293;
+  --bw-button-tracking: .12em;
 }
 html { scroll-padding-top: 32px; }
 body { line-height: 1.7; -webkit-font-smoothing: antialiased; }
@@ -14,23 +19,23 @@ body { line-height: 1.7; -webkit-font-smoothing: antialiased; }
 :where(p,li) { overflow-wrap: break-word; }
 :where(button,input,select,textarea) { font: inherit; }
 :where(button,a,input,select,textarea,summary):focus-visible {
-  outline: 2px solid var(--bw-gold); outline-offset: 5px;
+  outline: 2px solid var(--bw-focus) !important; outline-offset: 3px !important;
 }
 :where(button,a,input,select,textarea) { -webkit-tap-highlight-color: #d4b88b26; }
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea) {
   min-height: 44px; border-radius: var(--bw-radius); accent-color: var(--bw-gold);
 }
-:where(input,textarea)::placeholder { opacity: 1; color: #aaa293; }
+:where(input,textarea)::placeholder { opacity: 1; color: var(--bw-placeholder); }
 .button, a.button:visited {
   display: inline-flex; align-items: center; justify-content: center;
   min-height: 44px; padding: 11px 20px; gap: 8px; border: 1px solid var(--bw-line);
   border-radius: var(--bw-radius); color: var(--bw-ink); background: #d4b88b08;
-  font: 12px/1.5 Arial,sans-serif; letter-spacing: .12em;
-  text-align: center; text-decoration: none;
+  font: 12px/1.5 var(--bw-font-ui); letter-spacing: var(--bw-button-tracking);
+  text-align: center; text-decoration: none; white-space: normal; overflow-wrap: anywhere; max-width: 100%;
   transition: background .2s, border-color .2s, transform .2s;
 }
 .button::after { display: none; }
-.button:hover { background: #d4b88b18; border-color: var(--bw-gold); transform: translateY(-2px); }
+.button:hover { letter-spacing: var(--bw-button-tracking); background: #d4b88b18; border-color: var(--bw-gold); transform: translateY(-2px); }
 .button.copper { -webkit-text-fill-color: currentColor; background-clip: border-box; border-color: #d4b88b70; color: var(--bw-gold); }
 :where(button[type=submit],.contact-form button,.footer-archive-form button) {
   min-height: 44px; border-radius: var(--bw-radius);
@@ -80,7 +85,7 @@ button:disabled { cursor: default; }
 .footer-col a { display: inline-flex; align-items: center; min-height: 36px; line-height: 1.5; }
 .footer-bottom { gap: 20px; line-height: 1.7; }
 .footer-legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-@media(max-width:600px) {
+@media(max-width:1024px) {
   .hero { height:auto; min-height:100svh; }
   .hero .blackwood-nav-item.is-open { flex-basis:100%; }
   .hero .blackwood-dropdown {
@@ -89,8 +94,10 @@ button:disabled { cursor: default; }
     opacity:1; visibility:visible; pointer-events:auto;
   }
   .hero .blackwood-nav-item.is-open > .blackwood-dropdown { display:block; }
-  .button { font-size: 11px; letter-spacing: .08em; }
-  .work-actions .button { flex: 1 1 160px; }
+}
+@media(max-width:600px) {
+  .button { --bw-button-tracking: .08em; font-size: 11px; letter-spacing: var(--bw-button-tracking); }
+  .work-actions .button { flex: 0 1 auto; width:100%; }
   .footer-top { gap: 32px; }
   .footer-links { flex-wrap: wrap; gap: 28px; }
   .footer-col { min-width: 130px; }
@@ -100,3 +107,70 @@ button:disabled { cursor: default; }
 @media(prefers-reduced-motion:reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Shared public-page scale, including specialised heroes with legacy overrides. */
+body.sub-page .about-hero-content { min-width:0; max-width:100%; }
+body.sub-page .about-hero h1,
+body.submissions-page .submissions-hero h1 {
+  font-size:clamp(30px,4.2vw,54px); font-weight:400; line-height:1.16;
+  letter-spacing:-.035em; overflow-wrap:break-word;
+}
+body.sub-page .book-feature-content h2 { font-size:clamp(28px,3.4vw,42px); line-height:1.2; letter-spacing:-.025em; }
+.work-actions .button { margin-top:0; }
+.footer-archive-form :is(input,button) { min-height:46px; }
+.footer-archive-form { gap:10px; }
+body.author-desk-page { --bw-focus:#244b3d; --bw-placeholder:#68736c; }
+body .circle-auth-tab,body .circle-button,body #hashtag { min-height:44px; }
+body #hashtag { padding:10px 14px; line-height:1.5; border-radius:var(--bw-radius); }
+
+/* These store rules intentionally supersede the old 8px / 30px overrides. */
+body.store-page .store-filter-button,
+body.store-page .store-offer-banner .button,
+body.store-page .blackwood-circle-promo-button,
+body.store-page .shopify-buy__btn,
+body.store-page .shopify-buy__cart-toggle,
+body.store-page .shopify-buy__quantity-increment,
+body.store-page .shopify-buy__quantity-decrement {
+  min-height:44px !important; font-size:11px !important; line-height:1.5 !important;
+  padding:10px 14px !important; letter-spacing:.08em !important;
+  white-space:normal !important; max-width:100%;
+}
+body.store-page .store-search-wrap input { min-height:46px !important; font-size:16px !important; }
+body.store-page .shopify-buy__quantity { min-height:44px !important; height:44px !important; font-size:16px !important; }
+
+@media(max-width:1024px) {
+  .footer-col a { min-height:44px; }
+  html { -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+  body:not(.bp-reading-page) input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),
+  body:not(.bp-reading-page) select,
+  body:not(.bp-reading-page) textarea { font-size:16px; }
+  .footer-archive-form input { font-size:16px; }
+  body .simple-header .blackwood-nav-link { letter-spacing:.08em; }
+  body .simple-header .blackwood-dropdown a { min-height:44px; }
+}
+@media(max-width:760px) {
+  .footer-col a { min-height:44px; }
+  .footer-archive-form { flex-wrap:wrap; }
+  .footer-archive-form :is(input,button) { min-width:0; max-width:100%; }
+  body.sub-page .about-hero-content { width:100%; padding-inline:var(--bw-gutter); }
+  .hero-statement .cta,.work-actions { gap:12px; }
+  .contact-form :is(input,select,textarea) { width:100%; min-width:0; }
+  .contact-form textarea { min-height:160px; resize:vertical; }
+}
+@media(hover:none) {
+  .button:hover { transform:none; }
+  .work:hover img,.series a:hover .carousel img,.store-product-card:hover .store-product-image img { transform:none; }
+}
+
+.footer-legal a { display:inline-flex; align-items:center; min-height:44px; padding:4px 6px; }
+
+/* Content is available before JavaScript; reveal effects are optional enhancement. */
+.fade-in,.work { opacity:1; transform:none; }
+.bw-reveal-pending:not(.visible) { opacity:0; transform:translateY(16px); }
+.bw-reveal-pending,.bw-reveal-pending.visible { transition:opacity .35s ease,transform .35s ease; }
+@media(max-width:1024px),(hover:none),(prefers-reduced-motion:reduce) {
+ .fade-in,.work,.bw-reveal-pending { opacity:1!important; transform:none!important; transition:none!important; transition-delay:0ms!important; }
+}
+
+/* Standard 3D mockups have transparent landscape padding around the book. */
+.series .carousel img.book-mockup { object-fit:cover; }

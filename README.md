@@ -55,3 +55,4 @@ This site was built with that in mind.
 - [Website to-do list](docs/website-roadmap.md)
 - [Author Desk overview](docs/author-desk-overview.md)
 - [Meta scheduler setup](docs/meta-social-scheduler.md)
+- [CSS and mobile audit](docs/css-mobile-audit.md)

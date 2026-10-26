@@ -26,6 +26,23 @@ that still need live configuration, database changes or app-store setup.
 batch.** Existing records, queries and permissions remain the data source. Seeing a
 document record is not an online signing or file-delivery workflow.
 
+## Completed: shared CSS and mobile audit, 26 October
+
+- [x] Standardise public hero typography, button treatment and keyboard focus.
+- [x] Keep mobile content visible immediately; remove multi-second reveal delays and oversized stacked book buttons.
+- [x] Improve the display size of known padded 3D book mockups without editing their artwork.
+- [x] Fix tablet navigation overflow; use the compact menu through 1024px.
+- [x] Fix narrow-phone hero overflow on Recovered Files, Independent Works and Appearances.
+- [x] Use readable 16px tablet/phone form fields and at least 44px primary controls.
+- [x] Improve store filters and embedded Shopify button presentation without changing checkout logic.
+- [x] Keep touch hover effects from shifting cards/buttons, and keep home navigation accessible in landscape.
+- [x] Repair Community Spotlight's duplicated document and its hashtag copy handler.
+- [x] Preserve EPUB colours, accessibility zoom and protected reading/navigation boundaries.
+- [x] Check public layouts, touch navigation, Author Desk, publishing tools and real EPUB rendering.
+
+See [the CSS audit](css-mobile-audit.md) for measured results and limits. No Supabase
+changes are required. Large image downloads remain a separate performance task below.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and
@@ -124,5 +141,10 @@ This is a planned replacement, not a description of the current downloadable ARC
 - [ ] Connect monthly newsletters to the subscribed mailing audience and unsubscribe
   handling; ARC assignment is not newsletter consent.
 - [ ] Review submissions, rights enquiries and trade information for completeness.
+- [ ] Optimise large original background images for delivery: add verified modern-format
+  responsive derivatives while retaining the original artwork. Several files exceed 10 MB.
+- [ ] Consolidate legacy CSS gradually after checking cascade order; do not blindly delete
+  duplicate rules across media queries.
+- [ ] Check physical iPhone/Safari and Android devices and profile real-network performance.
 - [ ] Continue mobile accessibility, performance and end-to-end permission checks.
 - [ ] Revisit AI drafting only if the owner chooses a provider and billing/data approach.
