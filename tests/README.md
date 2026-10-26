@@ -218,3 +218,15 @@ See `docs/css-mobile-audit.md` for findings and follow-up performance work.
 without requiring 20% of a multi-screen element to fit in the viewport. It also checks
 that the resulting transition stays brief. Mobile/reduced-motion/script-failure content
 visibility is covered by `site-polish.cjs`.
+
+## Reader journeys
+
+Run `tests/reader-services.cjs` against a local static server with Playwright (`BASE_URL`
+and optional `CHROMIUM_PATH`). It checks discovery, public samples, newsletter consent,
+analytics choices, responsive layouts and caller-scoped account summaries. External
+services are intercepted; it sends no newsletter email or payment and does not verify
+live Supabase policies, MailerLite or Google Analytics settings.
+
+`node tests/reading-account.mjs` checks cross-device sync and conflict/outbox behaviour.
+The existing `tests/bp-reading.cjs` exercises search and rendering with the local real
+EPUB fixture; see its fixture prerequisites above.

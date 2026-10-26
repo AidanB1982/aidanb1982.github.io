@@ -174,3 +174,10 @@ body.store-page .shopify-buy__quantity { min-height:44px !important; height:44px
 
 /* Standard 3D mockups have transparent landscape padding around the book. */
 .series .carousel img.book-mockup { object-fit:cover; }
+
+/* Explicit newsletter consent and accessible privacy controls. */
+.footer-ml-form .footer-mail-consent { display:flex; flex:1 0 100%; align-items:flex-start; gap:12px; text-align:left; white-space:normal; font:14px/1.6 Arial,sans-serif; color:#cfc5b6; }
+.footer-ml-form .footer-mail-consent input { flex:0 0 22px; width:22px; height:22px; min-height:22px!important; margin:2px 0 0; accent-color:#caa56c; }
+.footer-ml-form { flex-wrap:wrap; }
+.footer-privacy-settings { background:transparent; border:1px solid #75654b; color:#e5d6c2; border-radius:6px; padding:10px 14px; min-height:44px; font:14px/1.5 Arial,sans-serif; text-align:left; cursor:pointer; }
+.footer-privacy-settings:focus-visible { outline:3px solid #e5c38c; outline-offset:3px; }

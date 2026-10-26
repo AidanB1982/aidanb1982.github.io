@@ -1,0 +1,224 @@
+[
+  {
+    "id": "the-black-bothy",
+    "title": "The Black Bothy",
+    "author": "Aidan Blackwood",
+    "series": "The Archive Files",
+    "order": 1,
+    "genre": "Supernatural fiction",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/A8.png",
+    "description": "The first door into the Archive. Isolation, grief, and the thing waiting in the dark.",
+    "href": "/pages/store.html#the-black-bothy",
+    "sample": null
+  },
+  {
+    "id": "the-drowned-fjord",
+    "title": "The Drowned Fjord",
+    "author": "Aidan Blackwood",
+    "series": "The Archive Files",
+    "order": 2,
+    "genre": "Supernatural fiction",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/A7.png",
+    "description": "A cold coastal descent into memory, loss, and the things the water refuses to keep buried.",
+    "href": "/pages/store.html#the-drowned-fjord",
+    "sample": null
+  },
+  {
+    "id": "the-erased-archivist",
+    "title": "The Erased Archivist",
+    "author": "Aidan Blackwood",
+    "series": "The Archive Files",
+    "order": 3,
+    "genre": "Supernatural fiction",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/A6.png",
+    "description": "A record begins to vanish. Identity, obsession, and the archive turning against its keeper.",
+    "href": "/pages/store.html#the-erased-archivist",
+    "sample": null
+  },
+  {
+    "id": "holdfast",
+    "title": "Holdfast",
+    "author": "Aidan Blackwood",
+    "series": "The Archive Files",
+    "order": 4,
+    "genre": "Supernatural fiction",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/A5.png",
+    "description": "The fourth Archive File. A transmission, a locked record, and something that should not be opened.",
+    "href": "/pages/store.html#holdfast",
+    "sample": "/pages/reading-preview.html?book=holdfast"
+  },
+  {
+    "id": "dour-hill-house",
+    "title": "Dour Hill House",
+    "author": "Aidan Blackwood",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Independent works",
+    "moods": [
+      "Memory",
+      "Consequence"
+    ],
+    "cover": "/assets/book1.jpg",
+    "description": "A house marked by memory, grief, and the quiet pressure of what remains inside.",
+    "href": "/pages/store.html#dour-hill-house",
+    "sample": null
+  },
+  {
+    "id": "the-scheme",
+    "title": "The Scheme",
+    "author": "Aidan Blackwood",
+    "series": "Hard Silence",
+    "order": 1,
+    "genre": "Crime",
+    "moods": [
+      "Consequence",
+      "Tension"
+    ],
+    "cover": "/assets/book9.png",
+    "description": "Urban pressure, damaged lives, and the kind of silence that does not stay buried.",
+    "href": "/pages/store.html#the-scheme",
+    "sample": null
+  },
+  {
+    "id": "red-streets",
+    "title": "Red Streets",
+    "author": "Aidan Blackwood",
+    "series": "Hard Silence",
+    "order": 2,
+    "genre": "Crime",
+    "moods": [
+      "Consequence",
+      "Tension"
+    ],
+    "cover": "/assets/book10.jpg",
+    "description": "Blood, consequence, and lives moving through the city with nowhere clean to land.",
+    "href": "/pages/store.html#red-streets",
+    "sample": null
+  },
+  {
+    "id": "corrour-bothy",
+    "title": "Corrour Bothy",
+    "author": "Aidan Blackwood",
+    "series": "The Cursed Bothies",
+    "order": 1,
+    "genre": "Horror",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/book2.jpg",
+    "description": "A remote bothy, a broken mind, and the wilderness pressing too close to the door.",
+    "href": "/pages/store.html#corrour-bothy",
+    "sample": null
+  },
+  {
+    "id": "love-abused",
+    "title": "Love, Abused",
+    "author": "Campbell Stewart",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Independent works",
+    "moods": [
+      "Memory",
+      "Consequence"
+    ],
+    "cover": "/assets/book15.jpg",
+    "description": "A raw, intimate record of damage, survival, and the things people miss until it is too late.",
+    "href": "/pages/store.html#love-abused",
+    "sample": null
+  },
+  {
+    "id": "gualachulain-bothy",
+    "title": "Gualachulain",
+    "author": "Aidan Blackwood",
+    "series": "The Cursed Bothies",
+    "order": 2,
+    "genre": "Horror",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/book7.png",
+    "description": "Book Two of The Cursed Bothies. Continue the series beyond Corrour Bothy.",
+    "href": "/pages/cursed-bothies.html",
+    "sample": null
+  },
+  {
+    "id": "the-crossing",
+    "title": "The Crossing",
+    "author": "Miren Vale",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Dark fantasy",
+    "moods": [
+      "Unease",
+      "Consequence"
+    ],
+    "cover": "/assets/A16.png",
+    "description": "Dark fantasy concerned with thresholds, inheritance, ritual and what follows when old warnings are ignored.",
+    "href": "/pages/miren-vale.html",
+    "sample": null
+  },
+  {
+    "id": "the-red-clad-collector",
+    "title": "The Red-Clad Collector",
+    "author": "Aidan Blackwood",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Independent works",
+    "moods": [
+      "Unease",
+      "Memory"
+    ],
+    "cover": "/assets/book11.png",
+    "description": "Explore this independent work in the Blackwood catalogue.",
+    "href": "/pages/standalone.html",
+    "sample": null
+  },
+  {
+    "id": "accounting-sole-traders",
+    "title": "Accounting for UK Sole Traders",
+    "author": "",
+    "series": "Practical Guides",
+    "order": null,
+    "genre": "Non-fiction",
+    "moods": [
+      "Practical"
+    ],
+    "cover": "/assets/A20.png",
+    "description": "Practical record keeping and accounting guidance for UK sole traders.",
+    "href": "/pages/soletrader.html",
+    "sample": null
+  },
+  {
+    "id": "accounting-landlords",
+    "title": "Accounting for UK Landlords",
+    "author": "",
+    "series": "Practical Guides",
+    "order": null,
+    "genre": "Non-fiction",
+    "moods": [
+      "Practical"
+    ],
+    "cover": "/assets/Accounting_Landlords.jpg",
+    "description": "Practical record keeping and accounting guidance for UK landlords.",
+    "href": "/pages/landlords.html",
+    "sample": null
+  }
+]

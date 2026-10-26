@@ -141,142 +141,15 @@
     // =========================
 
     function initFooterArchiveSignup(footerContainer) {
-        if (!footerContainer) return;
-
-        const form = footerContainer.querySelector(".footer-ml-form");
-
+        const form = footerContainer?.querySelector(".footer-ml-form");
         if (!form || form.dataset.initialised === "true") return;
-
         form.dataset.initialised = "true";
-
-        const emailInput = form.querySelector("input[type='email']");
-        const submitButton = form.querySelector("button[type='submit']");
-
-        let status = footerContainer.querySelector("#footer-archive-status");
-
-        if (!status) {
-            status = footerContainer.querySelector(".footer-archive-note");
-        }
-
-        if (!status) {
-            status = document.createElement("p");
-            status.className = "footer-archive-note";
-            form.insertAdjacentElement("afterend", status);
-        }
-
-        status.setAttribute("aria-live", "polite");
-
-        let iframe = footerContainer.querySelector(
-            'iframe[name="footer-mailerlite-frame"]'
-        );
-
-        if (!iframe) {
-            iframe = document.createElement("iframe");
-            iframe.name = "footer-mailerlite-frame";
-            iframe.title = "Mailing list signup";
-            iframe.style.display = "none";
-            form.insertAdjacentElement("afterend", iframe);
-        }
-
-        form.setAttribute("target", "footer-mailerlite-frame");
-        form.setAttribute("method", "post");
-        form.setAttribute("accept-charset", "utf-8");
-
-        ensureHiddenInput(form, "ml-submit", "1");
-        ensureHiddenInput(form, "anticsrf", "true");
-
-        const originalButtonText = submitButton
-            ? submitButton.textContent.trim()
-            : "Become an Archivist";
-
-        let hasSubmitted = false;
-        let fallbackTimer = null;
-        let resetButtonTimer = null;
-
-        function setStatus(message, type) {
-            status.textContent = message;
-            status.classList.remove(
-                "is-success",
-                "is-error",
-                "is-loading"
-            );
-
-            if (type) {
-                status.classList.add(type);
-            }
-        }
-
-        function resetButtonSoon() {
-            if (!submitButton) return;
-
-            window.clearTimeout(resetButtonTimer);
-
-            resetButtonTimer = window.setTimeout(() => {
-                submitButton.disabled = false;
-                submitButton.textContent = originalButtonText;
-            }, 2600);
-        }
-
-        function finishSignup() {
-            if (!hasSubmitted) return;
-
-            hasSubmitted = false;
-
-            window.clearTimeout(fallbackTimer);
-
-            setStatus(
-                "Thank you. Check your inbox to confirm your place among the Archivists.",
-                "is-success"
-            );
-
-            form.reset();
-
-            if (submitButton) {
-                submitButton.textContent = "Filed";
-            }
-
-            resetButtonSoon();
-        }
-
+        const status = footerContainer.querySelector("#footer-archive-status");
         form.addEventListener("submit", event => {
-            if (!emailInput || !emailInput.checkValidity()) {
-                event.preventDefault();
-
-                setStatus(
-                    "Please enter a valid email address.",
-                    "is-error"
-                );
-
-                if (emailInput) {
-                    emailInput.focus();
-                }
-
-                return;
-            }
-
-            hasSubmitted = true;
-
-            setStatus(
-                "Filing your request...",
-                "is-loading"
-            );
-
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.textContent = "Filing...";
-            }
-
-            window.clearTimeout(fallbackTimer);
-
-            fallbackTimer = window.setTimeout(() => {
-                finishSignup();
-            }, 3200);
-        });
-
-        iframe.addEventListener("load", () => {
-            if (!hasSubmitted) return;
-
-            finishSignup();
+            if (!form.reportValidity()) {event.preventDefault(); return;}
+            // A cross-origin iframe load is not proof of provider acceptance.
+            status.textContent = "Your request is being sent to MailerLite. Check your inbox for any confirmation request. If nothing arrives, use Mailing-list help.";
+            window.BlackwoodAnalytics?.event("newsletter_request");
         });
     }
 
@@ -392,6 +265,10 @@
                     role="menu"
                     aria-label="The Books"
                 >
+                    <a href="/pages/discover.html" role="menuitem">
+                        Find Your Next Read
+                    </a>
+
                     <a href="/pages/publications.html" role="menuitem">
                         All Publications
                     </a>

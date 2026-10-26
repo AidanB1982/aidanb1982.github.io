@@ -99,7 +99,17 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  const before=await page.evaluate(()=>JSON.parse(localStorage.getItem('bp-reading:reader-test:edition:2:v2')).position);
  await page.keyboard.press('ArrowRight');await page.waitForTimeout(400);
  const after=await page.evaluate(()=>JSON.parse(localStorage.getItem('bp-reading:reader-test:edition:2:v2')).position);assert(before!==after,'keyboard page turn');
- await page.locator('#open-search').click();await page.locator('#book-search').fill('water');await page.locator('#book-search-form button').click();await page.waitForFunction(()=>!document.getElementById('search-status').textContent.includes('Searching'));assert((await page.locator('#search-results button').count())>0,'search results');await page.locator('#search-results button').first().click();await page.waitForTimeout(300);
+ await page.locator('#open-search').click();await page.locator('#book-search').fill('water');await page.locator('#book-search-form button[type=submit]').click();await page.waitForFunction(()=>document.getElementById('cancel-book-search').hidden);assert((await page.locator('#search-results button').count())>0,'search results');await page.locator('#search-results button').first().click();await page.waitForTimeout(300);
+
+
+ await page.locator('#open-search').click();
+ const searchPosition=await page.evaluate(()=>JSON.parse(localStorage.getItem('bp-reading:reader-test:edition:2:v2')).position);
+ await page.evaluate(()=>{document.getElementById('book-search').value='water';document.getElementById('book-search-form').requestSubmit();document.getElementById('cancel-book-search').click();});
+ await page.waitForTimeout(150);
+ assert((await page.locator('#search-status').textContent()).startsWith('Search stopped'),'search cancellation keeps its status');
+ assert(await page.locator('#search-results button').count()===0,'cancelled async search cannot append stale results');
+ assert(await page.evaluate(()=>JSON.parse(localStorage.getItem('bp-reading:reader-test:edition:2:v2')).position)===searchPosition,'search does not move the reading place');
+ await page.locator('#close-panel').click();
 
  await page.locator('#open-notebook').click();await page.locator('#add-page-note').click();await page.locator('#notebook-list textarea').first().fill('A private reading note');await page.getByRole('button',{name:'Save note',exact:true}).first().click();await page.locator('#close-panel').click();
  assert((await page.locator('#reader-watermark').textContent()).includes('Reader'),'personal watermark');

@@ -1071,6 +1071,8 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                 </a>
             </section>
 
+            <section class="rs-account" id="member-reading-centre" aria-label="Reading account"></section>
+
             ${renderArcProfileMount()}
 
             ${renderBookshelfMount()}
@@ -1094,6 +1096,14 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
     `;
 
     bindDashboardEvents();
+    if (typeof window.initBlackwoodReadingCentre === "function") {
+        void window.initBlackwoodReadingCentre({
+            root: document.getElementById("member-reading-centre"),
+            client: BlackwoodMembersState.client,
+            userId: BlackwoodMembersState.session?.user?.id,
+            isAdmin: isAdminProfile(member)
+        });
+    }
 }
 
     function renderMemberHomeDashboard(member, pointsTotal, summary) {

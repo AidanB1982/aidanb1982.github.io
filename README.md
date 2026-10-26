@@ -56,3 +56,5 @@ This site was built with that in mind.
 - [Author Desk overview](docs/author-desk-overview.md)
 - [Meta scheduler setup](docs/meta-social-scheduler.md)
 - [CSS and mobile audit](docs/css-mobile-audit.md)
+
+Reader-facing discovery, public samples, account summaries, newsletter and gifting journeys: [implementation and remaining setup](docs/reader-journeys.md).

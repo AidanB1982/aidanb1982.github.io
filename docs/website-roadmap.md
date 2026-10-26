@@ -43,6 +43,30 @@ document record is not an online signing or file-delivery workflow.
 See [the CSS audit](css-mobile-audit.md) for measured results and limits. No Supabase
 changes are required. Large image downloads remain a separate performance task below.
 
+## Completed: reader journeys, 26 October
+
+- [x] Add public catalogue filters for genre, mood, series, author and reading order.
+- [x] Add clearly labelled device-only saved books and author shortcuts, preserving the
+  separate account bookshelf and making no email-alert promise.
+- [x] Add adjustable White/Off-white/Dark reading of the existing public Holdfast
+  prologue; do not extract samples from protected EPUBs or expose new retail content.
+- [x] Add a member reading-account section for recorded access dates, permanent purchases,
+  an eligible unfinished book, Shopify-account management and support.
+- [x] Add a dedicated newsletter page and explicit mailing consent; remove timed fake
+  subscription-success messages from the footer.
+- [x] Add gift-reading suggestions and signed-copy enquiries using existing store routes.
+- [x] Make the Google analytics integration opt-in, limit it to public pages and add
+  private/account/reader exclusions, clean URLs and curated interest events.
+- [x] Add reporting links and distinguish clicks/signup requests from confirmed sales
+  and subscribers.
+- [x] Improve existing book search with progress, chapter labels and cancellation;
+  retain reading place and add keyboard/zoom guidance.
+- [x] Prepare the remaining email, gift-redemption and reporting configuration checklist.
+
+See [reader journeys](reader-journeys.md). No Supabase migration is required for the
+published features. Subscription pricing stays at £10.99 pending the owner's Shopify
+change; update checkout's server-side £10.99 validation together with the price.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and
@@ -135,11 +159,16 @@ This is a planned replacement, not a description of the current downloadable ARC
 - [ ] Review existing book pages and public author pages before redesigning or duplicating
   them; strengthen samples, series order, genuine reviews and clear reading/buying routes.
 - [ ] Attach verified cover artwork to Author Desk books using an agreed catalogue source.
-- [ ] Add a personalised members dashboard with relevant updates and continue-reading.
-- [ ] Add editorial genre/mood/series discovery, using approved book metadata rather than AI.
+- [x] Add a reading-account overview and eligible continue-reading summary to the existing members dashboard.
+- [ ] Add server-scoped book/author follows and consent-aware release notifications; device shortcuts do not deliver alerts.
+- [x] Add editorial genre/mood/series discovery from existing public metadata.
 - [ ] Connect TikTok posting through its own approved integration.
-- [ ] Connect monthly newsletters to the subscribed mailing audience and unsubscribe
-  handling; ARC assignment is not newsletter consent.
+- [ ] Verify MailerLite confirmation/consent and configure welcome automation, real genre
+  preference fields and monthly campaign delivery; ARC assignment is not newsletter consent.
+- [ ] Configure one-time gift-membership products and verified, single-use redemption.
+- [ ] Configure priced/stocked Shopify bundle products before advertising bundle savings.
+- [ ] Validate analytics property settings and live reporting; connect verified paid-order
+  reporting before calculating membership conversion or customer lifetime value.
 - [ ] Review submissions, rights enquiries and trade information for completeness.
 - [ ] Optimise large original background images for delivery: add verified modern-format
   responsive derivatives while retaining the original artwork. Several files exceed 10 MB.

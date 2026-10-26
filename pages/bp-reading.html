@@ -15,8 +15,9 @@
 
   <link rel="stylesheet" href="/css/header.css?v=20261115">
   <link rel="stylesheet" href="/css/styles.css?v=20260913">
-  <link rel="stylesheet" href="/css/site-polish.css?v=20261115">
+  <link rel="stylesheet" href="/css/site-polish.css?v=20261116">
   <link rel="stylesheet" href="/css/BP-Reading.css?v=20261115">
+<script src="/js/analytics-consent.js?v=20261116" defer></script>
 </head>
 
 <body class="sub-page bp-reading-page">
@@ -205,7 +206,7 @@
     <dialog id="reader-panel" aria-labelledby="reader-panel-title">
       <div class="panel-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="reader-panel-title">Reading settings</h2></div><button class="control" id="close-panel" aria-label="Close panel" type="button">✕</button></div>
       <section id="panel-appearance" hidden>
-        <p class="panel-intro">A page that feels like yours.</p><div class="type-preview" id="type-preview" aria-hidden="true"><span>A quiet moment, just for you.</span><p>Beyond the window, the world could wait. There was another chapter to begin.</p></div>
+        <p class="panel-intro">A page that feels like yours.</p><p class="device-note">Adjust the text and spacing to suit you. Outside menus, use Left/Right arrows or Page Up/Page Down to turn pages; Tab moves between controls. Your browser’s zoom remains available.</p><div class="type-preview" id="type-preview" aria-hidden="true"><span>A quiet moment, just for you.</span><p>Beyond the window, the world could wait. There was another chapter to begin.</p></div>
         <p class="device-note">Page colour — choose the background that feels most comfortable.</p><div class="theme-previews" role="group" aria-label="Page colour"><button type="button" data-reading-theme="day" aria-pressed="false"><span class="theme-sample" aria-hidden="true">Aa</span>White</button><button type="button" data-reading-theme="parchment" aria-pressed="true"><span class="theme-sample" aria-hidden="true">Aa</span>Off-white</button><button type="button" data-reading-theme="night" aria-pressed="false"><span class="theme-sample" aria-hidden="true">Aa</span>Dark</button></div>
         <div class="appearance-basics">        <button
           class="control"
@@ -245,8 +246,8 @@
       <section id="panel-contents" hidden><p class="panel-intro">Find your next chapter.</p><nav id="chapter-list" aria-label="Book chapters"></nav></section>
       <section id="panel-notebook" hidden><p class="panel-intro">A private companion to your reading.</p><p class="device-note">Select text in the book to save a highlight and add a note. Use the button below for a note about your current page.</p><button class="control" id="add-page-note" type="button">Note on this page</button><div id="notebook-list"></div></section>
       <section id="panel-search" hidden>
-        <p class="panel-intro">Find a line. Return to a moment.</p>
-        <form id="book-search-form"><label for="book-search">Search this book</label><div class="search-fields"><input id="book-search" type="search" required minlength="2" maxlength="120" placeholder="A word or phrase…"><button class="control" type="submit">Find</button></div></form>
+        <p class="panel-intro">Find a line. Return to a moment.</p><p class="device-note">Search your authorised book without changing your reading place. Choose a result to open the passage.</p>
+        <form id="book-search-form"><label for="book-search">Search this book</label><div class="search-fields"><input id="book-search" type="search" required minlength="2" maxlength="120" placeholder="A word or phrase…"><button class="control" type="submit">Find</button><button class="control" type="button" id="cancel-book-search" hidden>Stop search</button></div></form>
         <p id="search-status" role="status" aria-live="polite"></p><div id="search-results"></div>
       </section>
       <section id="panel-bookmarks" hidden><p class="panel-intro">The places you wanted to keep.</p><div id="bookmark-list"></div></section>
@@ -300,7 +301,7 @@
   </section>
 
   <div id="footer-placeholder"></div>
-  <script src="/js/header.js?v=20261115" defer></script>
+  <script src="/js/header.js?v=20261116" defer></script>
 
   <!-- EPUB DEPENDENCIES -->
 
@@ -309,7 +310,7 @@
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js?v=20261112"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261116"></script>
 
 </body>
 </html>

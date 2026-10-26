@@ -1506,6 +1506,7 @@ function closeBook() {
   ++searchVersion;
   $('search-results').replaceChildren();
   $('book-search-form').reset();
+  $('cancel-book-search').hidden = true;
   $('search-status').textContent = '';
   previousPlace = null;
   $("return-position").hidden = true;
@@ -1717,7 +1718,7 @@ function openPanel(kind, trigger) {
     });
   }
   $('reader-panel').showModal();
-  $('close-panel').focus();
+  (kind === 'search' ? $('book-search') : $('close-panel')).focus();
 }
 function renderContents() {
   chapterItems = [];
@@ -1782,6 +1783,12 @@ for (const [key, id] of Object.entries({font:'reader-font',spacing:'reader-spaci
     saveState();
   };
 }
+$('cancel-book-search').onclick = () => {
+  ++searchVersion;
+  $('cancel-book-search').hidden = true;
+  $('search-status').textContent = 'Search stopped. Any matches already found are kept below.';
+  $('book-search').focus();
+};
 $('book-search-form').onsubmit = async event => {
   event.preventDefault();
   const query = $('book-search').value.trim();
@@ -1789,11 +1796,13 @@ $('book-search-form').onsubmit = async event => {
   const version = ++searchVersion;
   const book = state.book;
   const output = $('search-results'); output.replaceChildren();
+  $('cancel-book-search').hidden = false;
   $('search-status').textContent = 'Searching your book…';
-  let count = 0;
+  let count = 0, checked = 0;
+  const sections = book.spine.spineItems;
   try {
-    // Search an independently loaded XML document without unloading visible content.
-    for (const section of book.spine.spineItems) {
+    // Search independently loaded XML; never unload or replace the visible page.
+    for (const section of sections) {
       if (version !== searchVersion || book !== state.book) return;
       const response = await book.load(section.url);
       if (version !== searchVersion || book !== state.book) return;
@@ -1808,18 +1817,26 @@ $('book-search-form').onsubmit = async event => {
         section.document = original;
         section.contents = originalContents;
       }
+      const chapter = chapterItems.find(item => item.href.split('#')[0] === section.href.split('#')[0]);
       for (const result of found) {
         if (count >= 100) break;
         const button = document.createElement('button'); button.type = 'button'; button.className = 'chapter-link';
         button.textContent = result.excerpt;
+        if (chapter) {const label = document.createElement('small'); label.textContent = chapter.label; button.prepend(label);}
         button.onclick = () => void jumpTo(result.cfi);
         output.append(button); count++;
       }
+      checked++;
+      $('search-status').textContent = `Searched ${checked} of ${sections.length} sections · ${count} matching passages`;
       if (count >= 100) break;
+      // Keep stop controls responsive even when cached sections load immediately.
+      await new Promise(resolve => setTimeout(resolve,0));
     }
     if (version === searchVersion) $('search-status').textContent = count ? `${count === 100 ? 'First ' : ''}${count} matching passages` : 'No matching passages. Try another word or phrase.';
   } catch {
     if (version === searchVersion) $('search-status').textContent = 'Search could not finish. Please try again.';
+  } finally {
+    if (version === searchVersion) $('cancel-book-search').hidden = true;
   }
 };
 $('reader-fullscreen').onclick = async () => {

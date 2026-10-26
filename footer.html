@@ -18,6 +18,8 @@
                     <p class="footer-heading">Explore</p>
                     <a href="/pages/start-here.html">Start Here</a>
                     <a href="/pages/publications.html">The Works</a>
+                    <a href="/pages/discover.html">Find your next read</a>
+                    <a href="/pages/gifts.html">Books to give</a>
                     <a href="/pages/holdfast.html">New Releases</a>
                     <a href="/pages/reading-lists.html">Reading Lists</a>
                     <a href="/pages/arc-team.html">ARC Team</a>
@@ -37,6 +39,7 @@
                     <a href="/pages/members.html">My account · The Archivists</a>
                     <a href="/pages/arc-team.html">ARC Team</a>
                     <a href="/pages/resources.html">Resources</a>
+                    <a href="/pages/newsletter.html">Email updates</a>
                 </div>
 
                 <div class="footer-col">
@@ -45,93 +48,27 @@
                     <a href="/pages/refund-policy.html">Refund Policy</a>
                     <a href="/pages/terms-of-service.html">Terms of Service</a>
                     <a href="/security-policy.html">Security Policy</a>
+                    <button type="button" class="footer-privacy-settings" data-privacy-settings>Privacy choices</button>
                 </div>
 
             </nav>
 
         </div>
 
-        <!-- THE ARCHIVISTS SIGNUP -->
         <section class="footer-archive-signup" aria-labelledby="footer-circle-title">
-
-            <p class="footer-archive-kicker">
-                The Archivists
-            </p>
-
-            <h2 id="footer-circle-title">
-                Become an Archivist
-            </h2>
-
-            <p>
-                Create your Reader Record inside the Blackwood Archive.
-            </p>
-
-            <p>
-                Receive private dispatches, ARC notices, release updates, rewards,
-                and fragments from behind the books.
-            </p>
-
-            <p>
-                Some records are reserved for Archivist Access.
-            </p>
-
-            <form
-                class="footer-ml-form"
-                action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe"
-                method="post"
-                target="footer-mailerlite-frame"
-                accept-charset="utf-8"
-                autocomplete="on"
-                onsubmit="
-                    document.getElementById('footer-archive-status').textContent = 'Opening your Reader Record...';
-                    this.querySelector('[data-footer-submit]').textContent = 'Filing...';
-                    window.setTimeout(() => {
-                        document.getElementById('footer-archive-status').textContent = 'Thank you. Check your inbox to confirm your place among the Archivists.';
-                        this.querySelector('[data-footer-submit]').textContent = 'Filed';
-                        this.reset();
-                    }, 1200);
-                "
-            >
-                <label class="sr-only" for="footer-email">
-                    Email address
-                </label>
-
-                <input
-                    id="footer-email"
-                    type="email"
-                    name="fields[email]"
-                    placeholder="Your email address"
-                    autocomplete="email"
-                    required
-                >
-
-                <input
-                    type="hidden"
-                    name="ml-submit"
-                    value="1"
-                >
-
-                <input
-                    type="hidden"
-                    name="anticsrf"
-                    value="true"
-                >
-
-                <button type="submit" data-footer-submit>
-                    Become an Archivist
-                </button>
+            <p class="footer-archive-kicker">Letters from Blackwood</p>
+            <h2 id="footer-circle-title">A monthly letter. A new place to begin.</h2>
+            <p>Book news, releases and occasional offers. Mailing-list signup is separate from your member account and ARC access.</p>
+            <form class="footer-ml-form" action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" method="post" target="footer-mailerlite-frame" accept-charset="utf-8">
+                <label class="sr-only" for="footer-email">Email address</label>
+                <input id="footer-email" type="email" name="fields[email]" placeholder="Your email address" autocomplete="email" maxlength="254" required>
+                <input type="hidden" name="ml-submit" value="1"><input type="hidden" name="anticsrf" value="true">
+                <label class="footer-mail-consent"><input type="checkbox" required> Email me Blackwood book news and occasional offers. I can unsubscribe at any time.</label>
+                <button type="submit" data-footer-submit>Join the mailing list</button>
             </form>
-
-            <iframe
-                name="footer-mailerlite-frame"
-                title="Mailing list signup"
-                style="display:none;"
-            ></iframe>
-
-            <p class="footer-archive-note" id="footer-archive-status" aria-live="polite">
-                You can unsubscribe at any time.
-            </p>
-
+            <iframe name="footer-mailerlite-frame" title="Mailing list provider response" hidden></iframe>
+            <p class="footer-archive-note" id="footer-archive-status" role="status" aria-live="polite">Check your inbox for any confirmation request. <a href="/pages/privacy-policy.html">Privacy policy</a>.</p>
+            <p><a href="/pages/newsletter.html">Mailing-list help</a> · <a href="/pages/members.html">Create or open a member account</a></p>
         </section>
 
         <!-- CENTER SEAL -->
@@ -155,6 +92,7 @@
                 <a href="/pages/terms-of-service.html">Terms of Service</a>
                 ·
                 <a href="/security-policy.html">Security Policy</a>
+
             </p>
         </div>
 
