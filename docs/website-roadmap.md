@@ -157,6 +157,17 @@ The catalogue has 24 visible reading titles; the hidden workbook remains in the 
 Dedicated `readingCover` fields preserve the discovery and bookshop presentation.
 No Supabase changes are required for these display mappings.
 
+## Owner-approved EPUB uploads: 27 October
+
+- [x] Owner approved The Black Bothy and The Crossing for BP Reading release.
+- [x] Confirm The Black Bothy uses book record 4 and ebook edition 10.
+- [x] Prepare/test its atomic, rerunnable [registration script](../supabase/operations/release-black-bothy.sql).
+- [ ] Run that script in live Supabase, refresh BP Reading and verify the uploaded EPUB.
+- [ ] Resolve The Crossing's real book/ebook IDs using [the read-only lookup](../supabase/operations/find-crossing-edition.sql), then register its approved upload.
+
+A GitHub push does not run these SQL operations. No member grants, payment records,
+RLS, bucket privacy, launch flags or navigation visibility are changed by this release.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and

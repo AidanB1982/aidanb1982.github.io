@@ -115,3 +115,32 @@ confirmed covers and use book12.jpg.
 Corrour Bothy's standard reading cover is book2.jpg. Book13.jpg is the separate black
 and copper limited physical edition, not a second reading title. The Manuscript Audit
 Workbook stays hidden from BP Reading and keeps its shop artwork.
+
+## Owner-approved uploads — 27 October 2026
+
+The owner approved both The Black Bothy and The Crossing for BP Reading release.
+Their object paths (inside the existing private bucket) are:
+
+- `The_Black_Bothy/The Black Bothy.epub`
+- `The_Crossing/The Crossing.epub`
+
+The supplied live lookup confirms **The Black Bothy: book record 4, ebook edition 10**.
+Run [the tested Black Bothy release script](../supabase/operations/release-black-bothy.sql)
+in Supabase SQL Editor as administrator. It checks the real edition/parent/format,
+private bucket and exact object; preserves an existing reading identity; registers
+the file and catalogue row; and pins an enabled release to the exact object. It rolls
+back if validation fails and can be rerun without duplicate rows. Unexpected extra
+mandatory registry fields stop the script rather than receive invented values.
+
+This script is prepared and tested locally; a GitHub push does not run it in Supabase.
+After a successful run, refresh BP Reading and test the actual uploaded EPUB with an
+authorised account. Existing entitlement checks and customer-launch settings remain
+in force. The page stays hidden from member and public navigation.
+
+The first exact-title lookup did not return The Crossing. Run
+[the read-only Crossing lookup](../supabase/operations/find-crossing-edition.sql) and
+return its `crossing_lookup` value. It searches title/edition-name variations and
+Miren's author identity without exposing contact details. If no edition exists, create
+its real book/ebook records with the appropriate author relationship before registering
+the upload. Do not reuse edition 10, Gualachulain's edition 2, or an ID from the separate
+`publishing_editions` inventory table.

@@ -245,3 +245,9 @@ the real EPUB engine, checks prose/copyright against their source paragraphs, an
 exercises page turns, section navigation, local notes/resume and mobile display.
 It also asserts no private delivery request or fabricated edition key is used.
 The public-text route is allowlisted; this does not release other protected titles.
+
+`tests/reading-owner-release.cjs` runs the actual Black Bothy registration SQL in
+embedded PostgreSQL (PGlite). It checks matching real IDs/format, private bucket/file
+validation, unexpected mandatory registry columns, rollback and rerun behaviour,
+stable reading identities and preservation of other releases. This is not a live
+Supabase deployment or proof that the uploaded EPUB renders successfully.
