@@ -18,6 +18,13 @@ that still need live configuration, database changes or app-store setup.
 BP Reading navigation/member links remain hidden. No missing author accounts are
 created by this operation; new preparation records carry no invented contract dates.
 
+## Compact mobile reading shelf
+
+- [x] Use smaller covers and tighter card spacing on phones/small tablets.
+- [x] Omit repeated eyebrows/synopses and duplicate Coming soon text on mobile,
+  retaining complete titles, reading progress and 44px reading buttons.
+- [x] Keep desktop descriptions and the approved reading order. No Supabase change.
+
 ## BP Reading chronology
 
 - [x] Group The Third Night, The Black Bothy, The Gåtestein Log, The Drowned Fjord,

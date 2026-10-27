@@ -21,5 +21,12 @@ assert.equal(await p.locator('.open-book:not(:disabled)').count(),2);assert.equa
    await p.waitForSelector('.book-card[data-edition-id="77"]');assert.equal(await p.locator('.book-card').count(),count,'promotion replaces the matching placeholder');assert.equal(await p.getByRole('heading',{name:'Camban',exact:true}).count(),1);assert.equal(await p.getByRole('button',{name:'Read Book',exact:true}).count(),3);assert((await p.evaluate(()=>window.accessQueries)).every(id=>id===77));}
  }
  for(const width of [320,768]){await p.setViewportSize({width,height:900});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'catalogue layout fits '+width);}
+ await p.setViewportSize({width:390,height:844});
+ const first=p.locator('.book-card').first();
+ assert((await first.boundingBox()).height<260,'compact mobile card');
+ assert((await first.locator('.open-book').boundingBox()).height>=44,'touch target');
+ assert.equal(await first.locator('.book-synopsis').isVisible(),false);
+ await p.setViewportSize({width:1280,height:900});
+ if(!config.metadataMissing)assert.equal(await first.locator('.book-synopsis').isVisible(),true,'desktop retains synopsis');
  assert.deepEqual(errors,[]);await p.close();
 }console.log('PASS pending catalogue: empty server/admin/member states, no invented IDs or access calls, promotion after approval, missing-server/metadata failures and mobile layouts');}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});
