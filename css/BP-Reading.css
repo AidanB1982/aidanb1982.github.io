@@ -867,3 +867,9 @@ body.bp-reading-page .simple-header {
 @media(max-width:760px) {
  #reader-panel :is(select,input,textarea) { font-size:16px; min-height:44px; }
 }
+
+/* Planned titles are a display-only catalogue, never an unlocked reading edition. */
+.book-card[data-availability="coming-soon"] { background:linear-gradient(145deg,#22261f,#181c17); }
+.book-card[data-availability="coming-soon"] .book-cover img { opacity:.8; }
+.book-card[data-availability="coming-soon"] .open-book:disabled { cursor:default; opacity:.7; background:transparent; color:var(--text); border:1px solid var(--border); box-shadow:none; }
+.book-card .progress-track[hidden] { display:none; }

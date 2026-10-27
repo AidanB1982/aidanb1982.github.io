@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="/css/header.css?v=20261115">
   <link rel="stylesheet" href="/css/styles.css?v=20260913">
   <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
-  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261115">
+  <link rel="stylesheet" href="/css/BP-Reading.css?v=20261121">
 <script src="/js/analytics-consent.js?v=20261116" defer></script>
 </head>
 
@@ -53,7 +53,7 @@
       <div><p class="device-note">Read inside BP Reading. No file downloads.<br>Refund requests must be made within 7 days of purchase. After this period, membership payments are non-refundable, subject to your statutory rights.<br>Cancel renewal at any time; access continues until your paid period ends.<br>Membership checkout is being connected.</p><button class="control" id="subscribe-reading" type="button">Subscribe — £20 per year</button><button class="control" id="check-reading-payment" type="button" hidden>Check payment</button><p class="device-note" id="reading-payment-status" role="status" aria-live="polite"></p></div>
     </section>
     <p id="reading-sync-status" class="device-note" role="status" aria-live="polite">Checking reading sync…</p>
-    <div class="library-tools"><label>Find your next read<input id="library-search" type="search" placeholder="Title, author or series"></label><label>Reading status<select id="library-status"><option value="all">All books</option><option value="reading">In progress</option><option value="unread">Unread</option><option value="finished">Finished</option></select></label><label>Sort by<select id="library-sort"><option value="series">Series order</option><option value="title">Title</option></select></label><button class="control" id="load-synced" type="button">Load synced place</button></div>
+    <div class="library-tools"><label>Find your next read<input id="library-search" type="search" placeholder="Title, author or series"></label><label>Reading status<select id="library-status"><option value="all">All books</option><option value="reading">In progress</option><option value="unread">Unread</option><option value="finished">Finished</option></select></label><label>Reading availability<select id="library-availability"><option value="all">Full collection</option><option value="ready">Reading editions listed</option><option value="coming">Coming soon</option></select></label><label>Sort by<select id="library-sort"><option value="series">Series order</option><option value="title">Title</option></select></label><button class="control" id="load-synced" type="button">Load synced place</button></div>
     <button class="control" id="preview-reading-checkout" type="button" hidden>Preview annual checkout</button>
     <button class="control" id="check-reading-setup" type="button" hidden>Check Shopify setup</button><pre id="reading-setup-result" class="device-note" role="status" aria-live="polite" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
     <form id="reading-reconcile-form" class="library-tools" hidden>
@@ -62,6 +62,7 @@
       <p class="device-note">Administrator recovery checks Shopify's saved payment and original reader account. It does not charge again or change fulfilment.</p>
     </form>
     <div class="shelf-heading"><h2>Your library</h2><span>Your collection</span></div>
+    <p id="library-catalogue-status" class="device-note" role="status" aria-live="polite"></p>
     <section
       class="book-grid"
       id="book-grid"
@@ -76,7 +77,7 @@
     </p>
 
     <p class="library-note">
-      Only approved reading editions appear here. Your reading place and private notebook are linked to your account.
+      The full Blackwood collection is listed here. “Coming soon” titles cannot be opened until their reading editions are uploaded and approved. Your reading place and private notebook are linked to your account.
     </p>
 
   </main>
@@ -310,7 +311,7 @@
 
   <!-- BP READING APPLICATION -->
 
-  <script type="module" src="/js/BP-reading.js?v=20261118"></script>
+  <script type="module" src="/js/BP-reading.js?v=20261121"></script>
 
 </body>
 </html>

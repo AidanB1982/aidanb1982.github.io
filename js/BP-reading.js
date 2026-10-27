@@ -6,6 +6,7 @@ import {
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
+import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261121";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
 /* =====================================================
@@ -34,6 +35,8 @@ let BOOK = {
     "Blackwood Publishing — administrator reading edition."
 };
 
+const ADMIN_TEST_BOOK = Object.freeze({...BOOK});
+
 let STORAGE_KEY = "bp-reading-gualachulain-v1";
 let activeUser = null;
 let membershipStatus={known:false,active:false,expiresAt:null};
@@ -45,6 +48,8 @@ let readerLastSize="";
 let checkoutController = null;
 let readingAccount = null;
 let libraryBooks = [BOOK];
+let catalogueVerified = false;
+let plannedCatalogueLoaded = false;
 let switchingEdition = false;
 let sessionEpoch = 0;
 
@@ -213,31 +218,36 @@ function renderLibrary() {
   const filter = $("library-status").value;
   const collection = libraryBooks.map(book => {
     let saved = {};
-    try { saved = JSON.parse(localStorage.getItem(`bp-reading:${activeUser?.id}:edition:${book.editionId}:v2`)) || {}; } catch {}
+    if (book.readingReady) try { saved = JSON.parse(localStorage.getItem(`bp-reading:${activeUser?.id}:edition:${book.editionId}:v2`)) || {}; } catch {}
     const progress = Number.isFinite(saved.progress) ? clamp(saved.progress,0,100) : 0;
     return {...book, progress, started:saved.hasStarted === true,lastChapter:typeof saved.lastChapter==='string'?saved.lastChapter.slice(0,500):'',lastReadAt:Number.isFinite(saved.lastReadAt)?saved.lastReadAt:0};
   });
   renderContinueReading(collection);
-  const books=collection.filter(book => `${book.title} ${book.author} ${book.series}`.toLowerCase().includes(query)
+  const availability = $('library-availability').value;
+  const books=collection.filter(book => (availability === 'all' || (availability === 'ready' ? book.readingReady : !book.readingReady)) && `${book.title} ${book.author} ${book.series}`.toLowerCase().includes(query)
     && (filter === 'all' || (filter === 'finished' ? book.progress >= 100 : filter === 'unread' ? !book.started : book.started && book.progress < 100)));
   books.sort((a,b) => $('library-sort').value === 'title' ? a.title.localeCompare(b.title) : String(a.series).localeCompare(String(b.series)) || (a.seriesOrder || 0) - (b.seriesOrder || 0) || a.title.localeCompare(b.title));
+  const ready = collection.filter(book=>book.readingReady).length;
+  $('library-catalogue-status').textContent = `${books.length} of ${collection.length} titles shown · ${ready} reading edition${ready===1?'':'s'} listed` + (!catalogueVerified ? ' · Reading availability could not be fully checked; refresh to retry.' : '') + (!plannedCatalogueLoaded ? ' · The full book list could not load; showing approved editions only.' : ' · Other titles will follow as reading editions are prepared.');
+  $('load-synced').disabled = !readingAccount || switchingEdition;
   if (!books.length) { grid.textContent = 'No books match these filters.'; return; }
   for (const book of books) {
-    const card = document.createElement('article'); card.className = 'book-card';
+    const card = document.createElement('article'); card.className = 'book-card'; card.dataset.availability = book.readingReady ? 'ready' : 'coming-soon'; if(book.readingReady)card.dataset.editionId=String(book.editionId);
     const cover = document.createElement('div'); cover.className = 'book-cover';
-    const image = document.createElement('img'); image.src = book.cover; image.alt = book.title + ' cover'; image.loading = 'lazy'; cover.append(image);
+    const image = document.createElement('img'); image.src = book.cover; image.alt = book.coverAlt || book.title + ' cover'; image.loading = 'lazy'; cover.append(image);
     const details = document.createElement('div'); details.className = 'book-details';
-    const eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = book.started ? 'PICK UP WHERE YOU LEFT OFF' : 'YOUR NEXT CHAPTER AWAITS';
+    const eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = !book.readingReady ? 'IN THE BLACKWOOD COLLECTION' : book.started ? 'PICK UP WHERE YOU LEFT OFF' : 'YOUR NEXT CHAPTER AWAITS';
     const heading = document.createElement('h2'); heading.textContent = book.title;
     const meta = document.createElement('p'); meta.className = 'book-description'; meta.textContent = [book.author, book.series, book.seriesOrder ? 'Book ' + book.seriesOrder : ''].filter(Boolean).join(' · ');
     const description = document.createElement('p'); description.className = 'book-description'; description.textContent = book.description;
-    const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = book.started ? `${book.progress}% complete` : 'Not started';
+    const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = !book.readingReady ? book.availabilityUnknown ? 'Availability could not be checked.' : 'The reading edition is being prepared.' : book.started ? `${book.progress}% complete` : 'Not started';
     const track = document.createElement('div'); track.className = 'progress-track'; const fill = document.createElement('div'); fill.className = 'progress-fill'; fill.style.width = book.progress + '%'; track.append(fill);
-    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = switchingEdition || state.isLoading;
-    button.onclick = () => {if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = !book.readingReady || switchingEdition || state.isLoading;
+    button.onclick = () => {if (!book.readingReady) return; if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
     const badges=document.createElement('div');badges.className='book-badges';
-    const access=document.createElement('span');access.className='book-badge';access.textContent=!book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
+    const access=document.createElement('span');access.className='book-badge';access.textContent=!book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
     if(book.progress>=100){const finished=document.createElement('span');finished.className='book-badge finished';finished.textContent='Finished';badges.append(finished);}
+    track.hidden = !book.readingReady;
     track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
     details.append(badges,eyebrow,heading,meta,description,progress,track,button); card.append(cover,details); grid.append(card);
   }
@@ -272,7 +282,7 @@ async function connectEdition(book) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot())); } catch {}
 }
 async function openEdition(book) {
-  if (!activeUser || !book.canRead || switchingEdition || state.isOpen) return;
+  if (!activeUser || !book.readingReady || !Number.isSafeInteger(book.editionId) || !book.canRead || switchingEdition || state.isOpen) return;
   const epoch = sessionEpoch;
   switchingEdition = true; renderLibrary();
   try {
@@ -332,11 +342,14 @@ async function loadReadingCatalogue() {
   if (!user) return;
   await refreshReadingMembership();
   if(activeUser?.id!==user.id)return;
+  let approved = user.isAdmin ? [{...ADMIN_TEST_BOOK}] : [];
+  catalogueVerified = false;
   try {
     const {data,error} = await supabase.from('bp_reading_catalog').select('edition_id,book_id,title,author,description,cover_url,series,series_order').eq('available',true);
     if (error) throw error;
     if (activeUser?.id !== user.id) return;
-    if (Array.isArray(data)) libraryBooks = data.map(row => ({editionId:row.edition_id,id:String(row.edition_id),bookId:row.book_id,title:row.title,author:row.author || '',description:row.description || '',cover:safeCover(row.cover_url),series:row.series || '',seriesOrder:row.series_order}));
+    catalogueVerified = Array.isArray(data);
+    if (Array.isArray(data)) approved = data.map(row => ({editionId:row.edition_id,id:String(row.edition_id),bookId:row.book_id,title:row.title,author:row.author || '',description:row.description || '',cover:row.cover_url ? safeCover(row.cover_url) : '',series:row.series || '',seriesOrder:row.series_order}));
     const states = await supabase.from('bp_reading_state').select('edition_id,payload').eq('user_id',activeUser.id);
     if (!states.error && Array.isArray(states.data)) {
       for (const row of states.data) {
@@ -345,7 +358,21 @@ async function loadReadingCatalogue() {
         if (!pending && row.payload && typeof row.payload === 'object') localStorage.setItem(key,JSON.stringify(row.payload));
       }
     }
-  } catch { if (!user.isAdmin) libraryBooks = []; }
+  } catch { /* Existing administrator test edition remains the only local fallback. */ }
+  let planned = [];
+  plannedCatalogueLoaded = false;
+  const catalogueRequest = new AbortController();
+  const catalogueTimeout = setTimeout(()=>catalogueRequest.abort(),8000);
+  try {
+    const response = await fetch('/data/book-discovery.json?v=20261121',{signal:catalogueRequest.signal});
+    if (!response.ok) throw Error();
+    const data = await response.json();
+    if (!Array.isArray(data)) throw Error();
+    planned = data; plannedCatalogueLoaded = true;
+  } catch { /* Approved server editions remain usable if display metadata is unavailable. */ }
+  finally { clearTimeout(catalogueTimeout); }
+  if (activeUser?.id !== user.id) return;
+  libraryBooks = mergeReadingCatalogue(planned,approved,{verified:catalogueVerified});
   if (activeUser?.id !== user.id) return;
   // Labels describe verified purchases; they never grant access.
   let purchases=[];
@@ -353,6 +380,7 @@ async function loadReadingCatalogue() {
   if(activeUser?.id!==user.id)return;
   libraryBooks=libraryBooks.map(book=>({...book,owned:purchases.includes(book.bookId)}));
   const checked = await Promise.all(libraryBooks.map(async book => {
+    if (!book.readingReady) return {...book,canRead:false};
     if (user.isAdmin) return {...book,canRead:true};
     try {const access = await supabase.rpc('bp_reading_can_read',{p_edition_id:book.editionId});return {...book,canRead:!access.error && access.data === true};}
     catch {return {...book,canRead:false};}
@@ -1663,7 +1691,7 @@ function chapterTimeRemaining() {
 $('save-highlight').onclick = () => addAnnotation(selectedPassage);
 $('dismiss-selection').onclick = () => {$('selection-tools').hidden = true; selectedPassage = null;};
 $('add-page-note').onclick = () => {const cfi = getCurrentCfi(); if (cfi) addAnnotation({cfi,chapter:chapterName()});};
-for (const id of ['library-search','library-status','library-sort']) $(id).addEventListener(id === 'library-search' ? 'input' : 'change',renderLibrary);
+for (const id of ['library-search','library-status','library-sort','library-availability']) $(id).addEventListener(id === 'library-search' ? 'input' : 'change',renderLibrary);
 $('load-synced').onclick = async () => {
   if (!readingAccount || state.isOpen || switchingEdition) return;
   if (!confirm('Load this book’s synced reading data? Any unsynced local changes for this book will be replaced.')) return;
@@ -2116,7 +2144,9 @@ async function initialise() {
     $('reader-watermark').textContent = 'Personal reading copy · Reader ' + user.id.slice(0,8).toUpperCase();
     await loadReadingCatalogue();
     if (!activeUser || epoch !== sessionEpoch) return;
-    await connectEdition(BOOK);
+    const firstReadable = libraryBooks.find(book=>book.canRead);
+    if (firstReadable) await connectEdition(firstReadable);
+    else reportSync("Your collection is listed below. Reading editions will become available when prepared and authorised.");
     if (!activeUser || epoch !== sessionEpoch) return;
     renderLibrary();
     $("reader-access").hidden = true;

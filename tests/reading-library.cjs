@@ -1,5 +1,6 @@
 const {chromium} = require('playwright');
 const assert = require('node:assert/strict');
+const plannedCount=require('../data/book-discovery.json').length;
 const TEST_DIR = process.env.READING_TEST_DIR || '/tmp/blackwood-reading-test';
 const CUSTOMER_TEST = process.env.READING_CUSTOMER_TEST === '1';
 const EXPIRED_TEST=process.env.READING_EXPIRED_TEST==='1';
@@ -25,7 +26,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
         }
         return {auth:{getUser:async()=>({data:{user:{id:'library-test'}}}),getSession:async()=>({data:{session:{access_token:'test'}}}),onAuthStateChange:()=>{}},
           from(table){const filters={};return {select(){return this},eq(key,value){filters[key]=value;return this},single:async()=>({data:{is_admin:${CUSTOMER_TEST || LOCKED_TEST || PURCHASE_TEST ? 'false' : 'true'}}}),maybeSingle:async()=>({data:rows(table,filters)[0]||null}),then(resolve,reject){return Promise.resolve({data:rows(table,filters)}).then(resolve,reject)}}},
-          async rpc(name,args){if(name==='bp_reading_can_read')return {data:${LOCKED_TEST ? 'false' : 'true'}};const cloud=JSON.parse(localStorage.getItem('mock-cloud')||'{}');const row=cloud[args.p_edition_id];if((row?.revision||0)!==args.p_expected_revision)return {error:{code:'40001'}};cloud[args.p_edition_id]={payload:args.p_payload,revision:(row?.revision||0)+1};localStorage.setItem('mock-cloud',JSON.stringify(cloud));return {data:cloud[args.p_edition_id].revision};}
+          async rpc(name,args){if(name==='bp_reading_can_read'){(window.testEntitlementIds ||= []).push(args.p_edition_id);return {data:${LOCKED_TEST ? 'false' : 'true'}};}const cloud=JSON.parse(localStorage.getItem('mock-cloud')||'{}');const row=cloud[args.p_edition_id];if((row?.revision||0)!==args.p_expected_revision)return {error:{code:'40001'}};cloud[args.p_edition_id]={payload:args.p_payload,revision:(row?.revision||0)+1};localStorage.setItem('mock-cloud',JSON.stringify(cloud));return {data:cloud[args.p_edition_id].revision};}
         };
       }`});
     if (url.includes('jszip')) return route.fulfill({path:`${TEST_DIR}/jszip.min.js`,contentType:'application/javascript'});
@@ -35,7 +36,15 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   });
   await page.goto(`${BASE_URL}/pages/bp-reading.html`);
   await page.waitForFunction(()=>!document.getElementById('library').hidden);
-  assert.equal(await page.locator('.book-card').count(),2);
+  assert.equal(await page.locator('.book-card').count(),plannedCount+1);
+  assert.equal(await page.locator('.book-card[data-availability=ready]').count(),2);
+  assert.equal(await page.locator('.book-card[data-availability=coming-soon]').count(),plannedCount-1);
+  await page.locator('#library-availability').selectOption('coming');
+  assert.equal(await page.locator('.open-book:not(:disabled)').count(),0,'pending titles cannot open, even for administrators');
+  assert.equal(await page.locator('.progress-track:visible').count(),0,'pending titles do not pretend to have reading progress');
+  assert((await page.evaluate(()=>window.testEntitlementIds||[])).every(id=>id===2||id===3),'only approved editions receive entitlement queries');
+  await page.locator('#library-availability').selectOption('ready');assert.equal(await page.locator('.book-card').count(),2);
+  await page.locator('#library-availability').selectOption('all');
   assert.equal(await page.locator('#reading-membership-offer').count(),!CUSTOMER_TEST&&(LOCKED_TEST||PURCHASE_TEST)?1:0,'whole offer removed for active members and admins');
   if(CUSTOMER_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Annual membership active.*Reading access through/);
   if(CUSTOMER_TEST) {
@@ -48,15 +57,16 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
   if(!CUSTOMER_TEST&&!LOCKED_TEST&&!PURCHASE_TEST)assert.match(await page.locator('#reading-membership-text').textContent(),/Administrator access/);
   if(CUSTOMER_TEST||PURCHASE_TEST)assert.equal(await page.getByRole('button',{name:'Read Book',exact:true}).count(),2);
   if(PURCHASE_TEST)assert.equal(await page.locator('.book-card').filter({has:page.getByRole('heading',{name:'Gualachulain',exact:true})}).locator('.book-badge').first().textContent(),'Owned','verified permanent purchase label');
-  if(CUSTOMER_TEST)assert.equal(await page.locator('.book-badge').first().textContent(),'Included','membership inclusion label');
+  if(CUSTOMER_TEST)assert.equal(await page.locator('.book-card[data-availability=ready] .book-badge').first().textContent(),'Included','membership inclusion label');
   const titleSize=await page.locator('.library h1').evaluate(node=>parseFloat(getComputedStyle(node).fontSize));assert(titleSize<=28,'compact library title');
   if (LOCKED_TEST) {
     assert.equal(await page.getByRole('button',{name:'Subscribe to read',exact:true}).count(),2);
-    await page.locator('#book-grid .open-book').first().click();
+    await page.locator('#book-grid .book-card[data-availability=ready] .open-book').first().click();
     assert.equal(await page.locator('#reader').isVisible(),false);
     assert.match(await page.locator('#library-error').textContent(),/membership or purchase/);
     console.log('PASS signed-in nonmember sees subscription route and cannot open protected books');await browser.close();return;
   }
+  await page.locator('#library-search').fill('Camban');assert.equal(await page.locator('.book-card').count(),1);assert.equal(await page.getByRole('button',{name:'Coming soon',exact:true}).isDisabled(),true);
   await page.locator('#library-search').fill('Test Author');assert.equal(await page.locator('.book-card').count(),1);
   await page.locator('#book-grid .open-book').click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
   assert.equal(await page.locator('#reader-book-title').textContent(),'Fixture Title','selected edition title');

@@ -157,7 +157,11 @@
     "cover": "/assets/book7.png",
     "description": "Book Two of The Cursed Bothies. Continue the series beyond Corrour Bothy.",
     "href": "/pages/cursed-bothies.html",
-    "sample": null
+    "sample": null,
+    "readingAliases": [
+      "gualachulain",
+      "Gualachulain Bothy"
+    ]
   },
   {
     "id": "the-crossing",
@@ -219,6 +223,88 @@
     "cover": "/assets/Accounting_Landlords.jpg",
     "description": "Practical record keeping and accounting guidance for UK landlords.",
     "href": "/pages/landlords.html",
+    "sample": null
+  },
+  {
+    "id": "camban",
+    "title": "Camban",
+    "author": "Aidan Blackwood",
+    "series": "The Cursed Bothies",
+    "order": 3,
+    "genre": "Horror",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/book8.jpg",
+    "description": "A documentary crew goes looking for folklore in the hills and finds something that refuses to remain a story.",
+    "href": "/pages/cursed-bothies.html",
+    "sample": null
+  },
+  {
+    "id": "sanare-per-mortem",
+    "title": "Sanare Per Mortem",
+    "author": "Aidan Blackwood",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Independent works",
+    "moods": [
+      "Unease"
+    ],
+    "cover": "/assets/logo1.png",
+    "coverAlt": "Blackwood Publishing mark; cover to follow",
+    "description": "An independent Blackwood work. Its in-reader edition is being prepared.",
+    "href": "/pages/publications.html",
+    "sample": null,
+    "readingAliases": [
+      "sanae-per-mortem"
+    ]
+  },
+  {
+    "id": "the-third-night",
+    "title": "The Third Night",
+    "author": "Aidan Blackwood",
+    "series": "Recovered Files",
+    "order": null,
+    "genre": "Supernatural fiction",
+    "moods": [
+      "Isolation",
+      "Unease"
+    ],
+    "cover": "/assets/TheThirdNight.png",
+    "description": "A recovered account connected to The Black Bothy. Not everything that comes back from the hills is meant to.",
+    "href": "/pages/the-third-night.html",
+    "sample": null
+  },
+  {
+    "id": "the-gatestein-log",
+    "title": "The Gåtestein Log",
+    "author": "Aidan Blackwood",
+    "series": "Recovered Files",
+    "order": null,
+    "genre": "Supernatural fiction",
+    "moods": [
+      "Memory",
+      "Unease"
+    ],
+    "cover": "/assets/Gatestein.jpg",
+    "description": "A recovered journal fragment connected to The Drowned Fjord.",
+    "href": "/pages/gatestein-log.html",
+    "sample": null
+  },
+  {
+    "id": "blackwood-manuscript-audit-workbook",
+    "title": "Blackwood Manuscript Audit Workbook",
+    "author": "",
+    "series": "Writer Resources",
+    "order": null,
+    "genre": "Non-fiction",
+    "moods": [
+      "Practical"
+    ],
+    "cover": "/assets/BYA.jpg",
+    "description": "A self-guided structural revision workbook for fiction writers. The in-reader edition is being prepared.",
+    "href": "/pages/store.html#blackwood-manuscript-audit-workbook",
     "sample": null
   }
 ]

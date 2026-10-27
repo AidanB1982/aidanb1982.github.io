@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {mergeReadingCatalogue} from '../js/BP-reading-catalogue.js';
+const planned=[{id:'gualachulain-bothy',title:'Gualachulain',author:'Aidan Blackwood',cover:'/assets/book7.png',readingAliases:['gualachulain','Gualachulain Bothy']},{id:'future',title:'Future title',editionId:999,canRead:true,readingReady:true}];
+let result=mergeReadingCatalogue(planned,[]);
+assert.equal(result.length,2);assert(result.every(b=>b.editionId===null&&!b.canRead&&!b.readingReady),'metadata never supplies an edition ID or unlock');
+const approved={editionId:2,bookId:'gualachulain',title:'Gualachulain',author:'Aidan Blackwood',canRead:true};
+result=mergeReadingCatalogue(planned,[approved]);assert.equal(result.length,2);assert.equal(result.filter(b=>b.title==='Gualachulain').length,1);assert.equal(result[0].editionId,2);assert.equal(result[0].cover,'/assets/book7.png');assert.equal(result[0].canRead,true);
+result=mergeReadingCatalogue(planned,[{...approved,canRead:false}]);assert.equal(result[0].readingReady,true);assert.equal(result[0].canRead,false,'approved listing still needs independently checked entitlement');
+result=mergeReadingCatalogue(planned,[{...approved,title:'Gualachulain Bothy',bookId:'another-real-id'}]);assert.equal(result.length,2,'documented alternate title deduplicates without changing the real ID');
+result=mergeReadingCatalogue(planned,[{...approved,bookId:'actual-database-id'}]);assert.equal(result.filter(b=>b.title==='Gualachulain').length,1,'matching title and author do not need guessed DB IDs');
+result=mergeReadingCatalogue(planned,[{...approved,bookId:'different-book',author:'Another author'}]);assert.equal(result.length,3,'title alone does not merge different authors');
+result=mergeReadingCatalogue(planned,[approved,approved,{editionId:-1},{editionId:3,title:'New server title',canRead:false}]);assert.equal(result.length,3,'duplicate and invalid edition IDs discarded, unknown approved title retained');
+result=mergeReadingCatalogue(planned,[],{verified:false});assert(result.every(b=>b.availabilityUnknown&&!b.canRead));
+console.log('PASS planned catalogue: display-only metadata, no invented IDs or access, promotion without duplicate cards, missing artwork fallback, entitlement separation and failed verification');

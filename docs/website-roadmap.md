@@ -115,6 +115,20 @@ access or direct reader-page permissions. Public reader navigation remains hidde
 - [x] Use two-column phone navigation, a full-width phone signup, readable text and 44px controls.
 - [x] Keep BP Reading hidden and retain privacy-choice controls.
 
+## Completed: full BP Reading collection, 27 October
+
+- [x] List the 19 Blackwood titles/workbooks/fragments documented on the site, excluding
+  other publishers' recommendations, duplicate physical formats and editorial services.
+- [x] Keep missing reading editions as disabled Coming soon cards, including for admins.
+- [x] Add availability filtering and catalogue counts without invented IDs or progress.
+- [x] Replace matching placeholders with approved Supabase editions without duplicate cards.
+- [x] Preserve entitlement, private-file delivery, per-edition state and hidden navigation.
+- [x] Prepare [the gradual-upload checklist](bp-reading-book-uploads.md).
+- [ ] Upload, register, approve and test each actual EPUB edition as rights permit.
+- [ ] Confirm a front cover for Sanare Per Mortem; the imprint mark is used for now.
+
+No new Supabase migration or function deployment is needed for the shelf display.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and

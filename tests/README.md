@@ -230,3 +230,12 @@ live Supabase policies, MailerLite or Google Analytics settings.
 `node tests/reading-account.mjs` checks cross-device sync and conflict/outbox behaviour.
 The existing `tests/bp-reading.cjs` exercises search and rendering with the local real
 EPUB fixture; see its fixture prerequisites above.
+
+## Planned reading catalogue
+
+`node tests/reading-catalogue.mjs` checks that display metadata cannot supply edition
+IDs or access and that approved records replace matching placeholders.
+`tests/reading-catalogue-browser.cjs` checks empty catalogues, admin/member placeholders,
+newly approved titles, unavailable services and narrow layouts using mocked services.
+`tests/reading-library.cjs` covers approved-edition opening/sync alongside the full shelf;
+set `READING_CUSTOMER_TEST=1` or `READING_LOCKED_TEST=1` for those access states.

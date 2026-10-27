@@ -136,7 +136,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  assert(await page.locator('#reader-access').isVisible(),'failed auth has visible recovery');assert(!(await page.locator('#library').isVisible()),'failed auth hides library');
  await page.unroute('https://esm.sh/**');
  await page.route('**/functions/v1/bp-reading-deliver-epub',r=>r.fulfill({status:403,contentType:'application/json',body:JSON.stringify({error:'Test access denied'}),headers:{'access-control-allow-origin':'*'}}));
- await page.reload();await page.locator('#book-grid .open-book').click();await page.waitForFunction(()=>document.getElementById('library-error').textContent.includes('Test access denied'));
+ await page.reload();await page.locator('#book-grid .book-card[data-availability=ready] .open-book').click();await page.waitForFunction(()=>document.getElementById('library-error').textContent.includes('Test access denied'));
  assert(await page.locator('#library').isVisible(),'delivery failure returns to library');
  await page.waitForSelector('#header-placeholder .simple-header');
  const mobileMenu=page.locator('#header-placeholder .blackwood-mobile-toggle');
