@@ -168,6 +168,15 @@ No Supabase changes are required for these display mappings.
 A GitHub push does not run these SQL operations. No member grants, payment records,
 RLS, bucket privacy, launch flags or navigation visibility are changed by this release.
 
+## Whole-catalogue database reconciliation
+
+- [x] Owner authorised reusing existing records and creating missing book/ebook records.
+- [x] Prepare/test [a non-mutating catalogue/schema report](../supabase/operations/inspect-reading-catalogue.sql) across reader/Author Desk and Publishing Inventory tables.
+- [ ] Run the inspection in live Supabase and return `catalogue_report`.
+- [ ] Use the actual schema to prepare/test a duplicate-safe bulk create/reuse script.
+- [ ] Link the approved Crossing upload to its real newly resolved/created ebook edition.
+- [ ] Keep all other unuploaded editions planned/Coming soon; do not enable releases in bulk.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and

@@ -144,3 +144,30 @@ Miren's author identity without exposing contact details. If no edition exists, 
 its real book/ebook records with the appropriate author relationship before registering
 the upload. Do not reuse edition 10, Gualachulain's edition 2, or an ID from the separate
 `publishing_editions` inventory table.
+
+## Whole-catalogue reconciliation
+
+The owner authorised finding/reusing existing records and creating missing records
+for The Crossing and the other books. Before constructing the bulk insert, run
+[the catalogue inspection](../supabase/operations/inspect-reading-catalogue.sql) in
+Supabase SQL Editor and return its `catalogue_report` JSON result.
+
+The report pulls non-contact book/edition metadata from both systems:
+
+- `book_records` / `book_editions`: Author Desk and protected-reader edition identities.
+- `publishing_titles` / `publishing_editions`: the separate Publishing Inventory model.
+- Existing author/contributor identities and reader catalogue registrations.
+- Actual column defaults, generated-ID settings, required fields and constraints.
+- The 24 current reading titles to reconcile, excluding the hidden workbook.
+
+Optional absent tables/columns are reported without making up values. No persistent
+table is written, no permissions are changed and no absent book is created by this
+inspection. It uses a session-local setting to return one JSON result rather than
+creating a permanent report table/function. Run the entire file together.
+
+The next bulk operation must reuse unambiguous existing works and real ebook IDs,
+create genuinely missing records with database-generated IDs/defaults, preserve existing
+reader identities and stop on ambiguous matches. It must not copy an ID from the
+Publishing Inventory into `book_editions`, invent commercial ISBNs/prices, grant author
+permissions by guessing a profile, or publish files that have not been uploaded and
+approved. Public recovered stories do not need fictitious Supabase EPUB editions.

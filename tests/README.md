@@ -251,3 +251,8 @@ embedded PostgreSQL (PGlite). It checks matching real IDs/format, private bucket
 validation, unexpected mandatory registry columns, rollback and rerun behaviour,
 stable reading identities and preservation of other releases. This is not a live
 Supabase deployment or proof that the uploaded EPUB renders successfully.
+
+`tests/reading-catalogue-inspection.cjs` executes the catalogue inspection in PGlite
+and checks both ID namespaces, absent optional tables/columns, real schema details,
+exclusion of contact data and absence of book-record mutations. It does not inspect
+the live Supabase project; the owner must run the published report there.
