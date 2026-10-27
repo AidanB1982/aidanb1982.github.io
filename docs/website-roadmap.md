@@ -107,6 +107,14 @@ No Supabase or email configuration changes are required for this layout update.
 This is a presentation switch, not a change to protected delivery, existing paid
 access or direct reader-page permissions. Public reader navigation remains hidden.
 
+## Completed: shared footer tidy, 27 October
+
+- [x] Replace uneven navigation and duplicate account/ARC links with three balanced groups.
+- [x] Align the brand at the top and consolidate legal links into one readable bottom row.
+- [x] Simplify newsletter presentation while preserving explicit consent and provider handling.
+- [x] Use two-column phone navigation, a full-width phone signup, readable text and 44px controls.
+- [x] Keep BP Reading hidden and retain privacy-choice controls.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and

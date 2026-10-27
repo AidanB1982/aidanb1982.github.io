@@ -1,101 +1,70 @@
 <footer class="footer">
-
     <div class="footer-content">
-
-        <!-- TOP ROW -->
         <div class="footer-top">
-
-            <!-- LEFT -->
             <div class="footer-brand">
-                <p class="footer-title">Blackwood Publishing</p>
-                <p class="footer-sub">Independent Literary Imprint</p>
+                <div>
+                    <p class="footer-title">Blackwood Publishing</p>
+                    <p class="footer-sub">Independent literary imprint</p>
+                </div>
+                <img src="/assets/seal.png" class="footer-seal" alt="" width="48" height="48" loading="lazy">
             </div>
-
-            <!-- RIGHT -->
             <nav class="footer-links" aria-label="Footer navigation">
-
                 <div class="footer-col">
-                    <p class="footer-heading">Explore</p>
-                    <a href="/pages/start-here.html">Start Here</a>
-                    <a href="/pages/publications.html">The Works</a>
+                    <p class="footer-heading">The books</p>
+                    <a href="/pages/start-here.html">Start here</a>
+                    <a href="/pages/publications.html">The works</a>
                     <a href="/pages/discover.html">Find your next read</a>
+                    <a href="/pages/store.html">Bookshop</a>
                     <a href="/pages/gifts.html">Books to give</a>
-                    <a href="/pages/holdfast.html">New Releases</a>
-                    <a href="/pages/reading-lists.html">Reading Lists</a>
-                    <a href="/pages/arc-team.html">ARC Team</a>
-                    <a href="/pages/members.html">My account · The Archivists</a>
-                    <a href="/pages/contact.html">Contact</a>
+                    <a href="/pages/holdfast.html">New releases</a>
                 </div>
-
                 <div class="footer-col">
-                    <p class="footer-heading">Authors / Imprints</p>
-                    <a href="/pages/author.html">Aidan Blackwood</a>
-                    <a href="/pages/miren-vale.html">Miren Vale</a>
-                </div>
-
-                <div class="footer-col">
-                    <p class="footer-heading">Reader Areas</p>
-                    <a href="/pages/reader-records.html">Reader Records</a>
-                    <a href="/pages/members.html">My account · The Archivists</a>
-                    <a href="/pages/arc-team.html">ARC Team</a>
+                    <p class="footer-heading">For readers</p>
+                    <a href="/pages/members.html">My account</a>
+                    <a href="/pages/arc-team.html">ARC team</a>
+                    <a href="/pages/reader-records.html">Reader records</a>
+                    <a href="/pages/reading-lists.html">Reading lists</a>
                     <a href="/pages/resources.html">Resources</a>
                     <a href="/pages/newsletter.html">Email updates</a>
                 </div>
-
                 <div class="footer-col">
-                    <p class="footer-heading">Legal</p>
-                    <a href="/pages/privacy-policy.html">Privacy Policy</a>
-                    <a href="/pages/refund-policy.html">Refund Policy</a>
-                    <a href="/pages/terms-of-service.html">Terms of Service</a>
-                    <a href="/security-policy.html">Security Policy</a>
-                    <button type="button" class="footer-privacy-settings" data-privacy-settings>Privacy choices</button>
+                    <p class="footer-heading">The publishing house</p>
+                    <a href="/pages/author.html">Aidan Blackwood</a>
+                    <a href="/pages/miren-vale.html">Miren Vale</a>
+                    <a href="/pages/about.html">About Blackwood</a>
+                    <a href="/pages/submissions.html">Submissions</a>
+                    <a href="/pages/contact.html">Contact</a>
                 </div>
-
             </nav>
-
         </div>
-
         <section class="footer-archive-signup" aria-labelledby="footer-circle-title">
-            <p class="footer-archive-kicker">Letters from Blackwood</p>
-            <h2 id="footer-circle-title">A monthly letter. A new place to begin.</h2>
-            <p>Book news, releases and occasional offers. Mailing-list signup is separate from your member account and ARC access.</p>
-            <form class="footer-ml-form" action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" method="post" target="footer-mailerlite-frame" accept-charset="utf-8">
-                <label class="sr-only" for="footer-email">Email address</label>
-                <input id="footer-email" type="email" name="fields[email]" placeholder="Your email address" autocomplete="email" maxlength="254" required>
-                <input type="hidden" name="ml-submit" value="1"><input type="hidden" name="anticsrf" value="true">
-                <label class="footer-mail-consent"><input type="checkbox" required> Email me Blackwood book news and occasional offers. I can unsubscribe at any time.</label>
-                <button type="submit" data-footer-submit>Join the mailing list</button>
-            </form>
-            <iframe name="footer-mailerlite-frame" title="Mailing list provider response" hidden></iframe>
-            <p class="footer-archive-note" id="footer-archive-status" role="status" aria-live="polite">Check your inbox for any confirmation request. <a href="/pages/privacy-policy.html">Privacy policy</a>.</p>
-            <p><a href="/pages/newsletter.html">Mailing-list help</a> · <a href="/pages/members.html">Create or open a member account</a></p>
+            <div class="footer-newsletter-copy">
+                <p class="footer-archive-kicker">Stay in the story</p>
+                <h2 id="footer-circle-title">Letters from Blackwood.</h2>
+                <p>Monthly book news, releases and occasional offers. Separate from your member account and ARC access.</p>
+            </div>
+            <div class="footer-newsletter-form">
+                <form class="footer-ml-form" action="https://assets.mailerlite.com/jsonp/1669329/forms/160078221157598470/subscribe" method="post" target="footer-mailerlite-frame" accept-charset="utf-8">
+                    <label class="sr-only" for="footer-email">Email address</label>
+                    <input id="footer-email" type="email" name="fields[email]" placeholder="Your email address" autocomplete="email" maxlength="254" required>
+                    <input type="hidden" name="ml-submit" value="1"><input type="hidden" name="anticsrf" value="true">
+                    <button type="submit" data-footer-submit>Join the list</button>
+                    <label class="footer-mail-consent"><input type="checkbox" required> Email me Blackwood book news and occasional offers. I can unsubscribe at any time.</label>
+                </form>
+                <iframe name="footer-mailerlite-frame" title="Mailing list provider response" hidden></iframe>
+                <p class="footer-archive-note" id="footer-archive-status" role="status" aria-live="polite">Check your inbox for any confirmation request.</p>
+                <p class="footer-newsletter-help"><a href="/pages/newsletter.html">Mailing-list help</a></p>
+            </div>
         </section>
-
-        <!-- CENTER SEAL -->
-        <div class="footer-seal-wrap">
-            <img src="/assets/seal.png" class="footer-seal" alt="Blackwood Publishing seal">
-        </div>
-
-        <div class="footer-divider"></div>
-
-        <!-- BOTTOM -->
         <div class="footer-bottom">
-            <p>
-                © 2026 Blackwood Publishing. Independent literary imprint. All works protected.
-            </p>
-
-            <p class="footer-legal">
-                <a href="/pages/privacy-policy.html">Privacy Policy</a>
-                ·
-                <a href="/pages/refund-policy.html">Refund Policy</a>
-                ·
-                <a href="/pages/terms-of-service.html">Terms of Service</a>
-                ·
-                <a href="/security-policy.html">Security Policy</a>
-
-            </p>
+            <p>© 2026 Blackwood Publishing. All works protected.</p>
+            <nav class="footer-legal" aria-label="Legal and privacy">
+                <a href="/pages/privacy-policy.html">Privacy</a>
+                <a href="/pages/refund-policy.html">Refunds</a>
+                <a href="/pages/terms-of-service.html">Terms</a>
+                <a href="/security-policy.html">Security</a>
+                <button type="button" class="footer-privacy-settings" data-privacy-settings>Privacy choices</button>
+            </nav>
         </div>
-
     </div>
-
 </footer>

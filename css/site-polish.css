@@ -181,3 +181,56 @@ body.store-page .shopify-buy__quantity { min-height:44px !important; height:44px
 .footer-ml-form { flex-wrap:wrap; }
 .footer-privacy-settings { background:transparent; border:1px solid #75654b; color:#e5d6c2; border-radius:6px; padding:10px 14px; min-height:44px; font:14px/1.5 Arial,sans-serif; text-align:left; cursor:pointer; }
 .footer-privacy-settings:focus-visible { outline:3px solid #e5c38c; outline-offset:3px; }
+
+/* Shared footer: balanced link groups, clear signup, one legal row. */
+.footer { width:100%; left:auto; transform:none; padding:40px var(--bw-gutter) 24px; }
+.footer .footer-content { max-width:var(--bw-measure); padding:0; }
+.footer .footer-top { display:block; }
+.footer .footer-brand { display:flex; align-items:center; justify-content:space-between; gap:24px; max-width:none; width:100%; margin:0 0 26px; padding:0 0 24px; border-bottom:1px solid var(--bw-line); text-align:left; }
+.footer .footer-title { margin:0 0 4px; font:400 clamp(20px,2.2vw,26px)/1.3 Georgia,serif; font-variant:normal; text-transform:none; letter-spacing:0; color:var(--bw-ink); }
+.footer .footer-sub { margin:0; font:13px/1.6 var(--bw-font-ui); color:var(--bw-muted); opacity:1; }
+.footer .footer-seal { width:48px; height:48px; flex-shrink:0; margin:0; opacity:.55; object-fit:contain; filter:none; transform:none; }
+.footer .footer-links { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px; width:100%; justify-self:stretch; }
+.footer .footer-col { min-width:0; align-items:flex-start; gap:0; text-align:left; letter-spacing:0; }
+.footer .footer-heading { margin:0 0 12px; font:700 11px/1.5 var(--bw-font-ui); letter-spacing:.14em; opacity:1; }
+.footer .footer-col a { display:flex; align-items:center; min-height:44px; width:fit-content; max-width:100%; padding:7px 0; font:14px/1.5 var(--bw-font-ui); letter-spacing:0; color:#d3ccbf; opacity:1; text-decoration:none; }
+.footer .footer-col a::after,.footer .footer-legal a::after { display:none; }
+.footer .footer-col a:hover,.footer .footer-legal a:hover { color:var(--bw-gold); text-decoration:underline; text-underline-offset:4px; transform:none; }
+.footer .footer-archive-signup { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:28px 48px; align-items:start; width:100%; max-width:none; margin:32px 0 0; padding:28px 0; border-top:1px solid var(--bw-line); border-bottom:1px solid var(--bw-line); background:none; text-align:left; }
+.footer .footer-archive-kicker { margin:0 0 10px; font:700 11px/1.5 var(--bw-font-ui); letter-spacing:.14em; color:var(--bw-gold); opacity:1; }
+.footer .footer-archive-signup h2 { margin:0 0 12px; font:400 clamp(23px,2.8vw,30px)/1.25 Georgia,serif; letter-spacing:-.02em; text-transform:none; }
+.footer .footer-archive-signup p:not(.footer-archive-kicker) { max-width:50ch; margin:0 0 12px; font:14px/1.65 var(--bw-font-ui); color:var(--bw-muted); }
+.footer .footer-ml-form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; width:100%; margin:0 0 14px; border:0; }
+.footer .footer-ml-form input[type=email] { width:100%; min-width:0; min-height:48px; padding:11px 14px; border:1px solid #8f795a; border-radius:7px; background:#121710; color:var(--bw-ink); font:16px/1.5 var(--bw-font-ui); }
+.footer .footer-ml-form button { min-height:48px; padding:10px 16px; border:1px solid #c2a273; border-radius:7px; background:#d4b88b; color:#191b15; font:600 14px/1.5 var(--bw-font-ui); letter-spacing:0; text-transform:none; white-space:normal; transform:none; }
+.footer .footer-mail-consent { grid-column:1/-1; margin:2px 0 0; font:13px/1.6 var(--bw-font-ui); }
+.footer .footer-archive-signup .footer-archive-note,.footer .footer-archive-signup .footer-newsletter-help { font-size:12px; }
+.footer .footer-newsletter-help a { display:inline-flex; align-items:center; min-height:44px; color:var(--bw-gold); text-underline-offset:4px; }
+.footer .footer-bottom { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px 24px; margin:0; padding-top:18px; text-align:left; opacity:1; }
+.footer .footer-bottom > p { margin:0; font:12px/1.7 var(--bw-font-ui); color:var(--bw-muted); }
+.footer .footer-legal { display:flex; flex-wrap:wrap; align-items:center; gap:4px 18px; text-align:left; opacity:1; }
+.footer .footer-legal a { display:inline-flex; align-items:center; min-height:44px; color:#c9c0b1; font:13px/1.5 var(--bw-font-ui); }
+.footer .footer-privacy-settings { font-size:13px; padding:9px 12px; }
+@media(max-width:700px) {
+ .footer .footer-archive-signup { grid-template-columns:1fr; gap:16px; }
+ .footer .footer-links { gap:20px; }
+ .footer .footer-col a { font-size:13px; }
+ .footer .footer-bottom { align-items:flex-start; }
+}
+@media(max-width:480px) {
+ .footer { padding-inline:20px; }
+ .footer .footer-links { grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px 18px; }
+ .footer .footer-col:last-child { grid-column:1/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:18px; }
+ .footer .footer-col:last-child .footer-heading { grid-column:1/-1; }
+ .footer .footer-ml-form { grid-template-columns:1fr; }
+ .footer .footer-ml-form button { grid-row:3; }
+ .footer .footer-mail-consent { grid-row:2; }
+ .footer .footer-brand { gap:16px; }
+}
+/* Override legacy phone centring so the footer keeps one consistent alignment. */
+.footer .footer-brand { flex-direction:row; }
+.footer .footer-brand > div { min-width:0; }
+.footer .footer-seal { display:block; }
+.footer .footer-archive-signup p:not(.footer-archive-kicker),.footer .footer-ml-form input[type=email] { text-align:left; }
+.footer .footer-bottom { flex-direction:row; }
+.footer .footer-legal { justify-content:flex-start; margin:0; }
