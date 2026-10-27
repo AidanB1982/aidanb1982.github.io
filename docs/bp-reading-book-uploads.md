@@ -21,7 +21,7 @@ The reading catalogue includes novels, practical guides and the two Recovered Fi
 The Manuscript Audit Workbook is hidden from BP Reading at the owner’s request and
 remains in the public bookshop/discovery catalogue. Alternate physical editions of one book are not duplicated;
 editorial services and other publishers' recommended books are not included.
-Sanare Per Mortem currently uses the imprint mark because no front-cover assignment
+Sanare Per Mortem currently uses book12.jpg (Cover Coming Soon) because no front-cover assignment
 was confirmed in the existing catalogue. Supply its proper cover when preparing it.
 
 ## For each upload
@@ -84,7 +84,7 @@ bookmarks and notes use account-scoped **device storage**, separate from real nu
 Supabase editions. They do not claim cross-device sync; the sync button is disabled
 for these public files. Keep their source manuscripts stable to preserve CFI positions.
 
-There are now 23 visible reading titles in eight collection groups. The collection
+There are now 24 visible reading titles in eight collection groups. The collection
 filter and headings follow the Publications page and the supplied series information:
 Archive Files, Recovered Files, Threshold Records, The Hollowing Veil, Hard Silence,
 Independent Works, The Cursed Bothies and Practical Guides. Only known book numbers
@@ -95,5 +95,23 @@ sequel order. Sorting is within collection.
 New owner-supplied titles: Introduction to Accounts (Martin Hales), Staying: An Account,
 The Salt Widow, The Orphan and the Hollow Tree (Miren Vale), and Before the House Closed
 (Aidan Blackwood). These remain coming soon until their actual reading editions are
-uploaded and approved. Their unconfirmed covers use the imprint mark. The two existing
+uploaded and approved. Unconfirmed covers now use book12.jpg (Cover Coming Soon). The two existing
 UK accounting guides are also credited to Martin Hales, as their public pages state.
+
+## Confirmed flat-cover mapping
+
+The owner's `book1`–`book20` filenames are front-facing covers specifically for BP Reading.
+Dedicated `readingCover` fields take precedence over older Supabase artwork without
+changing public discovery/bookshop covers. Where `readingCoverPending=true`, a real
+Supabase `cover_url` takes precedence over book12.jpg.
+This keeps unknown covers replaceable without showing the wrong book's cover.
+
+The Money Reset by Martin Hales has been added to Practical Guides with book17.png,
+as a coming-soon reading title. Introduction to Accounts uses book18.jpg; UK Landlords
+uses book19.jpg; Before the House Closed uses book20.png. The existing UK Sole Traders
+guide uses book14.jpg. Sanare and the three additional Miren Vale titles await their
+confirmed covers and use book12.jpg.
+
+Corrour Bothy's standard reading cover is book2.jpg. Book13.jpg is the separate black
+and copper limited physical edition, not a second reading title. The Manuscript Audit
+Workbook stays hidden from BP Reading and keeps its shop artwork.

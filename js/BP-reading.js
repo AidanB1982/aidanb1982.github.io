@@ -6,7 +6,7 @@ import {
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
-import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261122";
+import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261123";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
@@ -388,7 +388,7 @@ async function loadReadingCatalogue() {
   const catalogueRequest = new AbortController();
   const catalogueTimeout = setTimeout(()=>catalogueRequest.abort(),8000);
   try {
-    const response = await fetch('/data/book-discovery.json?v=20261122',{signal:catalogueRequest.signal});
+    const response = await fetch('/data/book-discovery.json?v=20261123',{signal:catalogueRequest.signal});
     if (!response.ok) throw Error();
     const data = await response.json();
     if (!Array.isArray(data)) throw Error();

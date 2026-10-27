@@ -20,3 +20,7 @@ assert.equal(result.find(b=>b.title==='Ordinary book').canRead,false,'metadata c
 result=mergeReadingCatalogue(special,[{editionId:222,bookId:'the-third-night',title:'The Third Night'}]);
 assert.equal(result.filter(b=>b.title==='The Third Night').length,1,'public story does not duplicate a later server listing');
 assert.equal(result.find(b=>b.title==='The Third Night').publicTextId,'the-third-night','existing public story remains free');
+
+result=mergeReadingCatalogue([{...planned[0],readingCover:'/assets/book7.png'}],[{...approved,cover:'/assets/old-mockup.png'}]);assert.equal(result[0].cover,'/assets/book7.png','confirmed flat cover replaces older server artwork');
+result=mergeReadingCatalogue([{...planned[0],readingCover:'/assets/book12.jpg',readingCoverPending:true,readingCoverAlt:'Cover coming soon'}],[{...approved,cover:'/assets/actual-upload.jpg'}]);assert.equal(result[0].cover,'/assets/actual-upload.jpg','real server cover replaces a pending placeholder');
+result=mergeReadingCatalogue([{...planned[0],readingCover:'/assets/book12.jpg',readingCoverPending:true,readingCoverAlt:'Cover coming soon'}],[approved]);assert.equal(result[0].cover,'/assets/book12.jpg');assert.equal(result[0].coverAlt,'Cover coming soon');

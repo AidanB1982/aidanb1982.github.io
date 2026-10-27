@@ -144,6 +144,19 @@ No new Supabase migration or function deployment is needed for the shelf display
 The reading catalogue now shows 23 titles. The member/public navigation remains hidden;
 no Supabase change is needed for the two already-public recovered stories.
 
+## Completed: owner-confirmed flat covers, 27 October
+
+- [x] Apply the supplied book1–book20 flat-cover map specifically to BP Reading.
+- [x] Add The Money Reset by Martin Hales to Practical Guides, with book17.png.
+- [x] Use book12.jpg for covers awaiting confirmation; keep actual uploaded artwork
+  available as a replacement for those pending covers.
+- [x] Prefer confirmed flat covers over older server/mockup artwork in reading cards.
+- [x] Preserve Corrour's normal book2 cover and its separate book13 limited shop edition.
+
+The catalogue has 24 visible reading titles; the hidden workbook remains in the shop.
+Dedicated `readingCover` fields preserve the discovery and bookshop presentation.
+No Supabase changes are required for these display mappings.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and
