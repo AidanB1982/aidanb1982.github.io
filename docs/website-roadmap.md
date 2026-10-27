@@ -20,7 +20,8 @@ created by this operation; new preparation records carry no invented contract da
 
 ## Compact mobile reading shelf
 
-- [x] Use smaller covers and tighter card spacing on phones/small tablets.
+- [x] Use a two-column mobile shelf with smaller covers, tighter card spacing and
+  narrower buttons. Stack covers above details on phones; preserve 44px touch targets.
 - [x] Omit repeated eyebrows/synopses and duplicate Coming soon text on mobile,
   retaining complete titles, reading progress and 44px reading buttons.
 - [x] Keep desktop descriptions and the approved reading order. No Supabase change.

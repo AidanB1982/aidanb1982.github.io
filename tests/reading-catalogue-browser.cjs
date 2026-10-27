@@ -23,7 +23,8 @@ assert.equal(await p.locator('.open-book:not(:disabled)').count(),2);assert.equa
  for(const width of [320,768]){await p.setViewportSize({width,height:900});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'catalogue layout fits '+width);}
  await p.setViewportSize({width:390,height:844});
  const first=p.locator('.book-card').first();
- assert((await first.boundingBox()).height<260,'compact mobile card');
+ if(!config.metadataMissing){const a=await first.boundingBox(),b=await p.locator('.book-card').nth(1).boundingBox();assert(Math.abs(a.y-b.y)<2&&b.x>a.x,'two cards per mobile row');}
+ assert((await first.locator('.open-book').boundingBox()).width<=140,'compact button width');
  assert((await first.locator('.open-book').boundingBox()).height>=44,'touch target');
  assert.equal(await first.locator('.book-synopsis').isVisible(),false);
  await p.setViewportSize({width:1280,height:900});

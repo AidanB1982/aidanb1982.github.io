@@ -878,9 +878,10 @@ body.bp-reading-page .simple-header {
 .reading-collection-heading:first-child { margin-top:0; }
 .reading-collection-heading span { font:12px/1.5 Arial,sans-serif; color:var(--muted); }
 
-/* Compact shelf rows on phones and small tablets; retain full details on desktop. */
+/* Compact two-column shelf on phones and small tablets. */
+.book-details .open-book { width: fit-content; max-width: 100%; padding-inline: 18px; }
 @media (max-width: 900px) {
-  .book-grid { gap: 12px; }
+  .book-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
   .book-card { grid-template-columns: 76px minmax(0,1fr); gap: 14px; padding: 14px; }
   .book-details { min-width: 0; }
   .book-details .eyebrow, .book-synopsis { display: none; }
@@ -894,6 +895,13 @@ body.bp-reading-page .simple-header {
   .reading-collection-heading { margin-top: 18px; padding-bottom: 10px; }
 }
 @media (max-width: 600px) {
-  .book-card { grid-template-columns: 68px minmax(0,1fr); gap: 12px; padding: 12px; }
-  .book-card :is(h2,h4) { font-size: 20px; }
+  .book-card { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
+  .book-cover { width: 76px; max-width: 100%; align-self: center; }
+  .book-details { display: flex; flex-direction: column; align-items: flex-start; flex: 1; width: 100%; }
+  .book-card :is(h2,h4) { font-size: 18px; }
+  .book-card .progress-track { width: 100%; }
+  .book-details .open-book { margin-top: auto; align-self: flex-start; }
+  .book-card .progress-track, .book-card[data-availability="coming-soon"] .book-description { margin-bottom: 10px; }
+  .book-card .book-description { font-size: 11px; }
+
 }
