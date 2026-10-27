@@ -1190,3 +1190,52 @@
         align-items: center;
     }
 }
+
+/* Compact ARC drawers: native details preserve keyboard and screen-reader controls. */
+.arc-profile-disclosure { padding:0; }
+.arc-profile-toggle { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:24px; min-height:88px; cursor:pointer; list-style:none; }
+.arc-profile-toggle::-webkit-details-marker,.arc-vault-item > summary::-webkit-details-marker { display:none; }
+.arc-profile-toggle-copy { flex:1; display:grid; gap:8px; min-width:0; }
+.arc-profile-toggle .arc-profile-kicker { margin:0; }
+.arc-profile-toggle h2 { font-size:clamp(24px,3vw,32px); margin:0; line-height:1.2; }
+.arc-profile-fold-status { font:14px/1.6 Arial,sans-serif; color:#cfc0ac; overflow-wrap:anywhere; }
+.arc-profile-toggle-hint { flex-shrink:0; font:12px/1.5 Arial,sans-serif; color:#d6b181; }
+.arc-profile-toggle::after { content:'+'; color:#d6b181; font:26px/1 Arial,sans-serif; }
+.arc-profile-disclosure[open] > .arc-profile-toggle::after { content:'−'; }
+.arc-profile-toggle:focus-visible,.arc-vault-item > summary:focus-visible { outline:3px solid #e9c38d; outline-offset:-5px; border-radius:12px; }
+.arc-profile-body { padding:0 24px 24px; border-top:1px solid #8d6a3c55; }
+.arc-profile-body > [data-arc-live-summary] { margin-top:22px; }
+.arc-profile-body .arc-current-card { border-radius:12px; }
+.arc-profile-body .arc-profile-details { margin-top:18px; }
+.arc-profile-body .arc-profile-details-summary { min-height:54px; }
+.arc-profile-body .arc-profile-details > p { padding:0 18px; color:#c6b9a6; font-size:14px; line-height:1.6; }
+.arc-profile-body .arc-welcome-poster { margin:0; border:0; box-shadow:none; background:transparent; }
+.arc-profile-body .arc-welcome-poster-copy h3 { font-size:24px; }
+.arc-profile-body .arc-welcome-poster-preview { max-width:160px; }
+.arc-vault-item { padding:0; border-radius:12px; overflow:hidden; }
+.arc-vault-item > .arc-vault-item-heading { position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px 18px; padding:20px 48px 20px 20px; margin:0; list-style:none; cursor:pointer; min-height:80px; }
+.arc-vault-item > summary::after { content:'+'; position:absolute; right:18px; top:24px; color:#d6b181; font:23px/1 Arial,sans-serif; }
+.arc-vault-item[open] > summary::after { content:'−'; }
+.arc-vault-item-heading h4 { font-size:clamp(21px,3vw,27px); overflow-wrap:anywhere; }
+.arc-vault-item-heading .arc-profile-kicker { display:none; }
+.arc-assignment-fold-date { grid-column:1/-1; color:#cfc0ac; font:13px/1.6 Arial,sans-serif; }
+.arc-assignment-body { padding:20px; border-top:1px solid #8d6a3c44; }
+.arc-assignment-body .arc-current-meta { gap:12px; }
+.arc-assignment-body .arc-current-meta > div { min-width:0; }
+.arc-assignment-body .arc-current-meta strong { overflow-wrap:anywhere; }
+.arc-assignment-body .arc-copyright-box { margin:18px 0; }
+.arc-assignment-body .arc-copyright-box label { grid-template-columns:22px 1fr; gap:12px; font-size:14px; line-height:1.65; min-height:44px; align-items:start; cursor:pointer; }
+.arc-assignment-body .arc-copyright-box input { width:20px; height:20px; margin:2px 0 0; }
+.arc-assignment-body .arc-current-actions,.arc-assignment-body .arc-review-link-row { display:flex; flex-wrap:wrap; gap:12px; }
+.arc-assignment-body .arc-profile-button { min-height:44px; max-width:100%; white-space:normal; text-align:center; }
+.arc-assignment-body .arc-review-link-row input { min-width:0; flex:1 1 220px; font-size:16px; }
+@media(max-width:600px) {
+ .arc-profile-toggle { padding:20px; gap:12px; }
+ .arc-profile-toggle-hint { display:none; }
+ .arc-profile-body { padding:0 16px 18px; }
+ .arc-vault-item > .arc-vault-item-heading { grid-template-columns:minmax(0,1fr); padding:18px 44px 18px 18px; gap:10px; }
+ .arc-vault-item-heading .arc-vault-status { justify-self:start; }
+ .arc-assignment-body { padding:16px; }
+ .arc-assignment-body .arc-current-actions > *, .arc-assignment-body .arc-review-link-row > button { width:100%; }
+ .arc-assignment-body .arc-copyright-box { padding:14px; }
+}

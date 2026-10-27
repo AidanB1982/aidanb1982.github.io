@@ -1,6 +1,6 @@
 # Blackwood website to-do list
 
-Updated **26 October 2026** (UK). This separates published website work from features
+Updated **27 October 2026** (UK). This separates published website work from features
 that still need live configuration, database changes or app-store setup.
 
 ## Completed: Author Desk improvements, 26 October
@@ -66,6 +66,20 @@ changes are required. Large image downloads remain a separate performance task b
 See [reader journeys](reader-journeys.md). No Supabase migration is required for the
 published features. Subscription pricing stays at £10.99 pending the owner's Shopify
 change; update checkout's server-side £10.99 validation together with the price.
+
+## Completed: ARC profile tidy, 27 October
+
+- [x] Collapse the full ARC profile by default while keeping its current book/review
+  summary visible in the heading.
+- [x] Give each assigned book its own keyboard-accessible drawer for terms, downloads
+  and review controls, retaining closed-campaign records and existing access checks.
+- [x] Move the welcome poster and historical application details below the vault in
+  separate collapsed sections; preserve the current book as the primary information.
+- [x] Improve phone spacing, checkbox targets, buttons, due-date presentation and labels.
+- [x] Preserve expanded book drawers when vault records refresh; folding does not accept
+  terms or change assignments, reviews or recorded dates.
+
+No Supabase or email configuration changes are required for this layout update.
 
 ## Existing foundations already in place
 

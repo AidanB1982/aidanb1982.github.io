@@ -397,46 +397,29 @@
         const applicationStatus =
             readOnly["Application Status"] || "";
 
+        const expanded = root.querySelector("[data-arc-profile-disclosure]")?.open === true;
         root.innerHTML = `
-            <div class="arc-profile-card">
-
-                <div class="arc-profile-heading">
-                    <div>
-                        <p class="arc-profile-kicker">
-                            ARC Team
-                        </p>
-
-                        <h2>
-                            My ARC Profile
-                        </h2>
-
-                        <p>
-                            This is the reader profile Blackwood
-                            uses when selecting ARC readers,
-                            issuing advance copies, and managing
-                            review records.
-                        </p>
+            <details class="arc-profile-card arc-profile-disclosure" data-arc-profile-disclosure ${expanded ? "open" : ""}>
+                <summary class="arc-profile-toggle">
+                    <div class="arc-profile-toggle-copy">
+                        <span class="arc-profile-kicker">ARC Team</span>
+                        <h2>My ARC Profile</h2>
+                        <span class="arc-profile-fold-status" data-arc-fold-status aria-live="polite">Your assigned books, review links and reader details.</span>
                     </div>
-
-                    <div
-                        class="arc-profile-seal"
-                        aria-hidden="true"
-                    >
-                        ARC
-                    </div>
+                    <span class="arc-profile-toggle-hint" aria-hidden="true">Open / close</span>
+                </summary>
+                <div class="arc-profile-body">
+                <div data-arc-live-summary aria-live="polite"><p>Checking your current ARC assignments…</p></div>
+                <div data-arc-vault-root>
+                    ${renderArcVaultLoading()}
                 </div>
 
-                <div data-arc-live-summary aria-live="polite"><p>Checking your current ARC assignments…</p></div>
+                ${renderArcWelcomePoster(applicationStatus)}
+
                 <details class="arc-profile-details"><summary class="arc-profile-details-summary">Application record and previous ARC details</summary>
                   <p>These are historical application details. Your current assigned books and due dates are shown above and in your ARC Vault.</p>
                   <div class="arc-profile-status-panel" aria-label="Historical ARC application details">${renderReadOnlyFields(readOnly)}</div>
                 </details>
-
-                ${renderArcWelcomePoster(applicationStatus)}
-
-                <div data-arc-vault-root>
-                    ${renderArcVaultLoading()}
-                </div>
 
                 <div data-arc-admin-root></div>
 
@@ -505,7 +488,8 @@
 
                 </details>
 
-            </div>
+                </div>
+            </details>
         `;
 
         bindArcProfileForm(root, {
@@ -528,6 +512,8 @@
         }
 
         return `
+            <details class="arc-profile-details arc-poster-details">
+              <summary class="arc-profile-details-summary">Your ARC welcome poster</summary>
             <section
                 class="arc-welcome-poster"
                 aria-labelledby="arc-welcome-poster-title"
@@ -587,6 +573,7 @@
                 </a>
 
             </section>
+            </details>
         `;
     }
 
@@ -634,9 +621,14 @@
                 await fetchArcAssignments(session);
 
             const current=window.BlackwoodArcCampaignSummary.summarize(assignments);
+            const folded = root.querySelector('[data-arc-fold-status]');
+            if (folded) folded.textContent = current.latest
+                ? `${current.title} · ${current.pending.length} review${current.pending.length === 1 ? '' : 's'} to file`
+                : assignments.length ? `${assignments.length} retained ARC record${assignments.length === 1 ? '' : 's'} · view your ARC vault`
+                : 'No assigned books yet. Open to view your reader details.';
             const live=root.querySelector('[data-arc-live-summary]');
             if(live)live.innerHTML=current.latest
-                ? `<section class="arc-current-card"><p class="arc-profile-kicker">YOUR CURRENT ARC</p><h3>${escapeHtml(current.title)}</h3><p>${current.due?'Review due '+escapeHtml(current.due):'No review due date recorded.'}</p><p>${current.pending.length} review${current.pending.length===1?'':'s'} still to file. Your other assignments remain in the vault below.</p></section>`
+                ? `<section class="arc-current-card"><p class="arc-profile-kicker">YOUR CURRENT ARC</p><h3>${escapeHtml(current.title)}</h3><p>${current.due?'Review due '+escapeHtml(formatDateForDisplay(current.due) || current.due):'Review date to be confirmed.'}</p><p>${current.pending.length} review${current.pending.length===1?'':'s'} still to file. Your other assignments remain in the vault below.</p></section>`
                 : '<p>No outstanding ARC assignments. New books will appear here when assigned to your account.</p>';
             if (!assignments.length) {
                 vaultRoot.innerHTML =
@@ -645,8 +637,14 @@
                 return;
             }
 
-            vaultRoot.innerHTML =
-                renderArcVaultAssignments(assignments);
+            const openAssignments = new Set(Array.from(vaultRoot.querySelectorAll('details[data-arc-assignment-card][open]'), card => card.dataset.assignmentId));
+            const focusedAssignment = vaultRoot.contains(document.activeElement)
+                ? document.activeElement.closest('[data-arc-assignment-card]')?.dataset.assignmentId : null;
+            vaultRoot.innerHTML = renderArcVaultAssignments(assignments);
+            vaultRoot.querySelectorAll('details[data-arc-assignment-card]').forEach(card => {
+                card.open = openAssignments.has(card.dataset.assignmentId);
+                if (card.dataset.assignmentId === focusedAssignment) card.querySelector('summary')?.focus({preventScroll:true});
+            });
 
             bindArcVaultActions(
                 root,
@@ -656,6 +654,8 @@
         } catch (error) {
             const live=root.querySelector('[data-arc-live-summary]');
             if(live)live.textContent='Current ARC assignments could not be verified. Refresh to try again.';
+            const folded = root.querySelector('[data-arc-fold-status]');
+            if (folded) folded.textContent = 'Assignments could not be checked. Open for details.';
             console.warn(
                 "Blackwood ARC Vault failed:",
                 error
@@ -809,7 +809,7 @@
             getArcReleaseState(arcFile);
 
         return `
-            <article
+            <details
                 class="arc-vault-item"
                 data-arc-assignment-card
                 data-assignment-id="${safeAssignmentId}"
@@ -820,7 +820,7 @@
                 data-campaign-active="${campaignActive ? "true" : "false"}"
             >
 
-                <div class="arc-vault-item-heading">
+                <summary class="arc-vault-item-heading">
 
                     <div>
                         <p class="arc-profile-kicker">
@@ -842,8 +842,10 @@
                         ${escapeHtml(reviewStatus.label)}
                     </span>
 
-                </div>
+                    <span class="arc-assignment-fold-date">Review due: ${escapeHtml(formatDateForDisplay(reviewDueDate) || "to be confirmed")}</span>
+                </summary>
 
+                <div class="arc-assignment-body">
                 ${renderArcReleasePanel(
                     arcFile,
                     releaseState,
@@ -877,7 +879,7 @@
 
                     <div>
                         <span>
-                            Last Opened
+                            Last Downloaded
                         </span>
 
                         <strong>
@@ -1051,7 +1053,8 @@
                     aria-live="polite"
                 ></p>
 
-            </article>
+                </div>
+            </details>
         `;
     }
 
