@@ -63,7 +63,7 @@ export function createCheckoutHandler(deps: Dependencies) {
       const result=payload.data?.cartCreate;
       const cart=result?.cart;
       const lines=cart?.lines?.nodes;
-      if(payload.errors?.length||result?.userErrors?.length||!cart?.id||!cart.checkoutUrl||lines?.length!==1||lines[0].quantity!==1||lines[0].merchandise?.id!==VARIANT||lines[0].sellingPlanAllocation?.sellingPlan?.id!==plan||cart.cost?.subtotalAmount?.currencyCode!=='GBP'||Number(cart.cost.subtotalAmount.amount)!==10.99)throw Error('The annual plan could not be confirmed');
+      if(payload.errors?.length||result?.userErrors?.length||!cart?.id||!cart.checkoutUrl||lines?.length!==1||lines[0].quantity!==1||lines[0].merchandise?.id!==VARIANT||lines[0].sellingPlanAllocation?.sellingPlan?.id!==plan||cart.cost?.subtotalAmount?.currencyCode!=='GBP'||Number(cart.cost.subtotalAmount.amount)!==20)throw Error('The annual plan could not be confirmed');
       const target=new URL(cart.checkoutUrl);
       if(target.protocol!=='https:')throw Error('Invalid checkout URL');
       stage='CHECKOUT_LINK';

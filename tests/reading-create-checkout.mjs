@@ -7,7 +7,7 @@ function fixture(config={}) {
   const env={BP_READING_CHECKOUT_ENABLED:'true',BP_READING_CUSTOMER_ACCESS:'true',SHOPIFY_STORE_DOMAIN:'example.myshopify.com',SHOPIFY_STOREFRONT_TOKEN:'public-test-token',SHOPIFY_READING_SELLING_PLAN_ID:plan,...config.env};
   const handler=createCheckoutHandler({env:key=>env[key],authenticate:async()=>config.denied?null:'verified-user',isAdmin:async()=>config.admin===true,log:stage=>calls.push(['log',stage]),
     createIntent:async user=>{calls.push(['intent',user]);return 'intent-uuid';},attachCart:async(...args)=>{calls.push(['attach',...args]);},failIntent:async id=>calls.push(['failed',id]),
-    fetch:async(url,options)=>{assert.equal(url,'https://example.myshopify.com/api/2026-10/graphql.json');const body=JSON.parse(options.body);assert.equal(body.variables.input.lines[0].sellingPlanId,plan);assert.equal(body.variables.input.lines[0].merchandiseId,variant);assert.equal(body.variables.input.attributes[0].value,'intent-uuid');return Response.json({data:{cartCreate:{cart:{id:'cart',checkoutUrl:'https://example.myshopify.com/checkouts/test',cost:{subtotalAmount:{amount:config.wrongPrice?'0.00':'10.99',currencyCode:'GBP'}},lines:{nodes:[{quantity:1,merchandise:{id:variant},sellingPlanAllocation:config.noPlan?null:{sellingPlan:{id:plan}}}]}},userErrors:[]}}});}
+    fetch:async(url,options)=>{assert.equal(url,'https://example.myshopify.com/api/2026-10/graphql.json');const body=JSON.parse(options.body);assert.equal(body.variables.input.lines[0].sellingPlanId,plan);assert.equal(body.variables.input.lines[0].merchandiseId,variant);assert.equal(body.variables.input.attributes[0].value,'intent-uuid');return Response.json({data:{cartCreate:{cart:{id:'cart',checkoutUrl:'https://example.myshopify.com/checkouts/test',cost:{subtotalAmount:{amount:config.wrongPrice?'0.00':(config.price??'20.00'),currencyCode:'GBP'}},lines:{nodes:[{quantity:1,merchandise:{id:variant},sellingPlanAllocation:config.noPlan?null:{sellingPlan:{id:plan}}}]}},userErrors:[]}}});}
   });return {handler,calls};
 }
 const req=(action)=>new Request('https://service.invalid',{method:'POST',headers:{Origin:'https://blackwoodpublishing.co.uk',Authorization:'Bearer valid-token'},body:JSON.stringify(action?{action}:{})});
@@ -22,3 +22,9 @@ f=fixture({env:{BP_READING_CHECKOUT_ENABLED:'false',BP_READING_CUSTOMER_ACCESS:'
 f=fixture({env:{BP_READING_CHECKOUT_ENABLED:'false',BP_READING_CUSTOMER_ACCESS:'false'}});response=await f.handler(req());assert.equal((await response.json()).code,'TEST_ACCOUNT_NOT_CONFIGURED');assert(f.calls.some(c=>c[1]==='REJECT_503_TEST_ACCOUNT_NOT_CONFIGURED'));
 f=fixture({env:{BP_READING_CHECKOUT_ENABLED:'false',BP_READING_CUSTOMER_ACCESS:'false',BP_READING_TEST_USER_ID:'different-user'}});response=await f.handler(req());assert.equal((await response.json()).code,'TEST_ACCOUNT_MISMATCH');assert.equal(response.headers.get('X-BP-Reading-Checkout'),'controlled-test-v2');
 console.log('PASS checkout creation: authenticated account binding, configured annual plan, fixed variant, GBP price verification, no one-time fallback, disabled launch gate and failed-cart handling');
+
+for (const price of ['10.99','19.99','20.01','30.00']) {
+ const mismatch=fixture({price});
+ assert.equal((await mismatch.handler(req())).status,503,'checkout rejects unexpected annual price '+price);
+ assert.equal(mismatch.calls.some(call=>call[0]==='attach'),false);
+}

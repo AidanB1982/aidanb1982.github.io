@@ -64,8 +64,9 @@ changes are required. Large image downloads remain a separate performance task b
 - [x] Prepare the remaining email, gift-redemption and reporting configuration checklist.
 
 See [reader journeys](reader-journeys.md). No Supabase migration is required for the
-published features. Subscription pricing stays at £10.99 pending the owner's Shopify
-change; update checkout's server-side £10.99 validation together with the price.
+published features. The owner changed Shopify membership pricing to £20 on 27 October.
+Website copy and checkout/payment validation now match £20; deploy the three updated
+reading payment Edge Functions as recorded below.
 
 ## Completed: ARC profile tidy, 27 October
 
@@ -80,6 +81,20 @@ change; update checkout's server-side £10.99 validation together with the price
   terms or change assignments, reviews or recorded dates.
 
 No Supabase or email configuration changes are required for this layout update.
+
+## Membership price update: 27 October
+
+- [x] Match reader copy, subscription buttons and administrator previews to £20/year.
+- [x] Require the verified annual £20 GBP amount in checkout creation, signed payment
+  verification and administrator order recovery; keep exact variant/plan/auth checks.
+- [x] Rebuild the three single-file Supabase deployment bundles and test price mismatches.
+- [ ] Deploy `bp-reading-create-checkout`, `bp-reading-shopify-webhook` and
+  `bp-reading-reconcile-order` from the updated dashboard files. A GitHub push does
+  not deploy Supabase Edge Functions.
+- [ ] Verify a newly created Shopify checkout displays £20, annual billing and no shipping.
+- [ ] Review any existing £10.99 subscription contracts separately before renewal.
+  Shopify product-price changes do not rewrite existing contracts; the new verifier
+  accepts £20 only. Existing membership dates/receipts are not rewritten or revoked.
 
 ## Existing foundations already in place
 

@@ -37,7 +37,7 @@ export function initializeReadingCheckout(client, {button, status, retry}, platf
         say(until > new Date() ? `Payment confirmed. Your BP Reading membership runs until ${date}.` : `Your paid membership ended on ${date}.`);
         busy=false;button.disabled=until > new Date();retry.hidden=true;
         if (until > new Date()) button.textContent='Membership active';
-        else {intentId=null;checkoutUrl=null;button.textContent='Subscribe — £10.99 per year';}
+        else {intentId=null;checkoutUrl=null;button.textContent='Subscribe — £20 per year';}
         if (until > new Date()) platform.dispatchEvent(new CustomEvent('bp-reading-membership-confirmed',{detail:{accessUntil:result.access_until}}));
         return;
       }
@@ -81,5 +81,5 @@ export function initializeReadingCheckout(client, {button, status, retry}, platf
     }
   });
   retry.addEventListener('click',()=>{deadline=Date.now()+60000;void check();});
-  return {reset(){stopPolling();busy=false;intentId=null;checkoutUrl=null;deadline=0;button.disabled=false;button.textContent='Subscribe — £10.99 per year';retry.hidden=true;say('');},stop(){stopped=true;stopPolling();button.disabled=true;if(popup && !popup.closed)popup.close();}};
+  return {reset(){stopPolling();busy=false;intentId=null;checkoutUrl=null;deadline=0;button.disabled=false;button.textContent='Subscribe — £20 per year';retry.hidden=true;say('');},stop(){stopped=true;stopPolling();button.disabled=true;if(popup && !popup.closed)popup.close();}};
 }

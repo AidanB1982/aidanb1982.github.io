@@ -5,7 +5,7 @@ import {
   createClient
 } from "https://esm.sh/@supabase/supabase-js@2";
 
-import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261031";
+import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
 /* =====================================================
@@ -2066,7 +2066,7 @@ $('reading-reconcile-form').onsubmit=async event=>{
 
 $('preview-reading-checkout').onclick=async()=>{
   if(!activeUser?.isAdmin)return;
-  if(!confirm('This opens a REAL Shopify checkout for £10.99 per year. Inspect it only; do not complete payment during this preview. Continue?'))return;
+  if(!confirm('This opens a REAL Shopify checkout for £20 per year. Inspect it only; do not complete payment during this preview. Continue?'))return;
   const popup=window.open('about:blank','bp-reading-admin-preview','popup,width=620,height=820,resizable=yes,scrollbars=yes');
   const button=$('preview-reading-checkout'),output=$('reading-setup-result');
   if(!popup){output.textContent='Allow popups for this site, then try the checkout preview again.';return;}
@@ -2079,7 +2079,7 @@ $('preview-reading-checkout').onclick=async()=>{
     const target=new URL(result.data.checkoutUrl);
     if(target.protocol!=='https:')throw Error();
     if(!popup.closed)popup.location.replace(target.href);
-    output.textContent='Annual checkout created with the verified £10.99 GBP plan. Check the price, yearly renewal and absence of shipping in Shopify. Do not complete payment during this preview.';
+    output.textContent='Annual checkout created with the verified £20 GBP plan. Check the price, yearly renewal and absence of shipping in Shopify. Do not complete payment during this preview.';
   }catch{popup.close();if(activeUser?.isAdmin)output.textContent='Checkout preview failed. Check that bp-reading-create-checkout has the latest index.ts and handler.ts, then inspect its Supabase logs. Customer checkout remains disabled.';}
   finally{button.disabled=false;}
 };

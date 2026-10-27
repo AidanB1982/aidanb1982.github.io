@@ -2,11 +2,11 @@
 
 ## Product decisions
 
-- £10.99 GBP per year for all available Blackwood reading editions, through an annual Shopify subscription.
+- £20 GBP per year for all available Blackwood reading editions, through an annual Shopify subscription.
 - Each paid purchase/renewal starts its own 12-calendar-month access period at the verified payment timestamp (UTC). Leap-day anniversaries fall on 28 February the next year. Repeated delivery of the same payment does not extend access; out-of-order payments cannot shorten an existing paid period.
 - £1.99 per book will provide permanent in-reader access even when membership expires. The schema supports this; individual-book Shopify products/checkouts still need configuring.
 - No downloadable-file link or offline book cache. Browsers receive EPUB bytes to render them, so extraction and screenshots cannot be made impossible.
-- Shopify membership product ID: `16729856016729`; variant: `60163522265433`; annual selling plan: `697040896345`. Product data supplied by the owner confirms £10.99, no shipping and a required selling plan.
+- Shopify membership product ID: `16729856016729`; variant: `60163522265433`; annual selling plan: `697040896345`. The owner confirmed a change to £20 on 27 October 2026; the product remains non-shipping with a required annual selling plan.
 - Membership product URL uses `blackwoodpublishing.myshopify.com`; the existing physical-store code uses `vmbd0z-c6.myshopify.com`. Confirm the canonical Shopify shop domain before issuing credentials or configuring webhooks; do not assume a Storefront token for one domain applies to another.
 
 ## Prepared locally; not deployed
@@ -15,7 +15,7 @@ The reader now supports multi-book metadata/series filtering, per-account and pe
 
 The optional sync client has a persistent device outbox, optimistic revision checks and explicit recovery when another device has newer data. Missing migrations/network access leave a clearly labelled device-only mode. Appearance is currently per edition. Highlights use EPUB CFIs, so replacing an edition can require position migration. The notebook supports up to 500 entries, 4,000-character quotes and 6,000-character notes; the server snapshot limit is 400 KB. Oversized snapshots remain local and report sync failure.
 
-The **Subscribe** button opens a separate browser popup (or tab on browsers that choose tabs), leaving BP Reading open. It never embeds Shopify in an iframe. Checkout is created for the verified Supabase user with the exact annual selling plan and £10.99 GBP subtotal; it has no one-time-purchase fallback. A server-generated checkout reference binds the purchase to the account. A popup closing, checkout return URL, email match, cart note alone or browser callback never grants access. Polling reads only the caller's checkout status; after five minutes a manual payment check remains available. A pending checkout can be reopened instead of creating another payment attempt.
+The **Subscribe** button opens a separate browser popup (or tab on browsers that choose tabs), leaving BP Reading open. It never embeds Shopify in an iframe. Checkout is created for the verified Supabase user with the exact annual selling plan and £20 GBP subtotal; it has no one-time-purchase fallback. A server-generated checkout reference binds the purchase to the account. A popup closing, checkout return URL, email match, cart note alone or browser callback never grants access. Polling reads only the caller's checkout status; after five minutes a manual payment check remains available. A pending checkout can be reopened instead of creating another payment attempt.
 
 ## Database migrations
 
@@ -59,7 +59,7 @@ No credential values are saved in this repository. These are Edge Function setti
 
 ## Shopify configuration and live acceptance
 
-1. Keep the annual product non-shipping, subscription-only and £10.99 GBP with the confirmed yearly plan. Do not attach downloadable files or fulfil it through a digital-download app.
+1. Keep the annual product non-shipping, subscription-only and £20 GBP with the confirmed yearly plan. Do not attach downloadable files or fulfil it through a digital-download app.
 2. Configure the supported Storefront access/app for the canonical shop and verify that its cart API returns the correct annual allocation. The physical-store Buy Button is not used for this checkout.
 3. Deploy the webhook and subscribe it to `orders/paid` and `refunds/create` at `https://bmnlynjldlnxfvunqbqq.supabase.co/functions/v1/bp-reading-shopify-webhook`. Use the actual signing secret for those webhook subscriptions.
 4. Verify Admin GraphQL API version `2026-10`, permissions, line selling-plan IDs, successful transaction timestamps and checkout attributes against real test orders. The adapter fails closed if it cannot verify these fields. A captured payment must be confirmed; authorization alone grants nothing.
@@ -105,7 +105,7 @@ including for administrators.
 
 The preview creates an account-bound checkout intent and Shopify cart, but does
 not charge or grant membership. Its confirmation explicitly warns that the
-checkout is real: inspect £10.99 GBP, annual renewal, and no shipping, then close
+checkout is real: inspect £20 GBP, annual renewal, and no shipping, then close
 it without completing payment. This is not a sandbox transaction and does not
 replace a controlled initial-payment/renewal acceptance test. Checkout failures
 log a fixed stage name without credential values.
@@ -257,3 +257,28 @@ than automatically from the supplied KDP term dates.
 The library uses the existing `/header-simple.html` and `/footer.html` partials
 through `js/header.js`. Both, together with the floating account link, are hidden
 while a book is open and return when the reader goes back to the library.
+
+## £20 annual price deployment — 27 October 2026
+
+The owner changed the Shopify membership price to £20. Website labels and the fixed
+annual-price checks now require £20 GBP. The £1.99 individual-title price is unchanged.
+No SQL migration or change to existing access dates is needed.
+
+Redeploy all three matching single-file bundles from `supabase/dashboard/`:
+
+1. `bp-reading-create-checkout.ts` → `bp-reading-create-checkout`.
+2. `bp-reading-shopify-webhook.ts` → `bp-reading-shopify-webhook` (JWT verification stays
+   off; raw-body Shopify signature verification remains mandatory).
+3. `bp-reading-reconcile-order.ts` → `bp-reading-reconcile-order`.
+
+Keep the other functions' existing JWT/authentication configuration. A website push
+does not update these live server functions. Before deployment, their old £10.99
+checks will reject the new price. Inspect a fresh checkout after deployment and close
+any old unpaid checkout rather than assume it reflects the new product price.
+
+Existing paid access is preserved. Existing Shopify subscription contracts do not
+automatically adopt a new product price. This verifier requires £20; £10.99 renewals
+and historical £10.99 reconciliation will be rejected. If any real customers retain
+a contracted £10.99 rate, implement verified legacy-contract pricing before their
+next renewal, or manage a properly agreed price change through Shopify. Do not change
+an existing customer's contract silently or simply accept arbitrary paid amounts.

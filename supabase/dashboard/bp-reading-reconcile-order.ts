@@ -86,7 +86,7 @@ export async function verifyAndApplyReadingOrder(gid:string,topic:'orders/paid'|
       ['CURRENCY',order.currency==='GBP'],
       ['QUANTITY',order.quantity===1],
       ['LINE_COUNT',order.lineCount===1],
-      ['ANNUAL_AMOUNT',Number(order.lineAmount)===10.99],
+      ['ANNUAL_AMOUNT',Number(order.lineAmount)===20],
       ['SELLING_PLAN',order.sellingPlanId===plan],
       ['CHECKOUT_REFERENCE',Boolean(order.intentId&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(order.intentId))],
       ['PAYMENT_TIMESTAMP',Boolean(order.paidAt&&Number.isFinite(Date.parse(order.paidAt)))]
