@@ -106,3 +106,11 @@ bookmarks, notes and sign-out using local EPUBs and mocked authentication.
 No live database migration, real payment, external post or marketing email is performed
 by these tests. Real-device Safari/Android, live MailerLite confirmation, Shopify
 subscription management and live analytics reporting require service/device checks.
+
+## Member visibility paused — 27 October 2026
+
+At the owner's request, `BLACKWOOD_MEMBERS_CONFIG.showBpReading` is `false`. The
+member dashboard does not render its Reading Room CTA or reading-account section,
+and it does not initialise that section's queries. All implementation code remains
+for later restoration. ARC access, the account bookshelf and other member features
+are unchanged. This does not disable the direct reader URL or alter server access.

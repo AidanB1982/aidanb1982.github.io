@@ -96,6 +96,17 @@ No Supabase or email configuration changes are required for this layout update.
   Shopify product-price changes do not rewrite existing contracts; the new verifier
   accepts £20 only. Existing membership dates/receipts are not rewritten or revoked.
 
+## BP Reading member visibility paused: 27 October
+
+- [x] Hide the Reading Room link and reading-account/continue-reading section in the
+  member dashboard for all users, including administrators.
+- [x] Retain their code and prevent the hidden account section from fetching records.
+  Restore later using `BLACKWOOD_MEMBERS_CONFIG.showBpReading` in `js/members.js`.
+- [x] Keep ARC, the account bookshelf, reviews and rewards available.
+
+This is a presentation switch, not a change to protected delivery, existing paid
+access or direct reader-page permissions. Public reader navigation remains hidden.
+
 ## Existing foundations already in place
 
 - [x] Author Desk book/production records, documents/rights, statements, payments and

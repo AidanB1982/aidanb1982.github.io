@@ -22,6 +22,8 @@
     const BLACKWOOD_MEMBERS_CONFIG = {
         supabaseUrl: "https://bmnlynjldlnxfvunqbqq.supabase.co",
         supabaseKey: "sb_publishable_eL7qdDe_6XWGhzmdsql_7w_7dg6psC0",
+        // Presentation switch only; protected reader access remains server-controlled.
+        showBpReading: false,
         membersPagePath: "/pages/members.html",
         readerRecordsPagePath: "/pages/reader-records.html",
         behindFilesJsonPath: "/data/BFA.json",
@@ -1049,6 +1051,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                 <p class="circle-dashboard-status" id="circle-dashboard-status" aria-live="polite"></p>
             </div>
 
+            ${BLACKWOOD_MEMBERS_CONFIG.showBpReading ? `
             <section class="circle-reader-record-cta" aria-labelledby="circle-bp-reading-title">
                 <div>
                     <h2 id="circle-bp-reading-title">The Blackwood Reading Room</h2>
@@ -1056,6 +1059,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                 </div>
                 <a href="/pages/bp-reading.html" class="circle-reader-record-button">Open BP Reading</a>
             </section>
+            ` : ""}
 
             <section class="circle-reader-record-cta" aria-labelledby="circle-reader-record-cta-title">
                 <div>
@@ -1071,7 +1075,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                 </a>
             </section>
 
-            <section class="rs-account" id="member-reading-centre" aria-label="Reading account"></section>
+            ${BLACKWOOD_MEMBERS_CONFIG.showBpReading ? `<section class="rs-account" id="member-reading-centre" aria-label="Reading account"></section>` : ""}
 
             ${renderArcProfileMount()}
 
@@ -1096,7 +1100,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
     `;
 
     bindDashboardEvents();
-    if (typeof window.initBlackwoodReadingCentre === "function") {
+    if (BLACKWOOD_MEMBERS_CONFIG.showBpReading && typeof window.initBlackwoodReadingCentre === "function") {
         void window.initBlackwoodReadingCentre({
             root: document.getElementById("member-reading-centre"),
             client: BlackwoodMembersState.client,
