@@ -1,3 +1,4 @@
+import {readFileSync} from "node:fs";
 import assert from 'node:assert/strict';
 import {mergeReadingCatalogue} from '../js/BP-reading-catalogue.js';
 const planned=[{id:'gualachulain-bothy',title:'Gualachulain',author:'Aidan Blackwood',cover:'/assets/book7.png',readingAliases:['gualachulain','Gualachulain Bothy']},{id:'future',title:'Future title',editionId:999,canRead:true,readingReady:true}];
@@ -24,3 +25,12 @@ assert.equal(result.find(b=>b.title==='The Third Night').publicTextId,'the-third
 result=mergeReadingCatalogue([{...planned[0],readingCover:'/assets/book7.png'}],[{...approved,cover:'/assets/old-mockup.png'}]);assert.equal(result[0].cover,'/assets/book7.png','confirmed flat cover replaces older server artwork');
 result=mergeReadingCatalogue([{...planned[0],readingCover:'/assets/book12.jpg',readingCoverPending:true,readingCoverAlt:'Cover coming soon'}],[{...approved,cover:'/assets/actual-upload.jpg'}]);assert.equal(result[0].cover,'/assets/actual-upload.jpg','real server cover replaces a pending placeholder');
 result=mergeReadingCatalogue([{...planned[0],readingCover:'/assets/book12.jpg',readingCoverPending:true,readingCoverAlt:'Cover coming soon'}],[approved]);assert.equal(result[0].cover,'/assets/book12.jpg');assert.equal(result[0].coverAlt,'Cover coming soon');
+
+// Reading chronology includes recovered stories without renumbering published novels.
+const archiveExpected=['The Third Night','The Black Bothy','The Gåtestein Log','The Drowned Fjord','The Erased Archivist','Holdfast'];
+for(const approved of [[],[{editionId:10,bookId:'4',title:'The Black Bothy',author:'Aidan Blackwood',seriesOrder:1,canRead:true}]]) {
+ const archive=mergeReadingCatalogue(JSON.parse(readFileSync('data/book-discovery.json','utf8')),approved)
+  .filter(b=>b.collection==='The Archive Files').sort((a,b)=>a.readingOrder-b.readingOrder);
+ assert.deepEqual(archive.map(b=>b.title),archiveExpected);
+ assert.equal(archive.find(b=>b.title==='The Black Bothy').seriesOrder,1);
+}

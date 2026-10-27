@@ -3,7 +3,7 @@
 Updated **27 October 2026** (UK). This separates published website work from features
 that still need live configuration, database changes or app-store setup.
 
-## Catalogue reconciliation — prepared, live SQL pending
+## Catalogue reconciliation — owner confirmed live
 
 - [x] Review the supplied catalogue/schema report and test reconciliation against it.
 - [x] Prepare `supabase/operations/reconcile-reading-catalogue.sql`: reuse existing
@@ -11,12 +11,18 @@ that still need live configuration, database changes or app-store setup.
   release only the approved Black Bothy and Crossing uploads.
 - [x] Verify atomic failure, rerun safety, private crosswalk and author identity rules.
 - [x] Repair imported identity sequences behind existing IDs; test the reported edition-ID collision.
-- [ ] Owner runs the whole SQL file in Supabase and returns the result or any error.
-- [ ] Confirm both uploaded EPUBs open with an entitled account after that live run.
+- [x] Owner ran reconciliation successfully; all 26 linked works were returned.
+- [x] Owner confirmed Black Bothy and Crossing working; subsequently uploaded and confirmed Drowned Fjord, Erased Archivist and Holdfast.
 - [ ] Add remaining EPUB files and approve each release separately over coming days.
 
 BP Reading navigation/member links remain hidden. No missing author accounts are
 created by this operation; new preparation records carry no invented contract dates.
+
+## BP Reading chronology
+
+- [x] Group The Third Night, The Black Bothy, The Gåtestein Log, The Drowned Fjord,
+  The Erased Archivist and Holdfast under The Archive Files, in that reading order.
+  Keep published novel numbers and public discovery metadata unchanged. No SQL needed.
 
 ## Completed: Author Desk improvements, 26 October
 

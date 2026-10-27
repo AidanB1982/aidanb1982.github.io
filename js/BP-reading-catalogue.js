@@ -25,15 +25,15 @@ export function mergeReadingCatalogue(planned, approved, {verified = true} = {})
     const entry = metadata.find(item => matches(item,book));
     return {...entry,...book,title:book.title || entry?.title || 'Reading edition',author:book.author || entry?.author || '',
       description:book.description || entry?.description || '',...readingArtwork(entry,book),
-      collection:entry?.collection || entry?.series || book.series || 'Independent Works',
+      collection:entry?.readingCollection || entry?.collection || entry?.series || book.series || 'Independent Works',
       series:book.series || entry?.series || '',seriesOrder:book.seriesOrder ?? entry?.order ?? null,
-      readingReady:true,availabilityUnknown:false,canRead:book.canRead === true};
+      readingOrder:entry?.readingOrder ?? null,readingReady:true,availabilityUnknown:false,canRead:book.canRead === true};
   });
   for (const entry of metadata) {
     if (entry.hideFromReading === true || editions.some(book => matches(entry,book))) continue;
     const publicWork = publicReadingWork(entry.id);
-    result.push({id:'planned:'+entry.id,catalogueId:entry.id,title:entry.title,author:entry.author || '',collection:entry.collection || entry.series || 'Independent Works',series:entry.series || '',
-      seriesOrder:entry.order ?? null,description:entry.description || '',...readingArtwork(entry),
+    result.push({id:'planned:'+entry.id,catalogueId:entry.id,title:entry.title,author:entry.author || '',collection:entry.readingCollection || entry.collection || entry.series || 'Independent Works',series:entry.series || '',
+      readingOrder:entry.readingOrder ?? null,seriesOrder:entry.order ?? null,description:entry.description || '',...readingArtwork(entry),
       editionId:null,bookId:null,publicTextId:publicWork?entry.id:null,readingReady:Boolean(publicWork),availabilityUnknown:!publicWork&&!verified,canRead:Boolean(publicWork),owned:false});
   }
   return result;

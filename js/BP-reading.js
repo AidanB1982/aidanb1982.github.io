@@ -6,7 +6,7 @@ import {
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
-import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261123";
+import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261124";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
@@ -235,7 +235,7 @@ function renderLibrary() {
     && (filter === 'all' || (filter === 'finished' ? book.progress >= 100 : filter === 'unread' ? !book.started : book.started && book.progress < 100)));
   const collectionOrder=['The Archive Files','Recovered Files','Threshold Records','The Hollowing Veil','Hard Silence','Independent Works','The Cursed Bothies','Practical Guides'];
   const collectionRank=book=>{const index=collectionOrder.indexOf(book.collection);return index<0?collectionOrder.length:index;};
-  books.sort((a,b)=>collectionRank(a)-collectionRank(b)||String(a.collection).localeCompare(String(b.collection))||($('library-sort').value==='title'?a.title.localeCompare(b.title):(a.seriesOrder??999)-(b.seriesOrder??999)||a.title.localeCompare(b.title)));
+  books.sort((a,b)=>collectionRank(a)-collectionRank(b)||String(a.collection).localeCompare(String(b.collection))||($('library-sort').value==='title'?a.title.localeCompare(b.title):(a.readingOrder??a.seriesOrder??999)-(b.readingOrder??b.seriesOrder??999)||a.title.localeCompare(b.title)));
 
   const ready = collection.filter(book=>book.readingReady).length;
   $('library-catalogue-status').textContent = `${books.length} of ${collection.length} titles shown · ${ready} reading edition${ready===1?'':'s'} listed` + (!catalogueVerified ? ' · Reading availability could not be fully checked; refresh to retry.' : '') + (!plannedCatalogueLoaded ? ' · The full book list could not load; showing available reading editions only.' : ' · Other titles will follow as reading editions are prepared.');
@@ -388,7 +388,7 @@ async function loadReadingCatalogue() {
   const catalogueRequest = new AbortController();
   const catalogueTimeout = setTimeout(()=>catalogueRequest.abort(),8000);
   try {
-    const response = await fetch('/data/book-discovery.json?v=20261123',{signal:catalogueRequest.signal});
+    const response = await fetch('/data/book-discovery.json?v=20261124',{signal:catalogueRequest.signal});
     if (!response.ok) throw Error();
     const data = await response.json();
     if (!Array.isArray(data)) throw Error();

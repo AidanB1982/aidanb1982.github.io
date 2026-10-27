@@ -8,7 +8,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',count=require('../data/
  if(config.metadataMissing){assert.equal(await p.locator('.book-card').count(),1);assert.match(await p.locator('#library-catalogue-status').textContent(),/full book list could not load/);}
  else{assert.equal(await p.locator('.book-card').count(),count);
   assert.equal(await p.getByRole('heading',{name:'Blackwood Manuscript Audit Workbook',exact:true}).count(),0);
-  assert.equal(await p.locator('.reading-collection-heading').count(),8,'visible collection headings');
+  assert.equal(await p.locator('.reading-collection-heading').count(),7,'visible collection headings');
+  await p.locator('#library-collection').selectOption('The Archive Files');assert.deepEqual(await p.locator('.book-card h4').allTextContents(),['The Third Night','The Black Bothy','The Gåtestein Log','The Drowned Fjord','The Erased Archivist','Holdfast']);await p.locator('#library-collection').selectOption('');
   for(const [title,file] of [['The Black Bothy','book3.jpg'],['The Drowned Fjord','book4.jpg'],['The Erased Archivist','book5.jpg'],['Holdfast','book6.jpg'],['The Money Reset','book17.png'],['Introduction to Accounts','book18.jpg'],['Accounting for UK Landlords','book19.jpg'],['Before the House Closed','book20.png']]){const card=p.locator('.book-card').filter({has:p.getByRole('heading',{name:title,exact:true})});assert.equal(await card.locator('img').getAttribute('src'),'/assets/'+file,'flat reading cover for '+title);}
   assert.equal(await p.locator('.book-card img[src="/assets/book13.jpg"]').count(),0,'limited physical edition is not substituted for the main reading cover');
   await p.locator('#library-collection').selectOption('The Hollowing Veil');assert.equal(await p.locator('.book-card').count(),2);assert.deepEqual(await p.locator('.book-card h4').allTextContents(),['The Orphan and the Hollow Tree','The Salt Widow']);

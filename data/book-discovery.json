@@ -14,7 +14,9 @@
     "description": "The first door into the Archive. Isolation, grief, and the thing waiting in the dark.",
     "href": "/pages/store.html#the-black-bothy",
     "sample": null,
-    "readingCover": "/assets/book3.jpg"
+    "readingCover": "/assets/book3.jpg",
+    "readingCollection": "The Archive Files",
+    "readingOrder": 2
   },
   {
     "id": "the-drowned-fjord",
@@ -31,7 +33,9 @@
     "description": "A cold coastal descent into memory, loss, and the things the water refuses to keep buried.",
     "href": "/pages/store.html#the-drowned-fjord",
     "sample": null,
-    "readingCover": "/assets/book4.jpg"
+    "readingCover": "/assets/book4.jpg",
+    "readingCollection": "The Archive Files",
+    "readingOrder": 4
   },
   {
     "id": "the-erased-archivist",
@@ -48,7 +52,9 @@
     "description": "A record begins to vanish. Identity, obsession, and the archive turning against its keeper.",
     "href": "/pages/store.html#the-erased-archivist",
     "sample": null,
-    "readingCover": "/assets/book5.jpg"
+    "readingCover": "/assets/book5.jpg",
+    "readingCollection": "The Archive Files",
+    "readingOrder": 5
   },
   {
     "id": "holdfast",
@@ -65,7 +71,9 @@
     "description": "The fourth Archive File. A transmission, a locked record, and something that should not be opened.",
     "href": "/pages/store.html#holdfast",
     "sample": "/pages/reading-preview.html?book=holdfast",
-    "readingCover": "/assets/book6.jpg"
+    "readingCover": "/assets/book6.jpg",
+    "readingCollection": "The Archive Files",
+    "readingOrder": 6
   },
   {
     "id": "dour-hill-house",
@@ -295,7 +303,9 @@
     "href": "/pages/the-third-night.html",
     "sample": null,
     "collection": "Recovered Files",
-    "readingCover": "/assets/TheThirdNight.png"
+    "readingCover": "/assets/TheThirdNight.png",
+    "readingCollection": "The Archive Files",
+    "readingOrder": 1
   },
   {
     "id": "the-gatestein-log",
@@ -313,7 +323,9 @@
     "href": "/pages/gatestein-log.html",
     "sample": null,
     "collection": "Recovered Files",
-    "readingCover": "/assets/Gatestein.jpg"
+    "readingCover": "/assets/Gatestein.jpg",
+    "readingCollection": "The Archive Files",
+    "readingOrder": 3
   },
   {
     "id": "blackwood-manuscript-audit-workbook",
