@@ -145,29 +145,44 @@ its real book/ebook records with the appropriate author relationship before regi
 the upload. Do not reuse edition 10, Gualachulain's edition 2, or an ID from the separate
 `publishing_editions` inventory table.
 
-## Whole-catalogue reconciliation
+## Whole-catalogue reconciliation — ready to run
 
-The owner authorised finding/reusing existing records and creating missing records
-for The Crossing and the other books. Before constructing the bulk insert, run
-[the catalogue inspection](../supabase/operations/inspect-reading-catalogue.sql) in
-Supabase SQL Editor and return its `catalogue_report` JSON result.
+The owner supplied the inspection report on 27 October. The Crossing is absent from
+both catalogue systems. Run the **whole**
+[reconciliation SQL](../supabase/operations/reconcile-reading-catalogue.sql) as an
+administrator in Supabase SQL Editor. This replaces the earlier inspection/lookup
+steps; it has been prepared and tested locally, **not executed in the live project**.
+No Edge Function deployment or frontend flag change is needed.
 
-The report pulls non-contact book/edition metadata from both systems:
+The transaction reuses `book_records` / numeric `book_editions` and the separate
+UUID `publishing_titles` / `publishing_editions`, creating missing records with
+real database-generated IDs. It covers the 24 visible reading titles plus existing
+inventory works. It keeps Corrour and Corrour Bothy separate and excludes the hidden
+Manuscript Audit Workbook. The supplied report produced 26 linked works in validation.
 
-- `book_records` / `book_editions`: Author Desk and protected-reader edition identities.
-- `publishing_titles` / `publishing_editions`: the separate Publishing Inventory model.
-- Existing author/contributor identities and reader catalogue registrations.
-- Actual column defaults, generated-ID settings, required fields and constraints.
-- The 24 current reading titles to reconcile, excluding the hidden workbook.
+New book records start at `pre_publication`; new ebook editions retain the database's
+`planned` default. These are preparation records, not invented publication dates or
+contract evidence. Existing stages, statuses, commercial identifiers and reader IDs
+are preserved. Public recovered texts receive book metadata without fake EPUB IDs.
 
-Optional absent tables/columns are reported without making up values. No persistent
-table is written, no permissions are changed and no absent book is created by this
-inspection. It uses a session-local setting to return one JSON result rather than
-creating a permanent report table/function. Run the entire file together.
+Only these owner-approved uploads are registered and released:
 
-The next bulk operation must reuse unambiguous existing works and real ebook IDs,
-create genuinely missing records with database-generated IDs/defaults, preserve existing
-reader identities and stop on ambiguous matches. It must not copy an ID from the
-Publishing Inventory into `book_editions`, invent commercial ISBNs/prices, grant author
-permissions by guessing a profile, or publish files that have not been uploaded and
-approved. Public recovered stories do not need fictitious Supabase EPUB editions.
+- `The_Black_Bothy/The Black Bothy.epub`, confirmed book 4 / edition 10.
+- `The_Crossing/The Crossing.epub`, assigned its real new book/edition IDs.
+
+Both must already exist inside the private `bp-reading-editions` bucket. All other
+new reading entries remain unavailable until separately uploaded and approved.
+Existing Gualachulain access is preserved. Membership/payment checks stay in force;
+BP Reading remains hidden from navigation and the member area.
+
+The internal `bp_reading_catalogue_links` crosswalk preserves associations between the
+two ID systems on reruns. It has RLS enabled and no anonymous/authenticated grants.
+Existing matching author identities may be linked; missing author identities are
+reported without creating accounts or assigning their books to Aidan. Miren, Martin
+and Campbell therefore still need their own Author Desk identities if desk access is
+wanted. Reading access does not require those author logins.
+
+Ambiguous matches, missing uploads, unexpected required columns or mismatched IDs
+abort the transaction. Resolve the reported problem before rerunning; do not bypass
+the checks. The final result lists actual book/ebook IDs and released/planned/public
+text states. Send back that result or any error so live completion can be recorded.

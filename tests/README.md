@@ -256,3 +256,11 @@ Supabase deployment or proof that the uploaded EPUB renders successfully.
 and checks both ID namespaces, absent optional tables/columns, real schema details,
 exclusion of contact data and absence of book-record mutations. It does not inspect
 the live Supabase project; the owner must run the published report there.
+
+`tests/reading-catalogue-reconciliation.cjs` runs the bulk reconciliation in PGlite.
+It checks atomic rollback on missing/private-file failures and ambiguous titles,
+separate Corrour identities, stable reruns, existing reader/release state, no invented
+author identities, private crosswalk permissions and release of only the approved
+uploads. Run with PGlite available in `NODE_PATH`. A separate local validation used
+the supplied schema constraints and catalogue rows; that private report is not
+committed. Neither check executes SQL against live Supabase.
