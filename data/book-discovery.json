@@ -174,10 +174,11 @@
       "Unease",
       "Consequence"
     ],
-    "cover": "/assets/A16.png",
+    "cover": "/assets/book16.jpg",
     "description": "Dark fantasy concerned with thresholds, inheritance, ritual and what follows when old warnings are ignored.",
     "href": "/pages/miren-vale.html",
-    "sample": null
+    "sample": null,
+    "collection": "Threshold Records"
   },
   {
     "id": "the-red-clad-collector",
@@ -198,7 +199,7 @@
   {
     "id": "accounting-sole-traders",
     "title": "Accounting for UK Sole Traders",
-    "author": "",
+    "author": "Martin Hales",
     "series": "Practical Guides",
     "order": null,
     "genre": "Non-fiction",
@@ -213,7 +214,7 @@
   {
     "id": "accounting-landlords",
     "title": "Accounting for UK Landlords",
-    "author": "",
+    "author": "Martin Hales",
     "series": "Practical Guides",
     "order": null,
     "genre": "Non-fiction",
@@ -274,7 +275,8 @@
     "cover": "/assets/TheThirdNight.png",
     "description": "A recovered account connected to The Black Bothy. Not everything that comes back from the hills is meant to.",
     "href": "/pages/the-third-night.html",
-    "sample": null
+    "sample": null,
+    "collection": "Recovered Files"
   },
   {
     "id": "the-gatestein-log",
@@ -290,7 +292,8 @@
     "cover": "/assets/Gatestein.jpg",
     "description": "A recovered journal fragment connected to The Drowned Fjord.",
     "href": "/pages/gatestein-log.html",
-    "sample": null
+    "sample": null,
+    "collection": "Recovered Files"
   },
   {
     "id": "blackwood-manuscript-audit-workbook",
@@ -305,6 +308,84 @@
     "cover": "/assets/BYA.jpg",
     "description": "A self-guided structural revision workbook for fiction writers. The in-reader edition is being prepared.",
     "href": "/pages/store.html#blackwood-manuscript-audit-workbook",
+    "sample": null,
+    "hideFromReading": true
+  },
+  {
+    "id": "introduction-to-accounts",
+    "title": "Introduction to Accounts",
+    "author": "Martin Hales",
+    "series": "Practical Guides",
+    "order": null,
+    "genre": "Non-fiction",
+    "moods": [
+      "Practical"
+    ],
+    "cover": "/assets/logo1.png",
+    "coverAlt": "Blackwood Publishing mark; cover to follow",
+    "description": "Your Go-To Guide to Accounting Terms, What They Mean and Why We Use Them.",
+    "href": "https://www.amazon.co.uk/dp/1919555544",
+    "sample": null,
+    "publicationDate": "2024-09-10"
+  },
+  {
+    "id": "staying-an-account",
+    "title": "Staying: An Account",
+    "author": "Miren Vale",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Independent works",
+    "moods": [],
+    "cover": "/assets/logo1.png",
+    "coverAlt": "Blackwood Publishing mark; cover to follow",
+    "description": "A Miren Vale title. Its in-reader edition will follow once uploaded and approved.",
+    "href": "https://www.amazon.co.uk/dp/B0GG6KX7Z6",
+    "sample": null,
+    "publicationDate": "2026-01-10",
+    "collection": "Threshold Records"
+  },
+  {
+    "id": "the-salt-widow",
+    "title": "The Salt Widow",
+    "author": "Miren Vale",
+    "series": "The Hollowing Veil",
+    "order": null,
+    "genre": "Horror",
+    "moods": [],
+    "cover": "/assets/logo1.png",
+    "coverAlt": "Blackwood Publishing mark; cover to follow",
+    "description": "Grief is a tide. Part of The Hollowing Veil by Miren Vale.",
+    "href": "https://www.amazon.co.uk/dp/B0FH733PSY",
+    "sample": null,
+    "publicationDate": "2025-07-18"
+  },
+  {
+    "id": "the-orphan-and-the-hollow-tree",
+    "title": "The Orphan and the Hollow Tree",
+    "author": "Miren Vale",
+    "series": "The Hollowing Veil",
+    "order": 1,
+    "genre": "Horror",
+    "moods": [],
+    "cover": "/assets/logo1.png",
+    "coverAlt": "Blackwood Publishing mark; cover to follow",
+    "description": "A Gothic horror novel. Book One of The Hollowing Veil by Miren Vale.",
+    "href": "https://www.amazon.co.uk/dp/B0FC62WJBN",
+    "sample": null,
+    "publicationDate": "2025-01-05"
+  },
+  {
+    "id": "before-the-house-closed",
+    "title": "Before the House Closed",
+    "author": "Aidan Blackwood",
+    "series": "Independent Works",
+    "order": null,
+    "genre": "Independent works",
+    "moods": [],
+    "cover": "/assets/logo1.png",
+    "coverAlt": "Blackwood Publishing mark; cover to follow",
+    "description": "An Aidan Blackwood title. Its in-reader edition will follow once uploaded and approved.",
+    "href": "/pages/publications.html",
     "sample": null
   }
 ]

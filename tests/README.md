@@ -239,3 +239,9 @@ IDs or access and that approved records replace matching placeholders.
 newly approved titles, unavailable services and narrow layouts using mocked services.
 `tests/reading-library.cjs` covers approved-edition opening/sync alongside the full shelf;
 set `READING_CUSTOMER_TEST=1` or `READING_LOCKED_TEST=1` for those access states.
+
+`tests/reading-public.cjs` reads both existing public recovered manuscripts through
+the real EPUB engine, checks prose/copyright against their source paragraphs, and
+exercises page turns, section navigation, local notes/resume and mobile display.
+It also asserts no private delivery request or fabricated edition key is used.
+The public-text route is allowlisted; this does not release other protected titles.

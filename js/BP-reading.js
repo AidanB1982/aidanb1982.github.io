@@ -6,7 +6,8 @@ import {
 } from "https://esm.sh/@supabase/supabase-js@2";
 
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
-import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261121";
+import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261122";
+import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
 
 /* =====================================================
@@ -218,26 +219,42 @@ function renderLibrary() {
   const filter = $("library-status").value;
   const collection = libraryBooks.map(book => {
     let saved = {};
-    if (book.readingReady) try { saved = JSON.parse(localStorage.getItem(`bp-reading:${activeUser?.id}:edition:${book.editionId}:v2`)) || {}; } catch {}
+    if (book.readingReady) try { saved = JSON.parse(localStorage.getItem(readingStorageKey(activeUser?.id,book))) || {}; } catch {}
     const progress = Number.isFinite(saved.progress) ? clamp(saved.progress,0,100) : 0;
     return {...book, progress, started:saved.hasStarted === true,lastChapter:typeof saved.lastChapter==='string'?saved.lastChapter.slice(0,500):'',lastReadAt:Number.isFinite(saved.lastReadAt)?saved.lastReadAt:0};
   });
   renderContinueReading(collection);
+  const collectionFilter = $('library-collection'), selectedCollection = collectionFilter.value;
+  const collectionNames = [...new Set(collection.map(book=>book.collection || book.series || 'Independent Works'))];
+  collectionFilter.replaceChildren(new Option('All collections',''));
+  collectionNames.sort().forEach(name=>collectionFilter.add(new Option(name,name)));
+  if (collectionNames.includes(selectedCollection)) collectionFilter.value = selectedCollection;
   const availability = $('library-availability').value;
-  const books=collection.filter(book => (availability === 'all' || (availability === 'ready' ? book.readingReady : !book.readingReady)) && `${book.title} ${book.author} ${book.series}`.toLowerCase().includes(query)
+  const books=collection.filter(book => (availability === 'all' || (availability === 'ready' ? book.readingReady : !book.readingReady)) && `${book.title} ${book.author} ${book.series} ${book.collection}`.toLowerCase().includes(query)
+    && (!collectionFilter.value || book.collection === collectionFilter.value)
     && (filter === 'all' || (filter === 'finished' ? book.progress >= 100 : filter === 'unread' ? !book.started : book.started && book.progress < 100)));
-  books.sort((a,b) => $('library-sort').value === 'title' ? a.title.localeCompare(b.title) : String(a.series).localeCompare(String(b.series)) || (a.seriesOrder || 0) - (b.seriesOrder || 0) || a.title.localeCompare(b.title));
+  const collectionOrder=['The Archive Files','Recovered Files','Threshold Records','The Hollowing Veil','Hard Silence','Independent Works','The Cursed Bothies','Practical Guides'];
+  const collectionRank=book=>{const index=collectionOrder.indexOf(book.collection);return index<0?collectionOrder.length:index;};
+  books.sort((a,b)=>collectionRank(a)-collectionRank(b)||String(a.collection).localeCompare(String(b.collection))||($('library-sort').value==='title'?a.title.localeCompare(b.title):(a.seriesOrder??999)-(b.seriesOrder??999)||a.title.localeCompare(b.title)));
+
   const ready = collection.filter(book=>book.readingReady).length;
-  $('library-catalogue-status').textContent = `${books.length} of ${collection.length} titles shown · ${ready} reading edition${ready===1?'':'s'} listed` + (!catalogueVerified ? ' · Reading availability could not be fully checked; refresh to retry.' : '') + (!plannedCatalogueLoaded ? ' · The full book list could not load; showing approved editions only.' : ' · Other titles will follow as reading editions are prepared.');
+  $('library-catalogue-status').textContent = `${books.length} of ${collection.length} titles shown · ${ready} reading edition${ready===1?'':'s'} listed` + (!catalogueVerified ? ' · Reading availability could not be fully checked; refresh to retry.' : '') + (!plannedCatalogueLoaded ? ' · The full book list could not load; showing available reading editions only.' : ' · Other titles will follow as reading editions are prepared.');
   $('load-synced').disabled = !readingAccount || switchingEdition;
   if (!books.length) { grid.textContent = 'No books match these filters.'; return; }
+  let previousCollection = null;
   for (const book of books) {
-    const card = document.createElement('article'); card.className = 'book-card'; card.dataset.availability = book.readingReady ? 'ready' : 'coming-soon'; if(book.readingReady)card.dataset.editionId=String(book.editionId);
+    const collectionName = book.collection || book.series || 'Independent Works';
+    if (collectionName !== previousCollection) {
+      const group = document.createElement('h3'); group.className='reading-collection-heading'; group.textContent=collectionName;
+      const count=document.createElement('span');const size=books.filter(item=>item.collection===collectionName).length;count.textContent=`${size} ${size===1?'title':'titles'}`;group.append(count);grid.append(group);
+      previousCollection=collectionName;
+    }
+    const card = document.createElement('article'); card.className = 'book-card'; card.dataset.availability = book.readingReady ? 'ready' : 'coming-soon'; if(Number.isSafeInteger(book.editionId))card.dataset.editionId=String(book.editionId); if(book.publicTextId)card.dataset.publicTextId=book.publicTextId;
     const cover = document.createElement('div'); cover.className = 'book-cover';
     const image = document.createElement('img'); image.src = book.cover; image.alt = book.coverAlt || book.title + ' cover'; image.loading = 'lazy'; cover.append(image);
     const details = document.createElement('div'); details.className = 'book-details';
     const eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = !book.readingReady ? 'IN THE BLACKWOOD COLLECTION' : book.started ? 'PICK UP WHERE YOU LEFT OFF' : 'YOUR NEXT CHAPTER AWAITS';
-    const heading = document.createElement('h2'); heading.textContent = book.title;
+    const heading = document.createElement('h4'); heading.textContent = book.title;
     const meta = document.createElement('p'); meta.className = 'book-description'; meta.textContent = [book.author, book.series, book.seriesOrder ? 'Book ' + book.seriesOrder : ''].filter(Boolean).join(' · ');
     const description = document.createElement('p'); description.className = 'book-description'; description.textContent = book.description;
     const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = !book.readingReady ? book.availabilityUnknown ? 'Availability could not be checked.' : 'The reading edition is being prepared.' : book.started ? `${book.progress}% complete` : 'Not started';
@@ -245,7 +262,7 @@ function renderLibrary() {
     const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = !book.readingReady || switchingEdition || state.isLoading;
     button.onclick = () => {if (!book.readingReady) return; if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
     const badges=document.createElement('div');badges.className='book-badges';
-    const access=document.createElement('span');access.className='book-badge';access.textContent=!book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
+    const access=document.createElement('span');access.className='book-badge';access.textContent=book.publicTextId ? 'Free recovered file' : !book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
     if(book.progress>=100){const finished=document.createElement('span');finished.className='book-badge finished';finished.textContent='Finished';badges.append(finished);}
     track.hidden = !book.readingReady;
     track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
@@ -271,8 +288,15 @@ function renderContinueReading(collection) {
 function reportSync(text) { $('reading-sync-status').textContent = text; }
 async function connectEdition(book) {
   readingAccount?.stop();
+  if (publicReadingWork(book.publicTextId)) {
+    readingAccount = null; EDITION_ID = null; BOOK = book;
+    STORAGE_KEY = readingStorageKey(activeUser.id,book);
+    restorePreferences(loadSavedState());
+    reportSync('Public recovered file · your place, appearance and notebook are saved on this device.');
+    return;
+  }
   EDITION_ID = book.editionId; BOOK = book;
-  STORAGE_KEY = `bp-reading:${activeUser.id}:edition:${EDITION_ID}:v2`;
+  STORAGE_KEY = readingStorageKey(activeUser.id,book);
   restorePreferences(loadSavedState());
   const account = new ReadingAccount(supabase,activeUser.id,EDITION_ID,reportSync);
   readingAccount = account;
@@ -282,7 +306,7 @@ async function connectEdition(book) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot())); } catch {}
 }
 async function openEdition(book) {
-  if (!activeUser || !book.readingReady || !Number.isSafeInteger(book.editionId) || !book.canRead || switchingEdition || state.isOpen) return;
+  if (!activeUser || !book.readingReady || (!Number.isSafeInteger(book.editionId) && !publicReadingWork(book.publicTextId)) || !book.canRead || switchingEdition || state.isOpen) return;
   const epoch = sessionEpoch;
   switchingEdition = true; renderLibrary();
   try {
@@ -364,7 +388,7 @@ async function loadReadingCatalogue() {
   const catalogueRequest = new AbortController();
   const catalogueTimeout = setTimeout(()=>catalogueRequest.abort(),8000);
   try {
-    const response = await fetch('/data/book-discovery.json?v=20261121',{signal:catalogueRequest.signal});
+    const response = await fetch('/data/book-discovery.json?v=20261122',{signal:catalogueRequest.signal});
     if (!response.ok) throw Error();
     const data = await response.json();
     if (!Array.isArray(data)) throw Error();
@@ -380,6 +404,7 @@ async function loadReadingCatalogue() {
   if(activeUser?.id!==user.id)return;
   libraryBooks=libraryBooks.map(book=>({...book,owned:purchases.includes(book.bookId)}));
   const checked = await Promise.all(libraryBooks.map(async book => {
+    if (publicReadingWork(book.publicTextId)) return {...book,canRead:true};
     if (!book.readingReady) return {...book,canRead:false};
     if (user.isAdmin) return {...book,canRead:true};
     try {const access = await supabase.rpc('bp_reading_can_read',{p_edition_id:book.editionId});return {...book,canRead:!access.error && access.data === true};}
@@ -1346,6 +1371,8 @@ async function openBook() {
   state.isLoading = true;
   state.isOpen = true;
   state.locationsReady = false;
+  $("reader-seek").disabled = true;
+  $("quiet-percent").textContent = "Preparing…";
   state.currentLocation = null;
   state.currentCfi = null;
 
@@ -1370,7 +1397,9 @@ async function openBook() {
   showStatus("");
 
   try {
-    const bytes = await fetchProtectedEpub();
+    const bytes = publicReadingWork(BOOK.publicTextId)
+      ? await buildPublicReadingEpub(BOOK.publicTextId)
+      : await fetchProtectedEpub();
 
     if (openingId !== state.openingId) {
       return;
@@ -1547,6 +1576,8 @@ function closeBook() {
   state.isLoading = false;
   state.isNavigating = false;
   state.locationsReady = false;
+  $("reader-seek").disabled = true;
+  $("quiet-percent").textContent = "Preparing…";
   state.currentLocation = null;
   state.currentCfi = null;
 
@@ -1691,7 +1722,7 @@ function chapterTimeRemaining() {
 $('save-highlight').onclick = () => addAnnotation(selectedPassage);
 $('dismiss-selection').onclick = () => {$('selection-tools').hidden = true; selectedPassage = null;};
 $('add-page-note').onclick = () => {const cfi = getCurrentCfi(); if (cfi) addAnnotation({cfi,chapter:chapterName()});};
-for (const id of ['library-search','library-status','library-sort','library-availability']) $(id).addEventListener(id === 'library-search' ? 'input' : 'change',renderLibrary);
+for (const id of ['library-search','library-status','library-sort','library-availability','library-collection']) $(id).addEventListener(id === 'library-search' ? 'input' : 'change',renderLibrary);
 $('load-synced').onclick = async () => {
   if (!readingAccount || state.isOpen || switchingEdition) return;
   if (!confirm('Load this book’s synced reading data? Any unsynced local changes for this book will be replaced.')) return;

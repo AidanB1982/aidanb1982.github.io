@@ -1,3 +1,4 @@
+import {publicReadingWork} from "./BP-reading-public.js?v=20261122";
 /* Planned metadata is display-only. Only approved server rows carry edition IDs. */
 const normalized = value => String(value || '').normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 function matches(planned, approved) {
@@ -8,9 +9,10 @@ function matches(planned, approved) {
 }
 export function mergeReadingCatalogue(planned, approved, {verified = true} = {}) {
   const metadata = Array.isArray(planned) ? planned.filter(book => book && typeof book.id === 'string' && typeof book.title === 'string') : [];
+  const hidden = metadata.filter(book=>book.hideFromReading === true);
   const seen = new Set();
   const editions = (Array.isArray(approved) ? approved : []).filter(book => {
-    if (!book || !Number.isSafeInteger(book.editionId) || book.editionId <= 0 || seen.has(book.editionId)) return false;
+    if (!book || hidden.some(entry=>matches(entry,book)) || metadata.some(entry=>publicReadingWork(entry.id)&&matches(entry,book)) || !Number.isSafeInteger(book.editionId) || book.editionId <= 0 || seen.has(book.editionId)) return false;
     seen.add(book.editionId); return true;
   });
   const result = editions.map(book => {
@@ -18,14 +20,16 @@ export function mergeReadingCatalogue(planned, approved, {verified = true} = {})
     return {...entry,...book,title:book.title || entry?.title || 'Reading edition',author:book.author || entry?.author || '',
       description:book.description || entry?.description || '',cover:book.cover || entry?.cover || '/assets/logo1.png',
       coverAlt:book.cover ? book.title+' cover' : entry?.coverAlt,
+      collection:entry?.collection || entry?.series || book.series || 'Independent Works',
       series:book.series || entry?.series || '',seriesOrder:book.seriesOrder ?? entry?.order ?? null,
       readingReady:true,availabilityUnknown:false,canRead:book.canRead === true};
   });
   for (const entry of metadata) {
-    if (editions.some(book => matches(entry,book))) continue;
-    result.push({id:'planned:'+entry.id,catalogueId:entry.id,title:entry.title,author:entry.author || '',series:entry.series || '',
+    if (entry.hideFromReading === true || editions.some(book => matches(entry,book))) continue;
+    const publicWork = publicReadingWork(entry.id);
+    result.push({id:'planned:'+entry.id,catalogueId:entry.id,title:entry.title,author:entry.author || '',collection:entry.collection || entry.series || 'Independent Works',series:entry.series || '',
       seriesOrder:entry.order ?? null,description:entry.description || '',cover:entry.cover || '/assets/logo1.png',coverAlt:entry.coverAlt,
-      editionId:null,bookId:null,readingReady:false,availabilityUnknown:!verified,canRead:false,owned:false});
+      editionId:null,bookId:null,publicTextId:publicWork?entry.id:null,readingReady:Boolean(publicWork),availabilityUnknown:!publicWork&&!verified,canRead:Boolean(publicWork),owned:false});
   }
   return result;
 }

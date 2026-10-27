@@ -88,7 +88,7 @@ No Supabase or email configuration changes are required for this layout update.
 - [x] Require the verified annual £20 GBP amount in checkout creation, signed payment
   verification and administrator order recovery; keep exact variant/plan/auth checks.
 - [x] Rebuild the three single-file Supabase deployment bundles and test price mismatches.
-- [ ] Deploy `bp-reading-create-checkout`, `bp-reading-shopify-webhook` and
+- [x] Owner confirmed deployment of `bp-reading-create-checkout`, `bp-reading-shopify-webhook` and
   `bp-reading-reconcile-order` from the updated dashboard files. A GitHub push does
   not deploy Supabase Edge Functions.
 - [ ] Verify a newly created Shopify checkout displays £20, annual billing and no shipping.
@@ -128,6 +128,21 @@ access or direct reader-page permissions. Public reader navigation remains hidde
 - [ ] Confirm a front cover for Sanare Per Mortem; the imprint mark is used for now.
 
 No new Supabase migration or function deployment is needed for the shelf display.
+
+## Completed: recovered stories and collection groups, 27 October
+
+- [x] Hide the Manuscript Audit Workbook from BP Reading while retaining its shop listing.
+- [x] Make The Third Night and The Gåtestein Log readable in BP Reading from their
+  existing public manuscripts, with original prose/copyright and no private-file bypass.
+- [x] Keep public-story places/notebooks device-local with no invented Supabase IDs.
+- [x] Add collection headings/filtering and sort within the eight collection groups.
+- [x] Add Martin's Introduction to Accounts; Miren's Staying: An Account, The Salt Widow
+  and The Orphan and the Hollow Tree; and Aidan's Before the House Closed.
+- [x] Credit Martin Hales on the existing UK Sole Traders and UK Landlords guides.
+- [ ] Supply confirmed front covers and private EPUB editions for the new coming-soon titles.
+
+The reading catalogue now shows 23 titles. The member/public navigation remains hidden;
+no Supabase change is needed for the two already-public recovered stories.
 
 ## Existing foundations already in place
 

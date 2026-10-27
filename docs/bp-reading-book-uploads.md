@@ -1,8 +1,8 @@
 # Adding books to BP Reading gradually
 
 Updated 27 October 2026. The full on-site Blackwood collection is displayed using
-`data/book-discovery.json`; only approved Supabase reading editions have a reading
-button. This update does not upload files, grant memberships or enable releases.
+`data/book-discovery.json`. Protected titles require an approved Supabase edition;
+the two explicitly allowed public recovered stories can also be opened. This update does not upload files, grant memberships or enable releases.
 
 ## What readers see
 
@@ -17,8 +17,9 @@ button. This update does not upload files, grant memberships or enable releases.
 - Approving a reading edition replaces its matching placeholder on the next library
   load. Metadata matching is presentation only; it never grants reading access.
 
-The catalogue includes novels, practical guides, the two Recovered Files and the
-Manuscript Audit Workbook. Alternate physical editions of one book are not duplicated;
+The reading catalogue includes novels, practical guides and the two Recovered Files.
+The Manuscript Audit Workbook is hidden from BP Reading at the owner’s request and
+remains in the public bookshop/discovery catalogue. Alternate physical editions of one book are not duplicated;
 editorial services and other publishers' recommended books are not included.
 Sanare Per Mortem currently uses the imprint mark because no front-cover assignment
 was confirmed in the existing catalogue. Supply its proper cover when preparing it.
@@ -67,3 +68,32 @@ These are not instructions to change your actual database keys.
 
 No new migration or function deployment is required to display the coming-soon shelf.
 Existing BP Reading visibility remains paused in the member dashboard and public nav.
+
+## Public recovered files and collections — 27 October
+
+The Third Night and The Gåtestein Log now read inside the full BP Reading interface
+from their already-public HTML manuscripts. They do not need a private EPUB upload,
+a fabricated Supabase edition ID or a paid membership. BP Reading itself retains its
+existing sign-in screen. Only these two hard-coded public source paths can use this
+route; other titles still require protected delivery and existing server checks.
+
+The browser prepares their existing prose, copyright, notes and closing line for the
+EPUB rendering engine, stripping scripts, handlers, embedded content and promotional
+links. No downloadable EPUB asset or export button is added. Places, preferences,
+bookmarks and notes use account-scoped **device storage**, separate from real numeric
+Supabase editions. They do not claim cross-device sync; the sync button is disabled
+for these public files. Keep their source manuscripts stable to preserve CFI positions.
+
+There are now 23 visible reading titles in eight collection groups. The collection
+filter and headings follow the Publications page and the supplied series information:
+Archive Files, Recovered Files, Threshold Records, The Hollowing Veil, Hard Silence,
+Independent Works, The Cursed Bothies and Practical Guides. Only known book numbers
+are shown. Titles without a confirmed series stay in the independent collection;
+Threshold Records is Miren's existing imprint/collection grouping, not an invented
+sequel order. Sorting is within collection.
+
+New owner-supplied titles: Introduction to Accounts (Martin Hales), Staying: An Account,
+The Salt Widow, The Orphan and the Hollow Tree (Miren Vale), and Before the House Closed
+(Aidan Blackwood). These remain coming soon until their actual reading editions are
+uploaded and approved. Their unconfirmed covers use the imprint mark. The two existing
+UK accounting guides are also credited to Martin Hales, as their public pages state.

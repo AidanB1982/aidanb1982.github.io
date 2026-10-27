@@ -12,3 +12,11 @@ result=mergeReadingCatalogue(planned,[{...approved,bookId:'different-book',autho
 result=mergeReadingCatalogue(planned,[approved,approved,{editionId:-1},{editionId:3,title:'New server title',canRead:false}]);assert.equal(result.length,3,'duplicate and invalid edition IDs discarded, unknown approved title retained');
 result=mergeReadingCatalogue(planned,[],{verified:false});assert(result.every(b=>b.availabilityUnknown&&!b.canRead));
 console.log('PASS planned catalogue: display-only metadata, no invented IDs or access, promotion without duplicate cards, missing artwork fallback, entitlement separation and failed verification');
+const special=[{id:'blackwood-manuscript-audit-workbook',title:'Blackwood Manuscript Audit Workbook',hideFromReading:true},{id:'the-third-night',title:'The Third Night'},{id:'the-gatestein-log',title:'The Gåtestein Log'},{id:'ordinary',title:'Ordinary book',publicTextId:'the-third-night',canRead:true}];
+result=mergeReadingCatalogue(special,[{editionId:555,bookId:'blackwood-manuscript-audit-workbook',title:'Blackwood Manuscript Audit Workbook'}]);
+assert.equal(result.length,3,'hidden workbook excluded from planned and approved rows');
+assert.equal(result.filter(b=>b.publicTextId&&b.canRead&&b.editionId===null).length,2,'only the two allowlisted public files are readable without edition IDs');
+assert.equal(result.find(b=>b.title==='Ordinary book').canRead,false,'metadata cannot turn an ordinary book into public text');
+result=mergeReadingCatalogue(special,[{editionId:222,bookId:'the-third-night',title:'The Third Night'}]);
+assert.equal(result.filter(b=>b.title==='The Third Night').length,1,'public story does not duplicate a later server listing');
+assert.equal(result.find(b=>b.title==='The Third Night').publicTextId,'the-third-night','existing public story remains free');
