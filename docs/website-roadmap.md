@@ -10,6 +10,7 @@ that still need live configuration, database changes or app-store setup.
   identities, create missing works/ebooks, preserve separate Corrour records and
   release only the approved Black Bothy and Crossing uploads.
 - [x] Verify atomic failure, rerun safety, private crosswalk and author identity rules.
+- [x] Repair imported identity sequences behind existing IDs; test the reported edition-ID collision.
 - [ ] Owner runs the whole SQL file in Supabase and returns the result or any error.
 - [ ] Confirm both uploaded EPUBs open with an entitled account after that live run.
 - [ ] Add remaining EPUB files and approve each release separately over coming days.

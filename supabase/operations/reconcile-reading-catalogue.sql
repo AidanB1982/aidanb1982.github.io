@@ -33,6 +33,27 @@ begin
 end
 $preflight$;
 
+-- Imported explicit IDs can leave identity sequences behind existing rows.
+-- Block concurrent table writes during repair; never lower a sequence already ahead.
+-- Sequence advances are not rolled back by PostgreSQL; harmless gaps may remain on failure.
+lock table public.book_records,public.book_editions,public.book_contributors,public.bp_reading_files
+  in share row exclusive mode;
+do $identity_sequences$
+declare target_table text;sequence_name text;highest_id bigint;sequence_value bigint;
+begin
+  foreach target_table in array array['book_records','book_editions','book_contributors','bp_reading_files'] loop
+    if not exists(select 1 from information_schema.columns where table_schema='public' and table_name=target_table and column_name='id') then continue;end if;
+    sequence_name:=pg_get_serial_sequence(format('public.%I',target_table),'id');
+    if sequence_name is null then continue;end if;
+    execute format('select max(id) from public.%I',target_table) into highest_id;
+    execute format('select last_value from %s',sequence_name::regclass) into sequence_value;
+    if highest_id is not null and highest_id>=sequence_value then
+      perform setval(sequence_name::regclass,highest_id,true);
+    end if;
+  end loop;
+end
+$identity_sequences$;
+
 -- Internal crosswalk only. IDs from the UUID inventory are never used as numeric ebook IDs.
 create table if not exists public.bp_reading_catalogue_links(
   catalogue_key text primary key,

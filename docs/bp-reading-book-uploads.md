@@ -186,3 +186,12 @@ Ambiguous matches, missing uploads, unexpected required columns or mismatched ID
 abort the transaction. Resolve the reported problem before rerunning; do not bypass
 the checks. The final result lists actual book/ebook IDs and released/planned/public
 text states. Send back that result or any error so live completion can be recorded.
+
+### Duplicate generated ID after an import
+
+The reconciliation now advances lagging identity sequences for books, editions,
+contributors and file registry rows before inserting. Existing IDs stay unchanged;
+sequences already ahead are preserved. The transaction locks those tables against
+concurrent writes during repair. PostgreSQL sequence advances survive rollback, so
+an unsuccessful run may leave harmless gaps. If an older version failed on
+`book_editions_pkey`, copy the latest whole script and rerun it.

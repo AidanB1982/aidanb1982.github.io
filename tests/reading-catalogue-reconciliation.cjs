@@ -35,7 +35,10 @@ const fail=async(pattern)=>{await assert.rejects(()=>db.exec(sql),pattern);await
 await db.exec('update storage.buckets set public=true');await fail(/remain private/);await db.exec('update storage.buckets set public=false');
 await db.exec("delete from storage.objects where name like 'The_Crossing/%'");await fail(/both approved EPUB/);await db.exec("insert into storage.objects values('bp-reading-editions','The_Crossing/The Crossing.epub')");
 await db.exec("insert into book_records(internal_reference,title)values('DUP','The Crossing') ,('DUP2','The Crossing')");await assert.rejects(()=>db.exec(sql),/multiple Book Records/);await db.exec('rollback');assert.equal((await rows("select to_regclass('bp_reading_catalogue_links') t"))[0].t,null);await db.exec("delete from book_records where internal_reference like 'DUP%'");
+// Reproduce an imported catalogue whose identity sequence still points at existing IDs.
+await db.exec("select setval(pg_get_serial_sequence('book_records','id'),1,false);select setval(pg_get_serial_sequence('book_editions','id'),8,false);select setval(pg_get_serial_sequence('book_contributors','id'),100,true)");
 await db.exec(sql);
+assert.ok(Number((await rows("select last_value from book_contributors_id_seq"))[0].last_value)>=100,'ahead sequence must not move backwards');
 const first=await rows('select catalogue_key,book_id,edition_id,publishing_title_id from bp_reading_catalogue_links order by catalogue_key');
 assert.equal(first.length,25);
 await db.exec(sql);assert.deepEqual(await rows('select catalogue_key,book_id,edition_id,publishing_title_id from bp_reading_catalogue_links order by catalogue_key'),first);
