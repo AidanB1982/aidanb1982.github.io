@@ -264,3 +264,10 @@ author identities, private crosswalk permissions and release of only the approve
 uploads. Run with PGlite available in `NODE_PATH`. A separate local validation used
 the supplied schema constraints and catalogue rows; that private report is not
 committed. Neither check executes SQL against live Supabase.
+
+`tests/reading-offline.cjs` exercises encrypted IndexedDB copies, account isolation,
+non-exportable browser keys, expiry/clock bounds, explicit saving, service-worker
+shell cache exclusion, complete offline reload and real EPUB rendering, removal and
+signout cleanup. Run using the same Playwright/Chromium and synthetic EPUB dependencies
+as `reading-public.cjs`. Delivery tests also check server-issued offline windows.
+Live Supabase deployment and owner device acceptance remain separate steps.

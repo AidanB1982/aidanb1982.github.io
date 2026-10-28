@@ -1,6 +1,6 @@
 # Blackwood website to-do list
 
-Updated **27 October 2026** (UK). This separates published website work from features
+Updated **28 October 2026** (UK). This separates published website work from features
 that still need live configuration, database changes or app-store setup.
 
 ## Catalogue reconciliation — owner confirmed live
@@ -17,6 +17,19 @@ that still need live configuration, database changes or app-store setup.
 
 BP Reading navigation/member links remain hidden. No missing author accounts are
 created by this operation; new preparation records carry no invented contract dates.
+
+## Offline BP Reading — website prepared, delivery deployment pending
+
+- [x] Add opt-in encrypted device copies, refresh/remove controls and offline reader shell.
+- [x] Keep EPUB export/public file URLs out of the offline interface.
+- [x] Prepare seven-day server-issued offline windows bounded by membership expiry,
+  preserving existing payment/release/auth checks. No new database migration/secrets.
+- [ ] Owner deploys the updated `bp-reading-deliver-epub/handler.ts`.
+- [ ] Owner verifies Save offline, airplane-mode reopen, page turns, notes and removal
+  using a live entitled account after deployment. ARC Vault remains unchanged.
+
+See [offline setup and limitations](bp-reading-offline.md), including storage eviction,
+reconnection, delayed revocation and the distinction between encryption and DRM.
 
 ## Compact mobile reading shelf
 

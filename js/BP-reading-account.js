@@ -7,7 +7,9 @@ export class ReadingAccount {
     this.report = report;
     this.storage = storage;
     this.outboxKey = `bp-reading-outbox:${userId}:${editionId}`;
+    this.revisionKey = `bp-reading-revision:${userId}:${editionId}`;
     this.revision = 0;
+    try {const value=Number(storage.getItem(this.revisionKey));if(Number.isSafeInteger(value)&&value>=0)this.revision=value;}catch{}
     this.ready = false;
     this.stopped = false;
     this.conflict = false;
@@ -23,6 +25,7 @@ export class ReadingAccount {
       if (error) throw error;
       if (this.stopped) return null;
       this.revision = data?.revision || 0;
+      try {this.storage.setItem(this.revisionKey,String(this.revision));}catch{}
       this.ready = true;
       if (outbox?.payload && Number.isInteger(outbox.revision)) {
         if (outbox.revision !== this.revision) {
@@ -61,6 +64,7 @@ export class ReadingAccount {
       if (error) throw error;
       if (!Number.isInteger(data) || data < 1) throw Error('Invalid sync response');
       this.revision = data;
+      try {this.storage.setItem(this.revisionKey,String(this.revision));}catch{}
       succeeded = true;
       if (this.pending) {
         try { this.storage.setItem(this.outboxKey,JSON.stringify({revision:this.revision,payload:this.pending})); } catch {}
@@ -85,6 +89,7 @@ export class ReadingAccount {
     if (error || !data) throw Error('No synced reading place is available yet.');
     if (this.stopped) throw Error('Your session has ended.');
     clearTimeout(this.timer); this.pending = null; this.conflict = false; this.revision = data.revision; this.ready = true;
+    try {this.storage.setItem(this.revisionKey,String(this.revision));}catch{}
     try { this.storage.removeItem(this.outboxKey); } catch {}
     this.report('Loaded your synced reading data');
     return data.payload;

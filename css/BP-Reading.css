@@ -905,3 +905,10 @@ body.bp-reading-page .simple-header {
   .book-card .book-description { font-size: 11px; }
 
 }
+
+.book-offline-controls { display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:8px; align-items:center; }
+.book-offline-controls .device-note { width:100%; font-size:10px; }
+.offline-action { background:transparent; color:var(--muted); border:0; border-bottom:1px solid var(--border); padding:8px 0; min-height:44px; font:11px/1.4 Arial,sans-serif; text-align:left; cursor:pointer; }
+.offline-action:focus-visible { outline:2px solid var(--copper); outline-offset:3px; }
+.offline-action:disabled { cursor:wait; opacity:.6; }
+.book-offline-controls:empty { display:none; }

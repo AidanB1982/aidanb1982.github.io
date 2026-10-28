@@ -8,7 +8,8 @@ import {
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
 import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261124";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
-import { ReadingAccount } from "/js/BP-reading-account.js?v=20261025";
+import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261127";
+import { ReadingAccount } from "/js/BP-reading-account.js?v=20261127";
 
 /* =====================================================
    BLACKWOOD PUBLISHING — BP READING
@@ -53,6 +54,49 @@ let catalogueVerified = false;
 let plannedCatalogueLoaded = false;
 let switchingEdition = false;
 let sessionEpoch = 0;
+const offlineLibrary=new OfflineLibrary();
+let offlineRows=new Map();
+const offlineSaving=new Set();
+const offlineAccountKey='bp-reading-offline-account-v1';
+async function refreshOfflineRows() {
+  try{offlineRows=new Map((await offlineLibrary.list(activeUser.id)).map(row=>[row.id,row]));}
+  catch{offlineRows=new Map();}
+}
+async function saveOfflineBook(book) {
+  if(!activeUser||!navigator.onLine||!book.canRead||offlineSaving.has(offlineBookKey(book)))return;
+  const user=activeUser,epoch=sessionEpoch,key=offlineBookKey(book);
+  offlineSaving.add(key);renderLibrary();
+  $('reading-offline-status').textContent='Saving '+book.title+' and preparing the offline reader…';
+  try {
+    await prepareOfflineShell();
+    const result=publicReadingWork(book.publicTextId)
+      ? {bytes:await buildPublicReadingEpub(book.publicTextId),expiresAt:Date.now()+OFFLINE_WINDOW}
+      : await fetchProtectedEpub({editionId:book.editionId,offline:true});
+    if(activeUser?.id!==user.id||sessionEpoch!==epoch)return;
+    await offlineLibrary.save(user.id,book,result.bytes,result.expiresAt);
+    if(activeUser?.id!==user.id||sessionEpoch!==epoch){await offlineLibrary.clear(user.id);return;}
+    localStorage.setItem(offlineAccountKey,user.id);
+    await refreshOfflineRows();
+    $('reading-offline-status').textContent=book.title+' saved on this device. Refresh online within seven days to renew offline access. Browser storage may be cleared by your device.';
+  }catch(error){$('reading-offline-status').textContent=error.message||'This book could not be saved. Check your connection and available device storage.';}
+  finally{offlineSaving.delete(key);renderLibrary();}
+}
+async function initialiseOffline() {
+  const userId=localStorage.getItem(offlineAccountKey);
+  const cachedUser=JSON.parse(localStorage.getItem('sb-bmnlynjldlnxfvunqbqq-auth-token')||'null')?.user?.id;
+  if(!userId||cachedUser!==userId)throw Error('Sign in online before opening this offline library.');
+  activeUser={id:userId,isAdmin:false,offline:true};
+  await refreshOfflineRows();
+  if(!offlineRows.size){activeUser=null;throw Error('No saved books remain available. Reconnect to save or renew your offline books.');}
+  libraryBooks=[...offlineRows.values()].map(row=>({...row.book,readingReady:true,canRead:true,owned:false}));
+  catalogueVerified=false;plannedCatalogueLoaded=true;
+  membershipOfferNode=$('reading-membership-offer');membershipOfferNode.hidden=true;membershipOfferNode.remove();
+  $('reading-membership-summary').hidden=true;$('load-synced').disabled=true;
+  $('reading-offline-status').textContent='Offline · showing books saved on this device. Your reading place and notes are saved locally. Reconnect to check access and sync.';
+  renderLibrary();$('reader-access').hidden=true;$('library').hidden=false;
+  document.documentElement.classList.add('bp-reader-verified');
+}
+
 
 const PAGE_TURN_DURATION = 280;
 const TOUCH_EDGE_FRACTION = 0.22;
@@ -239,7 +283,7 @@ function renderLibrary() {
 
   const ready = collection.filter(book=>book.readingReady).length;
   $('library-catalogue-status').textContent = `${books.length} of ${collection.length} titles shown · ${ready} reading edition${ready===1?'':'s'} listed` + (!catalogueVerified ? ' · Reading availability could not be fully checked; refresh to retry.' : '') + (!plannedCatalogueLoaded ? ' · The full book list could not load; showing available reading editions only.' : ' · Other titles will follow as reading editions are prepared.');
-  $('load-synced').disabled = !readingAccount || switchingEdition;
+  $('load-synced').disabled = !navigator.onLine || !readingAccount || switchingEdition;
   if (!books.length) { grid.textContent = 'No books match these filters.'; return; }
   let previousCollection = null;
   for (const book of books) {
@@ -266,7 +310,17 @@ function renderLibrary() {
     if(book.progress>=100){const finished=document.createElement('span');finished.className='book-badge finished';finished.textContent='Finished';badges.append(finished);}
     track.hidden = !book.readingReady;
     track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
-    details.append(badges,eyebrow,heading,meta,description,progress,track,button); card.append(cover,details); grid.append(card);
+    const offlineControls=document.createElement('div');offlineControls.className='book-offline-controls';
+    const offlineKey=offlineBookKey(book),savedOffline=offlineRows.get(offlineKey);
+    if(savedOffline){
+      const label=document.createElement('span');label.className='device-note';label.textContent='Saved offline · until '+new Date(savedOffline.expiresAt).toLocaleDateString('en-GB');
+      const remove=document.createElement('button');remove.type='button';remove.className='offline-action';remove.textContent='Remove offline';remove.onclick=async()=>{try{await offlineLibrary.remove(activeUser.id,offlineKey);await refreshOfflineRows();if(!navigator.onLine)libraryBooks=libraryBooks.filter(item=>offlineBookKey(item)!==offlineKey);renderLibrary();$('reading-offline-status').textContent='Offline copy removed from this device.';}catch{$('reading-offline-status').textContent='The saved copy could not be removed. Please try again.';}};
+      offlineControls.append(label,remove);
+    }
+    if(navigator.onLine&&book.readingReady&&book.canRead){
+      const save=document.createElement('button');save.type='button';save.className='offline-action';save.textContent=offlineSaving.has(offlineKey)?'Saving…':savedOffline?'Refresh offline':'Save offline';save.disabled=offlineSaving.has(offlineKey);save.onclick=()=>void saveOfflineBook(book);offlineControls.append(save);
+    }
+    details.append(badges,eyebrow,heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); grid.append(card);
   }
 }
 function renderContinueReading(collection) {
@@ -300,7 +354,7 @@ async function connectEdition(book) {
   restorePreferences(loadSavedState());
   const account = new ReadingAccount(supabase,activeUser.id,EDITION_ID,reportSync);
   readingAccount = account;
-  const remote = await account.load();
+  const remote = navigator.onLine ? await account.load() : null;
   if (readingAccount !== account || account.stopped) return;
   if (remote) restorePreferences(remote);
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot())); } catch {}
@@ -406,8 +460,8 @@ async function loadReadingCatalogue() {
   const checked = await Promise.all(libraryBooks.map(async book => {
     if (publicReadingWork(book.publicTextId)) return {...book,canRead:true};
     if (!book.readingReady) return {...book,canRead:false};
-    if (user.isAdmin) return {...book,canRead:true};
-    try {const access = await supabase.rpc('bp_reading_can_read',{p_edition_id:book.editionId});return {...book,canRead:!access.error && access.data === true};}
+    if (user.isAdmin) return {...book,canRead:true,accessVerified:true};
+    try {const access = await supabase.rpc('bp_reading_can_read',{p_edition_id:book.editionId});return {...book,canRead:!access.error && access.data === true,accessVerified:!access.error};}
     catch {return {...book,canRead:false};}
   }));
   if (activeUser?.id === user.id) libraryBooks=checked;
@@ -448,7 +502,7 @@ async function verifyBPReadingUser() {
    PROTECTED EPUB DELIVERY
    ===================================================== */
 
-async function fetchProtectedEpub() {
+async function fetchProtectedEpub({editionId=EDITION_ID,offline=false}={}) {
   const {
     data: { session },
     error: sessionError
@@ -476,7 +530,7 @@ async function fetchProtectedEpub() {
       },
 
       body: JSON.stringify({
-        editionId: EDITION_ID
+        editionId,offline
       }),
 
       cache: "no-store"
@@ -534,6 +588,11 @@ async function fetchProtectedEpub() {
     );
   }
 
+  if(offline) {
+    const expiresAt=Date.parse(response.headers.get('X-BP-Offline-Until'));
+    if(!Number.isFinite(expiresAt))throw Error('Offline saving needs the updated bp-reading-deliver-epub function. Online reading is still available.');
+    return {bytes,expiresAt};
+  }
   return bytes;
 }
 
@@ -1397,7 +1456,9 @@ async function openBook() {
   showStatus("");
 
   try {
-    const bytes = publicReadingWork(BOOK.publicTextId)
+    const bytes = !navigator.onLine
+      ? await offlineLibrary.read(activeUser.id,BOOK)
+      : publicReadingWork(BOOK.publicTextId)
       ? await buildPublicReadingEpub(BOOK.publicTextId)
       : await fetchProtectedEpub();
 
@@ -1917,8 +1978,14 @@ $('bookmark').addEventListener('click', () => {
   const cfi = getCurrentCfi();
   if (cfi) {bookmarkDetails[cfi] = {label:chapterName(),progress:state.progress}; saveState();}
 });
-supabase.auth.onAuthStateChange(event => {
+supabase.auth.onAuthStateChange((event,session) => {
+  if(event==='SIGNED_IN'&&activeUser&&session?.user?.id&&session.user.id!==activeUser.id){
+    const previousUser=activeUser.id;sessionEpoch++;readingAccount?.stop();checkoutController?.stop();closeBook();activeUser=null;offlineRows.clear();
+    localStorage.removeItem(offlineAccountKey);void offlineLibrary.clear(previousUser).catch(()=>{});location.reload();return;
+  }
   if (event === 'SIGNED_OUT') {
+    const signedOutId=activeUser?.id||localStorage.getItem(offlineAccountKey);
+    localStorage.removeItem(offlineAccountKey);if(signedOutId)void offlineLibrary.clear(signedOutId).catch(()=>{});offlineRows.clear();
     sessionEpoch++; readingAccount?.stop(); checkoutController?.stop(); activeUser = null;
     membershipStatus={known:false,active:false,expiresAt:null};
     lastVerifiedMembershipActive=false;
@@ -2156,6 +2223,27 @@ $('check-reading-setup').onclick=async()=>{
   finally{button.disabled=false;}
 };
 
+setInterval(()=>{
+  if(navigator.onLine||!activeUser)return;
+  const current=offlineRows.get(offlineBookKey(BOOK));
+  if(state.isOpen&&current&&current.expiresAt<=Date.now()){
+    closeBook();showLibraryError('Offline access for this book has expired. Reconnect to refresh it.');
+    libraryBooks=libraryBooks.map(book=>offlineBookKey(book)===current.id?{...book,canRead:false}:book);renderLibrary();
+    void offlineLibrary.remove(activeUser.id,current.id).catch(()=>{});offlineRows.delete(current.id);
+  }
+},30000);
+window.addEventListener('offline',async()=>{
+  if(!activeUser)return;
+  await refreshOfflineRows();
+  libraryBooks=libraryBooks.map(book=>({...book,canRead:offlineRows.has(offlineBookKey(book))}));
+  $('reading-offline-status').textContent='Offline · only books saved on this device can open. Your place and notes remain on this device.';
+  renderLibrary();
+});
+window.addEventListener('online',async()=>{
+  if(!activeUser)return;
+  $('reading-offline-status').textContent='Connection restored. Refresh the library to verify access and sync your reading place.';
+  if(!state.isOpen)location.reload();
+});
 async function initialise() {
   const heading=document.querySelector('.library h1');
   if(parseFloat(getComputedStyle(heading).fontSize)>28)heading.style.fontSize='28px';
@@ -2163,6 +2251,7 @@ async function initialise() {
   renderLibrary();
 
   try {
+    if(!navigator.onLine){await initialiseOffline();return;}
     const user = await verifyBPReadingUser();
     if (epoch !== sessionEpoch) return;
     activeUser = user;
@@ -2175,6 +2264,12 @@ async function initialise() {
     $('reader-watermark').textContent = 'Personal reading copy · Reader ' + user.id.slice(0,8).toUpperCase();
     await loadReadingCatalogue();
     if (!activeUser || epoch !== sessionEpoch) return;
+    await refreshOfflineRows();
+    for(const row of offlineRows.values()) {
+      const matched=libraryBooks.find(book=>book.editionId===row.book.editionId);
+      if(!row.book.publicTextId&&catalogueVerified&&(!matched||(matched.accessVerified&&!matched.canRead)))await offlineLibrary.remove(user.id,row.id);
+    }
+    await refreshOfflineRows();
     const firstReadable = libraryBooks.find(book=>book.canRead);
     if (firstReadable) await connectEdition(firstReadable);
     else reportSync("Your collection is listed below. Reading editions will become available when prepared and authorised.");
@@ -2192,7 +2287,7 @@ async function initialise() {
       error.message
     );
 
-    $("access-message").textContent = "Your library could not be opened. Sign in through The Archivists, then try again.";
+    $("access-message").textContent = navigator.onLine ? "Your library could not be opened. Sign in through The Archivists, then try again." : "No valid offline library is available for this account. Reconnect and sign in to save or refresh your books.";
   }
 }
 

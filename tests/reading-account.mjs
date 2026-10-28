@@ -48,5 +48,6 @@ concurrent.schedule({progress:1}); const inFlight = concurrent.flush();
 concurrent.schedule({progress:2});release(); await inFlight;
 assert.equal(JSON.parse(concurrent.storage.getItem(concurrent.outboxKey)).revision,1,'outbox base revision advances after in-flight save');
 assert.equal(concurrent.pending.progress,2,'edits during save retained');
+const offlineReopened=new ReadingAccount(delayed.client,'reader',2,()=>{},concurrent.storage);assert.equal(offlineReopened.revision,1,'offline reopen retains last verified sync revision');offlineReopened.stop();
 for (const account of [first,second,reloaded,reopened,offline,concurrent]) account.stop();
 console.log('PASS reader sync: cross-device load, private notebook payloads, CAS conflicts, explicit server reload, persistent outbox, missing backend fallback, edits during in-flight save');
