@@ -10,6 +10,8 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
   const client={auth:{getUser:async()=>({data:{user:{id:people[0].id}}}),getSession:async()=>({data:{session:null}}),onAuthStateChange:fn=>{window.mockAuthCallbacks.push(fn);}},from(table){return {select(){return this},eq(){return this},order(){return this},range:async()=>({data:window.mockPosts}),maybeSingle:async()=>({data:{is_admin:!window.mockDenied}})};},functions:{async invoke(name,{body}){
    window.mockCalls.push(body);
    if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:false,socialSchedulerReady:true,socialConfigured:true,socialEnabled:false}};
+   if(body.action==='social-check'&&window.mockSocialHold)await new Promise(resolve=>{window.releaseSocialCheck=resolve});
+   if(body.action==='social-check'&&window.mockSocialFailure)return {error:{context:{json:async()=>({error:'Deploy the updated publishing desk function to check Meta.'})}}};
    if(body.action==='social-check')return {data:{pageName:'Blackwood Publishing',instagramConnected:true,instagramUsername:'blackwood',enabled:false}};
    if(body.action==='assign'&&window.mockAssignFailure)return {error:{context:{json:async()=>({error:'This ARC campaign is inactive or closed.'})}}};
    if(body.action==='assign'){let created=0,retained=0,blocked=[];for(const id of body.members){
@@ -51,6 +53,19 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  assert.equal(await page.evaluate(()=>window.mockCalls.filter(c=>c.action==='send').length),0,'preview never sends email');
  await page.locator('#ops-send').click();await page.waitForFunction(()=>document.getElementById('ops-status').textContent.includes('3 notice(s) submitted'));
  assert(await page.locator('#ops-ai').isHidden(),'AI assistant is benched');
+ await page.evaluate(()=>window.mockSocialHold=true);await page.locator('#ops-social-check').click();
+ await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Checking the Facebook Page'));
+ assert.equal(await page.locator('#ops-social-check').isDisabled(),true);
+ await page.evaluate(()=>{window.mockSocialHold=false;window.releaseSocialCheck();});
+ await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Connected to Blackwood Publishing'));
+ await page.evaluate(()=>window.mockSocialFailure=true);await page.locator('#ops-social-check').click();
+ await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Deploy the updated publishing desk function'));
+ assert.equal(await page.locator('#ops-social-check').isEnabled(),true);
+ await page.evaluate(()=>window.mockSocialFailure=false);await page.locator('#ops-social-check').click();await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Connected to Blackwood Publishing'));
+ await page.evaluate(()=>{window.mockSocialHold=true;window.originalTimeout=window.setTimeout;window.setTimeout=(fn,ms,...args)=>window.originalTimeout(fn,ms===25000?30:ms,...args);});
+ await page.locator('#ops-social-check').click();await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('timed out'));
+ assert.equal(await page.locator('#ops-social-check').isEnabled(),true,'timeout releases controls');
+ await page.evaluate(()=>{window.setTimeout=window.originalTimeout;window.mockSocialHold=false;window.releaseSocialCheck();});
  await page.locator('#ops-social-check').click();await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Connected to Blackwood Publishing'));
  assert((await page.locator('#ops-social-state').textContent()).includes('paused'));
  await page.locator('#ops-post-title').fill('Gualachulain announcement');await page.selectOption('#ops-post-channel','TikTok');await page.locator('#ops-post-content').fill('My own approved caption.');

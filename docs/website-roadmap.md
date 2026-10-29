@@ -247,6 +247,12 @@ RLS, bucket privacy, launch flags or navigation visibility are changed by this r
 
 ### 1. Finish Meta connection and verify the scheduler
 
+- [x] Owner created the Meta app, enabled Page test permissions and retrieved
+  Blackwood Publishing Page ID `1236290872910367` and a Page token.
+- [x] Add immediate progress, deployment errors and a bounded timeout to the connection check.
+- [ ] Confirm the updated desk is deployed and the live read-only check returns the Page.
+- [ ] Obtain suitable long-lived credentials; verify Instagram permissions and its linked professional account.
+
 - [ ] Confirm the social scheduler SQL has been applied to the live Supabase project.
 - [ ] Deploy the updated `bp-publishing-desk` and new `bp-social-publish` functions.
 - [ ] Use the existing Meta app to obtain the Blackwood Page ID and appropriate Page

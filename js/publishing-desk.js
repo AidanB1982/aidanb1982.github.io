@@ -18,9 +18,15 @@
  }
  function invalidatePreview(){preview=null;$('ops-email-preview').hidden=true;$('ops-preview-person').replaceChildren();$('ops-preview-text').textContent='';}
  function lock(){epoch++;$('ops-controls').disabled=true;client=null;owner=null;data=null;posts=[];editing=null;selected.clear();invalidatePreview();$('ops-readers').replaceChildren();$('ops-posts').replaceChildren();$('ops-calendar-grid').replaceChildren();$('ops-ai-output').value='';$('ops-ai-status').textContent='';$('ops-post-status-message').textContent='';$('ops-social-state').textContent='Meta connection not checked.';$('ops-ai-form').reset();$('ops-post-form').reset();$('ops-campaign').innerHTML='<option value="">Choose an ARC book</option>';$('ops-send-status').textContent='';$('ops-selection-state').textContent='Choose an ARC campaign to select readers.';$('ops-arc-status').textContent='';status('Sign in as an administrator to use this desk.');}
- async function invoke(body){
+ async function invoke(body,{timeoutMs=0}={}){
   if(!client)throw Error('Administrator sign-in is required.');const version=epoch;
-  const {data:result,error}=await client.functions.invoke('bp-publishing-desk',{body});
+  const controller=timeoutMs?new AbortController():null;
+  let timer;
+  const request=client.functions.invoke('bp-publishing-desk',{body,...(controller?{signal:controller.signal}:{})});
+  let response;
+  try {response=timeoutMs?await Promise.race([request,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(Error('The Meta connection check timed out. Confirm bp-publishing-desk is deployed with the latest dashboard code, then retry. No post was sent.'));},timeoutMs);})]):await request;}
+  finally{clearTimeout(timer);}
+  const {data:result,error}=response;
   if(version!==epoch)throw Error('Your session changed.');
   if(error){let message='The publishing function is not available. Check its deployment and configuration.';try{message=(await error.context.json()).error||message;}catch{}throw Error(message);}
   if(result?.error)throw Error(result.error);return result;
@@ -128,7 +134,16 @@
   return p;
  }
  const postStatus=text=>{status(text);$('ops-post-status-message').textContent=text;};
- $('ops-social-check').onclick=()=>operation(async()=>{const result=await invoke({action:'social-check'});$('ops-social-state').textContent='Connected to '+result.pageName+(result.instagramConnected?' · Instagram '+(result.instagramUsername||'account'):' · No linked Instagram professional account')+'. '+(result.enabled?'Automatic publishing switch is on. Confirm the background schedule is installed.':'Automatic publishing is paused.');},text=>{$('ops-social-state').textContent=text;});
+ $('ops-social-check').onclick=()=>{
+  const report=text=>{$('ops-social-state').textContent=text;};
+  if(busy){report('Another publishing desk request is running. Wait for it to finish, then retry this connection check.');return;}
+  report('Checking the Facebook Page and linked Instagram account… No post will be sent.');
+  return operation(async()=>{
+   const result=await invoke({action:'social-check'},{timeoutMs:25000});
+   if(typeof result?.pageName!=='string')throw Error('The deployed publishing desk did not return a Meta connection result. Deploy the latest bp-publishing-desk dashboard code.');
+   report('Connected to '+result.pageName+(result.instagramConnected?' · Instagram '+(result.instagramUsername||'account'):' · No linked Instagram professional account')+'. '+(result.enabled?'Automatic publishing switch is on. Confirm the background schedule is installed.':'Automatic publishing is paused.'));
+  },report);
+ };
  $('ops-post-form').onsubmit=e=>{e.preventDefault();void operation(async()=>{
   if(!client)throw Error('Administrator sign-in required.');const value=payload(),version=epoch;
   const response=await client.rpc('bp_marketing_save_post',{p_id:editing?.id||null,p_revision:editing?.revision||0,p_payload:value});

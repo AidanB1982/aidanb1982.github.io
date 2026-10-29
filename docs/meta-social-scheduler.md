@@ -127,3 +127,13 @@ quarantined rather than claiming exactly-once delivery across two services.
 TikTok and newsletter auto-delivery are separate future integrations. Monthly email
 needs the actual subscribed mailing list and its unsubscribe handling; ARC assignments
 are not newsletter consent. The AI panel is currently hidden by request.
+
+## Connection button gives no feedback
+
+The connection button now shows a checking message immediately, reports deployment
+and Meta errors beside the button, and times out after 25 seconds while releasing
+the controls. This timeout applies only to the read-only social check, not ARC sends.
+If the deployed desk predates Meta support, replace its dashboard `index.ts` with the
+whole `supabase/dashboard/bp-publishing-desk.ts` bundle and redeploy. Do not paste SQL
+or a partial handler into it. Preserve its existing authenticated-admin/JWT setup.
+Keep `BP_SOCIAL_PUBLISHING_ENABLED=false`; checking the connection makes no posts.
