@@ -55,11 +55,16 @@ export async function prepareOfflineShell() {
   if(!('serviceWorker' in navigator)||!window.isSecureContext)throw Error('Offline reading needs HTTPS and a supported browser.');
   const registration=await navigator.serviceWorker.register('/bp-reading-sw.js',{scope:'/pages/bp-reading.html'});
   await navigator.serviceWorker.ready;
-  const worker=registration.active||registration.waiting||registration.installing;
+  const worker=registration.installing||registration.waiting||registration.active;
   if(!worker)throw Error('The offline reader is not ready yet.');
+  if(worker.state!=='activated')await new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>reject(Error('The offline reader update is not ready. Refresh online and try again.')),15000);
+    const changed=()=>{if(worker.state==='activated'){clearTimeout(timer);worker.removeEventListener('statechange',changed);resolve();}else if(worker.state==='redundant'){clearTimeout(timer);worker.removeEventListener('statechange',changed);reject(Error('The offline reader update failed. Refresh online and try again.'));}};
+    worker.addEventListener('statechange',changed);changed();
+  });
   await new Promise((resolve,reject)=>{
     const channel=new MessageChannel(),timer=setTimeout(()=>reject(Error('The offline reader could not finish saving. Try again online.')),45000);
-    channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data?.ok?resolve():reject(Error('The offline reader could not be saved. Please try again online.'));};
+    channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data?.ok?resolve():reject(Error(typeof event.data?.error==='string'?event.data.error:'The offline reader could not be saved. Please try again online.'));};
     worker.postMessage({type:'PREPARE_READER'},[channel.port2]);
   });
 }

@@ -1,6 +1,6 @@
 # Blackwood website to-do list
 
-Updated **28 October 2026** (UK). This separates published website work from features
+Updated **29 October 2026** (UK). This separates published website work from features
 that still need live configuration, database changes or app-store setup.
 
 ## Catalogue reconciliation — owner confirmed live
@@ -18,14 +18,17 @@ that still need live configuration, database changes or app-store setup.
 BP Reading navigation/member links remain hidden. No missing author accounts are
 created by this operation; new preparation records carry no invented contract dates.
 
-## Offline BP Reading — website prepared, delivery deployment pending
+## Offline BP Reading — live offline acceptance pending
 
 - [x] Add opt-in encrypted device copies, refresh/remove controls and offline reader shell.
 - [x] Keep EPUB export/public file URLs out of the offline interface.
 - [x] Prepare seven-day server-issued offline windows bounded by membership expiry,
   preserving existing payment/release/auth checks. No new database migration/secrets.
-- [ ] Owner deploys the updated delivery function: paste the whole
+- [x] Owner deployed the updated delivery function: paste the whole
   `supabase/dashboard/bp-reading-deliver-epub.ts` bundle into dashboard `index.ts`.
+- [x] Improve offline error visibility and prevent disconnected books from showing
+  Subscribe to read; await worker updates and report failed reader dependencies.
+- [ ] Diagnose owner-reported save failure using the new per-book message.
 - [ ] Owner verifies Save offline, airplane-mode reopen, page turns, notes and removal
   using a live entitled account after deployment. ARC Vault remains unchanged.
 

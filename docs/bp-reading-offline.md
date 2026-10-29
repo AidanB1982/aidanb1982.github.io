@@ -67,3 +67,13 @@ non-exportable key, account isolation, expiry/clock rollback, shell cache exclus
 a complete offline reload and real EPUB rendering, removal and signout cleanup.
 `tests/reading-delivery.mjs` covers server expiry/purchase/revocation policy in addition
 to the established delivery checks. These do not deploy Supabase or certify live books.
+
+## Troubleshooting a save that returns to Save offline
+
+The saved confirmation is required. If saving fails, its reason appears both above
+library filters and beside that book. A public shell/dependency failure names the
+resource and HTTP status where available. Update-in-progress service workers are
+awaited before preparing resources. While disconnected, a book without a usable
+saved copy is disabled as **Save online first**, never Subscribe to read.
+Reconnect, refresh the reading page and retry. If it still fails, report the exact
+message beside the book; the button reverting alone does not establish the cause.

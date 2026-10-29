@@ -8,7 +8,7 @@ import {
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
 import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261124";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
-import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261127";
+import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261128";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261127";
 
 /* =====================================================
@@ -57,6 +57,7 @@ let sessionEpoch = 0;
 const offlineLibrary=new OfflineLibrary();
 let offlineRows=new Map();
 const offlineSaving=new Set();
+const offlineSaveErrors=new Map();
 const offlineAccountKey='bp-reading-offline-account-v1';
 async function refreshOfflineRows() {
   try{offlineRows=new Map((await offlineLibrary.list(activeUser.id)).map(row=>[row.id,row]));}
@@ -65,7 +66,7 @@ async function refreshOfflineRows() {
 async function saveOfflineBook(book) {
   if(!activeUser||!navigator.onLine||!book.canRead||offlineSaving.has(offlineBookKey(book)))return;
   const user=activeUser,epoch=sessionEpoch,key=offlineBookKey(book);
-  offlineSaving.add(key);renderLibrary();
+  offlineSaveErrors.delete(key);offlineSaving.add(key);renderLibrary();
   $('reading-offline-status').textContent='Saving '+book.title+' and preparing the offline reader…';
   try {
     await prepareOfflineShell();
@@ -78,7 +79,7 @@ async function saveOfflineBook(book) {
     localStorage.setItem(offlineAccountKey,user.id);
     await refreshOfflineRows();
     $('reading-offline-status').textContent=book.title+' saved on this device. Refresh online within seven days to renew offline access. Browser storage may be cleared by your device.';
-  }catch(error){$('reading-offline-status').textContent=error.message||'This book could not be saved. Check your connection and available device storage.';}
+  }catch(error){const message=error.message||'This book could not be saved. Check your connection and available device storage.';offlineSaveErrors.set(key,message);$('reading-offline-status').textContent=message;}
   finally{offlineSaving.delete(key);renderLibrary();}
 }
 async function initialiseOffline() {
@@ -303,10 +304,11 @@ function renderLibrary() {
     const description = document.createElement('p'); description.className = 'book-description book-synopsis'; description.textContent = book.description;
     const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = !book.readingReady ? book.availabilityUnknown ? 'Availability could not be checked.' : 'The reading edition is being prepared.' : book.started ? `${book.progress}% complete` : 'Not started';
     const track = document.createElement('div'); track.className = 'progress-track'; const fill = document.createElement('div'); fill.className = 'progress-fill'; fill.style.width = book.progress + '%'; track.append(fill);
-    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = !book.readingReady || switchingEdition || state.isLoading;
+    const offlineMissing=!navigator.onLine&&!offlineRows.has(offlineBookKey(book));
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = offlineMissing ? 'Save online first' : !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = offlineMissing || !book.readingReady || switchingEdition || state.isLoading;
     button.onclick = () => {if (!book.readingReady) return; if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
     const badges=document.createElement('div');badges.className='book-badges';
-    const access=document.createElement('span');access.className='book-badge';access.textContent=book.publicTextId ? 'Free recovered file' : !book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
+    const access=document.createElement('span');access.className='book-badge';access.textContent=offlineMissing ? 'Not saved offline' : book.publicTextId ? 'Free recovered file' : !book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
     if(book.progress>=100){const finished=document.createElement('span');finished.className='book-badge finished';finished.textContent='Finished';badges.append(finished);}
     track.hidden = !book.readingReady;
     track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
@@ -320,6 +322,7 @@ function renderLibrary() {
     if(navigator.onLine&&book.readingReady&&book.canRead){
       const save=document.createElement('button');save.type='button';save.className='offline-action';save.textContent=offlineSaving.has(offlineKey)?'Saving…':savedOffline?'Refresh offline':'Save offline';save.disabled=offlineSaving.has(offlineKey);save.onclick=()=>void saveOfflineBook(book);offlineControls.append(save);
     }
+    if(offlineSaveErrors.has(offlineKey)){const error=document.createElement('p');error.className='offline-save-error device-note';error.setAttribute('role','status');error.textContent=offlineSaveErrors.get(offlineKey);offlineControls.append(error);}
     details.append(badges,eyebrow,heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); grid.append(card);
   }
 }
@@ -2236,7 +2239,7 @@ window.addEventListener('offline',async()=>{
   if(!activeUser)return;
   await refreshOfflineRows();
   libraryBooks=libraryBooks.map(book=>({...book,canRead:offlineRows.has(offlineBookKey(book))}));
-  $('reading-offline-status').textContent='Offline · only books saved on this device can open. Your place and notes remain on this device.';
+  $('reading-offline-status').textContent=offlineRows.size ? 'Offline · saved books can open. Books marked “Save online first” need to be saved while connected; you do not need another subscription.' : 'Offline · no usable saved copies were found. Reconnect, choose Save offline and wait for the saved confirmation. Your existing membership has not changed.';
   renderLibrary();
 });
 window.addEventListener('online',async()=>{
