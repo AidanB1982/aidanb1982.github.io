@@ -18,7 +18,7 @@ that still need live configuration, database changes or app-store setup.
 BP Reading navigation/member links remain hidden. No missing author accounts are
 created by this operation; new preparation records carry no invented contract dates.
 
-## Offline BP Reading — live offline acceptance pending
+## Offline BP Reading — owner confirmed working
 
 - [x] Add opt-in encrypted device copies, refresh/remove controls and offline reader shell.
 - [x] Keep EPUB export/public file URLs out of the offline interface.
@@ -33,9 +33,9 @@ created by this operation; new preparation records carry no invented contract da
 - [x] Reproduce the Supabase tracing HTTP 404 caused by import examples inside
   quoted warnings. Replace regex scanning with a pinned module parser that ignores
   strings/comments and optional dynamic imports; retain actual static dependencies.
-- [ ] Owner retries saving after the tracing fix and confirms a successful offline read.
-- [ ] Owner verifies Save offline, airplane-mode reopen, page turns, notes and removal
-  using a live entitled account after deployment. ARC Vault remains unchanged.
+- [x] Owner confirmed saving and offline reading work after the parser correction.
+- [ ] Finish live checks for offline notes/progress sync after reconnection, expiry and
+  removal, plus iPhone/Safari and Android coverage. ARC Vault remains unchanged.
 
 See [offline setup and limitations](bp-reading-offline.md), including storage eviction,
 reconnection, delayed revocation and the distinction between encryption and DRM.
@@ -213,8 +213,8 @@ No Supabase changes are required for these display mappings.
 - [x] Owner approved The Black Bothy and The Crossing for BP Reading release.
 - [x] Confirm The Black Bothy uses book record 4 and ebook edition 10.
 - [x] Prepare/test its atomic, rerunnable [registration script](../supabase/operations/release-black-bothy.sql).
-- [ ] Run that script in live Supabase, refresh BP Reading and verify the uploaded EPUB.
-- [ ] Resolve The Crossing's real book/ebook IDs using [the read-only lookup](../supabase/operations/find-crossing-edition.sql), then register its approved upload.
+- [x] Owner released and confirmed Black Bothy working through catalogue reconciliation.
+- [x] Owner confirmed The Crossing released and working: book 20 / ebook edition 39.
 
 A GitHub push does not run these SQL operations. No member grants, payment records,
 RLS, bucket privacy, launch flags or navigation visibility are changed by this release.
@@ -223,10 +223,10 @@ RLS, bucket privacy, launch flags or navigation visibility are changed by this r
 
 - [x] Owner authorised reusing existing records and creating missing book/ebook records.
 - [x] Prepare/test [a non-mutating catalogue/schema report](../supabase/operations/inspect-reading-catalogue.sql) across reader/Author Desk and Publishing Inventory tables.
-- [ ] Run the inspection in live Supabase and return `catalogue_report`.
-- [ ] Use the actual schema to prepare/test a duplicate-safe bulk create/reuse script.
-- [ ] Link the approved Crossing upload to its real newly resolved/created ebook edition.
-- [ ] Keep all other unuploaded editions planned/Coming soon; do not enable releases in bulk.
+- [x] Owner supplied the live `catalogue_report`.
+- [x] Prepare/test and owner-run duplicate-safe reconciliation; 26 works linked.
+- [x] Link the approved Crossing upload to real book 20 / ebook edition 39.
+- [x] Keep unuploaded editions planned/Coming soon; only explicitly approved uploads released.
 
 ## Existing foundations already in place
 
