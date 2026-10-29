@@ -28,7 +28,9 @@ created by this operation; new preparation records carry no invented contract da
   `supabase/dashboard/bp-reading-deliver-epub.ts` bundle into dashboard `index.ts`.
 - [x] Improve offline error visibility and prevent disconnected books from showing
   Subscribe to read; await worker updates and report failed reader dependencies.
-- [ ] Diagnose owner-reported save failure using the new per-book message.
+- [x] Address the owner-reported old generic worker message with versioned worker
+  registration, explicit update/cache bypass and protocol checks.
+- [ ] Owner retries saving and returns any remaining resource-specific error.
 - [ ] Owner verifies Save offline, airplane-mode reopen, page turns, notes and removal
   using a live entitled account after deployment. ARC Vault remains unchanged.
 

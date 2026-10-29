@@ -271,3 +271,7 @@ shell cache exclusion, complete offline reload and real EPUB rendering, removal 
 signout cleanup. Run using the same Playwright/Chromium and synthetic EPUB dependencies
 as `reading-public.cjs`. Delivery tests also check server-issued offline windows.
 Live Supabase deployment and owner device acceptance remain separate steps.
+
+`node tests/reading-offline-update.mjs` checks stale-worker update ordering, script
+cache bypass, versioned registration, revision negotiation and preservation of the
+resource-specific error message when preparation fails.

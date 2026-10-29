@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {prepareOfflineShell} from '../js/BP-reading-offline.js';
+const messages=[];
+const worker=reply=>({state:'activated',postMessage(message,ports){messages.push(message);ports[0].postMessage(reply);ports[0].close();}});
+const oldWorker=worker({ok:false});
+let reply={ok:true,revision:3},updates=0;
+const registration={active:oldWorker,async update(){updates++;this.active=worker(reply);}};
+Object.defineProperty(globalThis,'window',{value:{isSecureContext:true},configurable:true});
+Object.defineProperty(globalThis,'navigator',{value:{serviceWorker:{ready:Promise.resolve(registration),async register(url,options){assert.match(url,/bp-reading-sw\.js\?v=/);assert.equal(options.updateViaCache,'none');assert.equal(options.scope,'/pages/bp-reading.html');registration.active=oldWorker;return registration;}}},configurable:true});
+await prepareOfflineShell();assert.equal(updates,1);assert.equal(messages.length,1,'only the updated worker handles preparation');
+reply={ok:false,revision:3,error:'Offline reader could not cache /css/example.css (HTTP 503).'};
+await assert.rejects(()=>prepareOfflineShell(),/example.css.*503/);
+reply={ok:false};await assert.rejects(()=>prepareOfflineShell(),/older offline reader/);
+console.log('PASS stale-worker recovery: versioned registration, cache bypass, explicit update before preparation, protocol check and resource error propagation');

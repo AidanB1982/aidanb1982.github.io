@@ -53,7 +53,8 @@ export class OfflineLibrary {
 }
 export async function prepareOfflineShell() {
   if(!('serviceWorker' in navigator)||!window.isSecureContext)throw Error('Offline reading needs HTTPS and a supported browser.');
-  const registration=await navigator.serviceWorker.register('/bp-reading-sw.js',{scope:'/pages/bp-reading.html'});
+  const registration=await navigator.serviceWorker.register('/bp-reading-sw.js?v=20261029-2',{scope:'/pages/bp-reading.html',updateViaCache:'none'});
+  await registration.update();
   await navigator.serviceWorker.ready;
   const worker=registration.installing||registration.waiting||registration.active;
   if(!worker)throw Error('The offline reader is not ready yet.');
@@ -64,7 +65,7 @@ export async function prepareOfflineShell() {
   });
   await new Promise((resolve,reject)=>{
     const channel=new MessageChannel(),timer=setTimeout(()=>reject(Error('The offline reader could not finish saving. Try again online.')),45000);
-    channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data?.ok?resolve():reject(Error(typeof event.data?.error==='string'?event.data.error:'The offline reader could not be saved. Please try again online.'));};
+    channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data?.revision!==3?reject(Error('An older offline reader is still active. Refresh this page while online and try again.')):event.data?.ok?resolve():reject(Error(typeof event.data?.error==='string'?event.data.error:'Offline preparation failed without a resource detail. Refresh online and try again.'));};
     worker.postMessage({type:'PREPARE_READER'},[channel.port2]);
   });
 }

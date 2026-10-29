@@ -77,3 +77,9 @@ awaited before preparing resources. While disconnected, a book without a usable
 saved copy is disabled as **Save online first**, never Subscribe to read.
 Reconnect, refresh the reading page and retry. If it still fails, report the exact
 message beside the book; the button reverting alone does not establish the cause.
+
+The earlier generic “The offline reader could not be saved” message identifies the
+old worker protocol. Saving now registers a versioned worker with HTTP script-cache
+bypass, explicitly checks for updates and waits for activation. Client/worker revision
+checks prevent silently accepting an old protocol. This refresh preserves IndexedDB
+books and account storage; do not clear site data as a first troubleshooting step.

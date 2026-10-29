@@ -16,7 +16,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',DIR=process.env.READING
  await page.goto(BASE+'/pages/bp-reading.html');await page.waitForFunction(()=>!document.getElementById('library').hidden);
  // Encryption, account isolation, expiry, future-date rejection and clock rollback.
  const checks=await page.evaluate(async()=>{
-  const {OfflineLibrary,OFFLINE_WINDOW}=await import('/js/BP-reading-offline.js?v=20261128');let now=Date.now();const store=new OfflineLibrary(indexedDB,()=>now);
+  const {OfflineLibrary,OFFLINE_WINDOW}=await import('/js/BP-reading-offline.js?v=20261129');let now=Date.now();const store=new OfflineLibrary(indexedDB,()=>now);
   const book={editionId:999,title:'Test',token:'must not persist'},bytes=new Uint8Array([80,75,3,4,42]).buffer;
   await store.save('unit-reader',book,bytes,now+10000);
   const row=(await store.list('unit-reader'))[0],isolated=(await store.list('other-reader')).length===0;
@@ -56,8 +56,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',DIR=process.env.READING
  assert.equal(deliveries,1,'offline read never calls delivery');
  await page.locator('#reader-menu-toggle').click();await page.locator('#back-to-library').click();
  await page.getByRole('button',{name:'Remove offline',exact:true}).click();await page.waitForFunction(()=>document.querySelectorAll('.book-card').length===0);
- await page.evaluate(async()=>{const {OfflineLibrary}=await import('/js/BP-reading-offline.js?v=20261128');const library=new OfflineLibrary();await library.save('offline-reader',{editionId:88,title:'Signout test'},new Uint8Array([80,75,3,4,1]).buffer,Date.now()+60000);window.testSignOut();});
- await page.waitForFunction(async()=>{const {OfflineLibrary}=await import('/js/BP-reading-offline.js?v=20261128');return(await new OfflineLibrary().list('offline-reader')).length===0});
+ await page.evaluate(async()=>{const {OfflineLibrary}=await import('/js/BP-reading-offline.js?v=20261129');const library=new OfflineLibrary();await library.save('offline-reader',{editionId:88,title:'Signout test'},new Uint8Array([80,75,3,4,1]).buffer,Date.now()+60000);window.testSignOut();});
+ await page.waitForFunction(async()=>{const {OfflineLibrary}=await import('/js/BP-reading-offline.js?v=20261129');return(await new OfflineLibrary().list('offline-reader')).length===0});
  assert.equal(await page.evaluate(()=>localStorage.getItem('bp-reading-offline-account-v1')),null,'signout clears offline identity');
  assert.deepEqual(errors,[]);
  console.log('PASS encrypted offline storage, non-exportable key, account isolation, expiry/clock bounds, explicit save, shell-only cache, full offline reload and EPUB rendering, removal');
