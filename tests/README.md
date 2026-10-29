@@ -275,3 +275,8 @@ Live Supabase deployment and owner device acceptance remain separate steps.
 `node tests/reading-offline-update.mjs` checks stale-worker update ordering, script
 cache bypass, versioned registration, revision negotiation and preservation of the
 resource-specific error message when preparation fails.
+
+`node tests/reading-offline-dependencies.cjs` reproduces the reported Supabase tracing
+404 with a static module/re-export graph and an optional dynamic tracing import. It
+asserts required modules are cached and the invalid optional URL is never fetched.
+The browser offline test includes the same optional-import fixture.
