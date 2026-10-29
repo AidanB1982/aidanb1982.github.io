@@ -84,9 +84,10 @@ bypass, explicitly checks for updates and waits for activation. Client/worker re
 checks prevent silently accepting an old protocol. This refresh preserves IndexedDB
 books and account storage; do not clear site data as a first troubleshooting step.
 
-The reported Supabase 2.118.0 tracing HTTP 404 was reproduced: the dependency crawler
-mistook an optional dynamic `import("@supabase/supabase-js/tracing")` for an eager
-relative URL. Preparation now walks static imports/re-exports only; optional tracing
-is not preloaded. Runtime requests remain subject to the existing public-resource
-allowlist and private-data exclusions. The regression fixture reproduces the exact
-failing path and verifies successful preparation without requesting it.
+The reported Supabase 2.118.0 tracing HTTP 404 was reproduced from the package's
+warning text: a quoted message contains `import '@supabase/supabase-js/tracing'`.
+The previous regular-expression scanner incorrectly treated it as a real dependency.
+Preparation now uses the pinned, MIT-licensed es-module-lexer 1.7.0 JavaScript parser,
+ignoring strings, comments and optional dynamic imports while retaining real static
+imports/re-exports. The worker is a module worker with a versioned script URL and
+protocol revision 5. No Supabase redeployment is needed for this website-only fix.

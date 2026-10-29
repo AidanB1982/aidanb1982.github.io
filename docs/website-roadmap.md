@@ -30,8 +30,9 @@ created by this operation; new preparation records carry no invented contract da
   Subscribe to read; await worker updates and report failed reader dependencies.
 - [x] Address the owner-reported old generic worker message with versioned worker
   registration, explicit update/cache bypass and protocol checks.
-- [x] Reproduce and fix the reported Supabase tracing HTTP 404 by excluding
-  optional dynamic imports from reader preloading; retain static dependencies.
+- [x] Reproduce the Supabase tracing HTTP 404 caused by import examples inside
+  quoted warnings. Replace regex scanning with a pinned module parser that ignores
+  strings/comments and optional dynamic imports; retain actual static dependencies.
 - [ ] Owner retries saving after the tracing fix and confirms a successful offline read.
 - [ ] Owner verifies Save offline, airplane-mode reopen, page turns, notes and removal
   using a live entitled account after deployment. ARC Vault remains unchanged.
