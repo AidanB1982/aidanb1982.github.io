@@ -7,27 +7,55 @@ or database migration sends anything by itself; the worker defaults to paused.
 
 ## 1. Existing Meta app and account access
 
-Use the existing Blackwood Publishing app in Meta for Developers. This integration
-uses **Facebook Login / Instagram API with Facebook Login**, a Facebook Page access
-token and the Instagram professional account linked to that Page. It does not use an
-Instagram Login token or an app access token. Facebook Page admin access alone is not
-an API token.
+The existing Facebook connection uses a **Facebook Page access token**. The owner
+verified Blackwood Publishing Page `1236290872910367`; Graph API Explorer was using
+`v26.0`, so that version is explicitly saved in `META_GRAPH_VERSION` for this setup.
+Page admin access alone is not an API token.
 
-The Page access token needs publishing permissions for the owner-managed assets:
-`pages_manage_posts`, `pages_read_engagement`, `instagram_basic` and
-`instagram_content_publish`. `pages_show_list` is used when obtaining the token and
-identifying the Page. App/use-case setup, advanced access and review requirements
-depend on the app and assets. Confirm these in the app dashboard. Development-mode
-tests must use authorised app roles/assets. Do not assume read access proves publish
-permission.
+There are two supported Instagram credential routes:
 
-Meta's Graph API Explorer can request the app's user permissions and list the managed
-Pages via `me/accounts?fields=id,name,access_token,instagram_business_account{id,username}`.
-Choose the Blackwood Page and save **that Page's** ID and access token in Supabase
-Secrets. Do not paste the response or token into chat, a public repository, or a
-browser script. Use a token with suitable longevity for unattended work; temporary
-Explorer tokens are for connection tests. Tokens can expire or be revoked and need
-replacement; this first version has no OAuth refresh flow.
+- Existing Facebook-login apps may return the linked professional Instagram account
+  in `instagram_business_account` using an appropriately authorised Page token.
+- The owner's newer app displays **Instagram API with Unified Login**, a configuration
+  with Instagram assets, `instagram_basic` / `instagram_content_publish`, and a
+  system-user access token. Configure its numeric Instagram account ID and token
+  separately in the two optional Instagram secrets below. Facebook retains its own
+  Page token. These credentials use `graph.facebook.com`, not the different standalone
+  Instagram Login API/token type.
+
+For Facebook, request `pages_manage_posts`, `pages_read_engagement` and
+`pages_show_list` as needed during authorisation/discovery. Instagram publishing
+needs `instagram_basic` and `instagram_content_publish` for this app's displayed
+Unified Login flow. Ads, messages and comment management are not used by our scheduler;
+remove those optional permissions through **Edit permissions** where possible.
+
+For the current Unified Login dashboard:
+
+1. Select the Instagram configuration. The owner created configuration
+   `1433285518283606`; **this is not the Instagram account ID**.
+2. Under **Generate access tokens**, use **Add Instagram account** / the token-generation
+   controls. Follow the dashboard's requirement to assign the Instagram Tester role
+   and accept its invitation in Instagram. The account must be professional.
+3. Save the generated account token and numeric Instagram account ID in Supabase,
+   not chat or frontend files. If the dashboard requires a redirect URL to proceed,
+   stop and inspect that flow: the website does not currently implement Meta OAuth
+   start/callback/token exchange. Do not register a fictional `/auth/callback` URL.
+4. Deploy the regenerated desk and worker bundles below. The read-only check verifies
+   the direct Instagram ID with its own token. It reports an Instagram-specific
+   failure without discarding a working Facebook connection. Partial/invalid explicit
+   Instagram configuration never silently falls back to a different linked account.
+
+The dashboard says direct developers working only with their own Instagram businesses
+may skip App Review; access for clients/other businesses has different requirements.
+Use the actual app's roles, assets, permission and review requirements. A read-only
+connection result does not establish permission to publish or prove cron health.
+
+For the older Page-linked route, Graph API Explorer may list the managed Pages via
+`me/accounts?fields=id,name,access_token,instagram_business_account{id,username}`.
+Save **the Page's** token, not the Explorer's user token. Temporary Explorer tokens
+are for tests; obtain suitable longevity before unattended work. Even a token labelled
+“never expires” can be revoked by Meta or account/asset changes. No OAuth refresh flow
+is implemented in this version.
 
 Required server secrets:
 
@@ -35,12 +63,14 @@ Required server secrets:
 | --- | --- |
 | `META_PAGE_ID` | Numeric Blackwood Facebook Page ID |
 | `META_PAGE_ACCESS_TOKEN` | That Page's authorised access token |
+| `META_INSTAGRAM_ACCOUNT_ID` | Optional pair: numeric Instagram account ID from Unified Login |
+| `META_INSTAGRAM_ACCESS_TOKEN` | Optional pair: that account's authorised Unified Login token |
 | `BP_SOCIAL_CRON_SECRET` | Unique random secret, at least 32 characters |
 | `BP_SOCIAL_PUBLISHING_ENABLED` | Keep `false` until the connection and schedule are verified |
 | `META_GRAPH_VERSION` | Optional supported Graph API version; default `v24.0` |
 
 Never put any of these secret values in the HTML or JavaScript. The UI connection
-check returns the Page name and linked Instagram username only. It performs GET
+check returns the Page name, verified Instagram username and a safe Instagram error if needed. It performs GET
 requests and never creates posts; it cannot prove all publishing scopes or cron health.
 
 ## 2. Database and Edge Functions

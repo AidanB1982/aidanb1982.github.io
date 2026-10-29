@@ -25,3 +25,29 @@ console.log('PASS Meta read-only connection, Facebook text/image, Instagram read
 let captured;
 const uncertainWorker=createSocialWorker({secret:()=>secret,enabled:()=>true,configured:()=>true,claim:async()=>post,publish:async()=>({state:'unknown',providerId:null,message:'Check account before retrying.'}),finish:async(p,r)=>{captured=r;return true;}});
 assert.equal((await (await uncertainWorker(new Request('https://edge.invalid/worker',{method:'POST',headers:{'x-bp-social-secret':secret}}))).json()).state,'unknown');assert.equal(captured.state,'unknown','ambiguous result is persisted for reconciliation');
+
+// New-app Unified Login credentials are distinct from the working Facebook Page token.
+const unifiedSettings={...settings,META_GRAPH_VERSION:'v26.0',META_INSTAGRAM_ACCOUNT_ID:'456',META_INSTAGRAM_ACCESS_TOKEN:'private-instagram-fixture'};
+let unifiedCalls=[];
+const unifiedTransport=async(url,options)=>{unifiedCalls.push({url,options});
+ if(url.includes('/123?fields=id,name'))return Response.json({id:'123',name:'Blackwood'});
+ if(url.includes('/456?fields=id,username'))return Response.json({id:'456',username:'aidan.blackwood'});
+ if(url.includes('?fields=status_code'))return Response.json({status_code:'FINISHED'});
+ if(url.endsWith('/media_publish'))return Response.json({id:'888'});
+ if(url.endsWith('/media'))return Response.json({id:'777'});
+ return Response.json({id:'123_999'});
+};
+const unified=createMetaPublisher(k=>unifiedSettings[k],unifiedTransport,async()=>{});
+account=await unified.check();assert.equal(account.pageName,'Blackwood');assert.equal(account.instagramConnected,true);assert.equal(account.instagramUsername,'aidan.blackwood');assert.equal(account.instagramError,null);assert(unifiedCalls.every(c=>c.options.method==='GET'));assert(!JSON.stringify(account).includes('private-instagram-fixture'));
+assert.equal(unifiedCalls[0].options.headers.Authorization,'Bearer private-fixture-token');assert.equal(unifiedCalls[1].options.headers.Authorization,'Bearer private-instagram-fixture');
+unifiedCalls=[];result=await unified.publish({...post,channel:'Instagram',media_url:'https://example.invalid/cover.jpg'});assert.equal(result.state,'published');assert(unifiedCalls.every(c=>c.options.headers.Authorization==='Bearer private-instagram-fixture'));assert(unifiedCalls.every(c=>c.url.startsWith('https://graph.facebook.com/v26.0/')));assert.equal(unifiedCalls.filter(c=>c.url.endsWith('/media_publish')).length,1);
+unifiedCalls=[];assert.equal((await unified.publish(post)).state,'published');assert.equal(unifiedCalls.length,1);assert.equal(unifiedCalls[0].options.headers.Authorization,'Bearer private-fixture-token');
+for(const partial of [{META_INSTAGRAM_ACCOUNT_ID:''},{META_INSTAGRAM_ACCESS_TOKEN:''},{META_INSTAGRAM_ACCOUNT_ID:'wrong'}]){
+ unifiedCalls=[];const partialConfig={...unifiedSettings,...partial};const p=createMetaPublisher(k=>partialConfig[k],unifiedTransport,async()=>{});
+ account=await p.check();assert.equal(account.pageName,'Blackwood');assert.equal(account.instagramConnected,false);assert.match(account.instagramError,/Add both/);
+ unifiedCalls=[];assert.equal((await p.publish({...post,channel:'Instagram',media_url:'https://example.invalid/cover.jpg'})).state,'failed');assert.equal(unifiedCalls.length,0,'partial credentials never fall back to another Instagram account');assert.equal((await p.publish(post)).state,'published');
+}
+const mismatched=createMetaPublisher(k=>unifiedSettings[k],async(url,options)=>{if(url.includes('/456?fields=id,username'))return Response.json({id:'999',username:'other'});return unifiedTransport(url,options);},async()=>{});
+unifiedCalls=[];account=await mismatched.check();assert.equal(account.instagramConnected,false);assert.match(account.instagramError,/could not be verified/);
+assert.equal((await mismatched.publish({...post,channel:'Instagram',media_url:'https://example.invalid/cover.jpg'})).state,'failed');assert(!unifiedCalls.some(c=>c.options.method==='POST'));
+console.log('PASS Unified Login: direct IG identity verification, separate tokens for all IG requests, Facebook preservation, partial-config refusal and no fallback on wrong account');

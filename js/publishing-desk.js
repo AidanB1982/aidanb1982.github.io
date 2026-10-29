@@ -137,11 +137,11 @@
  $('ops-social-check').onclick=()=>{
   const report=text=>{$('ops-social-state').textContent=text;};
   if(busy){report('Another publishing desk request is running. Wait for it to finish, then retry this connection check.');return;}
-  report('Checking the Facebook Page and linked Instagram account… No post will be sent.');
+  report('Checking the Facebook Page and Instagram account… No post will be sent.');
   return operation(async()=>{
    const result=await invoke({action:'social-check'},{timeoutMs:25000});
    if(typeof result?.pageName!=='string')throw Error('The deployed publishing desk did not return a Meta connection result. Deploy the latest bp-publishing-desk dashboard code.');
-   report('Connected to '+result.pageName+(result.instagramConnected?' · Instagram '+(result.instagramUsername||'account'):' · No linked Instagram professional account')+'. '+(result.enabled?'Automatic publishing switch is on. Confirm the background schedule is installed.':'Automatic publishing is paused.'));
+   report('Connected to '+result.pageName+(result.instagramConnected?' · Instagram '+(result.instagramUsername||'account'):' · Instagram not connected'+(typeof result.instagramError==='string'?': '+result.instagramError:'. Check Instagram permissions or Unified Login setup.'))+'. '+(result.enabled?'Automatic publishing switch is on. Confirm the background schedule is installed.':'Automatic publishing is paused.'));
   },report);
  };
  $('ops-post-form').onsubmit=e=>{e.preventDefault();void operation(async()=>{

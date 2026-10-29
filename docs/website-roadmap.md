@@ -250,8 +250,13 @@ RLS, bucket privacy, launch flags or navigation visibility are changed by this r
 - [x] Owner created the Meta app, enabled Page test permissions and retrieved
   Blackwood Publishing Page ID `1236290872910367` and a Page token.
 - [x] Add immediate progress, deployment errors and a bounded timeout to the connection check.
-- [ ] Confirm the updated desk is deployed and the live read-only check returns the Page.
-- [ ] Obtain suitable long-lived credentials; verify Instagram permissions and its linked professional account.
+- [x] Owner deployed the Meta-capable desk and confirmed its live read-only Facebook check.
+- [x] Owner confirmed Facebook connection and a linked @aidan.blackwood Instagram account.
+- [x] Prepare separate Unified Login Instagram credentials and account verification;
+  preserve Facebook connection and do not publish when explicit IG configuration is invalid.
+- [ ] Owner generates Instagram token/account ID using the new Unified Login configuration,
+  deploys both regenerated dashboard bundles and verifies the live account.
+- [ ] Obtain suitable long-lived Facebook credentials before unattended operation.
 
 - [ ] Confirm the social scheduler SQL has been applied to the live Supabase project.
 - [ ] Deploy the updated `bp-publishing-desk` and new `bp-social-publish` functions.

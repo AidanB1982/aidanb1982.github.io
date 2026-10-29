@@ -281,3 +281,8 @@ resource-specific error message when preparation fails.
 graph and an optional dynamic tracing import. It
 asserts required modules are cached and the invalid optional URL is never fetched.
 The browser offline test includes the same optional-import fixture.
+
+Meta tests also cover separate Unified Login Instagram credentials, direct identity
+verification, token separation across verification/container/poll/publish calls,
+preservation of Facebook when Instagram configuration fails and no fallback to a
+different account. These are mock-provider tests, not live Meta acceptance.

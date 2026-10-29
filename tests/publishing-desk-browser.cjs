@@ -11,6 +11,7 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
    window.mockCalls.push(body);
    if(body.action==='overview')return {data:{campaigns:[{id:1,title:'The Crossing',is_active:true},{id:2,title:'Gualachulain',author_name:'Aidan Blackwood',is_active:true}],readers:people,assignments:window.mockAssignments,notices:[],mailConfigured:true,aiConfigured:false,socialSchedulerReady:true,socialConfigured:true,socialEnabled:false}};
    if(body.action==='social-check'&&window.mockSocialHold)await new Promise(resolve=>{window.releaseSocialCheck=resolve});
+   if(body.action==='social-check'&&window.mockInstagramFailure)return {data:{pageName:'Blackwood Publishing',instagramConnected:false,instagramUsername:null,instagramError:'Add both META_INSTAGRAM_ACCESS_TOKEN and numeric META_INSTAGRAM_ACCOUNT_ID in Supabase for Unified Login.',enabled:false}};
    if(body.action==='social-check'&&window.mockSocialFailure)return {error:{context:{json:async()=>({error:'Deploy the updated publishing desk function to check Meta.'})}}};
    if(body.action==='social-check')return {data:{pageName:'Blackwood Publishing',instagramConnected:true,instagramUsername:'blackwood',enabled:false}};
    if(body.action==='assign'&&window.mockAssignFailure)return {error:{context:{json:async()=>({error:'This ARC campaign is inactive or closed.'})}}};
@@ -68,6 +69,10 @@ const BASE_URL=process.env.BASE_URL||'http://127.0.0.1:8000';const OUT=process.e
  await page.evaluate(()=>{window.setTimeout=window.originalTimeout;window.mockSocialHold=false;window.releaseSocialCheck();});
  await page.locator('#ops-social-check').click();await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('Connected to Blackwood Publishing'));
  assert((await page.locator('#ops-social-state').textContent()).includes('paused'));
+ await page.evaluate(()=>window.mockInstagramFailure=true);await page.locator('#ops-social-check').click();
+ await page.waitForFunction(()=>document.getElementById('ops-social-state').textContent.includes('META_INSTAGRAM_ACCOUNT_ID'));
+ assert.match(await page.locator('#ops-social-state').textContent(),/Connected to Blackwood Publishing/);
+ await page.evaluate(()=>window.mockInstagramFailure=false);
  await page.locator('#ops-post-title').fill('Gualachulain announcement');await page.selectOption('#ops-post-channel','TikTok');await page.locator('#ops-post-content').fill('My own approved caption.');
  await page.locator('#ops-post-time').fill('2099-10-01T10:00');await page.selectOption('#ops-post-status','scheduled');await page.getByRole('button',{name:'Save content',exact:true}).click();
  await page.waitForSelector('.ops-post');assert((await page.locator('.ops-post').textContent()).includes('TikTok'));
