@@ -7,8 +7,11 @@ personalised EPUB/download workflow.
 
 1. Publish the website changes, including root `bp-reading-sw.js` and
    `js/BP-reading-offline.js`. The custom domain must use HTTPS.
-2. Update **the existing** Supabase function `bp-reading-deliver-epub` with the
-   repository's current `handler.ts` (keep its existing `index.ts` import/wiring).
+2. For the single-file Supabase dashboard editor, replace the entire `index.ts`
+   in **the existing** function `bp-reading-deliver-epub` with
+   [`supabase/dashboard/bp-reading-deliver-epub.ts`](../supabase/dashboard/bp-reading-deliver-epub.ts).
+   This generated bundle includes both the tested handler and `Deno.serve` wiring.
+   For a multi-file CLI deployment, deploy the source function directory normally.
    Preserve its current JWT verification, launch gates and secrets. No new secret,
    migration, bucket or public Storage policy is needed. Do not disable auth.
 3. Sign in online and choose **Save offline** beside a readable book. Wait for the

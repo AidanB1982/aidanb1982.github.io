@@ -24,7 +24,8 @@ created by this operation; new preparation records carry no invented contract da
 - [x] Keep EPUB export/public file URLs out of the offline interface.
 - [x] Prepare seven-day server-issued offline windows bounded by membership expiry,
   preserving existing payment/release/auth checks. No new database migration/secrets.
-- [ ] Owner deploys the updated `bp-reading-deliver-epub/handler.ts`.
+- [ ] Owner deploys the updated delivery function: paste the whole
+  `supabase/dashboard/bp-reading-deliver-epub.ts` bundle into dashboard `index.ts`.
 - [ ] Owner verifies Save offline, airplane-mode reopen, page turns, notes and removal
   using a live entitled account after deployment. ARC Vault remains unchanged.
 

@@ -34,7 +34,7 @@ export function createReadingHandler(deps: Dependencies) {
     const headers: Record<string,string> = {
       'Access-Control-Allow-Headers':'authorization, apikey, x-client-info, content-type',
       'Access-Control-Allow-Methods':'POST, OPTIONS',
-      'Access-Control-Expose-Headers':'Content-Length',
+      'Access-Control-Expose-Headers':'Content-Length, X-BP-Offline-Until',
       'Cache-Control':'private, no-store',
       'X-Content-Type-Options':'nosniff',
       'Vary':'Origin'
@@ -93,6 +93,23 @@ export function createReadingHandler(deps: Dependencies) {
       const edition = await service.from('book_editions').select('id,format').eq('id',editionId).maybeSingle();
       if (edition.error) return fail(503,'The book edition could not be verified.');
       if (!edition.data || edition.data.format !== 'ebook') return fail(404,'This reading edition is not available.');
+      if ((body as Record<string,unknown>).offline === true) {
+        const now=Date.now();
+        let until=now+7*24*60*60*1000;
+        if(!isAdmin) {
+          const catalogue=await service.from('bp_reading_catalog').select('book_id').eq('edition_id',editionId).maybeSingle();
+          if(catalogue.error||typeof catalogue.data?.book_id!=='string')return fail(503,'Offline access could not be verified.');
+          const purchase=await service.from('bp_reading_purchases').select('revoked_at').eq('user_id',userData.user.id).eq('book_id',catalogue.data.book_id).maybeSingle();
+          if(purchase.error)return fail(503,'Offline access could not be verified.');
+          if(!purchase.data||purchase.data.revoked_at) {
+            const membership=await service.from('bp_reading_memberships').select('access_until,revoked_at').eq('user_id',userData.user.id).maybeSingle();
+            const expires=typeof membership.data?.access_until==='string'?Date.parse(membership.data.access_until):NaN;
+            if(membership.error||membership.data?.revoked_at||!Number.isFinite(expires)||expires<=now)return fail(403,'An active membership or purchase is required to save offline.');
+            until=Math.min(until,expires);
+          }
+        }
+        headers['X-BP-Offline-Until']=new Date(until).toISOString();
+      }
       const downloaded = await service.storage.from(BUCKET).download(record.storage_path);
       if (downloaded.error || !downloaded.data) return fail(404,'The reading file is not currently available.');
       const bytes = await downloaded.data.arrayBuffer();
