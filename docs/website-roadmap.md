@@ -292,6 +292,9 @@ silently import the separate browser-local planner or imply that it is shared.
 
 ### 4. Protected ARC reading and notifications
 
+- [x] Prepare encrypted personalised ARC offline copies, bounded server deadlines and reconnect revocation checks; hide redundant legacy profiles for fully migrated readers.
+- [ ] Owner applies the ARC offline patch, redeploys bp-reading-arc and tests save/disconnect/reload on the live account.
+
 - [x] Owner confirmed the Gualachulain pilot shelf and reading pages load.
 - [x] Automatically add/mark an assigned ARC on the member bookshelf, preserving
   existing notes, owned/signed flags and chosen stages; provide an ARC reading link.
@@ -306,7 +309,7 @@ silently import the separate browser-local planner or imply that it is shared.
 - [x] Prepare/test pilot-only pinned assignment access, server-recorded copyright terms,
   legacy reference reuse, personalised in-reader delivery, local ARC progress/reviews
   and a member-area entry. No paid/cloud/offline rules are replaced.
-- [ ] Owner applies pilot migration, deploys bp-reading-arc and runs the single-account
+- [x] Owner applies pilot migration, deploys bp-reading-arc and runs the single-account
   grant operation. See [ARC pilot instructions](bp-reading-arc-pilot.md).
 - [ ] Owner tests the ARC route and verifies both legacy EPUB/PDF delivery reject the
   migrated assignment before enabling this for the wider team.

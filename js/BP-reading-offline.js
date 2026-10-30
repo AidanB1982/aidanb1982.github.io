@@ -1,6 +1,6 @@
 /* Device storage is not DRM. Never store tokens or private Storage URLs here. */
 export const OFFLINE_WINDOW = 7 * 24 * 60 * 60 * 1000;
-export const offlineBookKey = book => book.publicTextId ? `public:${book.publicTextId}` : `edition:${book.editionId}`;
+export const offlineBookKey = book => Number.isSafeInteger(book.arcAssignmentId)&&book.arcAssignmentId>0 ? `arc:${book.arcAssignmentId}` : book.publicTextId ? `public:${book.publicTextId}` : `edition:${book.editionId}`;
 export class OfflineLibrary {
   constructor(factory=globalThis.indexedDB,now=()=>Date.now()) {this.factory=factory;this.now=now;}
   async db() {
@@ -26,12 +26,12 @@ export class OfflineLibrary {
     const sig=new Uint8Array(bytes,0,4);if(sig[0]!==80||sig[1]!==75||sig[2]!==3||sig[3]!==4)throw Error('This book could not be saved.');
     const id=offlineBookKey(book);
     // Explicit allowlist: no session, auth token, signed URL, server path or admin identity.
-    const metadata=Object.fromEntries(['id','editionId','bookId','publicTextId','title','author','cover','coverAlt','series','seriesOrder','collection','readingOrder','description'].map(k=>[k,book[k]??null]));
+    const metadata=Object.fromEntries(['id','editionId','bookId','publicTextId','title','author','cover','coverAlt','series','seriesOrder','collection','readingOrder','description','arcAssignmentId','arcReference','arcTermsAccepted','reviewDue','reviewLink'].map(k=>[k,book[k]??null]));
     if(!globalThis.crypto?.subtle)throw Error('Encrypted offline storage is unavailable in this browser.');
     const encryptionKey=await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
     const iv=crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:new TextEncoder().encode(userId+':'+id)},encryptionKey,bytes);
-    await this.transact('readwrite',store=>store.put({key:userId+':'+id,userId,id,book:metadata,ciphertext,encryptionKey,iv,expiresAt,lastSeen:now}));
+    const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:new TextEncoder().encode(userId+':'+id+':'+expiresAt)},encryptionKey,bytes);
+    await this.transact('readwrite',store=>store.put({key:userId+':'+id,userId,id,book:metadata,ciphertext,encryptionKey,iv,expiresAt,cryptoVersion:2,lastSeen:now}));
   }
   async list(userId) {
     const rows=await this.transact('readonly',store=>store.getAll()),now=this.now(),valid=[];
@@ -46,14 +46,14 @@ export class OfflineLibrary {
     const row=(await this.list(userId)).find(row=>row.id===offlineBookKey(book));
     if(!row)throw Error('This book is not saved offline, or its offline access has expired. Reconnect to refresh it.');
     row.lastSeen=Math.max(row.lastSeen,this.now());await this.transact('readwrite',store=>store.put(row));
-    return crypto.subtle.decrypt({name:'AES-GCM',iv:row.iv,additionalData:new TextEncoder().encode(userId+':'+row.id)},row.encryptionKey,row.ciphertext);
+    return crypto.subtle.decrypt({name:'AES-GCM',iv:row.iv,additionalData:new TextEncoder().encode(userId+':'+row.id+(row.cryptoVersion===2?':'+row.expiresAt:''))},row.encryptionKey,row.ciphertext);
   }
   async remove(userId,id) {await this.transact('readwrite',store=>store.delete(userId+':'+id));}
   async clear(userId) {for(const row of await this.transact('readonly',store=>store.getAll()))if(row.userId===userId)await this.remove(userId,row.id);}
 }
 export async function prepareOfflineShell() {
   if(!('serviceWorker' in navigator)||!window.isSecureContext)throw Error('Offline reading needs HTTPS and a supported browser.');
-  const registration=await navigator.serviceWorker.register('/bp-reading-sw.js?v=20261029-4',{scope:'/pages/bp-reading.html',type:'module',updateViaCache:'none'});
+  const registration=await navigator.serviceWorker.register('/bp-reading-sw.js?v=20261030-arc-offline1',{scope:'/pages/bp-reading.html',type:'module',updateViaCache:'none'});
   await registration.update();
   await navigator.serviceWorker.ready;
   const worker=registration.installing||registration.waiting||registration.active;
@@ -65,7 +65,7 @@ export async function prepareOfflineShell() {
   });
   await new Promise((resolve,reject)=>{
     const channel=new MessageChannel(),timer=setTimeout(()=>reject(Error('The offline reader could not finish saving. Try again online.')),45000);
-    channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data?.revision!==5?reject(Error('An older offline reader is still active. Refresh this page while online and try again.')):event.data?.ok?resolve():reject(Error(typeof event.data?.error==='string'?event.data.error:'Offline preparation failed without a resource detail. Refresh online and try again.'));};
+    channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data?.revision!==6?reject(Error('An older offline reader is still active. Refresh this page while online and try again.')):event.data?.ok?resolve():reject(Error(typeof event.data?.error==='string'?event.data.error:'Offline preparation failed without a resource detail. Refresh online and try again.'));};
     worker.postMessage({type:'PREPARE_READER'},[channel.port2]);
   });
 }

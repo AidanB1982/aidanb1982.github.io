@@ -922,3 +922,4 @@ body.bp-reading-page .simple-header {
 .arc-reading-review button { margin-top:8px; }
 
 @media(max-width:600px){.arc-book-card { grid-column:1/-1; }.arc-book-card .book-cover { align-self:flex-start; }}
+.membership-summary[hidden] { display:none; }

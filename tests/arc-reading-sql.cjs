@@ -24,6 +24,7 @@ insert into arc_file_assignments(id,member_id,arc_file_id,application_id,status)
 insert into storage.buckets values('bp-reading-editions',false);insert into storage.objects values('bp-reading-editions','PRIVATE_MASTER.epub');
 `);
 await db.exec(readFileSync('supabase/migrations/20261030160000_arc_reading_pilot.sql','utf8'));
+await db.exec(readFileSync('supabase/migrations/20261030170000_arc_reading_offline.sql','utf8'));await db.exec(readFileSync('supabase/migrations/20261030170000_arc_reading_offline.sql','utf8'));
 const operation=readFileSync('supabase/operations/enable-arc-reading-pilot.sql','utf8').replace('00000000-0000-0000-0000-000000000000',A);
 await db.exec(operation);await db.exec(operation);
 const query=async(sql)=>(await db.query(sql)).rows;
@@ -49,7 +50,10 @@ await assert.rejects(()=>query(`select bp_arc_reading_open('${B}',81,true,'ARC C
 assert.equal((await query(`select bp_arc_reading_check('${A}',81) ok`))[0].ok,false,'active assignment still requires terms for continued access');
 const opened=(await query(`select bp_arc_reading_open('${A}',81,true,'ARC Copyright Terms v1') r`))[0].r;
 assert.equal((await query(`select bp_arc_reading_check('${A}',81) ok`))[0].ok,true);
-const reopened=(await query(`select bp_arc_reading_open('${A}',81,false,'') r`))[0].r;assert.equal(opened.reference,reopened.reference);assert.equal(opened.edition_id,2);
+const reopened=(await query(`select bp_arc_reading_open('${A}',81,false,'') r`))[0].r;assert.equal(opened.reference,reopened.reference);assert.equal(opened.edition_id,2);assert(Date.parse(opened.offline_until)>Date.now()+6*86400000);
+await db.exec("update arc_files set downloads_close_at=now()+interval '2 days'");
+const bounded=(await query(`select bp_arc_reading_open('${A}',81,false,'') r`))[0].r;assert(Date.parse(bounded.offline_until)<=Date.now()+2*86400000);
+await db.exec('update arc_files set downloads_close_at=null');
 assert.equal((await query('select count(*)::int n from arc_file_issuances'))[0].n,1,'permanent issuance reused');
 await query(`select bp_arc_reading_record_open('${A}',81)`);assert.equal((await query('select open_count from bp_arc_reading_activity'))[0].open_count,1);assert.equal((await query(`select download_count from arc_file_assignments where id=81`))[0].download_count,0);
 for(const [deny,restore] of [

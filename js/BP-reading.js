@@ -8,8 +8,8 @@ import {
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
 import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261124";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
-import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261029-offline5";
-import {isArcBook,arcReadingBooks,arcStorageKey,requestArc,ARC_TERMS_VERSION} from "/js/BP-reading-arc.js?v=20261030-arc1";
+import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261030-arc-offline1";
+import {isArcBook,arcReadingBooks,arcStorageKey,requestArc,ARC_TERMS_VERSION} from "/js/BP-reading-arc.js?v=20261030-arc-offline1";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261127";
 
 /* =====================================================
@@ -68,21 +68,23 @@ async function refreshOfflineRows() {
   catch{offlineRows=new Map();}
 }
 async function saveOfflineBook(book) {
-  if(isArcBook(book)||!activeUser||!navigator.onLine||!book.canRead||offlineSaving.has(offlineBookKey(book)))return;
+  if(!activeUser||!navigator.onLine||!book.canRead||offlineSaving.has(offlineBookKey(book)))return;
   const user=activeUser,epoch=sessionEpoch,key=offlineBookKey(book);
   offlineSaveErrors.delete(key);offlineSaving.add(key);renderLibrary();
   $('reading-offline-status').textContent='Saving '+book.title+' and preparing the offline reader…';
   try {
     await prepareOfflineShell();
-    const result=publicReadingWork(book.publicTextId)
+    const result=isArcBook(book)?await requestArc(supabase,SUPABASE_URL,SUPABASE_ANON_KEY,book,{saveOffline:true,acceptedTerms:arcConsent.has(book.arcAssignmentId)}):publicReadingWork(book.publicTextId)
       ? {bytes:await buildPublicReadingEpub(book.publicTextId),expiresAt:Date.now()+OFFLINE_WINDOW}
       : await fetchProtectedEpub({editionId:book.editionId,offline:true});
     if(activeUser?.id!==user.id||sessionEpoch!==epoch)return;
-    await offlineLibrary.save(user.id,book,result.bytes,result.expiresAt);
+    const savedBook=isArcBook(book)?{...book,arcReference:result.reference,arcTermsAccepted:true}:book;
+    await offlineLibrary.save(user.id,savedBook,result.bytes,result.expiresAt);
+    if(isArcBook(book))libraryBooks=libraryBooks.map(item=>item.arcAssignmentId===book.arcAssignmentId?{...item,arcTermsAccepted:true,arcReference:result.reference}:item);
     if(activeUser?.id!==user.id||sessionEpoch!==epoch){await offlineLibrary.clear(user.id);return;}
     localStorage.setItem(offlineAccountKey,user.id);
     await refreshOfflineRows();
-    $('reading-offline-status').textContent=book.title+' saved on this device. Refresh online within seven days to renew offline access. Browser storage may be cleared by your device.';
+    $('reading-offline-status').textContent=book.title+' saved on this device until '+new Date(result.expiresAt).toLocaleDateString('en-GB')+'. Reconnect to check access and renew before it expires.';
   }catch(error){const message=error.message||'This book could not be saved. Check your connection and available device storage.';offlineSaveErrors.set(key,message);$('reading-offline-status').textContent=message;}
   finally{offlineSaving.delete(key);renderLibrary();}
 }
@@ -92,12 +94,14 @@ async function initialiseOffline() {
   if(!userId||cachedUser!==userId)throw Error('Sign in online before opening this offline library.');
   activeUser={id:userId,isAdmin:false,offline:true};
   await refreshOfflineRows();
-  if(!offlineRows.size){activeUser=null;throw Error('No saved books remain available. Reconnect to save or renew your offline books.');}
-  libraryBooks=[...offlineRows.values()].map(row=>({...row.book,readingReady:true,canRead:true,owned:false}));
+  const savedRows=[...offlineRows.values()].filter(row=>ARC_MODE?isArcBook(row.book):!isArcBook(row.book));
+  if(!savedRows.length){activeUser=null;throw Error('No saved books remain available. Reconnect to save or renew your offline books.');}
+  libraryBooks=savedRows.map(row=>({...row.book,readingReady:true,canRead:true,owned:false}));
   catalogueVerified=false;plannedCatalogueLoaded=true;
   membershipOfferNode=$('reading-membership-offer');membershipOfferNode.hidden=true;membershipOfferNode.remove();
   $('reading-membership-summary').hidden=true;$('load-synced').disabled=true;
   $('reading-offline-status').textContent='Offline · showing books saved on this device. Your reading place and notes are saved locally. Reconnect to check access and sync.';
+  if(ARC_MODE){document.querySelector('.library h1').textContent='Your ARC reading room';document.querySelector('.library-note').textContent='Saved personalised ARC copies. Reconnect to renew access or file your review.';$('reading-offline-status').textContent='Offline · only your saved ARC copies are shown. Access expires at the saved deadline.';}
   renderLibrary();$('reader-access').hidden=true;$('library').hidden=false;
   document.documentElement.classList.add('bp-reader-verified');
 }
@@ -310,7 +314,7 @@ function renderLibrary() {
     const progress = document.createElement('p'); progress.className = 'progress-label'; progress.textContent = !book.readingReady ? book.availabilityUnknown ? 'Availability could not be checked.' : 'The reading edition is being prepared.' : book.started ? `${book.progress}% complete` : 'Not started';
     const track = document.createElement('div'); track.className = 'progress-track'; const fill = document.createElement('div'); fill.className = 'progress-fill'; fill.style.width = book.progress + '%'; track.append(fill);
     const offlineMissing=!navigator.onLine&&!offlineRows.has(offlineBookKey(book));
-    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = isArcBook(book)&&!navigator.onLine ? 'Connect to read ARC' : offlineMissing ? 'Save online first' : !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = (isArcBook(book)&&!navigator.onLine) || offlineMissing || !book.readingReady || switchingEdition || state.isLoading;
+    const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = isArcBook(book)&&offlineMissing ? 'Save online first' : offlineMissing ? 'Save online first' : !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = offlineMissing || !book.readingReady || switchingEdition || state.isLoading;
     button.onclick = () => {if (!book.readingReady) return; if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
     const badges=document.createElement('div');badges.className='book-badges';
     const access=document.createElement('span');access.className='book-badge';access.textContent=isArcBook(book)?'Private ARC assignment':offlineMissing ? 'Not saved offline' : book.publicTextId ? 'Free recovered file' : !book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
@@ -319,18 +323,18 @@ function renderLibrary() {
     track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
     const offlineControls=document.createElement('div');offlineControls.className='book-offline-controls';
     const offlineKey=offlineBookKey(book),savedOffline=offlineRows.get(offlineKey);
-    if(savedOffline&&!isArcBook(book)){
+    if(savedOffline){
       const label=document.createElement('span');label.className='device-note';label.textContent='Saved offline · until '+new Date(savedOffline.expiresAt).toLocaleDateString('en-GB');
       const remove=document.createElement('button');remove.type='button';remove.className='offline-action';remove.textContent='Remove offline';remove.onclick=async()=>{try{await offlineLibrary.remove(activeUser.id,offlineKey);await refreshOfflineRows();if(!navigator.onLine)libraryBooks=libraryBooks.filter(item=>offlineBookKey(item)!==offlineKey);renderLibrary();$('reading-offline-status').textContent='Offline copy removed from this device.';}catch{$('reading-offline-status').textContent='The saved copy could not be removed. Please try again.';}};
       offlineControls.append(label,remove);
     }
-    if(!isArcBook(book)&&navigator.onLine&&book.readingReady&&book.canRead){
-      const save=document.createElement('button');save.type='button';save.className='offline-action';save.textContent=offlineSaving.has(offlineKey)?'Saving…':savedOffline?'Refresh offline':'Save offline';save.disabled=offlineSaving.has(offlineKey);save.onclick=()=>void saveOfflineBook(book);offlineControls.append(save);
+    if(navigator.onLine&&book.readingReady&&book.canRead){
+      const save=document.createElement('button');save.type='button';save.className='offline-action';save.textContent=offlineSaving.has(offlineKey)?'Saving…':savedOffline?'Refresh offline':'Save offline';save.dataset.saveOffline='true';save.disabled=offlineSaving.has(offlineKey)||(isArcBook(book)&&!book.arcTermsAccepted&&!arcConsent.has(book.arcAssignmentId));save.onclick=()=>void saveOfflineBook(book);offlineControls.append(save);
     }
     if(offlineSaveErrors.has(offlineKey)){const error=document.createElement('p');error.className='offline-save-error device-note';error.setAttribute('role','status');error.textContent=offlineSaveErrors.get(offlineKey);offlineControls.append(error);}
     if(isArcBook(book)){
       if(!book.readingReady){button.textContent='ARC reading closed';progress.textContent='Your assignment and review record are retained.';}
-      else button.textContent='Read your ARC';
+      else button.textContent=offlineMissing?'Save online first':'Read your ARC';
       const terms=document.createElement('fieldset');terms.className='arc-reading-terms';
       const legend=document.createElement('legend');legend.textContent=ARC_TERMS_VERSION;terms.append(legend);
       if(book.arcTermsAccepted){const accepted=document.createElement('p');accepted.textContent='Copyright terms accepted.';terms.append(accepted);}
@@ -338,15 +342,15 @@ function renderLibrary() {
         const inputs=[];
         for(const text of ['I understand this ARC is for my personal review use only.','I will not upload, sell, share, copy, forward, or redistribute this file.','I understand this is an advance/review copy and may differ from the final published edition.']){
           const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.checked=arcConsent.has(book.arcAssignmentId);inputs.push(input);label.append(input,document.createTextNode(text));terms.append(label);
-          input.onchange=()=>{const accepted=inputs.every(item=>item.checked);if(accepted)arcConsent.add(book.arcAssignmentId);else arcConsent.delete(book.arcAssignmentId);button.disabled=!accepted||switchingEdition||state.isLoading||!navigator.onLine;};
+          input.onchange=()=>{const accepted=inputs.every(item=>item.checked);if(accepted)arcConsent.add(book.arcAssignmentId);else arcConsent.delete(book.arcAssignmentId);button.disabled=!accepted||switchingEdition||state.isLoading||(!navigator.onLine&&offlineMissing);const offlineSave=offlineControls.querySelector('[data-save-offline]');if(offlineSave)offlineSave.disabled=!accepted||offlineSaving.has(offlineKey);};
         }
         button.disabled=button.disabled||!arcConsent.has(book.arcAssignmentId);
       }
       const due=document.createElement('p');due.className='device-note';due.textContent=book.reviewDue?'Review due '+book.reviewDue:'No review due date recorded.';
       const form=document.createElement('form');form.className='arc-reading-review';const label=document.createElement('label');label.textContent='Your review link';const input=document.createElement('input');input.type='url';input.required=true;input.maxLength=2048;input.placeholder='https://';input.value=book.reviewLink||'';label.append(input);
-      const save=document.createElement('button');save.type='submit';save.className='control';save.textContent=book.reviewLink?'Update review link':'Save review link';const message=document.createElement('p');message.setAttribute('role','status');
+      const save=document.createElement('button');save.type='submit';save.className='control';save.disabled=!navigator.onLine;save.textContent=!navigator.onLine?'Connect to file review':book.reviewLink?'Update review link':'Save review link';const message=document.createElement('p');message.setAttribute('role','status');
       form.append(label,save,message);form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{const url=new URL(input.value);if(url.protocol!=='https:'||url.username||url.password)throw Error('Use an HTTPS review link.');const result=await supabase.rpc('bp_arc_reading_review',{p_assignment_id:book.arcAssignmentId,p_review_link:url.href});if(result.error||result.data!==true)throw Error('Your review link could not be saved.');message.textContent='Review link filed.';}catch(error){message.textContent=error.message;}finally{save.disabled=false;}};
-      details.append(badges,heading,meta,due,progress,terms,button,form);
+      details.append(badges,heading,meta,due,progress,terms,button,offlineControls,form);
     }else details.append(badges,eyebrow,heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); grid.append(card);
   }
 }
@@ -1486,7 +1490,7 @@ async function openBook() {
   try {
     let bytes;
     if(isArcBook(BOOK)){
-      const arc=await requestArc(supabase,SUPABASE_URL,SUPABASE_ANON_KEY,BOOK,{acceptedTerms:arcConsent.has(BOOK.arcAssignmentId)});
+      const arc=navigator.onLine?await requestArc(supabase,SUPABASE_URL,SUPABASE_ANON_KEY,BOOK,{acceptedTerms:arcConsent.has(BOOK.arcAssignmentId)}):{bytes:await offlineLibrary.read(activeUser.id,BOOK),reference:BOOK.arcReference};
       bytes=arc.bytes;$('reader-watermark').textContent='Personal ARC review copy · '+arc.reference;
       libraryBooks=libraryBooks.map(book=>book.arcAssignmentId===BOOK.arcAssignmentId?{...book,arcTermsAccepted:true}:book);
     }else bytes = !navigator.onLine ? await offlineLibrary.read(activeUser.id,BOOK) : publicReadingWork(BOOK.publicTextId) ? await buildPublicReadingEpub(BOOK.publicTextId) : await fetchProtectedEpub();
@@ -2263,7 +2267,7 @@ setInterval(()=>{
 },30000);
 window.addEventListener('offline',async()=>{
   if(!activeUser)return;
-  if(ARC_MODE){if(state.isOpen)closeBook();libraryBooks=libraryBooks.map(book=>({...book,canRead:false}));renderLibrary();$('reading-offline-status').textContent='ARC reading requires an internet connection. Reconnect to continue.';return;}
+  if(ARC_MODE){await refreshOfflineRows();if(state.isOpen&&!offlineRows.has(offlineBookKey(BOOK)))closeBook();libraryBooks=libraryBooks.map(book=>({...book,arcReference:offlineRows.get(offlineBookKey(book))?.book.arcReference||book.arcReference,canRead:offlineRows.has(offlineBookKey(book))}));renderLibrary();$('reading-offline-status').textContent='Offline · saved personalised ARC copies remain available until their saved deadline. Reconnect to renew access or file a review.';return;}
   await refreshOfflineRows();
   libraryBooks=libraryBooks.map(book=>({...book,canRead:offlineRows.has(offlineBookKey(book))}));
   $('reading-offline-status').textContent=offlineRows.size ? 'Offline · saved books can open. Books marked “Save online first” need to be saved while connected; you do not need another subscription.' : 'Offline · no usable saved copies were found. Reconnect, choose Save offline and wait for the saved confirmation. Your existing membership has not changed.';
@@ -2272,14 +2276,14 @@ window.addEventListener('offline',async()=>{
 window.addEventListener('online',async()=>{
   if(!activeUser)return;
   $('reading-offline-status').textContent='Connection restored. Refresh the library to verify access and sync your reading place.';
-  if(!state.isOpen)location.reload();
+  if(!state.isOpen)location.reload();else if(ARC_MODE)void checkOpenArcAccess();
 });
 let arcAccessChecking=false;
 async function checkOpenArcAccess(){
- if(!ARC_MODE||!activeUser||!state.isOpen||!isArcBook(BOOK)||arcAccessChecking)return;
+ if(!ARC_MODE||!activeUser||!state.isOpen||!isArcBook(BOOK)||arcAccessChecking||!navigator.onLine)return;
  const assignment=BOOK.arcAssignmentId,epoch=sessionEpoch;arcAccessChecking=true;
- try{await requestArc(supabase,SUPABASE_URL,SUPABASE_ANON_KEY,BOOK,{check:true});}
- catch{if(epoch===sessionEpoch&&BOOK.arcAssignmentId===assignment&&state.isOpen){closeBook();showLibraryError('ARC access could not be verified. Reconnect and refresh your assignments.');}}
+ try{const result=await requestArc(supabase,SUPABASE_URL,SUPABASE_ANON_KEY,BOOK,{check:true});const saved=offlineRows.get(offlineBookKey(BOOK));if(saved&&Date.parse(result.offlineUntil)<saved.expiresAt-1000){await offlineLibrary.remove(activeUser.id,saved.id);await refreshOfflineRows();}}
+ catch(error){if(epoch===sessionEpoch&&BOOK.arcAssignmentId===assignment&&state.isOpen){closeBook();if([401,403,404].includes(error.status)){await offlineLibrary.remove(activeUser.id,offlineBookKey(BOOK));await refreshOfflineRows();renderLibrary();}showLibraryError('ARC access could not be verified. Reconnect and refresh your assignments.');}}
  finally{arcAccessChecking=false;}
 }
 setInterval(()=>void checkOpenArcAccess(),60000);
@@ -2288,8 +2292,11 @@ async function initialiseArcShelf(){
  const result=await supabase.rpc('bp_arc_reading_catalogue');
  if(result.error)throw Error('The ARC pilot database is not ready.');
  libraryBooks=arcReadingBooks(result.data);catalogueVerified=true;plannedCatalogueLoaded=true;
+ await refreshOfflineRows();
+ for(const saved of offlineRows.values()){if(!isArcBook(saved.book))continue;const assigned=libraryBooks.find(book=>book.arcAssignmentId===saved.book.arcAssignmentId);if(!assigned?.canRead){await offlineLibrary.remove(activeUser.id,saved.id);continue;}try{const check=await requestArc(supabase,SUPABASE_URL,SUPABASE_ANON_KEY,assigned,{check:true});if(!Number.isFinite(Date.parse(check.offlineUntil))||Date.parse(check.offlineUntil)<saved.expiresAt-1000)await offlineLibrary.remove(activeUser.id,saved.id);}catch(error){if([401,403,404].includes(error.status))await offlineLibrary.remove(activeUser.id,saved.id);}}
+ await refreshOfflineRows();
  membershipOfferNode=$('reading-membership-offer');membershipOfferNode?.remove();$('reading-membership-summary').hidden=true;
- $('reading-offline-status').textContent='Private ARC assignments · online reading only. No paid membership is required. Your place and notebook are saved on this device.';
+ $('reading-offline-status').textContent='Private ARC assignments · save personalised copies for offline reading after accepting the terms. Your place and notebook stay on this device.';
  document.querySelector('.library h1').textContent='Your ARC reading room';
  document.querySelector('.library-note').textContent='Only your assigned ARC editions appear here. Accept the copyright terms before reading. Review records remain in your member area.';
  $('load-synced').disabled=true;
@@ -2303,7 +2310,7 @@ async function initialise() {
   renderLibrary();
 
   try {
-    if(!navigator.onLine){if(ARC_MODE)throw Error('ARC reading requires a connection.');await initialiseOffline();return;}
+    if(!navigator.onLine){await initialiseOffline();return;}
     const user = await verifyBPReadingUser();
     if (epoch !== sessionEpoch) return;
     activeUser = user;
@@ -2320,7 +2327,7 @@ async function initialise() {
     await refreshOfflineRows();
     for(const row of offlineRows.values()) {
       const matched=libraryBooks.find(book=>book.editionId===row.book.editionId);
-      if(!row.book.publicTextId&&catalogueVerified&&(!matched||(matched.accessVerified&&!matched.canRead)))await offlineLibrary.remove(user.id,row.id);
+      if(!isArcBook(row.book)&&!row.book.publicTextId&&catalogueVerified&&(!matched||(matched.accessVerified&&!matched.canRead)))await offlineLibrary.remove(user.id,row.id);
     }
     await refreshOfflineRows();
     const firstReadable = libraryBooks.find(book=>book.canRead);

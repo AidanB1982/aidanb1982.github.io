@@ -32,6 +32,14 @@ GitHub publication does **not** execute SQL or deploy Edge Functions. The public
 reading navigation remains hidden. Other ARC readers/campaigns stay on their current
 workflow until this pilot is accepted and individually migrated.
 
+## Offline update for the existing pilot
+
+Run [the offline SQL patch](../supabase/migrations/20261030170000_arc_reading_offline.sql), then replace the existing **bp-reading-arc** dashboard `index.ts` with [the updated combined file](../supabase/dashboard/bp-reading-arc.ts) and deploy. Keep legacy JWT verification OFF; fresh caller validation remains in the handler. No new secret or repeat of the original grant operation is needed.
+
+Refresh the ARC room online, accept the current terms and choose **Save offline**. Wait for the saved confirmation before disconnecting. Reopen `/pages/bp-reading.html?arc=1` in the same browser/account. Copies are personalised, encrypted on the device and expire within seven days or at campaign close, whichever comes first. There is no EPUB export control. A disconnected device cannot receive immediate revocations; confirmed denial on reconnect removes the saved copy. Local notes/progress remain local; review filing requires connectivity.
+
+Fully migrated readers with no remaining active legacy assignments no longer see the old ARC profile section. Legacy records and unmigrated readers retain their existing workflow.
+
 ## Access and delivery
 
 - The ARC shelf returns only the caller's explicitly migrated assignments. ARC status
@@ -50,8 +58,9 @@ workflow until this pilot is accepted and individually migrated.
 - Reading deliveries are tracked separately in `bp_arc_reading_activity`; an open
   count is not evidence of completing the book. The ARC reader stores place/notes
   separately on the device, not the paid-reader cloud-sync namespace.
-- ARC offline saving is disabled and disconnecting closes the ARC reader. A periodic
-  check (60 seconds and on returning to the tab) closes it when server access fails.
+- Explicit offline saves require current terms and a server-issued deadline. Paid and ARC
+  device copies use separate keys. Without a saved valid copy, disconnecting closes
+  the ARC reader. Online periodic checks and reconnect checks revalidate access.
 - Review links are saved on the retained assignment, including after the campaign
   closes. Legacy Apps Script records/points automation are not silently rewritten.
 - The old personalised EPUB endpoint checks `status='active'`; a migrated
@@ -70,8 +79,9 @@ workflow until this pilot is accepted and individually migrated.
 - Test without an admin session. Only the assigned ARC appears and opens after terms;
   a paid entitlement never substitutes for an absent ARC grant.
 - Check personal reference, page turns, local progress/notes and review-link filing.
-- Confirm the new ARC screen offers no offline/save/export controls and the member
-  area offers a reader entry instead of a legacy download for this assignment.
+- Save offline, disconnect and reload the ARC room; verify reading and local progress.
+  Reconnect after revoking access and confirm the saved copy is removed. No EPUB
+  export is offered; the member area opens the reader instead of legacy downloads.
 - Confirm direct legacy EPUB/PDF requests for the migrated assignment are rejected.
 - Temporarily disable `bp_arc_reading_grants.enabled` for the assignment: opening must
   fail and an open reader must close on its next check. Restore only for the pilot.
@@ -90,7 +100,7 @@ terms/reference reuse, guarded assignment changes, review filing, private tables
 sequence repair and rerun safety. A private local run also used the supplied ARC column
 constraints and existing issuance function; the uploaded report is not committed.
 Handler/personalisation tests verify fresh auth, server-only grants, no spoofed user,
-no offline action, inline/no-store personalised delivery and revalidation before bytes.
+bounded offline saves, inline/no-store personalised delivery and revalidation before bytes.
 Browser tests use real EPUB.js with synthetic accounts and check the complete pilot
 flow, revocation closure, reviews, member entry and mobile layouts. Live deployment
 and owner acceptance are separate steps.

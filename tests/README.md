@@ -303,7 +303,7 @@ ARC reading pilot:
 - `READING_TEST_DIR=... node tests/arc-reading-delivery.mjs` tests authenticated inline
   delivery and actual ZIP chapter personalisation; uses the existing JSZip fixture.
 - `tests/arc-reading-browser.cjs` uses Playwright/Chromium and the same real EPUB
-  fixtures as public-reader tests for the complete online-only assigned ARC flow.
+  fixtures as public-reader tests for the complete assigned ARC flow, encrypted offline save/reload, consent gating and reconnect revocation cleanup.
 No test changes a live account, sends email or claims that deployed legacy PDF APIs
 have been checked. Follow `docs/bp-reading-arc-pilot.md` for live acceptance.
 

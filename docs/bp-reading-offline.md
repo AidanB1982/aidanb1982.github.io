@@ -1,7 +1,8 @@
 # BP Reading offline copies
 
-Prepared 28 October 2026. This covers BP Reading, not the ARC Vault's existing
-personalised EPUB/download workflow.
+Updated 30 October 2026. This covers paid/public BP Reading and migrated ARC assignments. The legacy ARC Vault download workflow is unchanged.
+
+For ARC offline deployment, run the new SQL patch and redeploy `bp-reading-arc` as described in [the ARC pilot guide](bp-reading-arc-pilot.md#offline-update-for-the-existing-pilot). ARC copies are personalised, separately keyed and bounded by seven days/campaign close. ARC notes/progress stay local and reviews require connectivity.
 
 ## Deployment and use
 
@@ -90,4 +91,4 @@ The previous regular-expression scanner incorrectly treated it as a real depende
 Preparation now uses the pinned, MIT-licensed es-module-lexer 1.7.0 JavaScript parser,
 ignoring strings, comments and optional dynamic imports while retaining real static
 imports/re-exports. The worker is a module worker with a versioned script URL and
-protocol revision 5. No Supabase redeployment is needed for this website-only fix.
+protocol revision 6. No Supabase redeployment is needed for this website-only fix.

@@ -248,9 +248,18 @@
             return;
         }
 
+        root.hidden = false;
+        root.style.removeProperty("display");
         renderArcProfileLoading(root);
 
         try {
+            // Fully migrated readers use the ARC room; retain legacy sections only when legacy assignments remain.
+            try {
+                const migrated = await supabaseRestRpc(session, "bp_arc_reading_catalogue", {}, {signal: AbortSignal.timeout(5000)});
+                if (Array.isArray(migrated) && migrated.length && !(await fetchArcAssignments(session)).length) {
+                    root.replaceChildren();root.hidden=true;root.style.display="none";return;
+                }
+            } catch { /* Existing readers keep their legacy profile if migration cannot be verified. */ }
             const response = await sendArcProfileRequest({
                 action: "getArcProfile",
                 accessToken: session.access_token
@@ -3164,7 +3173,8 @@
     async function supabaseRestRpc(
         session,
         functionName,
-        payload
+        payload,
+        requestOptions = {}
     ) {
         const url =
             BLACKWOOD_SUPABASE_URL +
@@ -3176,6 +3186,7 @@
                 url,
                 {
                     method: "POST",
+                    ...(requestOptions.signal ? {signal: requestOptions.signal} : {}),
 
                     headers: {
                         "apikey":

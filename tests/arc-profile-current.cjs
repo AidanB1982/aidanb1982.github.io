@@ -1,11 +1,13 @@
 const {chromium}=require('playwright');const assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--no-sandbox']});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ let migrated=false;
  const assignments=[{id:1,member_id:'00000000-0000-0000-0000-000000000001',arc_file_id:1,status:'active',created_at:'2026-09-01',review_due_date:'2026-09-14',download_count:1,review_link:'https://review.invalid',arc_files:{title:'The Crossing',slug:'the-crossing',author_name:'Miren Vale',is_active:false}},{id:2,member_id:'00000000-0000-0000-0000-000000000001',arc_file_id:2,status:'active',created_at:'2026-10-25',review_due_date:'2099-11-10',download_count:0,arc_files:{title:'Gualachulain',slug:'gualachulain',author_name:'Aidan Blackwood',is_active:true}}];
  await page.route('https://**/*',route=>{
   const url=route.request().url();
+  if(url.includes('/rpc/bp_arc_reading_catalogue'))return route.fulfill({contentType:'application/json',body:JSON.stringify(migrated?[{assignment_id:9,title:'Gualachulain'}]:[])});
   if(url.includes('script.google.com'))return route.fulfill({contentType:'application/json',body:JSON.stringify({ok:true,profile:{editable:{Name:'Fixture reader'},readOnly:{'Application Status':'Accepted','ARC Sent':'The Crossing','Review Due Date':'14 Sept 2026'}}})});
-  if(url.includes('/rest/v1/arc_file_assignments'))return route.fulfill({contentType:'application/json',body:JSON.stringify(assignments)});
+  if(url.includes('/rest/v1/arc_file_assignments'))return route.fulfill({contentType:'application/json',body:JSON.stringify(migrated?[]:assignments)});
   if(url.includes('get_arc_admin_dashboard'))return route.fulfill({contentType:'application/json',body:JSON.stringify(assignments.map(a=>({...a,title:a.arc_files.title,author_name:a.arc_files.author_name,reader_name:'Fixture reader',reader_email:'reader@example.invalid',review_status:a.review_link?'Review Filed':'Active'})))});
   return route.abort();
  });
@@ -40,5 +42,11 @@ const {chromium}=require('playwright');const assert=require('node:assert/strict'
  for(const width of [320,390,768,1280]){await page.setViewportSize({width,height:900});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'ARC layout fits '+width+'px');}
  await page.locator('.arc-profile-toggle').focus();await page.keyboard.press('Enter');assert(await current.locator('.arc-assignment-body').isHidden(),'whole profile folds with keyboard');
  await page.locator('[data-arc-profile-disclosure]').screenshot({path:(process.env.READING_TEST_DIR||'/tmp')+'/arc-profile-collapsed.png'});
+ migrated=true;
+ await page.evaluate(async()=>{const root=document.createElement('section');root.id='arc-migrated-test';document.body.append(root);await window.initBlackwoodArcProfile({root,session:{access_token:'test',user:{id:'00000000-0000-0000-0000-000000000001'}}});});
+ assert.equal(await page.locator('#arc-migrated-test').isHidden(),true,'full legacy profile hidden when every assignment has moved to the reader');
+ migrated=false;
+ await page.evaluate(async()=>{const root=document.getElementById('arc-migrated-test');await window.initBlackwoodArcProfile({root,session:{access_token:'test',user:{id:'00000000-0000-0000-0000-000000000001'}}});});
+ assert.equal(await page.locator('#arc-migrated-test').isVisible(),true,'legacy profile remains available for unmigrated readers');
  assert.deepEqual(errors,[]);console.log('PASS real ARC profile uses current Supabase assignment, retains collapsed legacy details and review history, and filters the admin monitor by book');await browser.close();
 })().catch(e=>{console.error(e);process.exit(1)});
