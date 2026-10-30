@@ -91,4 +91,6 @@ The previous regular-expression scanner incorrectly treated it as a real depende
 Preparation now uses the pinned, MIT-licensed es-module-lexer 1.7.0 JavaScript parser,
 ignoring strings, comments and optional dynamic imports while retaining real static
 imports/re-exports. The worker is a module worker with a versioned script URL and
-protocol revision 6. No Supabase redeployment is needed for this website-only fix.
+protocol revision 7. No Supabase redeployment is needed for this website-only fix.
+
+Offline shell version matching: cached scripts must match their complete versioned URL. Only reader navigation ignores query parameters, so `?arc=1` works offline. Shell cache v2 isolates older resources; encrypted book storage is retained.

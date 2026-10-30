@@ -50,7 +50,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',DIR=process.env.READING
  await page.getByRole('button',{name:'Save offline',exact:true}).click();
  await page.waitForFunction(()=>!document.getElementById('reading-offline-status').textContent.startsWith('Saving '),{},{timeout:60000});assert.match(await page.locator('#reading-offline-status').textContent(),/saved on this device/);
  assert.equal(deliveries,1);assert.equal(tracingRequests,0,'optional tracing dependency not requested');
- const cacheURLs=await page.evaluate(async()=>{const c=await caches.open('bp-reader-shell-v1');return(await c.keys()).map(r=>r.url)});
+ const cacheURLs=await page.evaluate(async()=>{const c=await caches.open('bp-reader-shell-v2');return(await c.keys()).map(r=>r.url)});
  assert(cacheURLs.some(url=>url.endsWith('/offline-fixture.mjs')),'transitive SDK dependency cached');
  assert(!cacheURLs.some(url=>url.includes('/functions/')||url.includes('/auth/')||url.endsWith('.epub')),'private data never enters public shell cache');
  await page.evaluate(async()=>{const {OfflineLibrary}=await import('/js/BP-reading-offline.js?v=20261030-arc-offline1');await new OfflineLibrary().save('offline-reader',{editionId:10,arcAssignmentId:99,title:'Separate ARC record',arcReference:'GUA-ARC-TEST'},new Uint8Array([80,75,3,4,1]).buffer,Date.now()+60000);});
