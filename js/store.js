@@ -107,7 +107,7 @@
         {
             id: "16751387345241",
             slug: "gualachulain-bothy",
-            title: "Gualachulain Bothy: The Second Silence",
+            title: "Gualachulain Bothy",
             subtitle: "The Cursed Bothies",
             category: "cursed-bothies",
             categoryLabel: "The Cursed Bothies",
