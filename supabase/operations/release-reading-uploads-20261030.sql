@@ -2,9 +2,9 @@
 -- Run this entire file in Supabase SQL Editor. No UUID edits required.
 -- Uses confirmed existing books/editions; preserves catalogue metadata and access rules.
 begin;
-create temporary table reading_uploads on commit drop (
+create temporary table reading_uploads (
  title text,book_id bigint,edition_id bigint primary key,storage_path text
-);
+) on commit drop;
 insert into reading_uploads values
  ('Love, Abused',5,35,'love_abused/love_abused.epub'),
  ('The Scheme',2,8,'the_scheme/The-Scheme.epub'),
