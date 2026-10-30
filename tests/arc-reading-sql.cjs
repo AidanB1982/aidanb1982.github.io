@@ -76,5 +76,14 @@ await db.exec(`update arc_files set downloads_close_at=now()-interval '1 second'
 catalogue=await query('select * from bp_arc_reading_catalogue()');assert.equal(catalogue[0].can_read,false,'closed assignment remains visible as history');
 await query("select bp_arc_reading_review(81,'https://example.invalid/review')");await assert.rejects(()=>query("select bp_arc_reading_review(81,'javascript:alert(1)')"),/HTTPS/);await db.exec('reset role');
 const rollout=(await query(readFileSync('supabase/operations/arc-reading-rollout-report.sql','utf8')))[0].arc_rollout_report;assert.equal(rollout.changes_made,false);assert(Array.isArray(rollout.campaigns));assert(Array.isArray(rollout.reading_editions));
+await db.exec("update arc_files set downloads_close_at=null;insert into arc_files values(1,'The Crossing','the-crossing',false,null,null);insert into arc_file_assignments(member_id,arc_file_id,application_id,status) values('"+B+"',1,'OLD','active');update arc_file_assignments set review_link='https://example.invalid/retained',download_count=4 where id=80");
+const team=readFileSync('supabase/operations/migrate-gualachulain-arc-team.sql','utf8');
+await db.exec("update member_profiles set is_arc_member=false where id='"+B+"'");await assert.rejects(()=>db.exec(team),/profile needs review/);await db.exec('rollback');assert.equal((await query('select status from arc_file_assignments where id=80'))[0].status,'active','failed batch changes no assignments');await db.exec("update member_profiles set is_arc_member=true where id='"+B+"'");
+const beforeProfiles=await query('select * from member_profiles order by id');
+await db.exec(team);await db.exec(team);
+assert.deepEqual(await query('select * from member_profiles order by id'),beforeProfiles,'team migration preserves profile roles and tiers');
+const migrated=(await query('select * from arc_file_assignments where id=80'))[0];assert.equal(migrated.status,'reader_active');assert.equal(migrated.review_link,'https://example.invalid/retained');assert.equal(migrated.download_count,4);
+assert.equal((await query("select status from arc_file_assignments where arc_file_id=1"))[0].status,'active','inactive Crossing campaign untouched');
+assert.equal((await query("select bp_arc_reading_eligible('"+B+"',80) ok"))[0].ok,true);
 console.log('PASS ARC SQL: isolated per-assignment access despite paid membership, terms, legacy issuance reuse, unchanged download/paid history, pilot limits, closed-history review, RLS, revocation/window/private-file denial and rerunnable grant');
 }finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1});
