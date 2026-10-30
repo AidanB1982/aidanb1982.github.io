@@ -333,7 +333,10 @@
 
         content.appendChild(badge);
         content.appendChild(title);
-        content.appendChild(subtitle);
+        const collectionLabel = value => value.trim().toLowerCase().replace(/s$/, "");
+        if (collectionLabel(product.subtitle) !== collectionLabel(product.categoryLabel)) {
+            content.appendChild(subtitle);
+        }
         content.appendChild(category);
         content.appendChild(description);
         content.appendChild(buttonMount);
