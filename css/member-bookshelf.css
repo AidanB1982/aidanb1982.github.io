@@ -3468,3 +3468,6 @@
 .bookshelf-stage-display .bookshelf-book-slot:last-child {
     transform: none;
 }
+
+.bookshelf-arc-reading-link { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:8px 12px; box-sizing:border-box; color:var(--bookshelf-cream); background:#b36a2126; border:1px solid var(--bookshelf-line-strong); border-radius:6px; font:12px/1.4 Arial,sans-serif; text-decoration:none; margin:4px 0; }
+.bookshelf-arc-reading-link:focus-visible { outline:2px solid var(--bookshelf-gold); outline-offset:3px; }

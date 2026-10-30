@@ -292,6 +292,12 @@ silently import the separate browser-local planner or imply that it is shared.
 
 ### 4. Protected ARC reading and notifications
 
+- [x] Owner confirmed the Gualachulain pilot shelf and reading pages load.
+- [x] Automatically add/mark an assigned ARC on the member bookshelf, preserving
+  existing notes, owned/signed flags and chosen stages; provide an ARC reading link.
+- [x] Display ARC Reader for Reader/ARC profiles with the ARC flag, without changing
+  stored membership tiers, paid access or admin permissions.
+
 - [x] Owner selected an existing active basic-member account for an isolated ARC pilot;
   no admin upgrade or paid-membership change authorised.
 - [x] Prepare read-only ARC schema/issuance/access preflight before altering live rules.

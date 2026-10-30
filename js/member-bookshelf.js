@@ -209,6 +209,7 @@
         pointsTotal: 0,
 
         shelfRecords: [],
+        arcAssignments: new Map(),
 
         customisationItems: [],
         customisationItemsLoaded: false,
@@ -248,6 +249,7 @@
         BlackwoodBookshelfState.member = options ? options.member || null : null;
         BlackwoodBookshelfState.pointsTotal = Number(options && options.pointsTotal ? options.pointsTotal : 0);
 
+        BlackwoodBookshelfState.arcAssignments = new Map();
         BlackwoodBookshelfState.modalMode = "closed";
         BlackwoodBookshelfState.activeBookId = "";
         BlackwoodBookshelfState.statusMessage = "";
@@ -273,6 +275,8 @@
                 8000,
                 "Bookshelf records timed out."
             );
+
+            await syncAssignedArcShelf();
 
             BlackwoodBookshelfState.customisationSelections = normaliseCustomisationSelections(
                 loadLocalShelfCustomisationSelections()
@@ -351,6 +355,45 @@
         BlackwoodBookshelfState.shelfRecords = Array.isArray(result.data)
             ? result.data.map(normaliseShelfRecord)
             : [];
+    }
+
+    async function syncAssignedArcShelf() {
+        const state=BlackwoodBookshelfState,client=state.client,userId=getCurrentUserId(),root=state.root;
+        if(state.member?.is_arc_member!==true||!client?.rpc)return;
+        const current=()=>state.client===client&&getCurrentUserId()===userId&&root.isConnected;
+        const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+        try {
+            const result=await withBookshelfTimeout(client.rpc('bp_arc_reading_catalogue'),5000,'ARC shelf check timed out.');
+            if(!current()||result.error||!Array.isArray(result.data))return;
+            for(const assignment of result.data) {
+                if(!current())return;
+                if(!Number.isSafeInteger(assignment.assignment_id)||assignment.assignment_id<=0)continue;
+                const book=BLACKWOOD_BOOKSHELF_BOOKS.find(item=>
+                    (normalize(item.id)===normalize(assignment.book_id)||normalize(item.title)===normalize(assignment.title)||(item.id==='gualachulain-bothy'&&assignment.book_id==='gualachulain'))
+                    &&(!assignment.author||normalize(item.author)===normalize(assignment.author)));
+                if(!book)continue;
+                state.arcAssignments.set(book.id,assignment);
+                const existing=getRecordByBookId(book.id);
+                // Closed records keep their existing ARC provenance, but do not repopulate a removed shelf entry.
+                if(!existing&&assignment.can_read!==true)continue;
+                if(!existing) {
+                    const record=createDefaultRecord(book);record.updated_at=new Date().toISOString();record.is_arc=true;record.format='ARC';record.shelf_status='tbr';
+                    try{const position=JSON.parse(localStorage.getItem(`bp-reading:${userId}:arc-assignment:${assignment.assignment_id}:v1`));if(position?.hasStarted===true)record.shelf_status='reading';}catch{}
+                    record.shelf_position=getNextShelfPosition(record.shelf_status);
+                    const inserted=await withBookshelfTimeout(client.from(BLACKWOOD_BOOKSHELF_CONFIG.tableName).upsert(record,{onConflict:'member_id,book_id',ignoreDuplicates:true}),5000,'ARC shelf save timed out.');
+                    if(inserted.error)throw inserted.error;
+                }
+                if(!current())return;
+                if(!existing||!existing.is_arc){const updated=await withBookshelfTimeout(client.from(BLACKWOOD_BOOKSHELF_CONFIG.tableName).update({is_arc:true,updated_at:new Date().toISOString()}).eq('member_id',userId).eq('book_id',book.id),5000,'ARC shelf update timed out.');if(updated.error)throw updated.error;}
+            }
+            if(current())await withBookshelfTimeout(loadBookshelfRecords(),8000,'Shelf refresh timed out.');
+        }catch(error){if(current()){state.statusMessage='Your existing shelf is available, but assigned ARCs could not be added automatically. Refresh to retry.';state.statusType='is-error';}}
+    }
+
+    function arcShelfLink(book) {
+        const assignment=BlackwoodBookshelfState.arcAssignments.get(book.id);
+        if(!assignment)return '';
+        return `<a class="bookshelf-arc-reading-link" href="/pages/bp-reading.html?arc=1&amp;assignment=${assignment.assignment_id}">${assignment.can_read?'Read your ARC':'View ARC record'}</a>`;
     }
 
     async function loadShelfCustomisationItems() {
@@ -885,6 +928,7 @@
                 </div>
 
                 <div class="bookshelf-spine-controls">
+                    ${arcShelfLink(book)}
                     <label>
                         <span>Move to</span>
 
@@ -1057,6 +1101,8 @@
 
                                 <p class="bookshelf-modal-copy">
                                     ${escapeHtml(book.author)}. Keep a private record for this title.
+                                    ${arcShelfLink(book)}
+                                    ${BlackwoodBookshelfState.arcAssignments.get(book.id)?.can_read ? "This ARC is filed automatically from your assignment. Your reading stage and notes remain yours to manage." : ""}
                                 </p>
 
                                 <form
@@ -1084,7 +1130,7 @@
                                         </label>
 
                                         <label class="bookshelf-check">
-                                            <input type="checkbox" name="is_arc" ${record.is_arc ? "checked" : ""}>
+                                            <input type="checkbox" name="is_arc" ${record.is_arc ? "checked" : ""} ${BlackwoodBookshelfState.arcAssignments.has(book.id) ? "disabled" : ""}>
                                             <span>This was an ARC copy</span>
                                         </label>
 
@@ -1134,7 +1180,7 @@
                                         </button>
 
                                         ${
-                                            isNewRecord
+                                            (isNewRecord || BlackwoodBookshelfState.arcAssignments.get(book.id)?.can_read)
                                                 ? ""
                                                 : `
                                                     <button type="button" class="bookshelf-modal-button danger" data-bookshelf-remove>
@@ -1641,7 +1687,7 @@
             book_title: book.title,
             owned: Boolean(form.elements.owned && form.elements.owned.checked),
             has_read: Boolean(form.elements.has_read && form.elements.has_read.checked),
-            is_arc: Boolean(form.elements.is_arc && form.elements.is_arc.checked),
+            is_arc: BlackwoodBookshelfState.arcAssignments.has(book.id) || Boolean(form.elements.is_arc && form.elements.is_arc.checked),
             is_signed: Boolean(form.elements.is_signed && form.elements.is_signed.checked),
             wants_signed: Boolean(form.elements.wants_signed && form.elements.wants_signed.checked),
             is_favourite: isFavourite,
@@ -1698,6 +1744,8 @@
             setBookshelfModalStatus("This shelf record could not be removed.", "is-error");
             return;
         }
+
+        if(BlackwoodBookshelfState.arcAssignments.get(book.id)?.can_read){setBookshelfModalStatus('This ARC is filed automatically while its assignment is active. You can change its reading stage and notes.','is-error');return;}
 
         const confirmed = window.confirm(`Remove "${book.title}" from your Blackwood Bookshelf?`);
 

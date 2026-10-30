@@ -1017,7 +1017,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
     const pointsTotal = getCurrentPointsTotal();
 
     const displayName = member.display_name || member.reader_name || member.email || "Reader";
-    const tier = member.member_tier || "Reader";
+    const tier = isArcMemberProfile(member) && ["Reader", "ARC", "ARC Reader", ""].includes(String(member.member_tier || "").trim()) ? "ARC Reader" : member.member_tier || "Reader";
     const status = member.member_status || "active";
     const arcLabel = isArcMemberProfile(member) ? "ARC Team Member" : "Archivist";
 

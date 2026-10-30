@@ -94,3 +94,23 @@ no offline action, inline/no-store personalised delivery and revalidation before
 Browser tests use real EPUB.js with synthetic accounts and check the complete pilot
 flow, revocation closure, reviews, member entry and mobile layouts. Live deployment
 and owner acceptance are separate steps.
+
+## Member bookshelf and tier display
+
+The member bookshelf checks the caller-scoped ARC catalogue for ARC-flagged profiles.
+Current readable assignments automatically create a missing shelf entry with ARC
+provenance; Gualachulain maps to the existing `gualachulain-bothy` spine. Inserts ignore
+concurrent duplicates. Existing entries receive only the ARC flag/timestamp update;
+notes, owned/signed flags and selected reading stages are preserved. New entries start
+in TBR, or Reading when the account's local ARC reader position has already started.
+
+An active assigned ARC stays filed automatically; its metadata remains editable but
+its provenance checkbox/removal control is locked while that assignment is readable.
+Closed assignments retain existing shelf records, and do not recreate manually removed
+closed records. Shelf badges are metadata and never grant book access. Reading links
+continue through the protected ARC room. Failures leave the existing shelf usable.
+
+Reader/ARC tier labels display **ARC Reader** when the profile's ARC flag is on. The
+stored `member_tier`, paid membership, points and administrator permissions are not
+rewritten. Other named tiers retain their existing display. This needs no new SQL or
+Edge Function deployment beyond the existing ARC pilot.

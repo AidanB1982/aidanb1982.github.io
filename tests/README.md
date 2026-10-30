@@ -306,3 +306,8 @@ ARC reading pilot:
   fixtures as public-reader tests for the complete online-only assigned ARC flow.
 No test changes a live account, sends email or claims that deployed legacy PDF APIs
 have been checked. Follow `docs/bp-reading-arc-pilot.md` for live acceptance.
+
+`tests/bookshelf-arc-browser.cjs` checks automatic assigned-ARC creation, local Reading
+stage default, reference to the existing Gualachulain spine, badge/reading link,
+deduplication, preservation of personal fields and account isolation using the real
+bookshelf UI with synthetic Supabase records.
