@@ -307,7 +307,6 @@ function renderLibrary() {
     const cover = document.createElement('div'); cover.className = 'book-cover';
     const image = document.createElement('img'); image.src = book.cover; image.alt = book.coverAlt || book.title + ' cover'; image.loading = 'lazy'; cover.append(image);
     const details = document.createElement('div'); details.className = 'book-details';
-    const eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = !book.readingReady ? 'IN THE BLACKWOOD COLLECTION' : book.started ? 'PICK UP WHERE YOU LEFT OFF' : 'YOUR NEXT CHAPTER AWAITS';
     const heading = document.createElement('h4'); heading.textContent = book.title;
     const meta = document.createElement('p'); meta.className = 'book-description'; meta.textContent = [book.author, book.series, book.seriesOrder ? 'Book ' + book.seriesOrder : ''].filter(Boolean).join(' · ');
     const description = document.createElement('p'); description.className = 'book-description book-synopsis'; description.textContent = book.description;
@@ -317,7 +316,7 @@ function renderLibrary() {
     const button = document.createElement('button'); button.type = 'button'; button.className = 'open-book'; button.textContent = isArcBook(book)&&offlineMissing ? 'Save online first' : offlineMissing ? 'Save online first' : !book.readingReady ? book.availabilityUnknown ? 'Check back later' : 'Coming soon' : switchingEdition || state.isLoading ? 'Opening…' : !book.canRead ? 'Subscribe to read' : book.started ? 'Continue Reading' : 'Read Book'; button.disabled = offlineMissing || !book.readingReady || switchingEdition || state.isLoading;
     button.onclick = () => {if (!book.readingReady) return; if (book.canRead) void openEdition(book); else {membershipOfferNode?.querySelector('#subscribe-reading')?.focus();showLibraryError(membershipStatus.active?'Reading access could not be verified for this title. Please refresh and try again.':'An active membership or purchase of this title is required to read it.');}};
     const badges=document.createElement('div');badges.className='book-badges';
-    const access=document.createElement('span');access.className='book-badge';access.textContent=isArcBook(book)?'Private ARC assignment':offlineMissing ? 'Not saved offline' : book.publicTextId ? 'Free recovered file' : !book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';badges.append(access);
+    const access=document.createElement('span');access.className='book-badge';access.textContent=isArcBook(book)?'Private ARC assignment':offlineMissing ? 'Not saved offline' : book.publicTextId ? 'Free recovered file' : !book.readingReady ? book.availabilityUnknown ? 'Availability unverified' : 'Coming soon' : !book.canRead?'Membership required':activeUser?.isAdmin?'Administrator':book.owned?'Owned':membershipStatus.active?'Included':'Available';if(!['Coming soon','Administrator'].includes(access.textContent))badges.append(access);
     if(book.progress>=100){const finished=document.createElement('span');finished.className='book-badge finished';finished.textContent='Finished';badges.append(finished);}
     track.hidden = !book.readingReady;
     track.setAttribute('role','progressbar');track.setAttribute('aria-label',book.title+' reading progress');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(book.progress));
@@ -350,8 +349,8 @@ function renderLibrary() {
       const form=document.createElement('form');form.className='arc-reading-review';const label=document.createElement('label');label.textContent='Your review link';const input=document.createElement('input');input.type='url';input.required=true;input.maxLength=2048;input.placeholder='https://';input.value=book.reviewLink||'';label.append(input);
       const save=document.createElement('button');save.type='submit';save.className='control';save.disabled=!navigator.onLine;save.textContent=!navigator.onLine?'Connect to file review':book.reviewLink?'Update review link':'Save review link';const message=document.createElement('p');message.setAttribute('role','status');
       form.append(label,save,message);form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{const url=new URL(input.value);if(url.protocol!=='https:'||url.username||url.password)throw Error('Use an HTTPS review link.');const result=await supabase.rpc('bp_arc_reading_review',{p_assignment_id:book.arcAssignmentId,p_review_link:url.href});if(result.error||result.data!==true)throw Error('Your review link could not be saved.');message.textContent='Review link filed.';}catch(error){message.textContent=error.message;}finally{save.disabled=false;}};
-      details.append(badges,heading,meta,due,progress,terms,button,offlineControls,form);
-    }else details.append(badges,eyebrow,heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); grid.append(card);
+      details.append(...(badges.childElementCount?[badges]:[]),heading,meta,due,progress,terms,button,offlineControls,form);
+    }else details.append(...(badges.childElementCount?[badges]:[]),heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); grid.append(card);
   }
 }
 function renderContinueReading(collection) {
