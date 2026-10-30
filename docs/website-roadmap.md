@@ -292,6 +292,13 @@ silently import the separate browser-local planner or imply that it is shared.
 
 ### 4. Protected ARC reading and notifications
 
+- [x] Owner selected an existing active basic-member account for an isolated ARC pilot;
+  no admin upgrade or paid-membership change authorised.
+- [x] Prepare read-only ARC schema/issuance/access preflight before altering live rules.
+- [ ] Owner returns preflight; check historical paid test grants before ARC-only testing.
+- [ ] Implement pilot-only book-assignment access, accepted terms and protected delivery
+  before switching the whole team away from download controls.
+
 - [ ] Replace ARC EPUB download delivery with protected reading inside BP Reading/app.
 - [ ] Preserve existing issuance history; create/reuse the personalised reference on
   first opening and keep personalised watermarks.

@@ -1,0 +1,24 @@
+const {PGlite}=require('@electric-sql/pglite'),{readFileSync}=require('node:fs'),assert=require('node:assert/strict');
+(async()=>{const db=new PGlite();try{
+ await db.exec(`create table member_profiles(id uuid primary key,email text,member_status text,member_tier text,is_arc_member boolean,is_admin boolean);
+ create table bp_reading_memberships(user_id uuid,access_until timestamptz,revoked_at timestamptz);
+ create table bp_reading_titles(book_id text,title text);
+ create table bp_reading_purchases(user_id uuid,book_id text,revoked_at timestamptz);
+ create table arc_files(id bigint primary key,title text,slug text,is_active boolean,downloads_open_at timestamptz,downloads_close_at timestamptz,storage_path text);
+ create table arc_file_assignments(id bigint primary key,member_id uuid,arc_file_id bigint references arc_files(id),status text,review_due_date date,watermarked_storage_path text);
+ create table bp_reading_catalog(edition_id bigint,book_id text,title text,available boolean);
+ create function create_arc_issuance(p_assignment_id bigint) returns text language sql as 'select ''fixture-reference''::text';
+ insert into member_profiles values('00000000-0000-0000-0000-000000000001','private@example.invalid','active','Reader',false,false);
+ insert into bp_reading_memberships values('00000000-0000-0000-0000-000000000001',now()+interval '1 day',null);
+ insert into arc_files values(1,'Gualachulain','gualachulain',true,null,null,'PRIVATE_STORAGE.epub');
+ insert into arc_file_assignments values(2,'00000000-0000-0000-0000-000000000001',1,'active',null,'PERSONAL_PRIVATE.epub');
+ insert into bp_reading_catalog values(2,'gualachulain','Gualachulain',true);`);
+ const sql=readFileSync('supabase/diagnostics/arc-reading-preflight.sql','utf8');
+ let report=(await db.query(sql)).rows[0].arc_reading_preflight;assert.equal(report.test_profile,null);
+ report=(await db.query(sql.replace('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000001'))).rows[0].arc_reading_preflight;
+ assert.equal(report.test_profile.is_arc_member,false);assert.equal(report.test_profile.is_admin,false);assert.equal(report.existing_access.active_membership,true);assert.equal(report.existing_access.gualachulain_purchase,false);
+ assert.equal(report.test_assignments.length,1);assert.equal(report.gualachulain_campaigns.length,1);assert.equal(report.gualachulain_reading_editions[0].edition_id,2);assert(report.functions.some(fn=>fn.name==='create_arc_issuance'));assert(report.columns.some(c=>c.table==='arc_files'));assert(report.constraints.some(c=>c.table==='arc_file_assignments'));
+ for(const privateValue of ['private@example.invalid','PRIVATE_STORAGE.epub','PERSONAL_PRIVATE.epub'])assert(!JSON.stringify(report).includes(privateValue));
+ assert.equal((await db.query('select is_arc_member from member_profiles')).rows[0].is_arc_member,false,'diagnostic grants nothing');
+ console.log('PASS ARC preflight: target-only profile/access, historical membership detection, schema/issuance metadata, no contact/private path data and no role changes');
+}finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1});

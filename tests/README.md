@@ -290,3 +290,8 @@ different account. These are mock-provider tests, not live Meta acceptance.
 Meta diagnostics tests reject a User-token identity in the read-only Page connection
 check, preserve numeric provider codes/subcodes and validated trace IDs, and verify
 raw provider messages or malformed diagnostic strings cannot leak into delivery errors.
+
+`tests/arc-reading-preflight.cjs` runs the ARC pilot diagnostic in PGlite. It verifies
+profile targeting, detection of historical paid membership, campaign/edition and
+issuance/schema metadata, absence of contact/private-path values and no role changes.
+It does not grant live ARC access or replace the existing Vault delivery.
