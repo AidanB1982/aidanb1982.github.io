@@ -6,3 +6,8 @@ verify_jwt = false
 # External cron authenticates with BP_SOCIAL_CRON_SECRET, never a browser session.
 [functions.bp-social-publish]
 verify_jwt = false
+
+# ARC delivery verifies the caller's current JWT with auth.getUser inside the handler.
+# This supports the project's ES256 sessions without the legacy-secret gateway check.
+[functions.bp-reading-arc]
+verify_jwt = false

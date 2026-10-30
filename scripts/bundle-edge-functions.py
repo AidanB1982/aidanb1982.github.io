@@ -8,6 +8,7 @@ functions = {
     'bp-social-publish': ['meta.ts', 'handler.ts'],
     'bp-reading-create-checkout': ['handler.ts'],
     'bp-reading-deliver-epub': ['handler.ts'],
+    'bp-reading-arc': ['handler.ts', 'personalise.ts'],
     'bp-reading-shopify-webhook': ['handler.ts', 'shopify-auth.ts', 'shopify-service.ts'],
     'bp-reading-reconcile-order': [
         '../bp-reading-shopify-webhook/handler.ts',

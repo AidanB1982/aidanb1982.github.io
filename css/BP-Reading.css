@@ -912,3 +912,13 @@ body.bp-reading-page .simple-header {
 .offline-action:focus-visible { outline:2px solid var(--copper); outline-offset:3px; }
 .offline-action:disabled { cursor:wait; opacity:.6; }
 .book-offline-controls:empty { display:none; }
+
+.arc-reading-terms { border:1px solid var(--border); border-radius:6px; margin:10px 0; padding:10px; font:12px/1.5 Arial,sans-serif; }
+.arc-reading-terms label { display:flex; align-items:flex-start; gap:8px; padding:7px 0; }
+.arc-reading-terms input { flex:none; width:18px; height:18px; margin-top:2px; }
+.arc-reading-review { margin-top:16px; font:12px/1.5 Arial,sans-serif; }
+.arc-reading-review label { display:grid; gap:6px; }
+.arc-reading-review input { min-width:0; width:100%; box-sizing:border-box; min-height:44px; padding:8px; color:var(--text); background:var(--panel); border:1px solid var(--border); }
+.arc-reading-review button { margin-top:8px; }
+
+@media(max-width:600px){.arc-book-card { grid-column:1/-1; }.arc-book-card .book-cover { align-self:flex-start; }}

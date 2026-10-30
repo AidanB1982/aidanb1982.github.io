@@ -295,9 +295,15 @@ silently import the separate browser-local planner or imply that it is shared.
 - [x] Owner selected an existing active basic-member account for an isolated ARC pilot;
   no admin upgrade or paid-membership change authorised.
 - [x] Prepare read-only ARC schema/issuance/access preflight before altering live rules.
-- [ ] Owner returns preflight; check historical paid test grants before ARC-only testing.
-- [ ] Implement pilot-only book-assignment access, accepted terms and protected delivery
-  before switching the whole team away from download controls.
+- [x] Owner supplied the corrected preflight; test account retains paid membership.
+  Preserve it and isolate ARC checks from paid entitlements.
+- [x] Prepare/test pilot-only pinned assignment access, server-recorded copyright terms,
+  legacy reference reuse, personalised in-reader delivery, local ARC progress/reviews
+  and a member-area entry. No paid/cloud/offline rules are replaced.
+- [ ] Owner applies pilot migration, deploys bp-reading-arc and runs the single-account
+  grant operation. See [ARC pilot instructions](bp-reading-arc-pilot.md).
+- [ ] Owner tests the ARC route and verifies both legacy EPUB/PDF delivery reject the
+  migrated assignment before enabling this for the wider team.
 
 - [ ] Replace ARC EPUB download delivery with protected reading inside BP Reading/app.
 - [ ] Preserve existing issuance history; create/reuse the personalised reference on

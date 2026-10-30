@@ -295,3 +295,14 @@ raw provider messages or malformed diagnostic strings cannot leak into delivery 
 profile targeting, detection of historical paid membership, campaign/edition and
 issuance/schema metadata, absence of contact/private-path values and no role changes.
 It does not grant live ARC access or replace the existing Vault delivery.
+
+ARC reading pilot:
+- `NODE_PATH=... node tests/arc-reading-sql.cjs` runs migration/grant tests in PGlite,
+  including paid-member isolation, server-only pinned grants, terms/reference reuse,
+  private tables, field guards, release/revocation checks and retained reviews.
+- `READING_TEST_DIR=... node tests/arc-reading-delivery.mjs` tests authenticated inline
+  delivery and actual ZIP chapter personalisation; uses the existing JSZip fixture.
+- `tests/arc-reading-browser.cjs` uses Playwright/Chromium and the same real EPUB
+  fixtures as public-reader tests for the complete online-only assigned ARC flow.
+No test changes a live account, sends email or claims that deployed legacy PDF APIs
+have been checked. Follow `docs/bp-reading-arc-pilot.md` for live acceptance.
