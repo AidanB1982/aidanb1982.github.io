@@ -311,3 +311,8 @@ have been checked. Follow `docs/bp-reading-arc-pilot.md` for live acceptance.
 stage default, reference to the existing Gualachulain spine, badge/reading link,
 deduplication, preservation of personal fields and account isolation using the real
 bookshelf UI with synthetic Supabase records.
+
+`NODE_PATH=... node tests/reading-upload-release.cjs` validates the six owner-supplied
+30 October EPUB registrations: exact private paths, confirmed book/edition IDs,
+withdrawn-edition refusal, all-or-nothing release, rerun safety, conflicting-file
+refusal and preservation of existing catalogue metadata/unrelated releases.
