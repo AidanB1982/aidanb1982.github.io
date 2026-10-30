@@ -124,3 +124,7 @@ Reader/ARC tier labels display **ARC Reader** when the profile's ARC flag is on.
 stored `member_tier`, paid membership, points and administrator permissions are not
 rewritten. Other named tiers retain their existing display. This needs no new SQL or
 Edge Function deployment beyond the existing ARC pilot.
+
+## Team rollout inventory
+
+Before migrating the remaining team, run the read-only [rollout report](../supabase/operations/arc-reading-rollout-report.sql). It needs no UUID edits and returns campaign counts, existing edition mappings, private-file readiness and profiles needing review without exposing member emails, tokens or storage paths. Share the result to prepare an assignment-preserving batch operation. Do not infer campaign mappings from similar titles or reactivate historical/revoked assignments. Confirm live legacy EPUB and PDF endpoints reject the migrated pilot before enabling further readers.

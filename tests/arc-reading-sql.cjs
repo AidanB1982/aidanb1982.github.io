@@ -75,5 +75,6 @@ await db.exec(`set request.jwt.claim.sub='${B}';set role authenticated;`);assert
 await db.exec(`update arc_files set downloads_close_at=now()-interval '1 second';set request.jwt.claim.sub='${A}';set role authenticated;`);
 catalogue=await query('select * from bp_arc_reading_catalogue()');assert.equal(catalogue[0].can_read,false,'closed assignment remains visible as history');
 await query("select bp_arc_reading_review(81,'https://example.invalid/review')");await assert.rejects(()=>query("select bp_arc_reading_review(81,'javascript:alert(1)')"),/HTTPS/);await db.exec('reset role');
+const rollout=(await query(readFileSync('supabase/operations/arc-reading-rollout-report.sql','utf8')))[0].arc_rollout_report;assert.equal(rollout.changes_made,false);assert(Array.isArray(rollout.campaigns));assert(Array.isArray(rollout.reading_editions));
 console.log('PASS ARC SQL: isolated per-assignment access despite paid membership, terms, legacy issuance reuse, unchanged download/paid history, pilot limits, closed-history review, RLS, revocation/window/private-file denial and rerunnable grant');
 }finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1});
