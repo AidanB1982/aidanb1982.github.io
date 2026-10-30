@@ -108,12 +108,12 @@
             id: "16751387345241",
             slug: "gualachulain-bothy",
             title: "Gualachulain Bothy: The Second Silence",
-            subtitle: "Book Two of The Cursed Bothies · Signed Paperback",
+            subtitle: "The Cursed Bothies",
             category: "cursed-bothies",
             categoryLabel: "The Cursed Bothies",
-            badge: "Signed Edition",
+            badge: "Direct Edition",
             image: "/assets/book7.png",
-            description: "A signed paperback by Aidan Blackwood. Beside Loch Etive, a grieving father hears a familiar voice—and his children begin to fear what is answering."
+            description: "Beside Loch Etive, a grieving father hears a familiar voice and his children begin to fear what is answering."
         },
         {
             id: "16446308811097",
