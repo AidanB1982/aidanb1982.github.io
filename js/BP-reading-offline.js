@@ -53,15 +53,24 @@ export class OfflineLibrary {
 }
 export async function prepareOfflineShell() {
   if(!('serviceWorker' in navigator)||!window.isSecureContext)throw Error('Offline reading needs HTTPS and a supported browser.');
-  const registration=await navigator.serviceWorker.register('/bp-reading-sw.js?v=20261030-arc-offline1',{scope:'/pages/bp-reading.html',type:'module',updateViaCache:'none'});
+  const registration=await navigator.serviceWorker.register('/bp-reading-sw.js?v=20261030-arc-offline2',{scope:'/pages/bp-reading.html',type:'module',updateViaCache:'none'});
   await registration.update();
   await navigator.serviceWorker.ready;
-  const worker=registration.installing||registration.waiting||registration.active;
-  if(!worker)throw Error('The offline reader is not ready yet.');
-  if(worker.state!=='activated')await new Promise((resolve,reject)=>{
-    const timer=setTimeout(()=>reject(Error('The offline reader update is not ready. Refresh online and try again.')),15000);
-    const changed=()=>{if(worker.state==='activated'){clearTimeout(timer);worker.removeEventListener('statechange',changed);resolve();}else if(worker.state==='redundant'){clearTimeout(timer);worker.removeEventListener('statechange',changed);reject(Error('The offline reader update failed. Refresh online and try again.'));}};
-    worker.addEventListener('statechange',changed);changed();
+  // An updated worker may be installed but waiting behind another reader tab.
+  // Ask that worker to activate, and follow registration changes rather than
+  // holding a worker that the browser may replace during the update.
+  const worker=await new Promise((resolve,reject)=>{
+    const watched=new Set();
+    const finish=(error,value)=>{clearTimeout(timer);registration.removeEventListener?.('updatefound',changed);for(const item of watched)item.removeEventListener?.('statechange',changed);error?reject(error):resolve(value);};
+    const changed=()=>{
+      const candidate=registration.installing||registration.waiting||registration.active;
+      if(!candidate)return;
+      if(candidate.state==='activated'){finish(null,candidate);return;}
+      if(!watched.has(candidate)){watched.add(candidate);candidate.addEventListener?.('statechange',changed);}
+      if(candidate.state==='installed')candidate.postMessage({type:'ACTIVATE_READER'});
+    };
+    const timer=setTimeout(()=>finish(Error('The offline reader update is waiting. Close other BP Reading tabs, then try Save offline again online.')),45000);
+    registration.addEventListener?.('updatefound',changed);changed();
   });
   await new Promise((resolve,reject)=>{
     const channel=new MessageChannel(),timer=setTimeout(()=>reject(Error('The offline reader could not finish saving. Try again online.')),45000);

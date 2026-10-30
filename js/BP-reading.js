@@ -8,7 +8,7 @@ import {
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
 import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261124";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
-import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261030-arc-offline1";
+import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261030-arc-offline2";
 import {isArcBook,arcReadingBooks,arcStorageKey,requestArc,ARC_TERMS_VERSION} from "/js/BP-reading-arc.js?v=20261030-arc-offline1";
 import { ReadingAccount } from "/js/BP-reading-account.js?v=20261127";
 

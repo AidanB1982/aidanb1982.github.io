@@ -11,4 +11,9 @@ await prepareOfflineShell();assert.equal(updates,1);assert.equal(messages.length
 reply={ok:false,revision:6,error:'Offline reader could not cache /css/example.css (HTTP 503).'};
 await assert.rejects(()=>prepareOfflineShell(),/example.css.*503/);
 reply={ok:false};await assert.rejects(()=>prepareOfflineShell(),/older offline reader/);
+// Reproduce a waiting update while another tab still owns the previous worker.
+const listeners=new Set();let activationRequests=0;
+registration.update=async function(){updates++;this.active=oldWorker;this.waiting={state:'installed',addEventListener(type,fn){listeners.add(fn);},removeEventListener(type,fn){listeners.delete(fn);},postMessage(message){assert.equal(message.type,'ACTIVATE_READER');activationRequests++;this.state='activated';for(const fn of [...listeners])fn();this.postMessage=worker({ok:true,revision:6}).postMessage;}};};
+// Switch the message handler before the resolved activation promise continues.
+await prepareOfflineShell();assert.equal(activationRequests,1);assert.equal(listeners.size,0);
 console.log('PASS stale-worker recovery: versioned registration, cache bypass, explicit update before preparation, protocol check and resource error propagation');
