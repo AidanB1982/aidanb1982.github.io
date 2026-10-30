@@ -1,6 +1,6 @@
 # Blackwood website to-do list
 
-Updated **29 October 2026** (UK). This separates published website work from features
+Updated **30 October 2026** (UK). This separates published website work from features
 that still need live configuration, database changes or app-store setup.
 
 ## Catalogue reconciliation — owner confirmed live
@@ -245,36 +245,30 @@ RLS, bucket privacy, launch flags or navigation visibility are changed by this r
 
 ## Next: owner configuration and backend work
 
-### 1. Finish Meta connection and verify the scheduler
+### 1. Meta scheduler — owner confirmed live, 30 October
 
-- [x] Owner created the Meta app, enabled Page test permissions and retrieved
-  Blackwood Publishing Page ID `1236290872910367` and a Page token.
-- [x] Add immediate progress, deployment errors and a bounded timeout to the connection check.
-- [x] Owner deployed the Meta-capable desk and confirmed its live read-only Facebook check.
-- [x] Owner confirmed Facebook connection and a linked @aidan.blackwood Instagram account.
-- [x] Prepare separate Unified Login Instagram credentials and account verification;
-  preserve Facebook connection and do not publish when explicit IG configuration is invalid.
-- [ ] Owner generates Instagram token/account ID using the new Unified Login configuration,
-  deploys both regenerated dashboard bundles and verifies the live account.
-- [ ] Obtain suitable long-lived Facebook credentials before unattended operation.
+- [x] Connect Blackwood Publishing Facebook Page `1236290872910367` and Instagram
+  @aidan.blackwood using the verified Page-token route.
+- [x] Owner applied the scheduler database setup and deployed the desk/worker functions.
+- [x] Install cron job 2, running every minute with matching Edge/Vault secrets and
+  worker JWT verification off; authenticated requests confirmed.
+- [x] Resolve expired/User-token credentials and install a verified long-lived Page
+  token with approximately two months' validity. Separate Unified Login credentials
+  remain supported but are not required for the working Page-token route.
+- [x] Add Page-token identity validation and safe Meta code/subcode diagnostics.
+- [x] Owner confirmed BP Scheduler Test 001 published automatically to Facebook.
+- [x] Owner confirmed Instagram automatic image publishing worked successfully.
+- [x] Owner enabled automatic publishing for the live tests. Existing manual plans
+  remain manual; only explicitly scheduled automatic items enter the queue.
+- [ ] Renew/revalidate the Page token before its confirmed expiry, 29 December 2026.
+- [ ] Continue checking delivery receipts/account visibility during initial regular use.
 
-- [ ] Confirm the social scheduler SQL has been applied to the live Supabase project.
-- [ ] Deploy the updated `bp-publishing-desk` and new `bp-social-publish` functions.
-- [ ] Use the existing Meta app to obtain the Blackwood Page ID and appropriate Page
-  access token, with access to its linked Instagram professional account.
-- [ ] Save server secrets, configure the Vault/cron request, and verify the read-only
-  connection while automatic publication remains paused.
-- [x] Owner installed cron job 2 (every minute), disabled worker JWT verification
-  and verified authenticated requests reach the worker.
-- [x] Owner scheduled a Facebook test; worker claimed it but Meta denied publishing.
-- [x] Add read-only server-token Page identity validation and safe Meta code/subcode diagnostics.
-- [ ] Deploy both refreshed dashboard bundles, resolve the publishing refusal and verify
-  one successful Facebook test; Instagram image test still pending.
-- [ ] Confirm delivery receipts and background execution, then enable regular posting.
+Next agreed work: finish the remaining BP Reading library uploads, then move ARC
+reading in-house. BP Reading navigation remains hidden until the separate launch checks.
 
 Instructions: [Meta scheduler setup](meta-social-scheduler.md). Never put tokens in
-chat or frontend files. Existing manual plans do not become automatic by deployment.
-TikTok, videos/Reels, carousels and monthly email delivery remain manual plans.
+chat or frontend files. TikTok, videos/Reels, carousels and monthly email delivery
+remain manual plans; their automatic delivery has not been implemented or verified.
 
 ### 2. Connect production planning to the existing Author Desk
 

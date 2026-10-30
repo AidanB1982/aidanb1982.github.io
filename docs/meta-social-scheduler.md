@@ -2,7 +2,8 @@
 
 Write posts in Behind the Files; no AI subscription or model is required. The code
 supports Facebook text/single-image posts and Instagram single-image posts. It is not
-connected to live Meta accounts until the owner completes this setup. No deployment
+connected by deployment alone. The owner confirmed successful Facebook and Instagram
+automatic publishing on 30 October 2026 using the Page-token route. No deployment
 or database migration sends anything by itself; the worker defaults to paused.
 
 ## 1. Existing Meta app and account access
