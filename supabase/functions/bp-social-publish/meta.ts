@@ -3,12 +3,23 @@ export type SocialResult={state:'published'|'failed'|'unknown';providerId:string
 export class MetaError extends Error {ambiguous:boolean;constructor(message:string,ambiguous=false){super(message);this.ambiguous=ambiguous;}}
 export function createMetaPublisher(env:(name:string)=>string|undefined,transport:typeof fetch=fetch,pause:(ms:number)=>Promise<void>=ms=>new Promise(resolve=>setTimeout(resolve,ms))){
  const config=()=>{const token=env('META_PAGE_ACCESS_TOKEN')||'',page=env('META_PAGE_ID')||'',version=env('META_GRAPH_VERSION')||'v24.0';if(!token||!/^\d+$/.test(page)||!/^v\d+\.\d+$/.test(version))throw new MetaError('Meta is not configured. Add META_PAGE_ACCESS_TOKEN and META_PAGE_ID in Supabase.');return {token,page,version};};
+ function diagnostic(error:any){
+  const parts:string[]=[];
+  if(Number.isSafeInteger(error?.code))parts.push('code '+error.code);
+  if(Number.isSafeInteger(error?.error_subcode))parts.push('subcode '+error.error_subcode);
+  if(typeof error?.fbtrace_id==='string'&&/^[A-Za-z0-9_-]{1,100}$/.test(error.fbtrace_id))parts.push('trace '+error.fbtrace_id);
+  return parts.length?' [Meta '+parts.join(', ')+']':'';
+ }
  async function graph(path:string,method='GET',fields?:Record<string,string>,tokenOverride?:string){
   const current=config(),token=tokenOverride??current.token,version=current.version;let response:Response;
   try{response=await transport(`https://graph.facebook.com/${version}/${path}`,{method,headers:{Authorization:'Bearer '+token,...(method==='POST'?{'Content-Type':'application/x-www-form-urlencoded'}:{})},body:method==='POST'?new URLSearchParams(fields):undefined,redirect:'error',signal:AbortSignal.timeout(method==='GET'?10000:20000)});}catch{throw new MetaError('Meta did not confirm the request. Check the social account before retrying.',method==='POST');}
   let data:any;try{data=await response.json();}catch{throw new MetaError('Meta returned an unreadable response. Check the social account before retrying.',method==='POST');}
-  if(!response.ok||data.error){const code=data.error?.code;if(method==='POST'&&(response.status>=500||code===1||code===2))throw new MetaError('Meta did not confirm publication. Check the social account before retrying.',true);throw new MetaError(code===190?'The Meta access token expired or is invalid. Update it in Supabase.':code===10||code===200?'Meta denied publishing permission. Check app permissions and Page access.':response.status===429?'Meta is rate limiting requests. Try scheduling again later.':'Meta rejected the request. Check image format, account permissions and platform restrictions.',method==='POST'&&(response.status>=500||code===1||code===2));}
+  if(!response.ok||data.error){const code=data.error?.code,detail=diagnostic(data.error);if(method==='POST'&&(response.status>=500||code===1||code===2))throw new MetaError('Meta did not confirm publication. Check the social account before retrying.'+detail,true);throw new MetaError((code===190?'The Meta access token expired or is invalid. Update it in Supabase.':code===10||code===200?'Meta denied publishing permission. Check app permissions and Page access.':response.status===429?'Meta is rate limiting requests. Try scheduling again later.':'Meta rejected the request. Check image format, account permissions and platform restrictions.')+detail,method==='POST'&&(response.status>=500||code===1||code===2));}
   return data;
+ }
+ async function verifyPageToken(){
+  const {page}=config(),identity=await graph('me?fields=id,name');
+  if(String(identity.id)!==page)throw new MetaError('META_PAGE_ACCESS_TOKEN does not identify the configured Facebook Page. Save the Page access token returned in the Page query, rather than the Explorer User token.');
  }
  async function account(){const {page}=config();const data=await graph(page+'?fields=id,name,instagram_business_account{id,username}');if(String(data.id)!==page)throw new MetaError('The configured Facebook Page could not be verified.');return data;}
  async function instagram(pageAccount?:any){
@@ -26,7 +37,7 @@ export function createMetaPublisher(env:(name:string)=>string|undefined,transpor
  return {
   configured(){try{config();return true;}catch{return false;}},
   async check(){
-   const a=await account(),result={pageName:typeof a.name==='string'?a.name:'Facebook Page',instagramUsername:null as string|null,instagramConnected:false,instagramError:null as string|null,enabled:env('BP_SOCIAL_PUBLISHING_ENABLED')==='true'};
+   const [,a]=await Promise.all([verifyPageToken(),account()]),result={pageName:typeof a.name==='string'?a.name:'Facebook Page',instagramUsername:null as string|null,instagramConnected:false,instagramError:null as string|null,enabled:env('BP_SOCIAL_PUBLISHING_ENABLED')==='true'};
    try{const ig=await instagram(a);result.instagramUsername=ig.username;result.instagramConnected=true;}
    catch(error){result.instagramError=error instanceof MetaError?error.message:'Instagram verification is unavailable. Facebook remains connected.';}
    return result;

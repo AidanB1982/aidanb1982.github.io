@@ -167,3 +167,18 @@ If the deployed desk predates Meta support, replace its dashboard `index.ts` wit
 whole `supabase/dashboard/bp-publishing-desk.ts` bundle and redeploy. Do not paste SQL
 or a partial handler into it. Preserve its existing authenticated-admin/JWT setup.
 Keep `BP_SOCIAL_PUBLISHING_ENABLED=false`; checking the connection makes no posts.
+
+## Publishing denied despite granted user scopes
+
+The read-only connection check now verifies `me?fields=id,name` using the actual
+server-configured Facebook token and requires its ID to match `META_PAGE_ID`. A User
+token may read Page metadata and list the expected granted/granular scopes without
+being the Page token required by this publishing configuration. This check performs
+no POST and rejects that identity mismatch before claiming publishing is connected.
+It does not prove all Page tasks or publish permission; a controlled post is still
+needed after it passes.
+
+Provider failures retain numeric Meta code/subcode and a validated trace ID in the
+existing delivery error field. Raw provider messages, response bodies and tokens
+remain excluded. Deploy both regenerated dashboard bundles to use these diagnostics;
+leave the existing failed post unchanged until the read-only check is understood.

@@ -264,7 +264,12 @@ RLS, bucket privacy, launch flags or navigation visibility are changed by this r
   access token, with access to its linked Instagram professional account.
 - [ ] Save server secrets, configure the Vault/cron request, and verify the read-only
   connection while automatic publication remains paused.
-- [ ] Run one deliberately scheduled Facebook test and one Instagram image test.
+- [x] Owner installed cron job 2 (every minute), disabled worker JWT verification
+  and verified authenticated requests reach the worker.
+- [x] Owner scheduled a Facebook test; worker claimed it but Meta denied publishing.
+- [x] Add read-only server-token Page identity validation and safe Meta code/subcode diagnostics.
+- [ ] Deploy both refreshed dashboard bundles, resolve the publishing refusal and verify
+  one successful Facebook test; Instagram image test still pending.
 - [ ] Confirm delivery receipts and background execution, then enable regular posting.
 
 Instructions: [Meta scheduler setup](meta-social-scheduler.md). Never put tokens in

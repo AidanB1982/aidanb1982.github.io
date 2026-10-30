@@ -30,6 +30,7 @@ assert.equal((await (await uncertainWorker(new Request('https://edge.invalid/wor
 const unifiedSettings={...settings,META_GRAPH_VERSION:'v26.0',META_INSTAGRAM_ACCOUNT_ID:'456',META_INSTAGRAM_ACCESS_TOKEN:'private-instagram-fixture'};
 let unifiedCalls=[];
 const unifiedTransport=async(url,options)=>{unifiedCalls.push({url,options});
+ if(url.includes('/me?fields=id,name'))return Response.json({id:'123',name:'Blackwood'});
  if(url.includes('/123?fields=id,name'))return Response.json({id:'123',name:'Blackwood'});
  if(url.includes('/456?fields=id,username'))return Response.json({id:'456',username:'aidan.blackwood'});
  if(url.includes('?fields=status_code'))return Response.json({status_code:'FINISHED'});
@@ -39,7 +40,7 @@ const unifiedTransport=async(url,options)=>{unifiedCalls.push({url,options});
 };
 const unified=createMetaPublisher(k=>unifiedSettings[k],unifiedTransport,async()=>{});
 account=await unified.check();assert.equal(account.pageName,'Blackwood');assert.equal(account.instagramConnected,true);assert.equal(account.instagramUsername,'aidan.blackwood');assert.equal(account.instagramError,null);assert(unifiedCalls.every(c=>c.options.method==='GET'));assert(!JSON.stringify(account).includes('private-instagram-fixture'));
-assert.equal(unifiedCalls[0].options.headers.Authorization,'Bearer private-fixture-token');assert.equal(unifiedCalls[1].options.headers.Authorization,'Bearer private-instagram-fixture');
+assert.equal(unifiedCalls[0].options.headers.Authorization,'Bearer private-fixture-token');assert.equal(unifiedCalls[1].options.headers.Authorization,'Bearer private-fixture-token');assert.equal(unifiedCalls[2].options.headers.Authorization,'Bearer private-instagram-fixture');
 unifiedCalls=[];result=await unified.publish({...post,channel:'Instagram',media_url:'https://example.invalid/cover.jpg'});assert.equal(result.state,'published');assert(unifiedCalls.every(c=>c.options.headers.Authorization==='Bearer private-instagram-fixture'));assert(unifiedCalls.every(c=>c.url.startsWith('https://graph.facebook.com/v26.0/')));assert.equal(unifiedCalls.filter(c=>c.url.endsWith('/media_publish')).length,1);
 unifiedCalls=[];assert.equal((await unified.publish(post)).state,'published');assert.equal(unifiedCalls.length,1);assert.equal(unifiedCalls[0].options.headers.Authorization,'Bearer private-fixture-token');
 for(const partial of [{META_INSTAGRAM_ACCOUNT_ID:''},{META_INSTAGRAM_ACCESS_TOKEN:''},{META_INSTAGRAM_ACCOUNT_ID:'wrong'}]){
@@ -51,3 +52,11 @@ const mismatched=createMetaPublisher(k=>unifiedSettings[k],async(url,options)=>{
 unifiedCalls=[];account=await mismatched.check();assert.equal(account.instagramConnected,false);assert.match(account.instagramError,/could not be verified/);
 assert.equal((await mismatched.publish({...post,channel:'Instagram',media_url:'https://example.invalid/cover.jpg'})).state,'failed');assert(!unifiedCalls.some(c=>c.options.method==='POST'));
 console.log('PASS Unified Login: direct IG identity verification, separate tokens for all IG requests, Facebook preservation, partial-config refusal and no fallback on wrong account');
+
+const userInsteadOfPage=createMetaPublisher(k=>settings[k],async(url,options)=>url.includes('/me?fields=')?Response.json({id:'user-456',name:'Personal profile'}):mock(url,options));
+await assert.rejects(()=>userInsteadOfPage.check(),/does not identify the configured Facebook Page/);
+const detailed=createMetaPublisher(k=>settings[k],async()=>Response.json({error:{code:200,error_subcode:2018065,fbtrace_id:'safe_trace_123',message:'private provider data access_token=never-expose'}},{status:403}));
+const refused=await detailed.publish(post);assert.equal(refused.state,'failed');assert.match(refused.message,/code 200, subcode 2018065, trace safe_trace_123/);assert(!refused.message.includes('private provider data'));assert(!refused.message.includes('never-expose'));
+const unsafeTrace=createMetaPublisher(k=>settings[k],async()=>Response.json({error:{code:10,error_subcode:'secret',fbtrace_id:'unsafe token=secret'}},{status:403}));
+assert(!JSON.stringify(await unsafeTrace.publish(post)).includes('secret'));
+console.log('PASS publishing diagnostics: read-only Page-token identity check, numeric Meta code/subcode and validated trace only; provider text/tokens excluded');

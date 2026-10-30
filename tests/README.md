@@ -286,3 +286,7 @@ Meta tests also cover separate Unified Login Instagram credentials, direct ident
 verification, token separation across verification/container/poll/publish calls,
 preservation of Facebook when Instagram configuration fails and no fallback to a
 different account. These are mock-provider tests, not live Meta acceptance.
+
+Meta diagnostics tests reject a User-token identity in the read-only Page connection
+check, preserve numeric provider codes/subcodes and validated trace IDs, and verify
+raw provider messages or malformed diagnostic strings cannot leak into delivery errors.
