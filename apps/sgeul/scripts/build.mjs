@@ -96,6 +96,8 @@ await build({
 });
 await copyFile(path.join(app, "src/index.html"), path.join(out, "index.html"));
 await copyFile(path.join(app, "src/sgeul.css"), path.join(out, "sgeul.css"));
+await mkdir(path.join(out, 'assets'), {recursive:true});
+await copyFile(path.join(repo, 'assets/Sgeul Icon Square.png'),path.join(out,'assets/sgeul-icon.png'));
 let html = await read("pages/bp-reading.html");
 html = html
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")

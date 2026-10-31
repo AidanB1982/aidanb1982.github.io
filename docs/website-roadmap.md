@@ -336,7 +336,8 @@ This is a planned replacement, not a description of the current downloadable ARC
   signout cleanup and physical variant filtering. Android debug build compiled.
 - [ ] Owner adds native origin to delivery settings, deploys ARC CORS update and
   tests the debug APK on a real Android phone. This is not Play release acceptance.
-- [ ] Add final approved icon source assets, account deletion, store disclosures,
+- [x] Package the uploaded Sgeul square artwork as launcher/adaptive/splash assets.
+- [ ] Complete themed-icon/device checks, account deletion, store disclosures,
   release signing and remaining native bookshelf/notification features.
 
 - [ ] Enrol in Google Play Console and Apple Developer Program; choose the correct

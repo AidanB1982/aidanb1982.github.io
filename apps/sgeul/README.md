@@ -33,6 +33,7 @@ platform 35/build-tools 35.0.0, and Android Studio or equivalent command-line to
 ```sh
 cd apps/sgeul
 npm ci
+npm run icons        # regenerate launcher/splash assets from the approved square artwork
 npm run android:sync
 npm test
 npm run android:open
@@ -91,10 +92,11 @@ remain permitted. Web-browser development origins are not automatically trusted.
 
 ## Before Play submission
 
-- Supply the approved Sgeul foreground transparent PNG and square blue artwork as
-  source files. The prototype retains the framework's temporary launcher/splash
-  artwork; no recreation of the approved logo is being passed off as final branding.
-- Add adaptive/monochrome icons and branded splash assets with mask-safe padding.
+- The approved `assets/Sgeul Icon Square.png` now supplies launcher/adaptive icons,
+  branded splash assets and the welcome-screen mark. `npm run icons` regenerates
+  native sizes using Capacitor Assets; the source artwork is retained unchanged.
+- Verify adaptive masks on real phones. A separate transparent foreground/monochrome
+  export can refine themed-icon support before the store release.
 - Implement account deletion and its web request route; review privacy/support and
   Google Play Data safety declarations against actual SDK/data use.
 - Add the member bookshelf and notifications only after their native flows are tested.
