@@ -10,7 +10,7 @@ Blackwood Publishing is a collection of literary and psychological fiction shape
 
 These works explore isolation, atmosphere, and the quiet persistence of what lingers — in landscapes, in people, and in what is left behind.
 
-This repository contains the official website.
+This repository contains the official website and the [Sgeul Android reader prototype](apps/sgeul/README.md).
 
 ---
 

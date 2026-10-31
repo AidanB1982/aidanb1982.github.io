@@ -316,3 +316,9 @@ bookshelf UI with synthetic Supabase records.
 30 October EPUB registrations: exact private paths, confirmed book/edition IDs,
 withdrawn-edition refusal, all-or-nothing release, rerun safety, conflicting-file
 refusal and preservation of existing catalogue metadata/unrelated releases.
+
+Sgeul Android prototype: see `apps/sgeul/README.md`. Build with `npm run build`
+in that directory, then `npm test`. `tests/sgeul-browser.cjs` runs the actual app
+bundle with synthetic Supabase/Shopify responses and real EPUB rendering; includes
+expired-session offline navigation, ARC-only access, reconnect revocation, physical
+variant gating and signout cleanup. No live account or checkout is changed.

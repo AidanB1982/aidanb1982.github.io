@@ -7,6 +7,8 @@ import JSZip from "https://esm.sh/jszip@3.10.1";
 type ArcClient={auth:{getUser(token:string):PromiseLike<{data:{user:{id:string}|null};error?:unknown}>};rpc(name:string,args:Record<string,unknown>):PromiseLike<{data:any;error?:any}>;storage:{from(bucket:string):{download(path:string):PromiseLike<{data:Blob|null;error?:unknown}>}}};
 export function createArcReadingHandler(deps:{env(name:string):string|undefined;client(url:string,key:string):ArcClient;personalise(bytes:ArrayBuffer,reference:string):Promise<ArrayBuffer>;log(message:string):void}){
  const origins=new Set(['https://blackwoodpublishing.co.uk','https://www.blackwoodpublishing.co.uk','https://aidanb1982.github.io']);
+ for(const value of (deps.env('BP_READING_ALLOWED_ORIGINS')||'').split(',')){const origin=value.trim();if(!origin)continue;try{const url=new URL(origin);if(url.protocol==='https:'&&url.origin===origin)origins.add(origin);}catch{deps.log('Ignoring an invalid ARC reading origin.');}}
+
  return async(request:Request)=>{
   const origin=request.headers.get('Origin'),headers:Record<string,string>={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','Vary':'Origin','Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'authorization, apikey, content-type, x-client-info','Access-Control-Expose-Headers':'X-BP-ARC-Reference, X-BP-Offline-Until'};
   if(origin&&origins.has(origin))headers['Access-Control-Allow-Origin']=origin;

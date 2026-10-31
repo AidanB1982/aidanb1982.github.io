@@ -5,7 +5,7 @@ import {createRequire} from 'node:module';
 const origin='https://blackwoodpublishing.co.uk';
 function fixture(config={}){
  const calls=[];
- const handler=createArcReadingHandler({env:name=>({SUPABASE_URL:'https://test.invalid',SUPABASE_ANON_KEY:'anon',SUPABASE_SERVICE_ROLE_KEY:'service'})[name],log:()=>{},personalise:async(bytes,ref)=>{calls.push({personalise:ref});return bytes;},client:(url,key)=>({auth:{getUser:async token=>{assert.equal(key,'anon');return {data:{user:config.badToken?null:{id:'verified-reader'}}};}},rpc:async(name,args)=>{
+ const handler=createArcReadingHandler({env:name=>({SUPABASE_URL:'https://test.invalid',SUPABASE_ANON_KEY:'anon',SUPABASE_SERVICE_ROLE_KEY:'service',BP_READING_ALLOWED_ORIGINS:config.allowedOrigins})[name],log:()=>{},personalise:async(bytes,ref)=>{calls.push({personalise:ref});return bytes;},client:(url,key)=>({auth:{getUser:async token=>{assert.equal(key,'anon');return {data:{user:config.badToken?null:{id:'verified-reader'}}};}},rpc:async(name,args)=>{
   assert.equal(key,'service');assert.equal(args.p_member_id,'verified-reader');calls.push({name,args});
   if(name==='bp_arc_reading_offline_until')return {data:config.denied?null:new Date(Date.now()+86400000).toISOString()};
   if(name==='bp_arc_reading_check')return {data:!config.denied};
@@ -23,6 +23,9 @@ r=await request({}, {action:'check',assignmentId:9});assert.equal(r.response.sta
 r=await request({},undefined,{Origin:'https://untrusted.invalid'});assert.equal(r.response.status,403);assert(!r.response.headers.has('Access-Control-Allow-Origin'));
 r=await request({}, {action:'save',assignmentId:9,acceptedTerms:true,termsVersion:'ARC Copyright Terms v1'});assert.equal(r.response.status,200);assert(Date.parse(r.response.headers.get('X-BP-Offline-Until'))>Date.now());assert(!r.calls.some(c=>c.name==='bp_arc_reading_record_open'),'saving is not a reading open');
 r=await request({missingLease:true},{action:'save',assignmentId:9,acceptedTerms:true,termsVersion:'ARC Copyright Terms v1'});assert.equal(r.response.status,503);assert(!r.calls.some(c=>c.download));
+r=await request({},undefined,{Origin:'https://localhost'});assert.equal(r.response.status,403);
+r=await request({allowedOrigins:'https://localhost'},undefined,{Origin:'https://localhost'});assert.equal(r.response.status,200);assert.equal(r.response.headers.get('Access-Control-Allow-Origin'),'https://localhost');
+r=await request({allowedOrigins:'http://localhost,https://untrusted.invalid/path'},undefined,{Origin:'http://localhost'});assert.equal(r.response.status,403);
 const require=createRequire(import.meta.url),JSZip=require((process.env.READING_TEST_DIR||'/tmp/blackwood-reading-test')+'/jszip.min.js');
 const zip=new JSZip();zip.file('mimetype','application/epub+zip');zip.file('chapter.xhtml','<html xmlns="http://www.w3.org/1999/xhtml"><body><h1>Original chapter</h1><p>Original story.</p></body></html>');
 const bytes=await zip.generateAsync({type:'arraybuffer'}),personalised=await personaliseArc(JSZip,bytes,'GUA-ARC-001');const output=await JSZip.loadAsync(personalised),chapter=await output.file('chapter.xhtml').async('string');assert(chapter.includes('Original story.'));assert(chapter.includes('GUA-ARC-001'));assert(!chapter.includes('@'));await assert.rejects(()=>personaliseArc(JSZip,bytes,'<unsafe>'),/Invalid ARC reference/);

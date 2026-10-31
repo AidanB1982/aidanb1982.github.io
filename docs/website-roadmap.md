@@ -326,6 +326,19 @@ This is a planned replacement, not a description of the current downloadable ARC
 
 ### 5. Android and iPhone app
 
+- [x] Name/branding agreed: Sgeul — Every Story Begins Somewhere.
+- [x] Google Play account enrolled; identity verification pending (owner report).
+- [x] Build a bundled Android prototype with existing-account sign-in, protected
+  library/ARC reader, encrypted offline copies and physical-only Shopify bookshop.
+  See [Sgeul setup and device acceptance](../apps/sgeul/README.md).
+- [x] Synthetic bundled-app tests: online sign-in, paid denial, assigned ARC,
+  offline reload after online token expiry, personal reference, reconnect revocation,
+  signout cleanup and physical variant filtering. Android debug build compiled.
+- [ ] Owner adds native origin to delivery settings, deploys ARC CORS update and
+  tests the debug APK on a real Android phone. This is not Play release acceptance.
+- [ ] Add final approved icon source assets, account deletion, store disclosures,
+  release signing and remaining native bookshelf/notification features.
+
 - [ ] Enrol in Google Play Console and Apple Developer Program; choose the correct
   individual/organisation identity and complete required verification.
 - [ ] Confirm branding, privacy/support details and the first-release specification.

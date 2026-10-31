@@ -1,0 +1,246 @@
+:root {
+  color-scheme: dark;
+  --navy: #101820;
+  --ink: #0c1d2a;
+  --cream: #fbeed1;
+  --gold: #c9ac7c;
+  --muted: #bac0bc;
+  font-family: Georgia, serif;
+  background: var(--navy);
+  color: var(--cream);
+}
+* {
+  box-sizing: border-box;
+}
+[hidden] {
+  display: none !important;
+}
+body {
+  margin: 0;
+  background: linear-gradient(155deg, #102535, #101820 65%);
+  min-height: 100vh;
+}
+main {
+  max-width: 800px;
+  margin: auto;
+  padding: calc(26px + env(safe-area-inset-top)) 22px
+    calc(100px + env(safe-area-inset-bottom));
+}
+h1 {
+  font-size: 64px;
+  margin: 8px 0 12px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+}
+h2 {
+  font-size: 25px;
+  font-weight: 400;
+}
+h3 {
+  font-size: 25px;
+  font-weight: 400;
+  margin: 12px 0;
+}
+p {
+  line-height: 1.65;
+}
+a {
+  color: inherit;
+}
+.masthead {
+  margin: 20px 0 38px;
+}
+.publisher,
+.eyebrow {
+  font:
+    11px/1.6 system-ui,
+    sans-serif;
+  letter-spacing: 0.19em;
+  color: var(--gold);
+}
+.tagline {
+  font-style: italic;
+  font-size: 18px;
+  color: var(--muted);
+}
+.panel {
+  background: #172732;
+  border: 1px solid #40505a;
+  border-radius: 17px;
+  padding: 24px;
+  margin-bottom: 18px;
+}
+.destination {
+  display: block;
+  text-decoration: none;
+}
+.destination p {
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.action {
+  color: var(--gold);
+}
+label {
+  display: block;
+  font:
+    14px system-ui,
+    sans-serif;
+  margin: 20px 0 8px;
+}
+input,
+select {
+  display: block;
+  width: 100%;
+  font:
+    16px system-ui,
+    sans-serif;
+  padding: 14px;
+  margin: 9px 0;
+  border: 1px solid #60717a;
+  border-radius: 8px;
+  background: #0e1c26;
+  color: var(--cream);
+}
+button,
+.button {
+  font:
+    15px system-ui,
+    sans-serif;
+  border: 0;
+  border-radius: 9px;
+  background: var(--cream);
+  color: var(--ink);
+  padding: 14px 20px;
+  min-height: 46px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 4px;
+}
+.text-button {
+  padding-left: 0;
+  background: transparent;
+  color: var(--gold);
+  text-align: left;
+}
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 15px calc(10px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  background: #101820f5;
+  border-top: 1px solid #40505a;
+  z-index: 1000;
+}
+.app-nav button {
+  background: transparent;
+  color: var(--muted);
+  flex: 1;
+}
+.app-nav [aria-current="page"] {
+  color: var(--cream);
+  background: #263844;
+}
+.connection {
+  background: #263844;
+  border-radius: 10px;
+  padding: 12px;
+}
+.muted {
+  color: var(--muted);
+  font:
+    14px/1.6 system-ui,
+    sans-serif;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.account-links {
+  display: flex;
+  flex-direction: column;
+  margin-top: 25px;
+}
+.shop-grid {
+  display: grid;
+  gap: 18px;
+}
+.shop-book {
+  display: grid;
+  grid-template-columns: 85px 1fr;
+  gap: 20px;
+}
+.shop-book img {
+  width: 85px;
+  height: 130px;
+  object-fit: contain;
+}
+.shop-book h3 {
+  font-size: 21px;
+  margin-top: 0;
+}
+.shop-book .price {
+  font-family: system-ui, sans-serif;
+  color: var(--gold);
+}
+.sgeul-reader-bar {
+  padding: calc(12px + env(safe-area-inset-top)) 18px 12px;
+  display: flex;
+  justify-content: space-between;
+  background: #101820;
+  color: var(--cream);
+  font:
+    15px system-ui,
+    sans-serif;
+}
+.sgeul-reader-bar a {
+  text-decoration: none;
+}
+.sgeul-reader-page .library {
+  padding-top: 20px;
+}
+.sgeul-reader-page .library-masthead,
+.sgeul-reader-page #reading-membership-offer,
+.sgeul-reader-page #reading-membership-summary,
+.sgeul-reader-page #preview-reading-checkout,
+.sgeul-reader-page #check-reading-setup,
+.sgeul-reader-page #reading-reconcile-form {
+  display: none !important;
+}
+@media (min-width: 650px) {
+  .destinations {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .shop-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    animation: none !important;
+  }
+}
+
+.sgeul-reader-page:has(#reader:not([hidden])) > .sgeul-reader-bar {
+  display: none;
+}

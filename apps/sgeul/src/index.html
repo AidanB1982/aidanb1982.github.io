@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101820" />
+    <title>Sgeul</title>
+    <link rel="stylesheet" href="/sgeul.css" />
+  </head>
+  <body>
+    <main id="app">
+      <header class="masthead">
+        <p class="publisher">BLACKWOOD PUBLISHING</p>
+        <h1>Sgeul</h1>
+        <p class="tagline">Every Story Begins Somewhere</p>
+      </header>
+      <p id="connection" class="connection" role="status" hidden>
+        Offline · saved copies remain on this device.
+      </p>
+      <section id="sign-in" class="panel" hidden>
+        <h2>Welcome to your stories</h2>
+        <p>Sign in with your existing Blackwood Publishing account.</p>
+        <form id="login-form">
+          <label
+            >Email<input
+              name="email"
+              type="email"
+              autocomplete="username"
+              required
+              maxlength="254" /></label
+          ><label
+            >Password<input
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required /></label
+          ><button id="login-button">Sign in</button>
+        </form>
+        <p id="login-status" role="status"></p>
+        <button class="text-button" id="password-help">Password help</button>
+      </section>
+      <section id="home" hidden>
+        <div class="section-heading">
+          <h2>Your reading room</h2>
+          <span id="reader-name"></span>
+        </div>
+        <div class="destinations">
+          <a class="panel destination" href="/pages/bp-reading.html"
+            ><span class="eyebrow">YOUR LIBRARY</span>
+            <h3>Find your next chapter</h3>
+            <p>Read your available books and keep a copy for the journey.</p>
+            <span class="action">Open library →</span></a
+          ><a
+            id="arc-entry"
+            class="panel destination"
+            href="/pages/bp-reading.html?arc=1"
+            hidden
+            ><span class="eyebrow">PRIVATE ADVANCE COPIES</span>
+            <h3>Your ARC reading room</h3>
+            <p id="arc-summary">Open your assigned stories.</p>
+            <span class="action">Open ARC room →</span></a
+          >
+        </div>
+        <p id="home-status" class="muted" role="status"></p>
+      </section>
+      <section id="shop" hidden>
+        <h2>Books to keep</h2>
+        <p>
+          Physical books and signed editions, supplied by Blackwood Publishing.
+          Shipping is calculated at checkout.
+        </p>
+        <div id="shop-products" class="shop-grid"></div>
+        <p id="shop-status" role="status"></p>
+      </section>
+      <section id="account" class="panel" hidden>
+        <h2>Your account</h2>
+        <p id="account-email"></p>
+        <p>
+          Your saved copies belong to this account on this device. Signing out
+          removes them. ARC places and notes are stored on this device.
+        </p>
+        <button id="sign-out">Sign out</button>
+        <p id="account-status" role="status"></p>
+        <div class="account-links">
+          <button
+            class="text-button"
+            data-external="https://blackwoodpublishing.co.uk/security-policy.html"
+          >
+            Privacy information</button
+          ><button
+            class="text-button"
+            data-external="https://blackwoodpublishing.co.uk/pages/contact.html"
+          >
+            Help and account requests
+          </button>
+        </div>
+        <p class="muted">
+          Sgeul · Android prototype 0.1.0<br />By Blackwood Publishing
+        </p>
+      </section>
+      <p id="startup-status" role="status">Preparing your reading room…</p>
+    </main>
+    <nav class="app-nav" aria-label="Sgeul">
+      <button data-view="home" aria-current="page">Home</button
+      ><button data-view="shop">Bookshop</button
+      ><button data-view="account">Account</button>
+    </nav>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

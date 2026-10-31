@@ -1,0 +1,7 @@
+{
+  "appId": "uk.co.blackwoodpublishing.sgeul",
+  "appName": "Sgeul",
+  "webDir": "dist",
+  "server": { "androidScheme": "https", "hostname": "localhost" },
+  "android": { "allowMixedContent": false, "backgroundColor": "#101820" }
+}
