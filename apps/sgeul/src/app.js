@@ -4,8 +4,10 @@ import { Browser } from "@capacitor/browser";
 import { client } from "./client.js";
 import { OfflineLibrary } from "../../../js/BP-reading-offline.js";
 import { loadShop } from "./shop.js";
+import { isOnline, initialiseConnectivity } from "./connectivity.js";
 const $ = (id) => document.getElementById(id),
   offline = new OfflineLibrary();
+let connectivityReady = false;
 let user = null,
   view = "home",
   busy = false,
@@ -35,11 +37,12 @@ function showView(next) {
   if (user && next === "shop") void loadShop(openExternal);
 }
 function connection() {
-  $("connection").hidden = navigator.onLine;
+  $("connection").hidden = isOnline();
 }
 async function loadAccount() {
+  if (!connectivityReady) return;
   const current = ++epoch;
-  if (navigator.onLine) {
+  if (isOnline()) {
     const { data } = await client.auth.getSession();
     if (current !== epoch) return;
     user = data.session?.user || null;
@@ -70,7 +73,8 @@ async function loadAccount() {
   $("arc-entry").hidden = true;
   const saved = await offline.list(user.id).catch(() => []);
   if (current !== epoch) return;
-  if (!navigator.onLine) {
+  renderSavedBooks(saved);
+  if (!isOnline()) {
     const count = saved.filter((row) => row.book.arcAssignmentId).length;
     $("arc-entry").hidden = !count;
     $("arc-summary").textContent =
@@ -99,10 +103,31 @@ async function loadAccount() {
         "ARC assignments could not be checked. Reconnect and try again.";
   }
 }
+function renderSavedBooks(rows) {
+  const section = $("saved-books"),
+    list = $("saved-book-list");
+  list.replaceChildren();
+  section.hidden = !rows.length;
+  for (const row of rows) {
+    const link = document.createElement("a");
+    link.className = "saved-book";
+    link.href =
+      "/pages/bp-reading.html" + (row.book.arcAssignmentId ? "?arc=1" : "");
+    const title = document.createElement("strong"),
+      detail = document.createElement("span");
+    title.textContent = row.book.title;
+    detail.textContent =
+      (row.book.arcAssignmentId ? "ARC room" : "Library") +
+      " · saved until " +
+      new Date(row.expiresAt).toLocaleDateString("en-GB");
+    link.append(title, detail);
+    list.append(link);
+  }
+}
 $("login-form").onsubmit = async (event) => {
   event.preventDefault();
   if (busy) return;
-  if (!navigator.onLine) {
+  if (!isOnline()) {
     $("login-status").textContent = "Connect to the internet to sign in.";
     return;
   }
@@ -138,7 +163,7 @@ $("sign-out").onclick = async () => {
       if (key.startsWith("bp-reading:" + previous + ":"))
         localStorage.removeItem(key);
     localStorage.removeItem("bp-reading-offline-account-v1");
-    if (!navigator.onLine) {
+    if (!isOnline()) {
       client.auth.stopAutoRefresh();
       localStorage.removeItem("sb-bmnlynjldlnxfvunqbqq-auth-token");
       location.replace("/index.html");
@@ -186,6 +211,8 @@ if (Capacitor.isNativePlatform())
     if (view !== "home") showView("home");
     else void App.minimizeApp();
   });
+await initialiseConnectivity();
+connectivityReady = true;
 connection();
 void loadAccount().catch(() => {
   $("startup-status").textContent =

@@ -119,3 +119,16 @@ HTTP server rooted at `apps/sgeul/dist`, with `BASE_URL`, `CHROMIUM_PATH`,
 `READING_TEST_DIR` (real EPUB fixture) and Playwright's `NODE_PATH` configured.
 Browser tests model unavailable external network while allowing packaged localhost
 assets. They do not replace real Android airplane-mode and device lifecycle tests.
+
+## Prototype update 0.1.1
+
+Android connection status now comes from Capacitor Network, including an initial
+check before auth/library startup and a fresh check when the app resumes. The local
+WebView's `navigator.onLine` is not authoritative for native reading. Native events
+feed the same reader expiry/revocation and offline handling; browser previews retain
+the browser's network signal. A home-screen **Saved on this device** list links each
+valid copy to its Library or ARC room, without mixing their access or storage keys.
+Install this update over 0.1.0 using the same package ID and debug signing key: do not
+uninstall or clear storage when testing an existing saved copy. No Supabase changes
+are required for this client-side update. Verify real-phone airplane mode after
+restart and after switching the radios while the app is running.

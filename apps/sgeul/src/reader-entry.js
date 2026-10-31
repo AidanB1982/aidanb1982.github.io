@@ -1,5 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
+import { initialiseConnectivity } from "./connectivity.js";
+await initialiseConnectivity();
 window.__SGEUL_BUNDLED_READER__ = true;
 const bar = document.createElement("nav");
 bar.className = "sgeul-reader-bar";

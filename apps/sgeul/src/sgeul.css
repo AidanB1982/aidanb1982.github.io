@@ -245,4 +245,27 @@ select:focus-visible {
   display: none;
 }
 
-.sgeul-mark { width:72px; height:72px; border-radius:16px; margin-bottom:18px; }
+.sgeul-mark {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  margin-bottom: 18px;
+}
+
+.saved-book {
+  display: block;
+  padding: 14px 0;
+  text-decoration: none;
+  border-bottom: 1px solid #40505a;
+}
+.saved-book:last-child {
+  border-bottom: 0;
+}
+.saved-book span {
+  display: block;
+  font:
+    13px/1.6 system-ui,
+    sans-serif;
+  color: var(--muted);
+  margin-top: 6px;
+}

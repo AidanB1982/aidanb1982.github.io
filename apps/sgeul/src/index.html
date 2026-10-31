@@ -13,7 +13,13 @@
   <body>
     <main id="app">
       <header class="masthead">
-        <img class="sgeul-mark" src="/assets/sgeul-icon.png" alt="" width="72" height="72">
+        <img
+          class="sgeul-mark"
+          src="/assets/sgeul-icon.png"
+          alt=""
+          width="72"
+          height="72"
+        />
         <p class="publisher">BLACKWOOD PUBLISHING</p>
         <h1>Sgeul</h1>
         <p class="tagline">Every Story Begins Somewhere</p>
@@ -65,6 +71,10 @@
             <span class="action">Open ARC room →</span></a
           >
         </div>
+        <section id="saved-books" class="panel" hidden>
+          <h2>Saved on this device</h2>
+          <div id="saved-book-list"></div>
+        </section>
         <p id="home-status" class="muted" role="status"></p>
       </section>
       <section id="shop" hidden>
@@ -99,7 +109,7 @@
           </button>
         </div>
         <p class="muted">
-          Sgeul · Android prototype 0.1.0<br />By Blackwood Publishing
+          Sgeul · Android prototype 0.1.1<br />By Blackwood Publishing
         </p>
       </section>
       <p id="startup-status" role="status">Preparing your reading room…</p>

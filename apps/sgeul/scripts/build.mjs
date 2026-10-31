@@ -14,6 +14,12 @@ function required(source, from, to) {
     throw Error("Shared integration changed: " + from.slice(0, 70));
   return source.replace(from, to);
 }
+function useNativeConnectivity(source) {
+  return source.includes("navigator.onLine")
+    ? 'import {isOnline as sgeulOnline} from "sgeul-connectivity";\n' +
+        source.replaceAll("navigator.onLine", "sgeulOnline()")
+    : source;
+}
 function nativeReader(source) {
   const start = source.indexOf(
       "$('reading-reconcile-form').onsubmit=async event=>{",
@@ -41,6 +47,9 @@ function nativeReader(source) {
 const plugin = {
   name: "sgeul-reader",
   setup(b) {
+    b.onResolve({ filter: /^sgeul-connectivity$/ }, () => ({
+      path: path.join(app, "src/connectivity.js"),
+    }));
     b.onResolve({ filter: /^sgeul-shared-reader$/ }, () => ({
       path: path.join(repo, "js/BP-reading.js"),
     }));
@@ -67,7 +76,9 @@ const plugin = {
       path: path.resolve(args.resolveDir, args.path.split("?")[0]),
     }));
     b.onLoad({ filter: /\/js\/BP-reading\.js$/ }, async (args) => ({
-      contents: nativeReader(await readFile(args.path, "utf8")),
+      contents: useNativeConnectivity(
+        nativeReader(await readFile(args.path, "utf8")),
+      ),
       resolveDir: path.dirname(args.path),
       loader: "js",
     }));
@@ -77,6 +88,11 @@ const plugin = {
           "export async function prepareOfflineShell()",
         )[0] +
         `export async function prepareOfflineShell(){if(!window.__SGEUL_BUNDLED_READER__)throw Error('The bundled reader is unavailable.');}`,
+      resolveDir: path.dirname(args.path),
+      loader: "js",
+    }));
+    b.onLoad({ filter: /\/js\/BP-reading[^/]*\.js$/ }, async (args) => ({
+      contents: useNativeConnectivity(await readFile(args.path, "utf8")),
       resolveDir: path.dirname(args.path),
       loader: "js",
     }));
@@ -96,8 +112,11 @@ await build({
 });
 await copyFile(path.join(app, "src/index.html"), path.join(out, "index.html"));
 await copyFile(path.join(app, "src/sgeul.css"), path.join(out, "sgeul.css"));
-await mkdir(path.join(out, 'assets'), {recursive:true});
-await copyFile(path.join(repo, 'assets/Sgeul Icon Square.png'),path.join(out,'assets/sgeul-icon.png'));
+await mkdir(path.join(out, "assets"), { recursive: true });
+await copyFile(
+  path.join(repo, "assets/Sgeul Icon Square.png"),
+  path.join(out, "assets/sgeul-icon.png"),
+);
 let html = await read("pages/bp-reading.html");
 html = html
   .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
@@ -173,7 +192,7 @@ await writeFile(
   path.join(out, "build-info.json"),
   JSON.stringify({
     app: "Sgeul",
-    version: "0.1.0",
+    version: "0.1.1",
     bundledReader: true,
     physicalShop: true,
   }),

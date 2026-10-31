@@ -1,14 +1,15 @@
+import { isOnline } from "./connectivity.js";
 let loading = false;
 const $ = (id) => document.getElementById(id);
 export async function loadShop(openExternal) {
   if (loading) return;
   loading = true;
   $("shop-products").replaceChildren();
-  $("shop-status").textContent = navigator.onLine
+  $("shop-status").textContent = isOnline()
     ? "Checking available editions…"
     : "Reconnect to check prices and availability.";
   try {
-    if (!navigator.onLine) return;
+    if (!isOnline()) return;
     const metadata = await fetch("/data/physical-books.json").then((r) =>
       r.json(),
     );
@@ -76,7 +77,7 @@ export async function loadShop(openExternal) {
           style: "currency",
           currency: v.price.currencyCode,
         }).format(Number(v.price.amount));
-        button.disabled = !navigator.onLine || !v.availableForSale;
+        button.disabled = !isOnline() || !v.availableForSale;
         button.textContent = v.availableForSale
           ? "Buy physical copy"
           : "Sold out";
@@ -84,8 +85,7 @@ export async function loadShop(openExternal) {
       select.onchange = update;
       button.onclick = async () => {
         const v = variants.find((v) => v.id === select.value);
-        if (!navigator.onLine || !v?.requiresShipping || !v.availableForSale)
-          return;
+        if (!isOnline() || !v?.requiresShipping || !v.availableForSale) return;
         const id = v.id.match(/^gid:\/\/shopify\/ProductVariant\/(\d+)$/)?.[1];
         if (!id) return;
         try {
