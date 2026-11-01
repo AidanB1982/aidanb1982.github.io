@@ -1,0 +1,38 @@
+/* Martin Hales: practical guides, within Blackwood's shared author layout. */
+.martin-hales-page{background:radial-gradient(ellipse at 90% 5%,#17333b40,transparent 42%),#101310;color:#ece7dc}
+.hales-wrap{max-width:1200px;margin:0 auto;padding:60px 30px 90px}
+.hales-hero{display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:55px;padding:50px 0 70px;border-bottom:1px solid #b8733340}
+.martin-hales-page .hales-kicker{font:11px/1.6 Arial,sans-serif;letter-spacing:.17em;color:#cfaa76;margin:0 0 14px}
+.hales-hero h1{font-size:clamp(3rem,6vw,5.5rem);font-weight:400;line-height:1.1;letter-spacing:-.035em;margin:0 0 18px}
+.hales-role{font:14px Arial,sans-serif;letter-spacing:.05em;color:#bdbdb1}
+.hales-lead{font-size:clamp(1.6rem,2.7vw,2.2rem);line-height:1.35;margin:30px 0 20px;color:#f0dfbf}
+.hales-intro,.hales-section-heading>p:last-child{max-width:640px;line-height:1.85;color:#c9c7bd}
+.hales-hero .work-actions{justify-content:flex-start;margin-top:28px;gap:12px}
+.hales-hero-books{display:flex;align-items:center;justify-content:center;gap:12px;min-width:0}
+.hales-hero-books img{display:block;width:29%;height:auto;box-shadow:0 18px 35px #0007;border-radius:2px}
+.hales-hero-books img:nth-child(2){width:34%;transform:translateY(-14px)}
+.hales-about{display:grid;grid-template-columns:.7fr 1.3fr;gap:65px;padding:65px 0;border-bottom:1px solid #b873332b}
+.hales-about h2,.hales-section h2,.hales-checker h2,.hales-contact h2{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:400;line-height:1.25;margin:0 0 20px}
+.hales-about p:not(.hales-kicker),.hales-book p:not(.hales-kicker),.hales-checker p:not(.hales-kicker),.hales-contact p:not(.hales-kicker){font-size:16px;line-height:1.85;color:#c9c7bd}
+.hales-about p:first-child{margin-top:0}
+.hales-section{padding:65px 0;scroll-margin-top:120px}
+.hales-section-heading{margin-bottom:35px}
+.hales-book-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.hales-book{display:flex;flex-direction:column;align-items:flex-start;padding:28px 24px;background:#ffffff03;border:1px solid #b8733338;border-radius:4px;min-width:0}
+.hales-book>img{height:225px;width:150px;object-fit:contain;object-position:left;margin-bottom:26px;filter:drop-shadow(0 12px 14px #0007)}
+.hales-book h3{font-size:25px;font-weight:400;line-height:1.3;margin:0 0 12px}
+.hales-book .hales-book-subtitle{font-style:italic;font-size:14px;color:#d9c7a6;line-height:1.6;margin-top:0}
+.hales-book>.button{margin-top:auto;padding:13px 16px;font-size:12px;letter-spacing:.04em;white-space:normal;line-height:1.6;text-align:center}
+.hales-checker{display:grid;grid-template-columns:.65fr 1.35fr;align-items:center;gap:50px;padding:44px;background:linear-gradient(120deg,#153038,#162322);border:1px solid #53818177;border-radius:8px;scroll-margin-top:120px}
+.hales-checker-mark{display:flex;flex-direction:column;gap:18px;text-align:center;color:#e8d7b2}
+.hales-checker-mark span:first-child{font-size:68px;letter-spacing:.03em}
+.hales-checker-mark span:last-child{font:12px/1.7 Arial,sans-serif;letter-spacing:.22em;color:#a9cecb}
+.hales-checker .button{margin-top:10px}
+.hales-contact{display:flex;align-items:center;justify-content:space-between;gap:30px;padding-top:65px}
+.hales-contact h2{font-size:28px;margin-bottom:10px}
+.hales-contact .button{flex-shrink:0}
+.hales-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.martin-hales-page a:focus-visible{outline:2px solid #e6bc82;outline-offset:5px}
+@media(min-width:1100px){body.publications-page #practical-guides .series-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.hales-wrap{padding:35px 24px 65px}.hales-hero{grid-template-columns:1fr;gap:40px;padding-top:25px}.hales-hero-books{max-width:480px}.hales-about{gap:30px;grid-template-columns:1fr}.hales-book-grid{grid-template-columns:1fr}.hales-book{display:grid;grid-template-columns:145px 1fr;column-gap:25px}.hales-book>img{grid-column:1;grid-row:1/6;width:130px;height:200px;margin:0}.hales-book>:not(img){grid-column:2}.hales-book .button{justify-self:start}.hales-checker{grid-template-columns:1fr;gap:25px;padding:30px}.hales-checker-mark{display:none}.hales-contact{align-items:flex-start;flex-direction:column}}
+@media(max-width:480px){.hales-wrap{padding-left:20px;padding-right:20px}.hales-book{display:flex;padding:24px}.hales-book>img{width:135px;height:205px;margin-bottom:24px}.hales-hero .work-actions{align-items:stretch;flex-direction:column}.hales-hero .button{text-align:center}.hales-about{padding:45px 0}.hales-section{padding:45px 0}}

@@ -357,6 +357,10 @@
                         Miren Vale
                     </a>
 
+                    <a href="/pages/martin-hales.html" role="menuitem">
+                        Martin Hales
+                    </a>
+
                     <a href="/pages/appearances.html" role="menuitem">
                         Appearances
                     </a>
