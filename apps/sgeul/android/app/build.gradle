@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+// Upload credentials are supplied only by the build environment, never committed.
+def uploadStorePath = System.getenv('SGEUL_UPLOAD_KEYSTORE')
+def uploadStorePassword = System.getenv('SGEUL_UPLOAD_STORE_PASSWORD')
+def uploadKeyAlias = System.getenv('SGEUL_UPLOAD_KEY_ALIAS')
+def uploadKeyPassword = System.getenv('SGEUL_UPLOAD_KEY_PASSWORD')
+def hasUploadSigning = [uploadStorePath, uploadStorePassword, uploadKeyAlias, uploadKeyPassword].every { it }
+
 android {
     namespace "uk.co.blackwoodpublishing.sgeul"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +14,8 @@ android {
         applicationId "uk.co.blackwoodpublishing.sgeul"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "0.1.1"
+        versionCode 3
+        versionName "0.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +23,19 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasUploadSigning) {
+            upload {
+                storeFile file(uploadStorePath)
+                storePassword uploadStorePassword
+                keyAlias uploadKeyAlias
+                keyPassword uploadKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (hasUploadSigning) signingConfig signingConfigs.upload
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -51,4 +69,11 @@ try {
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
+
+// Do not silently produce an unsigned release when credentials are absent.
+tasks.matching { it.name == 'preReleaseBuild' }.configureEach {
+    doFirst {
+        if (!hasUploadSigning) throw new GradleException('Supply SGEUL_UPLOAD_KEYSTORE, SGEUL_UPLOAD_STORE_PASSWORD, SGEUL_UPLOAD_KEY_ALIAS and SGEUL_UPLOAD_KEY_PASSWORD for a release build.')
+    }
 }

@@ -7,3 +7,7 @@ android/**/build/
 *.keystore
 
 resources/
+*.p12
+*.pfx
+upload-signing.json
+*upload-key-backup*

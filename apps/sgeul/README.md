@@ -28,7 +28,7 @@ interactive member bookshelf, push notifications or in-app account deletion.
 ## Build
 
 Requirements: Node 22+, Java **JDK** 21 (a JRE alone is insufficient), Android SDK
-platform 35/build-tools 35.0.0, and Android Studio or equivalent command-line tools.
+platform 36/build-tools 35.0.0, and Android Studio or equivalent command-line tools.
 
 ```sh
 cd apps/sgeul
@@ -132,3 +132,19 @@ Install this update over 0.1.0 using the same package ID and debug signing key: 
 uninstall or clear storage when testing an existing saved copy. No Supabase changes
 are required for this client-side update. Verify real-phone airplane mode after
 restart and after switching the radios while the app is running.
+
+## First Google Play internal bundle · 0.1.2 (version code 3)
+
+The Android target/compile SDK is now 36, using Android Gradle Plugin 8.9.2.
+The first Play upload is a release-signed `.aab`, not the debug APK. Run
+`npm run android:bundle` with the four upload-signing environment variables in
+[the signing guide](signing/README.md). The build fails rather than silently
+creating an unsigned release. The public upload certificate is committed; the
+private upload key and its backup remain outside the public repository.
+
+Upload `Sgeul-0.1.2-internal.aab` to the internal testing release, name it
+`0.1.2 — First internal test`, and use `downloads/Sgeul-0.1.2-release-notes.txt`
+for the en-GB release notes. Use Google Play App Signing for distribution.
+The store listing, data disclosures, account deletion and required closed test
+remain separate launch work. Do not treat a successful internal upload as approval
+for production. The owner completes the Play Console preview/confirm step.

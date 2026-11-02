@@ -1,0 +1,11 @@
+<en-GB>
+First Google Play internal test of Sgeul.
+
+- Sign in with your existing Blackwood Publishing account.
+- Read available library books and privately assigned ARC copies.
+- Save books for offline reading, with a Saved on this device list.
+- Use native Android connection checks for airplane-mode reading.
+- Browse physical books and signed editions through Shopify.
+
+Please test sign-in, reading, offline reopening and returning online.
+</en-GB>

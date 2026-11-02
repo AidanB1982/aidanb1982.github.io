@@ -192,7 +192,7 @@ await writeFile(
   path.join(out, "build-info.json"),
   JSON.stringify({
     app: "Sgeul",
-    version: "0.1.1",
+    version: "0.1.2",
     bundledReader: true,
     physicalShop: true,
   }),
