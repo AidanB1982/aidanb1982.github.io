@@ -71,7 +71,8 @@ export function createReadingHandler(deps: Dependencies) {
       const isAdmin = profile.data?.is_admin === true;
       if (!isAdmin) {
         // Remains closed until payment verification, releases and acceptance tests are complete.
-        if (deps.env('BP_READING_CUSTOMER_ACCESS') !== 'true' && (deps.env('BP_READING_TEST_USER_ID')||'').trim().toLowerCase() !== userData.user.id) return fail(403,'Reader membership access has not opened yet.');
+        const testUsers = new Set([deps.env('BP_READING_TEST_USER_ID')||'', ...(deps.env('BP_READING_TEST_USER_IDS')||'').split(',')].map(value=>value.trim().toLowerCase()).filter(Boolean));
+        if (deps.env('BP_READING_CUSTOMER_ACCESS') !== 'true' && !testUsers.has(userData.user.id.toLowerCase())) return fail(403,'Reader membership access has not opened yet.');
         // Use the CALLER'S JWT. A service-role RPC cannot establish the user's entitlement.
         const access = await userClient.rpc('bp_reading_can_read',{p_edition_id:editionId});
         if (access.error) return fail(503,'Reader access could not be verified. Please try again.');

@@ -322,3 +322,9 @@ in that directory, then `npm test`. `tests/sgeul-browser.cjs` runs the actual ap
 bundle with synthetic Supabase/Shopify responses and real EPUB rendering; includes
 expired-session offline navigation, ARC-only access, reconnect revocation, physical
 variant gating and signout cleanup. No live account or checkout is changed.
+
+Play reviewer setup is covered by `tests/arc-reading-sql.cjs`: creates only the
+confirmed target's normal profile/complimentary entitlement and assigned ARC,
+preserves unrelated accounts, rejects existing admin/revoked state and creates no
+payment/purchase. Delivery tests cover the additional comma-separated tester
+allowlist while retaining entitlement checks and the original single tester setting.

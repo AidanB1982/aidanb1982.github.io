@@ -4,7 +4,7 @@ const origin = 'https://blackwoodpublishing.co.uk';
 function fixture(overrides={}) {
   const config = {isAdmin:true,enabled:false,entitled:false,release:true,file:true,edition:true,format:'ebook',status:'admin_testing',...overrides};
   const operations=[];
-  const env={SUPABASE_URL:'https://test.invalid',SUPABASE_ANON_KEY:'anon-fixture',SUPABASE_SERVICE_ROLE_KEY:'server-fixture',BP_READING_CUSTOMER_ACCESS:config.enabled?'true':'false',BP_READING_TEST_USER_ID:config.tester};
+  const env={SUPABASE_URL:'https://test.invalid',SUPABASE_ANON_KEY:'anon-fixture',SUPABASE_SERVICE_ROLE_KEY:'server-fixture',BP_READING_CUSTOMER_ACCESS:config.enabled?'true':'false',BP_READING_TEST_USER_ID:config.tester,BP_READING_TEST_USER_IDS:config.testers};
   const handler = createReadingHandler({env:name=>env[name],log:()=>{},createClient:(url,key,options)=>({
     auth:{getUser:async token=>config.badToken?{data:{user:null},error:{}}:{data:{user:{id:'verified-user'}}}},
     from(table) { const filters={}; return {select(){return this;},eq(k,v){filters[k]=v;return this;},async maybeSingle(){operations.push({table,filters});
@@ -40,6 +40,9 @@ result=await request({},'x'.repeat(4097));assert.equal(result.response.status,41
 result=await request({},undefined,{Origin:'https://untrusted.invalid'});assert.equal(result.response.status,403);assert.equal(result.response.headers.has('Access-Control-Allow-Origin'),false);
 result=await request({},undefined,{Authorization:''});assert.equal(result.response.status,401);
 const f=fixture();assert.equal((await f.handler(new Request('https://service.invalid',{method:'OPTIONS',headers:{Origin:origin}}))).status,204);assert.equal((await f.handler(new Request('https://service.invalid',{headers:{Origin:origin}}))).status,405);
+result=await request({isAdmin:false,enabled:false,testers:'other, VERIFIED-USER ',entitled:true});assert.equal(result.response.status,200,'additional reviewer allowlist retains full entitlement checks');
+result=await request({isAdmin:false,enabled:false,testers:'verified-user',entitled:false});assert.equal(result.response.status,403);assert(!result.operations.some(op=>op.download));
+result=await request({isAdmin:false,enabled:false,testers:'other-user',entitled:true});assert.equal(result.response.status,403);assert(!result.operations.some(op=>op.download));
 console.log('PASS delivery handler: verified admin path, closed customer gate, caller-scoped entitlements, per-file releases, mismatched paths, denied access before storage, invalid IDs/EPUBs, CORS and no-store headers');
 
 result=await request({}, {editionId:2,offline:true});assert.equal(result.response.status,200);assert(Date.parse(result.response.headers.get('X-BP-Offline-Until'))>Date.now()+6*86400000);
