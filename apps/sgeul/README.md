@@ -148,3 +148,13 @@ for the en-GB release notes. Use Google Play App Signing for distribution.
 The store listing, data disclosures, account deletion and required closed test
 remain separate launch work. Do not treat a successful internal upload as approval
 for production. The owner completes the Play Console preview/confirm step.
+
+## Play automatic-protection compatibility · 0.1.3 (version code 4)
+
+The first 0.1.2 upload was rejected because Play automatic protection requires
+minimum API 24. The replacement 0.1.3 bundle raises minSdkVersion to 24, keeps
+target/compile API 36 and uses the same upload key. Upload the replacement before
+reviewing empty-release/upgrade errors. Sgeul has no advertising integration and
+does not request `com.google.android.gms.permission.AD_ID`; answer No to the
+advertising ID declaration for this build. This does not replace the separate
+Data safety and privacy declarations.
