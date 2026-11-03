@@ -1,0 +1,195 @@
+.sgeul-beta-page {
+  background: radial-gradient(ellipse at 80% 0, #17374780, transparent 55%),
+    #101820;
+  color: #f4ead5;
+}
+.beta-wrap {
+  max-width: 1080px;
+  margin: auto;
+  padding: 85px 28px;
+}
+.beta-hero {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  align-items: center;
+  gap: 55px;
+  padding: 30px 0 55px;
+}
+.beta-mark {
+  width: min(100%, 260px);
+  height: auto;
+  border-radius: 24%;
+  justify-self: center;
+}
+.beta-kicker {
+  font: 11px/1.7 Arial, sans-serif;
+  letter-spacing: 0.18em;
+  color: #d6b982;
+}
+.beta-hero h1 {
+  font-size: clamp(2.6rem, 6vw, 4.8rem);
+  line-height: 1.1;
+  font-weight: 400;
+  margin: 18px 0;
+}
+.beta-tagline {
+  font-size: 22px;
+  font-style: italic;
+  color: #dcc49e;
+}
+.beta-lead {
+  font-size: 18px;
+  line-height: 1.8;
+  max-width: 660px;
+  color: #d1d2c8;
+}
+.beta-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 50px;
+}
+.beta-panel,
+.beta-form {
+  padding: 30px;
+  border: 1px solid #53666e;
+  background: #15252e;
+  border-radius: 12px;
+}
+.beta-panel h2,
+.beta-form h2 {
+  font-size: 27px;
+  font-weight: 400;
+  margin-top: 0;
+}
+.beta-panel p,
+.beta-panel li,
+.beta-form p {
+  line-height: 1.8;
+  color: #d1d2c8;
+}
+.beta-panel li {
+  margin: 12px 0;
+}
+.beta-form {
+  max-width: 780px;
+  margin: 25px auto;
+}
+.beta-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.beta-form label {
+  display: block;
+  font: 15px/1.6 Arial, sans-serif;
+  margin-bottom: 20px;
+}
+.beta-form input:not([type="checkbox"]),
+.beta-form select,
+.beta-form textarea {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  font: 16px/1.5 Arial, sans-serif;
+  border: 1px solid #697b82;
+  border-radius: 6px;
+  background: #101c25;
+  color: #f4ead5;
+  padding: 12px;
+  margin-top: 8px;
+}
+.beta-form small {
+  display: block;
+  color: #bac6c7;
+  font: 13px/1.6 Arial, sans-serif;
+  margin-top: 6px;
+}
+.beta-form textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+.beta-check {
+  display: flex !important;
+  gap: 12px;
+  align-items: flex-start;
+}
+.beta-check input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: #c8ae82;
+}
+.beta-form button {
+  border: 0;
+  background: #ddc398;
+  color: #101820;
+  font: 15px Arial, sans-serif;
+  border-radius: 7px;
+  padding: 15px 22px;
+  cursor: pointer;
+  min-height: 48px;
+}
+.beta-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.beta-form a,
+.beta-panel a {
+  color: #e4c58f;
+  text-decoration: underline;
+}
+.beta-form [role="status"] {
+  min-height: 24px;
+}
+.beta-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.beta-note {
+  max-width: 780px;
+  margin: 25px auto;
+  color: #c3c9c8;
+  font: 14px/1.8 Arial, sans-serif;
+}
+.beta-route {
+  display: inline-block;
+  margin: 18px 0;
+  color: #dfc69d !important;
+}
+.sgeul-beta-page :is(input, select, textarea, button, a):focus-visible {
+  outline: 3px solid #e1c48e;
+  outline-offset: 4px;
+}
+.sgeul-beta-page [hidden] {
+  display: none !important;
+}
+@media (max-width: 700px) {
+  .beta-wrap {
+    padding: 45px 20px;
+  }
+  .beta-hero {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .beta-mark {
+    width: 120px;
+    justify-self: start;
+    grid-row: 1;
+  }
+  .beta-panels,
+  .beta-fields {
+    grid-template-columns: 1fr;
+  }
+  .beta-form,
+  .beta-panel {
+    padding: 24px;
+  }
+  .beta-form button {
+    width: 100%;
+  }
+}

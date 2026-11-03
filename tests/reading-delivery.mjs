@@ -14,10 +14,11 @@ function fixture(overrides={}) {
       if(table==='bp_reading_catalog')return {data:{book_id:'gualachulain'}};
       if(table==='bp_reading_purchases')return {data:config.purchased?{revoked_at:config.revoked?'2026-01-01':null}:null};
       if(table==='bp_reading_memberships')return {data:{access_until:new Date(Date.now()+(config.expired?-1:3600000)).toISOString(),revoked_at:config.revoked?'2026-01-01':null}};
+      if(table==='bp_reading_beta_grants')return {data:config.betaAllowed?{access_until:new Date(Date.now()+(config.betaExpired?-1000:86400000)).toISOString(),revoked_at:config.betaRevoked?'2026-01-01':null}:null};
       if(table==='book_editions')return {data:config.edition?{id:2,format:config.format}:null};
       throw Error('Unexpected query');
     }};},
-    async rpc(name,args) {assert.equal(key,'anon-fixture','entitlements use caller client');assert.equal(options.global.headers.Authorization,'Bearer verified-token');operations.push({rpc:name,args});return config.rpcError?{data:null,error:{}}:{data:config.entitled};},
+    async rpc(name,args) {assert.equal(key,'anon-fixture','entitlements use caller client');assert.equal(options.global.headers.Authorization,'Bearer verified-token');operations.push({rpc:name,args});return config.rpcError?{data:null,error:{}}:{data:name==='bp_reading_beta_can_read'?config.betaAllowed===true:config.entitled};},
     storage:{from(bucket){assert.equal(key,'server-fixture');assert.equal(bucket,'bp-reading-editions');return {async download(path){assert.equal(path,'private-fixture.epub');operations.push({download:path});return {data:new Blob([new Uint8Array(config.invalidZip?[1,2,3]:[0x50,0x4b,0x03,0x04,1])])};}};}}
   })});
   return {handler,operations};
@@ -43,6 +44,10 @@ const f=fixture();assert.equal((await f.handler(new Request('https://service.inv
 result=await request({isAdmin:false,enabled:false,testers:'other, VERIFIED-USER ',entitled:true});assert.equal(result.response.status,200,'additional reviewer allowlist retains full entitlement checks');
 result=await request({isAdmin:false,enabled:false,testers:'verified-user',entitled:false});assert.equal(result.response.status,403);assert(!result.operations.some(op=>op.download));
 result=await request({isAdmin:false,enabled:false,testers:'other-user',entitled:true});assert.equal(result.response.status,403);assert(!result.operations.some(op=>op.download));
+result=await request({isAdmin:false,enabled:false,betaAllowed:true,entitled:true});assert.equal(result.response.status,200,'accepted beta can read its granted edition without opening the public gate');
+for(const config of [{betaAllowed:true,entitled:false},{betaAllowed:true,entitled:true,release:false}]){result=await request({isAdmin:false,enabled:false,...config});assert.equal(result.response.status,403);assert(!result.operations.some(op=>op.download));}
+result=await request({isAdmin:false,enabled:false,betaAllowed:true,entitled:true,expired:true},{editionId:2,offline:true});assert.equal(result.response.status,200);assert(Date.parse(result.response.headers.get('X-BP-Offline-Until'))<=Date.now()+86400000);
+for(const config of [{betaExpired:true},{betaRevoked:true}]){result=await request({isAdmin:false,enabled:false,betaAllowed:true,entitled:true,expired:true,...config},{editionId:2,offline:true});assert.equal(result.response.status,403);assert(!result.operations.some(op=>op.download));}
 console.log('PASS delivery handler: verified admin path, closed customer gate, caller-scoped entitlements, per-file releases, mismatched paths, denied access before storage, invalid IDs/EPUBs, CORS and no-store headers');
 
 result=await request({}, {editionId:2,offline:true});assert.equal(result.response.status,200);assert(Date.parse(result.response.headers.get('X-BP-Offline-Until'))>Date.now()+6*86400000);

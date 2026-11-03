@@ -72,7 +72,10 @@ export function createReadingHandler(deps: Dependencies) {
       if (!isAdmin) {
         // Remains closed until payment verification, releases and acceptance tests are complete.
         const testUsers = new Set([deps.env('BP_READING_TEST_USER_ID')||'', ...(deps.env('BP_READING_TEST_USER_IDS')||'').split(',')].map(value=>value.trim().toLowerCase()).filter(Boolean));
-        if (deps.env('BP_READING_CUSTOMER_ACCESS') !== 'true' && !testUsers.has(userData.user.id.toLowerCase())) return fail(403,'Reader membership access has not opened yet.');
+        if (deps.env('BP_READING_CUSTOMER_ACCESS') !== 'true' && !testUsers.has(userData.user.id.toLowerCase())) {
+          const beta = await userClient.rpc('bp_reading_beta_can_read',{p_edition_id:editionId});
+          if (beta.error || beta.data !== true) return fail(403,'Reader membership access has not opened yet.');
+        }
         // Use the CALLER'S JWT. A service-role RPC cannot establish the user's entitlement.
         const access = await userClient.rpc('bp_reading_can_read',{p_edition_id:editionId});
         if (access.error) return fail(503,'Reader access could not be verified. Please try again.');
@@ -105,8 +108,14 @@ export function createReadingHandler(deps: Dependencies) {
           if(!purchase.data||purchase.data.revoked_at) {
             const membership=await service.from('bp_reading_memberships').select('access_until,revoked_at').eq('user_id',userData.user.id).maybeSingle();
             const expires=typeof membership.data?.access_until==='string'?Date.parse(membership.data.access_until):NaN;
-            if(membership.error||membership.data?.revoked_at||!Number.isFinite(expires)||expires<=now)return fail(403,'An active membership or purchase is required to save offline.');
-            until=Math.min(until,expires);
+            if(membership.error)return fail(503,'Offline access could not be verified.');
+            if(!membership.data?.revoked_at&&Number.isFinite(expires)&&expires>now)until=Math.min(until,expires);
+            else {
+              const beta=await service.from('bp_reading_beta_grants').select('access_until,revoked_at').eq('user_id',userData.user.id).eq('edition_id',editionId).maybeSingle();
+              const betaExpires=typeof beta.data?.access_until==='string'?Date.parse(beta.data.access_until):NaN;
+              if(beta.error||beta.data?.revoked_at||!Number.isFinite(betaExpires)||betaExpires<=now)return fail(403,'Current book access is required to save offline.');
+              until=Math.min(until,betaExpires);
+            }
           }
         }
         headers['X-BP-Offline-Until']=new Date(until).toISOString();

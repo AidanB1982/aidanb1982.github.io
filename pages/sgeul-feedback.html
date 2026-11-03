@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sgeul Beta Feedback | Blackwood Publishing</title>
+    <meta
+      name="description"
+      content="Report a bug or suggest an improvement to Sgeul, Blackwood Publishing’s Android reading app."
+    />
+    <link
+      rel="canonical"
+      href="https://blackwoodpublishing.co.uk/pages/sgeul-feedback.html"
+    />
+    <link rel="stylesheet" href="/css/header.css?v=20261115" />
+    <link rel="stylesheet" href="/css/styles.css?v=20260913" />
+    <link rel="stylesheet" href="/css/site-polish.css?v=20261120" />
+    <link rel="stylesheet" href="/css/sgeul-beta.css?v=20261103" />
+    <script src="/js/analytics-consent.js?v=20261116" defer></script>
+  </head>
+  <body class="sub-page sgeul-beta-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div id="header-placeholder"></div>
+    <main id="main-content" class="beta-wrap">
+      <header class="beta-hero">
+        <div>
+          <p class="beta-kicker">SGEUL · PRIVATE BETA FEEDBACK</p>
+          <h1>Leave a useful note.</h1>
+          <p class="beta-lead">
+            A broken page turn, an offline book that won’t open, or one small
+            thing that could feel better. Tell us what happened so we can
+            improve Sgeul.
+          </p>
+          <a class="beta-route" href="/pages/sgeul-beta.html"
+            >About the Android beta →</a
+          >
+        </div>
+        <img
+          class="beta-mark"
+          src="/assets/Sgeul%20Icon%20Square.png"
+          alt="Sgeul icon"
+          width="200"
+          height="200"
+        />
+      </header>
+      <form
+        class="beta-form"
+        data-beta-form
+        action="https://formspree.io/f/mbdpplkw"
+        method="POST"
+      >
+        <input
+          type="hidden"
+          name="_subject"
+          value="Sgeul beta feedback"
+        /><input type="hidden" name="form_type" value="sgeul_beta_feedback" />
+        <div class="beta-honeypot" aria-hidden="true">
+          <label
+            >Leave this empty<input
+              name="_gotcha"
+              tabindex="-1"
+              autocomplete="off"
+          /></label>
+        </div>
+        <h2>What did you find?</h2>
+        <label
+          >Contact email <small>Optional, if you’d like us to follow up.</small
+          ><input
+            name="email"
+            type="email"
+            autocomplete="email"
+            maxlength="254"
+        /></label>
+        <div class="beta-fields">
+          <label
+            >App version<input
+              name="app_version"
+              required
+              maxlength="40"
+              placeholder="For example, 0.1.3"
+            /><small>Shown in Sgeul’s Account screen.</small></label
+          ><label
+            >Phone model and Android version<input
+              name="device"
+              required
+              maxlength="180"
+              placeholder="For example, Galaxy S23, Android 15"
+          /></label>
+        </div>
+        <div class="beta-fields">
+          <label
+            >Area<select name="area" required>
+              <option value="">Choose an area</option>
+              <option value="sign-in">Sign-in or account</option>
+              <option value="library">Library or book access</option>
+              <option value="reader">Reading or page turns</option>
+              <option value="offline">Offline saving or reopening</option>
+              <option value="arc">ARC room</option>
+              <option value="bookshop">Physical bookshop</option>
+              <option value="accessibility">Accessibility or display</option>
+              <option value="other">Other</option>
+            </select></label
+          ><label
+            >Impact<select name="impact" required>
+              <option value="">Choose the impact</option>
+              <option value="blocked">I can’t continue</option>
+              <option value="problem">Something isn’t working properly</option>
+              <option value="suggestion">Suggestion or general feedback</option>
+            </select></label
+          >
+        </div>
+        <label
+          >What were you doing, and what happened?<textarea
+            name="message"
+            required
+            rows="5"
+            maxlength="5000"
+            placeholder="Include the steps we can try to reproduce the problem."
+          ></textarea></label
+        ><label
+          >What did you expect? <small>Optional</small
+          ><textarea
+            name="expected_result"
+            rows="3"
+            maxlength="2000"
+          ></textarea></label
+        ><label
+          >Were you online, in airplane mode or reconnecting?<select
+            name="connection"
+            required
+          >
+            <option value="">Choose a connection state</option>
+            <option value="online">Online</option>
+            <option value="offline">Airplane mode / offline</option>
+            <option value="reconnecting">Returning online</option>
+            <option value="unknown">Not sure</option>
+          </select></label
+        ><label class="beta-check"
+          ><input
+            type="checkbox"
+            name="feedback_consent"
+            value="agreed"
+            required
+          /><span
+            >I understand this report is sent privately to Blackwood Publishing
+            to improve Sgeul and handle any follow-up.
+            <a href="/pages/privacy-policy.html#sgeul-beta-privacy"
+              >Beta privacy information</a
+            >.</span
+          ></label
+        >
+        <p>
+          Please leave out passwords, payment details and copied book passages.
+          Describe the screen or chapter instead.
+        </p>
+        <button type="submit">Send beta feedback</button>
+        <p role="status" aria-live="polite" data-form-status></p>
+      </form>
+      <p class="beta-note">
+        The form needs an internet connection. Keep a note of an offline problem
+        and send it when you reconnect. If necessary, contact
+        <a
+          href="mailto:aidan@blackwoodpublishing.co.uk?subject=Sgeul%20Beta%20Feedback"
+          >aidan@blackwoodpublishing.co.uk</a
+        >.
+      </p>
+    </main>
+    <div id="footer-placeholder"></div>
+    <script src="/js/header.js?v=20261103-beta" defer></script>
+    <script src="/js/sgeul-beta.js?v=20261103" defer></script>
+  </body>
+</html>

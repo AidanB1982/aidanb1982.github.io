@@ -327,6 +327,8 @@
                         Short Reads
                     </a>
 
+                    <a href="/pages/sgeul-beta.html" role="menuitem">Sgeul Android beta</a>
+
                     <a href="/pages/reader-records.html" role="menuitem">
                         Reader Records
                     </a>
