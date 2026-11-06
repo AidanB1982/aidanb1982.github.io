@@ -1,0 +1,12 @@
+<en-GB>
+Sgeul beta update.
+
+- A branded animated loading screen while signing in and opening your reading room.
+- Clear progress messages while your account is being prepared.
+- Reduced-motion support for readers who prefer less animation.
+
+Please continue testing sign-in, available library and ARC books, offline reopening and returning online.
+
+Report problems or suggestions at:
+https://blackwoodpublishing.co.uk/pages/sgeul-feedback.html
+</en-GB>

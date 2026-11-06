@@ -140,12 +140,124 @@
     isReactingToBehindFile: false,
     isAdminRewardBusy: false,
     isPasswordRecovery: false,
+    isSigningIn: false,
     escapeListenerBound: false
 };
 
     document.addEventListener("DOMContentLoaded", function () {
         initBlackwoodMembersArea();
     });
+
+    // One overlay follows real authentication/dashboard work, including overlapping
+    // session events. Dismissing a slow screen never cancels authentication.
+    const authLoading = {
+        pending: new Set(), overlay: null, slowTimer: null, dismissed: false,
+        previousFocus: null, wasInert: false, previousBusy: null
+    };
+    let dashboardLoad = null;
+    let dashboardUserId = null;
+
+    function ensureAuthLoading() {
+        if (authLoading.overlay) return authLoading.overlay;
+        const overlay = document.createElement("section");
+        overlay.id = "circle-auth-loading";
+        overlay.className = "auth-loading";
+        overlay.hidden = true;
+        overlay.setAttribute("role", "dialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.setAttribute("aria-labelledby", "circle-auth-loading-title");
+        overlay.style.setProperty("--auth-loading-background", "#0b0907");
+        overlay.style.setProperty("--auth-loading-ink", "#f2e9d9");
+        overlay.style.setProperty("--auth-loading-muted", "#b7ac99");
+        overlay.style.setProperty("--auth-loading-accent", "#c8a66c");
+        overlay.innerHTML = `
+            <div class="auth-loading__panel" tabindex="-1">
+                <div class="auth-loading__mark" aria-hidden="true">
+                    <span class="auth-loading__orbit"></span>
+                    <img src="/assets/Sgeul%20Icon%20Square.png" alt="" width="112" height="112">
+                </div>
+                <p class="auth-loading__kicker">BLACKWOOD PUBLISHING · THE ARCHIVISTS</p>
+                <div role="status" aria-live="polite" aria-atomic="true">
+                    <h2 class="auth-loading__title" id="circle-auth-loading-title"></h2>
+                    <p class="auth-loading__detail">Your stories and Reader Record are on their way.</p>
+                </div>
+                <div class="auth-loading__progress" aria-hidden="true"></div>
+                <button type="button" class="auth-loading__action" hidden>Continue browsing</button>
+            </div>`;
+        overlay.querySelector("button").addEventListener("click", function () {
+            authLoading.dismissed = true;
+            hideAuthLoading(true);
+        });
+        overlay.addEventListener("keydown", function (event) {
+            const button = overlay.querySelector("button");
+            if (event.key === "Escape" && !button.hidden) {
+                event.preventDefault();
+                button.click();
+            } else if (event.key === "Tab") {
+                event.preventDefault();
+                (button.hidden ? overlay.querySelector(".auth-loading__panel") : button).focus();
+            }
+        });
+        document.body.appendChild(overlay);
+        authLoading.overlay = overlay;
+        return overlay;
+    }
+
+    function hideAuthLoading(restoreFocus) {
+        clearTimeout(authLoading.slowTimer);
+        authLoading.slowTimer = null;
+        const overlay = authLoading.overlay;
+        const wasVisible = overlay && !overlay.hidden;
+        if (overlay) overlay.hidden = true;
+        document.body.classList.remove("auth-loading-open");
+        if (BlackwoodMembersState.app) BlackwoodMembersState.app.inert = authLoading.wasInert;
+        if (restoreFocus && wasVisible) {
+            const previous = authLoading.previousFocus;
+            if (previous && previous.isConnected && !previous.disabled && previous !== document.body) {
+                previous.focus({ preventScroll: true });
+            } else {
+                const heading = BlackwoodMembersState.app?.querySelector("h1, h2");
+                if (heading) {
+                    heading.setAttribute("tabindex", "-1");
+                    heading.focus({ preventScroll: true });
+                }
+            }
+        }
+    }
+
+    function beginAuthLoading(message) {
+        const overlay = ensureAuthLoading();
+        const token = {};
+        if (!authLoading.pending.size) {
+            authLoading.dismissed = false;
+            authLoading.previousFocus = document.activeElement;
+            authLoading.wasInert = BlackwoodMembersState.app.inert;
+            authLoading.previousBusy = BlackwoodMembersState.app.getAttribute("aria-busy");
+            overlay.querySelector(".auth-loading__detail").textContent = "Your stories and Reader Record are on their way.";
+            overlay.querySelector("button").hidden = true;
+            authLoading.slowTimer = setTimeout(function () {
+                overlay.querySelector(".auth-loading__detail").textContent = "This is taking a little longer. Check your connection, or continue browsing while we finish.";
+                overlay.querySelector("button").hidden = false;
+            }, 8000);
+        }
+        authLoading.pending.add(token);
+        BlackwoodMembersState.app.setAttribute("aria-busy", "true");
+        overlay.querySelector(".auth-loading__title").textContent = message;
+        if (!authLoading.dismissed) {
+            const wasHidden = overlay.hidden;
+            overlay.hidden = false;
+            BlackwoodMembersState.app.inert = true;
+            document.body.classList.add("auth-loading-open");
+            if (wasHidden) overlay.querySelector(".auth-loading__panel").focus({ preventScroll: true });
+        }
+        return function () {
+            authLoading.pending.delete(token);
+            if (authLoading.pending.size) return;
+            hideAuthLoading(true);
+            if (authLoading.previousBusy === null) BlackwoodMembersState.app.removeAttribute("aria-busy");
+            else BlackwoodMembersState.app.setAttribute("aria-busy", authLoading.previousBusy);
+        };
+    }
 
     async function initBlackwoodMembersArea() {
         const app = document.getElementById("blackwood-circle-app");
@@ -158,6 +270,7 @@
         BlackwoodMembersState.app = app;
 
         renderLoadingState("Opening the Private Archive...");
+        const finishLoading = beginAuthLoading("Opening the Private Archive…");
 
         try {
             await loadSupabaseLibrary();
@@ -184,12 +297,23 @@
 
     if (event === "PASSWORD_RECOVERY" || (session && isPasswordResetRoute())) {
         BlackwoodMembersState.isPasswordRecovery = true;
+        authLoading.dismissed = true;
+        hideAuthLoading(false);
+        if (authLoading.previousBusy === null) BlackwoodMembersState.app.removeAttribute("aria-busy");
+        else BlackwoodMembersState.app.setAttribute("aria-busy", authLoading.previousBusy);
         renderPasswordUpdateView();
         return;
     }
 
+    if (BlackwoodMembersState.isPasswordRecovery) return;
     if (BlackwoodMembersState.session) {
-        loadMemberDashboard();
+        // Keep authenticated Supabase work outside the Auth callback's lock.
+        // Explicit sign-in already owns the dashboard request.
+        if (!BlackwoodMembersState.isSigningIn) setTimeout(function () {
+            if (BlackwoodMembersState.session?.user?.id === session.user.id && !BlackwoodMembersState.isPasswordRecovery) {
+                void loadMemberDashboard();
+            }
+        }, 0);
         return;
     }
 
@@ -222,6 +346,8 @@
             console.error("Blackwood Archivists initialisation failed:", error);
 updateMemberIntroVisibility(null);
 renderErrorState("The Private Archive could not be opened. Please refresh and try again.");
+        } finally {
+            finishLoading();
         }
     }
 
@@ -488,6 +614,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
 
     async function handleMemberSignIn(event) {
         event.preventDefault();
+        if (BlackwoodMembersState.isSigningIn) return;
 
         const email = getInputValue("circle-sign-in-email");
         const password = getInputValue("circle-sign-in-password");
@@ -503,6 +630,10 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
         }
 
         setAuthStatus("Checking your Reader Record...", "is-loading");
+        BlackwoodMembersState.isSigningIn = true;
+        const submit = event.currentTarget.querySelector("button[type=submit]");
+        const finishLoading = beginAuthLoading("Opening your Private Archive…");
+        submit.disabled = true;
 
         try {
             const { data, error } = await BlackwoodMembersState.client.auth.signInWithPassword({
@@ -527,6 +658,10 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
         } catch (error) {
             console.error("Archivist sign in failed:", error);
             setAuthStatus(cleanSupabaseError(error.message), "is-error");
+        } finally {
+            BlackwoodMembersState.isSigningIn = false;
+            submit.disabled = false;
+            finishLoading();
         }
     }
 
@@ -787,7 +922,25 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             return false;
         }
     }
-    async function loadMemberDashboard() {
+    function loadMemberDashboard() {
+        if (BlackwoodMembersState.isPasswordRecovery) return Promise.resolve();
+        const userId = BlackwoodMembersState.session?.user?.id;
+        if (dashboardLoad && dashboardUserId === userId) return dashboardLoad;
+        const task = performLoadMemberDashboard();
+        dashboardLoad = task;
+        dashboardUserId = userId;
+        function clearDashboardLoad() {
+            if (dashboardLoad === task) {
+                dashboardLoad = null;
+                dashboardUserId = null;
+            }
+        }
+        void task.then(clearDashboardLoad, clearDashboardLoad);
+        return task;
+    }
+
+    async function performLoadMemberDashboard() {
+        if (BlackwoodMembersState.isPasswordRecovery) return;
         if (!BlackwoodMembersState.session || !BlackwoodMembersState.session.user) {
             renderAuthView();
             return;
@@ -795,9 +948,10 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
 
         updateMemberIntroVisibility(BlackwoodMembersState.session);
         renderLoadingState("Retrieving your reader record...");
+        const finishLoading = beginAuthLoading("Gathering your Reader Record…");
+        const user = BlackwoodMembersState.session.user;
 
         try {
-            const user = BlackwoodMembersState.session.user;
             BlackwoodMembersState.hasAuthorDeskAccess =
             await checkAuthorDeskAccess(user.id);
             const [
@@ -851,6 +1005,7 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             const memberProfile = profileResult.data || buildFallbackProfile(user);
             const adminRewardRedemptions = await loadAdminRewardDashboardIfAllowed(memberProfile);
 
+            if (BlackwoodMembersState.session?.user?.id !== user.id || BlackwoodMembersState.isPasswordRecovery) return;
             BlackwoodMembersState.member = memberProfile;
             BlackwoodMembersState.posts = legacyPosts || [];
             BlackwoodMembersState.behindFiles = behindFiles || [];
@@ -866,7 +1021,11 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
 
         } catch (error) {
             console.error("Blackwood Archivist dashboard failed:", error);
-            renderErrorState("Your Reader Record could not be loaded. Please refresh and try again.");
+            if (BlackwoodMembersState.session?.user?.id === user.id && !BlackwoodMembersState.isPasswordRecovery) {
+                renderErrorState("Your Reader Record could not be loaded. Please refresh and try again.");
+            }
+        } finally {
+            finishLoading();
         }
     }
 

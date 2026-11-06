@@ -117,6 +117,11 @@ ARC terms/save/offline reload with an expired online session, reconnect revocati
 physical variant filtering/live-price display and sign-out cleanup. Run against an
 HTTP server rooted at `apps/sgeul/dist`, with `BASE_URL`, `CHROMIUM_PATH`,
 `READING_TEST_DIR` (real EPUB fixture) and Playwright's `NODE_PATH` configured.
+`tests/sgeul-login-loading.cjs` uses the same bundled app and synthetic HTTP
+fixtures to check delayed sign-in, failures, focus restoration, reduced motion,
+responsive layouts and dismissal of slow loading screens without duplicate auth.
+`tests/members-loading-browser.cjs` checks the website's matching login and recovery
+flows against a local repository-root server with a mocked Auth client.
 Browser tests model unavailable external network while allowing packaged localhost
 assets. They do not replace real Android airplane-mode and device lifecycle tests.
 
@@ -158,3 +163,16 @@ reviewing empty-release/upgrade errors. Sgeul has no advertising integration and
 does not request `com.google.android.gms.permission.AD_ID`; answer No to the
 advertising ID declaration for this build. This does not replace the separate
 Data safety and privacy declarations.
+
+## Animated sign-in screen · 0.1.4 (version code 5)
+
+A branded loading screen now accompanies sign-in and reading-room preparation.
+Its animation follows the device's reduced-motion preference. The loader does not
+change authentication, library entitlements, ARC grants or offline-copy deadlines.
+
+Upload `downloads/Sgeul-0.1.4-internal.aab` as a new release on the chosen Play testing
+track, with `downloads/Sgeul-0.1.4-release-notes.txt` for en-GB. It uses the existing
+upload key, package ID, minimum API 24 and target/compile API 36. An AAB upload does
+not publish a release automatically; finish the Console review/publishing steps.
+Existing website and server-side changes do not update an installed native app:
+testers receive this screen after installing the updated Play build.

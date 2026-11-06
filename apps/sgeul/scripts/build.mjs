@@ -152,6 +152,7 @@ await build({
 });
 const files = [
   "css/BP-Reading.css",
+  "css/auth-loading.css",
   "data/book-discovery.json",
   "pages/the-third-night.html",
   "pages/gatestein-log.html",
@@ -192,7 +193,8 @@ await writeFile(
   path.join(out, "build-info.json"),
   JSON.stringify({
     app: "Sgeul",
-    version: "0.1.3",
+    version: JSON.parse(await readFile(path.join(app, "package.json"), "utf8"))
+      .version,
     bundledReader: true,
     physicalShop: true,
   }),

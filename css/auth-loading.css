@@ -1,0 +1,171 @@
+/* Shared sign-in presentation for Sgeul and the Archivists member page. */
+.auth-loading {
+  --auth-loading-background: #101820;
+  --auth-loading-ink: #fbeed1;
+  --auth-loading-muted: #b8c2c3;
+  --auth-loading-accent: #cfb183;
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: max(30px, env(safe-area-inset-top))
+    max(24px, env(safe-area-inset-right)) max(30px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+  box-sizing: border-box;
+  color: var(--auth-loading-ink);
+  background: radial-gradient(ellipse at 50% 35%, #c9ac7c0d, transparent 52%),
+    var(--auth-loading-background);
+  animation: auth-loading-enter 180ms ease-out;
+}
+.auth-loading[hidden] {
+  display: none !important;
+}
+.auth-loading__panel {
+  width: min(100%, 420px);
+  margin: auto;
+  padding: 24px 0;
+  text-align: center;
+  outline: none;
+}
+.auth-loading__mark {
+  position: relative;
+  display: block;
+  width: 108px;
+  height: 108px;
+  margin: 18px auto 45px;
+}
+.auth-loading__mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 26%;
+  animation: auth-loading-breathe 3.6s ease-in-out infinite;
+}
+.auth-loading__orbit {
+  position: absolute;
+  inset: -15px;
+  border: 1px solid #c9ac7c30;
+  border-radius: 50%;
+}
+.auth-loading__orbit::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid transparent;
+  border-top-color: var(--auth-loading-accent);
+  border-right-color: var(--auth-loading-accent);
+  border-radius: inherit;
+  animation: auth-loading-orbit 2.6s linear infinite;
+}
+.auth-loading .auth-loading__kicker {
+  margin: 0 0 16px;
+  color: var(--auth-loading-accent);
+  font: 10px/1.7 Arial, sans-serif;
+  letter-spacing: 0.23em;
+  text-transform: uppercase;
+}
+.auth-loading .auth-loading__title {
+  margin: 0 0 16px;
+  color: var(--auth-loading-ink);
+  font: 400 clamp(27px, 6vw, 36px) / 1.25 Georgia, serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.auth-loading .auth-loading__detail {
+  max-width: 34ch;
+  margin: 0 auto;
+  color: var(--auth-loading-muted);
+  font: 14px/1.8 Arial, sans-serif;
+  letter-spacing: 0;
+}
+.auth-loading__progress {
+  position: relative;
+  width: min(65%, 210px);
+  height: 2px;
+  margin: 30px auto;
+  overflow: hidden;
+  background: #c9ac7c25;
+}
+.auth-loading__progress::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: -45%;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--auth-loading-accent),
+    transparent
+  );
+  animation: auth-loading-progress 1.8s ease-in-out infinite;
+}
+.auth-loading .auth-loading__action {
+  display: inline-block;
+  width: auto;
+  min-height: 44px;
+  margin: 8px auto 0;
+  padding: 11px 22px;
+  border: 1px solid var(--auth-loading-accent);
+  border-radius: 24px;
+  background: transparent;
+  color: var(--auth-loading-ink);
+  font: 14px/1.5 Arial, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+}
+.auth-loading .auth-loading__action[hidden] {
+  display: none !important;
+}
+.auth-loading .auth-loading__action:focus-visible {
+  outline: 2px solid var(--auth-loading-accent);
+  outline-offset: 5px;
+}
+body.auth-loading-open {
+  overflow: hidden;
+}
+@keyframes auth-loading-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes auth-loading-breathe {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes auth-loading-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes auth-loading-progress {
+  to {
+    left: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-loading,
+  .auth-loading__mark img,
+  .auth-loading__orbit::after,
+  .auth-loading__progress::after {
+    animation: none !important;
+  }
+  .auth-loading__progress::after {
+    left: 25%;
+    width: 50%;
+  }
+}

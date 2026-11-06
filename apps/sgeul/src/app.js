@@ -2,11 +2,16 @@ import { Capacitor } from "@capacitor/core";
 import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { client } from "./client.js";
+import { createLoginLoading } from "./login-loading.js";
 import { OfflineLibrary } from "../../../js/BP-reading-offline.js";
 import { loadShop } from "./shop.js";
 import { isOnline, initialiseConnectivity } from "./connectivity.js";
 const $ = (id) => document.getElementById(id),
   offline = new OfflineLibrary();
+const loginLoading = createLoginLoading($("auth-loading"), [
+  $("app"),
+  document.querySelector(".app-nav"),
+]);
 let connectivityReady = false;
 let user = null,
   view = "home",
@@ -43,8 +48,9 @@ async function loadAccount() {
   if (!connectivityReady) return;
   const current = ++epoch;
   if (isOnline()) {
-    const { data } = await client.auth.getSession();
+    const { data, error } = await client.auth.getSession();
     if (current !== epoch) return;
+    if (error) throw error;
     user = data.session?.user || null;
   } else {
     // An expired online JWT must not prevent opening an unexpired device copy.
@@ -70,6 +76,11 @@ async function loadAccount() {
   $("account-email").textContent = user.email || "";
   $("reader-name").textContent = "";
   showView(view);
+  if (busy)
+    loginLoading.update(
+      "Opening your reading room",
+      "Preparing your library and assigned stories.",
+    );
   $("arc-entry").hidden = true;
   const saved = await offline.list(user.id).catch(() => []);
   if (current !== epoch) return;
@@ -134,6 +145,7 @@ $("login-form").onsubmit = async (event) => {
   busy = true;
   $("login-button").disabled = true;
   $("login-status").textContent = "Signing in…";
+  loginLoading.start("Signing you in", "Checking your Blackwood account.");
   try {
     const form = new FormData(event.currentTarget);
     const { error } = await client.auth.signInWithPassword({
@@ -150,6 +162,7 @@ $("login-form").onsubmit = async (event) => {
   } finally {
     busy = false;
     $("login-button").disabled = false;
+    loginLoading.finish();
   }
 };
 $("sign-out").onclick = async () => {
@@ -197,24 +210,44 @@ document
   );
 window.addEventListener("offline", () => {
   connection();
-  void loadAccount();
+  if (!busy) refreshAccount();
 });
 window.addEventListener("online", () => {
   connection();
-  void loadAccount();
+  if (!busy) refreshAccount();
 });
+function refreshAccount() {
+  void loadAccount().catch(() => {
+    $("home-status").textContent =
+      "Your account could not be refreshed. Reconnect and try again.";
+  });
+}
 client.auth.onAuthStateChange(() => {
-  setTimeout(() => void loadAccount(), 0);
+  // Explicit sign-in/startup already owns its account load and loading screen.
+  if (busy || !connectivityReady) return;
+  setTimeout(refreshAccount, 0);
 });
 if (Capacitor.isNativePlatform())
   App.addListener("backButton", () => {
     if (view !== "home") showView("home");
     else void App.minimizeApp();
   });
-await initialiseConnectivity();
-connectivityReady = true;
-connection();
-void loadAccount().catch(() => {
+showView("home");
+busy = true;
+$("login-button").disabled = true;
+loginLoading.start("Opening Sgeul", "Preparing your reading room.");
+try {
+  await initialiseConnectivity();
+  connectivityReady = true;
+  connection();
+  await loadAccount();
+} catch {
+  $("startup-status").hidden = false;
   $("startup-status").textContent =
-    "Your reading room could not start. Close and reopen Sgeul to try again.";
-});
+    "Your reading room could not finish loading. Check your connection and try signing in.";
+  showView("home");
+} finally {
+  busy = false;
+  $("login-button").disabled = false;
+  loginLoading.finish();
+}
