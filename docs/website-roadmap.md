@@ -326,6 +326,11 @@ This is a planned replacement, not a description of the current downloadable ARC
 
 ### 5. Android and iPhone app
 
+The current Android update list is tracked in
+[Sgeul: next larger update](sgeul-next-update.md), updated 6 November 2026.
+It records the 0.1.4 baseline, source-confirmed improvements, device checks and
+later features. No tester problems have been reported yet.
+
 - [x] Name/branding agreed: Sgeul — Every Story Begins Somewhere.
 - [x] Google Play account enrolled; identity verification pending (owner report).
 - [x] Build a bundled Android prototype with existing-account sign-in, protected
