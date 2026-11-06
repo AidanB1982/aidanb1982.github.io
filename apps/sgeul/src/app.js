@@ -3,6 +3,7 @@ import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { client } from "./client.js";
 import { createLoginLoading } from "./login-loading.js";
+import { startAtmosphere } from "../../../js/BP-reading-atmosphere.js";
 import { OfflineLibrary } from "../../../js/BP-reading-offline.js";
 import { loadShop } from "./shop.js";
 import { isOnline, initialiseConnectivity } from "./connectivity.js";
@@ -12,6 +13,10 @@ const loginLoading = createLoginLoading($("auth-loading"), [
   $("app"),
   document.querySelector(".app-nav"),
 ]);
+const atmosphere = startAtmosphere($("home"));
+window.addEventListener("pagehide", (event) => {
+  if (!event.persisted) atmosphere.destroy();
+});
 let connectivityReady = false;
 let user = null,
   view = "home",
@@ -21,9 +26,13 @@ export async function openExternal(value) {
   const url = new URL(value);
   if (
     url.protocol !== "https:" ||
-    !["blackwoodpublishing.co.uk", "vmbd0z-c6.myshopify.com"].includes(
-      url.hostname,
-    )
+    ![
+      "blackwoodpublishing.co.uk",
+      "vmbd0z-c6.myshopify.com",
+      "www.facebook.com",
+      "www.instagram.com",
+      "www.tiktok.com",
+    ].includes(url.hostname)
   )
     throw Error("This link is unavailable.");
   if (Capacitor.isNativePlatform()) await Browser.open({ url: url.href });

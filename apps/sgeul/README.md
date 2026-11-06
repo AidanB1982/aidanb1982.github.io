@@ -122,6 +122,10 @@ fixtures to check delayed sign-in, failures, focus restoration, reduced motion,
 responsive layouts and dismissal of slow loading screens without duplicate auth.
 `tests/members-loading-browser.cjs` checks the website's matching login and recovery
 flows against a local repository-root server with a mocked Auth client.
+`tests/reading-swipes.cjs` checks real Chromium touch input against an EPUB;
+`tests/reading-turns.cjs` retains page-curl, queue and pagination regression checks.
+`tests/reading-atmosphere.cjs` checks quote provenance, rotation and accessibility
+behaviour. The catalogue and ARC browser tests include the collapsed shelves.
 Browser tests model unavailable external network while allowing packaged localhost
 assets. They do not replace real Android airplane-mode and device lifecycle tests.
 
@@ -176,3 +180,20 @@ upload key, package ID, minimum API 24 and target/compile API 36. An AAB upload 
 not publish a release automatically; finish the Console review/publishing steps.
 Existing website and server-side changes do not update an installed native app:
 testers receive this screen after installing the updated Play build.
+
+## Reader and atmosphere update · 0.2.0 (version code 6)
+
+This larger beta update adds page-turn swipes, expandable series groups, a cleaner
+reading-room interface, atmospheric backgrounds and quotations, and Blackwood
+Publishing social links. The existing animated sign-in screen is retained.
+
+Upload `downloads/Sgeul-0.2.0-internal.aab` to the chosen Play testing track and use
+`downloads/Sgeul-0.2.0-release-notes.txt` for en-GB. It keeps the same package ID and
+upload key, minimum API 24 and target/compile API 36. Complete the Console release
+review and publishing steps; preparing or uploading the bundle does not publish it.
+
+On a real phone, check forward/back swipes inside a book, text selection and reader
+controls, expanding a series and opening a title, and reopening saved books in
+airplane mode. Check reduced-motion presentation and social links opening in the
+external browser. Account entitlements and existing offline-copy deadlines remain
+server-controlled.

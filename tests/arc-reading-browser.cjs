@@ -21,6 +21,8 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',DIR=process.env.READING
   return route.abort();
  });
  await page.goto(BASE+'/pages/bp-reading.html?arc=1');await page.waitForFunction(()=>!document.getElementById('library').hidden);
+ assert.equal(await page.locator('.reading-collection[open]').count(),0,'ARC collections also start collapsed');
+ await page.locator('.reading-collection-heading').first().click();
  assert.equal(await page.locator('.book-card').count(),1);assert.equal(await page.locator('#reading-membership-offer').count(),0);assert.equal(await page.locator('#reading-membership-summary').isHidden(),true);assert.equal(await page.getByRole('button',{name:'Save offline',exact:true}).isDisabled(),true,'terms required before offline save');assert.equal(await page.locator('#load-synced').isDisabled(),true);
  const read=page.getByRole('button',{name:'Read your ARC',exact:true});assert.equal(await read.isDisabled(),true);
  for(const checkbox of await page.locator('.arc-reading-terms input').all())await checkbox.check();assert.equal(await read.isEnabled(),true);
@@ -31,6 +33,7 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',DIR=process.env.READING
  assert(await page.evaluate(()=>Object.keys(localStorage).some(key=>key.includes(':arc-assignment:9:'))),'ARC progress has separate device namespace');
  offline=true;await context.setOffline(true);assert.equal(await page.locator('#reader').isVisible(),true,'saved ARC remains readable after disconnect');
  await page.evaluate(()=>document.getElementById('back-to-library').click());await page.reload();await page.waitForFunction(()=>!document.getElementById('library').hidden);
+ await page.locator('.reading-collection-heading').first().click();
  assert.equal(await page.locator('.book-card').count(),1);assert.equal(await page.locator('.arc-reading-review button').isDisabled(),true,'reviews wait for a connection');
  await page.getByRole('button',{name:'Read your ARC',exact:true}).click();await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden,{},{timeout:30000});assert.match(await page.locator('#reader-watermark').textContent(),/GUA-ARC-001/);assert.equal(opens,1,'offline reopening never calls delivery');
  revoked=true;offline=false;await context.setOffline(false);await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await page.waitForFunction(()=>document.getElementById('reader').hidden);await page.waitForFunction(()=>document.getElementById('library-error').textContent.includes('ARC access could not be verified'));

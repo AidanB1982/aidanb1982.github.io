@@ -133,7 +133,7 @@ html = html
 html = html
   .replace(
     "</head>",
-    '<link rel="stylesheet" href="/css/BP-Reading.css"><link rel="stylesheet" href="/sgeul.css"></head>',
+    '<link rel="stylesheet" href="/css/BP-Reading.css"><link rel="stylesheet" href="/sgeul.css"><link rel="stylesheet" href="/css/BP-reading-atmosphere.css"></head>',
   )
   .replace(/<div id="(?:header|footer)-placeholder"><\/div>/g, "")
   .replace(
@@ -153,6 +153,7 @@ await build({
 const files = [
   "css/BP-Reading.css",
   "css/auth-loading.css",
+  "css/BP-reading-atmosphere.css",
   "data/book-discovery.json",
   "pages/the-third-night.html",
   "pages/gatestein-log.html",

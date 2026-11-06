@@ -1,17 +1,49 @@
 # Sgeul: next larger update
 
 Updated **6 November 2026** (Europe/London). Baseline: **0.1.4, version code 5**.
-The owner reports that the update workflow worked. No tester problems have been
-reported yet. This is a work list, not a statement that the proposed features are
-already implemented or that every device check has passed.
+The owner reports that the 0.1.4 update workflow worked. The first feedback batch
+is now recorded below. This work list distinguishes reported behaviour, requested
+refinements and features still planned for later; device acceptance remains separate.
 
-## Recommended scope
+## Selected scope: 0.2.0, version code 6
 
-Keep collecting feedback during the closed test. Build the next larger update
-around easier onboarding, returning to a book, clearer account/help screens and
-website news. The items below are candidates until the owner chooses the final
-scope. Routine improvements can ship together; a confirmed problem preventing
-sign-in or reading should receive prompt attention.
+The owner requested these changes as the next larger update:
+
+- **SG-001 — Swipes:** natural left/right swipes should turn the page from the
+  middle of the page as well as the edges. The earlier implementation required an
+  edge start and tied direction to that edge. Protect vertical scrolling, links,
+  long-press selection and zoom. Verify forward/back and chapter boundaries.
+- **Series menus:** show each collection/series as a collapsed disclosure, keeping
+  the chosen open state across refreshes and revealing search/filter matches.
+- **Cleaner shelf:** remove the two requested explanatory blocks and routine
+  synced-status banner. Keep actual errors, save results and offline notices.
+- **Atmosphere:** subtle interchangeable background quotes, sourced from short
+  passages already published on the website. Keep them decorative, behind the
+  shelf, paused when hidden, static for reduced motion and absent while reading
+  the actual book.
+- **Socials:** add the existing Blackwood Facebook, Instagram and TikTok links in
+  the app, opened through the external browser.
+
+The items below remain the wider backlog. Do not add unrelated features to this
+release unless the owner expands its scope. Keep collecting feedback during the
+closed test; a confirmed sign-in or reading blocker should receive prompt attention.
+
+## Checks completed for the prepared 0.2.0 build
+
+- Real EPUB with Chromium touch input: centre/side swipes in both directions;
+  cancelled, vertical, long-press, selected-text, link and multi-touch gestures.
+- Existing page-turn regression: page-curl snapshots, queued turns, stable
+  pagination, edge gestures and reduced-motion/instant modes.
+- Collapsed shelf keyboard/toggle state, search/filter results, missing catalogue
+  data and responsive layouts.
+- Native bundled-app sign-in, social destinations, ARC terms, encrypted offline
+  reopening, reconnect revocation and sign-out cleanup.
+- Public quote provenance, rotation/pause, reduced motion and pointer independence.
+- Web reader shell revision 8 and private reading-account sync regression.
+
+These are automated browser/build checks. Confirm the swipe behaviour and layout
+on the actual Android phone after installing the new Play test build. The signed
+bundle is prepared for the existing Alpha track; it is not published by a Git push.
 
 ## Improvements grounded in the current app
 
@@ -82,9 +114,11 @@ For each item record:
 - Reproduction status, impact, owner and target build.
 - Fix/verification result and whether the reporter confirmed it.
 
-Current reported-issue list: **empty**. Add actual reports here using non-personal
-references. Use “needs reproduction” until investigated; do not count feature
-requests as crashes or login failures.
+Current reported issue: **SG-001**, ordinary page swipes do not turn the page.
+The implementation was limited to edge-start gestures; the new behaviour needs
+real-phone acceptance after the updated build is installed. The other selected
+items are interface requests. Add later reports using non-personal references;
+use “needs reproduction” until investigated.
 
 ## Release check
 

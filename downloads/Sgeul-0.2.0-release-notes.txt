@@ -1,0 +1,14 @@
+<en-GB>
+A larger Sgeul beta update.
+
+- Swipe to turn pages while reading.
+- Expand series groups to browse your library.
+- Cleaner screens with less introductory text.
+- Atmospheric backgrounds and ghost-story quotations.
+- Blackwood Publishing social links in the app.
+
+Please test reading controls, series navigation and saved books in airplane mode.
+
+Report problems or suggestions at:
+https://blackwoodpublishing.co.uk/pages/sgeul-feedback.html
+</en-GB>

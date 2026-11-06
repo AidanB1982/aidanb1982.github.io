@@ -6,7 +6,7 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  const page=await browser.newPage({viewport:process.env.READING_MOBILE_TEST==='1'?{width:390,height:844}:{width:1280,height:900}}); const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('https://**/*', async r=>{
  const url=r.request().url();
- if(url.includes('esm.sh/')) return r.fulfill({contentType:'application/javascript',body:`export function createClient(){return {auth:{getUser:async()=>({data:{user:{id:'reader-test'}}}),getSession:async()=>({data:{session:{access_token:'test'}}}),onAuthStateChange:(cb)=>{window.testSignOut=()=>cb('SIGNED_OUT')}},from:()=>({select:()=>({eq:()=>({single:async()=>({data:{is_admin:true}})})})})}}`});
+ if(url.includes('esm.sh/')) return r.fulfill({contentType:'application/javascript',body:`export function createClient(){return {auth:{getUser:async()=>({data:{user:{id:'reader-test'}}}),getSession:async()=>({data:{session:{access_token:'test'}}}),onAuthStateChange:(cb)=>{window.testSignOut=()=>cb('SIGNED_OUT')}},from(table){const rows=table==='bp_reading_catalog'?[{edition_id:2,book_id:'gualachulain',title:'Gualachulain',author:'Aidan Blackwood'}]:[];return{select(){return this},eq(){return this},single:async()=>({data:{is_admin:true}}),maybeSingle:async()=>({data:null}),then(resolve){resolve({data:rows})}}},rpc:async()=>({data:true})}}`});
  if(url.includes('jszip'))return r.fulfill({path:`${TEST_DIR}/jszip.min.js`,contentType:'application/javascript'});
  if(url.includes('epub.min.js'))return r.fulfill({path:`${TEST_DIR}/epub.min.js`,contentType:'application/javascript'});
  if(url.includes('bp-reading-deliver-epub'))return r.fulfill({path:`${TEST_DIR}/test.epub`,contentType:'application/epub+zip',headers:{'access-control-allow-origin':'*'}});
@@ -15,7 +15,10 @@ const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8000';
  const assert=(c,m)=>{if(!c)throw Error(m)};
  await page.goto(`${BASE_URL}/pages/bp-reading.html`);
  await page.screenshot({path:`${TEST_DIR}/library.png`});
- await page.getByRole('button',{name:'Read Book',exact:true}).click();
+ const card=page.locator('.book-card[data-edition-id="2"]');
+ const collection=card.locator('xpath=ancestor::details[1]');
+ if(await collection.count()&&await collection.getAttribute('open')===null)await collection.locator('summary').click();
+ await card.locator('.open-book').click();
  await page.waitForFunction(()=>!document.getElementById('reader-menu-toggle').hidden);
  await page.waitForFunction(()=>!document.getElementById('reader-seek').disabled);
 

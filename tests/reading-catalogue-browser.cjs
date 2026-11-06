@@ -5,6 +5,21 @@ const BASE=process.env.BASE_URL||'http://127.0.0.1:8000',count=require('../data/
  await p.route('https://**/*',r=>{if(r.request().url().includes('esm.sh/'))return r.fulfill({contentType:'application/javascript',body:`export function createClient(){window.mockEditions=${config.metadataMissing?JSON.stringify([{edition_id:2,book_id:'gualachulain',title:'Gualachulain'}]):'[]'};window.accessQueries=[];function rows(table){if(table==='bp_reading_catalog')return window.mockEditions;if(table==='bp_reading_memberships')return [{access_until:'2099-01-01',revoked_at:null}];return [];}return{auth:{getUser:async()=>({data:{user:{id:'reader'}}}),getSession:async()=>({data:{session:{access_token:'test'}}}),onAuthStateChange:()=>{}},from(table){return{select(){return this},eq(){return this},single:async()=>({data:{is_admin:${!!config.admin}}}),maybeSingle:async()=>({data:rows(table)[0]||null}),then(resolve){resolve(${config.unavailable?"table==='bp_reading_catalog'?{error:{message:'Unavailable'}}:":''}{data:rows(table)})}}},rpc:async(name,args)=>{window.accessQueries.push(args?.p_edition_id);return{data:true}}};}`});return r.abort();});
  if(config.metadataMissing)await p.route('**/data/book-discovery.json*',r=>r.fulfill({status:503,body:'unavailable'}));
  await p.goto(BASE+'/pages/bp-reading.html');await p.waitForFunction(()=>!document.getElementById('library').hidden);
+ assert.equal(await p.locator('.reading-collection[open]').count(),0,'each collection starts collapsed');
+ assert.equal(await p.locator('.book-card').first().isVisible(),false,'cards wait behind their disclosure');
+ assert.equal(await p.locator('#reading-offline-status').isVisible(),false,'empty offline status leaves no visual row');
+ assert.doesNotMatch(await p.locator('#library').textContent(),/The Blackwood reading collection is listed here|Save individual books for offline reading|Reading synced · place, bookmarks, appearance & notebook/);
+ if(!config.metadataMissing){
+  const firstSummary=p.locator('.reading-collection-heading').first();
+  await firstSummary.click();assert.equal(await p.locator('.reading-collection').first().evaluate(el=>el.open),true);
+  await p.locator('#library-sort').selectOption('title');assert.equal(await p.locator('.reading-collection').first().evaluate(el=>el.open),true,'sorting preserves open collection');
+  await p.locator('#library-sort').selectOption('series');
+  await p.locator('.reading-collection-heading').first().focus();await p.keyboard.press('Enter');assert.equal(await p.locator('.reading-collection').first().evaluate(el=>el.open),false,'native summary closes from keyboard');
+  await p.locator('#library-search').fill('The Third Night');assert.equal(await p.locator('.book-card').first().isVisible(),true,'search reveals the matching book');
+  await p.locator('#library-search').fill('');assert.equal(await p.locator('.reading-collection').first().evaluate(el=>el.open),false,'clearing search restores deliberate collapse');
+  if(!config.admin&&!config.unavailable)await p.screenshot({path:'/workspace/scratch/sgeul-collapsed-library.png',fullPage:true});
+ }
+ await p.locator('.reading-collection').evaluateAll(groups=>groups.forEach(group=>group.open=true));
  if(config.metadataMissing){assert.equal(await p.locator('.book-card').count(),1);assert.match(await p.locator('#library-catalogue-status').textContent(),/full book list could not load/);}
  else{assert.equal(await p.locator('.book-card').count(),count);
   assert.equal(await p.getByRole('heading',{name:'Blackwood Manuscript Audit Workbook',exact:true}).count(),0);
@@ -30,4 +45,4 @@ assert.equal(await p.locator('.open-book:not(:disabled)').count(),2);assert.equa
  await p.setViewportSize({width:1280,height:900});
  if(!config.metadataMissing)assert.equal(await first.locator('.book-synopsis').isVisible(),true,'desktop retains synopsis');
  assert.deepEqual(errors,[]);await p.close();
-}console.log('PASS pending catalogue: empty server/admin/member states, no invented IDs or access calls, promotion after approval, missing-server/metadata failures and mobile layouts');}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});
+}console.log('PASS catalogue: collapsed accessible collections, remembered toggles, visible search matches, removed default copy, empty server/admin/member states, no invented IDs/access calls, promotion after approval, missing-server/metadata failures and mobile layouts');}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

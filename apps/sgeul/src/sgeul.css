@@ -269,3 +269,23 @@ select:focus-visible {
   color: var(--muted);
   margin-top: 6px;
 }
+
+.publisher-socials {
+  margin-top: 28px;
+  padding-top: 18px;
+  border-top: 1px solid #40505a;
+}
+.publisher-socials h3 {
+  margin: 0 0 12px;
+  font: 15px/1.5 system-ui, sans-serif;
+  color: var(--muted);
+}
+.publisher-socials__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+}
+.publisher-socials__links .text-button {
+  min-height: 44px;
+  padding: 10px 0;
+}

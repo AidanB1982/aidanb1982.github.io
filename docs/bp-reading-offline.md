@@ -94,3 +94,12 @@ imports/re-exports. The worker is a module worker with a versioned script URL an
 protocol revision 7. No Supabase redeployment is needed for this website-only fix.
 
 Offline shell version matching: cached scripts must match their complete versioned URL. Only reader navigation ignores query parameters, so `?arc=1` works offline. Shell cache v2 isolates older resources; encrypted book storage is retained.
+
+## Reader interface update · 0.2.0
+
+The public web shell now prepares its current reader, quiet sync helper, collapsed
+shelf styles and public quote module/styles together (protocol revision 8). The
+existing cache name is retained; encrypted book bytes remain in the separate
+account-scoped offline library, not CacheStorage. Save or refresh a book while
+online to prepare the updated shell before relying on it offline. The native app
+continues bundling these public interface assets and does not install this worker.

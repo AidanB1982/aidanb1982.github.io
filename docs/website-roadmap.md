@@ -329,7 +329,8 @@ This is a planned replacement, not a description of the current downloadable ARC
 The current Android update list is tracked in
 [Sgeul: next larger update](sgeul-next-update.md), updated 6 November 2026.
 It records the 0.1.4 baseline, source-confirmed improvements, device checks and
-later features. No tester problems have been reported yet.
+later features. The first feedback batch now covers swipe page turns, collapsed
+series, shelf copy, atmospheric quotes and social links for the 0.2.0 update.
 
 - [x] Name/branding agreed: Sgeul — Every Story Begins Somewhere.
 - [x] Google Play account enrolled; identity verification pending (owner report).

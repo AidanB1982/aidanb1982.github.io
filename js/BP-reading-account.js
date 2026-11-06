@@ -37,7 +37,7 @@ export class ReadingAccount {
         this.report('Restoring local changes waiting to sync…');
         return outbox.payload;
       }
-      this.report('Reading sync connected');
+      this.report('');
       return data?.payload || null;
     } catch {
       this.report('Device-only mode · Supabase reader storage is not connected. Your place and notebook are saved in this browser.');
@@ -71,7 +71,7 @@ export class ReadingAccount {
       } else {
         try { this.storage.removeItem(this.outboxKey); } catch {}
       }
-      if (!this.stopped) this.report('Reading synced · place, bookmarks, appearance & notebook');
+      if (!this.stopped) this.report('');
     } catch (error) {
       if (!this.pending) this.pending = payload;
       if (error.code === '40001') {

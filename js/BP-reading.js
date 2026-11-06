@@ -8,9 +8,10 @@ import {
 import { initializeReadingCheckout } from "/js/BP-reading-checkout.js?v=20261118";
 import { mergeReadingCatalogue } from "/js/BP-reading-catalogue.js?v=20261124";
 import { publicReadingWork, readingStorageKey, buildPublicReadingEpub } from "/js/BP-reading-public.js?v=20261122";
-import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261030-arc-offline3";
+import {OfflineLibrary, offlineBookKey, OFFLINE_WINDOW, prepareOfflineShell} from "/js/BP-reading-offline.js?v=20261106-reader8";
 import {isArcBook,arcReadingBooks,arcStorageKey,requestArc,ARC_TERMS_VERSION} from "/js/BP-reading-arc.js?v=20261030-arc-offline1";
-import { ReadingAccount } from "/js/BP-reading-account.js?v=20261127";
+import { ReadingAccount } from "/js/BP-reading-account.js?v=20261106-quiet";
+import { startAtmosphere } from "/js/BP-reading-atmosphere.js?v=20261106a";
 
 /* =====================================================
    BLACKWOOD PUBLISHING — BP READING
@@ -120,6 +121,8 @@ const supabase = createClient(
 );
 
 const $ = id => document.getElementById(id);
+const libraryAtmosphere = startAtmosphere($('library'));
+window.addEventListener('pagehide', event => { if (!event.persisted) libraryAtmosphere.destroy(); });
 
 const allowedThemes = [
   "parchment",
@@ -266,8 +269,14 @@ function showLibraryError(message) {
    LIBRARY
    ===================================================== */
 
+const collectionDisclosureState = new Map();
 function renderLibrary() {
-  const grid = $("book-grid"); grid.replaceChildren();
+  const grid = $("book-grid");
+  // Preserve deliberate disclosure choices, not sections temporarily expanded by a filter.
+  for (const group of grid.querySelectorAll('.reading-collection')) {
+    if (!group.dataset.filterOpen) collectionDisclosureState.set(group.dataset.disclosureKey, group.open);
+  }
+  grid.replaceChildren();
   const query = $("library-search").value.trim().toLowerCase();
   const filter = $("library-status").value;
   const collection = libraryBooks.map(book => {
@@ -295,12 +304,24 @@ function renderLibrary() {
   if(ARC_MODE)$('library-catalogue-status').textContent=books.length+' of '+collection.length+' ARC assignment(s) shown · access is checked independently of paid membership.';
   $('load-synced').disabled = ARC_MODE || !navigator.onLine || !readingAccount || switchingEdition;
   if (!books.length) { grid.textContent = 'No books match these filters.'; return; }
-  let previousCollection = null;
+  let previousCollection = null, collectionBooks = null;
+  const revealMatches = Boolean(query || collectionFilter.value || filter !== 'all' || availability !== 'all');
   for (const book of books) {
     const collectionName = book.collection || book.series || 'Independent Works';
     if (collectionName !== previousCollection) {
-      const group = document.createElement('h3'); group.className='reading-collection-heading'; group.textContent=collectionName;
-      const count=document.createElement('span');const size=books.filter(item=>item.collection===collectionName).length;count.textContent=`${size} ${size===1?'title':'titles'}`;group.append(count);grid.append(group);
+      const group = document.createElement('details'); group.className='reading-collection'; group.dataset.collection=collectionName;
+      const disclosureKey = `${activeUser?.id || 'pending'}:${ARC_MODE ? 'arc' : 'library'}:${collectionName}`;
+      group.dataset.disclosureKey=disclosureKey;
+      if (revealMatches) group.dataset.filterOpen='true';
+      group.open = revealMatches || collectionDisclosureState.get(disclosureKey) === true;
+      const summary=document.createElement('summary');summary.className='reading-collection-heading';
+      const heading=document.createElement('h3');heading.textContent=collectionName;
+      const count=document.createElement('span');const size=books.filter(item=>(item.collection || item.series || 'Independent Works')===collectionName).length;count.textContent=`${size} ${size===1?'title':'titles'}`;
+      const indicator=document.createElement('span');indicator.className='reading-collection-indicator';indicator.setAttribute('aria-hidden','true');indicator.textContent='+';
+      summary.append(heading,count,indicator);
+      collectionBooks=document.createElement('div');collectionBooks.className='reading-collection-books';
+      group.append(summary,collectionBooks);grid.append(group);
+      group.addEventListener('toggle',()=>{if(group.isConnected&&!group.dataset.filterOpen)collectionDisclosureState.set(disclosureKey,group.open);});
       previousCollection=collectionName;
     }
     const card = document.createElement('article'); card.className = 'book-card'+(isArcBook(book)?' arc-book-card':''); card.dataset.availability = book.readingReady ? 'ready' : 'coming-soon'; if(Number.isSafeInteger(book.editionId))card.dataset.editionId=String(book.editionId); if(book.publicTextId)card.dataset.publicTextId=book.publicTextId;
@@ -350,7 +371,7 @@ function renderLibrary() {
       const save=document.createElement('button');save.type='submit';save.className='control';save.disabled=!navigator.onLine;save.textContent=!navigator.onLine?'Connect to file review':book.reviewLink?'Update review link':'Save review link';const message=document.createElement('p');message.setAttribute('role','status');
       form.append(label,save,message);form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{const url=new URL(input.value);if(url.protocol!=='https:'||url.username||url.password)throw Error('Use an HTTPS review link.');const result=await supabase.rpc('bp_arc_reading_review',{p_assignment_id:book.arcAssignmentId,p_review_link:url.href});if(result.error||result.data!==true)throw Error('Your review link could not be saved.');message.textContent='Review link filed.';}catch(error){message.textContent=error.message;}finally{save.disabled=false;}};
       details.append(...(badges.childElementCount?[badges]:[]),heading,meta,due,progress,terms,button,offlineControls,form);
-    }else details.append(...(badges.childElementCount?[badges]:[]),heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); grid.append(card);
+    }else details.append(...(badges.childElementCount?[badges]:[]),heading,meta,description,progress,track,button,offlineControls); card.append(cover,details); collectionBooks.append(card);
   }
 }
 function renderContinueReading(collection) {
@@ -1076,11 +1097,10 @@ async function changePage(direction,options={}) {
    The reader content is inside an EPUB.js iframe.
    We register handlers on each EPUB document.
 
-   Only gestures starting near the page edges
-   begin a physical page turn.
-
-   Central text selection and ordinary links
-   are left alone.
+   A horizontal touch swipe can start anywhere on the visible page.
+   Its direction follows the drag rather than the starting edge.
+   Edge clicks, text selection, links, vertical pans and pinch zoom
+   retain their own behaviour.
    ===================================================== */
 
 function getPageDirection(
@@ -1105,22 +1125,21 @@ function getPageDirection(
 }
 
 function isInteractiveTarget(target) {
-  if (!(target instanceof Element)) {
+  // EPUB elements belong to another window, so parent-window instanceof
+  // Element checks do not identify them reliably.
+  if (target?.nodeType !== 1 || typeof target.closest !== "function") {
     return false;
   }
 
   return Boolean(
     target.closest(
-      "a, button, input, textarea, select, " +
-      "[contenteditable='true']"
+      "a, button, input, textarea, select, label, [role='button'], " +
+      "[contenteditable]:not([contenteditable='false'])"
     )
   );
 }
 
 function registerPageGestures(contents) {
-  contents.document.addEventListener("pointermove",wakeReaderChrome,{passive:true});
-  contents.document.addEventListener("pointerdown",wakeReaderChrome,{passive:true});
-  contents.document.addEventListener("keydown",wakeReaderChrome);
   const doc = contents.document;
 
   if (!doc || doc.__bpReadingGesturesInstalled) {
@@ -1128,6 +1147,15 @@ function registerPageGestures(contents) {
   }
 
   doc.__bpReadingGesturesInstalled = true;
+  doc.addEventListener("pointermove",wakeReaderChrome,{passive:true});
+  doc.addEventListener("pointerdown",wakeReaderChrome,{passive:true});
+  doc.addEventListener("keydown",wakeReaderChrome);
+
+  // The EPUB has its own browsing context. Applying this only to the outer
+  // viewer does not prevent that document claiming a horizontal touch pan.
+  // Keep native vertical pans and two-finger zoom available.
+  doc.documentElement.style.touchAction = "pan-y pinch-zoom";
+  if (doc.body) doc.body.style.touchAction = "pan-y pinch-zoom";
 
   // Browser deterrents only: screenshots and deliberate extraction cannot be blocked.
   // Scope to EPUB documents; library/search/settings keep normal clipboard access.
@@ -1149,13 +1177,28 @@ function registerPageGestures(contents) {
   };
 
 
+  const cancelGesture = () => {
+    const gesture = state.gesture;
+    if (!gesture) return;
+    state.gesture = null;
+    if (gesture.active) {
+      state.suppressClickUntil = performance.now() + 500;
+      resetPageTurn();
+    }
+    try { gesture.captureTarget?.releasePointerCapture(gesture.pointerId); } catch {}
+  };
+
   const begin = event => {
+    // A second finger belongs to pinch zoom, never to a page turn.
+    if (event.isPrimary === false) {
+      cancelGesture();
+      return;
+    }
     if (
       !state.isOpen ||
       state.isLoading ||
       state.isNavigating ||
       state.gesture ||
-      event.isPrimary === false ||
       (event.pointerType === "mouse" &&
         event.button !== 0)
     ) {
@@ -1166,17 +1209,9 @@ function registerPageGestures(contents) {
       return;
     }
 
+    if (doc.getSelection?.()?.toString().trim()) return;
+
     const point = getCoordinates(event);
-
-    const direction = getPageDirection(
-      point.x,
-      point.width,
-      event.pointerType
-    );
-
-    if (!direction || !canTurn(direction)) {
-      return;
-    }
 
     // Mouse users click to turn pages.
     // Touch users drag the page.
@@ -1186,11 +1221,12 @@ function registerPageGestures(contents) {
 
     state.gesture = {
       pointerId: event.pointerId,
-      direction,
+      direction: 0,
       startX: point.x,
       startY: point.y,
       lastX: point.x,
       lastTime: performance.now(),
+      startedAt: performance.now(),
       velocity: 0,
       progress: 0,
       active: false,
@@ -1214,12 +1250,13 @@ function registerPageGestures(contents) {
     const dx = point.x - gesture.startX;
     const dy = point.y - gesture.startY;
 
-    const towardTurn =
-      gesture.direction > 0
-        ? -dx
-        : dx;
-
     if (!gesture.active) {
+      // Leave a held press to the browser's text selection controls.
+      if (doc.getSelection?.()?.toString().trim() ||
+          performance.now() - gesture.startedAt > 500) {
+        cancelGesture();
+        return;
+      }
       if (
         Math.abs(dx) < DRAG_START_DISTANCE &&
         Math.abs(dy) < DRAG_START_DISTANCE
@@ -1227,20 +1264,27 @@ function registerPageGestures(contents) {
         return;
       }
 
-      // Do not hijack predominantly vertical
-      // movements or drags away from the page.
-      if (
-        Math.abs(dy) > Math.abs(dx) ||
-        towardTurn <= 0
-      ) {
-        state.gesture = null;
+      // Only a clear horizontal intent should turn a page.
+      if (Math.abs(dx) < Math.abs(dy) * 1.2) {
+        cancelGesture();
+        return;
+      }
+      gesture.direction = dx < 0 ? 1 : -1;
+      if (!canTurn(gesture.direction)) {
+        cancelGesture();
         return;
       }
 
       gesture.active = true;
+      try {
+        event.target.setPointerCapture(event.pointerId);
+        gesture.captureTarget = event.target;
+      } catch {}
 
       if(appearance.motion!=='instant'&&!reducedMotion.matches)prepareTurnSheet(gesture.direction);
     }
+
+    const towardTurn = gesture.direction > 0 ? -dx : dx;
 
     if (event.cancelable) {
       event.preventDefault();
@@ -1293,6 +1337,7 @@ function registerPageGestures(contents) {
     }
 
     state.gesture = null;
+    try { gesture.captureTarget?.releasePointerCapture(gesture.pointerId); } catch {}
 
     if (!gesture.active) {
       return;
