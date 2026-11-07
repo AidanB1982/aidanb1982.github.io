@@ -373,6 +373,10 @@ series, shelf copy, atmospheric quotes and social links for the 0.2.0 update.
 
 ## Further improvements to review
 
+- [ ] Explore optional online book translation: Spanish first on one public story,
+  French later; retain English, preserve names and label machine translation.
+  This is a wishlist idea, outside the current release. See the
+  [Sgeul future-feature list](sgeul-next-update.md#later-reading-and-engagement-features).
 - [ ] Review existing book pages and public author pages before redesigning or duplicating
   them; strengthen samples, series order, genuine reviews and clear reading/buying routes.
 - [ ] Attach verified cover artwork to Author Desk books using an agreed catalogue source.
