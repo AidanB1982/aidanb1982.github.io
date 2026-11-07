@@ -1,7 +1,11 @@
 # Blackwood website to-do list
 
-Updated **30 October 2026** (UK). This separates published website work from features
+Updated **7 November 2026** (UK). This separates published website work from features
 that still need live configuration, database changes or app-store setup.
+
+On 7 November the owner approved **Reading → Sgeul — Read Online**, linking to
+the existing web reading room. This supersedes earlier navigation-hold notes;
+the link does not change account entitlements or customer-launch configuration.
 
 ## Catalogue reconciliation — owner confirmed live
 

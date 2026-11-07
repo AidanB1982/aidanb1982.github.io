@@ -315,6 +315,10 @@
                     role="menu"
                     aria-label="Reading"
                 >
+                    <a href="/pages/bp-reading.html" role="menuitem">
+                        Sgeul — Read Online
+                    </a>
+
                     <a href="/pages/reading-lists.html" role="menuitem">
                         Recommended Reads
                     </a>
