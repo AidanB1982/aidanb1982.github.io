@@ -18,8 +18,8 @@
     background: var(--sr-bg);
     color: var(--sr-text);
     min-height: 100vh;
-    font-size: 12px;
-    line-height: 1.35;
+    font-size: 14px;
+    line-height: 1.45;
 }
 
 .sr-page *,
@@ -35,6 +35,13 @@
 /* ==========================================
    MAIN LAYOUT
    ========================================== */
+
+/* Let the shared navigation reserve its own height on this dashboard. */
+.sr-page #header-placeholder .simple-header {
+    position: relative;
+    top: auto;
+    left: auto;
+}
 
 .sr-wrap {
     width: min(1600px, calc(100% - 28px));
@@ -60,7 +67,7 @@
 }
 
 .sr-hero h1 {
-    font-size: clamp(20px, 2.1vw, 28px);
+    font-size: clamp(22px, calc(2.1vw + 2px), 30px);
     line-height: 1.15;
     margin: 4px 0 7px;
     color: var(--sr-text);
@@ -69,14 +76,14 @@
 .sr-hero > p:not(.sr-kicker) {
     max-width: 900px;
     color: var(--sr-muted);
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.4;
     margin: 5px 0;
 }
 
 .sr-kicker {
     color: var(--sr-copper);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -112,7 +119,7 @@
 }
 
 .sr-section-heading h2 {
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.2;
     color: var(--sr-text);
     margin: 0;
@@ -120,7 +127,7 @@
 
 .sr-panel h3 {
     margin: 14px 0 7px;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.25;
     color: var(--sr-text);
 }
@@ -131,7 +138,7 @@
 
 .sr-muted {
     color: var(--sr-muted);
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.4;
 }
 
@@ -162,7 +169,7 @@
 .sr-kpi span {
     display: block;
     color: var(--sr-muted);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1.25;
     margin: 0;
@@ -171,7 +178,7 @@
 .sr-kpi strong {
     display: block;
     color: var(--sr-text);
-    font-size: clamp(14px, 1.3vw, 18px);
+    font-size: clamp(16px, calc(1.3vw + 2px), 20px);
     font-weight: 750;
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -183,7 +190,7 @@
 .sr-kpi small {
     display: block;
     color: var(--sr-muted);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 400;
     line-height: 1.25;
     margin: 1px 0 0;
@@ -198,7 +205,7 @@
 }
 
 .sr-page .sr-kpi strong {
-    font-size: clamp(14px, 1.3vw, 18px);
+    font-size: clamp(16px, calc(1.3vw + 2px), 20px);
 }
 
 /* ==========================================
@@ -226,7 +233,7 @@
     color: var(--sr-text);
     text-decoration: none;
     font: inherit;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1.2;
     cursor: pointer;
@@ -258,7 +265,7 @@
     background: var(--sr-panel-soft);
     border-radius: 3px 6px 6px 3px;
     color: var(--sr-text);
-    font-size: 11px;
+    font-size: 13px;
 }
 
 /* ==========================================
@@ -282,7 +289,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--sr-muted);
     min-width: 0;
@@ -298,7 +305,7 @@
     border-radius: 5px;
     color: var(--sr-text);
     font: inherit;
-    font-size: 11px;
+    font-size: 13px;
     color-scheme: dark;
 }
 
@@ -342,7 +349,7 @@
     align-items: center;
     gap: 8px;
     min-height: 17px;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .sr-bar-label {
@@ -383,7 +390,7 @@
 .sr-page table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.3;
 }
 
@@ -397,7 +404,7 @@
 
 .sr-page th {
     color: var(--sr-copper);
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -427,7 +434,7 @@
     background: rgba(197, 139, 89, 0.08);
     color: var(--sr-muted);
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 13px;
     line-height: 1.4;
 }
 
@@ -451,7 +458,7 @@
 }
 
 .sr-record strong {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--sr-text);
 }
 
@@ -465,7 +472,7 @@
 .sr-record p {
     color: var(--sr-muted);
     margin: 4px 0;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.3;
 }
 
@@ -493,7 +500,7 @@
     padding: 4px 7px;
     cursor: pointer;
     font: inherit;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .sr-delete:hover {
@@ -512,7 +519,7 @@
     border-top: 1px solid var(--sr-border);
     padding: 12px 0;
     color: var(--sr-muted);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 /* ==========================================
@@ -540,7 +547,7 @@
 
     .sr-kpi strong,
     .sr-page .sr-kpi strong {
-        font-size: 17px;
+        font-size: 19px;
     }
 }
 
@@ -597,11 +604,11 @@
 
     .sr-kpi strong,
     .sr-page .sr-kpi strong {
-        font-size: 15px;
+        font-size: 17px;
     }
 
     .sr-kpi small {
-        font-size: 9px;
+        font-size: 11px;
     }
 }
 
@@ -621,7 +628,7 @@
     }
 
     .sr-hero h1 {
-        font-size: 20px;
+        font-size: 22px;
     }
 
     .sr-panel {
@@ -637,7 +644,7 @@
     }
 
     .sr-section-heading h2 {
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .sr-kpi-grid {
@@ -653,16 +660,16 @@
     }
 
     .sr-kpi span {
-        font-size: 9px;
+        font-size: 11px;
     }
 
     .sr-kpi strong,
     .sr-page .sr-kpi strong {
-        font-size: 15px;
+        font-size: 17px;
     }
 
     .sr-kpi small {
-        font-size: 9px;
+        font-size: 11px;
         line-height: 1.2;
     }
 
@@ -675,11 +682,11 @@
     .sr-bar-row {
         grid-template-columns: 43px minmax(0, 1fr) 70px;
         gap: 5px;
-        font-size: 9px;
+        font-size: 11px;
     }
 
     .sr-page table {
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sr-page th,
@@ -696,7 +703,7 @@
 
     .sr-kpi strong,
     .sr-page .sr-kpi strong {
-        font-size: 14px;
+        font-size: 16px;
     }
 }
 
@@ -705,19 +712,13 @@
    FINAL HEADER SPACING & READABILITY ADJUSTMENTS
    ========================================================== */
 
-/* Prevent the site navigation from covering page content */
-body {
-    font-size: 14px;
-    line-height: 1.55;
-}
-
-/* Allow the department page to clear the fixed/sticky header */
+/* Keep dashboard panels below the navigation layer. */
 #sr-admin-content {
     position: relative;
     z-index: 1;
 }
 
-/* Keep the page introduction clear of the navigation */
+/* Space the page introduction within its panel. */
 .sr-hero,
 .sr-page-header,
 .sr-header {
@@ -734,19 +735,19 @@ body {
 
 /* Slightly larger section headings */
 .sr-panel h2 {
-    font-size: 19px;
+    font-size: 21px;
     line-height: 1.3;
 }
 
 .sr-panel h3 {
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.35;
 }
 
 /* More readable financial cards */
 .sr-kpi strong,
 .sr-kpi-value {
-    font-size: 20px;
+    font-size: 22px;
     line-height: 1.25;
 }
 
@@ -754,26 +755,26 @@ body {
 .sr-kpi small,
 .sr-kpi-label,
 .sr-kpi-detail {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.45;
 }
 
 /* Improve reporting controls */
 .sr-controls label,
 .sr-filter label {
-    font-size: 13px;
+    font-size: 15px;
 }
 
 .sr-controls select,
 .sr-filter select {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 /* Improve financial table readability */
 .sr-table,
 .sr-table th,
 .sr-table td {
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.5;
 }
 
@@ -781,7 +782,7 @@ body {
 .sr-muted,
 .sr-description,
 .sr-panel > p {
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.55;
 }
 
@@ -795,11 +796,11 @@ body {
 
     .sr-kpi strong,
     .sr-kpi-value {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .sr-panel h2 {
-        font-size: 17px;
+        font-size: 19px;
     }
 }
 
