@@ -1,7 +1,7 @@
 // =========================
 // BLACKWOOD ARCHIVISTS
 // Supabase Auth + Private Archive Dashboard + Rewards Redemption + Password Reset
-// Behind the Files uses the audience-protected dispatch feed, with legacy migration fallback.
+// Behind the Files uses the audience-protected published dispatch feed.
 // Behind the Files reactions powered by Supabase
 // ARC Profile powered by /js/member-arc-profile.js
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
@@ -26,7 +26,6 @@
         showBpReading: false,
         membersPagePath: "/pages/members.html",
         readerRecordsPagePath: "/pages/reader-records.html",
-        behindFilesJsonPath: "/data/BFA.json",
         behindFilesFallbackImage: "/assets/ArchiveFilesBG.png",
         supabaseCdn: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
     };
@@ -114,9 +113,7 @@
     session: null,
     member: null,
     hasAuthorDeskAccess: false,    
-    posts: [],
     behindFiles: [],
-    behindFilesSource: "legacy",
     behindFilesError: "",
     behindFilesIndex: 0,
     postReactions: [],
@@ -869,7 +866,6 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
 
             BlackwoodMembersState.session = null;
             BlackwoodMembersState.member = null;
-            BlackwoodMembersState.posts = [];
             BlackwoodMembersState.behindFiles = [];
             BlackwoodMembersState.behindFilesIndex = 0;
             BlackwoodMembersState.postReactions = [];
@@ -958,7 +954,6 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
             await checkAuthorDeskAccess(user.id);
             const [
                 profileResult,
-                legacyPosts,
                 behindFiles,
                 postReactions,
                 rewardsResult,
@@ -971,8 +966,6 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                     .select("*")
                     .eq("id", user.id)
                     .maybeSingle(),
-
-                loadLegacyMemberPosts(),
 
                 loadBehindFilesPosts(),
 
@@ -1009,7 +1002,6 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
 
             if (BlackwoodMembersState.session?.user?.id !== user.id || BlackwoodMembersState.isPasswordRecovery) return;
             BlackwoodMembersState.member = memberProfile;
-            BlackwoodMembersState.posts = legacyPosts || [];
             BlackwoodMembersState.behindFiles = behindFiles || [];
             BlackwoodMembersState.behindFilesIndex = 0;
             BlackwoodMembersState.postReactions = postReactions || [];
@@ -1101,62 +1093,14 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
         }
     }
 
-    async function loadLegacyMemberPosts() {
-        try {
-            const { data, error } = await BlackwoodMembersState.client
-                .from("member_posts")
-                .select("*")
-                .eq("is_published", true)
-                .order("published_at", { ascending: false });
-
-            if (error) {
-                console.warn("Legacy member_posts could not be loaded:", error.message);
-                return [];
-            }
-
-            return Array.isArray(data) ? data : [];
-
-        } catch (error) {
-            console.warn("Legacy member_posts query failed:", error);
-            return [];
-        }
-    }
-
     async function loadBehindFilesPosts() {
         BlackwoodMembersState.behindFilesError = "";
-        if (window.BlackwoodDispatches) {
-            try {
-                const posts = await window.BlackwoodDispatches.loadMember(BlackwoodMembersState.client);
-                BlackwoodMembersState.behindFilesSource = "database";
-                return posts;
-            } catch (error) {
-                // Keep the existing archive usable only until the new table is installed.
-                // An empty/unpublished database feed must never resurrect legacy posts.
-                if (!["42P01", "PGRST205"].includes(error.code) && error.status !== 404) {
-                    BlackwoodMembersState.behindFilesSource = "unavailable";
-                    BlackwoodMembersState.behindFilesError = "Updates could not be checked. Please refresh to try again.";
-                    console.warn("Published dispatches could not be loaded.");
-                    return [];
-                }
-            }
-        }
-        BlackwoodMembersState.behindFilesSource = "legacy";
         try {
-            const response = await fetch(
-                `${BLACKWOOD_MEMBERS_CONFIG.behindFilesJsonPath}?cache=${Date.now()}`
-            );
-
-            if (!response.ok) {
-                throw new Error("BFA.json could not be loaded.");
-            }
-
-            const data = await response.json();
-            const posts = Array.isArray(data.posts) ? data.posts : [];
-
-            return normaliseBehindFilesPosts(posts);
-
-        } catch (error) {
-            console.warn("Behind the Files JSON could not be loaded:", error);
+            if (!window.BlackwoodDispatches) throw new Error("Dispatch reader unavailable.");
+            return await window.BlackwoodDispatches.loadMember(BlackwoodMembersState.client);
+        } catch {
+            BlackwoodMembersState.behindFilesError = "Updates could not be checked. Please refresh to try again.";
+            console.warn("Published dispatches could not be loaded.");
             return [];
         }
     }
@@ -2819,83 +2763,11 @@ function bindPremiumDisclosureShortcuts() {
     // =========================
 
     function getBehindFilesForDisplay() {
-        if (BlackwoodMembersState.behindFilesSource !== "legacy") {
-            return BlackwoodMembersState.behindFiles;
-        }
-        if (BlackwoodMembersState.behindFiles.length) {
-            return BlackwoodMembersState.behindFiles;
-        }
-
-        return convertLegacyPostsToBehindFiles(BlackwoodMembersState.posts);
+        return BlackwoodMembersState.behindFiles;
     }
 
     function dispatchAudienceLabel(post) {
-        if (BlackwoodMembersState.behindFilesSource === "legacy") return "Archive update";
         return post.audience === "public" ? "Public update" : "Members only";
-    }
-
-    function convertLegacyPostsToBehindFiles(posts) {
-        if (!Array.isArray(posts) || !posts.length) {
-            return [];
-        }
-
-        return posts.map(function (post) {
-            return {
-                id: String(post.id || createFallbackPostId(post)),
-                title: String(post.title || "Untitled File"),
-                category: String(post.category || "Behind the Files"),
-                excerpt: String(post.excerpt || ""),
-                body: String(post.body || ""),
-                image: String(post.image_url || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage),
-                audience: "members",
-                published: true,
-                pinned: false,
-                publishedAt: String(post.published_at || post.created_at || "")
-            };
-        });
-    }
-
-    function normaliseBehindFilesPosts(posts) {
-        return posts
-            .filter(function (post) {
-                return post && post.published === true;
-            })
-            .map(function (post) {
-                return {
-                    id: String(post.id || createFallbackPostId(post)).trim(),
-                    title: String(post.title || "Untitled File").trim(),
-                    category: String(post.category || "Behind the Files").trim(),
-                    excerpt: String(post.excerpt || "").trim(),
-                    body: String(post.body || "").trim(),
-                    image: String(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage).trim(),
-                    audience: post.audience === "public" ? "public" : "members",
-                    published: post.published === true,
-                    pinned: post.pinned === true,
-                    publishedAt: String(post.publishedAt || "").trim()
-                };
-            })
-            .sort(sortBehindFilesPosts);
-    }
-
-    function sortBehindFilesPosts(a, b) {
-        if (a.pinned && !b.pinned) return -1;
-        if (!a.pinned && b.pinned) return 1;
-
-        return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
-    }
-
-    function createFallbackPostId(post) {
-        const title = String(post && post.title ? post.title : "behind-file")
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "")
-            .slice(0, 48);
-
-        const date = String(post && post.publishedAt ? post.publishedAt : "undated")
-            .replace(/[^0-9]/g, "");
-
-        return `bfa-${date || "undated"}-${title || "file"}`;
     }
 
     function renderBehindFilesCarousel() {
@@ -2929,13 +2801,12 @@ function bindPremiumDisclosureShortcuts() {
             Date.parse(item.publishedAt) > Date.parse(latest) ? item.publishedAt : latest,
             posts[0].publishedAt));
         const membersOnly = posts.every(item => item.audience !== "public");
-        const legacyArchive = BlackwoodMembersState.behindFilesSource === "legacy";
 
 return renderPremiumDisclosure({
     panelId: "behindFiles",
-    kicker: legacyArchive ? "Archive Dispatches" : membersOnly ? "Private Dispatches" : "Blackwood Updates",
+    kicker: membersOnly ? "Private Dispatches" : "Blackwood Updates",
     title: "Behind the Files",
-    summary: `${posts.length} ${legacyArchive ? "archived " : membersOnly ? "private " : ""}dispatch${posts.length === 1 ? "" : "es"} · Latest ${latestDate}`,
+    summary: `${posts.length} ${membersOnly ? "private " : ""}dispatch${posts.length === 1 ? "" : "es"} · Latest ${latestDate}`,
     countLabel: `${posts.length} filed`,
     isOpen: BlackwoodMembersState.premiumDisclosures.behindFiles,
     bodyHtml: `

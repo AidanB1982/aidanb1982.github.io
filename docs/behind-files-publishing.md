@@ -21,10 +21,18 @@ The members carousel now sits directly after its welcome heading, above account
 summaries, ARC/bookshelf and rewards. The homepage shows up to three public
 updates, with a link to the member feed. Counts and dates come from actual posts.
 
+## Migration status
+
+On 7 November the owner returned all five original dispatch IDs from the live
+Blackwood project with audience `members`, published `true`, and revision `1`.
+The current public `data/BFA.json` has been emptied, and the member reader and
+admin editor no longer fall back to JSON or the legacy SQL-post feed.
+
 ## Owner setup in the correct project
 
 This workspace does not have a live Supabase admin connection. Repository pushes
-do not apply migrations or import posts. No new Edge Function or Android bundle
+do not apply migrations or import posts; the owner completed and confirmed the
+following setup in the live Blackwood project. No new Edge Function or Android bundle
 is required for these website changes.
 
 1. Open **Blackwood Publishing Members Access / main** (`bmnlynjldlnxfvunqbqq`).
@@ -54,17 +62,15 @@ The previous implementation stored complete “private” dispatches in the publ
 served `/data/BFA.json`. A sign-in screen did not make that file private. The new
 members-only database rows have actual server-side access rules.
 
-During setup, the members page retains the old archive only while the new table
-is unavailable. Once the table responds, its result is authoritative, including
-an empty feed or an intentionally unpublished post. The homepage never reads the
-legacy JSON. New members-only drafts cannot be exported into that public file.
+The import has now been confirmed. The current public JSON contains only an empty
+`posts` array, with a private backup retained outside Git. Both readers and the
+editor use the protected database; a connection/setup failure shows an error
+instead of reviving archived content. The homepage never reads the legacy file.
+New members-only drafts cannot be exported into that public file.
 
-After the owner confirms import and member reading work, remove the five bodies
-from the current public JSON (retain an empty `posts` array or remove the legacy
-route and fallback together). Keep the private backup outside Git. Do not empty
-the old file before checking the import. Previously public material may remain
-in Git history or caches; migrating it does not retroactively make old copies
-private. Future member-only updates should use the protected editor exclusively.
+Previously public material may remain in Git history or caches; removing the
+current file contents does not retroactively make old copies private. Future
+member-only updates should use the protected editor exclusively.
 
 ## Existing reactions
 

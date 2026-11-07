@@ -16,12 +16,14 @@ the link does not change account entitlements or customer-launch configuration.
   and revision-checked administrator saves.
 - [x] Prepare a private, duplicate-safe import of the five existing posts, retaining
   their IDs/dates/content and selecting members-only by default.
-- [ ] Owner applies the dispatch migration and private import in Blackwood Supabase,
-  verifies reading/publication, then retires the old public JSON archive.
+- [x] Owner applied the dispatch migration/private import and confirmed all five
+  original IDs as published members-only rows, revision 1, on 7 November.
+- [x] Empty the current public JSON archive and remove legacy member/admin fallbacks.
+- [ ] Owner verifies signed-in reading and publishes the first intentional public update.
 
-The code push does not apply database changes. Until the owner completes setup,
-the old member archive is retained and the homepage shows its empty public-feed
-state. See [Behind the Files publishing setup](behind-files-publishing.md).
+The code push does not apply database changes; the owner has now confirmed the
+import. The homepage will show updates after the owner deliberately publishes a
+Public post. See [Behind the Files publishing setup](behind-files-publishing.md).
 
 ## Catalogue reconciliation — owner confirmed live
 

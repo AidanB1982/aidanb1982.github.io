@@ -11,8 +11,25 @@ const { chromium } = require("playwright"),
       }),
       page = await context.newPage(),
       errors = [];
+    let legacyRequests = 0;
     page.on("pageerror", (e) => errors.push(e.message));
     await context.route("https://**/*", (r) => r.abort());
+    await context.route("**/data/BFA.json*", (route) => {
+      legacyRequests++;
+      return route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          posts: [
+            {
+              id: "retired-private-archive",
+              title: "POISON legacy private title",
+              body: "POISON legacy private body",
+              published: true,
+            },
+          ],
+        }),
+      });
+    });
     await context.route("**/js/*", (r) =>
       r.request().url().includes("/js/behind-files-admin.js")
         ? r.continue()
@@ -194,12 +211,21 @@ const { chromium } = require("playwright"),
     await page.waitForFunction(() =>
       document
         .getElementById("bfa-existing-list")
-        .textContent.includes("Legacy public-file archive")
+        .textContent.includes("Protected publishing storage needs setup")
     );
     assert.equal(
       await page.locator("#bfa-existing-list button").count(),
       0,
-      "legacy file records are not edited or exported as private backend entries"
+      "missing protected storage does not show editable fallback records"
+    );
+    assert.equal(
+      legacyRequests,
+      0,
+      "missing protected storage never requests the retired public JSON archive"
+    );
+    assert.doesNotMatch(
+      await page.locator("body").textContent(),
+      /POISON legacy private/
     );
     assert.equal(
       await page.locator("#bfa-post-title").inputValue(),
@@ -262,9 +288,14 @@ const { chromium } = require("playwright"),
       () => document.getElementById("bfa-body").value === ""
     );
     assert.equal(await page.locator("#bfa-save").isDisabled(), true);
+    assert.equal(
+      legacyRequests,
+      0,
+      "the editor only loads protected database posts throughout the session"
+    );
     assert.deepEqual(errors, []);
     console.log(
-      "PASS protected dispatch editor: audience/drafts, safe preview, save/edit/unpublish, revision errors, setup failure retention, auth refresh, URL validation, responsive layout and sign-out/late-save denial. All API calls mocked."
+      "PASS protected dispatch editor: audience/drafts, safe preview, save/edit/unpublish, revision errors, setup failure retention without retired JSON fallback, auth refresh, URL validation, responsive layout and sign-out/late-save denial. All API calls mocked."
     );
   } finally {
     await browser.close();

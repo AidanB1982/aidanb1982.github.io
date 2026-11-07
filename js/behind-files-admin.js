@@ -453,39 +453,26 @@
             updatePreview();
             title.focus();
         }
-        function appendPost(row, legacy = false) {
+        function appendPost(row) {
             const article = document.createElement("article");
             article.className = "bfa-existing-item";
             const meta = document.createElement("p"), name = document.createElement("h3"), detail = document.createElement("p");
             meta.className = "bfa-status-pill";
-            meta.textContent = legacy ? "Legacy public-file archive" : (row.audience === "public" ? "Public" : "Members only") + (row.published ? " · Published" : " · Draft");
+            meta.textContent = (row.audience === "public" ? "Public" : "Members only") + (row.published ? " · Published" : " · Draft");
             name.textContent = row.title || "Untitled update";
-            detail.textContent = String(row.published_at || row.publishedAt || "").slice(0,10) + (row.pinned ? " · Pinned" : "");
+            detail.textContent = String(row.published_at || "").slice(0,10) + (row.pinned ? " · Pinned" : "");
             article.append(meta, name, detail);
-            if (!legacy) {
-                const button = document.createElement("button");
-                button.type = "button";
-                button.className = "bfa-button";
-                button.textContent = "Edit update";
-                button.disabled = !adminId || busy;
-                button.addEventListener("click", () => editPost(row.id));
-                article.append(button);
-            }
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "bfa-button";
+            button.textContent = "Edit update";
+            button.disabled = !adminId || busy;
+            button.addEventListener("click", () => editPost(row.id));
+            article.append(button);
             list.append(article);
         }
         function showListMessage(message) {
             const node = document.createElement("p"); node.className = "bfa-muted"; node.textContent = message; list.replaceChildren(node);
-        }
-        async function loadLegacyArchive(ownGeneration, ownLoad) {
-            // Legacy entries are already public files. New private drafts never use this path.
-            try {
-                const response = await fetch("/data/BFA.json", {cache:"no-store"});
-                if (!response.ok) return;
-                const data = await response.json();
-                if (!adminId || ownGeneration !== generation || ownLoad !== loadVersion) return;
-                const posts = Array.isArray(data.posts) ? data.posts : [];
-                for (const row of posts.slice(0,20)) appendPost(row, true);
-            } catch { /* Keep the setup message; do not make other hub tools unavailable. */ }
         }
         async function loadExistingPosts() {
             if (!adminId) return;
@@ -499,9 +486,8 @@
                     if (setupCodes.includes(result.error.code)) {
                         records.clear();
                         setupMissing = true;
-                        showListMessage("Protected publishing storage needs setup. The legacy public-file archive is shown below; import it before editing these entries.");
+                        showListMessage("Protected publishing storage needs setup. Saved updates can only be loaded from the protected dispatch database.");
                         setStatus("Apply the dispatch migration in the Blackwood Supabase project before saving. Your draft remains here.", "is-error");
-                        await loadLegacyArchive(ownGeneration, ownLoad);
                         return;
                     }
                     throw result.error;

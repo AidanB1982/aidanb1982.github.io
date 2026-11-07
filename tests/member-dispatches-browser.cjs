@@ -136,7 +136,7 @@ const { chromium } = require("playwright"),
                         code: "PGRST205",
                         message: "missingtable",
                       };
-                    else if (mode === "failure")
+                    else if (mode === "failure" || mode === "missing")
                       result.error = {
                         code: "08006",
                         message: "backend unavailable",
@@ -202,9 +202,6 @@ const { chromium } = require("playwright"),
           path: "/workspace/scratch/member-dispatches-mobile.png",
           fullPage: true,
         });
-      } else if (mode === "missing") {
-        assert.match(await panel.textContent(), /Legacy archive update/);
-        assert.equal(legacyFetches, 1);
       } else {
         assert.doesNotMatch(
           await panel.textContent(),
@@ -215,14 +212,14 @@ const { chromium } = require("playwright"),
           0,
           "empty/error DB feed must not resurrect legacyposts"
         );
-        if (mode === "failure")
+        if (mode === "failure" || mode === "missing")
           assert.match(await panel.textContent(), /could not be checked/);
       }
       assert.deepEqual(errors, []);
       await context.close();
     }
     console.log(
-      "PASS member dispatches: feed first, public+member labels, current latestdate, safe body, drafts hidden, authoritative empty/error feeds and migration fallback only for missing table. No live auth/datawrites."
+      "PASS member dispatches: feed first, public+member labels, current latestdate, safe body, drafts hidden, authoritative empty/error feeds and no legacy fallback even for missing table. No live auth/datawrites."
     );
   } finally {
     await browser.close();
