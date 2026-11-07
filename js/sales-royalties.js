@@ -71,6 +71,21 @@
         return Number.isFinite(result) ? result : 0;
     };
 
+    const hasReportedNumber = value =>
+        value !== null &&
+        value !== undefined &&
+        String(value).trim() !== "" &&
+        Number.isFinite(Number(value));
+
+    function missingShopifyGrossFields(error) {
+        return (
+            ["42703", "PGRST204"].includes(error?.code) &&
+            /gross_sales/i.test(
+                `${error.message || ""} ${error.details || ""}`
+            )
+        );
+    }
+
     const sum = (rows, key) =>
         rows.reduce(
             (total, row) => total + number(row[key]),
@@ -664,7 +679,9 @@
                     "payment_received_date",
                     "payment_amount",
                     "order_date",
-                    "product_title"
+                    "product_title",
+                    "gross_sales",
+                    "gross_sales_source"
                 ].join(",")
             ],
             [
@@ -731,12 +748,37 @@
             ) {
                 status(`Loading ${table}...`);
 
-                incoming[key] = await fetchAll(
-                    table,
-                    columns,
-                    version,
-                    orderBy || "id"
-                );
+                try {
+                    incoming[key] = await fetchAll(
+                        table,
+                        columns,
+                        version,
+                        orderBy || "id"
+                    );
+                } catch (error) {
+                    if (
+                        key !== "lines" ||
+                        !missingShopifyGrossFields(error)
+                    ) {
+                        throw error;
+                    }
+
+                    // Keep the dashboard usable while the nullable source fields
+                    // are being added or PostgREST is refreshing its schema.
+                    const existingColumns = columns.split(",").filter(
+                        column => ![
+                            "gross_sales",
+                            "gross_sales_source"
+                        ].includes(column)
+                    ).join(",");
+
+                    incoming[key] = await fetchAll(
+                        table,
+                        existingColumns,
+                        version,
+                        orderBy || "id"
+                    );
+                }
 
                 console.log(
                     `Department 03: ${table} loaded ` +
@@ -1800,6 +1842,31 @@
             )?.platform === "shopify"
         );
 
+        const shopifyGross = shopify.filter(line =>
+            hasReportedNumber(line.gross_sales)
+        );
+        const shopifyProducts = shopify.filter(line =>
+            String(line.product_title || "").trim() ||
+            hasReportedNumber(line.gross_sales)
+        );
+        const shopifyUnits = shopify.filter(line =>
+            hasReportedNumber(line.net_quantity)
+        );
+        const shopifyGrossPartial =
+            shopifyGross.length < shopifyProducts.length;
+        const shopifyGrossText = shopifyGross.length
+            ? `${money(sum(shopifyGross, "gross_sales"))} ` +
+                (shopifyGrossPartial
+                    ? "recorded gross product sales"
+                    : "gross product sales")
+            : "Gross sales not recorded for this selection.";
+        const shopifyUnitsText = shopifyUnits.length
+            ? `${integer(sum(shopifyUnits, "net_quantity"))} ` +
+                (shopifyUnits.length < shopifyProducts.length
+                    ? "recorded net product units (partial coverage)"
+                    : "net product units")
+            : "Net product units not supplied.";
+
         $("sr-platform-summary").innerHTML = `
             <div class="sr-record-list">
                 <div class="sr-record">
@@ -1853,15 +1920,22 @@
                     <strong>Shopify</strong>
 
                     <p>
-                        ${integer(
-                            sum(shopify, "net_quantity")
-                        )}
-                        net product units
+                        ${escapeHtml(shopifyGrossText)}
+                    </p>
+
+                    ${
+                        shopifyGross.length && shopifyGrossPartial
+                            ? `<p>Gross sales recorded for ${integer(shopifyGross.length)} of ${integer(shopifyProducts.length)} product records.</p>`
+                            : ""
+                    }
+
+                    <p>
+                        ${escapeHtml(shopifyUnitsText)}
                     </p>
 
                     <p>
-                        Revenue not calculated
-                        from average order value.
+                        Gross sales before discounts, returns,
+                        fees and fulfilment costs.
                     </p>
                 </div>
 

@@ -328,3 +328,12 @@ confirmed target's normal profile/complimentary entitlement and assigned ARC,
 preserves unrelated accounts, rejects existing admin/revoked state and creates no
 payment/purchase. Delivery tests cover the additional comma-separated tester
 allowlist while retaining entitlement checks and the original single tester setting.
+
+Shopify gross-sales reporting
+-----------------------------
+
+`node tests/shopify-gross-browser.cjs` runs against `BASE_URL` using the same
+Playwright/Chromium setup as the other browser checks. It uses fictional records
+and mock services to verify reported gross amounts, book/date/format/currency
+filters, partial coverage, missing values, access controls and the optional-field
+fallback before the schema is extended. It performs no live API writes.
