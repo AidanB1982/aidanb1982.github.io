@@ -373,6 +373,10 @@ series, shelf copy, atmospheric quotes and social links for the 0.2.0 update.
 
 ## Further improvements to review
 
+The [7 November website upgrade review](website-upgrade-review.md) records current
+content/link repairs, image optimisation, homepage journeys and animation ideas.
+These are recommendations; the review does not implement site changes.
+
 - [ ] Explore optional online book translation: Spanish first on one public story,
   French later; retain English, preserve names and label machine translation.
   This is a wishlist idea, outside the current release. See the
