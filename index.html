@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="/css/header.css?v=20261115">
     <link rel="stylesheet" href="/css/styles.css?v=20260902">
     <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
-    <link rel="stylesheet" href="/css/home-dispatches.css?v=20261107">
+    <link rel="stylesheet" href="/css/home-dispatches.css?v=20261107-panel">
 </head>
 
 <body class="home-page">
@@ -75,20 +75,28 @@
 
 <main id="main-content">
 
-<section class="home-dispatches" id="home-dispatches" aria-labelledby="home-dispatches-title">
-    <div class="home-dispatches__heading">
-        <div>
-            <p class="home-dispatches__kicker">Blackwood Updates</p>
-            <h2 id="home-dispatches-title">Behind the Files</h2>
-            <p class="home-dispatches__intro">News from the press, new books, and the stories behind them.</p>
-        </div>
-        <a class="button ghost" href="/pages/members.html#circle-panel-behindFiles">Read member dispatches</a>
+<section class="home-dispatches is-open" id="home-dispatches" aria-labelledby="home-dispatches-title">
+    <h2 class="home-dispatches__header" aria-labelledby="home-dispatches-title">
+        <button type="button" class="home-dispatches__toggle" data-dispatch-toggle
+            aria-expanded="true" aria-controls="home-dispatch-content" aria-labelledby="home-dispatches-title">
+            <span class="home-dispatches__heading">
+                <small class="home-dispatches__kicker">Public Dispatches</small>
+                <span class="home-dispatches__title" id="home-dispatches-title">Behind the Files</span>
+                <span class="home-dispatches__summary" data-dispatch-summary>News and updates from Blackwood Publishing.</span>
+            </span>
+            <span class="home-dispatches__side">
+                <span class="home-dispatches__count" data-dispatch-count>…</span>
+                <span class="home-dispatches__chevron" aria-hidden="true">↑</span>
+            </span>
+        </button>
+    </h2>
+    <div class="home-dispatches__content" id="home-dispatch-content">
+        <p class="home-dispatches__status" role="status" aria-live="polite" data-dispatch-status>Checking the latest public updates…</p>
+        <div class="home-dispatches__grid" data-dispatch-grid role="region" aria-roledescription="carousel" aria-label="Public dispatches"></div>
+        <button class="button home-dispatches__retry" type="button" data-dispatch-retry hidden>Try updates again</button>
+        <p class="home-dispatches__member-note">For members-only dispatches, <a href="/pages/members.html#circle-panel-behindFiles">Read member dispatches</a> in the Archivists area.</p>
+        <noscript><p class="home-dispatches__intro">Enable JavaScript to load public updates, or visit <a href="/pages/members.html#circle-panel-behindFiles">the Archivists member area</a>.</p></noscript>
     </div>
-    <p class="home-dispatches__status" role="status" aria-live="polite" data-dispatch-status>News and updates from Blackwood Publishing.</p>
-    <div class="home-dispatches__grid" data-dispatch-grid></div>
-    <button class="button home-dispatches__retry" type="button" data-dispatch-retry hidden>Try updates again</button>
-    <p class="home-dispatches__member-note">Sign in to the Archivists for members-only dispatches.</p>
-    <noscript><p class="home-dispatches__intro">Enable JavaScript to load public updates, or visit <a href="/pages/members.html#circle-panel-behindFiles">the Archivists member area</a>.</p></noscript>
 </section>
 <dialog class="home-dispatch-dialog" id="home-dispatch-dialog" aria-labelledby="home-dispatch-dialog-title">
     <div class="home-dispatch-dialog__bar"><button class="button" type="button" data-dispatch-close>Close update</button></div>
@@ -401,7 +409,7 @@
 <!-- JS -->
 <script src="/js/header.js?v=20261116" defer></script>
 <script src="/js/dispatches.js?v=20261107a" defer></script>
-<script src="/js/home-dispatches.js?v=20261107" defer></script>
+<script src="/js/home-dispatches.js?v=20261107-panel" defer></script>
 
 <script>
 window.addEventListener("load", async () => {

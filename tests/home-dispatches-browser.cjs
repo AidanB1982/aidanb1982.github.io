@@ -40,7 +40,7 @@ const assert = require("node:assert/strict");
       ...extra,
     });
     const rows = [
-      item("news-one"),
+      item("news-one", { pinned: true }),
       item("members-secret", {
         title: "Private title must never appear",
         audience: "members",
@@ -88,6 +88,8 @@ const assert = require("node:assert/strict");
           body: JSON.stringify(
             mode === "setup"
               ? { code: "PGRST205" }
+              : mode === "single"
+              ? [rows[0]]
               : mode === "empty"
               ? []
               : rows
@@ -99,8 +101,56 @@ const assert = require("node:assert/strict");
     const base = process.env.BASE_URL;
     await page.goto(base + "/");
     const section = page.locator("#home-dispatches");
-    await section.locator(".home-dispatch-card").first().waitFor();
-    assert.equal(await section.locator(".home-dispatch-card").count(), 2);
+    await section.locator(".home-dispatch-carousel").first().waitFor();
+    assert.equal(await section.locator(".home-dispatch-carousel").count(), 1);
+    assert.match(
+      await section.locator("[data-dispatch-summary]").textContent(),
+      /2 public dispatches/
+    );
+    assert.equal(
+      await section.locator(".home-dispatch-carousel__position").textContent(),
+      "1 of 2"
+    );
+    assert.equal(
+      await section.locator("[data-dispatch-pinned]").isVisible(),
+      true
+    );
+    const toggle = section.getByRole("button", {
+      name: "Behind the Files",
+      exact: true,
+    });
+    await toggle.press("Enter");
+    assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+    assert.equal(
+      await section.locator("#home-dispatch-content").isHidden(),
+      true
+    );
+    await toggle.press("Space");
+    assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+    const next = section.getByRole("button", {
+      name: "Next public update",
+      exact: true,
+    });
+    const previous = section.getByRole("button", {
+      name: "Previous public update",
+      exact: true,
+    });
+    await next.focus();
+    await page.keyboard.press("Enter");
+    assert.equal(await section.locator("h3").textContent(), "Public news-two");
+    assert.equal(
+      await section.locator(".home-dispatch-carousel__position").textContent(),
+      "2 of 2"
+    );
+    assert.equal(
+      await next.evaluate((el) => document.activeElement === el),
+      true,
+      "carousel navigation preserves focus"
+    );
+    assert.equal(
+      await section.locator("[data-dispatch-pinned]").isHidden(),
+      true
+    );
     assert.equal(
       legacyReads,
       0,
@@ -119,8 +169,8 @@ const assert = require("node:assert/strict");
     );
     assert.equal(
       await section
-        .locator(".home-dispatch-card img")
-        .nth(1)
+        .locator(".home-dispatch-carousel img")
+        .first()
         .getAttribute("src"),
       "/assets/ArchiveFilesBG.png",
       "unverified external image is not requested"
@@ -131,8 +181,22 @@ const assert = require("node:assert/strict");
       ),
       "home-dispatches"
     );
+    await previous.click();
+    assert.equal(await section.locator("h3").textContent(), "Public news-one");
+    await previous.click();
+    assert.equal(
+      await section.locator("h3").textContent(),
+      "Public news-two",
+      "previous wraps around"
+    );
+    await next.click();
+    assert.equal(
+      await section.locator("h3").textContent(),
+      "Public news-one",
+      "next wraps around"
+    );
     const open = section.getByRole("button", {
-      name: "Read update: Public news-one",
+      name: "Read File: Public news-one",
       exact: true,
     });
     await open.click();
@@ -181,6 +245,25 @@ const assert = require("node:assert/strict");
     await section.screenshot({
       path: "/workspace/scratch/home-dispatches-desktop.png",
     });
+    mode = "single";
+    await page.reload();
+    await section.locator(".home-dispatch-carousel").waitFor();
+    assert.equal(
+      await section
+        .getByRole("button", { name: "Next public update", exact: true })
+        .isDisabled(),
+      true
+    );
+    assert.equal(
+      await section
+        .getByRole("button", { name: "Previous public update", exact: true })
+        .isDisabled(),
+      true
+    );
+    assert.equal(
+      await section.locator(".home-dispatch-carousel__position").textContent(),
+      "1 of 1"
+    );
     mode = "empty";
     await page.reload();
     await page.waitForFunction(() =>
@@ -188,7 +271,7 @@ const assert = require("node:assert/strict");
         .querySelector("[data-dispatch-status]")
         .textContent.includes("Public updates will appear")
     );
-    assert.equal(await section.locator(".home-dispatch-card").count(), 0);
+    assert.equal(await section.locator(".home-dispatch-carousel").count(), 0);
     assert.equal(
       await section.locator("[data-dispatch-retry]").isHidden(),
       true
@@ -208,15 +291,15 @@ const assert = require("node:assert/strict");
     mode = "error";
     await page.reload();
     await section.getByRole("button", { name: "Try updates again" }).waitFor();
-    assert.equal(await section.locator(".home-dispatch-card").count(), 0);
+    assert.equal(await section.locator(".home-dispatch-carousel").count(), 0);
     assert(!/Supabase|SQL|apikey|503/.test(await section.textContent()));
     mode = "posts";
     await section.getByRole("button", { name: "Try updates again" }).click();
-    await section.locator(".home-dispatch-card").first().waitFor();
-    assert.equal(requests.length, 5);
+    await section.locator(".home-dispatch-carousel").first().waitFor();
+    assert.equal(requests.length, 6);
     assert.deepEqual(errors, []);
     console.log(
-      "PASS homepage dispatches: public-only anonymous request despite admin cache, no legacy/private/draft/future rendering, safe modal/focus, first-party images, empty/retry states and mobile/desktop layouts. No live API writes or emails."
+      "PASS homepage dispatches: public-only anonymous request despite admin cache, no legacy/private/draft/future rendering, safe modal/focus, first-party images, carousel navigation/collapse, single/empty/retry states and mobile/desktop layouts. No live API writes or emails."
     );
   } finally {
     await browser.close();
