@@ -1,7 +1,7 @@
 // =========================
 // BLACKWOOD ARCHIVISTS
 // Supabase Auth + Private Archive Dashboard + Rewards Redemption + Password Reset
-// Behind the Files carousel powered by /data/BFA.json
+// Behind the Files uses the audience-protected dispatch feed, with legacy migration fallback.
 // Behind the Files reactions powered by Supabase
 // ARC Profile powered by /js/member-arc-profile.js
 // Blackwood Bookshelf powered by /js/member-bookshelf.js
@@ -116,6 +116,8 @@
     hasAuthorDeskAccess: false,    
     posts: [],
     behindFiles: [],
+    behindFilesSource: "legacy",
+    behindFilesError: "",
     behindFilesIndex: 0,
     postReactions: [],
     rewards: [],
@@ -1121,6 +1123,24 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
     }
 
     async function loadBehindFilesPosts() {
+        BlackwoodMembersState.behindFilesError = "";
+        if (window.BlackwoodDispatches) {
+            try {
+                const posts = await window.BlackwoodDispatches.loadMember(BlackwoodMembersState.client);
+                BlackwoodMembersState.behindFilesSource = "database";
+                return posts;
+            } catch (error) {
+                // Keep the existing archive usable only until the new table is installed.
+                // An empty/unpublished database feed must never resurrect legacy posts.
+                if (!["42P01", "PGRST205"].includes(error.code) && error.status !== 404) {
+                    BlackwoodMembersState.behindFilesSource = "unavailable";
+                    BlackwoodMembersState.behindFilesError = "Updates could not be checked. Please refresh to try again.";
+                    console.warn("Published dispatches could not be loaded.");
+                    return [];
+                }
+            }
+        }
+        BlackwoodMembersState.behindFilesSource = "legacy";
         try {
             const response = await fetch(
                 `${BLACKWOOD_MEMBERS_CONFIG.behindFilesJsonPath}?cache=${Date.now()}`
@@ -1191,6 +1211,8 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                 </p>
             </div>
 
+            ${renderBehindFilesCarousel()}
+
             ${renderMemberHomeDashboard(member, pointsTotal, {
                 displayName,
                 tier,
@@ -1250,8 +1272,6 @@ renderErrorState("The Private Archive could not be opened. Please refresh and tr
                     aria-label="ARC Shield Watch Administration"
                 ></section>
             ` : ""}
-            ${renderBehindFilesCarousel()}
-
             ${renderRewardsDisclosure(pointsTotal)}
 
             ${renderRedemptionsDisclosure()}
@@ -2799,11 +2819,19 @@ function bindPremiumDisclosureShortcuts() {
     // =========================
 
     function getBehindFilesForDisplay() {
+        if (BlackwoodMembersState.behindFilesSource !== "legacy") {
+            return BlackwoodMembersState.behindFiles;
+        }
         if (BlackwoodMembersState.behindFiles.length) {
             return BlackwoodMembersState.behindFiles;
         }
 
         return convertLegacyPostsToBehindFiles(BlackwoodMembersState.posts);
+    }
+
+    function dispatchAudienceLabel(post) {
+        if (BlackwoodMembersState.behindFilesSource === "legacy") return "Archive update";
+        return post.audience === "public" ? "Public update" : "Members only";
     }
 
     function convertLegacyPostsToBehindFiles(posts) {
@@ -2819,6 +2847,7 @@ function bindPremiumDisclosureShortcuts() {
                 excerpt: String(post.excerpt || ""),
                 body: String(post.body || ""),
                 image: String(post.image_url || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage),
+                audience: "members",
                 published: true,
                 pinned: false,
                 publishedAt: String(post.published_at || post.created_at || "")
@@ -2839,6 +2868,7 @@ function bindPremiumDisclosureShortcuts() {
                     excerpt: String(post.excerpt || "").trim(),
                     body: String(post.body || "").trim(),
                     image: String(post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage).trim(),
+                    audience: post.audience === "public" ? "public" : "members",
                     published: post.published === true,
                     pinned: post.pinned === true,
                     publishedAt: String(post.publishedAt || "").trim()
@@ -2876,7 +2906,7 @@ function bindPremiumDisclosureShortcuts() {
             panelId: "behindFiles",
             kicker: "Private Dispatches",
             title: "Behind the Files",
-            summary: "Private Blackwood dispatches will appear here once filed.",
+            summary: BlackwoodMembersState.behindFilesError || "Blackwood dispatches will appear here once filed.",
             countLabel: "0 files",
             isOpen: BlackwoodMembersState.premiumDisclosures.behindFiles,
             bodyHtml: `
@@ -2895,13 +2925,17 @@ function bindPremiumDisclosureShortcuts() {
         const post = posts[BlackwoodMembersState.behindFilesIndex];
         const hasMultiplePosts = posts.length > 1;
 
-        const latestDate = formatBehindFileDate(post.publishedAt);
+        const latestDate = formatBehindFileDate(posts.reduce((latest, item) =>
+            Date.parse(item.publishedAt) > Date.parse(latest) ? item.publishedAt : latest,
+            posts[0].publishedAt));
+        const membersOnly = posts.every(item => item.audience !== "public");
+        const legacyArchive = BlackwoodMembersState.behindFilesSource === "legacy";
 
 return renderPremiumDisclosure({
     panelId: "behindFiles",
-    kicker: "Private Dispatches",
+    kicker: legacyArchive ? "Archive Dispatches" : membersOnly ? "Private Dispatches" : "Blackwood Updates",
     title: "Behind the Files",
-    summary: `${posts.length} private dispatch${posts.length === 1 ? "" : "es"} · Latest ${latestDate}`,
+    summary: `${posts.length} ${legacyArchive ? "archived " : membersOnly ? "private " : ""}dispatch${posts.length === 1 ? "" : "es"} · Latest ${latestDate}`,
     countLabel: `${posts.length} filed`,
     isOpen: BlackwoodMembersState.premiumDisclosures.behindFiles,
     bodyHtml: `
@@ -2919,6 +2953,7 @@ return renderPremiumDisclosure({
                         <div class="circle-bfa-meta">
                             <span id="circle-bfa-category">${escapeHtml(post.category)}</span>
                             <span id="circle-bfa-date">${escapeHtml(formatBehindFileDate(post.publishedAt))}</span>
+                            <span id="circle-bfa-audience">${escapeHtml(dispatchAudienceLabel(post))}</span>
                             <span id="circle-bfa-pinned" ${post.pinned ? "" : "hidden"}>Pinned</span>
                         </div>
 
@@ -2992,6 +3027,7 @@ return renderPremiumDisclosure({
                             <div class="circle-bfa-meta">
                                 <span id="circle-bfa-modal-category">${escapeHtml(post.category)}</span>
                                 <span id="circle-bfa-modal-date">${escapeHtml(formatBehindFileDate(post.publishedAt))}</span>
+                                <span id="circle-bfa-modal-audience">${escapeHtml(dispatchAudienceLabel(post))}</span>
                                 <span id="circle-bfa-modal-pinned" ${post.pinned ? "" : "hidden"}>Pinned</span>
                             </div>
 
@@ -3109,6 +3145,7 @@ return renderPremiumDisclosure({
         const image = document.getElementById("circle-bfa-image");
         const category = document.getElementById("circle-bfa-category");
         const date = document.getElementById("circle-bfa-date");
+        const audience = document.getElementById("circle-bfa-audience");
         const pinned = document.getElementById("circle-bfa-pinned");
         const title = document.getElementById("circle-bfa-title");
         const excerpt = document.getElementById("circle-bfa-excerpt");
@@ -3118,6 +3155,7 @@ return renderPremiumDisclosure({
         if (category) category.textContent = post.category;
         if (date) date.textContent = formatBehindFileDate(post.publishedAt);
         if (pinned) pinned.hidden = !post.pinned;
+        if (audience) audience.textContent = dispatchAudienceLabel(post);
         if (title) title.textContent = post.title;
         if (excerpt) excerpt.textContent = post.excerpt || "Open this file to read the full dispatch.";
         if (position) position.textContent = `${BlackwoodMembersState.behindFilesIndex + 1} of ${posts.length}`;
@@ -3166,6 +3204,7 @@ return renderPremiumDisclosure({
         const modalImage = document.getElementById("circle-bfa-modal-image");
         const modalCategory = document.getElementById("circle-bfa-modal-category");
         const modalDate = document.getElementById("circle-bfa-modal-date");
+        const modalAudience = document.getElementById("circle-bfa-modal-audience");
         const modalPinned = document.getElementById("circle-bfa-modal-pinned");
         const modalTitle = document.getElementById("circle-bfa-modal-title");
         const modalBody = document.getElementById("circle-bfa-modal-body");
@@ -3174,6 +3213,7 @@ return renderPremiumDisclosure({
         if (modalImage) modalImage.src = post.image || BLACKWOOD_MEMBERS_CONFIG.behindFilesFallbackImage;
         if (modalCategory) modalCategory.textContent = post.category;
         if (modalDate) modalDate.textContent = formatBehindFileDate(post.publishedAt);
+        if (modalAudience) modalAudience.textContent = dispatchAudienceLabel(post);
         if (modalPinned) modalPinned.hidden = !post.pinned;
         if (modalTitle) modalTitle.textContent = post.title;
 
@@ -4309,7 +4349,8 @@ function renderPointsDisclosure(pointsTotal) {
             return "Filed in the Archive";
         }
 
-        const date = new Date(`${value}T12:00:00`);
+        const raw = String(value).trim();
+        const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T12:00:00Z` : raw);
 
         if (Number.isNaN(date.getTime())) {
             return String(value);
@@ -4318,7 +4359,8 @@ function renderPointsDisclosure(pointsTotal) {
         return date.toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "short",
-            year: "numeric"
+            year: "numeric",
+            timeZone: "Europe/London"
         });
     }
 

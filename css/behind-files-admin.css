@@ -662,3 +662,9 @@ body.behind-files-admin-page {
     margin-top: auto;
     margin-bottom: 0;
 }
+
+/* Protected dispatch editing controls. */
+.bfa-field-help { margin:8px 0 0; color:var(--bfa-muted,#b7ac99); font-size:13px; line-height:1.6; }
+.bfa-warning a { color:inherit; text-decoration:underline; }
+.bfa-existing-item .bfa-button { margin-top:10px; min-height:44px; }
+.bfa-preview-meta { flex-wrap:wrap; }

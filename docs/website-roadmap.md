@@ -7,6 +7,22 @@ On 7 November the owner approved **Reading → Sgeul — Read Online**, linking 
 the existing web reading room. This supersedes earlier navigation-hold notes;
 the link does not change account entitlements or customer-launch configuration.
 
+## Behind the Files: one editor, two audiences
+
+- [x] Move the members dispatch feed immediately below its welcome heading.
+- [x] Add the homepage public-update feed and a Public / Members-only editor choice
+  to the existing Behind the Files management page.
+- [x] Prepare/test database-enforced audiences, draft/publish/unpublish, safe readers
+  and revision-checked administrator saves.
+- [x] Prepare a private, duplicate-safe import of the five existing posts, retaining
+  their IDs/dates/content and selecting members-only by default.
+- [ ] Owner applies the dispatch migration and private import in Blackwood Supabase,
+  verifies reading/publication, then retires the old public JSON archive.
+
+The code push does not apply database changes. Until the owner completes setup,
+the old member archive is retained and the homepage shows its empty public-feed
+state. See [Behind the Files publishing setup](behind-files-publishing.md).
+
 ## Catalogue reconciliation — owner confirmed live
 
 - [x] Review the supplied catalogue/schema report and test reconciliation against it.

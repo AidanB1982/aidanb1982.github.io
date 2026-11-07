@@ -22,14 +22,14 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/css/header.css?v=20261115">
     <link rel="stylesheet" href="/css/styles.css?v=20260910">
-    <link rel="stylesheet" href="/css/behind-files-admin.css?v=20261109">
+    <link rel="stylesheet" href="/css/behind-files-admin.css?v=20261107-dispatches">
 
 
     <!-- JS -->
     <script src="/js/header.js?v=20261116" defer></script>
     <link rel="stylesheet" href="/css/publishing-desk.css?v=20261108">
     <script src="/js/publishing-desk.js?v=20261029-meta2" defer></script>
-    <script src="/js/behind-files-admin.js?v=20261105" defer></script>
+    <script src="/js/behind-files-admin.js?v=20261107-dispatches" defer></script>
     <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
 </head>
 
@@ -305,11 +305,10 @@
             <section class="bfa-panel" aria-labelledby="reader-reporting-title"><div class="bfa-panel-inner"><h2 id="reader-reporting-title">Reader journeys &amp; sales reporting</h2><p>Public-site analytics are optional. Review catalogue visits, public-sample opens, bookshop clicks and newsletter requests in Google Analytics. These are interest signals, not confirmed sales.</p><div class="work-actions"><a class="bfa-button" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener noreferrer">Open Google Analytics</a><a class="bfa-button" href="https://admin.shopify.com/" target="_blank" rel="noopener noreferrer">Open Shopify reports</a><a class="bfa-button" href="/pages/discover.html">Review book discovery</a></div><p>Use Shopify for paid orders, refunds and recurring-payment reports, and MailerLite for confirmed subscribers. Customer lifetime value, royalty margins and membership conversion need verified reporting integration; they are not inferred from clicks.</p></div></section>
 
             <p class="bfa-warning">
-                This page prepares entries for
-                <strong>/data/BFA.json</strong>.
-                It does not save directly to GitHub.
-                Generate the post JSON, copy it, and paste it into the
-                <strong>posts</strong> array.
+                Choose <strong>Public</strong> for updates shown on the homepage and in the members area,
+                or <strong>Members only</strong> for signed-in readers. Drafts are visible only to administrators.
+                Updates now save to protected publishing storage.
+                <a href="https://github.com/AidanB1982/aidanb1982.github.io/blob/main/docs/behind-files-publishing.md" target="_blank" rel="noopener noreferrer">Publishing setup guide</a>.
             </p>
 
             <section
@@ -329,7 +328,7 @@
                         </p>
 
                         <h2 id="bfa-form-title">
-                            Create a Circle Update
+                            Create an update
                         </h2>
 
                         <form
@@ -347,7 +346,7 @@
                                     <input
                                         id="bfa-post-title"
                                         type="text"
-                                        maxlength="120"
+                                        maxlength="200"
                                         placeholder="This Week at Blackwood"
                                         required
                                     >
@@ -371,6 +370,15 @@
                                 </div>
 
                                 <div class="bfa-field">
+                                    <label for="bfa-audience">Audience</label>
+                                    <select id="bfa-audience" required>
+                                        <option value="members" selected>Members only</option>
+                                        <option value="public">Public — homepage and members</option>
+                                    </select>
+                                    <p class="bfa-field-help">Only published public updates appear on the homepage.</p>
+                                </div>
+
+                                <div class="bfa-field">
                                     <label for="bfa-date">
                                         Published Date
                                     </label>
@@ -388,6 +396,7 @@
 
                                     <input
                                         id="bfa-image"
+                                        maxlength="2000"
                                         type="text"
                                         placeholder="/assets/ArchiveFilesBG.png"
                                     >
@@ -412,6 +421,7 @@
 
                                     <textarea
                                         id="bfa-body"
+                                        maxlength="50000"
                                         placeholder="Write the full Behind the Files update here."
                                         required
                                     ></textarea>
@@ -425,11 +435,10 @@
                                     <input
                                         id="bfa-published"
                                         type="checkbox"
-                                        checked
                                     >
 
                                     <span>
-                                        Published
+                                        Publish this update
                                     </span>
                                 </label>
 
@@ -448,28 +457,15 @@
 
                             <div class="bfa-actions">
 
-                                <button
-                                    type="button"
-                                    class="bfa-button primary"
-                                    id="bfa-generate"
-                                >
-                                    Generate JSON
-                                </button>
-
-                                <button
-                                    type="button"
-                                    class="bfa-button"
-                                    id="bfa-copy"
-                                >
-                                    Copy JSON
-                                </button>
+                                <button type="submit" class="bfa-button primary" id="bfa-save">Save update</button>
+                                <button type="button" class="bfa-button" id="bfa-refresh">Refresh saved updates</button>
 
                                 <button
                                     type="reset"
                                     class="bfa-button"
                                     id="bfa-reset"
                                 >
-                                    Clear Draft
+                                    New draft
                                 </button>
 
                             </div>
@@ -481,22 +477,6 @@
                             ></p>
 
                         </form>
-
-                        <div class="bfa-json-box">
-
-                            <p class="bfa-label">
-                                Generated Post JSON
-                            </p>
-
-                            <textarea
-                                class="bfa-json-output"
-                                id="bfa-json-output"
-                                readonly
-                                spellcheck="false"
-                                placeholder="Generate a post to see the JSON here."
-                            ></textarea>
-
-                        </div>
 
                     </div>
                 </section>
@@ -513,7 +493,7 @@
                         </p>
 
                         <h2 id="bfa-preview-title">
-                            Circle Display
+                            Update preview
                         </h2>
 
                         <article class="bfa-preview-card">
@@ -542,6 +522,9 @@
                                     >
                                         Filed today
                                     </span>
+
+                                    <span class="bfa-status-pill" id="bfa-preview-audience">Members only</span>
+                                    <span class="bfa-status-pill" id="bfa-preview-publication">Draft</span>
 
                                     <span
                                         class="bfa-status-pill"
@@ -582,7 +565,7 @@
                         <div class="bfa-json-box">
 
                             <p class="bfa-label">
-                                Current BFA.json Posts
+                                Saved updates
                             </p>
 
                             <div

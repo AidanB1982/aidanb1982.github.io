@@ -6,10 +6,10 @@
 //
 // Supabase administrator verification
 // Behind the Files drafting tools
-// JSON generation and clipboard copying
+// Protected Public / Members-only publishing
 // Live preview and existing posts
 //
-// This file does not save directly to GitHub.
+// Dispatches save to Supabase through an administrator-only RPC.
 //
 // IMPORTANT:
 // Client-side access checks protect the UI.
@@ -32,6 +32,7 @@
     let supabaseClient = null;
     let editorInitialized = false;
     let accessCheckVersion = 0;
+    let dispatchEditor = null;
 
     // ==========================================
     // PAGE INITIALISATION
@@ -105,6 +106,7 @@
                 if (event === "SIGNED_OUT") {
                     accessCheckVersion += 1;
                     lockAdminEditor();
+                    dispatchEditor?.clear();
 
                     showAccessMessage(
                         "Sign In Required",
@@ -268,6 +270,7 @@
             }
 
             unlockAdminEditor();
+            dispatchEditor?.activate(user.id);
             window.BlackwoodPlanner?.activate(user.id);
             window.BlackwoodOperations?.activate(user.id,supabaseClient);
 
@@ -291,6 +294,7 @@
     }
 
     function lockAdminEditor(clearOperations = true) {
+        dispatchEditor?.suspend();
         window.BlackwoodPlanner?.lock();
         if(clearOperations)window.BlackwoodOperations?.lock();
         else window.BlackwoodOperations?.suspend();
@@ -361,369 +365,214 @@
     // ==========================================
 
     function initBehindFilesAdmin() {
-        const form = document.getElementById("bfa-form");
-        const title = document.getElementById("bfa-post-title");
-        const category = document.getElementById("bfa-category");
-        const date = document.getElementById("bfa-date");
-        const image = document.getElementById("bfa-image");
-        const excerpt = document.getElementById("bfa-excerpt");
-        const body = document.getElementById("bfa-body");
-        const published = document.getElementById("bfa-published");
-        const pinned = document.getElementById("bfa-pinned");
-        const generate = document.getElementById("bfa-generate");
-        const copy = document.getElementById("bfa-copy");
-        const status = document.getElementById("bfa-status");
-        const output = document.getElementById("bfa-json-output");
-
-        const previewImage =
-            document.getElementById("bfa-preview-image");
-
-        const previewCategory =
-            document.getElementById("bfa-preview-category");
-
-        const previewDate =
-            document.getElementById("bfa-preview-date");
-
-        const previewPinned =
-            document.getElementById("bfa-preview-pinned");
-
-        const previewHeading =
-            document.getElementById("bfa-preview-heading");
-
-        const previewExcerpt =
-            document.getElementById("bfa-preview-excerpt");
-
-        const previewBody =
-            document.getElementById("bfa-preview-body");
-
-        if (
-            !form ||
-            !title ||
-            !category ||
-            !date ||
-            !image ||
-            !excerpt ||
-            !body ||
-            !published ||
-            !pinned ||
-            !generate ||
-            !copy ||
-            !status ||
-            !output ||
-            !previewImage ||
-            !previewCategory ||
-            !previewDate ||
-            !previewPinned ||
-            !previewHeading ||
-            !previewExcerpt ||
-            !previewBody
-        ) {
-            console.error(
-                "Behind the Files Admin: Required page elements are missing."
-            );
+        const field = id => document.getElementById(id);
+        const form = field("bfa-form");
+        const title = field("bfa-post-title"), category = field("bfa-category");
+        const date = field("bfa-date"), image = field("bfa-image");
+        const excerpt = field("bfa-excerpt"), body = field("bfa-body");
+        const audience = field("bfa-audience"), published = field("bfa-published"), pinned = field("bfa-pinned");
+        const save = field("bfa-save"), refresh = field("bfa-refresh"), status = field("bfa-status");
+        const list = field("bfa-existing-list"), heading = field("bfa-form-title");
+        if ([form,title,category,date,image,excerpt,body,audience,published,pinned,save,refresh,status,list,heading].some(node => !node)) {
+            console.error("Behind the Files Admin: Required editor elements are missing.");
             return false;
         }
+        let adminId = null, generation = 0, loadVersion = 0, busy = false, saveAttempt = 0;
+        let editingId = "bfa-" + crypto.randomUUID(), editingRevision = null;
+        let records = new Map(), setupMissing = false;
+        const today = () => new Date().toISOString().slice(0,10);
+        const setupCodes = ["42P01", "42883", "PGRST202", "PGRST205"];
 
-        const today = new Date().toISOString().slice(0, 10);
-
-        date.value = today;
-        image.value = "/assets/ArchiveFilesBG.png";
-
-        [
-            title,
-            category,
-            date,
-            image,
-            excerpt,
-            body,
-            published,
-            pinned
-        ].forEach(function (field) {
-            field.addEventListener("input", updatePreview);
-            field.addEventListener("change", updatePreview);
-        });
-
-        // ==========================================
-        // GENERATE JSON
-        // ==========================================
-
-        generate.addEventListener("click", function () {
-            try {
-                const post = buildPostObject();
-
-                output.value = JSON.stringify(post, null, 4);
-
-                setStatus(
-                    "Post JSON generated. Copy it into /data/BFA.json.",
-                    "is-success"
-                );
-            } catch (error) {
-                setStatus(error.message, "is-error");
-            }
-        });
-
-        // ==========================================
-        // COPY JSON
-        // ==========================================
-
-        copy.addEventListener("click", async function () {
-            if (!output.value.trim()) {
-                setStatus(
-                    "Generate the JSON before copying.",
-                    "is-error"
-                );
-                return;
-            }
-
-            try {
-                await navigator.clipboard.writeText(output.value);
-
-                setStatus(
-                    "Post JSON copied to clipboard.",
-                    "is-success"
-                );
-            } catch (error) {
-                output.focus();
-                output.select();
-
-                setStatus(
-                    "Clipboard copy failed. The JSON has been selected for manual copy.",
-                    "is-error"
-                );
-            }
-        });
-
-        // ==========================================
-        // RESET DRAFT
-        // ==========================================
-
-        form.addEventListener("reset", function () {
-            window.setTimeout(function () {
-                date.value = today;
-                image.value = "/assets/ArchiveFilesBG.png";
-                published.checked = true;
-                pinned.checked = false;
-                output.value = "";
-
-                setStatus("", "");
-                updatePreview();
-            }, 0);
-        });
-
-        updatePreview();
-        loadExistingPosts();
-
-        // ==========================================
-        // BUILD POST OBJECT
-        // ==========================================
-
-        function buildPostObject() {
-            const cleanTitle = title.value.trim();
-            const cleanBody = body.value.trim();
-            const cleanDate = date.value || today;
-
-            if (!cleanTitle) {
-                title.focus();
-                throw new Error("Please enter a title.");
-            }
-
-            if (!cleanBody) {
-                body.focus();
-                throw new Error("Please enter the main body.");
-            }
-
-            return {
-                id: createPostId(cleanTitle, cleanDate),
-                title: cleanTitle,
-                category: category.value || "Weekly Dispatch",
-                excerpt: excerpt.value.trim(),
-                body: cleanBody,
-                image:
-                    image.value.trim() ||
-                    "/assets/ArchiveFilesBG.png",
-                published: published.checked,
-                pinned: pinned.checked,
-                publishedAt: cleanDate
-            };
+        function setStatus(message, kind = "") {
+            status.textContent = message;
+            status.classList.remove("is-success", "is-error");
+            if (kind) status.classList.add(kind);
         }
-
-        // ==========================================
-        // LIVE PREVIEW
-        // ==========================================
-
+        function updateControls() {
+            save.disabled = !adminId || busy;
+            refresh.disabled = !adminId || busy;
+            for (const control of form.querySelectorAll("input,select,textarea,button[type=reset]")) control.disabled = !adminId || busy;
+            for (const button of list.querySelectorAll("button")) button.disabled = !adminId || busy;
+            form.setAttribute("aria-busy", String(busy));
+        }
+        function imageUrl(value) {
+            const raw = String(value || "").trim() || "/assets/ArchiveFilesBG.png";
+            if (raw.startsWith("/assets/")) return raw;
+            try { const url = new URL(raw); if (url.protocol === "https:") return url.href; } catch {}
+            return null;
+        }
         function updatePreview() {
-            const cleanTitle =
-                title.value.trim() ||
-                "This Week at Blackwood";
-
-            const cleanCategory =
-                category.value ||
-                "Weekly Dispatch";
-
-            const cleanDate =
-                date.value ||
-                today;
-
-            const cleanImage =
-                image.value.trim() ||
-                "/assets/ArchiveFilesBG.png";
-
-            const cleanExcerpt =
-                excerpt.value.trim() ||
-                "A short preview of the dispatch will appear here.";
-
-            const cleanBody =
-                body.value.trim() ||
-                "The full Behind the Files update will appear here as you draft it.";
-
-            previewImage.src = cleanImage;
-            previewCategory.textContent = cleanCategory;
-            previewDate.textContent = formatDate(cleanDate);
-            previewPinned.hidden = !pinned.checked;
-            previewHeading.textContent = cleanTitle;
-            previewExcerpt.textContent = cleanExcerpt;
-            previewBody.innerHTML = formatPlainText(cleanBody);
+            field("bfa-preview-image").src = imageUrl(image.value) || "/assets/ArchiveFilesBG.png";
+            field("bfa-preview-category").textContent = category.value || "Weekly Dispatch";
+            field("bfa-preview-date").textContent = formatDate(date.value || today());
+            field("bfa-preview-pinned").hidden = !pinned.checked;
+            field("bfa-preview-audience").textContent = audience.value === "public" ? "Public" : "Members only";
+            field("bfa-preview-publication").textContent = published.checked ? "Published on save" : "Draft";
+            field("bfa-preview-heading").textContent = title.value.trim() || "This Week at Blackwood";
+            field("bfa-preview-excerpt").textContent = excerpt.value.trim() || "A short preview of the dispatch will appear here.";
+            field("bfa-preview-body").innerHTML = formatPlainText(body.value.trim() || "Your full update will appear here as you draft it.");
         }
-
-        // ==========================================
-        // LOAD EXISTING POSTS
-        // ==========================================
-
-        async function loadExistingPosts() {
-            const list =
-                document.getElementById("bfa-existing-list");
-
-            if (!list) {
-                return;
+        [title,category,date,image,excerpt,body,audience,published,pinned].forEach(node => {
+            node.addEventListener("input", updatePreview);
+            node.addEventListener("change", updatePreview);
+        });
+        function resetDraft() {
+            editingId = "bfa-" + crypto.randomUUID();
+            editingRevision = null;
+            date.value = today();
+            image.value = "/assets/ArchiveFilesBG.png";
+            audience.value = "members";
+            published.checked = false;
+            pinned.checked = false;
+            heading.textContent = "Create an update";
+            setStatus("");
+            updatePreview();
+        }
+        form.addEventListener("reset", event => {
+            if (busy && adminId) { event.preventDefault(); return; }
+            setTimeout(resetDraft, 0);
+        });
+        function editPost(id) {
+            if (!adminId || busy) return;
+            const row = records.get(id);
+            if (!row) return;
+            editingId = row.id;
+            editingRevision = row.revision;
+            title.value = row.title || "";
+            if (![...category.options].some(option => option.value === row.category)) category.add(new Option(row.category, row.category));
+            category.value = row.category || "Weekly Dispatch";
+            date.value = String(row.published_at || "").slice(0,10) || today();
+            image.value = row.image_url || "/assets/ArchiveFilesBG.png";
+            excerpt.value = row.excerpt || "";
+            body.value = row.body || "";
+            audience.value = row.audience === "public" ? "public" : "members";
+            published.checked = row.published === true;
+            pinned.checked = row.pinned === true;
+            heading.textContent = "Edit update";
+            setStatus("Editing this saved update. Changes are published only when you save.");
+            updatePreview();
+            title.focus();
+        }
+        function appendPost(row, legacy = false) {
+            const article = document.createElement("article");
+            article.className = "bfa-existing-item";
+            const meta = document.createElement("p"), name = document.createElement("h3"), detail = document.createElement("p");
+            meta.className = "bfa-status-pill";
+            meta.textContent = legacy ? "Legacy public-file archive" : (row.audience === "public" ? "Public" : "Members only") + (row.published ? " · Published" : " · Draft");
+            name.textContent = row.title || "Untitled update";
+            detail.textContent = String(row.published_at || row.publishedAt || "").slice(0,10) + (row.pinned ? " · Pinned" : "");
+            article.append(meta, name, detail);
+            if (!legacy) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "bfa-button";
+                button.textContent = "Edit update";
+                button.disabled = !adminId || busy;
+                button.addEventListener("click", () => editPost(row.id));
+                article.append(button);
             }
-
+            list.append(article);
+        }
+        function showListMessage(message) {
+            const node = document.createElement("p"); node.className = "bfa-muted"; node.textContent = message; list.replaceChildren(node);
+        }
+        async function loadLegacyArchive(ownGeneration, ownLoad) {
+            // Legacy entries are already public files. New private drafts never use this path.
             try {
-                const response = await fetch(
-                    "/data/BFA.json?cache=" + Date.now()
-                );
-
-                if (!response.ok) {
-                    throw new Error(
-                        "BFA.json could not be loaded."
-                    );
-                }
-
+                const response = await fetch("/data/BFA.json", {cache:"no-store"});
+                if (!response.ok) return;
                 const data = await response.json();
-
-                const posts = Array.isArray(data.posts)
-                    ? data.posts
-                    : [];
-
-                if (!posts.length) {
-                    list.innerHTML = `
-                        <article class="bfa-existing-item">
-                            <p class="bfa-muted">
-                                No Behind the Files posts are in BFA.json yet.
-                            </p>
-                        </article>
-                    `;
-                    return;
+                if (!adminId || ownGeneration !== generation || ownLoad !== loadVersion) return;
+                const posts = Array.isArray(data.posts) ? data.posts : [];
+                for (const row of posts.slice(0,20)) appendPost(row, true);
+            } catch { /* Keep the setup message; do not make other hub tools unavailable. */ }
+        }
+        async function loadExistingPosts() {
+            if (!adminId) return;
+            const ownGeneration = generation, ownLoad = ++loadVersion;
+            refresh.disabled = true;
+            showListMessage("Loading saved updates…");
+            try {
+                const result = await supabaseClient.from("bp_dispatches").select("*").order("published_at", {ascending:false}).limit(100);
+                if (!adminId || ownGeneration !== generation || ownLoad !== loadVersion) return;
+                if (result.error) {
+                    if (setupCodes.includes(result.error.code)) {
+                        records.clear();
+                        setupMissing = true;
+                        showListMessage("Protected publishing storage needs setup. The legacy public-file archive is shown below; import it before editing these entries.");
+                        setStatus("Apply the dispatch migration in the Blackwood Supabase project before saving. Your draft remains here.", "is-error");
+                        await loadLegacyArchive(ownGeneration, ownLoad);
+                        return;
+                    }
+                    throw result.error;
                 }
-
-                list.innerHTML = posts
-                    .slice()
-                    .sort(function (a, b) {
-                        return String(b.publishedAt || "")
-                            .localeCompare(
-                                String(a.publishedAt || "")
-                            );
-                    })
-                    .slice(0, 6)
-                    .map(function (post) {
-                        return `
-                            <article class="bfa-existing-item">
-                                <p class="bfa-status-pill">
-                                    ${escapeHtml(
-                                        post.category ||
-                                        "Behind the Files"
-                                    )}
-                                </p>
-
-                                <h3>
-                                    ${escapeHtml(
-                                        post.title ||
-                                        "Untitled File"
-                                    )}
-                                </h3>
-
-                                <p>
-                                    ${escapeHtml(
-                                        post.publishedAt ||
-                                        "Undated"
-                                    )}
-                                    ${post.pinned ? "· Pinned" : ""}
-                                    ${
-                                        post.published === false
-                                            ? "· Draft"
-                                            : ""
-                                    }
-                                </p>
-                            </article>
-                        `;
-                    })
-                    .join("");
-
+                records = new Map((Array.isArray(result.data) ? result.data : []).map(row => [String(row.id), row]));
+                if (setupMissing) { setupMissing = false; setStatus("Publishing storage is ready. Your draft has been kept."); }
+                list.replaceChildren();
+                for (const row of records.values()) appendPost(row);
+                if (!records.size) showListMessage("No updates have been saved yet. Create a draft to begin.");
+            } catch {
+                if (adminId && ownGeneration === generation && ownLoad === loadVersion) showListMessage("Saved updates could not be checked. Reconnect and refresh; your open draft has been kept.");
+            } finally {
+                if (ownLoad === loadVersion) refresh.disabled = !adminId || busy;
+            }
+        }
+        function saveError(error) {
+            if (setupCodes.includes(error?.code)) return "Protected publishing needs the dispatch migration first. Your draft remains here.";
+            if (error?.code === "40001") return "This update changed elsewhere. Refresh saved updates and open the latest version before saving. Your draft remains here.";
+            if (error?.code === "42501") return "Administrator access could not be verified. Sign in again before saving. Your draft remains here.";
+            if (error?.code === "22023") return "Check the required fields, image URL and date. Published dates cannot be in the future. Your draft remains here.";
+            return "The save could not be confirmed. Refresh saved updates before retrying; your draft remains here.";
+        }
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
+            if (!adminId || busy || !form.reportValidity()) return;
+            if (!navigator.onLine) { setStatus("Reconnect before saving. Your draft remains here.", "is-error"); return; }
+            const cleanImage = imageUrl(image.value);
+            if (!cleanImage || !date.value) { setStatus("Enter a valid published date and an HTTPS or site-relative image URL.", "is-error"); return; }
+            const payload = {id:editingId,title:title.value.trim(),category:category.value,excerpt:excerpt.value.trim(),body:body.value.trim(),image_url:cleanImage,audience:audience.value,published:published.checked,pinned:pinned.checked,published_at:date.value + "T00:00:00.000Z"};
+            if (!payload.title || !payload.body) { setStatus("Enter a title and main body.", "is-error"); return; }
+            const ownGeneration = generation, userId = adminId, attempt = ++saveAttempt;
+            busy = true; updateControls(); setStatus("Saving update…");
+            try {
+                const userResult = await supabaseClient.auth.getUser();
+                if (!adminId || ownGeneration !== generation) return;
+                if (userResult.error || userResult.data?.user?.id !== userId) throw {code:"42501"};
+                const result = await supabaseClient.rpc("bp_dispatch_save", {p_payload:payload,p_expected_revision:editingRevision});
+                if (!adminId || ownGeneration !== generation) return;
+                if (result.error) throw result.error;
+                const row = Array.isArray(result.data) ? result.data[0] : result.data;
+                if (!row || row.id !== payload.id || !Number.isSafeInteger(Number(row.revision)) || Number(row.revision) < 1) throw Error("Unconfirmed save");
+                editingId = row.id; editingRevision = Number(row.revision);
+                heading.textContent = "Edit update";
+                setStatus(row.published ? row.audience === "public" ? "Published. This public update can appear on the homepage and in the members area." : "Published for signed-in members only." : "Draft saved. Only administrators can see it.", "is-success");
+                await loadExistingPosts();
             } catch (error) {
-                console.warn(
-                    "Behind the Files posts could not be loaded:",
-                    error
-                );
-
-                list.innerHTML = `
-                    <article class="bfa-existing-item">
-                        <p class="bfa-muted">
-                            Existing posts could not be loaded yet.
-                        </p>
-                    </article>
-                `;
+                if (adminId && ownGeneration === generation) setStatus(saveError(error), "is-error");
+            } finally {
+                if (attempt === saveAttempt) {
+                    busy = false; updateControls();
+                    if (adminId && ownGeneration !== generation) {
+                        setStatus("Access was rechecked while saving. Refresh saved updates to confirm the result before retrying; your draft remains here.", "is-error");
+                        void loadExistingPosts();
+                    }
+                }
             }
-        }
-
-        // ==========================================
-        // STATUS MESSAGES
-        // ==========================================
-
-        function setStatus(message, className) {
-            status.textContent = message || "";
-
-            status.classList.remove(
-                "is-success",
-                "is-error"
-            );
-
-            if (className) {
-                status.classList.add(className);
-            }
-        }
-
+        });
+        refresh.addEventListener("click", loadExistingPosts);
+        dispatchEditor = {
+            activate(userId) { adminId = userId; generation += 1; updateControls(); void loadExistingPosts(); },
+            suspend() { adminId = null; generation += 1; loadVersion += 1; updateControls(); },
+            clear() { form.reset(); records.clear(); showListMessage("Sign in as an administrator to load updates."); }
+        };
+        resetDraft();
+        updateControls();
         return true;
     }
 
     // ==========================================
     // SHARED UTILITIES
     // ==========================================
-
-    function createPostId(title, date) {
-        const slug = String(title || "behind-file")
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-+|-+$/g, "")
-            .slice(0, 48);
-
-        const random =
-            Math.random().toString(36).slice(2, 7);
-
-        return "bfa-" +
-            String(date || "").replace(/-/g, "") +
-            "-" + slug +
-            "-" + random;
-    }
 
     function formatDate(value) {
         if (!value) {
