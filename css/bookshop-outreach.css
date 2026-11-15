@@ -600,5 +600,19 @@ a:focus-visible {
 #map .leaflet-control-attribution a {
   color: #0078a8;
 }
+.chain-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 1rem 0 0.35rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
 
+.chain-filter input {
+  width: 18px;
+  height: 18px;
+  accent-color: #c9a66b;
+  cursor: pointer;
+}
 
