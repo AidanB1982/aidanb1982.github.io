@@ -1,0 +1,415 @@
+
+:root {
+  color-scheme: dark;
+  --bg: #101310;
+  --panel: #171c19;
+  --panel-alt: #1c231f;
+  --text: #ece7dc;
+  --muted: #c9c7bd;
+  --copper: #b87333;
+  --gold: #cfaa76;
+  --border: #544332;
+  --teal: #4aabb0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+a {
+  color: #e7bd83;
+}
+
+a:hover {
+  color: #ffe1ad;
+}
+
+.page-header {
+  padding: 30px clamp(20px, 5vw, 70px);
+  background: #151a17;
+  border-bottom: 1px solid #b8733340;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  color: var(--gold);
+  font: 11px/1.6 Arial, sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.page-header h1 {
+  margin: 0 0 15px;
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.page-header > p:last-child {
+  margin-bottom: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.outreach-wrap {
+  width: min(100%, 1300px);
+  margin: 0 auto;
+  padding: 30px 20px 80px;
+}
+
+.panel {
+  min-width: 0;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid #b8733338;
+  border-radius: 8px;
+}
+
+.panel h2 {
+  margin: 0 0 18px;
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+
+.section-intro {
+  margin: -4px 0 20px;
+  color: var(--muted);
+  font: 14px/1.7 Arial, sans-serif;
+}
+
+.toolbar,
+.finder-controls,
+.form-actions,
+.shop-actions,
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar {
+  margin: 22px 0;
+}
+
+.finder-controls input,
+.toolbar input {
+  flex: 1 1 240px;
+}
+
+.finder-controls select {
+  flex: 0 1 180px;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
+  padding: 12px;
+  color: #f2ede3;
+  background: #1d2521;
+  border: 1px solid #66543c;
+  border-radius: 5px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 18px;
+  background: var(--copper);
+  color: white;
+  border: 1px solid var(--copper);
+  border-radius: 5px;
+  font: 13px/1.4 Arial, sans-serif;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn:hover:not(:disabled) {
+  background: #cb8844;
+}
+
+.btn.secondary {
+  background: transparent;
+  color: #e9c99b;
+}
+
+.btn.secondary:hover:not(:disabled) {
+  background: #2d251c;
+}
+
+.btn.small {
+  padding: 8px 11px;
+  font-size: 12px;
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, .9fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.shop-list {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  max-height: 550px;
+  overflow-y: auto;
+}
+
+.shop,
+.discovery-card {
+  min-width: 0;
+  padding: 16px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.shop h3,
+.discovery-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.18rem;
+  font-weight: 400;
+}
+
+.shop p,
+.discovery-card p {
+  margin: 6px 0;
+  color: var(--muted);
+  font: 13px/1.65 Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.shop-actions,
+.result-actions {
+  margin-top: 15px;
+  gap: 8px;
+}
+
+.discovery-results {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.discovery-results:empty {
+  display: none;
+}
+
+.result-meta {
+  display: inline-block;
+  margin-bottom: 9px;
+  color: #d7b47c;
+  font: 11px Arial, sans-serif;
+  letter-spacing: .04em;
+}
+
+.feedback {
+  min-height: 24px;
+  margin: 14px 0 0;
+  color: #d6c7aa;
+  font: 13px/1.6 Arial, sans-serif;
+}
+
+.feedback.error {
+  color: #ffaaa1;
+}
+
+.feedback.success {
+  color: #b7e5bd;
+}
+
+.notice {
+  margin: 14px 0 0;
+  color: #b9b9ae;
+  font: 12px/1.7 Arial, sans-serif;
+}
+
+.empty {
+  color: var(--muted);
+  font: 14px/1.7 Arial, sans-serif;
+}
+
+.editor-panel {
+  margin-top: 22px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.fields label {
+  display: grid;
+  gap: 7px;
+  color: #d8c8ae;
+  font: 13px Arial, sans-serif;
+}
+
+.fields label.full {
+  grid-column: 1 / -1;
+}
+
+.fields textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-actions {
+  margin-top: 18px;
+}
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 12px;
+  color: var(--muted);
+  font: 12px Arial, sans-serif;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.legend-dot.saved {
+  background: var(--copper);
+}
+
+.legend-dot.found {
+  background: var(--teal);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Leaflet isolation.
+ * Do not force tile dimensions or override tile transforms.
+ * Leaflet manages both internally.
+ */
+#map {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 480px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #26342e;
+  border-radius: 6px;
+}
+
+#map .leaflet-container {
+  font-family: Arial, sans-serif;
+}
+
+#map img.leaflet-tile,
+#map .leaflet-pane img {
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  object-fit: fill !important;
+}
+
+#map .leaflet-popup-content {
+  color: #222;
+  font-family: Arial, sans-serif;
+}
+
+@media (max-width: 850px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .discovery-results {
+    grid-template-columns: 1fr;
+  }
+
+  #map {
+    height: 350px;
+  }
+}
+
+@media (max-width: 520px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+
+  .fields label.full {
+    grid-column: auto;
+  }
+
+  .finder-controls select {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
