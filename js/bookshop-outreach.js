@@ -7,18 +7,19 @@
  *
  * Discovery:
  * - Cached OpenStreetMap bookshop data
+ * - Blackwood-curated bookshop data
  * - Distance search from a UK town or city
  * - Nominatim town lookup
  * - Optional major-chain filtering
  *
  * Management:
  * - Browser-local saved directory
- * - Expandable cards
+ * - Expandable bookshop cards
  * - Leaflet map markers
  * - Add/edit records
  * - Search and status filtering
  * - JSON export
- * - Manual email drafts
+ * - Editable manual email drafts
  *
  * No emails are sent automatically.
  * No bookshops are published automatically.
@@ -29,6 +30,9 @@ const STORAGE_KEY =
 
 const BOOKSHOP_DATA_URL =
   "/data/scotland-bookshops.json";
+
+const CURATED_DATA_URL =
+  "/data/blackwood-bookshops.json";
 
 const NOMINATIM_URL =
   "https://nominatim.openstreetmap.org/search";
@@ -44,13 +48,6 @@ const STATUSES = {
   "opted-out": "Do not contact"
 };
 
-/*
- * Known major retail chains.
- *
- * Exact-name matching avoids hiding independent
- * bookshops merely because their names contain
- * a similar word.
- */
 const MAJOR_CHAINS = new Set([
   "waterstones",
   "the works",
@@ -62,14 +59,43 @@ const MAJOR_CHAINS = new Set([
   "blackwell's university bookshop",
   "tgjones",
   "tg jones",
-  "tg jones",
   "foyles"
 ]);
+
+const EMAIL_SUBJECT =
+  "Blackwood Publishing — bookshop stocking enquiry";
+
+const EMAIL_TEMPLATE = [
+  "Hello,",
+  "",
+  "I'm getting in touch from Blackwood Publishing, an independent Scottish publishing imprint.",
+  "",
+  "We're introducing our paperback catalogue to independent bookshops and wondered whether selected titles might be suitable for your shelves.",
+  "",
+  "Our titles are available through IngramSpark, including:",
+  "",
+  "Gualachulain Bothy: The Second Silence — 9781919555560",
+  "Holdfast — 9781919555522",
+  "Love, Abused — 9781919555539",
+  "The Black Bothy — 9781919555584",
+  "Corrour: The First Summoning — 9781919555508",
+  "",
+  "We'd be happy to provide further information about our books, ordering and trade availability.",
+  "",
+  "Would you be interested in receiving our catalogue details?",
+  "",
+  "Kind regards,",
+  "Blackwood Publishing",
+  "https://blackwoodpublishing.co.uk",
+  "",
+  "If you'd prefer not to receive further trade enquiries, please let us know."
+].join("\n");
 
 const $ = id => document.getElementById(id);
 
 let shops = loadShops();
 let discoveredShops = [];
+
 let bookshopDataset = null;
 
 let editingId = null;
@@ -80,6 +106,13 @@ let lastSearchTown = "";
 let map = null;
 let savedMarkers = null;
 let discoveredMarkers = null;
+
+let emailDialog = null;
+let emailRecipient = null;
+let emailSubjectInput = null;
+let emailBodyInput = null;
+let emailFeedback = null;
+let activeEmailShopId = null;
 
 /* =========================================
    HELPERS
@@ -115,52 +148,11 @@ function normalise(value) {
     .replace(/\s+/g, " ");
 }
 
-function isMajorChain(shop) {
-  const name = normalise(shop.name)
-    .replace(/[’‘]/g, "'");
-
-  return MAJOR_CHAINS.has(name);
-}
-
-function visibleDiscoveredShops() {
-  const hideChains = $("hideChains")?.checked ?? false;
-
-  return discoveredShops
-    .filter(shop =>
-      !hideChains || !isMajorChain(shop)
-    )
-    .slice(0, MAX_RESULTS);
-}
-
-function updateDiscoveryFeedback() {
-  if (!lastSearchTown) return;
-
-  const visible = visibleDiscoveredShops();
-  const hidden = discoveredShops.filter(
-    isMajorChain
-  ).length;
-
-  if (!visible.length) {
-    feedback(
-      "finderFeedback",
-      discoveredShops.length
-        ? "No bookshops match the current chain filter. Untick the checkbox to see all results."
-        : "No bookshops found in the cached dataset for this radius. Try a larger radius."
-    );
-
-    return;
-  }
-
-  const hiddenText =
-    $("hideChains")?.checked && hidden
-      ? ` ${hidden} major-chain result(s) hidden.`
-      : "";
-
-  feedback(
-    "finderFeedback",
-    `Showing ${visible.length} bookshop(s) near ${lastSearchTown}.${hiddenText} Review before saving.`,
-    "success"
-  );
+function normaliseName(value) {
+  return normalise(value)
+    .replace(/[’‘]/g, "'")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 function validCoordinates(shop) {
@@ -230,6 +222,56 @@ function newId() {
   );
 }
 
+function isMajorChain(shop) {
+  const name = normalise(shop.name)
+    .replace(/[’‘]/g, "'");
+
+  return MAJOR_CHAINS.has(name);
+}
+
+function visibleDiscoveredShops() {
+  const hideChains =
+    $("hideChains")?.checked ?? false;
+
+  return discoveredShops
+    .filter(shop =>
+      !hideChains || !isMajorChain(shop)
+    )
+    .slice(0, MAX_RESULTS);
+}
+
+function updateDiscoveryFeedback() {
+  if (!lastSearchTown) return;
+
+  const visible = visibleDiscoveredShops();
+
+  const hidden = discoveredShops.filter(
+    isMajorChain
+  ).length;
+
+  if (!visible.length) {
+    feedback(
+      "finderFeedback",
+      discoveredShops.length
+        ? "No bookshops match the current chain filter. Untick the checkbox to see all results."
+        : "No bookshops found in the cached datasets for this radius. Try a larger radius."
+    );
+
+    return;
+  }
+
+  const hiddenText =
+    $("hideChains")?.checked && hidden
+      ? ` ${hidden} major-chain result(s) hidden.`
+      : "";
+
+  feedback(
+    "finderFeedback",
+    `Showing ${visible.length} bookshop(s) near ${lastSearchTown}.${hiddenText} Review before saving.`,
+    "success"
+  );
+}
+
 /* =========================================
    LOCAL STORAGE
 ========================================= */
@@ -277,6 +319,40 @@ function saveShops(nextShops) {
   }
 }
 
+function sameBookshop(a, b) {
+  if (
+    a.osmId &&
+    b.osmId &&
+    a.osmId === b.osmId
+  ) {
+    return true;
+  }
+
+  if (
+    normaliseName(a.name) !==
+    normaliseName(b.name)
+  ) {
+    return false;
+  }
+
+  if (
+    validCoordinates(a) &&
+    validCoordinates(b)
+  ) {
+    return distanceMetres(
+      a.lat,
+      a.lng,
+      b.lat,
+      b.lng
+    ) <= 500;
+  }
+
+  return (
+    normalise(a.town) ===
+    normalise(b.town)
+  );
+}
+
 function isDuplicate(
   candidate,
   excludeId = null
@@ -286,19 +362,9 @@ function isDuplicate(
       return false;
     }
 
-    if (
-      candidate.osmId &&
-      shop.osmId &&
-      candidate.osmId === shop.osmId
-    ) {
-      return true;
-    }
-
-    return (
-      normalise(shop.name) ===
-        normalise(candidate.name) &&
-      normalise(shop.town) ===
-        normalise(candidate.town)
+    return sameBookshop(
+      candidate,
+      shop
     );
   });
 }
@@ -333,8 +399,11 @@ function initMap() {
     }
   ).addTo(map);
 
-  savedMarkers = L.featureGroup().addTo(map);
-  discoveredMarkers = L.featureGroup().addTo(map);
+  savedMarkers =
+    L.featureGroup().addTo(map);
+
+  discoveredMarkers =
+    L.featureGroup().addTo(map);
 
   requestAnimationFrame(() => {
     map.invalidateSize({
@@ -553,8 +622,8 @@ function renderSaved() {
     ) {
       actions.append(
         makeButton(
-          "Draft email",
-          () => draftEmail(shop)
+          "Contact bookshop",
+          () => openEmailComposer(shop)
         )
       );
     }
@@ -614,10 +683,15 @@ function renderDiscovered() {
       "discovery-card"
     );
 
+    const sourceLabel =
+      shop.source === "curated"
+        ? "BLACKWOOD CURATED · REVIEW BEFORE CONTACT"
+        : "OPENSTREETMAP RESULT · UNVERIFIED";
+
     card.append(
       element(
         "span",
-        "OPENSTREETMAP RESULT · UNVERIFIED",
+        sourceLabel,
         "result-meta"
       ),
       element("h3", shop.name),
@@ -686,7 +760,12 @@ function renderDiscovered() {
       makeButton(
         "View on map",
         () => {
-          if (!map) return;
+          if (
+            !map ||
+            !validCoordinates(shop)
+          ) {
+            return;
+          }
 
           map.setView(
             [shop.lat, shop.lng],
@@ -814,14 +893,20 @@ function addDiscovered(shop) {
     lng: shop.lng,
     status: "prospect",
     notes: [
-      "Discovered using OpenStreetMap.",
-      `OSM reference: ${shop.osmId}`,
+      shop.source === "curated"
+        ? "Discovered in the Blackwood curated bookshop list."
+        : "Discovered using OpenStreetMap.",
+      shop.osmId
+        ? `OSM reference: ${shop.osmId}`
+        : "",
       `Address: ${
         shop.address || "Not supplied"
       }`,
-      "Independent status and trading status unverified.",
+      "Independent status and trading status require review.",
       "Contact details and stocking policy require review."
-    ].join("\n")
+    ]
+      .filter(Boolean)
+      .join("\n")
   };
 
   if (!saveShops([...shops, record])) {
@@ -832,7 +917,7 @@ function addDiscovered(shop) {
 
   feedback(
     "finderFeedback",
-    `${shop.name} added as an unverified prospect.`,
+    `${shop.name} added as a prospect.`,
     "success"
   );
 }
@@ -953,10 +1038,178 @@ function saveForm(event) {
 }
 
 /* =========================================
-   MANUAL EMAIL DRAFTS
+   EDITABLE EMAIL COMPOSER
 ========================================= */
 
-function draftEmail(shop) {
+function createEmailComposer() {
+  const dialog = document.createElement("dialog");
+
+  dialog.id = "blackwoodEmailDialog";
+
+  Object.assign(dialog.style, {
+    width: "min(720px, calc(100vw - 32px))",
+    maxHeight: "calc(100vh - 32px)",
+    overflowY: "auto",
+    padding: "24px",
+    border: "1px solid #8b693d",
+    borderRadius: "12px",
+    background: "#171c19",
+    color: "#f5ead5",
+    boxSizing: "border-box"
+  });
+
+  const heading = element(
+    "h2",
+    "Contact bookshop"
+  );
+
+  heading.id = "blackwoodEmailHeading";
+  heading.style.marginTop = "0";
+
+  dialog.setAttribute(
+    "aria-labelledby",
+    heading.id
+  );
+
+  const description = element(
+    "p",
+    "Edit your message below. Opening the draft does not send the email."
+  );
+
+  const form = document.createElement("form");
+  form.method = "dialog";
+
+  Object.assign(form.style, {
+    display: "grid",
+    gap: "14px"
+  });
+
+  function createField(labelText, control) {
+    const label = document.createElement("label");
+
+    Object.assign(label.style, {
+      display: "grid",
+      gap: "6px"
+    });
+
+    const caption = element(
+      "span",
+      labelText
+    );
+
+    label.append(caption, control);
+
+    return label;
+  }
+
+  function styleControl(control) {
+    Object.assign(control.style, {
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "10px 12px",
+      borderRadius: "6px",
+      border: "1px solid #806344",
+      background: "#202923",
+      color: "#fff",
+      font: "inherit"
+    });
+  }
+
+  emailRecipient = document.createElement("input");
+  emailRecipient.type = "email";
+  emailRecipient.readOnly = true;
+  styleControl(emailRecipient);
+
+  emailSubjectInput = document.createElement("input");
+  emailSubjectInput.type = "text";
+  emailSubjectInput.required = true;
+  emailSubjectInput.maxLength = 200;
+  styleControl(emailSubjectInput);
+
+  emailBodyInput = document.createElement("textarea");
+  emailBodyInput.required = true;
+  emailBodyInput.rows = 16;
+  styleControl(emailBodyInput);
+
+  emailBodyInput.style.resize = "vertical";
+  emailBodyInput.style.minHeight = "240px";
+
+  emailFeedback = element(
+    "p",
+    "",
+    "feedback"
+  );
+
+  emailFeedback.setAttribute(
+    "role",
+    "status"
+  );
+
+  const actions = element(
+    "div",
+    undefined,
+    "form-actions"
+  );
+
+  Object.assign(actions.style, {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px"
+  });
+
+  const openButton = makeButton(
+    "Open email draft",
+    () => openPreparedEmail()
+  );
+
+  const copyButton = makeButton(
+    "Copy message",
+    () => copyPreparedEmail(),
+    true
+  );
+
+  const cancelButton = makeButton(
+    "Cancel",
+    () => dialog.close(),
+    true
+  );
+
+  actions.append(
+    openButton,
+    copyButton,
+    cancelButton
+  );
+
+  form.append(
+    createField("To", emailRecipient),
+    createField("Subject", emailSubjectInput),
+    createField("Message", emailBodyInput),
+    emailFeedback,
+    actions
+  );
+
+  dialog.append(
+    heading,
+    description,
+    form
+  );
+
+  document.body.append(dialog);
+
+  dialog.addEventListener("click", event => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+
+  dialog.addEventListener("close", () => {
+    activeEmailShopId = null;
+  });
+
+  emailDialog = dialog;
+}
+
+function openEmailComposer(shop) {
   if (
     !shop.email ||
     shop.status === "opted-out"
@@ -964,38 +1217,116 @@ function draftEmail(shop) {
     return;
   }
 
-  const subject =
-    "Blackwood Publishing — paperback stocking enquiry";
+  if (!emailDialog) {
+    createEmailComposer();
+  }
 
-  const body = [
-    "Hello,",
+  activeEmailShopId = shop.id;
+
+  emailRecipient.value =
+    String(shop.email).trim();
+
+  emailSubjectInput.value =
+    EMAIL_SUBJECT;
+
+  emailBodyInput.value =
+    EMAIL_TEMPLATE;
+
+  emailFeedback.textContent = "";
+
+  emailDialog.showModal();
+
+  emailSubjectInput.focus();
+}
+
+function getPreparedEmail() {
+  if (!activeEmailShopId) {
+    return null;
+  }
+
+  const shop = shops.find(
+    item => item.id === activeEmailShopId
+  );
+
+  if (
+    !shop ||
+    !shop.email ||
+    shop.status === "opted-out"
+  ) {
+    emailFeedback.textContent =
+      "This bookshop is no longer available for contact.";
+
+    return null;
+  }
+
+  const subject =
+    emailSubjectInput.value.trim();
+
+  const body =
+    emailBodyInput.value.trim();
+
+  if (!subject || !body) {
+    emailFeedback.textContent =
+      "Please enter a subject and message.";
+
+    return null;
+  }
+
+  return {
+    email: String(shop.email).trim(),
+    subject,
+    body
+  };
+}
+
+function openPreparedEmail() {
+  const prepared = getPreparedEmail();
+
+  if (!prepared) return;
+
+  const mailto =
+    `mailto:${encodeURIComponent(prepared.email)}` +
+    `?subject=${encodeURIComponent(prepared.subject)}` +
+    `&body=${encodeURIComponent(prepared.body)}`;
+
+  /*
+   * Mailto opens the user's configured email
+   * application. It does not send the email.
+   */
+  window.location.href = mailto;
+
+  emailFeedback.textContent =
+    "Email draft requested. Review the message in your email application before sending.";
+}
+
+async function copyPreparedEmail() {
+  const prepared = getPreparedEmail();
+
+  if (!prepared) return;
+
+  const text = [
+    `To: ${prepared.email}`,
+    `Subject: ${prepared.subject}`,
     "",
-    "I'm getting in touch from Blackwood Publishing, an independent Scottish publishing imprint.",
-    "",
-    "We're introducing our paperback catalogue to independent bookshops and wondered whether you might consider selected titles.",
-    "",
-    "Our IngramSpark catalogue includes:",
-    "Gualachulain Bothy: The Second Silence — 9781919555560",
-    "Holdfast — 9781919555522",
-    "Love, Abused — 9781919555539",
-    "The Black Bothy — 9781919555584",
-    "Corrour: The First Summoning — 9781919555508",
-    "",
-    "We can provide current ordering and trade information on request.",
-    "",
-    "Would you be happy for us to send over further details?",
-    "",
-    "Kind regards,",
-    "Blackwood Publishing",
-    "https://blackwoodpublishing.co.uk",
-    "",
-    "If you'd prefer not to receive further trade enquiries, please let us know."
+    prepared.body
   ].join("\n");
 
-  window.location.href =
-    `mailto:${encodeURIComponent(shop.email)}` +
-    `?subject=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`;
+  try {
+    await navigator.clipboard.writeText(text);
+
+    emailFeedback.textContent =
+      "Message copied to clipboard.";
+  } catch {
+    /*
+     * Fallback for browsers where clipboard
+     * permissions are unavailable.
+     */
+    emailBodyInput.focus();
+    emailBodyInput.select();
+
+    emailFeedback.textContent =
+      "Clipboard access unavailable. The message has been selected so you can copy it manually.";
+  }
 }
 
 /* =========================================
@@ -1031,9 +1362,7 @@ async function fetchJSON(
     return await response.json();
 
   } catch (error) {
-    if (
-      error.name === "AbortError"
-    ) {
+    if (error.name === "AbortError") {
       throw new Error(
         "The request timed out."
       );
@@ -1051,13 +1380,12 @@ async function fetchJSON(
 ========================================= */
 
 async function geocodeTown(town) {
-  const params =
-    new URLSearchParams({
-      q: `${town}, United Kingdom`,
-      format: "jsonv2",
-      limit: "5",
-      addressdetails: "1"
-    });
+  const params = new URLSearchParams({
+    q: `${town}, United Kingdom`,
+    format: "jsonv2",
+    limit: "5",
+    addressdetails: "1"
+  });
 
   const results = await fetchJSON(
     `${NOMINATIM_URL}?${params}`
@@ -1091,30 +1419,106 @@ async function geocodeTown(town) {
 }
 
 /* =========================================
-   GITHUB PAGES DATASET
+   DISCOVERY DATASETS
 ========================================= */
+
+function normaliseDatasetShop(shop, source) {
+  const lat = Number(shop.lat);
+  const lng = Number(shop.lng);
+
+  return {
+    osmId: String(shop.osmId || ""),
+    name: String(shop.name || "").trim(),
+    town: String(shop.town || "").trim(),
+    address: String(shop.address || "").trim(),
+    website: safeWebsite(shop.website),
+    email: String(shop.email || "").trim(),
+    lat,
+    lng,
+    source
+  };
+}
 
 async function loadBookshopDataset() {
   if (bookshopDataset) {
     return bookshopDataset;
   }
 
-  const data = await fetchJSON(
-    BOOKSHOP_DATA_URL,
+  /*
+   * Both files are loaded independently.
+   * A failure in one source does not prevent
+   * the other source from being searched.
+   */
+  const sources = [
     {
-      cache: "no-cache"
+      url: BOOKSHOP_DATA_URL,
+      source: "openstreetmap"
+    },
+    {
+      url: CURATED_DATA_URL,
+      source: "curated"
     }
+  ];
+
+  const outcomes = await Promise.allSettled(
+    sources.map(async entry => {
+      const data = await fetchJSON(
+        entry.url,
+        { cache: "no-cache" }
+      );
+
+      if (!Array.isArray(data.shops)) {
+        throw new Error(
+          `Invalid bookshop data in ${entry.url}`
+        );
+      }
+
+      return data.shops.map(shop =>
+        normaliseDatasetShop(
+          shop,
+          entry.source
+        )
+      );
+    })
   );
 
-  if (!Array.isArray(data.shops)) {
+  const combined = [];
+  const failures = [];
+
+  outcomes.forEach((outcome, index) => {
+    if (outcome.status === "fulfilled") {
+      combined.push(...outcome.value);
+    } else {
+      failures.push(
+        sources[index].url
+      );
+
+      console.error(
+        `Unable to load ${sources[index].url}:`,
+        outcome.reason
+      );
+    }
+  });
+
+  if (failures.length === sources.length) {
     throw new Error(
-      "The bookshop dataset has an invalid format."
+      "Neither bookshop dataset could be loaded. Please try again later."
     );
   }
 
-  bookshopDataset = data;
+  if (failures.length) {
+    console.warn(
+      "Some discovery data is unavailable:",
+      failures.join(", ")
+    );
+  }
 
-  return data;
+  bookshopDataset = {
+    shops: combined,
+    partial: failures.length > 0
+  };
+
+  return bookshopDataset;
 }
 
 function distanceMetres(
@@ -1160,40 +1564,78 @@ async function searchCachedBookshops(
   const dataset =
     await loadBookshopDataset();
 
-  return dataset.shops
-    .filter(shop => {
-      const shopLat =
-        Number(shop.lat);
+  return dataset.shops.filter(shop => {
+    if (
+      !shop.name ||
+      !validCoordinates(shop)
+    ) {
+      return false;
+    }
 
-      const shopLng =
-        Number(shop.lng);
+    return distanceMetres(
+      lat,
+      lng,
+      shop.lat,
+      shop.lng
+    ) <= radius;
+  });
+}
 
-      if (
-        !Number.isFinite(shopLat) ||
-        !Number.isFinite(shopLng)
-      ) {
-        return false;
-      }
+function mergeDiscoveredResults(results, fallbackTown) {
+  /*
+   * Curated entries take priority over
+   * matching OpenStreetMap entries.
+   */
+  const ordered = [...results].sort((a, b) => {
+    if (a.source === b.source) return 0;
 
-      return distanceMetres(
-        lat,
-        lng,
-        shopLat,
-        shopLng
-      ) <= radius;
-    })
-    .map(shop => ({
-      osmId: String(shop.osmId || ""),
-      name: String(shop.name || ""),
-      town: String(shop.town || ""),
-      address: String(shop.address || ""),
-      website: safeWebsite(
-        shop.website
-      ),
-      email: String(shop.email || ""),
-      lat: Number(shop.lat),
-      lng: Number(shop.lng)
-    }));
+    return a.source === "curated" ? -1 : 1;
+  });
+
+  const unique = [];
+
+  for (const item of ordered) {
+    const shop = {
+      ...item,
+      town: item.town || fallbackTown,
+      address:
+        item.address ||
+        item.town ||
+        fallbackTown
+    };
+
+    const existing = unique.find(other =>
+      sameBookshop(other, shop)
+    );
+
+    if (!existing) {
+      unique.push(shop);
+      continue;
+    }
+
+    /*
+     * Keep useful contact details when the
+     * preferred record is missing them.
+     */
+    if (!existing.website && shop.website) {
+      existing.website = shop.website;
+    }
+
+    if (!existing.email && shop.email) {
+      existing.email = shop.email;
+    }
+
+    if (!existing.osmId && shop.osmId) {
+      existing.osmId = shop.osmId;
+    }
+  }
+
+  return unique.sort((a, b) =>
+    a.name.localeCompare(
+      b.name,
+      "en-GB"
+    )
+  );
 }
 
 /* =========================================
@@ -1269,17 +1711,14 @@ async function findBookshops(event) {
 
     if (map) {
       map.setView(
-        [
-          location.lat,
-          location.lng
-        ],
+        [location.lat, location.lng],
         11
       );
     }
 
     feedback(
       "finderFeedback",
-      `Searching the Blackwood bookshop dataset near ${town}…`
+      `Searching Blackwood's bookshop datasets near ${town}…`
     );
 
     const results =
@@ -1289,57 +1728,32 @@ async function findBookshops(event) {
         radius
       );
 
-    const unique = new Map();
-
-    for (const item of results) {
-      if (
-        !item.name ||
-        !validCoordinates(item)
-      ) {
-        continue;
-      }
-
-      const shop = {
-        ...item,
-        town:
-          item.town || town,
-        address:
-          item.address ||
-          item.town ||
-          town
-      };
-
-      const key =
-        shop.osmId ||
-        normalise(
-          `${shop.name}|${shop.town}|${shop.address}`
-        );
-
-      if (!unique.has(key)) {
-        unique.set(key, shop);
-      }
-    }
-
-    discoveredShops = [
-      ...unique.values()
-    ].sort((a, b) =>
-      a.name.localeCompare(
-        b.name,
-        "en-GB"
-      )
-    );
+    discoveredShops =
+      mergeDiscoveredResults(
+        results,
+        town
+      );
 
     lastSearchTown = town;
 
     renderDiscovered();
 
-    const visible = visibleDiscoveredShops();
-
-    if (visible.length) {
+    if (visibleDiscoveredShops().length) {
       fitMap(true);
     }
 
     updateDiscoveryFeedback();
+
+    if (bookshopDataset?.partial) {
+      const current =
+        $("finderFeedback").textContent;
+
+      feedback(
+        "finderFeedback",
+        `${current} Note: one discovery dataset could not be loaded.`,
+        "error"
+      );
+    }
 
   } catch (error) {
     console.error(
@@ -1432,7 +1846,7 @@ function initialise() {
     }
   );
 
-  $("hideChains").addEventListener(
+  $("hideChains")?.addEventListener(
     "change",
     () => {
       renderDiscovered();
