@@ -363,8 +363,10 @@ a:focus-visible {
   font-family: Arial, sans-serif;
 }
 
-#map img.leaflet-tile,
-#map .leaflet-pane img {
+
+/* Keep Leaflet tiles independent of site image styling. */
+#map .leaflet-pane img,
+#map .leaflet-tile {
   max-width: none !important;
   max-height: none !important;
   padding: 0 !important;
@@ -372,8 +374,15 @@ a:focus-visible {
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  object-fit: fill !important;
 }
+
+/* Preserve Leaflet's positioning and transforms. */
+#map .leaflet-map-pane,
+#map .leaflet-tile-pane,
+#map .leaflet-layer {
+  position: absolute;
+}
+
 
 #map .leaflet-popup-content {
   color: #222;
