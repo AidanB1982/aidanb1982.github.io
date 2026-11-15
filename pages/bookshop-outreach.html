@@ -1,17 +1,59 @@
 
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="en-GB" class="no-js">
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
 
-  <title>Bookshop Outreach | Blackwood Publishing</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="referrer"
+    content="strict-origin-when-cross-origin"
+  >
+
+  <script>
+    document.documentElement.classList.remove("no-js");
+  </script>
+
+  <title>
+    Bookshop Outreach | Blackwood Publishing
+  </title>
 
   <meta
     name="description"
-    content="Blackwood Publishing's independent bookshop discovery and outreach workspace."
+    content="Blackwood Publishing's bookshop discovery and outreach management workspace."
+  >
+
+  <link
+    rel="icon"
+    href="/assets/favicon.png"
+    type="image/png"
+  >
+
+  <!-- Analytics consent -->
+  <script
+    src="/js/analytics-consent.js?v=20261116"
+    defer
+  ></script>
+
+  <!-- Shared Blackwood styles -->
+  <link
+    rel="stylesheet"
+    href="/css/header.css?v=20261115"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/css/styles.css?v=20260910"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/css/site-polish.css?v=20261120"
   >
 
   <!-- Leaflet map stylesheet -->
@@ -22,11 +64,17 @@
     crossorigin=""
   >
 
-  <!-- Blackwood Bookshop Outreach stylesheet -->
+  <!-- Outreach styles load after shared styles -->
   <link
     rel="stylesheet"
     href="/css/bookshop-outreach.css?v=8"
   >
+
+  <!-- Shared Blackwood header/footer loader -->
+  <script
+    src="/js/header.js?v=20261116"
+    defer
+  ></script>
 
   <!-- Leaflet map JavaScript -->
   <script
@@ -36,267 +84,576 @@
     defer
   ></script>
 
-  <!-- Blackwood Bookshop Outreach JavaScript -->
+  <!--
+    Administrator access controller.
+
+    This script verifies Supabase administrator
+    permission before loading bookshop-outreach.js.
+
+    Do not add bookshop-outreach.js as a separate
+    script tag here: the access controller loads it
+    after successful verification.
+  -->
   <script
-    src="/js/bookshop-outreach.js?v=8"
+    src="/js/bookshop-outreach-access.js?v=1"
     defer
   ></script>
+
+  <style>
+    /*
+     * Keep the administrator workspace hidden
+     * until verification succeeds.
+     *
+     * Explicit !important prevents shared CSS
+     * from accidentally revealing hidden content.
+     */
+    #bookshop-admin-content[hidden],
+    #bookshop-access-screen[hidden] {
+      display: none !important;
+    }
+
+    .bookshop-access-wrap {
+      width: min(760px, calc(100% - 32px));
+      margin: 64px auto 100px;
+    }
+
+    .bookshop-access-panel {
+      padding: clamp(24px, 5vw, 48px);
+      border: 1px solid rgba(184, 115, 51, 0.4);
+      border-radius: 14px;
+      background: #171c19;
+      color: #f5ead5;
+      text-align: center;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+    }
+
+    .bookshop-access-panel h1 {
+      margin: 12px 0 18px;
+      color: #f5ead5;
+    }
+
+    .bookshop-access-panel p {
+      line-height: 1.7;
+    }
+
+    .bookshop-access-panel .eyebrow {
+      color: #d5a777;
+    }
+
+    .bookshop-access-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .bookshop-access-actions a {
+      display: inline-block;
+      padding: 12px 18px;
+      border: 1px solid #b87333;
+      border-radius: 8px;
+      color: #f5ead5;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+
+    .bookshop-access-actions a:hover,
+    .bookshop-access-actions a:focus-visible {
+      background: rgba(184, 115, 51, 0.2);
+    }
+
+    /*
+     * Keep the outreach page's own header
+     * visually separate from the site header.
+     */
+    .bookshop-page-intro {
+      position: relative;
+    }
+  </style>
+
 </head>
 
-<body>
-  <header class="page-header">
-    <p class="eyebrow">
-      Blackwood Publishing · Management Desk
-    </p>
+<body class="sub-page bookshop-outreach-page">
 
-    <h1>Bookshop Outreach</h1>
+  <a
+    class="skip-link"
+    href="#main-content"
+  >
+    Skip to content
+  </a>
 
-    <p>
-      Discover independent booksellers.
-      Build relationships.
-      Support local bookshops.
-    </p>
-  </header>
+  <!-- SHARED BLACKWOOD HEADER -->
+  <div id="header-placeholder"></div>
 
-  <main class="outreach-wrap">
+  <!-- ADMINISTRATOR ACCESS SCREEN -->
+  <section
+    id="bookshop-access-screen"
+    class="bookshop-access-wrap"
+    role="status"
+    aria-live="polite"
+    aria-labelledby="bookshop-access-title"
+  >
+    <div class="bookshop-access-panel">
 
-    <section class="panel" aria-labelledby="finder-heading">
-      <p class="eyebrow">Bookshop discovery</p>
-      <h2 id="finder-heading">Find independent bookshops</h2>
-
-      <p class="section-intro">
-        Search a UK town or city to discover bookshops.
-        Review each result before saving it to your directory.
+      <p class="eyebrow">
+        Blackwood Publishing · Management Access
       </p>
 
-      <form id="finderForm" class="finder-controls">
-        <label class="sr-only" for="finderTown">
-          Town or city
-        </label>
+      <h1 id="bookshop-access-title">
+        Verifying Access
+      </h1>
 
-        <input
-          id="finderTown"
-          type="search"
-          placeholder="Glasgow, Edinburgh, Stirling…"
-          required
-          minlength="2"
-          maxlength="120"
-        >
-
-        <label class="sr-only" for="finderRadius">
-          Search radius
-        </label>
-
-        <select id="finderRadius">
-          <option value="3000">Within 3 km</option>
-          <option value="5000" selected>Within 5 km</option>
-          <option value="10000">Within 10 km</option>
-          <option value="20000">Within 20 km</option>
-        </select>
-
-        <button id="findBtn" class="btn" type="submit">
-          Find bookshops
-        </button>
-
-        <button
-          id="clearResultsBtn"
-          class="btn secondary"
-          type="button"
-        >
-          Clear results
-        </button>
-            </form>
-
-      <label class="chain-filter">
-        <input
-          id="hideChains"
-          type="checkbox"
-          checked
-        >
-        Hide major bookshop chains
-      </label>
-
-      <p
-        id="finderFeedback"
-        class="feedback"
-        role="status"
-        aria-live="polite"
-      ></p>
-
-      <div
-        id="discoveryResults"
-        class="discovery-results"
-      ></div>
-
-      <p class="notice">
-        Discovery uses OpenStreetMap data.
-        Results may be incomplete or outdated.
-        No shop is contacted or published automatically.
+      <p id="bookshop-access-message">
+        Checking your Archivist administrator credentials…
       </p>
-    </section>
 
-    <div class="toolbar">
-      <label class="sr-only" for="search">
-        Search saved bookshops
-      </label>
+      <div class="bookshop-access-actions">
 
-      <input
-        id="search"
-        type="search"
-        placeholder="Search saved bookshops or towns…"
-      >
+        <a href="/pages/members.html">
+          Return to The Archivists
+        </a>
 
-      <label class="sr-only" for="statusFilter">
-        Filter by outreach status
-      </label>
+        <a href="/pages/behind-files-admin.html">
+          Management Hub
+        </a>
 
-      <select id="statusFilter">
-        <option value="">All statuses</option>
-        <option value="prospect">Prospect</option>
-        <option value="contacted">Contacted</option>
-        <option value="interested">Interested</option>
-        <option value="stockist">Confirmed stockist</option>
-        <option value="opted-out">Do not contact</option>
-      </select>
+      </div>
 
-      <button
-        id="exportBtn"
-        class="btn secondary"
-        type="button"
-      >
-        Export JSON
-      </button>
     </div>
+  </section>
 
-    <div class="workspace-grid">
-      <section class="panel" aria-labelledby="directory-heading">
-        <h2 id="directory-heading">Bookshop directory</h2>
-        <div id="shopList" class="shop-list"></div>
-      </section>
+  <!--
+    ADMINISTRATOR WORKSPACE
 
-      <section class="panel" aria-labelledby="map-heading">
-        <h2 id="map-heading">Bookshop map</h2>
+    Remains hidden until the new access controller
+    verifies the signed-in user's is_admin permission.
+  -->
+  <div
+    id="bookshop-admin-content"
+    hidden
+  >
 
-        <div
-          id="map"
-          aria-label="Map of bookshops"
-          role="region"
-        ></div>
+    <!-- OUTREACH PAGE INTRO -->
+    <header class="page-header bookshop-page-intro">
 
-        <div class="map-legend">
-          <span>
-            <i class="legend-dot saved" aria-hidden="true"></i>
-            Saved prospects
-          </span>
+      <p class="eyebrow">
+        Blackwood Publishing · Management Desk
+      </p>
 
-          <span>
-            <i class="legend-dot found" aria-hidden="true"></i>
-            Search results
-          </span>
-        </div>
+      <h1>
+        Bookshop Outreach
+      </h1>
 
-        <p class="notice">
-          Only shops with coordinates appear on the map.
+      <p>
+        Discover independent booksellers.
+        Build relationships.
+        Support local bookshops.
+      </p>
+
+    </header>
+
+    <!-- OUTREACH WORKSPACE -->
+    <main
+      id="main-content"
+      class="outreach-wrap"
+    >
+
+      <!-- BOOKSHOP DISCOVERY -->
+      <section
+        class="panel"
+        aria-labelledby="finder-heading"
+      >
+
+        <p class="eyebrow">
+          Bookshop discovery
         </p>
-      </section>
-    </div>
 
-    <section class="panel editor-panel" id="editor">
-      <h2 id="formHeading">Add a bookshop</h2>
+        <h2 id="finder-heading">
+          Find independent bookshops
+        </h2>
 
-      <form id="shopForm">
-        <div class="fields">
-          <label>
-            Bookshop name *
-            <input id="name" required maxlength="150">
+        <p class="section-intro">
+          Search a UK town or city to discover bookshops.
+          Review each result before saving it to your directory.
+        </p>
+
+        <form
+          id="finderForm"
+          class="finder-controls"
+        >
+
+          <label
+            class="sr-only"
+            for="finderTown"
+          >
+            Town or city
           </label>
 
-          <label>
-            Town or city *
-            <input id="town" required maxlength="100">
+          <input
+            id="finderTown"
+            type="search"
+            placeholder="Glasgow, Edinburgh, Stirling…"
+            required
+            minlength="2"
+            maxlength="120"
+          >
+
+          <label
+            class="sr-only"
+            for="finderRadius"
+          >
+            Search radius
           </label>
 
-          <label>
-            Public business email
-            <input id="email" type="email">
-          </label>
+          <select id="finderRadius">
+            <option value="3000">
+              Within 3 km
+            </option>
 
-          <label>
-            Website
-            <input
-              id="website"
-              type="url"
-              placeholder="https://"
-            >
-          </label>
+            <option value="5000" selected>
+              Within 5 km
+            </option>
 
-          <label>
-            Latitude
-            <input
-              id="lat"
-              type="number"
-              step="any"
-              min="-90"
-              max="90"
-            >
-          </label>
+            <option value="10000">
+              Within 10 km
+            </option>
 
-          <label>
-            Longitude
-            <input
-              id="lng"
-              type="number"
-              step="any"
-              min="-180"
-              max="180"
-            >
-          </label>
+            <option value="20000">
+              Within 20 km
+            </option>
+          </select>
 
-          <label>
-            Outreach status
-            <select id="status">
-              <option value="prospect">Prospect</option>
-              <option value="contacted">Contacted</option>
-              <option value="interested">Interested</option>
-              <option value="stockist">Confirmed stockist</option>
-              <option value="opted-out">Do not contact</option>
-            </select>
-          </label>
-
-          <label class="full">
-            Notes / source / stocking policy
-            <textarea id="notes"></textarea>
-          </label>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn" type="submit">
-            Save bookshop
+          <button
+            id="findBtn"
+            class="btn"
+            type="submit"
+          >
+            Find bookshops
           </button>
 
           <button
-            id="resetBtn"
+            id="clearResultsBtn"
             class="btn secondary"
             type="button"
           >
-            Clear form
+            Clear results
           </button>
-        </div>
-      </form>
 
-      <p
-        id="saveFeedback"
-        class="feedback"
-        role="status"
-        aria-live="polite"
-      ></p>
+        </form>
 
-      <p class="notice">
-        Records are stored in this browser only.
-        Emails open as drafts and are not sent automatically.
-      </p>
-    </section>
+        <!-- MAJOR CHAIN FILTER -->
+        <label class="chain-filter">
 
-  </main>
+          <input
+            id="hideChains"
+            type="checkbox"
+            checked
+          >
+
+          Hide major bookshop chains
+
+        </label>
+
+        <p
+          id="finderFeedback"
+          class="feedback"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <div
+          id="discoveryResults"
+          class="discovery-results"
+        ></div>
+
+        <p class="notice">
+          Discovery uses OpenStreetMap and Blackwood-curated
+          bookshop data. Results may be incomplete or outdated.
+          No shop is contacted or published automatically.
+        </p>
+
+      </section>
+
+      <!-- SAVED DIRECTORY TOOLBAR -->
+      <div class="toolbar">
+
+        <label
+          class="sr-only"
+          for="search"
+        >
+          Search saved bookshops
+        </label>
+
+        <input
+          id="search"
+          type="search"
+          placeholder="Search saved bookshops or towns…"
+        >
+
+        <label
+          class="sr-only"
+          for="statusFilter"
+        >
+          Filter by outreach status
+        </label>
+
+        <select id="statusFilter">
+
+          <option value="">
+            All statuses
+          </option>
+
+          <option value="prospect">
+            Prospect
+          </option>
+
+          <option value="contacted">
+            Contacted
+          </option>
+
+          <option value="interested">
+            Interested
+          </option>
+
+          <option value="stockist">
+            Confirmed stockist
+          </option>
+
+          <option value="opted-out">
+            Do not contact
+          </option>
+
+        </select>
+
+        <button
+          id="exportBtn"
+          class="btn secondary"
+          type="button"
+        >
+          Export JSON
+        </button>
+
+      </div>
+
+      <!-- DIRECTORY AND MAP -->
+      <div class="workspace-grid">
+
+        <!-- SAVED BOOKSHOP DIRECTORY -->
+        <section
+          class="panel"
+          aria-labelledby="directory-heading"
+        >
+
+          <h2 id="directory-heading">
+            Bookshop directory
+          </h2>
+
+          <div
+            id="shopList"
+            class="shop-list"
+          ></div>
+
+        </section>
+
+        <!-- LEAFLET MAP -->
+        <section
+          class="panel"
+          aria-labelledby="map-heading"
+        >
+
+          <h2 id="map-heading">
+            Bookshop map
+          </h2>
+
+          <div
+            id="map"
+            aria-label="Map of bookshops"
+            role="region"
+          ></div>
+
+          <div class="map-legend">
+
+            <span>
+              <i
+                class="legend-dot saved"
+                aria-hidden="true"
+              ></i>
+              Saved prospects
+            </span>
+
+            <span>
+              <i
+                class="legend-dot found"
+                aria-hidden="true"
+              ></i>
+              Search results
+            </span>
+
+          </div>
+
+          <p class="notice">
+            Only shops with coordinates appear on the map.
+          </p>
+
+        </section>
+
+      </div>
+
+      <!-- MANUAL ADD / EDIT FORM -->
+      <section
+        class="panel editor-panel"
+        id="editor"
+      >
+
+        <h2 id="formHeading">
+          Add a bookshop
+        </h2>
+
+        <form id="shopForm">
+
+          <div class="fields">
+
+            <label>
+              Bookshop name *
+
+              <input
+                id="name"
+                required
+                maxlength="150"
+              >
+            </label>
+
+            <label>
+              Town or city *
+
+              <input
+                id="town"
+                required
+                maxlength="100"
+              >
+            </label>
+
+            <label>
+              Public business email
+
+              <input
+                id="email"
+                type="email"
+              >
+            </label>
+
+            <label>
+              Website
+
+              <input
+                id="website"
+                type="url"
+                placeholder="https://"
+              >
+            </label>
+
+            <label>
+              Latitude
+
+              <input
+                id="lat"
+                type="number"
+                step="any"
+                min="-90"
+                max="90"
+              >
+            </label>
+
+            <label>
+              Longitude
+
+              <input
+                id="lng"
+                type="number"
+                step="any"
+                min="-180"
+                max="180"
+              >
+            </label>
+
+            <label>
+              Outreach status
+
+              <select id="status">
+
+                <option value="prospect">
+                  Prospect
+                </option>
+
+                <option value="contacted">
+                  Contacted
+                </option>
+
+                <option value="interested">
+                  Interested
+                </option>
+
+                <option value="stockist">
+                  Confirmed stockist
+                </option>
+
+                <option value="opted-out">
+                  Do not contact
+                </option>
+
+              </select>
+            </label>
+
+            <label class="full">
+              Notes / source / stocking policy
+
+              <textarea id="notes"></textarea>
+            </label>
+
+          </div>
+
+          <div class="form-actions">
+
+            <button
+              class="btn"
+              type="submit"
+            >
+              Save bookshop
+            </button>
+
+            <button
+              id="resetBtn"
+              class="btn secondary"
+              type="button"
+            >
+              Clear form
+            </button>
+
+          </div>
+
+        </form>
+
+        <p
+          id="saveFeedback"
+          class="feedback"
+          role="status"
+          aria-live="polite"
+        ></p>
+
+        <p class="notice">
+          Records are stored in this browser only.
+          Emails open as drafts and are not sent automatically.
+        </p>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- SHARED BLACKWOOD FOOTER -->
+  <div id="footer-placeholder"></div>
+
 </body>
 </html>
