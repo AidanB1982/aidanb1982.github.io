@@ -1,8 +1,2764 @@
-
 {
   "source": "OpenStreetMap / Overpass",
   "region": "Scotland",
-  "generatedAt": null,
-  "count": 0,
-  "shops": []
+  "generatedAt": "2026-11-15T15:27:21.026Z",
+  "count": 273,
+  "coverage": {
+    "totalTiles": 16,
+    "successfulTiles": 14,
+    "failedTiles": 2,
+    "complete": false,
+    "succeeded": [
+      "Southern Scotland — southwest",
+      "Southern Scotland — southeast",
+      "Southern Scotland — northwest",
+      "Southern Scotland — northeast",
+      "Central Scotland — southwest",
+      "Central Scotland — southeast",
+      "Central Scotland — northwest",
+      "Central Scotland — northeast",
+      "Northern Scotland — southwest",
+      "Northern Scotland — southeast",
+      "Northern Scotland — northwest",
+      "Northern Scotland — northeast",
+      "Highlands and Islands — southeast",
+      "Highlands and Islands — northeast"
+    ],
+    "failed": [
+      "Highlands and Islands — southwest",
+      "Highlands and Islands — northwest"
+    ]
+  },
+  "shops": [
+    {
+      "osmId": "way/115664997",
+      "name": "20 Storey",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5982288,
+      "lng": -2.434407
+    },
+    {
+      "osmId": "node/13686602687",
+      "name": "A Daily Dose Of Dopamine",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.0178057,
+      "lng": -3.6085553
+    },
+    {
+      "osmId": "node/6473518201",
+      "name": "A. B. Yule",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.0496193,
+      "lng": -3.0408736
+    },
+    {
+      "osmId": "way/998026373",
+      "name": "Ablekids Bookstore",
+      "town": "",
+      "address": "10-12 Market Brae Steps",
+      "website": "",
+      "email": "",
+      "lat": 57.4778434,
+      "lng": -4.2226764
+    },
+    {
+      "osmId": "node/13568365100",
+      "name": "Adventure Into Books",
+      "town": "Blairgowrie",
+      "address": "12 Allan Street, Blairgowrie",
+      "website": "",
+      "email": "",
+      "lat": 56.5925227,
+      "lng": -3.3385721
+    },
+    {
+      "osmId": "node/11081353334",
+      "name": "All About Books",
+      "town": "Pitlochry",
+      "address": "West Moulin Road, Pitlochry",
+      "website": "",
+      "email": "",
+      "lat": 56.7037776,
+      "lng": -3.7351035
+    },
+    {
+      "osmId": "node/1602086959",
+      "name": "Alnwick Lions Bookshop",
+      "town": "Alnwick",
+      "address": "Bondgate Within, Alnwick",
+      "website": "https://alnwick-lions.org.uk/bookshop/",
+      "email": "",
+      "lat": 55.413128,
+      "lng": -1.704743
+    },
+    {
+      "osmId": "node/366192004",
+      "name": "Amnesty Bookshop",
+      "town": "Edinburgh",
+      "address": "12 Roseneath Street, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9382638,
+      "lng": -3.192592
+    },
+    {
+      "osmId": "node/2333922716",
+      "name": "Argonaut Books",
+      "town": "Edinburgh",
+      "address": "15-17 Leith Walk, Edinburgh",
+      "website": "https://www.argonautbooks.co.uk/",
+      "email": "info@argonautbooks.co.uk",
+      "lat": 55.970096,
+      "lng": -3.1718798
+    },
+    {
+      "osmId": "node/9844672852",
+      "name": "Argyll Book Centre",
+      "town": "",
+      "address": "Unit 2 Lorne Street",
+      "website": "https://uk.bookshop.org/shop/argyllbookcentre",
+      "email": "",
+      "lat": 56.0379035,
+      "lng": -5.4335156
+    },
+    {
+      "osmId": "node/2594769123",
+      "name": "Armchair Books",
+      "town": "Edinburgh",
+      "address": "74 West Port, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9462803,
+      "lng": -3.2000712
+    },
+    {
+      "osmId": "node/2625905451",
+      "name": "At the Sign of the Dragon",
+      "town": "",
+      "address": "",
+      "website": "https://www.atthesignofthedragon.co.uk/",
+      "email": "",
+      "lat": 54.8710999,
+      "lng": -4.444237
+    },
+    {
+      "osmId": "node/6386834493",
+      "name": "Atkinson-Pryce Books",
+      "town": "Biggar",
+      "address": "27 High Street, Biggar",
+      "website": "https://www.atkinson-pryce.co.uk/",
+      "email": "tomes@atkinson-pryce.co.uk",
+      "lat": 55.6229094,
+      "lng": -3.5269165
+    },
+    {
+      "osmId": "node/13096845777",
+      "name": "Aye-Aye Books",
+      "town": "Glasgow",
+      "address": "123 Allison Street, Glasgow",
+      "website": "https://www.aye-ayebooks.com/",
+      "email": "",
+      "lat": 55.8367977,
+      "lng": -4.2652074
+    },
+    {
+      "osmId": "node/13723496170",
+      "name": "Balanced Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.6091384,
+      "lng": -4.4987846
+    },
+    {
+      "osmId": "node/347396332",
+      "name": "Balmore Coach House",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9341419,
+      "lng": -4.2383537
+    },
+    {
+      "osmId": "node/11134760800",
+      "name": "Barnabas Christian Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.4659631,
+      "lng": -2.9988559
+    },
+    {
+      "osmId": "node/1331323763",
+      "name": "Beckside Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.6647627,
+      "lng": -2.7508288
+    },
+    {
+      "osmId": "node/3142057464",
+      "name": "Beinn",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.4450811,
+      "lng": -3.1286232
+    },
+    {
+      "osmId": "node/4171774797",
+      "name": "Ben Nevis Book Corner",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.8172275,
+      "lng": -5.1115679
+    },
+    {
+      "osmId": "node/357168452",
+      "name": "Better Read",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.3631777,
+      "lng": -2.0764397
+    },
+    {
+      "osmId": "node/9757591406",
+      "name": "Better World Books",
+      "town": "Dunfermline",
+      "address": "Queensferry Road, Dunfermline",
+      "website": "https://www.betterworldbooks.co.uk/",
+      "email": "",
+      "lat": 56.0553359,
+      "lng": -3.4396519
+    },
+    {
+      "osmId": "node/1591177547",
+      "name": "Bigglestones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8586601,
+      "lng": -4.2492478
+    },
+    {
+      "osmId": "way/1189365688",
+      "name": "Birnam CD & DVD Duplication",
+      "town": "",
+      "address": "Station Road",
+      "website": "",
+      "email": "",
+      "lat": 56.5579214,
+      "lng": -3.5770427
+    },
+    {
+      "osmId": "node/1832724200",
+      "name": "Blackwell's University Bookshop",
+      "town": "Aberdeen",
+      "address": "99 High Street, Aberdeen",
+      "website": "",
+      "email": "",
+      "lat": 57.166617,
+      "lng": -2.1024225
+    },
+    {
+      "osmId": "node/1437801318",
+      "name": "Blackwells",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.910413,
+      "lng": -3.3218053
+    },
+    {
+      "osmId": "node/2089424441",
+      "name": "Blackwells",
+      "town": "Edinburgh",
+      "address": "53 South Bridge, Edinburgh",
+      "website": "https://blackwells.co.uk/bookshop/shops",
+      "email": "",
+      "lat": 55.947831,
+      "lng": -3.1861334
+    },
+    {
+      "osmId": "node/13764324240",
+      "name": "Boatshed Books",
+      "town": "Berwick Upon Tweed",
+      "address": "Lindisfarne Castle, Berwick Upon Tweed",
+      "website": "",
+      "email": "",
+      "lat": 55.6690721,
+      "lng": -1.7838866
+    },
+    {
+      "osmId": "node/10049941925",
+      "name": "Book Attic",
+      "town": "Dundee",
+      "address": "93 Perth Road, Dundee",
+      "website": "",
+      "email": "",
+      "lat": 56.4560644,
+      "lng": -2.9888093
+    },
+    {
+      "osmId": "node/7036780506",
+      "name": "Book Corner",
+      "town": "Wigtown",
+      "address": "High Street, Wigtown",
+      "website": "",
+      "email": "",
+      "lat": 54.8671882,
+      "lng": -4.4445724
+    },
+    {
+      "osmId": "node/11741911021",
+      "name": "Book Lovers Bookshop",
+      "town": "Edinburgh",
+      "address": "5 Melville Terrace, Edinburgh",
+      "website": "https://www.bookloversbookshop.co.uk/",
+      "email": "",
+      "lat": 55.9397539,
+      "lng": -3.1831934
+    },
+    {
+      "osmId": "node/3587467893",
+      "name": "Bookcase",
+      "town": "Carlisle",
+      "address": "17-19 Castle Street, Carlisle",
+      "website": "https://www.bookcasecarlisle.co.uk/",
+      "email": "",
+      "lat": 54.8955592,
+      "lng": -2.9392297
+    },
+    {
+      "osmId": "node/14087471859",
+      "name": "Bookends",
+      "town": "Keswick",
+      "address": "66 Main Street, Keswick",
+      "website": "",
+      "email": "",
+      "lat": 54.6019459,
+      "lng": -3.1394872
+    },
+    {
+      "osmId": "node/12256439785",
+      "name": "Bookpoint",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9485491,
+      "lng": -4.9254534
+    },
+    {
+      "osmId": "node/14052269069",
+      "name": "Bookpoint Too",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9486663,
+      "lng": -4.9251885
+    },
+    {
+      "osmId": "node/4515783801",
+      "name": "Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.694783,
+      "lng": -4.8577423
+    },
+    {
+      "osmId": "node/4298823430",
+      "name": "Bookspeed Wholesalers",
+      "town": "Edinburgh",
+      "address": "16 Salamander Yards, Edinburgh",
+      "website": "https://www.bookspeed.com/",
+      "email": "sales@bookspeed.com",
+      "lat": 55.9721528,
+      "lng": -3.1552656
+    },
+    {
+      "osmId": "node/11101624089",
+      "name": "Bouquiniste",
+      "town": "St Andrews",
+      "address": "31 Market Street, St Andrews",
+      "website": "https://www.bouquinistebookshop.com/",
+      "email": "",
+      "lat": 56.340337,
+      "lng": -2.7930768
+    },
+    {
+      "osmId": "way/256957311",
+      "name": "Byre Books",
+      "town": "",
+      "address": "",
+      "website": "http://www.byrebooks.co.uk/",
+      "email": "",
+      "lat": 54.8673518,
+      "lng": -4.4429863
+    },
+    {
+      "osmId": "node/1559470872",
+      "name": "Caberfeidh Horizons Bookshop",
+      "town": "Kingussie",
+      "address": "16 High Street, Kingussie",
+      "website": "https://caberfeidhhorizons.com/",
+      "email": "",
+      "lat": 57.0799554,
+      "lng": -4.0521151
+    },
+    {
+      "osmId": "node/1998719826",
+      "name": "Caledonia Books",
+      "town": "Glasgow",
+      "address": "483 Great Western Road, Glasgow",
+      "website": "https://www.caledoniabooks.co.uk/",
+      "email": "",
+      "lat": 55.8752924,
+      "lng": -4.2818928
+    },
+    {
+      "osmId": "node/2260567798",
+      "name": "Calton Books",
+      "town": "Glasgow",
+      "address": "159 London Road, Glasgow",
+      "website": "https://calton-books.co.uk/",
+      "email": "",
+      "lat": 55.8546249,
+      "lng": -4.2396627
+    },
+    {
+      "osmId": "node/2478064806",
+      "name": "Carmina Gadelica",
+      "town": "Portree",
+      "address": "Bank Street, Portree",
+      "website": "http://www.aros.co.uk/plan-your-visit/gift-shop/carmina-gadelica/",
+      "email": "aroscarmina@aol.com",
+      "lat": 57.4126751,
+      "lng": -6.1921261
+    },
+    {
+      "osmId": "node/3020379541",
+      "name": "Carmina Gadelica Bookshop / Leabhraichean",
+      "town": "Portree",
+      "address": "Bank Street, Portree",
+      "website": "",
+      "email": "",
+      "lat": 57.4125747,
+      "lng": -6.1921184
+    },
+    {
+      "osmId": "node/13972085274",
+      "name": "Castle Comics",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.7606387,
+      "lng": -4.1761013
+    },
+    {
+      "osmId": "node/7840355382",
+      "name": "Category Is Books",
+      "town": "Glasgow",
+      "address": "34 Allison Street, Glasgow",
+      "website": "https://www.categoryisbooks.com/",
+      "email": "",
+      "lat": 55.8368753,
+      "lng": -4.2682839
+    },
+    {
+      "osmId": "node/3974215861",
+      "name": "Choose Books",
+      "town": "Edinburgh",
+      "address": "126 Newhaven Road, Edinburgh",
+      "website": "https://www.instagram.com/choosebooks_/",
+      "email": "",
+      "lat": 55.9737549,
+      "lng": -3.1886567
+    },
+    {
+      "osmId": "node/1568917879",
+      "name": "Cogito Bookshop",
+      "town": "Hexham",
+      "address": "5 St Mary's Chare, Hexham",
+      "website": "https://www.cogitobooks.com/",
+      "email": "",
+      "lat": 54.9709137,
+      "lng": -2.1015032
+    },
+    {
+      "osmId": "node/6063884712",
+      "name": "Comhairle nan Leabhraichean",
+      "town": "Glasgow",
+      "address": "32 Mansfield Street, Glasgow",
+      "website": "",
+      "email": "",
+      "lat": 55.8715293,
+      "lng": -4.3013282
+    },
+    {
+      "osmId": "node/12919454153",
+      "name": "Cooper Hay Rare Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8644523,
+      "lng": -4.2626061
+    },
+    {
+      "osmId": "node/5824366914",
+      "name": "Cornerstone Bookshop",
+      "town": "Edinburgh",
+      "address": "Princes Street, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9499323,
+      "lng": -3.2063509
+    },
+    {
+      "osmId": "node/13598063665",
+      "name": "Cornucopia Unit Four",
+      "town": "Hawick",
+      "address": "Unit 4 Tower Dykeside, Hawick",
+      "website": "",
+      "email": "",
+      "lat": 55.4212559,
+      "lng": -2.7873672
+    },
+    {
+      "osmId": "node/14245902602",
+      "name": "Corrie Wee Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.6365212,
+      "lng": -5.1391147
+    },
+    {
+      "osmId": "node/10178387301",
+      "name": "Courtyard Books",
+      "town": "Cupar",
+      "address": "21 Lady Wynd, Cupar",
+      "website": "",
+      "email": "",
+      "lat": 56.3200367,
+      "lng": -3.0136477
+    },
+    {
+      "osmId": "node/6612861910",
+      "name": "Cullen Book Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.6905749,
+      "lng": -2.8178416
+    },
+    {
+      "osmId": "node/1392041212",
+      "name": "Cupar Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.3197786,
+      "lng": -3.0128986
+    },
+    {
+      "osmId": "way/1318124146",
+      "name": "Dalbeattie Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.9319355,
+      "lng": -3.8204604
+    },
+    {
+      "osmId": "node/12200676351",
+      "name": "Daydreams Bookshop",
+      "town": "Glasgow",
+      "address": "38 Stewart Street, Glasgow",
+      "website": "",
+      "email": "",
+      "lat": 55.9401561,
+      "lng": -4.3187531
+    },
+    {
+      "osmId": "node/6768803883",
+      "name": "Deeside Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.0482433,
+      "lng": -3.0388505
+    },
+    {
+      "osmId": "node/9094853194",
+      "name": "Dornoch Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.880748,
+      "lng": -4.0285519
+    },
+    {
+      "osmId": "node/3583637540",
+      "name": "Eden Valley Hospice Bookshop",
+      "town": "Carlisle",
+      "address": "79 Lowther Street, Carlisle",
+      "website": "",
+      "email": "",
+      "lat": 54.8948455,
+      "lng": -2.9337831
+    },
+    {
+      "osmId": "node/634851819",
+      "name": "Edinburgh Books",
+      "town": "Edinburgh",
+      "address": "145-147 West Port, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9460448,
+      "lng": -3.2015976
+    },
+    {
+      "osmId": "node/3950817288",
+      "name": "Edinburgh Community Bookshop",
+      "town": "Edinburgh",
+      "address": "179-181 Great Junction Street, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9733754,
+      "lng": -3.1767114
+    },
+    {
+      "osmId": "node/10302366587",
+      "name": "Evangelical Books",
+      "town": "",
+      "address": "16 North Bank Street",
+      "website": "https://www.evangelicalbooks.com/",
+      "email": "",
+      "lat": 55.9496973,
+      "lng": -3.1945062
+    },
+    {
+      "osmId": "node/4193388164",
+      "name": "Fab 288",
+      "town": "Edinburgh",
+      "address": "288 Portobello High Street, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9515917,
+      "lng": -3.1093259
+    },
+    {
+      "osmId": "way/635795948",
+      "name": "Faith Mission Bookshop",
+      "town": "Dunfermline",
+      "address": "Canmore Street, Dunfermline",
+      "website": "",
+      "email": "",
+      "lat": 56.0705852,
+      "lng": -3.4608742
+    },
+    {
+      "osmId": "node/5126658389",
+      "name": "Far From The Madding Crowd",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9768843,
+      "lng": -3.5969852
+    },
+    {
+      "osmId": "node/3648950256",
+      "name": "Fast Forward",
+      "town": "Ayr",
+      "address": "36 Smith Street, Ayr",
+      "website": "",
+      "email": "",
+      "lat": 55.4584212,
+      "lng": -4.6272474
+    },
+    {
+      "osmId": "node/14270451243",
+      "name": "Ferry Fair Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9902768,
+      "lng": -3.3969762
+    },
+    {
+      "osmId": "node/4225519963",
+      "name": "fm Bookshops",
+      "town": "",
+      "address": "",
+      "website": "http://www.fmbookshops.org/",
+      "email": "",
+      "lat": 57.50536,
+      "lng": -1.7816379
+    },
+    {
+      "osmId": "node/1312364772",
+      "name": "Forbidden Planet",
+      "town": "",
+      "address": "Sauchiehall Street",
+      "website": "https://forbiddenplanet.co.uk/",
+      "email": "",
+      "lat": 55.8648512,
+      "lng": -4.2575742
+    },
+    {
+      "osmId": "node/2752294927",
+      "name": "Forbidden Planet",
+      "town": "Edinburgh",
+      "address": "40-41 South Bridge, Edinburgh",
+      "website": "https://forbiddenplanet.co.uk/our-stores/edinburgh/",
+      "email": "",
+      "lat": 55.9485279,
+      "lng": -3.1865203
+    },
+    {
+      "osmId": "node/701201358",
+      "name": "Forest Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5471515,
+      "lng": -2.8412776
+    },
+    {
+      "osmId": "node/3556417006",
+      "name": "Forum Books",
+      "town": "Corbridge",
+      "address": "8 Market Place, Corbridge",
+      "website": "",
+      "email": "",
+      "lat": 54.9737983,
+      "lng": -2.0199597
+    },
+    {
+      "osmId": "node/14106005225",
+      "name": "Forum Bookshop",
+      "town": "Corbridge",
+      "address": "Corbridge",
+      "website": "https://www.forumbooksshop.com/",
+      "email": "",
+      "lat": 54.9742014,
+      "lng": -2.0192645
+    },
+    {
+      "osmId": "node/842279847",
+      "name": "Founditatlast",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.6231123,
+      "lng": -2.4687996
+    },
+    {
+      "osmId": "node/9652613202",
+      "name": "Friends of Wemyss Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8760823,
+      "lng": -4.8890578
+    },
+    {
+      "osmId": "node/9004838534",
+      "name": "Fruitmarket Bookshop",
+      "town": "Edinburgh",
+      "address": "45 Market Street, Edinburgh",
+      "website": "https://fruitmarketbookshop.myshopify.com/",
+      "email": "",
+      "lat": 55.9512543,
+      "lng": -3.189396
+    },
+    {
+      "osmId": "node/2862796860",
+      "name": "Ginger and Pickles",
+      "town": "Edinburgh",
+      "address": "51 St Stephen Street, Edinburgh",
+      "website": "https://www.gingerandpicklesbookshop.com/",
+      "email": "",
+      "lat": 55.9580776,
+      "lng": -3.2065103
+    },
+    {
+      "osmId": "node/1590552708",
+      "name": "GmhB",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8597473,
+      "lng": -4.2555295
+    },
+    {
+      "osmId": "node/3878036241",
+      "name": "Golden Hare Books",
+      "town": "Edinburgh",
+      "address": "68 St Stephen Street, Edinburgh",
+      "website": "https://goldenharebooks.com/",
+      "email": "",
+      "lat": 55.9579063,
+      "lng": -3.2062917
+    },
+    {
+      "osmId": "node/13273764801",
+      "name": "Good Press",
+      "town": "",
+      "address": "32 St Andrew's Street",
+      "website": "https://goodpress.co.uk/",
+      "email": "",
+      "lat": 55.8552384,
+      "lng": -4.2439869
+    },
+    {
+      "osmId": "node/2408936520",
+      "name": "Gospel Hall",
+      "town": "St Andrews",
+      "address": "Market Street, St Andrews",
+      "website": "",
+      "email": "",
+      "lat": 56.3403735,
+      "lng": -2.7934301
+    },
+    {
+      "osmId": "node/3926713706",
+      "name": "Hanselled Books",
+      "town": "Burntisland",
+      "address": "19 Kirkgate, Burntisland",
+      "website": "http://www.hanselledbooks.co.uk/",
+      "email": "",
+      "lat": 56.0585973,
+      "lng": -3.2333323
+    },
+    {
+      "osmId": "node/9759267117",
+      "name": "Heron and Willow",
+      "town": "",
+      "address": "",
+      "website": "https://heronandwillow.scot/",
+      "email": "heronandwillow@gmail.com",
+      "lat": 55.4777806,
+      "lng": -2.5548799
+    },
+    {
+      "osmId": "node/4630871025",
+      "name": "Highflight Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.5952339,
+      "lng": -4.4260894
+    },
+    {
+      "osmId": "node/4692643740",
+      "name": "Highland Hospice",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.584252,
+      "lng": -3.8707367
+    },
+    {
+      "osmId": "node/2874594753",
+      "name": "Hillbillies Bookstore",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.7315828,
+      "lng": -5.7039022
+    },
+    {
+      "osmId": "node/1887926915",
+      "name": "Hyndland Books",
+      "town": "",
+      "address": "143 Hyndland Road",
+      "website": "",
+      "email": "",
+      "lat": 55.876788,
+      "lng": -4.3060238
+    },
+    {
+      "osmId": "node/13042377302",
+      "name": "Inkspot & Silverleaf Booksellers",
+      "town": "Bo'ness",
+      "address": "76 South Street, Bo'ness",
+      "website": "",
+      "email": "",
+      "lat": 56.0173367,
+      "lng": -3.6062655
+    },
+    {
+      "osmId": "way/755021731",
+      "name": "Invercloy Corner",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5771214,
+      "lng": -5.1478882
+    },
+    {
+      "osmId": "node/9515009907",
+      "name": "J I Broom bookseller",
+      "town": "Stromness",
+      "address": "1 Graham Place, Stromness",
+      "website": "",
+      "email": "",
+      "lat": 58.9613313,
+      "lng": -3.2997645
+    },
+    {
+      "osmId": "node/2992588552",
+      "name": "John Kay's",
+      "town": "Edinburgh",
+      "address": "8 Victoria Street, Edinburgh",
+      "website": "http://www.oldtownbookshop-edinburgh.co.uk/",
+      "email": "",
+      "lat": 55.9487972,
+      "lng": -3.1931459
+    },
+    {
+      "osmId": "node/12856081359",
+      "name": "JOHN O' GROATS BOOKSHOP",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 58.6435369,
+      "lng": -3.0700432
+    },
+    {
+      "osmId": "node/1308343590",
+      "name": "Karnak Comics",
+      "town": "Callander",
+      "address": "30 Main Street, Callander",
+      "website": "https://karnakcomics.com/",
+      "email": "",
+      "lat": 56.2440836,
+      "lng": -4.2167214
+    },
+    {
+      "osmId": "node/12215849512",
+      "name": "Kesley’s Bookshop",
+      "town": "Haddington",
+      "address": "Haddington",
+      "website": "",
+      "email": "",
+      "lat": 55.9556842,
+      "lng": -2.7770335
+    },
+    {
+      "osmId": "way/427689503",
+      "name": "Keswick Book Shop",
+      "town": "Keswick",
+      "address": "4 Station Street, Keswick",
+      "website": "",
+      "email": "",
+      "lat": 54.6003855,
+      "lng": -3.1360696
+    },
+    {
+      "osmId": "node/1313005724",
+      "name": "Kings Book Store",
+      "town": "Callander",
+      "address": "91, 93 Main Street, Callander",
+      "website": "",
+      "email": "",
+      "lat": 56.2432986,
+      "lng": -4.2125237
+    },
+    {
+      "osmId": "node/11217860845",
+      "name": "Księgarna",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8519983,
+      "lng": -4.1976233
+    },
+    {
+      "osmId": "node/3214491854",
+      "name": "La Belle Adventure",
+      "town": "Edinburgh",
+      "address": "225 Leith Walk, Edinburgh",
+      "website": "https://labelleadventure.com/",
+      "email": "",
+      "lat": 55.9667052,
+      "lng": -3.1747682
+    },
+    {
+      "osmId": "way/64046230",
+      "name": "Leakey's",
+      "town": "Inverness",
+      "address": "Church Street, Inverness",
+      "website": "https://leakeysbookshop.com/",
+      "email": "leakeysbookshop@gmail.com",
+      "lat": 57.4802558,
+      "lng": -4.2286393
+    },
+    {
+      "osmId": "node/5254256716",
+      "name": "Letham Book Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.6290638,
+      "lng": -2.7695166
+    },
+    {
+      "osmId": "node/709308053",
+      "name": "Lighthouse Bookshop - Edinburgh's Radical Bookshop",
+      "town": "Edinburgh",
+      "address": "43 West Nicolson Street, Edinburgh",
+      "website": "https://lighthousebookshop.com/",
+      "email": "",
+      "lat": 55.9446069,
+      "lng": -3.1855056
+    },
+    {
+      "osmId": "node/7193059695",
+      "name": "Little Shop of Heroes",
+      "town": "Dunfermline",
+      "address": "8 Maygate, Dunfermline",
+      "website": "https://www.littleshopofheroes.co.uk/",
+      "email": "",
+      "lat": 56.0707961,
+      "lng": -3.4635171
+    },
+    {
+      "osmId": "node/9962214675",
+      "name": "Logos Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5463888,
+      "lng": -2.0156251
+    },
+    {
+      "osmId": "node/7036758340",
+      "name": "M. E. McCarty",
+      "town": "",
+      "address": "",
+      "website": "https://www.wigtown-booktown.co.uk/bookshop_info.asp?businessID=41",
+      "email": "",
+      "lat": 54.868415,
+      "lng": -4.4429943
+    },
+    {
+      "osmId": "node/6847957642",
+      "name": "Magazine Appreciation Society",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8562061,
+      "lng": -4.245383
+    },
+    {
+      "osmId": "node/3298301649",
+      "name": "Main Point Books",
+      "town": "Edinburgh",
+      "address": "77 Bread Street, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9459189,
+      "lng": -3.2020308
+    },
+    {
+      "osmId": "node/1374494880",
+      "name": "Mainstreet Books",
+      "town": "St Boswells",
+      "address": "St Boswells",
+      "website": "",
+      "email": "",
+      "lat": 55.5718758,
+      "lng": -2.6444195
+    },
+    {
+      "osmId": "way/318091906",
+      "name": "McLaren Books",
+      "town": "Helensburgh",
+      "address": "22 John Street, Helensburgh",
+      "website": "https://www.mclarenbooks.com/",
+      "email": "",
+      "lat": 56.0043771,
+      "lng": -4.7390772
+    },
+    {
+      "osmId": "node/2949465926",
+      "name": "McNaughtan's Bookshop",
+      "town": "Edinburgh",
+      "address": "3A-4A, Edinburgh",
+      "website": "http://www.mcnaughtansbookshop.com/",
+      "email": "",
+      "lat": 55.959345,
+      "lng": -3.183892
+    },
+    {
+      "osmId": "node/3201606787",
+      "name": "Mercat Bookshop",
+      "town": "Aberdeen",
+      "address": "45 Castle Street, Aberdeen",
+      "website": "https://www.vsa.org.uk/mercat-bookshop",
+      "email": "",
+      "lat": 57.147922,
+      "lng": -2.092823
+    },
+    {
+      "osmId": "node/1313715762",
+      "name": "Nairn Bookshop",
+      "town": "",
+      "address": "",
+      "website": "http://nairnbookshop.co.uk/",
+      "email": "",
+      "lat": 57.5857088,
+      "lng": -3.8670332
+    },
+    {
+      "osmId": "way/461119550",
+      "name": "Night Owl Books",
+      "town": "East Linton",
+      "address": "1 Bridge Street, East Linton",
+      "website": "https://nightowlbooks.co.uk/",
+      "email": "hello@nightowlbooks.co.uk",
+      "lat": 55.9851925,
+      "lng": -2.656223
+    },
+    {
+      "osmId": "node/12943165778",
+      "name": "Oakholm Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.6189855,
+      "lng": -3.8654892
+    },
+    {
+      "osmId": "node/2525487032",
+      "name": "Old Aberdeen Bookshop",
+      "town": "Aberdeen",
+      "address": "140 Spital, Aberdeen",
+      "website": "http://www.oldaberdeen-bookshop.co.uk/",
+      "email": "oldaberdeenbookshop@gmail.com",
+      "lat": 57.1604172,
+      "lng": -2.1003462
+    },
+    {
+      "osmId": "way/1023961096",
+      "name": "Old Curiosity Bookshop",
+      "town": "Hawick",
+      "address": "2 Bourtree Terrace, Hawick",
+      "website": "",
+      "email": "",
+      "lat": 55.4247729,
+      "lng": -2.7837739
+    },
+    {
+      "osmId": "node/8835643248",
+      "name": "Orcadian Bookshop",
+      "town": "Kirkwall, Orkney",
+      "address": "14 Albert Street, Kirkwall, Orkney",
+      "website": "",
+      "email": "",
+      "lat": 58.9834831,
+      "lng": -2.9582477
+    },
+    {
+      "osmId": "node/10560399235",
+      "name": "Oxfam Books & Music",
+      "town": "Dundee",
+      "address": "45 Reform Street, Dundee",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-books-music-dundee/",
+      "email": "",
+      "lat": 56.4615333,
+      "lng": -2.9711135
+    },
+    {
+      "osmId": "way/314091323",
+      "name": "Oxfam Books & Music",
+      "town": "Aberdeen",
+      "address": "5 Back Wynd, Aberdeen",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-books-music-aberdeen/",
+      "email": "",
+      "lat": 57.1466401,
+      "lng": -2.100011
+    },
+    {
+      "osmId": "node/1106080853",
+      "name": "Oxfam Bookshop",
+      "town": "Edinburgh",
+      "address": "25 Raeburn Place, Edinburgh",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-raeburn-place/",
+      "email": "oxfamshopf5817@oxfam.org.uk",
+      "lat": 55.9588659,
+      "lng": -3.2111897
+    },
+    {
+      "osmId": "node/1747065088",
+      "name": "Oxfam Bookshop",
+      "town": "",
+      "address": "79 Murray Place",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-stirling/",
+      "email": "",
+      "lat": 56.1194505,
+      "lng": -3.9375009
+    },
+    {
+      "osmId": "node/2271894239",
+      "name": "Oxfam Bookshop",
+      "town": "",
+      "address": "5 Royal Exchange Square",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-royal-exchange-square/",
+      "email": "",
+      "lat": 55.859819,
+      "lng": -4.2523473
+    },
+    {
+      "osmId": "node/3068497352",
+      "name": "Oxfam Bookshop",
+      "town": "Edinburgh",
+      "address": "116 Nicolson Street, Edinburgh",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-nicolson-street/",
+      "email": "",
+      "lat": 55.9443038,
+      "lng": -3.1834963
+    },
+    {
+      "osmId": "node/549722187",
+      "name": "Oxfam Bookshop",
+      "town": "Edinburgh",
+      "address": "Morningside Road, Edinburgh",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-morningside-road/",
+      "email": "",
+      "lat": 55.9283372,
+      "lng": -3.2096631
+    },
+    {
+      "osmId": "way/362065936",
+      "name": "Oxfam Bookshop",
+      "town": "Hexham",
+      "address": "10 Battle Hill, Hexham",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-hexham/",
+      "email": "",
+      "lat": 54.9698393,
+      "lng": -2.1017627
+    },
+    {
+      "osmId": "node/6867320700",
+      "name": "Pauline Books & Media",
+      "town": "",
+      "address": "36 St Enoch Square",
+      "website": "https://www.paulineuk.org/",
+      "email": "",
+      "lat": 55.8574373,
+      "lng": -4.255664
+    },
+    {
+      "osmId": "node/2594769124",
+      "name": "Peter Bell Books",
+      "town": "Edinburgh",
+      "address": "68 West Port, Edinburgh",
+      "website": "https://peterbell.net/",
+      "email": "",
+      "lat": 55.9463119,
+      "lng": -3.1999342
+    },
+    {
+      "osmId": "node/4710884028",
+      "name": "Picaresque Books and Galerie Fantoosh",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.5954022,
+      "lng": -4.4264357
+    },
+    {
+      "osmId": "node/3473441445",
+      "name": "Pitlochry Station Bookshop",
+      "town": "",
+      "address": "Station Road",
+      "website": "https://www.pitlochrystationbookshop.co.uk/",
+      "email": "",
+      "lat": 56.702477,
+      "lng": -3.7354956
+    },
+    {
+      "osmId": "node/11922316218",
+      "name": "PortaLibri",
+      "town": "Edinburgh",
+      "address": "167-171 Portobello High Street, Edinburgh",
+      "website": "https://www.tillsbookshop.co.uk/",
+      "email": "read@tillsandcompany.co.uk",
+      "lat": 55.9526447,
+      "lng": -3.1141789
+    },
+    {
+      "osmId": "node/7266851970",
+      "name": "Priorsford Books",
+      "town": "Peebles",
+      "address": "11 Northgate, Peebles",
+      "website": "https://www.priorsfordbooks.co.uk/",
+      "email": "",
+      "lat": 55.6525756,
+      "lng": -3.1891749
+    },
+    {
+      "osmId": "node/4380796422",
+      "name": "Pudding & Stories",
+      "town": "Edinburgh",
+      "address": "135 Comiston Road, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9216794,
+      "lng": -3.2112899
+    },
+    {
+      "osmId": "node/727348499",
+      "name": "Rare Birds Book Shop",
+      "town": "Edinburgh",
+      "address": "13 Raeburn Place, Edinburgh",
+      "website": "https://rarebirdsbooks.com/pages/visit-us",
+      "email": "",
+      "lat": 55.958828,
+      "lng": -3.2107233
+    },
+    {
+      "osmId": "node/8865944919",
+      "name": "Read & Relax",
+      "town": "Kinross",
+      "address": "157 High Street, Kinross",
+      "website": "https://www.readandrelax.co.uk/",
+      "email": "",
+      "lat": 56.2025491,
+      "lng": -3.4210781
+    },
+    {
+      "osmId": "node/7036758346",
+      "name": "ReadingLasses",
+      "town": "Wigtown",
+      "address": "17 South Main Street, Wigtown",
+      "website": "",
+      "email": "",
+      "lat": 54.8679066,
+      "lng": -4.4423694
+    },
+    {
+      "osmId": "node/14101727146",
+      "name": "Renwick's",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.9233772,
+      "lng": -1.7225388
+    },
+    {
+      "osmId": "node/10783733628",
+      "name": "RIAS Bookshop",
+      "town": "Edinburgh",
+      "address": "15 Rutland Square, Edinburgh",
+      "website": "https://bookshop.rias.org.uk/",
+      "email": "",
+      "lat": 55.9482653,
+      "lng": -3.2092869
+    },
+    {
+      "osmId": "node/11543882478",
+      "name": "River Thoughtful",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.6463071,
+      "lng": -3.4037341
+    },
+    {
+      "osmId": "node/1886752172",
+      "name": "Robert Murray Stamp Shop",
+      "town": "Edinburgh",
+      "address": "5-6 Inverleith Gardens, Edinburgh",
+      "website": "https://www.stamp-shop.com/",
+      "email": "",
+      "lat": 55.9710379,
+      "lng": -3.2098421
+    },
+    {
+      "osmId": "way/256184142",
+      "name": "Samye Ling Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.2894211,
+      "lng": -3.1873032
+    },
+    {
+      "osmId": "way/1001680683",
+      "name": "Scott's Selkirk",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5474313,
+      "lng": -2.8414397
+    },
+    {
+      "osmId": "node/12580347717",
+      "name": "Seagull Trust Cruises Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9996541,
+      "lng": -3.7863206
+    },
+    {
+      "osmId": "node/9605608757",
+      "name": "Seahorse",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.6392108,
+      "lng": -4.8159881
+    },
+    {
+      "osmId": "way/1097802824",
+      "name": "Second hand bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.9191067,
+      "lng": -1.7341279
+    },
+    {
+      "osmId": "node/9101844535",
+      "name": "Second Hand Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.64759,
+      "lng": -2.5944203
+    },
+    {
+      "osmId": "node/13173245330",
+      "name": "Secondhand Book Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.1525223,
+      "lng": -1.9579986
+    },
+    {
+      "osmId": "node/10544458471",
+      "name": "Shelter Scotland Bookshop",
+      "town": "Edinburgh",
+      "address": "106A Raeburn Place, Edinburgh",
+      "website": "https://scotland.shelter.org.uk/shops/edinburgh_stockbridge_books_community_shop",
+      "email": "",
+      "lat": 55.9593198,
+      "lng": -3.2141238
+    },
+    {
+      "osmId": "node/13342323394",
+      "name": "Somerville Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.1482948,
+      "lng": -2.1086907
+    },
+    {
+      "osmId": "node/1233912335",
+      "name": "St Columba's Hospice Bookshop",
+      "town": "Edinburgh",
+      "address": "14-15 Brandon Terrace, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9620766,
+      "lng": -3.2003138
+    },
+    {
+      "osmId": "node/892118295",
+      "name": "St Pauls Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9559943,
+      "lng": -3.1875949
+    },
+    {
+      "osmId": "node/6579709126",
+      "name": "Summerfield Books",
+      "town": "Penrith",
+      "address": "Skirsgill Business Park, Penrith",
+      "website": "https://www.summerfieldbooks.com/",
+      "email": "",
+      "lat": 54.6512724,
+      "lng": -2.7618975
+    },
+    {
+      "osmId": "way/1280229124",
+      "name": "TG Jones",
+      "town": "Dundee",
+      "address": "61-63 Murraygate, Dundee",
+      "website": "https://www.tgjonesonline.co.uk/stores/murraygate-dundee",
+      "email": "",
+      "lat": 56.4630633,
+      "lng": -2.9683915
+    },
+    {
+      "osmId": "node/10778056918",
+      "name": "TGJones",
+      "town": "Airdrie",
+      "address": "60/62 Graham Street, Airdrie",
+      "website": "https://www.tgjonesonline.co.uk/stores/graham-street-airdrie",
+      "email": "",
+      "lat": 55.8659957,
+      "lng": -3.9788289
+    },
+    {
+      "osmId": "node/12974495407",
+      "name": "TGJones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8842054,
+      "lng": -3.5109368
+    },
+    {
+      "osmId": "node/14143300618",
+      "name": "TGJones",
+      "town": "Banchory",
+      "address": "33 High Street, Banchory",
+      "website": "",
+      "email": "",
+      "lat": 57.051482,
+      "lng": -2.5039378
+    },
+    {
+      "osmId": "node/7851246034",
+      "name": "TGJones",
+      "town": "Largs",
+      "address": "34 Main Street, Largs",
+      "website": "https://www.tgjonesonline.co.uk/stores/main-street-largs",
+      "email": "",
+      "lat": 55.7941612,
+      "lng": -4.8694201
+    },
+    {
+      "osmId": "node/3678477907",
+      "name": "The Accidental Bookshop",
+      "town": "Alnwick",
+      "address": "4 Narrowgate, Alnwick",
+      "website": "https://www.forumbooksshop.com/",
+      "email": "",
+      "lat": 55.4141683,
+      "lng": -1.7073979
+    },
+    {
+      "osmId": "node/2920296538",
+      "name": "The Bethany Bookshop",
+      "town": "Edinburgh",
+      "address": "33A, Edinburgh",
+      "website": "https://www.bethanychristiantrust.com/",
+      "email": "",
+      "lat": 55.9606774,
+      "lng": -3.1820407
+    },
+    {
+      "osmId": "way/1189365685",
+      "name": "The Birnam Reader",
+      "town": "Dunkeld",
+      "address": "Station Road, Dunkeld",
+      "website": "https://www.facebook.com/thebirnamreader",
+      "email": "",
+      "lat": 56.5578407,
+      "lng": -3.5770795
+    },
+    {
+      "osmId": "way/256952952",
+      "name": "The Book End Studio",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.8678864,
+      "lng": -4.4439434
+    },
+    {
+      "osmId": "node/8925087528",
+      "name": "The Book Nook",
+      "town": "Stirling",
+      "address": "24 Upper Craigs, Stirling",
+      "website": "https://www.thebooknookstirling.co.uk/",
+      "email": "",
+      "lat": 56.1159717,
+      "lng": -3.9357514
+    },
+    {
+      "osmId": "node/13784661938",
+      "name": "The Bookhouse",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.4658915,
+      "lng": -2.8737665
+    },
+    {
+      "osmId": "node/7609355771",
+      "name": "The Bookmark",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.3299616,
+      "lng": -3.6090883
+    },
+    {
+      "osmId": "way/256953524",
+      "name": "The BookShop",
+      "town": "Wigtown",
+      "address": "17 North Main Street, Wigtown",
+      "website": "https://www.the-bookshop.com/",
+      "email": "",
+      "lat": 54.8682649,
+      "lng": -4.4434567
+    },
+    {
+      "osmId": "way/1251687150",
+      "name": "The Bookshop by WHSmith",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9522921,
+      "lng": -3.189196
+    },
+    {
+      "osmId": "node/1374494885",
+      "name": "The Border Reader Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5955562,
+      "lng": -2.6619528
+    },
+    {
+      "osmId": "way/256953362",
+      "name": "The Box of Frogs",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.8681523,
+      "lng": -4.4434778
+    },
+    {
+      "osmId": "node/472313037",
+      "name": "The Ceilidh Place",
+      "town": "",
+      "address": "14 West Argyle Street",
+      "website": "https://www.theceilidhplace.com/",
+      "email": "",
+      "lat": 57.89578,
+      "lng": -5.1634582
+    },
+    {
+      "osmId": "node/9401000086",
+      "name": "The Ceilidh Place",
+      "town": "",
+      "address": "14 West Argyle Street",
+      "website": "https://www.theceilidhplace.com/",
+      "email": "",
+      "lat": 57.895761,
+      "lng": -5.1633871
+    },
+    {
+      "osmId": "node/2920296541",
+      "name": "The Cookbook Shop",
+      "town": "Edinburgh",
+      "address": "19A, Edinburgh",
+      "website": "https://thecookbookshop.co.uk/",
+      "email": "",
+      "lat": 55.9601726,
+      "lng": -3.1827803
+    },
+    {
+      "osmId": "node/7036758339",
+      "name": "The Creaking Shelves Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.868472,
+      "lng": -4.4428562
+    },
+    {
+      "osmId": "node/1660995244",
+      "name": "The Edinburgh Bookshop",
+      "town": "Edinburgh",
+      "address": "176 Bruntsfield Place, Edinburgh",
+      "website": "https://www.edinburghbookshop.com/",
+      "email": "",
+      "lat": 55.9362033,
+      "lng": -3.2092761
+    },
+    {
+      "osmId": "node/3322857380",
+      "name": "The Gently Mad Book Shop & Bookbinder",
+      "town": "Edinburgh",
+      "address": "2, Edinburgh",
+      "website": "https://www.thegentlymad.co.uk/",
+      "email": "",
+      "lat": 55.9638923,
+      "lng": -3.2020449
+    },
+    {
+      "osmId": "node/4265339955",
+      "name": "The Hedgehog Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.6643319,
+      "lng": -2.7530594
+    },
+    {
+      "osmId": "node/5033046547",
+      "name": "The Highland Bookshop",
+      "town": "Fort William",
+      "address": "60 High Street, Fort William",
+      "website": "https://www.highlandbookshop.com/",
+      "email": "",
+      "lat": 56.8174531,
+      "lng": -5.1118925
+    },
+    {
+      "osmId": "node/6925498285",
+      "name": "The Lighthouse",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.3194631,
+      "lng": -3.0144195
+    },
+    {
+      "osmId": "node/12916958820",
+      "name": "The Moffat Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.3328524,
+      "lng": -3.4433984
+    },
+    {
+      "osmId": "node/3589962448",
+      "name": "The New Bookshop",
+      "town": "Cockermouth",
+      "address": "42-44 Main Street, Cockermouth",
+      "website": "https://www.newbookshop.co.uk/",
+      "email": "",
+      "lat": 54.6638466,
+      "lng": -3.3644658
+    },
+    {
+      "osmId": "node/2474675063",
+      "name": "The Next Chapter",
+      "town": "Edinburgh",
+      "address": "10 William Street, Edinburgh",
+      "website": "https://thenextchapter.org/",
+      "email": "",
+      "lat": 55.9495077,
+      "lng": -3.2117645
+    },
+    {
+      "osmId": "way/178210982",
+      "name": "The Next Chapter",
+      "town": "Hexham",
+      "address": "1 King Street, Hexham",
+      "website": "",
+      "email": "",
+      "lat": 55.1443062,
+      "lng": -2.2545876
+    },
+    {
+      "osmId": "way/178210987",
+      "name": "The Next Chapter",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.1438772,
+      "lng": -2.254311
+    },
+    {
+      "osmId": "way/256967155",
+      "name": "The Old Bank Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 54.8682332,
+      "lng": -4.4410831
+    },
+    {
+      "osmId": "node/4167750078",
+      "name": "The Portobello Bookshop",
+      "town": "Edinburgh",
+      "address": "46 Portobello High Street, Edinburgh",
+      "website": "https://www.theportobellobookshop.com/",
+      "email": "",
+      "lat": 55.954997,
+      "lng": -3.1175411
+    },
+    {
+      "osmId": "node/11382373499",
+      "name": "The Reading Room",
+      "town": "",
+      "address": "",
+      "website": "https://www.thereadingroommelrose.com/",
+      "email": "",
+      "lat": 55.5979004,
+      "lng": -2.7204193
+    },
+    {
+      "osmId": "node/3820946382",
+      "name": "The Shetland Bookshop",
+      "town": "Shetland",
+      "address": "71-79 Commercial Street, Shetland",
+      "website": "https://www.shetlandbookshop.co.uk/",
+      "email": "sales@shetlandbookshop.co.uk",
+      "lat": 60.1530112,
+      "lng": -1.1413615
+    },
+    {
+      "osmId": "node/12913481769",
+      "name": "The Watermill",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.6194242,
+      "lng": -3.8672755
+    },
+    {
+      "osmId": "node/318094121",
+      "name": "The Watermill",
+      "town": "Aberfeldy",
+      "address": "Mill Street, Aberfeldy",
+      "website": "https://www.aberfeldywatermill.com/",
+      "email": "",
+      "lat": 56.6194855,
+      "lng": -3.8672684
+    },
+    {
+      "osmId": "node/11784709290",
+      "name": "The Wedale Bookshop",
+      "town": "Stow",
+      "address": "231 Galashiels Road, Stow",
+      "website": "https://wedalebooks.scot/",
+      "email": "",
+      "lat": 55.6917966,
+      "lng": -2.8617043
+    },
+    {
+      "osmId": "node/12731453166",
+      "name": "The Wee Bookshop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9616365,
+      "lng": -4.8206124
+    },
+    {
+      "osmId": "node/10224086620",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1123",
+      "email": "",
+      "lat": 55.7730378,
+      "lng": -4.3341978
+    },
+    {
+      "osmId": "node/10723638871",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1124",
+      "email": "",
+      "lat": 55.7748131,
+      "lng": -4.033243
+    },
+    {
+      "osmId": "node/10743496831",
+      "name": "The Works",
+      "town": "Motherwell",
+      "address": "23 Brandon Parade South, Motherwell",
+      "website": "https://www.theworks.co.uk/Store?storeId=0899",
+      "email": "",
+      "lat": 55.7900071,
+      "lng": -3.9918508
+    },
+    {
+      "osmId": "node/11212198412",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0756",
+      "email": "",
+      "lat": 55.8567534,
+      "lng": -4.2531019
+    },
+    {
+      "osmId": "node/11357693210",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0679",
+      "email": "",
+      "lat": 57.4777199,
+      "lng": -4.2242144
+    },
+    {
+      "osmId": "node/11951431307",
+      "name": "The Works",
+      "town": "Dundee",
+      "address": "Dundee",
+      "website": "https://www.theworks.co.uk/Store?storeId=0049",
+      "email": "",
+      "lat": 56.4640378,
+      "lng": -2.9693121
+    },
+    {
+      "osmId": "node/12064747548",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0354",
+      "email": "",
+      "lat": 54.6437209,
+      "lng": -3.5453558
+    },
+    {
+      "osmId": "node/12076967247",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.1490029,
+      "lng": -3.7421427
+    },
+    {
+      "osmId": "node/12151468405",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 57.4817006,
+      "lng": -4.1771674
+    },
+    {
+      "osmId": "node/12333421566",
+      "name": "The Works",
+      "town": "Perth",
+      "address": "Perth",
+      "website": "https://www.theworks.co.uk/Store?storeId=0692",
+      "email": "",
+      "lat": 56.3959442,
+      "lng": -3.4316842
+    },
+    {
+      "osmId": "node/12709929702",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1182",
+      "email": "",
+      "lat": 56.1168109,
+      "lng": -3.9332179
+    },
+    {
+      "osmId": "node/12750214644",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1108",
+      "email": "",
+      "lat": 55.8195323,
+      "lng": -4.3419864
+    },
+    {
+      "osmId": "node/12973941915",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8832979,
+      "lng": -3.5212792
+    },
+    {
+      "osmId": "node/12974468073",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8840564,
+      "lng": -3.5134825
+    },
+    {
+      "osmId": "node/13972086401",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.7602997,
+      "lng": -4.1808443
+    },
+    {
+      "osmId": "node/1977943207",
+      "name": "The Works",
+      "town": "Edinburgh",
+      "address": "120 Princes Street, Edinburgh",
+      "website": "https://www.theworks.co.uk/Store?storeId=1234",
+      "email": "",
+      "lat": 55.9510165,
+      "lng": -3.2036026
+    },
+    {
+      "osmId": "node/2421592665",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1026",
+      "email": "",
+      "lat": 55.9264986,
+      "lng": -3.1641082
+    },
+    {
+      "osmId": "node/2696170109",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0146",
+      "email": "",
+      "lat": 56.1963225,
+      "lng": -3.1708687
+    },
+    {
+      "osmId": "node/3639263288",
+      "name": "The Works",
+      "town": "Ayr",
+      "address": "190-198 High Street, Ayr",
+      "website": "https://www.theworks.co.uk/Store?storeId=1198",
+      "email": "",
+      "lat": 55.4614282,
+      "lng": -4.6290308
+    },
+    {
+      "osmId": "node/5107942407",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1142",
+      "email": "",
+      "lat": 56.1100436,
+      "lng": -3.1589597
+    },
+    {
+      "osmId": "node/6236563167",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0877",
+      "email": "",
+      "lat": 56.0716851,
+      "lng": -3.459824
+    },
+    {
+      "osmId": "node/6833035241",
+      "name": "The Works",
+      "town": "Carlisle",
+      "address": "English Street, Carlisle",
+      "website": "https://www.theworks.co.uk/Store?storeId=1237",
+      "email": "",
+      "lat": 54.8941914,
+      "lng": -2.9352051
+    },
+    {
+      "osmId": "node/9250100886",
+      "name": "The Works",
+      "town": "Edinburgh",
+      "address": "Edinburgh",
+      "website": "https://www.theworks.co.uk/Store?storeId=1188",
+      "email": "",
+      "lat": 55.8848993,
+      "lng": -3.1650039
+    },
+    {
+      "osmId": "way/102144321",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1241",
+      "email": "",
+      "lat": 55.9346736,
+      "lng": -3.1061769
+    },
+    {
+      "osmId": "way/1207864615",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0748",
+      "email": "",
+      "lat": 55.8538264,
+      "lng": -4.2001324
+    },
+    {
+      "osmId": "way/505361011",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=1002",
+      "email": "",
+      "lat": 55.9387194,
+      "lng": -3.3150488
+    },
+    {
+      "osmId": "way/875514443",
+      "name": "The Works",
+      "town": "",
+      "address": "",
+      "website": "https://www.theworks.co.uk/Store?storeId=0174",
+      "email": "",
+      "lat": 55.8462239,
+      "lng": -4.422734
+    },
+    {
+      "osmId": "node/5214149299",
+      "name": "Thistle Books",
+      "town": "Glasgow",
+      "address": "55 Otago Street, Glasgow",
+      "website": "https://www.thistlebooks.co.uk/",
+      "email": "thistlebooks@gmail.com",
+      "lat": 55.8735685,
+      "lng": -4.2819473
+    },
+    {
+      "osmId": "node/13207378511",
+      "name": "Thrift Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 56.6200706,
+      "lng": -3.8649787
+    },
+    {
+      "osmId": "node/440797698",
+      "name": "Tills Bookshop",
+      "town": "Edinburgh",
+      "address": "1 Hope Park Crescent, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9412214,
+      "lng": -3.1828584
+    },
+    {
+      "osmId": "node/4524120938",
+      "name": "Timberbooks",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.6932615,
+      "lng": -4.8605671
+    },
+    {
+      "osmId": "node/2106254362",
+      "name": "Topping & Company Booksellers",
+      "town": "Edinburgh",
+      "address": "2 Blenheim Place, Edinburgh",
+      "website": "https://www.toppingbooks.co.uk/",
+      "email": "edinburgh@toppingbooks.co.uk",
+      "lat": 55.9576475,
+      "lng": -3.1842848
+    },
+    {
+      "osmId": "node/4033347631",
+      "name": "Topping and Company",
+      "town": "St Andrews",
+      "address": "Greyfriars Garden, St Andrews",
+      "website": "",
+      "email": "",
+      "lat": 56.3409625,
+      "lng": -2.7987451
+    },
+    {
+      "osmId": "node/2907784260",
+      "name": "Transreal",
+      "town": "Edinburgh",
+      "address": "46 Candlemaker Row, Edinburgh",
+      "website": "http://www.transreal.co.uk/",
+      "email": "",
+      "lat": 55.9471125,
+      "lng": -3.1918096
+    },
+    {
+      "osmId": "node/11192869974",
+      "name": "Turning The Page",
+      "town": "Hawick",
+      "address": "Buccleuch Street, Hawick",
+      "website": "",
+      "email": "",
+      "lat": 55.4212789,
+      "lng": -2.790007
+    },
+    {
+      "osmId": "node/4258387189",
+      "name": "Typewronger Books",
+      "town": "Edinburgh",
+      "address": "22 Bruntsfield Place, Edinburgh",
+      "website": "https://typewronger.com/",
+      "email": "info@typewronger.com",
+      "lat": 55.93979,
+      "lng": -3.2046911
+    },
+    {
+      "osmId": "node/4559846991",
+      "name": "Ullapool Bookshop",
+      "town": "Ullapool",
+      "address": "Quay Street, Ullapool",
+      "website": "https://www.ullapoolbookshop.co.uk/",
+      "email": "",
+      "lat": 57.895912,
+      "lng": -5.1599444
+    },
+    {
+      "osmId": "node/12478317022",
+      "name": "Unity Books",
+      "town": "Glasgow",
+      "address": "69 Dixon Road, Glasgow",
+      "website": "https://unitybooks.co.uk/",
+      "email": "office@unitybooks.co.uk",
+      "lat": 55.8333755,
+      "lng": -4.2528525
+    },
+    {
+      "osmId": "way/332101942",
+      "name": "Verey Books",
+      "town": "Pooley Bridge",
+      "address": "Pooley Bridge",
+      "website": "https://vereybooks.co.uk/",
+      "email": "",
+      "lat": 54.6123561,
+      "lng": -2.8200987
+    },
+    {
+      "osmId": "node/9875270739",
+      "name": "Village Bookshop",
+      "town": "Barnard Castle",
+      "address": "51 Market Place, Barnard Castle",
+      "website": "http://villagebookshop.co.uk/",
+      "email": "",
+      "lat": 54.6252173,
+      "lng": -2.0839101
+    },
+    {
+      "osmId": "node/5053838161",
+      "name": "Voltaire and Rousseau",
+      "town": "Glasgow",
+      "address": "12 Otago Lane, Glasgow",
+      "website": "https://voltaireandrousseaubooks.com/",
+      "email": "vandrbooks@gmail.com",
+      "lat": 55.8728343,
+      "lng": -4.2822065
+    },
+    {
+      "osmId": "node/10790085109",
+      "name": "Waterstones",
+      "town": "",
+      "address": "119-121 High Street",
+      "website": "https://www.waterstones.com/bookshops/falkirk",
+      "email": "",
+      "lat": 55.9990535,
+      "lng": -3.7842102
+    },
+    {
+      "osmId": "node/12173790811",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.876203,
+      "lng": -4.3656024
+    },
+    {
+      "osmId": "node/12191676770",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8198862,
+      "lng": -4.3424961
+    },
+    {
+      "osmId": "node/12246842176",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8697061,
+      "lng": -4.1360168
+    },
+    {
+      "osmId": "node/12559159032",
+      "name": "Waterstones",
+      "town": "Dumfries",
+      "address": "79-83 High Street, Dumfries",
+      "website": "https://www.waterstones.com/",
+      "email": "",
+      "lat": 55.067907,
+      "lng": -3.6103856
+    },
+    {
+      "osmId": "node/1468219484",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/glasgow-argyle-stree",
+      "email": "",
+      "lat": 55.8584158,
+      "lng": -4.2563008
+    },
+    {
+      "osmId": "node/1739484808",
+      "name": "Waterstones",
+      "town": "Carlisle",
+      "address": "66-68 Scotch Street, Carlisle",
+      "website": "https://www.waterstones.com/bookshops/carlisle",
+      "email": "",
+      "lat": 54.8950372,
+      "lng": -2.935626
+    },
+    {
+      "osmId": "node/1834245998",
+      "name": "Waterstones",
+      "town": "Oban",
+      "address": "12 George Street, Oban",
+      "website": "https://www.waterstones.com/bookshops/oban",
+      "email": "",
+      "lat": 56.4133139,
+      "lng": -5.4719973
+    },
+    {
+      "osmId": "node/2164036794",
+      "name": "Waterstones",
+      "town": "Edinburgh",
+      "address": "Fort Kinnaird, Edinburgh",
+      "website": "https://www.waterstones.com/bookshops/edinburgh-fort-kinnaird",
+      "email": "",
+      "lat": 55.9339738,
+      "lng": -3.1041716
+    },
+    {
+      "osmId": "node/2164585743",
+      "name": "Waterstones",
+      "town": "Aviemore",
+      "address": "87 Grampian Road, Aviemore",
+      "website": "https://www.waterstones.com/bookshops/aviemore",
+      "email": "",
+      "lat": 57.1891991,
+      "lng": -3.8298124
+    },
+    {
+      "osmId": "node/2331048461",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/newton-mearns",
+      "email": "",
+      "lat": 55.7723187,
+      "lng": -4.334319
+    },
+    {
+      "osmId": "node/2421592679",
+      "name": "Waterstones",
+      "town": "Edinburgh",
+      "address": "6 Lady Road, Edinburgh",
+      "website": "https://www.waterstones.com/bookshops/edinburgh-cameron-to",
+      "email": "",
+      "lat": 55.9273836,
+      "lng": -3.1644271
+    },
+    {
+      "osmId": "node/2609829797",
+      "name": "Waterstones",
+      "town": "Dundee",
+      "address": "35 Commercial Street, Dundee",
+      "website": "https://www.waterstones.com/bookshops/dundee",
+      "email": "dundee@waterstones.com",
+      "lat": 56.4613359,
+      "lng": -2.9674514
+    },
+    {
+      "osmId": "node/2937853708",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/inverness",
+      "email": "",
+      "lat": 57.479658,
+      "lng": -4.2203797
+    },
+    {
+      "osmId": "node/3553625052",
+      "name": "Waterstones",
+      "town": "Hexham",
+      "address": "33 Fore Street, Hexham",
+      "website": "https://www.waterstones.com/bookshops/hexham",
+      "email": "",
+      "lat": 54.9705126,
+      "lng": -2.1009304
+    },
+    {
+      "osmId": "node/3640518693",
+      "name": "Waterstones",
+      "town": "Ayr",
+      "address": "127-147 High Street, Ayr",
+      "website": "https://www.waterstones.com/bookshops/ayr",
+      "email": "",
+      "lat": 55.4620513,
+      "lng": -4.6299856
+    },
+    {
+      "osmId": "node/3960021179",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/kirkcaldy",
+      "email": "",
+      "lat": 56.1109347,
+      "lng": -3.1585267
+    },
+    {
+      "osmId": "node/4527162981",
+      "name": "Waterstones",
+      "town": "Perth",
+      "address": "Perth",
+      "website": "https://www.waterstones.com/bookshops/perth",
+      "email": "",
+      "lat": 56.396047,
+      "lng": -3.4301388
+    },
+    {
+      "osmId": "node/4532789648",
+      "name": "Waterstones",
+      "town": "Glasgow",
+      "address": "351-355 Byres Road, Glasgow",
+      "website": "https://www.waterstones.com/bookshops/glasgow-byres-road",
+      "email": "",
+      "lat": 55.8771651,
+      "lng": -4.2916954
+    },
+    {
+      "osmId": "node/4576965000",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/livingston",
+      "email": "",
+      "lat": 55.8837415,
+      "lng": -3.5165378
+    },
+    {
+      "osmId": "node/4787047463",
+      "name": "Waterstones",
+      "town": "",
+      "address": "153-157 Sauchiehall Street",
+      "website": "https://www.waterstones.com/bookshops/glasgow-sauchiehall-",
+      "email": "",
+      "lat": 55.8647259,
+      "lng": -4.2584339
+    },
+    {
+      "osmId": "node/5265989222",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/stirling-thistle-cen",
+      "email": "",
+      "lat": 56.1166951,
+      "lng": -3.9334498
+    },
+    {
+      "osmId": "node/587958560",
+      "name": "Waterstones",
+      "town": "Edinburgh",
+      "address": "128 Princes Street, Edinburgh",
+      "website": "https://www.waterstones.com/bookshops/edinburgh-west-end",
+      "email": "",
+      "lat": 55.9508088,
+      "lng": -3.2047963
+    },
+    {
+      "osmId": "node/6236563790",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/dunfermline",
+      "email": "",
+      "lat": 56.0725597,
+      "lng": -3.458798
+    },
+    {
+      "osmId": "node/6732213793",
+      "name": "Waterstones",
+      "town": "Aberdeen",
+      "address": "Bon Accord Centre, Aberdeen",
+      "website": "https://www.waterstones.com/bookshops/aberdeen",
+      "email": "",
+      "lat": 57.1486589,
+      "lng": -2.1002445
+    },
+    {
+      "osmId": "node/886194313",
+      "name": "Waterstones",
+      "town": "St Andrews",
+      "address": "101-103 Market Street, St Andrews",
+      "website": "https://www.waterstones.com/bookshops/st-andrews",
+      "email": "",
+      "lat": 56.3405291,
+      "lng": -2.7963092
+    },
+    {
+      "osmId": "way/296726607",
+      "name": "Waterstones",
+      "town": "",
+      "address": "",
+      "website": "https://www.waterstones.com/bookshops/edinburgh-gyle",
+      "email": "",
+      "lat": 55.9387995,
+      "lng": -3.31325
+    },
+    {
+      "osmId": "node/5197001292",
+      "name": "Whitie's Books & Crafts",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.6515908,
+      "lng": -3.188831
+    },
+    {
+      "osmId": "node/10233397501",
+      "name": "WHSmith",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.9483159,
+      "lng": -3.3645896
+    },
+    {
+      "osmId": "node/10266206239",
+      "name": "WHSmith",
+      "town": "Dyce",
+      "address": "Brent Road, Dyce",
+      "website": "",
+      "email": "",
+      "lat": 57.2002181,
+      "lng": -2.2031385
+    },
+    {
+      "osmId": "node/12096014386",
+      "name": "WHSmith",
+      "town": "Dyce",
+      "address": "Brent Road, Dyce",
+      "website": "",
+      "email": "",
+      "lat": 57.2000722,
+      "lng": -2.2039555
+    },
+    {
+      "osmId": "node/12328922482",
+      "name": "WHSmith",
+      "town": "Newcastle upon Tyne",
+      "address": "Newcastle upon Tyne",
+      "website": "https://www.newcastleairport.com/shop-eat-drink/shopping/whsmith/",
+      "email": "",
+      "lat": 55.0370932,
+      "lng": -1.7097688
+    },
+    {
+      "osmId": "node/321209857",
+      "name": "WHSmith",
+      "town": "St Andrews",
+      "address": "90-92 South Street, St Andrews",
+      "website": "https://www.tgjonesonline.co.uk/stores/south-street-st-andrews",
+      "email": "",
+      "lat": 56.339163,
+      "lng": -2.7959764
+    },
+    {
+      "osmId": "node/3469686850",
+      "name": "WHSmith",
+      "town": "Carlisle",
+      "address": "51-53 English Street, Carlisle",
+      "website": "https://www.tgjonesonline.co.uk/stores/english-street-carlisle",
+      "email": "",
+      "lat": 54.8932299,
+      "lng": -2.9347178
+    },
+    {
+      "osmId": "node/8252434758",
+      "name": "WHSmith",
+      "town": "Edinburgh",
+      "address": "51 Little France Crescent, Edinburgh",
+      "website": "",
+      "email": "",
+      "lat": 55.9218191,
+      "lng": -3.1354433
+    },
+    {
+      "osmId": "node/8944805701",
+      "name": "WHSmith",
+      "town": "Stranraer",
+      "address": "21 George Street, Stranraer",
+      "website": "https://www.tgjonesonline.co.uk/stores/george-street-stranraer",
+      "email": "",
+      "lat": 54.9045324,
+      "lng": -5.0267735
+    },
+    {
+      "osmId": "way/115678537",
+      "name": "WHSmith",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.5990164,
+      "lng": -2.4333946
+    },
+    {
+      "osmId": "node/2161252495",
+      "name": "Wild Fungarium",
+      "town": "Edinburgh",
+      "address": "13 Randolph Place, Edinburgh",
+      "website": "https://www.wildfungarium.com/",
+      "email": "",
+      "lat": 55.9512402,
+      "lng": -3.2100013
+    },
+    {
+      "osmId": "node/10189476686",
+      "name": "Yeadon's of Banchory",
+      "town": "Banchory",
+      "address": "20 Dee Street, Banchory",
+      "website": "",
+      "email": "",
+      "lat": 57.0504591,
+      "lng": -2.5021071
+    },
+    {
+      "osmId": "way/1107823209",
+      "name": "Yeadons of Elgin",
+      "town": "Elgin",
+      "address": "32 Commerce Street, Elgin",
+      "website": "https://www.yeadons.co.uk/",
+      "email": "",
+      "lat": 57.6481098,
+      "lng": -3.3129773
+    },
+    {
+      "osmId": "node/7255053413",
+      "name": "Young's Interesting Books",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 55.8296925,
+      "lng": -4.2810121
+    },
+    {
+      "osmId": "node/5107942379",
+      "name": "Zion Christian Bookstore",
+      "town": "Kirkcaldy",
+      "address": "46 High Street, Kirkcaldy",
+      "website": "",
+      "email": "",
+      "lat": 56.1079588,
+      "lng": -3.1599133
+    }
+  ]
 }
