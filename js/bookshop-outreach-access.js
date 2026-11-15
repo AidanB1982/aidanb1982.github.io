@@ -48,6 +48,35 @@
 
     let supabaseClient = null;
 
+    // Allow the Bookshop Outreach application to use
+    // the existing authenticated Supabase connection.
+    //
+    // This only exposes the public browser client,
+    // never the Supabase service-role key or
+    // Microsoft Graph credentials.
+    //
+    // Administrator permission is also checked
+    // independently inside the Edge Function.
+
+    window.blackwoodBookshopAuth = Object.freeze({
+        getClient: function () {
+            if (
+                !administratorApproved ||
+                !supabaseClient
+            ) {
+                throw new Error(
+                    "Bookshop administrator access is not verified."
+                );
+            }
+
+            return supabaseClient;
+        },
+
+        isAdministrator: function () {
+            return administratorApproved === true;
+        }
+    });
+
     let accessCheckVersion = 0;
 
     let outreachScriptPromise = null;
