@@ -20,7 +20,7 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
+body.bookshop-outreach-page {
   margin: 0;
   min-height: 100vh;
   background: var(--bg);
@@ -28,37 +28,45 @@ body {
   font-family: Georgia, "Times New Roman", serif;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+/* =========================================
+   SHARED BLACKWOOD HEADER INTEGRATION
+========================================= */
+
+/*
+ * The shared website navigation is positioned
+ * independently of the Bookshop Outreach header.
+ *
+ * Reserve space before the outreach title so
+ * the two headers cannot visually overlap.
+ */
+
+body.bookshop-outreach-page
+#bookshop-admin-content {
+  padding-top: 110px;
 }
 
-button {
-  cursor: pointer;
-}
+/*
+ * Keep the outreach page title separate from
+ * the shared website header.
+ */
 
-button:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-a {
-  color: #e7bd83;
-}
-
-a:hover {
-  color: #ffe1ad;
-}
-
-.page-header {
-  padding: 30px clamp(20px, 5vw, 70px);
+body.bookshop-outreach-page
+.bookshop-page-intro {
+  position: relative;
+  z-index: 1;
+  padding: 28px clamp(20px, 5vw, 70px) 30px;
   background: #151a17;
   border-bottom: 1px solid #b8733340;
 }
 
-.eyebrow {
+/*
+ * These selectors are intentionally scoped.
+ * They must not affect the Blackwood logo,
+ * navigation or shared header components.
+ */
+
+body.bookshop-outreach-page
+.bookshop-page-intro .eyebrow {
   margin: 0 0 12px;
   color: var(--gold);
   font: 11px/1.6 Arial, sans-serif;
@@ -66,18 +74,83 @@ a:hover {
   text-transform: uppercase;
 }
 
-.page-header h1 {
-  margin: 0 0 15px;
+body.bookshop-outreach-page
+.bookshop-page-intro h1 {
+  margin: 0 0 12px;
+  color: var(--text);
   font-size: clamp(2.2rem, 5vw, 3.6rem);
   font-weight: 400;
   line-height: 1.15;
 }
 
-.page-header > p:last-child {
-  margin-bottom: 0;
+body.bookshop-outreach-page
+.bookshop-page-intro > p:last-child {
+  margin: 0;
   color: var(--muted);
   line-height: 1.7;
 }
+
+/*
+ * Apply the same spacing to the access screen
+ * while administrator verification is running.
+ */
+
+body.bookshop-outreach-page
+.bookshop-access-wrap {
+  margin-top: 140px;
+}
+
+/*
+ * Never reveal the administrator workspace
+ * while the HTML hidden attribute is present.
+ */
+
+#bookshop-admin-content[hidden],
+#bookshop-access-screen[hidden] {
+  display: none !important;
+}
+
+/* =========================================
+   OUTREACH BASE ELEMENTS
+========================================= */
+
+body.bookshop-outreach-page button,
+body.bookshop-outreach-page input,
+body.bookshop-outreach-page select,
+body.bookshop-outreach-page textarea {
+  font: inherit;
+}
+
+body.bookshop-outreach-page button {
+  cursor: pointer;
+}
+
+body.bookshop-outreach-page button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+body.bookshop-outreach-page
+#bookshop-admin-content a {
+  color: #e7bd83;
+}
+
+body.bookshop-outreach-page
+#bookshop-admin-content a:hover {
+  color: #ffe1ad;
+}
+
+#bookshop-admin-content .eyebrow {
+  margin: 0 0 12px;
+  color: var(--gold);
+  font: 11px/1.6 Arial, sans-serif;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+/* =========================================
+   MAIN WORKSPACE
+========================================= */
 
 .outreach-wrap {
   width: min(100%, 1300px);
@@ -105,6 +178,10 @@ a:hover {
   font: 14px/1.7 Arial, sans-serif;
 }
 
+/* =========================================
+   TOOLBARS AND FORMS
+========================================= */
+
 .toolbar,
 .finder-controls,
 .form-actions,
@@ -128,9 +205,9 @@ a:hover {
   flex: 0 1 180px;
 }
 
-input,
-select,
-textarea {
+#bookshop-admin-content input,
+#bookshop-admin-content select,
+#bookshop-admin-content textarea {
   min-width: 0;
   padding: 12px;
   color: #f2ede3;
@@ -139,16 +216,20 @@ textarea {
   border-radius: 5px;
 }
 
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-button:focus-visible,
-a:focus-visible {
+#bookshop-admin-content input:focus-visible,
+#bookshop-admin-content select:focus-visible,
+#bookshop-admin-content textarea:focus-visible,
+#bookshop-admin-content button:focus-visible,
+#bookshop-admin-content a:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 3px;
 }
 
-.btn {
+/* =========================================
+   BUTTONS
+========================================= */
+
+#bookshop-admin-content .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -163,23 +244,27 @@ a:focus-visible {
   text-align: center;
 }
 
-.btn:hover:not(:disabled) {
+#bookshop-admin-content .btn:hover:not(:disabled) {
   background: #cb8844;
 }
 
-.btn.secondary {
+#bookshop-admin-content .btn.secondary {
   background: transparent;
   color: #e9c99b;
 }
 
-.btn.secondary:hover:not(:disabled) {
+#bookshop-admin-content .btn.secondary:hover:not(:disabled) {
   background: #2d251c;
 }
 
-.btn.small {
+#bookshop-admin-content .btn.small {
   padding: 8px 11px;
   font-size: 12px;
 }
+
+/* =========================================
+   DIRECTORY AND MAP LAYOUT
+========================================= */
 
 .workspace-grid {
   display: grid;
@@ -228,6 +313,10 @@ a:focus-visible {
   gap: 8px;
 }
 
+/* =========================================
+   DISCOVERY RESULTS
+========================================= */
+
 .discovery-results {
   display: grid;
   grid-template-columns:
@@ -247,6 +336,10 @@ a:focus-visible {
   font: 11px Arial, sans-serif;
   letter-spacing: .04em;
 }
+
+/* =========================================
+   FEEDBACK AND NOTICES
+========================================= */
 
 .feedback {
   min-height: 24px;
@@ -273,6 +366,10 @@ a:focus-visible {
   color: var(--muted);
   font: 14px/1.7 Arial, sans-serif;
 }
+
+/* =========================================
+   BOOKSHOP EDITOR
+========================================= */
 
 .editor-panel {
   margin-top: 22px;
@@ -305,6 +402,10 @@ a:focus-visible {
   margin-top: 18px;
 }
 
+/* =========================================
+   MAP LEGEND
+========================================= */
+
 .map-legend {
   display: flex;
   flex-wrap: wrap;
@@ -331,6 +432,10 @@ a:focus-visible {
   background: var(--teal);
 }
 
+/* =========================================
+   SCREEN READER UTILITIES
+========================================= */
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -343,11 +448,16 @@ a:focus-visible {
   border: 0;
 }
 
+/* =========================================
+   LEAFLET MAP
+========================================= */
+
 /*
  * Leaflet isolation.
- * Do not force tile dimensions or override tile transforms.
- * Leaflet manages both internally.
+ * Do not override tile transforms.
+ * Leaflet manages these internally.
  */
+
 #map {
   position: relative;
   display: block;
@@ -363,8 +473,8 @@ a:focus-visible {
   font-family: Arial, sans-serif;
 }
 
+/* Keep Leaflet tiles independent of site images. */
 
-/* Keep Leaflet tiles independent of site image styling. */
 #map .leaflet-pane img,
 #map .leaflet-tile {
   max-width: none !important;
@@ -376,20 +486,35 @@ a:focus-visible {
   box-shadow: none !important;
 }
 
-/* Preserve Leaflet's positioning and transforms. */
+/* Preserve Leaflet positioning. */
+
 #map .leaflet-map-pane,
 #map .leaflet-tile-pane,
 #map .leaflet-layer {
   position: absolute;
 }
 
-
 #map .leaflet-popup-content {
   color: #222;
   font-family: Arial, sans-serif;
 }
 
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
+
 @media (max-width: 850px) {
+
+  body.bookshop-outreach-page
+  #bookshop-admin-content {
+    padding-top: 95px;
+  }
+
+  body.bookshop-outreach-page
+  .bookshop-access-wrap {
+    margin-top: 120px;
+  }
+
   .workspace-grid {
     grid-template-columns: 1fr;
   }
@@ -404,6 +529,27 @@ a:focus-visible {
 }
 
 @media (max-width: 520px) {
+
+  body.bookshop-outreach-page
+  #bookshop-admin-content {
+    padding-top: 85px;
+  }
+
+  body.bookshop-outreach-page
+  .bookshop-page-intro {
+    padding: 24px 20px;
+  }
+
+  body.bookshop-outreach-page
+  .bookshop-page-intro h1 {
+    font-size: clamp(2rem, 9vw, 2.8rem);
+  }
+
+  body.bookshop-outreach-page
+  .bookshop-access-wrap {
+    margin-top: 105px;
+  }
+
   .fields {
     grid-template-columns: 1fr;
   }
@@ -423,7 +569,9 @@ a:focus-visible {
   }
 }
 
-/* Compact, expandable bookshop directory */
+/* =========================================
+   COMPACT EXPANDABLE DIRECTORY
+========================================= */
 
 .shop {
   padding: 0;
@@ -489,19 +637,9 @@ a:focus-visible {
   outline-offset: -3px;
 }
 
-@media (max-width: 520px) {
-  .shop-summary {
-    padding: 15px;
-  }
-
-  .shop-expanded {
-    padding: 0 15px 15px;
-  }
-}
-
 /* =========================================
    LEAFLET MAP LAYOUT REPAIR
-   Keep at the END of bookshop-outreach.css
+   KEEP THESE RULES IN PLACE
 ========================================= */
 
 #map.leaflet-container {
@@ -600,6 +738,11 @@ a:focus-visible {
 #map .leaflet-control-attribution a {
   color: #0078a8;
 }
+
+/* =========================================
+   CHAIN FILTER
+========================================= */
+
 .chain-filter {
   display: inline-flex;
   align-items: center;
@@ -614,5 +757,20 @@ a:focus-visible {
   height: 18px;
   accent-color: #c9a66b;
   cursor: pointer;
+}
+
+/* =========================================
+   SMALL SCREEN DIRECTORY
+========================================= */
+
+@media (max-width: 520px) {
+
+  .shop-summary {
+    padding: 15px;
+  }
+
+  .shop-expanded {
+    padding: 0 15px 15px;
+  }
 }
 
