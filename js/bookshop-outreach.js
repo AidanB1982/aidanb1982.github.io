@@ -16,13 +16,15 @@ const NOMINATIM_URL =
 
 
 const OVERPASS_ENDPOINTS = [
+
+const OVERPASS_ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter"
 ];
 
-
 const MAX_RESULTS = 60;
-const REQUEST_TIMEOUT_MS = 25000;
+const REQUEST_TIMEOUT_MS = 12000;
+
 
 const $ = id => document.getElementById(id);
 
@@ -783,9 +785,10 @@ async function geocodeTown(town) {
   };
 }
 
+
 async function queryOverpass(lat, lng, radius) {
   const query = `
-    [out:json][timeout:20];
+    [out:json][timeout:10];
     (
       node["shop"="books"](around:${radius},${lat},${lng});
       way["shop"="books"](around:${radius},${lat},${lng});
@@ -794,35 +797,52 @@ async function queryOverpass(lat, lng, radius) {
     out center;
   `;
 
-  let lastError = null;
+  const errors = [];
 
   for (const endpoint of OVERPASS_ENDPOINTS) {
     try {
+      console.info(
+        "Searching bookshops using:",
+        endpoint
+      );
+
       const result = await fetchJSON(endpoint, {
         method: "POST",
         headers: {
           "Content-Type":
             "application/x-www-form-urlencoded;charset=UTF-8"
         },
-        body: new URLSearchParams({ data: query })
+        body: new URLSearchParams({
+          data: query
+        })
       });
 
       if (!Array.isArray(result.elements)) {
         throw new Error(
-          "Unexpected response from bookshop search."
+          "Unexpected response from the bookshop service."
         );
       }
 
       return result.elements;
+
     } catch (error) {
-      lastError = error;
+      errors.push(error.message);
+
       console.warn(
-        "Overpass endpoint unavailable:",
+        "Bookshop search endpoint failed:",
         endpoint,
         error
       );
     }
   }
+
+  throw new Error(
+    "Both public bookshop search servers are unavailable. " +
+    "Please try again in a few minutes. " +
+    `Details: ${errors.join(" | ")}`
+  );
+}
+
 
   throw lastError || new Error(
     "Bookshop search is unavailable."
