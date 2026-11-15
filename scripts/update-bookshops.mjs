@@ -2,9 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const OUTPUT = path.resolve(
-  "data/scotland-bookshops.json"
-);
+const OUTPUT = path.resolve("data/scotland-bookshops.json");
 
 const ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
@@ -29,6 +27,10 @@ const REGIONS = [
     bbox: [57.7, -8.7, 60.9, -0.7]
   }
 ];
+
+const REQUEST_TIMEOUT_MS = 45000;
+const MAX_ATTEMPTS_PER_ENDPOINT = 2;
+const PAUSE_BETWEEN_REQUESTS_MS = 2500;
 
 const pause = ms =>
   new Promise(resolve => setTimeout(resolve, ms));
@@ -151,7 +153,7 @@ function makeQuery(bbox) {
   const bounds = bbox.join(",");
 
   return `
-    [out:json][timeout:90];
+    [out:json][timeout:35];
     (
       node["shop"="books"](${bounds});
       way["shop"="books"](${bounds});
@@ -161,12 +163,38 @@ function makeQuery(bbox) {
   `;
 }
 
+function splitRegion(region) {
+  const [south, west, north, east] = region.bbox;
+
+  const middleLat = (south + north) / 2;
+  const middleLng = (west + east) / 2;
+
+  return [
+    {
+      name: `${region.name} — southwest`,
+      bbox: [south, west, middleLat, middleLng]
+    },
+    {
+      name: `${region.name} — southeast`,
+      bbox: [south, middleLng, middleLat, east]
+    },
+    {
+      name: `${region.name} — northwest`,
+      bbox: [middleLat, west, north, middleLng]
+    },
+    {
+      name: `${region.name} — northeast`,
+      bbox: [middleLat, middleLng, north, east]
+    }
+  ];
+}
+
 async function requestEndpoint(endpoint, query) {
   const controller = new AbortController();
 
   const timer = setTimeout(
     () => controller.abort(),
-    110000
+    REQUEST_TIMEOUT_MS
   );
 
   try {
@@ -176,7 +204,7 @@ async function requestEndpoint(endpoint, query) {
         "Content-Type":
           "application/x-www-form-urlencoded;charset=UTF-8",
         "User-Agent":
-          "BlackwoodPublishing-BookshopDirectory/1.0"
+          "BlackwoodPublishing-BookshopDirectory/2.0"
       },
       body: new URLSearchParams({
         data: query
@@ -185,17 +213,13 @@ async function requestEndpoint(endpoint, query) {
     });
 
     if (!response.ok) {
-      throw new Error(
-        `HTTP ${response.status}`
-      );
+      throw new Error(`HTTP ${response.status}`);
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data.elements)) {
-      throw new Error(
-        "Invalid Overpass response"
-      );
+      throw new Error("Invalid Overpass response");
     }
 
     return data.elements;
@@ -204,14 +228,18 @@ async function requestEndpoint(endpoint, query) {
   }
 }
 
-async function fetchRegion(region) {
-  const query = makeQuery(region.bbox);
+async function fetchTile(tile) {
+  const query = makeQuery(tile.bbox);
 
   for (const endpoint of ENDPOINTS) {
-    for (let attempt = 1; attempt <= 2; attempt++) {
+    for (
+      let attempt = 1;
+      attempt <= MAX_ATTEMPTS_PER_ENDPOINT;
+      attempt++
+    ) {
       try {
         console.log(
-          `${region.name}: ${endpoint}, attempt ${attempt}`
+          `${tile.name}: ${endpoint}, attempt ${attempt}`
         );
 
         const elements = await requestEndpoint(
@@ -220,53 +248,168 @@ async function fetchRegion(region) {
         );
 
         console.log(
-          `${region.name}: received ${elements.length} elements`
+          `${tile.name}: received ${elements.length} elements`
         );
 
         return elements;
       } catch (error) {
         console.warn(
-          `${region.name}: ${error.message}`
+          `${tile.name}: ${error.message}`
         );
 
-        await pause(3000 * attempt);
+        await pause(1500 * attempt);
       }
     }
   }
 
   throw new Error(
-    `Unable to retrieve ${region.name}`
+    `Unable to retrieve ${tile.name}`
   );
 }
 
-async function main() {
-  const unique = new Map();
+async function loadExistingData() {
+  try {
+    const content = await fs.readFile(
+      OUTPUT,
+      "utf8"
+    );
 
-  for (const region of REGIONS) {
-    const elements = await fetchRegion(region);
+    const data = JSON.parse(content);
 
-    for (const item of elements) {
-      const shop = parseShop(item);
-
-      if (shop) {
-        unique.set(shop.osmId, shop);
-      }
+    if (!Array.isArray(data.shops)) {
+      throw new Error("Existing shops array is invalid");
     }
 
-    await pause(5000);
+    return data;
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return {
+        source: "OpenStreetMap / Overpass",
+        region: "Scotland",
+        generatedAt: null,
+        count: 0,
+        shops: []
+      };
+    }
+
+    throw error;
+  }
+}
+
+function validExistingShop(shop) {
+  return (
+    shop &&
+    typeof shop.osmId === "string" &&
+    shop.osmId.length > 0 &&
+    typeof shop.name === "string" &&
+    shop.name.length > 0 &&
+    Number.isFinite(Number(shop.lat)) &&
+    Number.isFinite(Number(shop.lng))
+  );
+}
+
+function insideBounds(shop, bbox) {
+  const lat = Number(shop.lat);
+  const lng = Number(shop.lng);
+
+  return (
+    lat >= bbox[0] &&
+    lat <= bbox[2] &&
+    lng >= bbox[1] &&
+    lng <= bbox[3]
+  );
+}
+
+function mergeSuccessfulTile(unique, bbox, elements) {
+  // A successful tile is authoritative for its area.
+  // Remove stale records there, but retain all records
+  // outside it, including areas whose requests failed.
+  for (const [id, shop] of unique) {
+    if (insideBounds(shop, bbox)) {
+      unique.delete(id);
+    }
   }
 
-  const shops = [...unique.values()]
-    .sort((a, b) =>
-      a.name.localeCompare(
-        b.name,
-        "en-GB"
-      )
+  for (const item of elements) {
+    const shop = parseShop(item);
+
+    if (shop) {
+      unique.set(shop.osmId, shop);
+    }
+  }
+}
+
+async function main() {
+  const previous = await loadExistingData();
+  const unique = new Map();
+
+  for (const shop of previous.shops) {
+    if (validExistingShop(shop)) {
+      unique.set(shop.osmId, shop);
+    }
+  }
+
+  console.log(
+    `Loaded ${unique.size} existing bookshops.`
+  );
+
+  const tiles = REGIONS.flatMap(splitRegion);
+  const succeeded = [];
+  const failed = [];
+
+  for (let index = 0; index < tiles.length; index++) {
+    const tile = tiles[index];
+
+    console.log(
+      `\nTile ${index + 1}/${tiles.length}: ${tile.name}`
     );
+
+    try {
+      const elements = await fetchTile(tile);
+
+      mergeSuccessfulTile(
+        unique,
+        tile.bbox,
+        elements
+      );
+
+      succeeded.push(tile.name);
+    } catch (error) {
+      console.warn(
+        `Preserving existing records for ${tile.name}: ${error.message}`
+      );
+
+      failed.push(tile.name);
+    }
+
+    if (index < tiles.length - 1) {
+      await pause(PAUSE_BETWEEN_REQUESTS_MS);
+    }
+  }
+
+  console.log(
+    `Successful tiles: ${succeeded.length}/${tiles.length}`
+  );
+
+  console.log(
+    `Failed tiles: ${failed.length}/${tiles.length}`
+  );
+
+  if (succeeded.length === 0) {
+    throw new Error(
+      "Every Overpass request failed. Existing dataset preserved."
+    );
+  }
+
+  const shops = [...unique.values()].sort(
+    (a, b) =>
+      a.name.localeCompare(b.name, "en-GB") ||
+      a.osmId.localeCompare(b.osmId)
+  );
 
   if (shops.length === 0) {
     throw new Error(
-      "No bookshops returned. Existing data preserved."
+      "No bookshops available. Existing dataset preserved."
     );
   }
 
@@ -275,6 +418,14 @@ async function main() {
     region: "Scotland",
     generatedAt: new Date().toISOString(),
     count: shops.length,
+    coverage: {
+      totalTiles: tiles.length,
+      successfulTiles: succeeded.length,
+      failedTiles: failed.length,
+      complete: failed.length === 0,
+      succeeded,
+      failed
+    },
     shops
   };
 
@@ -283,15 +434,28 @@ async function main() {
     { recursive: true }
   );
 
+  const temporaryOutput = `${OUTPUT}.tmp`;
+
   await fs.writeFile(
-    OUTPUT,
+    temporaryOutput,
     JSON.stringify(output, null, 2) + "\n",
     "utf8"
+  );
+
+  await fs.rename(
+    temporaryOutput,
+    OUTPUT
   );
 
   console.log(
     `Saved ${shops.length} Scottish bookshops.`
   );
+
+  if (failed.length > 0) {
+    console.warn(
+      "Dataset is partially refreshed. Failed areas retain existing records."
+    );
+  }
 }
 
 main().catch(error => {
