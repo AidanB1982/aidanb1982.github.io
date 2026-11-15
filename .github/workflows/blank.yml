@@ -1,0 +1,16 @@
+
+name: Blackwood Workflow Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Confirm GitHub Actions works
+        run: echo "Blackwood Publishing workflow is working!"
