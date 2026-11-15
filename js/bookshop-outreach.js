@@ -3,26 +3,28 @@
 
 /*
  * BLACKWOOD PUBLISHING
- * Bookshop Outreach — GitHub Pages edition
+ * BOOKSHOP OUTREACH
  *
- * Discovery:
- * - Cached OpenStreetMap bookshop data
- * - Blackwood-curated bookshop data
- * - Distance search from a UK town or city
- * - Nominatim town lookup
+ * Independent bookshop discovery and relationship management.
+ *
+ * Features:
+ * - OpenStreetMap and Blackwood-curated discovery
+ * - UK town and city searches
  * - Optional major-chain filtering
+ * - Browser-local saved bookshop directory
+ * - Expandable directory cards
+ * - Leaflet map with bookshop markers
+ * - Add and edit bookshops
+ * - Outreach status tracking
+ * - Contact activity history
+ * - Follow-up reminders
+ * - Editable introduction and follow-up email templates
+ * - JSON backup export
  *
- * Management:
- * - Browser-local saved directory
- * - Expandable bookshop cards
- * - Leaflet map markers
- * - Add/edit records
- * - Search and status filtering
- * - JSON export
- * - Editable manual email drafts
+ * Emails are NEVER sent automatically.
+ * Opening a mailto draft NEVER marks an email as sent.
  *
- * No emails are sent automatically.
- * No bookshops are published automatically.
+ * Existing localStorage records are preserved.
  */
 
 const STORAGE_KEY =
@@ -48,6 +50,14 @@ const STATUSES = {
   "opted-out": "Do not contact"
 };
 
+const CONTACT_TYPES = {
+  "email-sent": "Email sent",
+  "reply-received": "Reply received",
+  "phone-call": "Telephone call",
+  visit: "Bookshop visit",
+  note: "General note"
+};
+
 const MAJOR_CHAINS = new Set([
   "waterstones",
   "the works",
@@ -62,40 +72,73 @@ const MAJOR_CHAINS = new Set([
   "foyles"
 ]);
 
-const EMAIL_SUBJECT =
-  "Blackwood Publishing — bookshop stocking enquiry";
+const EMAIL_TEMPLATES = {
+  introduction: {
+    label: "Initial introduction",
+    subject:
+      "Blackwood Publishing — independent bookshop enquiry",
+    body: [
+      "Hello {bookshop},",
+      "",
+      "I'm getting in touch from Blackwood Publishing, an independent Scottish publishing imprint.",
+      "",
+      "We're introducing our paperback catalogue to independent bookshops and wondered whether selected titles might be suitable for your shelves.",
+      "",
+      "Our titles are available through IngramSpark, including:",
+      "",
+      "Gualachulain Bothy: The Second Silence — 9781919555560",
+      "Holdfast — 9781919555522",
+      "Love, Abused — 9781919555539",
+      "The Black Bothy — 9781919555584",
+      "Corrour: The First Summoning — 9781919555508",
+      "",
+      "We'd be happy to provide further information about our books, ordering and trade availability.",
+      "",
+      "Would you be interested in receiving our catalogue details?",
+      "",
+      "Thank you for your time and for supporting readers in your local community.",
+      "",
+      "Kind regards,",
+      "Aidan Blackwood",
+      "Blackwood Publishing",
+      "https://blackwoodpublishing.co.uk",
+      "",
+      "If you'd prefer not to receive further trade enquiries, please let us know."
+    ].join("\n")
+  },
 
-const EMAIL_TEMPLATE = [
-  "Hello,",
-  "",
-  "I'm getting in touch from Blackwood Publishing, an independent Scottish publishing imprint.",
-  "",
-  "We're introducing our paperback catalogue to independent bookshops and wondered whether selected titles might be suitable for your shelves.",
-  "",
-  "Our titles are available through IngramSpark, including:",
-  "",
-  "Gualachulain Bothy: The Second Silence — 9781919555560",
-  "Holdfast — 9781919555522",
-  "Love, Abused — 9781919555539",
-  "The Black Bothy — 9781919555584",
-  "Corrour: The First Summoning — 9781919555508",
-  "",
-  "We'd be happy to provide further information about our books, ordering and trade availability.",
-  "",
-  "Would you be interested in receiving our catalogue details?",
-  "",
-  "Kind regards,",
-  "Blackwood Publishing",
-  "https://blackwoodpublishing.co.uk",
-  "",
-  "If you'd prefer not to receive further trade enquiries, please let us know."
-].join("\n");
+  followup: {
+    label: "Friendly follow-up",
+    subject:
+      "Following up — Blackwood Publishing bookshop enquiry",
+    body: [
+      "Hello {bookshop},",
+      "",
+      "I hope you're well.",
+      "",
+      "I wanted to follow up on my earlier message introducing Blackwood Publishing and our paperback catalogue.",
+      "",
+      "I appreciate how busy independent bookshops are, so there's absolutely no pressure. I simply wanted to ask whether you might be interested in reviewing our catalogue or discussing potential stocking arrangements.",
+      "",
+      "Our titles are available through IngramSpark, and we'd be happy to share further book information and ordering details.",
+      "",
+      "Thank you again for your time.",
+      "",
+      "Kind regards,",
+      "Aidan Blackwood",
+      "Blackwood Publishing",
+      "https://blackwoodpublishing.co.uk",
+      "",
+      "If you'd prefer not to receive further trade enquiries, please let us know."
+    ].join("\n")
+  }
+};
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+  document.getElementById(id);
 
 let shops = loadShops();
 let discoveredShops = [];
-
 let bookshopDataset = null;
 
 let editingId = null;
@@ -109,13 +152,23 @@ let discoveredMarkers = null;
 
 let emailDialog = null;
 let emailRecipient = null;
+let emailTemplateSelect = null;
 let emailSubjectInput = null;
 let emailBodyInput = null;
 let emailFeedback = null;
 let activeEmailShopId = null;
 
+let contactDialog = null;
+let contactTypeSelect = null;
+let contactDateInput = null;
+let contactNotesInput = null;
+let contactFollowUpInput = null;
+let contactStatusSelect = null;
+let contactFeedback = null;
+let activeContactShopId = null;
+
 /* =========================================
-   HELPERS
+   GENERAL HELPERS
 ========================================= */
 
 function element(tag, text, className) {
@@ -138,7 +191,8 @@ function feedback(id, message, type = "") {
   if (!node) return;
 
   node.textContent = message;
-  node.className = `feedback ${type}`.trim();
+  node.className =
+    `feedback ${type}`.trim();
 }
 
 function normalise(value) {
@@ -222,6 +276,64 @@ function newId() {
   );
 }
 
+function localDate() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(
+    now.getMonth() + 1
+  ).padStart(2, "0");
+
+  const day = String(
+    now.getDate()
+  ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function validDate(value) {
+  if (
+    typeof value !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(value)
+  ) {
+    return false;
+  }
+
+  const date = new Date(
+    `${value}T12:00:00`
+  );
+
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date.getFullYear() ===
+      Number(value.slice(0, 4)) &&
+    date.getMonth() + 1 ===
+      Number(value.slice(5, 7)) &&
+    date.getDate() ===
+      Number(value.slice(8, 10))
+  );
+}
+
+function formatDate(value) {
+  if (!validDate(value)) {
+    return "Date not recorded";
+  }
+
+  return new Date(
+    `${value}T12:00:00`
+  ).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function activityHistory(shop) {
+  return Array.isArray(shop.contactHistory)
+    ? shop.contactHistory
+    : [];
+}
+
 function isMajorChain(shop) {
   const name = normalise(shop.name)
     .replace(/[’‘]/g, "'");
@@ -243,7 +355,8 @@ function visibleDiscoveredShops() {
 function updateDiscoveryFeedback() {
   if (!lastSearchTown) return;
 
-  const visible = visibleDiscoveredShops();
+  const visible =
+    visibleDiscoveredShops();
 
   const hidden = discoveredShops.filter(
     isMajorChain
@@ -279,10 +392,14 @@ function updateDiscoveryFeedback() {
 function loadShops() {
   try {
     const data = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) || "[]"
+      localStorage.getItem(STORAGE_KEY) ||
+      "[]"
     );
 
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(data)
+      ? data
+      : [];
+
   } catch (error) {
     console.error(
       "Unable to load bookshops:",
@@ -303,6 +420,7 @@ function saveShops(nextShops) {
     shops = nextShops;
 
     return true;
+
   } catch (error) {
     console.error(
       "Unable to save bookshops:",
@@ -317,6 +435,29 @@ function saveShops(nextShops) {
 
     return false;
   }
+}
+
+function updateShopRecord(id, changes) {
+  const existing = shops.find(
+    shop => shop.id === id
+  );
+
+  if (!existing) {
+    return false;
+  }
+
+  const updated = {
+    ...existing,
+    ...changes
+  };
+
+  return saveShops(
+    shops.map(shop =>
+      shop.id === id
+        ? updated
+        : shop
+    )
+  );
 }
 
 function sameBookshop(a, b) {
@@ -372,11 +513,15 @@ function isDuplicate(
 /* =========================================
    LEAFLET MAP
 ========================================= */
+
 function bookshopIcon(type = "found") {
-  const saved = type === "saved";
+  const saved =
+    type === "saved";
 
   return L.divIcon({
-    className: "blackwood-book-marker",
+    className:
+      "blackwood-book-marker",
+
     html: `
       <span
         style="
@@ -386,7 +531,11 @@ function bookshopIcon(type = "found") {
           width:36px;
           height:36px;
           border-radius:50%;
-          background:${saved ? "#b87333" : "#4aabb0"};
+          background:${
+            saved
+              ? "#b87333"
+              : "#4aabb0"
+          };
           border:2px solid #f5ead5;
           box-shadow:0 3px 10px rgba(0,0,0,.35);
           font-size:20px;
@@ -395,11 +544,13 @@ function bookshopIcon(type = "found") {
         aria-hidden="true"
       >📚</span>
     `,
+
     iconSize: [40, 40],
     iconAnchor: [20, 20],
     popupAnchor: [0, -20]
   });
 }
+
 function initMap() {
   const mapElement = $("map");
 
@@ -439,22 +590,26 @@ function initMap() {
   });
 
   if ("ResizeObserver" in window) {
-    const observer = new ResizeObserver(() => {
-      requestAnimationFrame(() => {
-        map.invalidateSize({
-          pan: false
+    const observer =
+      new ResizeObserver(() => {
+        requestAnimationFrame(() => {
+          map.invalidateSize({
+            pan: false
+          });
         });
       });
-    });
 
     observer.observe(mapElement);
   }
 
-  window.addEventListener("resize", () => {
-    map.invalidateSize({
-      pan: false
-    });
-  });
+  window.addEventListener(
+    "resize",
+    () => {
+      map.invalidateSize({
+        pan: false
+      });
+    }
+  );
 }
 
 function fitMap(preferDiscovered = false) {
@@ -473,13 +628,154 @@ function fitMap(preferDiscovered = false) {
 
   if (!layers.length) return;
 
-  const bounds = L.featureGroup(layers)
-    .getBounds()
-    .pad(0.15);
+  const bounds =
+    L.featureGroup(layers)
+      .getBounds()
+      .pad(0.15);
 
   map.fitBounds(bounds, {
     maxZoom: 13
   });
+}
+
+/* =========================================
+   CONTACT TRACKING OVERVIEW
+========================================= */
+
+function ensureContactOverview() {
+  let overview =
+    $("bookshopContactOverview");
+
+  if (overview) return overview;
+
+  const toolbar =
+    document.querySelector(
+      "#bookshop-admin-content .toolbar"
+    );
+
+  if (!toolbar) return null;
+
+  overview = element(
+    "section",
+    undefined,
+    "bookshop-contact-overview"
+  );
+
+  overview.id =
+    "bookshopContactOverview";
+
+  overview.setAttribute(
+    "aria-label",
+    "Bookshop outreach overview"
+  );
+
+  Object.assign(overview.style, {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+    margin: "0 0 22px"
+  });
+
+  toolbar.insertAdjacentElement(
+    "afterend",
+    overview
+  );
+
+  return overview;
+}
+
+function renderContactOverview() {
+  const overview =
+    ensureContactOverview();
+
+  if (!overview) return;
+
+  const counts = {
+    prospect: 0,
+    contacted: 0,
+    interested: 0,
+    stockist: 0,
+    due: 0
+  };
+
+  const today = localDate();
+
+  for (const shop of shops) {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        counts,
+        shop.status
+      )
+    ) {
+      counts[shop.status] += 1;
+    }
+
+    if (
+      shop.status !== "opted-out" &&
+      shop.status !== "stockist" &&
+      validDate(shop.followUpDate) &&
+      shop.followUpDate <= today
+    ) {
+      counts.due += 1;
+    }
+  }
+
+  const items = [
+    ["Saved bookshops", shops.length],
+    ["Prospects", counts.prospect],
+    ["Contacted", counts.contacted],
+    ["Interested", counts.interested],
+    ["Stockists", counts.stockist],
+    ["Follow-ups due", counts.due]
+  ];
+
+  overview.replaceChildren();
+
+  for (const [label, count] of items) {
+    const card = element(
+      "div",
+      undefined,
+      "bookshop-overview-stat"
+    );
+
+    Object.assign(card.style, {
+      flex: "1 1 135px",
+      padding: "15px",
+      background: "#1c231f",
+      border: "1px solid #544332",
+      borderRadius: "8px"
+    });
+
+    const number = element(
+      "strong",
+      String(count)
+    );
+
+    Object.assign(number.style, {
+      display: "block",
+      color: "#e7bd83",
+      fontSize: "25px",
+      fontWeight: "400",
+      marginBottom: "5px"
+    });
+
+    const caption = element(
+      "span",
+      label
+    );
+
+    Object.assign(caption.style, {
+      font: "12px/1.5 Arial, sans-serif",
+      color: "#c9c7bd"
+    });
+
+    card.append(
+      number,
+      caption
+    );
+
+    overview.append(card);
+  }
 }
 
 /* =========================================
@@ -515,6 +811,8 @@ function renderSaved() {
   if (savedMarkers) {
     savedMarkers.clearLayers();
   }
+
+  renderContactOverview();
 
   if (!results.length) {
     list.append(
@@ -597,7 +895,8 @@ function renderSaved() {
       element(
         "p",
         `Outreach: ${
-          STATUSES[shop.status] || "Prospect"
+          STATUSES[shop.status] ||
+          "Prospect"
         }`
       )
     );
@@ -609,6 +908,122 @@ function renderSaved() {
           `Email: ${shop.email}`
         )
       );
+    }
+
+    const history =
+      activityHistory(shop);
+
+    if (history.length) {
+      const latest = [...history]
+        .sort((a, b) =>
+          String(b.date || "")
+            .localeCompare(
+              String(a.date || "")
+            )
+        )[0];
+
+      content.append(
+        element(
+          "p",
+          `Last activity: ${
+            CONTACT_TYPES[latest.type] ||
+            "Contact note"
+          } · ${formatDate(latest.date)}`
+        )
+      );
+    }
+
+    if (validDate(shop.followUpDate)) {
+      const due =
+        shop.followUpDate <= localDate() &&
+        shop.status !== "opted-out" &&
+        shop.status !== "stockist";
+
+      const reminder = element(
+        "p",
+        `${
+          due
+            ? "Follow-up due"
+            : "Next follow-up"
+        }: ${formatDate(shop.followUpDate)}`
+      );
+
+      if (due) {
+        reminder.style.color =
+          "#e7bd83";
+
+        reminder.style.fontWeight =
+          "bold";
+      }
+
+      content.append(reminder);
+    }
+
+    if (history.length) {
+      const historyHeading = element(
+        "h4",
+        "Contact history"
+      );
+
+      historyHeading.style.margin =
+        "20px 0 10px";
+
+      historyHeading.style.color =
+        "#e7bd83";
+
+      content.append(
+        historyHeading
+      );
+
+      const historyList =
+        document.createElement("ul");
+
+      Object.assign(
+        historyList.style,
+        {
+          paddingLeft: "20px",
+          margin: "0 0 15px"
+        }
+      );
+
+      const sorted = [...history]
+        .sort((a, b) =>
+          String(b.date || "")
+            .localeCompare(
+              String(a.date || "")
+            )
+        );
+
+      for (const entry of sorted) {
+        const item =
+          document.createElement("li");
+
+        item.style.marginBottom =
+          "10px";
+
+        const label = element(
+          "strong",
+          `${
+            CONTACT_TYPES[entry.type] ||
+            "Contact note"
+          } — ${formatDate(entry.date)}`
+        );
+
+        item.append(label);
+
+        if (entry.notes) {
+          item.append(
+            element(
+              "p",
+              entry.notes
+            )
+          );
+        }
+
+        historyList.append(item);
+      }
+
+      content.append(historyList);
     }
 
     const actions = element(
@@ -625,9 +1040,15 @@ function renderSaved() {
       )
     );
 
-    const website = safeWebsite(
-      shop.website
+    actions.append(
+      makeButton(
+        "Record contact",
+        () => openContactDialog(shop)
+      )
     );
+
+    const website =
+      safeWebsite(shop.website);
 
     if (website) {
       actions.append(
@@ -665,12 +1086,13 @@ function renderSaved() {
       validCoordinates(shop)
     ) {
       const marker = L.marker(
-  [shop.lat, shop.lng],
-  {
-    icon: bookshopIcon("saved"),
-    title: `${shop.name} — ${shop.town}`
-  }
-);
+        [shop.lat, shop.lng],
+        {
+          icon: bookshopIcon("saved"),
+          title:
+            `${shop.name} — ${shop.town}`
+        }
+      );
 
       marker.bindPopup(
         element(
@@ -698,7 +1120,8 @@ function renderDiscovered() {
     discoveredMarkers.clearLayers();
   }
 
-  const visible = visibleDiscoveredShops();
+  const visible =
+    visibleDiscoveredShops();
 
   for (const shop of visible) {
     const card = element(
@@ -718,7 +1141,10 @@ function renderDiscovered() {
         sourceLabel,
         "result-meta"
       ),
-      element("h3", shop.name),
+      element(
+        "h3",
+        shop.name
+      ),
       element(
         "p",
         shop.address || shop.town
@@ -749,7 +1175,8 @@ function renderDiscovered() {
       "result-actions"
     );
 
-    const duplicate = isDuplicate(shop);
+    const duplicate =
+      isDuplicate(shop);
 
     const addButton = makeButton(
       duplicate
@@ -758,13 +1185,13 @@ function renderDiscovered() {
       () => addDiscovered(shop)
     );
 
-    addButton.disabled = duplicate;
+    addButton.disabled =
+      duplicate;
 
     actions.append(addButton);
 
-    const website = safeWebsite(
-      shop.website
-    );
+    const website =
+      safeWebsite(shop.website);
 
     if (website) {
       actions.append(
@@ -813,12 +1240,12 @@ function renderDiscovered() {
       validCoordinates(shop)
     ) {
       const marker = L.marker(
-  [shop.lat, shop.lng],
-  {
-    icon: bookshopIcon("found"),
-    title: shop.name
-  }
-);
+        [shop.lat, shop.lng],
+        {
+          icon: bookshopIcon("found"),
+          title: shop.name
+        }
+      );
 
       marker.bindPopup(
         element(
@@ -864,8 +1291,12 @@ function editShop(id) {
 
   editingId = id;
 
-  $("name").value = shop.name;
-  $("town").value = shop.town;
+  $("name").value =
+    shop.name;
+
+  $("town").value =
+    shop.town;
+
   $("email").value =
     shop.email || "";
 
@@ -913,6 +1344,10 @@ function addDiscovered(shop) {
     lat: shop.lat,
     lng: shop.lng,
     status: "prospect",
+
+    contactHistory: [],
+    followUpDate: "",
+
     notes: [
       shop.source === "curated"
         ? "Discovered in the Blackwood curated bookshop list."
@@ -921,7 +1356,8 @@ function addDiscovered(shop) {
         ? `OSM reference: ${shop.osmId}`
         : "",
       `Address: ${
-        shop.address || "Not supplied"
+        shop.address ||
+        "Not supplied"
       }`,
       "Independent status and trading status require review.",
       "Contact details and stocking policy require review."
@@ -930,7 +1366,10 @@ function addDiscovered(shop) {
       .join("\n")
   };
 
-  if (!saveShops([...shops, record])) {
+  if (!saveShops([
+    ...shops,
+    record
+  ])) {
     return;
   }
 
@@ -972,24 +1411,54 @@ function saveForm(event) {
     : null;
 
   const record = {
+    /*
+     * Preserve every existing property,
+     * including contact history and future
+     * tracking fields.
+     */
+    ...(previous || {}),
+
     id: editingId || newId(),
-    osmId: previous?.osmId || "",
-    name: $("name").value.trim(),
-    town: $("town").value.trim(),
-    email: $("email").value.trim(),
+
+    osmId:
+      previous?.osmId || "",
+
+    name:
+      $("name").value.trim(),
+
+    town:
+      $("town").value.trim(),
+
+    email:
+      $("email").value.trim(),
+
     website: safeWebsite(
       $("website").value.trim()
     ),
+
     lat:
       latText === ""
         ? null
         : Number(latText),
+
     lng:
       lngText === ""
         ? null
         : Number(lngText),
-    status: $("status").value,
-    notes: $("notes").value.trim()
+
+    status:
+      $("status").value,
+
+    notes:
+      $("notes").value.trim(),
+
+    contactHistory:
+      activityHistory(
+        previous || {}
+      ),
+
+    followUpDate:
+      previous?.followUpDate || ""
   };
 
   if (
@@ -1059,17 +1528,15 @@ function saveForm(event) {
 }
 
 /* =========================================
-   EDITABLE EMAIL COMPOSER
+   SHARED DIALOG HELPERS
 ========================================= */
 
-function createEmailComposer() {
-  const dialog = document.createElement("dialog");
-
-  dialog.id = "blackwoodEmailDialog";
-
+function styleDialog(dialog) {
   Object.assign(dialog.style, {
-    width: "min(720px, calc(100vw - 32px))",
-    maxHeight: "calc(100vh - 32px)",
+    width:
+      "min(720px, calc(100vw - 32px))",
+    maxHeight:
+      "calc(100vh - 32px)",
     overflowY: "auto",
     padding: "24px",
     border: "1px solid #8b693d",
@@ -1078,14 +1545,119 @@ function createEmailComposer() {
     color: "#f5ead5",
     boxSizing: "border-box"
   });
+}
+
+function styleDialogControl(control) {
+  Object.assign(control.style, {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "10px 12px",
+    borderRadius: "6px",
+    border: "1px solid #806344",
+    background: "#202923",
+    color: "#fff",
+    font: "inherit"
+  });
+}
+
+function dialogField(labelText, control) {
+  const label =
+    document.createElement("label");
+
+  Object.assign(label.style, {
+    display: "grid",
+    gap: "6px"
+  });
+
+  label.append(
+    element(
+      "span",
+      labelText
+    ),
+    control
+  );
+
+  return label;
+}
+
+function dialogForm() {
+  const form =
+    document.createElement("form");
+
+  form.method = "dialog";
+
+  Object.assign(form.style, {
+    display: "grid",
+    gap: "14px"
+  });
+
+  return form;
+}
+
+/* =========================================
+   EMAIL TEMPLATES
+========================================= */
+
+function personaliseTemplate(
+  template,
+  shop
+) {
+  return template.replaceAll(
+    "{bookshop}",
+    shop.name
+  );
+}
+
+function applyEmailTemplate() {
+  const shop = shops.find(
+    item =>
+      item.id === activeEmailShopId
+  );
+
+  if (!shop) return;
+
+  const template =
+    EMAIL_TEMPLATES[
+      emailTemplateSelect.value
+    ];
+
+  if (!template) return;
+
+  emailSubjectInput.value =
+    template.subject;
+
+  emailBodyInput.value =
+    personaliseTemplate(
+      template.body,
+      shop
+    );
+
+  emailFeedback.textContent = "";
+}
+
+/* =========================================
+   EDITABLE EMAIL COMPOSER
+========================================= */
+
+function createEmailComposer() {
+  const dialog =
+    document.createElement("dialog");
+
+  dialog.id =
+    "blackwoodEmailDialog";
+
+  styleDialog(dialog);
 
   const heading = element(
     "h2",
     "Contact bookshop"
   );
 
-  heading.id = "blackwoodEmailHeading";
-  heading.style.marginTop = "0";
+  heading.id =
+    "blackwoodEmailHeading";
+
+  heading.style.marginTop =
+    "0";
 
   dialog.setAttribute(
     "aria-labelledby",
@@ -1094,66 +1666,85 @@ function createEmailComposer() {
 
   const description = element(
     "p",
-    "Edit your message below. Opening the draft does not send the email."
+    "Choose a template, personalise your message and open it in your email application. Nothing is sent automatically."
   );
 
-  const form = document.createElement("form");
-  form.method = "dialog";
+  const form =
+    dialogForm();
 
-  Object.assign(form.style, {
-    display: "grid",
-    gap: "14px"
-  });
+  emailRecipient =
+    document.createElement("input");
 
-  function createField(labelText, control) {
-    const label = document.createElement("label");
+  emailRecipient.type =
+    "email";
 
-    Object.assign(label.style, {
-      display: "grid",
-      gap: "6px"
-    });
+  emailRecipient.readOnly =
+    true;
 
-    const caption = element(
-      "span",
-      labelText
+  styleDialogControl(
+    emailRecipient
+  );
+
+  emailTemplateSelect =
+    document.createElement("select");
+
+  styleDialogControl(
+    emailTemplateSelect
+  );
+
+  for (
+    const [key, template]
+    of Object.entries(
+      EMAIL_TEMPLATES
+    )
+  ) {
+    emailTemplateSelect.add(
+      new Option(
+        template.label,
+        key
+      )
     );
-
-    label.append(caption, control);
-
-    return label;
   }
 
-  function styleControl(control) {
-    Object.assign(control.style, {
-      width: "100%",
-      boxSizing: "border-box",
-      padding: "10px 12px",
-      borderRadius: "6px",
-      border: "1px solid #806344",
-      background: "#202923",
-      color: "#fff",
-      font: "inherit"
-    });
-  }
+  emailTemplateSelect.addEventListener(
+    "change",
+    applyEmailTemplate
+  );
 
-  emailRecipient = document.createElement("input");
-  emailRecipient.type = "email";
-  emailRecipient.readOnly = true;
-  styleControl(emailRecipient);
+  emailSubjectInput =
+    document.createElement("input");
 
-  emailSubjectInput = document.createElement("input");
-  emailSubjectInput.type = "text";
-  emailSubjectInput.required = true;
-  emailSubjectInput.maxLength = 200;
-  styleControl(emailSubjectInput);
+  emailSubjectInput.type =
+    "text";
 
-  emailBodyInput = document.createElement("textarea");
-  emailBodyInput.required = true;
-  emailBodyInput.rows = 16;
-  styleControl(emailBodyInput);
+  emailSubjectInput.required =
+    true;
 
-  emailBodyInput.style.resize = "vertical";
-  emailBodyInput.style.minHeight = "240px";
+  emailSubjectInput.maxLength =
+    200;
+
+  styleDialogControl(
+    emailSubjectInput
+  );
+
+  emailBodyInput =
+    document.createElement("textarea");
+
+  emailBodyInput.required =
+    true;
+
+  emailBodyInput.rows =
+    16;
+
+  styleDialogControl(
+    emailBodyInput
+  );
+
+  emailBodyInput.style.resize =
+    "vertical";
+
+  emailBodyInput.style.minHeight =
+    "240px";
 
   emailFeedback = element(
     "p",
@@ -1172,25 +1763,39 @@ function createEmailComposer() {
     "form-actions"
   );
 
-  Object.assign(actions.style, {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "10px"
-  });
-
   const openButton = makeButton(
     "Open email draft",
-    () => openPreparedEmail()
+    openPreparedEmail
   );
 
   const copyButton = makeButton(
     "Copy message",
-    () => copyPreparedEmail(),
+    copyPreparedEmail,
+    true
+  );
+
+  const recordButton = makeButton(
+    "Record sent email",
+    () => {
+      const shop = shops.find(
+        item =>
+          item.id === activeEmailShopId
+      );
+
+      if (!shop) return;
+
+      dialog.close();
+
+      openContactDialog(
+        shop,
+        "email-sent"
+      );
+    },
     true
   );
 
   const cancelButton = makeButton(
-    "Cancel",
+    "Close",
     () => dialog.close(),
     true
   );
@@ -1198,13 +1803,31 @@ function createEmailComposer() {
   actions.append(
     openButton,
     copyButton,
+    recordButton,
     cancelButton
   );
 
   form.append(
-    createField("To", emailRecipient),
-    createField("Subject", emailSubjectInput),
-    createField("Message", emailBodyInput),
+    dialogField(
+      "To",
+      emailRecipient
+    ),
+
+    dialogField(
+      "Email template",
+      emailTemplateSelect
+    ),
+
+    dialogField(
+      "Subject",
+      emailSubjectInput
+    ),
+
+    dialogField(
+      "Message",
+      emailBodyInput
+    ),
+
     emailFeedback,
     actions
   );
@@ -1215,17 +1838,25 @@ function createEmailComposer() {
     form
   );
 
-  document.body.append(dialog);
+  document.body.append(
+    dialog
+  );
 
-  dialog.addEventListener("click", event => {
-    if (event.target === dialog) {
-      dialog.close();
+  dialog.addEventListener(
+    "click",
+    event => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
     }
-  });
+  );
 
-  dialog.addEventListener("close", () => {
-    activeEmailShopId = null;
-  });
+  dialog.addEventListener(
+    "close",
+    () => {
+      activeEmailShopId = null;
+    }
+  );
 
   emailDialog = dialog;
 }
@@ -1242,18 +1873,27 @@ function openEmailComposer(shop) {
     createEmailComposer();
   }
 
-  activeEmailShopId = shop.id;
+  activeEmailShopId =
+    shop.id;
 
   emailRecipient.value =
     String(shop.email).trim();
 
-  emailSubjectInput.value =
-    EMAIL_SUBJECT;
+  const hasContact =
+    activityHistory(shop).some(
+      entry =>
+        entry.type === "email-sent"
+    );
 
-  emailBodyInput.value =
-    EMAIL_TEMPLATE;
+  emailTemplateSelect.value =
+    hasContact
+      ? "followup"
+      : "introduction";
 
-  emailFeedback.textContent = "";
+  applyEmailTemplate();
+
+  emailFeedback.textContent =
+    "";
 
   emailDialog.showModal();
 
@@ -1266,7 +1906,8 @@ function getPreparedEmail() {
   }
 
   const shop = shops.find(
-    item => item.id === activeEmailShopId
+    item =>
+      item.id === activeEmailShopId
   );
 
   if (
@@ -1294,34 +1935,52 @@ function getPreparedEmail() {
   }
 
   return {
-    email: String(shop.email).trim(),
+    email:
+      String(shop.email).trim(),
+
     subject,
     body
   };
 }
 
 function openPreparedEmail() {
-  const prepared = getPreparedEmail();
+  const prepared =
+    getPreparedEmail();
 
   if (!prepared) return;
 
   const mailto =
-    `mailto:${encodeURIComponent(prepared.email)}` +
-    `?subject=${encodeURIComponent(prepared.subject)}` +
-    `&body=${encodeURIComponent(prepared.body)}`;
+    `mailto:${
+      encodeURIComponent(
+        prepared.email
+      )
+    }` +
+    `?subject=${
+      encodeURIComponent(
+        prepared.subject
+      )
+    }` +
+    `&body=${
+      encodeURIComponent(
+        prepared.body
+      )
+    }`;
 
   /*
-   * Mailto opens the user's configured email
-   * application. It does not send the email.
+   * This opens a draft only.
+   * It does not send the message or
+   * change the bookshop's status.
    */
-  window.location.href = mailto;
+  window.location.href =
+    mailto;
 
   emailFeedback.textContent =
-    "Email draft requested. Review the message in your email application before sending.";
+    "Email draft requested. Review and send it in your email application. Afterwards, use Record sent email to update your contact history.";
 }
 
 async function copyPreparedEmail() {
-  const prepared = getPreparedEmail();
+  const prepared =
+    getPreparedEmail();
 
   if (!prepared) return;
 
@@ -1333,21 +1992,388 @@ async function copyPreparedEmail() {
   ].join("\n");
 
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(
+      text
+    );
 
     emailFeedback.textContent =
       "Message copied to clipboard.";
+
   } catch {
-    /*
-     * Fallback for browsers where clipboard
-     * permissions are unavailable.
-     */
     emailBodyInput.focus();
     emailBodyInput.select();
 
     emailFeedback.textContent =
       "Clipboard access unavailable. The message has been selected so you can copy it manually.";
   }
+}
+
+/* =========================================
+   CONTACT ACTIVITY DIALOG
+========================================= */
+
+function createContactDialog() {
+  const dialog =
+    document.createElement("dialog");
+
+  dialog.id =
+    "blackwoodContactDialog";
+
+  styleDialog(dialog);
+
+  const heading = element(
+    "h2",
+    "Record bookshop contact"
+  );
+
+  heading.id =
+    "blackwoodContactHeading";
+
+  heading.style.marginTop =
+    "0";
+
+  dialog.setAttribute(
+    "aria-labelledby",
+    heading.id
+  );
+
+  const description = element(
+    "p",
+    "Record an action that has actually happened. Set a follow-up date if needed."
+  );
+
+  const form =
+    dialogForm();
+
+  contactTypeSelect =
+    document.createElement("select");
+
+  styleDialogControl(
+    contactTypeSelect
+  );
+
+  for (
+    const [key, label]
+    of Object.entries(
+      CONTACT_TYPES
+    )
+  ) {
+    contactTypeSelect.add(
+      new Option(
+        label,
+        key
+      )
+    );
+  }
+
+  contactDateInput =
+    document.createElement("input");
+
+  contactDateInput.type =
+    "date";
+
+  contactDateInput.required =
+    true;
+
+  styleDialogControl(
+    contactDateInput
+  );
+
+  contactNotesInput =
+    document.createElement("textarea");
+
+  contactNotesInput.rows =
+    5;
+
+  contactNotesInput.maxLength =
+    5000;
+
+  contactNotesInput.placeholder =
+    "What happened? Who did you speak to? What was agreed?";
+
+  styleDialogControl(
+    contactNotesInput
+  );
+
+  contactNotesInput.style.resize =
+    "vertical";
+
+  contactFollowUpInput =
+    document.createElement("input");
+
+  contactFollowUpInput.type =
+    "date";
+
+  styleDialogControl(
+    contactFollowUpInput
+  );
+
+  contactStatusSelect =
+    document.createElement("select");
+
+  styleDialogControl(
+    contactStatusSelect
+  );
+
+  for (
+    const [key, label]
+    of Object.entries(
+      STATUSES
+    )
+  ) {
+    contactStatusSelect.add(
+      new Option(
+        label,
+        key
+      )
+    );
+  }
+
+  contactFeedback = element(
+    "p",
+    "",
+    "feedback"
+  );
+
+  contactFeedback.setAttribute(
+    "role",
+    "status"
+  );
+
+  const actions = element(
+    "div",
+    undefined,
+    "form-actions"
+  );
+
+  const saveButton = makeButton(
+    "Save contact record",
+    saveContactActivity
+  );
+
+  const cancelButton = makeButton(
+    "Cancel",
+    () => dialog.close(),
+    true
+  );
+
+  actions.append(
+    saveButton,
+    cancelButton
+  );
+
+  form.append(
+    dialogField(
+      "Contact type",
+      contactTypeSelect
+    ),
+
+    dialogField(
+      "Date of activity",
+      contactDateInput
+    ),
+
+    dialogField(
+      "Notes",
+      contactNotesInput
+    ),
+
+    dialogField(
+      "Next follow-up date (optional)",
+      contactFollowUpInput
+    ),
+
+    dialogField(
+      "Outreach status",
+      contactStatusSelect
+    ),
+
+    contactFeedback,
+    actions
+  );
+
+  dialog.append(
+    heading,
+    description,
+    form
+  );
+
+  document.body.append(
+    dialog
+  );
+
+  dialog.addEventListener(
+    "click",
+    event => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    }
+  );
+
+  dialog.addEventListener(
+    "close",
+    () => {
+      activeContactShopId = null;
+    }
+  );
+
+  contactDialog = dialog;
+}
+
+function openContactDialog(
+  shop,
+  initialType = "note"
+) {
+  if (!contactDialog) {
+    createContactDialog();
+  }
+
+  const current = shops.find(
+    item => item.id === shop.id
+  );
+
+  if (!current) return;
+
+  activeContactShopId =
+    current.id;
+
+  contactTypeSelect.value =
+    initialType;
+
+  contactDateInput.value =
+    localDate();
+
+  contactNotesInput.value =
+    "";
+
+  contactFollowUpInput.value =
+    current.followUpDate || "";
+
+  contactStatusSelect.value =
+    initialType === "email-sent" &&
+    current.status === "prospect"
+      ? "contacted"
+      : current.status || "prospect";
+
+  contactFeedback.textContent =
+    "";
+
+  contactDialog.showModal();
+}
+
+function saveContactActivity() {
+  const shop = shops.find(
+    item =>
+      item.id === activeContactShopId
+  );
+
+  if (!shop) {
+    contactFeedback.textContent =
+      "The selected bookshop could not be found.";
+
+    return;
+  }
+
+  const type =
+    contactTypeSelect.value;
+
+  const date =
+    contactDateInput.value;
+
+  const notes =
+    contactNotesInput.value.trim();
+
+  const followUpDate =
+    contactFollowUpInput.value;
+
+  const status =
+    contactStatusSelect.value;
+
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      CONTACT_TYPES,
+      type
+    )
+  ) {
+    contactFeedback.textContent =
+      "Choose a valid contact type.";
+
+    return;
+  }
+
+  if (!validDate(date)) {
+    contactFeedback.textContent =
+      "Choose a valid activity date.";
+
+    return;
+  }
+
+  if (
+    followUpDate &&
+    !validDate(followUpDate)
+  ) {
+    contactFeedback.textContent =
+      "Choose a valid follow-up date.";
+
+    return;
+  }
+
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      STATUSES,
+      status
+    )
+  ) {
+    contactFeedback.textContent =
+      "Choose a valid outreach status.";
+
+    return;
+  }
+
+  const activity = {
+    id: newId(),
+    type,
+    date,
+    notes,
+    recordedAt:
+      new Date().toISOString()
+  };
+
+  const updatedHistory = [
+    ...activityHistory(shop),
+    activity
+  ];
+
+  const success =
+    updateShopRecord(
+      shop.id,
+      {
+        contactHistory:
+          updatedHistory,
+
+        followUpDate,
+
+        status
+      }
+    );
+
+  if (!success) {
+    contactFeedback.textContent =
+      "Unable to save contact history. Please export a backup and try again.";
+
+    return;
+  }
+
+  contactDialog.close();
+
+  render();
+
+  feedback(
+    "saveFeedback",
+    `Contact activity recorded for ${shop.name}.`,
+    "success"
+  );
 }
 
 /* =========================================
@@ -1361,9 +2387,12 @@ async function fetchJSON(
   const controller =
     new AbortController();
 
-  const timer = setTimeout(() => {
-    controller.abort();
-  }, REQUEST_TIMEOUT_MS);
+  const timer = setTimeout(
+    () => {
+      controller.abort();
+    },
+    REQUEST_TIMEOUT_MS
+  );
 
   try {
     const response = await fetch(
@@ -1401,12 +2430,13 @@ async function fetchJSON(
 ========================================= */
 
 async function geocodeTown(town) {
-  const params = new URLSearchParams({
-    q: `${town}, United Kingdom`,
-    format: "jsonv2",
-    limit: "5",
-    addressdetails: "1"
-  });
+  const params =
+    new URLSearchParams({
+      q: `${town}, United Kingdom`,
+      format: "jsonv2",
+      limit: "5",
+      addressdetails: "1"
+    });
 
   const results = await fetchJSON(
     `${NOMINATIM_URL}?${params}`
@@ -1421,10 +2451,15 @@ async function geocodeTown(town) {
     );
   }
 
-  const match = results.find(item =>
-    item.address?.country_code === "gb" &&
-    Number.isFinite(Number(item.lat)) &&
-    Number.isFinite(Number(item.lon))
+  const match = results.find(
+    item =>
+      item.address?.country_code === "gb" &&
+      Number.isFinite(
+        Number(item.lat)
+      ) &&
+      Number.isFinite(
+        Number(item.lon)
+      )
   );
 
   if (!match) {
@@ -1443,19 +2478,35 @@ async function geocodeTown(town) {
    DISCOVERY DATASETS
 ========================================= */
 
-function normaliseDatasetShop(shop, source) {
-  const lat = Number(shop.lat);
-  const lng = Number(shop.lng);
-
+function normaliseDatasetShop(
+  shop,
+  source
+) {
   return {
-    osmId: String(shop.osmId || ""),
-    name: String(shop.name || "").trim(),
-    town: String(shop.town || "").trim(),
-    address: String(shop.address || "").trim(),
-    website: safeWebsite(shop.website),
-    email: String(shop.email || "").trim(),
-    lat,
-    lng,
+    osmId:
+      String(shop.osmId || ""),
+
+    name:
+      String(shop.name || "").trim(),
+
+    town:
+      String(shop.town || "").trim(),
+
+    address:
+      String(shop.address || "").trim(),
+
+    website:
+      safeWebsite(shop.website),
+
+    email:
+      String(shop.email || "").trim(),
+
+    lat:
+      Number(shop.lat),
+
+    lng:
+      Number(shop.lng),
+
     source
   };
 }
@@ -1465,11 +2516,6 @@ async function loadBookshopDataset() {
     return bookshopDataset;
   }
 
-  /*
-   * Both files are loaded independently.
-   * A failure in one source does not prevent
-   * the other source from being searched.
-   */
   const sources = [
     {
       url: BOOKSHOP_DATA_URL,
@@ -1481,47 +2527,67 @@ async function loadBookshopDataset() {
     }
   ];
 
-  const outcomes = await Promise.allSettled(
-    sources.map(async entry => {
-      const data = await fetchJSON(
-        entry.url,
-        { cache: "no-cache" }
-      );
+  const outcomes =
+    await Promise.allSettled(
+      sources.map(
+        async entry => {
+          const data =
+            await fetchJSON(
+              entry.url,
+              {
+                cache: "no-cache"
+              }
+            );
 
-      if (!Array.isArray(data.shops)) {
-        throw new Error(
-          `Invalid bookshop data in ${entry.url}`
-        );
-      }
+          if (
+            !Array.isArray(
+              data.shops
+            )
+          ) {
+            throw new Error(
+              `Invalid bookshop data in ${entry.url}`
+            );
+          }
 
-      return data.shops.map(shop =>
-        normaliseDatasetShop(
-          shop,
-          entry.source
-        )
-      );
-    })
-  );
+          return data.shops.map(
+            shop =>
+              normaliseDatasetShop(
+                shop,
+                entry.source
+              )
+          );
+        }
+      )
+    );
 
   const combined = [];
   const failures = [];
 
-  outcomes.forEach((outcome, index) => {
-    if (outcome.status === "fulfilled") {
-      combined.push(...outcome.value);
-    } else {
-      failures.push(
-        sources[index].url
-      );
+  outcomes.forEach(
+    (outcome, index) => {
+      if (
+        outcome.status === "fulfilled"
+      ) {
+        combined.push(
+          ...outcome.value
+        );
+      } else {
+        failures.push(
+          sources[index].url
+        );
 
-      console.error(
-        `Unable to load ${sources[index].url}:`,
-        outcome.reason
-      );
+        console.error(
+          `Unable to load ${sources[index].url}:`,
+          outcome.reason
+        );
+      }
     }
-  });
+  );
 
-  if (failures.length === sources.length) {
+  if (
+    failures.length ===
+    sources.length
+  ) {
     throw new Error(
       "Neither bookshop dataset could be loaded. Please try again later."
     );
@@ -1536,7 +2602,8 @@ async function loadBookshopDataset() {
 
   bookshopDataset = {
     shops: combined,
-    partial: failures.length > 0
+    partial:
+      failures.length > 0
   };
 
   return bookshopDataset;
@@ -1548,10 +2615,12 @@ function distanceMetres(
   lat2,
   lng2
 ) {
-  const toRadians = degrees =>
-    degrees * Math.PI / 180;
+  const toRadians =
+    degrees =>
+      degrees * Math.PI / 180;
 
-  const earthRadius = 6371000;
+  const earthRadius =
+    6371000;
 
   const dLat =
     toRadians(lat2 - lat1);
@@ -1561,8 +2630,12 @@ function distanceMetres(
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRadians(lat1)) *
-    Math.cos(toRadians(lat2)) *
+    Math.cos(
+      toRadians(lat1)
+    ) *
+    Math.cos(
+      toRadians(lat2)
+    ) *
     Math.sin(dLng / 2) ** 2;
 
   return (
@@ -1585,77 +2658,106 @@ async function searchCachedBookshops(
   const dataset =
     await loadBookshopDataset();
 
-  return dataset.shops.filter(shop => {
-    if (
-      !shop.name ||
-      !validCoordinates(shop)
-    ) {
-      return false;
-    }
+  return dataset.shops.filter(
+    shop => {
+      if (
+        !shop.name ||
+        !validCoordinates(shop)
+      ) {
+        return false;
+      }
 
-    return distanceMetres(
-      lat,
-      lng,
-      shop.lat,
-      shop.lng
-    ) <= radius;
-  });
+      return distanceMetres(
+        lat,
+        lng,
+        shop.lat,
+        shop.lng
+      ) <= radius;
+    }
+  );
 }
 
-function mergeDiscoveredResults(results, fallbackTown) {
-  /*
-   * Curated entries take priority over
-   * matching OpenStreetMap entries.
-   */
-  const ordered = [...results].sort((a, b) => {
-    if (a.source === b.source) return 0;
+function mergeDiscoveredResults(
+  results,
+  fallbackTown
+) {
+  const ordered = [
+    ...results
+  ].sort(
+    (a, b) => {
+      if (
+        a.source === b.source
+      ) {
+        return 0;
+      }
 
-    return a.source === "curated" ? -1 : 1;
-  });
+      return a.source === "curated"
+        ? -1
+        : 1;
+    }
+  );
 
   const unique = [];
 
   for (const item of ordered) {
     const shop = {
       ...item,
-      town: item.town || fallbackTown,
+
+      town:
+        item.town ||
+        fallbackTown,
+
       address:
         item.address ||
         item.town ||
         fallbackTown
     };
 
-    const existing = unique.find(other =>
-      sameBookshop(other, shop)
-    );
+    const existing =
+      unique.find(
+        other =>
+          sameBookshop(
+            other,
+            shop
+          )
+      );
 
     if (!existing) {
       unique.push(shop);
       continue;
     }
 
-    /*
-     * Keep useful contact details when the
-     * preferred record is missing them.
-     */
-    if (!existing.website && shop.website) {
-      existing.website = shop.website;
+    if (
+      !existing.website &&
+      shop.website
+    ) {
+      existing.website =
+        shop.website;
     }
 
-    if (!existing.email && shop.email) {
-      existing.email = shop.email;
+    if (
+      !existing.email &&
+      shop.email
+    ) {
+      existing.email =
+        shop.email;
     }
 
-    if (!existing.osmId && shop.osmId) {
-      existing.osmId = shop.osmId;
+    if (
+      !existing.osmId &&
+      shop.osmId
+    ) {
+      existing.osmId =
+        shop.osmId;
     }
   }
 
-  return unique.sort((a, b) =>
-    a.name.localeCompare(
-      b.name,
-      "en-GB"
-    )
+  return unique.sort(
+    (a, b) =>
+      a.name.localeCompare(
+        b.name,
+        "en-GB"
+      )
   );
 }
 
@@ -1686,9 +2788,12 @@ async function findBookshops(event) {
   }
 
   if (
-    ![3000, 5000, 10000, 20000].includes(
-      radius
-    )
+    ![
+      3000,
+      5000,
+      10000,
+      20000
+    ].includes(radius)
   ) {
     feedback(
       "finderFeedback",
@@ -1699,10 +2804,12 @@ async function findBookshops(event) {
     return;
   }
 
-  const now = Date.now();
+  const now =
+    Date.now();
 
   if (
-    now - lastSearchStarted < 1500
+    now - lastSearchStarted <
+    1500
   ) {
     feedback(
       "finderFeedback",
@@ -1713,13 +2820,20 @@ async function findBookshops(event) {
     return;
   }
 
-  lastSearchStarted = now;
-  searching = true;
+  lastSearchStarted =
+    now;
 
-  const button = $("findBtn");
+  searching =
+    true;
 
-  button.disabled = true;
-  button.textContent = "Searching…";
+  const button =
+    $("findBtn");
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "Searching…";
 
   feedback(
     "finderFeedback",
@@ -1732,7 +2846,10 @@ async function findBookshops(event) {
 
     if (map) {
       map.setView(
-        [location.lat, location.lng],
+        [
+          location.lat,
+          location.lng
+        ],
         11
       );
     }
@@ -1755,17 +2872,22 @@ async function findBookshops(event) {
         town
       );
 
-    lastSearchTown = town;
+    lastSearchTown =
+      town;
 
     renderDiscovered();
 
-    if (visibleDiscoveredShops().length) {
+    if (
+      visibleDiscoveredShops().length
+    ) {
       fitMap(true);
     }
 
     updateDiscoveryFeedback();
 
-    if (bookshopDataset?.partial) {
+    if (
+      bookshopDataset?.partial
+    ) {
       const current =
         $("finderFeedback").textContent;
 
@@ -1789,9 +2911,12 @@ async function findBookshops(event) {
     );
 
   } finally {
-    searching = false;
+    searching =
+      false;
 
-    button.disabled = false;
+    button.disabled =
+      false;
+
     button.textContent =
       "Find bookshops";
   }
@@ -1802,18 +2927,20 @@ async function findBookshops(event) {
 ========================================= */
 
 function exportJSON() {
-  const blob = new Blob(
-    [
-      JSON.stringify(
-        shops,
-        null,
-        2
-      )
-    ],
-    {
-      type: "application/json"
-    }
-  );
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          shops,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
 
   const url =
     URL.createObjectURL(blob);
@@ -1821,18 +2948,27 @@ function exportJSON() {
   const link =
     document.createElement("a");
 
-  link.href = url;
+  link.href =
+    url;
 
   link.download =
     "blackwood-bookshop-outreach.json";
 
-  document.body.append(link);
+  document.body.append(
+    link
+  );
+
   link.click();
   link.remove();
 
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 1000);
+  setTimeout(
+    () => {
+      URL.revokeObjectURL(
+        url
+      );
+    },
+    1000
+  );
 }
 
 /* =========================================
@@ -1873,7 +3009,9 @@ function initialise() {
       renderDiscovered();
       updateDiscoveryFeedback();
 
-      if (visibleDiscoveredShops().length) {
+      if (
+        visibleDiscoveredShops().length
+      ) {
         fitMap(true);
       } else {
         fitMap();
@@ -1906,12 +3044,15 @@ function initialise() {
 }
 
 if (
-  document.readyState === "loading"
+  document.readyState ===
+  "loading"
 ) {
   document.addEventListener(
     "DOMContentLoaded",
     initialise,
-    { once: true }
+    {
+      once: true
+    }
   );
 } else {
   initialise();
