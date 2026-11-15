@@ -372,7 +372,34 @@ function isDuplicate(
 /* =========================================
    LEAFLET MAP
 ========================================= */
+function bookshopIcon(type = "found") {
+  const saved = type === "saved";
 
+  return L.divIcon({
+    className: "blackwood-book-marker",
+    html: `
+      <span
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          width:36px;
+          height:36px;
+          border-radius:50%;
+          background:${saved ? "#b87333" : "#4aabb0"};
+          border:2px solid #f5ead5;
+          box-shadow:0 3px 10px rgba(0,0,0,.35);
+          font-size:20px;
+          line-height:1;
+        "
+        aria-hidden="true"
+      >📚</span>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20]
+  });
+}
 function initMap() {
   const mapElement = $("map");
 
@@ -637,16 +664,13 @@ function renderSaved() {
       savedMarkers &&
       validCoordinates(shop)
     ) {
-      const marker = L.circleMarker(
-        [shop.lat, shop.lng],
-        {
-          radius: 8,
-          color: "#f1d0a2",
-          weight: 2,
-          fillColor: "#b87333",
-          fillOpacity: 0.95
-        }
-      );
+      const marker = L.marker(
+  [shop.lat, shop.lng],
+  {
+    icon: bookshopIcon("saved"),
+    title: `${shop.name} — ${shop.town}`
+  }
+);
 
       marker.bindPopup(
         element(
@@ -788,16 +812,13 @@ function renderDiscovered() {
       discoveredMarkers &&
       validCoordinates(shop)
     ) {
-      const marker = L.circleMarker(
-        [shop.lat, shop.lng],
-        {
-          radius: 7,
-          color: "#d5f4f5",
-          weight: 2,
-          fillColor: "#4aabb0",
-          fillOpacity: 0.9
-        }
-      );
+      const marker = L.marker(
+  [shop.lat, shop.lng],
+  {
+    icon: bookshopIcon("found"),
+    title: shop.name
+  }
+);
 
       marker.bindPopup(
         element(
