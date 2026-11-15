@@ -1,0 +1,17 @@
+
+{
+  "source": "Blackwood Publishing curated bookshop directory",
+  "version": 1,
+  "shops": [
+    {
+      "osmId": "",
+      "name": "Caffeinated Escapism",
+      "town": "Alexandria",
+      "address": "Alexandria, Scotland",
+      "website": "https://www.caffeinatedescapism.shop/",
+      "email": "hello@caffeinatedescapism.co.uk",
+      "lat": 55.9881112,
+      "lng": -4.5827038
+    }
+  ]
+}
