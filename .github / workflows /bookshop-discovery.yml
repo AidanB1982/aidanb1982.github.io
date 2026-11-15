@@ -1,6 +1,6 @@
 
 name: Refresh Scottish bookshop directory
-
+ 
 on:
   workflow_dispatch:
   schedule:
