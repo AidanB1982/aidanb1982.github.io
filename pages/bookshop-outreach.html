@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bookshop Outreach | Blackwood Publishing</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Georgia, serif;
+      background: #101310;
+      color: #ece7dc;
+    }
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button { cursor: pointer; }
+
+    header {
+      padding: 28px clamp(20px, 5vw, 70px);
+      border-bottom: 1px solid #b8733340;
+      background: #151a17;
+    }
+
+    .eyebrow {
+      font: 11px Arial, sans-serif;
+      letter-spacing: .18em;
+      color: #cfaa76;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 400;
+      margin: 10px 0;
+    }
+
+    header p:last-child {
+      color: #c9c7bd;
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 1300px;
+      margin: auto;
+      padding: 30px 20px 80px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    input, select, textarea {
+      background: #1d2521;
+      border: 1px solid #66543c;
+      color: #f2ede3;
+      border-radius: 5px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #cfaa76;
+      outline-offset: 2px;
+    }
+
+    .toolbar input {
+      flex: 1 1 240px;
+    }
+
+    .btn {
+      border: 1px solid #b87333;
+      border-radius: 5px;
+      background: #b87333;
+      color: #fff;
+      padding: 12px 18px;
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: #e9c99b;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr);
+      gap: 22px;
+    }
+
+    .panel {
+      background: #171c19;
+      border: 1px solid #b8733338;
+      border-radius: 8px;
+      padding: 20px;
+      min-width: 0;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      margin: 0 0 18px;
+    }
+
+    .shop-list {
+      display: grid;
+      gap: 12px;
+      max-height: 550px;
+      overflow-y: auto;
+    }
+
+    .shop {
+      border: 1px solid #544332;
+      padding: 16px;
+      border-radius: 6px;
+      background: #1c231f;
+    }
+
+    .shop h3 {
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin: 0 0 7px;
+    }
+
+    .shop p {
+      color: #c9c7bd;
+      margin: 6px 0;
+      font: 13px/1.6 Arial, sans-serif;
+    }
+
+    .shop-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .shop-actions button {
+      padding: 8px 11px;
+      font: 12px Arial, sans-serif;
+    }
+
+    #map {
+      height: 480px;
+      border-radius: 6px;
+      background: #26342e;
+    }
+
+    .form-panel {
+      margin-top: 22px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #d8c8ae;
+      font: 13px Arial, sans-serif;
+    }
+
+    label.full { grid-column: 1 / -1; }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .notice {
+      color: #b9b9ae;
+      font: 12px/1.6 Arial, sans-serif;
+      margin-top: 14px;
+    }
+
+    .empty {
+      color: #c9c7bd;
+      font: 14px Arial, sans-serif;
+    }
+
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+      #map { height: 350px; }
+    }
+
+    @media (max-width: 520px) {
+      .fields { grid-template-columns: 1fr; }
+      label.full { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Blackwood Publishing · Management Desk</div>
+    <h1>Bookshop Outreach</h1>
+    <p>Discover independent booksellers. Build relationships. Support local bookshops.</p>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Search bookshops or towns…" aria-label="Search bookshops">
+      <select id="statusFilter" aria-label="Filter by status">
+        <option value="">All statuses</option>
+        <option value="prospect">Prospect</option>
+        <option value="contacted">Contacted</option>
+        <option value="interested">Interested</option>
+        <option value="stockist">Confirmed stockist</option>
+        <option value="opted-out">Do not contact</option>
+      </select>
+      <button class="btn secondary" id="exportBtn" type="button">Export JSON</button>
+    </div>
+
+    <div class="layout">
+      <section class="panel">
+        <h2>Bookshop directory</h2>
+        <div class="shop-list" id="shopList"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Bookshop map</h2>
+        <div id="map" role="region" aria-label="Map of saved bookshops"></div>
+        <p class="notice">Map requires an internet connection. Only shops with coordinates appear on the map.</p>
+      </section>
+    </div>
+
+    <section class="panel form-panel" id="editor">
+      <h2 id="formHeading">Add a bookshop</h2>
+
+      <form id="shopForm">
+        <div class="fields">
+          <label>
+            Bookshop name *
+            <input id="name" required maxlength="150">
+          </label>
+
+          <label>
+            Town or city *
+            <input id="town" required maxlength="100">
+          </label>
+
+          <label>
+            Public business email
+            <input id="email" type="email">
+          </label>
+
+          <label>
+            Website
+            <input id="website" type="url" placeholder="https://">
+          </label>
+
+          <label>
+            Latitude
+            <input id="lat" type="number" step="any" min="-90" max="90">
+          </label>
+
+          <label>
+            Longitude
+            <input id="lng" type="number" step="any" min="-180" max="180">
+          </label>
+
+          <label>
+            Outreach status
+            <select id="status">
+              <option value="prospect">Prospect</option>
+              <option value="contacted">Contacted</option>
+              <option value="interested">Interested</option>
+              <option value="stockist">Confirmed stockist</option>
+              <option value="opted-out">Do not contact</option>
+            </select>
+          </label>
+
+          <label class="full">
+            Notes / source / stocking policy
+            <textarea id="notes"></textarea>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" type="submit">Save bookshop</button>
+          <button class="btn secondary" id="resetBtn" type="button">Clear form</button>
+        </div>
+      </form>
+
+      <p class="notice">
+        Prototype data is saved in this browser only.
+        No messages are sent and nothing is published to Blackwood.
+      </p>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "blackwood-bookshop-outreach-v1";
+    const STATUSES = {
+      prospect: "Prospect",
+      contacted: "Contacted",
+      interested: "Interested",
+      stockist: "Confirmed stockist",
+      "opted-out": "Do not contact"
+    };
+
+    const $ = id => document.getElementById(id);
+
+    function loadShops() {
+      try {
+        const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        return Array.isArray(value) ? value : [];
+      } catch (error) {
+        console.error("Could not read saved bookshops:", error);
+        return [];
+      }
+    }
+
+    let shops = loadShops();
+    let editingId = null;
+    let map = null;
+    let markers = null;
+
+    if (typeof L !== "undefined") {
+      map = L.map("map").setView([56.4, -4.2], 6);
+
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      markers = L.featureGroup().addTo(map);
+    } else {
+      $("map").textContent = "Map unavailable. Check your internet connection.";
+    }
+
+    function createElement(tag, text, className) {
+      const element = document.createElement(tag);
+      if (text !== undefined) element.textContent = text;
+      if (className) element.className = className;
+      return element;
+    }
+
+    function validCoordinates(shop) {
+      return Number.isFinite(shop.lat) &&
+        Number.isFinite(shop.lng) &&
+        shop.lat >= -90 && shop.lat <= 90 &&
+        shop.lng >= -180 && shop.lng <= 180;
+    }
+
+    function filteredShops() {
+      const query = $("search").value.trim().toLowerCase();
+      const status = $("statusFilter").value;
+
+      return shops.filter(shop => {
+        const matchesQuery =
+          `${shop.name} ${shop.town}`.toLowerCase().includes(query);
+
+        return matchesQuery && (!status || shop.status === status);
+      });
+    }
+
+    function render() {
+      const results = filteredShops();
+      const list = $("shopList");
+      list.replaceChildren();
+
+      if (markers) markers.clearLayers();
+
+      if (!results.length) {
+        list.append(createElement(
+          "p",
+          "No bookshops match your search. Add your first prospect below.",
+          "empty"
+        ));
+      }
+
+      results.forEach(shop => {
+        const card = createElement("article", undefined, "shop");
+        const heading = createElement("h3", shop.name);
+        const town = createElement("p", shop.town);
+        const status = createElement(
+          "p",
+          `Status: ${STATUSES[shop.status] || "Prospect"}`
+        );
+
+        card.append(heading, town, status);
+
+        if (shop.email) {
+          card.append(createElement("p", `Email: ${shop.email}`));
+        }
+
+        if (shop.notes) {
+          card.append(createElement("p", shop.notes));
+        }
+
+        const actions = createElement("div", undefined, "shop-actions");
+
+        const edit = createElement("button", "Edit", "btn secondary");
+        edit.type = "button";
+        edit.addEventListener("click", () => editShop(shop.id));
+        actions.append(edit);
+
+        if (shop.website) {
+          const website = createElement("button", "Website", "btn secondary");
+          website.type = "button";
+          website.addEventListener("click", () => {
+            window.open(shop.website, "_blank", "noopener,noreferrer");
+          });
+          actions.append(website);
+        }
+
+        if (shop.email && shop.status !== "opted-out") {
+          const email = createElement("button", "Draft email", "btn");
+          email.type = "button";
+          email.addEventListener("click", () => draftEmail(shop));
+          actions.append(email);
+        }
+
+        card.append(actions);
+        list.append(card);
+
+        if (markers && validCoordinates(shop)) {
+          const marker = L.marker([shop.lat, shop.lng]);
+          marker.bindPopup(
+            createElement("strong", `${shop.name} — ${shop.town}`)
+          );
+          markers.addLayer(marker);
+        }
+      });
+
+      if (markers && markers.getLayers().length) {
+        map.fitBounds(markers.getBounds().pad(0.15), { maxZoom: 11 });
+      }
+    }
+
+    function resetForm() {
+      editingId = null;
+      $("shopForm").reset();
+      $("formHeading").textContent = "Add a bookshop";
+    }
+
+    function editShop(id) {
+      const shop = shops.find(item => item.id === id);
+      if (!shop) return;
+
+      editingId = id;
+      $("name").value = shop.name;
+      $("town").value = shop.town;
+      $("email").value = shop.email || "";
+      $("website").value = shop.website || "";
+      $("lat").value = shop.lat ?? "";
+      $("lng").value = shop.lng ?? "";
+      $("status").value = shop.status;
+      $("notes").value = shop.notes || "";
+      $("formHeading").textContent = "Edit bookshop";
+      $("editor").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function draftEmail(shop) {
+      const subject = "Blackwood Publishing — paperback stocking enquiry";
+      const body = [
+        "Hello,",
+        "",
+        "I'm getting in touch from Blackwood Publishing, an independent Scottish publishing imprint.",
+        "",
+        "We're introducing our paperback catalogue to independent bookshops and wondered whether you might consider selected titles.",
+        "",
+        "Our books include:",
+        "• Gualachulain Bothy: The Second Silence — 9781919555560",
+        "• Holdfast — 9781919555522",
+        "• Love, Abused — 9781919555539",
+        "• The Black Bothy — 9781919555584",
+        "• Corrour: The First Summoning — 9781919555508",
+        "",
+        "These titles are listed in our IngramSpark catalogue. We can provide current ordering and trade information on request.",
+        "",
+        "Would you be happy for us to send over further details?",
+        "",
+        "Kind regards,",
+        "Blackwood Publishing",
+        "https://blackwoodpublishing.co.uk",
+        "",
+        "If you'd prefer not to receive further trade enquiries, please let us know."
+      ].join("\n");
+
+      const url = `mailto:${shop.email}?subject=${
+        encodeURIComponent(subject)
+      }&body=${encodeURIComponent(body)}`;
+
+      window.location.href = url;
+    }
+
+    $("shopForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const latValue = $("lat").value.trim();
+      const lngValue = $("lng").value.trim();
+
+      if ((latValue === "") !== (lngValue === "")) {
+        alert("Please enter both latitude and longitude, or leave both blank.");
+        return;
+      }
+
+      const record = {
+        id: editingId || crypto.randomUUID(),
+        name: $("name").value.trim(),
+        town: $("town").value.trim(),
+        email: $("email").value.trim(),
+        website: $("website").value.trim(),
+        lat: latValue === "" ? null : Number(latValue),
+        lng: lngValue === "" ? null : Number(lngValue),
+        status: $("status").value,
+        notes: $("notes").value.trim()
+      };
+
+      if (!record.name || !record.town) return;
+
+      const duplicate = shops.some(shop =>
+        shop.id !== record.id &&
+        shop.name.toLowerCase() === record.name.toLowerCase() &&
+        shop.town.toLowerCase() === record.town.toLowerCase()
+      );
+
+      if (duplicate) {
+        alert("That bookshop is already in the directory.");
+        return;
+      }
+
+      if (editingId) {
+        shops = shops.map(shop => shop.id === editingId ? record : shop);
+      } else {
+        shops.push(record);
+      }
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+      } catch (error) {
+        alert("Could not save to browser storage. Please export a backup.");
+        console.error(error);
+        return;
+      }
+
+      resetForm();
+      render();
+    });
+
+    $("search").addEventListener("input", render);
+    $("statusFilter").addEventListener("change", render);
+    $("resetBtn").addEventListener("click", resetForm);
+
+    $("exportBtn").addEventListener("click", () => {
+      const blob = new Blob(
+        [JSON.stringify(shops, null, 2)],
+        { type: "application/json" }
+      );
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "blackwood-bookshop-outreach.json";
+      link.click();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+
+    render();
+  </script>
+</body>
+</html>
