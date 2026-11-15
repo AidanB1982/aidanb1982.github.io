@@ -6,13 +6,14 @@
  * Bookshop Outreach — GitHub Pages edition
  *
  * Discovery:
- * - Loads cached OpenStreetMap bookshop data
- * - Searches by distance from a UK town or city
- * - Uses Nominatim for town coordinates
+ * - Cached OpenStreetMap bookshop data
+ * - Distance search from a UK town or city
+ * - Nominatim town lookup
+ * - Optional major-chain filtering
  *
  * Management:
  * - Browser-local saved directory
- * - Expandable bookshop cards
+ * - Expandable cards
  * - Leaflet map markers
  * - Add/edit records
  * - Search and status filtering
@@ -43,6 +44,28 @@ const STATUSES = {
   "opted-out": "Do not contact"
 };
 
+/*
+ * Known major retail chains.
+ *
+ * Exact-name matching avoids hiding independent
+ * bookshops merely because their names contain
+ * a similar word.
+ */
+const MAJOR_CHAINS = new Set([
+  "waterstones",
+  "the works",
+  "whsmith",
+  "wh smith",
+  "the bookshop by whsmith",
+  "blackwell's",
+  "blackwells",
+  "blackwell's university bookshop",
+  "tgjones",
+  "tg jones",
+  "tg jones",
+  "foyles"
+]);
+
 const $ = id => document.getElementById(id);
 
 let shops = loadShops();
@@ -52,6 +75,7 @@ let bookshopDataset = null;
 let editingId = null;
 let searching = false;
 let lastSearchStarted = 0;
+let lastSearchTown = "";
 
 let map = null;
 let savedMarkers = null;
@@ -89,6 +113,54 @@ function normalise(value) {
     .trim()
     .toLocaleLowerCase("en-GB")
     .replace(/\s+/g, " ");
+}
+
+function isMajorChain(shop) {
+  const name = normalise(shop.name)
+    .replace(/[’‘]/g, "'");
+
+  return MAJOR_CHAINS.has(name);
+}
+
+function visibleDiscoveredShops() {
+  const hideChains = $("hideChains")?.checked ?? false;
+
+  return discoveredShops
+    .filter(shop =>
+      !hideChains || !isMajorChain(shop)
+    )
+    .slice(0, MAX_RESULTS);
+}
+
+function updateDiscoveryFeedback() {
+  if (!lastSearchTown) return;
+
+  const visible = visibleDiscoveredShops();
+  const hidden = discoveredShops.filter(
+    isMajorChain
+  ).length;
+
+  if (!visible.length) {
+    feedback(
+      "finderFeedback",
+      discoveredShops.length
+        ? "No bookshops match the current chain filter. Untick the checkbox to see all results."
+        : "No bookshops found in the cached dataset for this radius. Try a larger radius."
+    );
+
+    return;
+  }
+
+  const hiddenText =
+    $("hideChains")?.checked && hidden
+      ? ` ${hidden} major-chain result(s) hidden.`
+      : "";
+
+  feedback(
+    "finderFeedback",
+    `Showing ${visible.length} bookshop(s) near ${lastSearchTown}.${hiddenText} Review before saving.`,
+    "success"
+  );
 }
 
 function validCoordinates(shop) {
@@ -533,7 +605,9 @@ function renderDiscovered() {
     discoveredMarkers.clearLayers();
   }
 
-  for (const shop of discoveredShops) {
+  const visible = visibleDiscoveredShops();
+
+  for (const shop of visible) {
     const card = element(
       "article",
       undefined,
@@ -1248,31 +1322,24 @@ async function findBookshops(event) {
 
     discoveredShops = [
       ...unique.values()
-    ]
-      .sort((a, b) =>
-        a.name.localeCompare(
-          b.name,
-          "en-GB"
-        )
+    ].sort((a, b) =>
+      a.name.localeCompare(
+        b.name,
+        "en-GB"
       )
-      .slice(0, MAX_RESULTS);
+    );
+
+    lastSearchTown = town;
 
     renderDiscovered();
 
-    if (discoveredShops.length) {
-      fitMap(true);
+    const visible = visibleDiscoveredShops();
 
-      feedback(
-        "finderFeedback",
-        `Found ${discoveredShops.length} mapped bookshop(s) near ${town}. Review before saving.`,
-        "success"
-      );
-    } else {
-      feedback(
-        "finderFeedback",
-        "No bookshops found in the cached dataset for this radius. Try a larger radius."
-      );
+    if (visible.length) {
+      fitMap(true);
     }
+
+    updateDiscoveryFeedback();
 
   } catch (error) {
     console.error(
@@ -1352,6 +1419,8 @@ function initialise() {
     "click",
     () => {
       discoveredShops = [];
+      lastSearchTown = "";
+
       renderDiscovered();
 
       feedback(
@@ -1360,6 +1429,20 @@ function initialise() {
       );
 
       fitMap();
+    }
+  );
+
+  $("hideChains").addEventListener(
+    "change",
+    () => {
+      renderDiscovered();
+      updateDiscoveryFeedback();
+
+      if (visibleDiscoveredShops().length) {
+        fitMap(true);
+      } else {
+        fitMap();
+      }
     }
   );
 
