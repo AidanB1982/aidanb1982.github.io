@@ -414,3 +414,79 @@ a:focus-visible {
   }
 }
 
+/* Compact, expandable bookshop directory */
+
+.shop {
+  padding: 0;
+}
+
+.shop-details {
+  width: 100%;
+}
+
+.shop-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 17px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.shop-summary::-webkit-details-marker {
+  display: none;
+}
+
+.shop-summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--gold);
+  font: 24px/1 Arial, sans-serif;
+}
+
+.shop-details[open] .shop-summary::after {
+  content: "−";
+}
+
+.shop-summary strong {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.shop-town {
+  color: var(--gold);
+  font: 12px Arial, sans-serif;
+}
+
+.shop-expanded {
+  padding: 0 18px 18px;
+  border-top: 1px solid #b873332b;
+}
+
+.shop-expanded .shop-blurb {
+  margin-top: 15px;
+  line-height: 1.7;
+}
+
+.shop-summary:hover {
+  background: #ffffff08;
+}
+
+.shop-summary:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -3px;
+}
+
+@media (max-width: 520px) {
+  .shop-summary {
+    padding: 15px;
+  }
+
+  .shop-expanded {
+    padding: 0 15px 15px;
+  }
+}
+
