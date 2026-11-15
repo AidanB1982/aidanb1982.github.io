@@ -19,6 +19,8 @@
  * - Contact activity history
  * - Follow-up reminders
  * - Editable introduction and follow-up email templates
+ * - Explicit Outlook sending via Supabase Edge Function
+ * - Durable server-side email attempt tracking
  * - JSON backup export
  *
  * Emails are NEVER sent automatically.
@@ -38,6 +40,12 @@ const CURATED_DATA_URL =
 
 const NOMINATIM_URL =
   "https://nominatim.openstreetmap.org/search";
+
+const OUTLOOK_FUNCTION_NAME =
+  "bp-publishing-desk";
+
+const OUTLOOK_PENDING_KEY =
+  "blackwood-bookshop-outlook-pending-v1";
 
 const MAX_RESULTS = 60;
 const REQUEST_TIMEOUT_MS = 15000;
@@ -156,7 +164,13 @@ let emailTemplateSelect = null;
 let emailSubjectInput = null;
 let emailBodyInput = null;
 let emailFeedback = null;
+let emailSendButton = null;
+let emailOpenButton = null;
+let emailCopyButton = null;
+let emailRecordButton = null;
+let emailCloseButton = null;
 let activeEmailShopId = null;
+let outlookSending = false;
 
 let contactDialog = null;
 let contactTypeSelect = null;
@@ -274,6 +288,19 @@ function newId() {
     "-" +
     Math.random().toString(36).slice(2)
   );
+}
+
+function newOutlookRequestId() {
+  if (
+    typeof crypto === "undefined" ||
+    typeof crypto.randomUUID !== "function"
+  ) {
+    throw new Error(
+      "Secure request IDs are unavailable. Open this page over HTTPS."
+    );
+  }
+
+  return crypto.randomUUID();
 }
 
 function localDate() {
@@ -1595,6 +1622,310 @@ function dialogForm() {
 }
 
 /* =========================================
+   OUTLOOK SEND SAFEGUARDS
+========================================= */
+
+function getOutlookPendingRequests() {
+  try {
+    const value = JSON.parse(
+      localStorage.getItem(
+        OUTLOOK_PENDING_KEY
+      ) || "{}"
+    );
+
+    return value &&
+      typeof value === "object" &&
+      !Array.isArray(value)
+        ? value
+        : {};
+  } catch {
+    return {};
+  }
+}
+
+function getOutlookPendingRequest(
+  bookshopId
+) {
+  return getOutlookPendingRequests()[
+    String(bookshopId)
+  ] || null;
+}
+
+function saveOutlookPendingRequest(
+  bookshopId,
+  request
+) {
+  try {
+    const pending =
+      getOutlookPendingRequests();
+
+    pending[String(bookshopId)] =
+      request;
+
+    localStorage.setItem(
+      OUTLOOK_PENDING_KEY,
+      JSON.stringify(pending)
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Unable to save Outlook request safeguard:",
+      error
+    );
+
+    return false;
+  }
+}
+
+function clearOutlookPendingRequest(
+  bookshopId,
+  requestId
+) {
+  try {
+    const pending =
+      getOutlookPendingRequests();
+
+    if (
+      pending[String(bookshopId)]
+        ?.requestId !== requestId
+    ) {
+      return true;
+    }
+
+    delete pending[String(bookshopId)];
+
+    localStorage.setItem(
+      OUTLOOK_PENDING_KEY,
+      JSON.stringify(pending)
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Unable to clear Outlook request safeguard:",
+      error
+    );
+
+    return false;
+  }
+}
+
+function setEmailFeedback(
+  message,
+  type = ""
+) {
+  if (!emailFeedback) return;
+
+  emailFeedback.textContent =
+    message;
+
+  emailFeedback.className =
+    `feedback ${type}`.trim();
+}
+
+function setOutlookSending(
+  sending
+) {
+  outlookSending =
+    Boolean(sending);
+
+  if (emailSendButton) {
+    emailSendButton.disabled =
+      outlookSending;
+
+    emailSendButton.textContent =
+      outlookSending
+        ? "Sending via Outlook…"
+        : "Send via Outlook";
+  }
+
+  for (const button of [
+    emailOpenButton,
+    emailCopyButton,
+    emailRecordButton,
+    emailCloseButton
+  ]) {
+    if (button) {
+      button.disabled =
+        outlookSending;
+    }
+  }
+
+  for (const control of [
+    emailTemplateSelect,
+    emailSubjectInput,
+    emailBodyInput
+  ]) {
+    if (control) {
+      control.disabled =
+        outlookSending;
+    }
+  }
+}
+
+function getOutlookClient() {
+  const auth =
+    window.blackwoodBookshopAuth;
+
+  if (
+    !auth ||
+    typeof auth.getClient !== "function" ||
+    typeof auth.isAdministrator !== "function" ||
+    !auth.isAdministrator()
+  ) {
+    throw new Error(
+      "Your administrator session is not verified. Refresh the page and sign in again."
+    );
+  }
+
+  const client =
+    auth.getClient();
+
+  if (
+    !client ||
+    !client.functions ||
+    typeof client.functions.invoke !== "function"
+  ) {
+    throw new Error(
+      "The Outlook connection is unavailable. Refresh the page."
+    );
+  }
+
+  return client;
+}
+
+function recordOutlookSubmission(
+  shopId,
+  requestId,
+  submittedAt,
+  recipient,
+  subject
+) {
+  const shop = shops.find(
+    item => item.id === shopId
+  );
+
+  if (!shop) {
+    return false;
+  }
+
+  const alreadyRecorded =
+    activityHistory(shop).some(
+      entry =>
+        entry.outlookRequestId ===
+        requestId
+    );
+
+  if (alreadyRecorded) {
+    return true;
+  }
+
+  const date =
+    typeof submittedAt === "string" &&
+    !Number.isNaN(
+      Date.parse(submittedAt)
+    )
+      ? new Date(
+          submittedAt
+        ).toLocaleDateString(
+          "en-CA"
+        )
+      : localDate();
+
+  const activity = {
+    id: newId(),
+    type: "email-sent",
+    date:
+      validDate(date)
+        ? date
+        : localDate(),
+    notes: [
+      "Submitted via Blackwood Outlook.",
+      `To: ${recipient}`,
+      `Subject: ${subject}`,
+      `Request ID: ${requestId}`,
+      "Microsoft Graph accepted the message for processing; delivery is not guaranteed."
+    ].join("\n"),
+    recordedAt:
+      new Date().toISOString(),
+    outlookRequestId:
+      requestId,
+    outlookState:
+      "submitted"
+  };
+
+  return updateShopRecord(
+    shopId,
+    {
+      contactHistory: [
+        ...activityHistory(shop),
+        activity
+      ],
+      status:
+        shop.status === "prospect"
+          ? "contacted"
+          : shop.status
+    }
+  );
+}
+
+async function readOutlookError(
+  error
+) {
+  if (!error) {
+    return "Outlook did not return a usable response.";
+  }
+
+  const context =
+    error.context;
+
+  if (
+    context &&
+    typeof context.json === "function"
+  ) {
+    try {
+      const body =
+        await context.json();
+
+      if (
+        body &&
+        typeof body.error === "string"
+      ) {
+        return body.error;
+      }
+    } catch {
+      // The response body may be unavailable.
+    }
+  }
+
+  return typeof error.message === "string"
+    ? error.message
+    : "The Outlook request could not be confirmed.";
+}
+
+function pendingOutlookWarning(
+  shopId
+) {
+  const pending =
+    getOutlookPendingRequest(
+      shopId
+    );
+
+  if (!pending) {
+    return "";
+  }
+
+  return (
+    "An earlier Outlook sending attempt needs review. " +
+    `Request ID: ${pending.requestId}. ` +
+    "Check Outlook Sent Items and the Supabase " +
+    "bp_bookshop_emails table before sending again. " +
+    "This safeguard prevents an accidental duplicate."
+  );
+}
+
+/* =========================================
    EMAIL TEMPLATES
 ========================================= */
 
@@ -1632,7 +1963,14 @@ function applyEmailTemplate() {
       shop
     );
 
-  emailFeedback.textContent = "";
+  setEmailFeedback(
+    pendingOutlookWarning(
+      shop.id
+    ),
+    getOutlookPendingRequest(shop.id)
+      ? "error"
+      : ""
+  );
 }
 
 /* =========================================
@@ -1666,7 +2004,7 @@ function createEmailComposer() {
 
   const description = element(
     "p",
-    "Choose a template, personalise your message and open it in your email application. Nothing is sent automatically."
+    "Choose a template and personalise your message. Send directly through Blackwood Outlook only after confirming, or open a draft in your email application."
   );
 
   const form =
@@ -1736,6 +2074,9 @@ function createEmailComposer() {
   emailBodyInput.rows =
     16;
 
+  emailBodyInput.maxLength =
+    20000;
+
   styleDialogControl(
     emailBodyInput
   );
@@ -1757,26 +2098,39 @@ function createEmailComposer() {
     "status"
   );
 
+  emailFeedback.setAttribute(
+    "aria-live",
+    "polite"
+  );
+
   const actions = element(
     "div",
     undefined,
     "form-actions"
   );
 
-  const openButton = makeButton(
-    "Open email draft",
-    openPreparedEmail
+  emailSendButton = makeButton(
+    "Send via Outlook",
+    sendPreparedEmailViaOutlook
   );
 
-  const copyButton = makeButton(
+  emailOpenButton = makeButton(
+    "Open email draft",
+    openPreparedEmail,
+    true
+  );
+
+  emailCopyButton = makeButton(
     "Copy message",
     copyPreparedEmail,
     true
   );
 
-  const recordButton = makeButton(
+  emailRecordButton = makeButton(
     "Record sent email",
     () => {
+      if (outlookSending) return;
+
       const shop = shops.find(
         item =>
           item.id === activeEmailShopId
@@ -1794,17 +2148,22 @@ function createEmailComposer() {
     true
   );
 
-  const cancelButton = makeButton(
+  emailCloseButton = makeButton(
     "Close",
-    () => dialog.close(),
+    () => {
+      if (!outlookSending) {
+        dialog.close();
+      }
+    },
     true
   );
 
   actions.append(
-    openButton,
-    copyButton,
-    recordButton,
-    cancelButton
+    emailSendButton,
+    emailOpenButton,
+    emailCopyButton,
+    emailRecordButton,
+    emailCloseButton
   );
 
   form.append(
@@ -1845,8 +2204,20 @@ function createEmailComposer() {
   dialog.addEventListener(
     "click",
     event => {
-      if (event.target === dialog) {
+      if (
+        event.target === dialog &&
+        !outlookSending
+      ) {
         dialog.close();
+      }
+    }
+  );
+
+  dialog.addEventListener(
+    "cancel",
+    event => {
+      if (outlookSending) {
+        event.preventDefault();
       }
     }
   );
@@ -1854,7 +2225,9 @@ function createEmailComposer() {
   dialog.addEventListener(
     "close",
     () => {
-      activeEmailShopId = null;
+      if (!outlookSending) {
+        activeEmailShopId = null;
+      }
     }
   );
 
@@ -1892,8 +2265,7 @@ function openEmailComposer(shop) {
 
   applyEmailTemplate();
 
-  emailFeedback.textContent =
-    "";
+  setOutlookSending(false);
 
   emailDialog.showModal();
 
@@ -1915,8 +2287,10 @@ function getPreparedEmail() {
     !shop.email ||
     shop.status === "opted-out"
   ) {
-    emailFeedback.textContent =
-      "This bookshop is no longer available for contact.";
+    setEmailFeedback(
+      "This bookshop is no longer available for contact.",
+      "error"
+    );
 
     return null;
   }
@@ -1928,20 +2302,351 @@ function getPreparedEmail() {
     emailBodyInput.value.trim();
 
   if (!subject || !body) {
-    emailFeedback.textContent =
-      "Please enter a subject and message.";
+    setEmailFeedback(
+      "Please enter a subject and message.",
+      "error"
+    );
+
+    return null;
+  }
+
+  if (
+    subject.length > 200 ||
+    body.length > 20000
+  ) {
+    setEmailFeedback(
+      "The subject or message is too long for the Outlook sending service.",
+      "error"
+    );
+
+    return null;
+  }
+
+  const email =
+    String(shop.email).trim();
+
+  if (
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ) {
+    setEmailFeedback(
+      "The bookshop email address is invalid. Edit the saved bookshop details.",
+      "error"
+    );
 
     return null;
   }
 
   return {
-    email:
-      String(shop.email).trim(),
-
+    email,
     subject,
     body
   };
 }
+
+/* =========================================
+   SEND DIRECTLY THROUGH OUTLOOK
+========================================= */
+
+async function sendPreparedEmailViaOutlook() {
+  if (outlookSending) return;
+
+  const prepared =
+    getPreparedEmail();
+
+  if (!prepared) return;
+
+  const shop = shops.find(
+    item =>
+      item.id === activeEmailShopId
+  );
+
+  if (!shop) {
+    setEmailFeedback(
+      "The selected bookshop could not be found.",
+      "error"
+    );
+
+    return;
+  }
+
+  const existingPending =
+    getOutlookPendingRequest(
+      shop.id
+    );
+
+  if (existingPending) {
+    setEmailFeedback(
+      pendingOutlookWarning(
+        shop.id
+      ),
+      "error"
+    );
+
+    return;
+  }
+
+  let client;
+
+  try {
+    client =
+      getOutlookClient();
+  } catch (error) {
+    setEmailFeedback(
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+  const emailType =
+    emailTemplateSelect.value ===
+    "followup"
+      ? "followup"
+      : "introduction";
+
+  const confirmation = [
+    "SEND EMAIL THROUGH BLACKWOOD OUTLOOK?",
+    "",
+    "From:",
+    "aidan@blackwoodpublishing.co.uk",
+    "",
+    "To:",
+    prepared.email,
+    "",
+    "Bookshop:",
+    shop.name,
+    "",
+    "Subject:",
+    prepared.subject,
+    "",
+    "Type:",
+    emailType === "followup"
+      ? "Follow-up"
+      : "Initial introduction",
+    "",
+    "This will send the message immediately.",
+    "It is not a draft.",
+    "",
+    "Select OK to send or Cancel to review."
+  ].join("\n");
+
+  if (!window.confirm(confirmation)) {
+    setEmailFeedback(
+      "Sending cancelled. Your draft has not been sent."
+    );
+
+    return;
+  }
+
+  let requestId;
+
+  try {
+    requestId =
+      newOutlookRequestId();
+  } catch (error) {
+    setEmailFeedback(
+      error.message,
+      "error"
+    );
+
+    return;
+  }
+
+  const pendingRequest = {
+    requestId,
+    bookshopId: shop.id,
+    bookshopName: shop.name,
+    email: prepared.email,
+    subject: prepared.subject,
+    emailType,
+    createdAt:
+      new Date().toISOString(),
+    state: "pending"
+  };
+
+  /*
+   * Persist the idempotency safeguard before
+   * contacting the backend.
+   *
+   * If the browser crashes or the response is
+   * lost, this prevents an accidental new send.
+   */
+  if (
+    !saveOutlookPendingRequest(
+      shop.id,
+      pendingRequest
+    )
+  ) {
+    setEmailFeedback(
+      "Unable to save the Outlook request safeguard in this browser. Nothing has been sent. Check browser storage and try again.",
+      "error"
+    );
+
+    return;
+  }
+
+  setOutlookSending(true);
+
+  setEmailFeedback(
+    "Submitting the email through Blackwood Outlook. Please keep this page open."
+  );
+
+  try {
+    const { data, error } =
+      await client.functions.invoke(
+        OUTLOOK_FUNCTION_NAME,
+        {
+          body: {
+            action: "bookshop-send",
+            requestId,
+            bookshopId: shop.id,
+            bookshopName: shop.name,
+            email: prepared.email,
+            subject: prepared.subject,
+            text: prepared.body,
+            emailType
+          }
+        }
+      );
+
+    if (error) {
+      const message =
+        await readOutlookError(
+          error
+        );
+
+      /*
+       * A 400 validation error or 409 duplicate
+       * response is not a successful send.
+       *
+       * We deliberately keep the request
+       * safeguard until the administrator
+       * reviews the outcome.
+       */
+      setEmailFeedback(
+        `${message} Request ID: ${requestId}. Check the Supabase email record before attempting another send.`,
+        "error"
+      );
+
+      return;
+    }
+
+    if (
+      !data ||
+      data.requestId !== requestId ||
+      ![
+        "submitted",
+        "failed",
+        "unknown"
+      ].includes(data.state)
+    ) {
+      setEmailFeedback(
+        "Outlook returned an unexpected response. The email may have been accepted. Do not resend until you have checked Outlook Sent Items and the Supabase email record. " +
+        `Request ID: ${requestId}.`,
+        "error"
+      );
+
+      return;
+    }
+
+    if (data.state === "submitted") {
+      const saved =
+        recordOutlookSubmission(
+          shop.id,
+          requestId,
+          data.submittedAt,
+          prepared.email,
+          prepared.subject
+        );
+
+      if (!saved) {
+        setEmailFeedback(
+          "Outlook accepted the message, but this browser could not save the local contact history. The server record is retained. Export your bookshop data and check the record before making changes. " +
+          `Request ID: ${requestId}.`,
+          "error"
+        );
+
+        return;
+      }
+
+      const cleared =
+        clearOutlookPendingRequest(
+          shop.id,
+          requestId
+        );
+
+      render();
+
+      if (!cleared) {
+        setEmailFeedback(
+          "Outlook accepted the message and contact history was saved, but the browser could not clear its sending safeguard. Do not send again until the request has been reviewed. " +
+          `Request ID: ${requestId}.`,
+          "error"
+        );
+
+        return;
+      }
+
+      setEmailFeedback(
+        "Success. Microsoft Outlook accepted the email for processing. The bookshop contact history has been updated automatically. Delivery to the recipient is not guaranteed.",
+        "success"
+      );
+
+      feedback(
+        "saveFeedback",
+        `Outlook email submitted for ${shop.name}. Contact history updated.`,
+        "success"
+      );
+
+      return;
+    }
+
+    if (data.state === "failed") {
+      /*
+       * The backend recorded a definite
+       * provider rejection. The request
+       * remains visible for manual review.
+       */
+      setEmailFeedback(
+        "Microsoft Outlook rejected the email request. No sent-email activity has been recorded. Check the Supabase email record and mailbox configuration before retrying. " +
+        `Request ID: ${requestId}.`,
+        "error"
+      );
+
+      return;
+    }
+
+    /*
+     * Unknown means Outlook may have accepted
+     * the email. Never automatically retry.
+     */
+    setEmailFeedback(
+      "Outlook could not confirm whether the email was accepted. Do not resend. Check Outlook Sent Items and the Supabase email record first. " +
+      `Request ID: ${requestId}.`,
+      "error"
+    );
+
+  } catch (error) {
+    console.error(
+      "Bookshop Outlook request failed:",
+      error
+    );
+
+    setEmailFeedback(
+      "The connection ended without a confirmed result. The email may have been accepted. Do not resend until Outlook Sent Items and the Supabase record have been checked. " +
+      `Request ID: ${requestId}.`,
+      "error"
+    );
+
+  } finally {
+    setOutlookSending(false);
+  }
+}
+
+/* =========================================
+   MANUAL EMAIL DRAFT
+========================================= */
 
 function openPreparedEmail() {
   const prepared =
@@ -1974,8 +2679,9 @@ function openPreparedEmail() {
   window.location.href =
     mailto;
 
-  emailFeedback.textContent =
-    "Email draft requested. Review and send it in your email application. Afterwards, use Record sent email to update your contact history.";
+  setEmailFeedback(
+    "Email draft requested. Review and send it in your email application. Afterwards, use Record sent email to update your contact history."
+  );
 }
 
 async function copyPreparedEmail() {
@@ -1996,15 +2702,18 @@ async function copyPreparedEmail() {
       text
     );
 
-    emailFeedback.textContent =
-      "Message copied to clipboard.";
+    setEmailFeedback(
+      "Message copied to clipboard.",
+      "success"
+    );
 
   } catch {
     emailBodyInput.focus();
     emailBodyInput.select();
 
-    emailFeedback.textContent =
-      "Clipboard access unavailable. The message has been selected so you can copy it manually.";
+    setEmailFeedback(
+      "Clipboard access unavailable. The message has been selected so you can copy it manually."
+    );
   }
 }
 
