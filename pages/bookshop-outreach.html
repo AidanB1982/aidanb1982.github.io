@@ -5,349 +5,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+
   <title>Bookshop Outreach | Blackwood Publishing</title>
+  <meta
+    name="description"
+    content="Blackwood Publishing's independent bookshop discovery and outreach workspace."
+  >
+
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoakqTxI="
     crossorigin=""
   >
-  <style>
-    :root {
-      color-scheme: dark;
-      font-family: Georgia, "Times New Roman", serif;
-      background: #101310;
-      color: #ece7dc;
-    }
 
-    * { box-sizing: border-box; }
+  <link rel="stylesheet" href="./bookshop-outreach.css">
 
-    body {
-      margin: 0;
-      background: #101310;
-    }
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+    defer
+  ></script>
 
-    button, input, select, textarea {
-      font: inherit;
-    }
-
-    button { cursor: pointer; }
-
-    button:disabled {
-      cursor: wait;
-      opacity: .55;
-    }
-
-    a { color: #e7bd83; }
-
-    a:hover { color: #ffe1ad; }
-
-    header {
-      padding: 28px clamp(20px, 5vw, 70px);
-      border-bottom: 1px solid #b8733340;
-      background: #151a17;
-    }
-
-    .eyebrow {
-      font: 11px/1.6 Arial, sans-serif;
-      letter-spacing: .18em;
-      color: #cfaa76;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      font-weight: 400;
-      margin: 10px 0;
-    }
-
-    header p:last-child {
-      color: #c9c7bd;
-      line-height: 1.6;
-    }
-
-    main {
-      max-width: 1300px;
-      margin: auto;
-      padding: 30px 20px 80px;
-    }
-
-    .panel {
-      background: #171c19;
-      border: 1px solid #b8733338;
-      border-radius: 8px;
-      padding: 20px;
-      min-width: 0;
-    }
-
-    .panel + .panel,
-    .layout + .panel,
-    .panel + .layout {
-      margin-top: 22px;
-    }
-
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 400;
-      margin: 0 0 18px;
-    }
-
-    h3 {
-      font-weight: 400;
-    }
-
-    .section-intro {
-      color: #c9c7bd;
-      font: 14px/1.7 Arial, sans-serif;
-      margin: -5px 0 20px;
-    }
-
-    .toolbar,
-    .finder-controls,
-    .form-actions,
-    .shop-actions,
-    .result-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .toolbar {
-      margin: 22px 0;
-    }
-
-    input, select, textarea {
-      background: #1d2521;
-      border: 1px solid #66543c;
-      color: #f2ede3;
-      border-radius: 5px;
-      padding: 12px;
-      min-width: 0;
-    }
-
-    input:focus-visible,
-    select:focus-visible,
-    textarea:focus-visible,
-    button:focus-visible,
-    a:focus-visible {
-      outline: 2px solid #cfaa76;
-      outline-offset: 3px;
-    }
-
-    .toolbar input,
-    .finder-controls input {
-      flex: 1 1 240px;
-    }
-
-    .finder-controls select {
-      flex: 0 1 180px;
-    }
-
-    .btn {
-      border: 1px solid #b87333;
-      border-radius: 5px;
-      background: #b87333;
-      color: #fff;
-      padding: 12px 18px;
-      text-decoration: none;
-      font: 13px/1.4 Arial, sans-serif;
-    }
-
-    .btn:hover:not(:disabled) {
-      background: #cb8844;
-    }
-
-    .btn.secondary {
-      background: transparent;
-      color: #e9c99b;
-    }
-
-    .btn.secondary:hover:not(:disabled) {
-      background: #2d251c;
-    }
-
-    .btn.small {
-      padding: 8px 11px;
-      font-size: 12px;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr);
-      gap: 22px;
-    }
-
-    .shop-list {
-      display: grid;
-      align-content: start;
-      gap: 12px;
-      max-height: 550px;
-      overflow-y: auto;
-    }
-
-    .shop, .discovery-card {
-      border: 1px solid #544332;
-      padding: 16px;
-      border-radius: 6px;
-      background: #1c231f;
-      min-width: 0;
-    }
-
-    .shop h3,
-    .discovery-card h3 {
-      font-size: 1.15rem;
-      margin: 0 0 7px;
-    }
-
-    .shop p,
-    .discovery-card p {
-      color: #c9c7bd;
-      margin: 6px 0;
-      font: 13px/1.6 Arial, sans-serif;
-      overflow-wrap: anywhere;
-    }
-
-    .shop-actions,
-    .result-actions {
-      margin-top: 14px;
-      gap: 8px;
-    }
-
-    #map {
-      height: 480px;
-      border-radius: 6px;
-      background: #26342e;
-      z-index: 0;
-    }
-
-    .fields {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    label {
-      display: grid;
-      gap: 7px;
-      color: #d8c8ae;
-      font: 13px Arial, sans-serif;
-    }
-
-    label.full { grid-column: 1 / -1; }
-
-    textarea {
-      resize: vertical;
-      min-height: 90px;
-    }
-
-    .form-actions { margin-top: 18px; }
-
-    .notice {
-      color: #b9b9ae;
-      font: 12px/1.7 Arial, sans-serif;
-      margin-top: 14px;
-    }
-
-    .empty {
-      color: #c9c7bd;
-      font: 14px/1.7 Arial, sans-serif;
-    }
-
-    .feedback {
-      min-height: 24px;
-      margin: 14px 0 0;
-      color: #d6c7aa;
-      font: 13px/1.6 Arial, sans-serif;
-    }
-
-    .feedback.error { color: #ffaaa1; }
-    .feedback.success { color: #b7e5bd; }
-
-    .discovery-results {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .discovery-results:empty { display: none; }
-
-    .result-meta {
-      display: inline-block;
-      color: #d7b47c;
-      font: 11px Arial, sans-serif;
-      letter-spacing: .04em;
-      margin-bottom: 8px;
-    }
-
-    .map-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      color: #c9c7bd;
-      font: 12px Arial, sans-serif;
-      margin-top: 12px;
-    }
-
-    .legend-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 6px;
-      background: #b87333;
-    }
-
-    .legend-dot.found { background: #4aabb0; }
-
-    .leaflet-popup-content {
-      color: #222;
-      font-family: Arial, sans-serif;
-    }
-
-    @media (max-width: 850px) {
-      .layout { grid-template-columns: 1fr; }
-      .discovery-results { grid-template-columns: 1fr; }
-      #map { height: 350px; }
-    }
-
-    @media (max-width: 520px) {
-      .fields { grid-template-columns: 1fr; }
-      label.full { grid-column: auto; }
-      .finder-controls select { flex: 1 1 100%; }
-    }
-  </style>
+  <script src="./bookshop-outreach.js" defer></script>
 </head>
 
 <body>
-  <header>
-    <div class="eyebrow">Blackwood Publishing · Management Desk</div>
+  <header class="page-header">
+    <p class="eyebrow">
+      Blackwood Publishing · Management Desk
+    </p>
+
     <h1>Bookshop Outreach</h1>
-    <p>Discover independent booksellers. Build relationships. Support local bookshops.</p>
+
+    <p>
+      Discover independent booksellers.
+      Build relationships.
+      Support local bookshops.
+    </p>
   </header>
 
-  <main>
-    <section class="panel" aria-labelledby="finderHeading">
-      <div class="eyebrow">Discover bookshops</div>
-      <h2 id="finderHeading">Find independent bookshops</h2>
+  <main class="outreach-wrap">
+
+    <section class="panel" aria-labelledby="finder-heading">
+      <p class="eyebrow">Bookshop discovery</p>
+      <h2 id="finder-heading">Find independent bookshops</h2>
 
       <p class="section-intro">
-        Search a UK town or city to discover mapped bookshops.
-        Review each result before adding it to your Blackwood directory.
+        Search a UK town or city to discover bookshops.
+        Review each result before saving it to your directory.
       </p>
 
       <form id="finderForm" class="finder-controls">
+        <label class="sr-only" for="finderTown">
+          Town or city
+        </label>
+
         <input
           id="finderTown"
           type="search"
-          placeholder="Try Glasgow, Edinburgh or Inverness"
-          aria-label="Town or city to search"
+          placeholder="Glasgow, Edinburgh, Stirling…"
           required
           minlength="2"
           maxlength="120"
         >
 
-        <select id="finderRadius" aria-label="Search radius">
+        <label class="sr-only" for="finderRadius">
+          Search radius
+        </label>
+
+        <select id="finderRadius">
           <option value="3000">Within 3 km</option>
           <option value="5000" selected>Within 5 km</option>
           <option value="10000">Within 10 km</option>
@@ -358,7 +86,11 @@
           Find bookshops
         </button>
 
-        <button id="clearResultsBtn" class="btn secondary" type="button">
+        <button
+          id="clearResultsBtn"
+          class="btn secondary"
+          type="button"
+        >
           Clear results
         </button>
       </form>
@@ -370,24 +102,34 @@
         aria-live="polite"
       ></p>
 
-      <div id="discoveryResults" class="discovery-results"></div>
+      <div
+        id="discoveryResults"
+        class="discovery-results"
+      ></div>
 
       <p class="notice">
-        Discovery uses OpenStreetMap data through Nominatim and Overpass.
-        Results may include chains, closed shops or incomplete records.
-        No result is saved, emailed or published without your action.
+        Discovery uses OpenStreetMap data.
+        Results may be incomplete or outdated.
+        No shop is contacted or published automatically.
       </p>
     </section>
 
     <div class="toolbar">
+      <label class="sr-only" for="search">
+        Search saved bookshops
+      </label>
+
       <input
         id="search"
         type="search"
         placeholder="Search saved bookshops or towns…"
-        aria-label="Search saved bookshops"
       >
 
-      <select id="statusFilter" aria-label="Filter by status">
+      <label class="sr-only" for="statusFilter">
+        Filter by outreach status
+      </label>
+
+      <select id="statusFilter">
         <option value="">All statuses</option>
         <option value="prospect">Prospect</option>
         <option value="contacted">Contacted</option>
@@ -396,39 +138,49 @@
         <option value="opted-out">Do not contact</option>
       </select>
 
-      <button class="btn secondary" id="exportBtn" type="button">
+      <button
+        id="exportBtn"
+        class="btn secondary"
+        type="button"
+      >
         Export JSON
       </button>
     </div>
 
-    <div class="layout">
-      <section class="panel">
-        <h2>Bookshop directory</h2>
-        <div class="shop-list" id="shopList"></div>
+    <div class="workspace-grid">
+      <section class="panel" aria-labelledby="directory-heading">
+        <h2 id="directory-heading">Bookshop directory</h2>
+        <div id="shopList" class="shop-list"></div>
       </section>
 
-      <section class="panel">
-        <h2>Bookshop map</h2>
+      <section class="panel" aria-labelledby="map-heading">
+        <h2 id="map-heading">Bookshop map</h2>
 
         <div
           id="map"
+          aria-label="Map of bookshops"
           role="region"
-          aria-label="Map of saved and discovered bookshops"
         ></div>
 
         <div class="map-legend">
-          <span><span class="legend-dot"></span>Saved prospects</span>
-          <span><span class="legend-dot found"></span>Search results</span>
+          <span>
+            <i class="legend-dot saved" aria-hidden="true"></i>
+            Saved prospects
+          </span>
+
+          <span>
+            <i class="legend-dot found" aria-hidden="true"></i>
+            Search results
+          </span>
         </div>
 
         <p class="notice">
           Only shops with coordinates appear on the map.
-          Search results are temporary until saved.
         </p>
       </section>
     </div>
 
-    <section class="panel" id="editor">
+    <section class="panel editor-panel" id="editor">
       <h2 id="formHeading">Add a bookshop</h2>
 
       <form id="shopForm">
@@ -450,17 +202,33 @@
 
           <label>
             Website
-            <input id="website" type="url" placeholder="https://">
+            <input
+              id="website"
+              type="url"
+              placeholder="https://"
+            >
           </label>
 
           <label>
             Latitude
-            <input id="lat" type="number" step="any" min="-90" max="90">
+            <input
+              id="lat"
+              type="number"
+              step="any"
+              min="-90"
+              max="90"
+            >
           </label>
 
           <label>
             Longitude
-            <input id="lng" type="number" step="any" min="-180" max="180">
+            <input
+              id="lng"
+              type="number"
+              step="any"
+              min="-180"
+              max="180"
+            >
           </label>
 
           <label>
@@ -481,1028 +249,33 @@
         </div>
 
         <div class="form-actions">
-          <button class="btn" type="submit">Save bookshop</button>
-          <button class="btn secondary" id="resetBtn" type="button">
+          <button class="btn" type="submit">
+            Save bookshop
+          </button>
+
+          <button
+            id="resetBtn"
+            class="btn secondary"
+            type="button"
+          >
             Clear form
           </button>
         </div>
       </form>
 
-      <p id="saveFeedback" class="feedback" role="status" aria-live="polite"></p>
+      <p
+        id="saveFeedback"
+        class="feedback"
+        role="status"
+        aria-live="polite"
+      ></p>
 
       <p class="notice">
-        Prototype records are saved in this browser only.
-        No emails are sent automatically and nothing is published to Blackwood.
+        Records are stored in this browser only.
+        Emails open as drafts and are not sent automatically.
       </p>
     </section>
+
   </main>
-
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-  ></script>
-
-  <script>
-    "use strict";
-
-    const STORAGE_KEY = "blackwood-bookshop-outreach-v1";
-
-    const STATUSES = {
-      prospect: "Prospect",
-      contacted: "Contacted",
-      interested: "Interested",
-      stockist: "Confirmed stockist",
-      "opted-out": "Do not contact"
-    };
-
-    const $ = id => document.getElementById(id);
-
-    const NOMINATIM_URL =
-      "https://nominatim.openstreetmap.org/search";
-
-    const OVERPASS_ENDPOINTS = [
-      "https://overpass.kumi.systems/api/interpreter",
-      "https://overpass-api.de/api/interpreter"
-    ];
-
-    const MAX_RESULTS = 60;
-    const REQUEST_TIMEOUT_MS = 25000;
-
-    let shops = loadShops();
-    let discoveredShops = [];
-    let editingId = null;
-    let searching = false;
-    let lastSearchStarted = 0;
-
-    let map = null;
-    let savedMarkers = null;
-    let discoveredMarkers = null;
-
-    function createElement(tag, content, className) {
-      const element = document.createElement(tag);
-
-      if (content !== undefined) {
-        element.textContent = content;
-      }
-
-      if (className) {
-        element.className = className;
-      }
-
-      return element;
-    }
-
-    function setFeedback(id, message, type = "") {
-      const element = $(id);
-      element.textContent = message;
-      element.className = `feedback ${type}`.trim();
-    }
-
-    function loadShops() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const parsed = JSON.parse(raw || "[]");
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (error) {
-        console.error("Could not read saved bookshops:", error);
-        return [];
-      }
-    }
-
-    function persistShops(nextShops) {
-      try {
-        localStorage.setItem(
-          STORAGE_KEY,
-          JSON.stringify(nextShops)
-        );
-
-        shops = nextShops;
-        return true;
-      } catch (error) {
-        console.error("Could not save bookshops:", error);
-
-        setFeedback(
-          "saveFeedback",
-          "Unable to save in this browser. Please export a backup.",
-          "error"
-        );
-
-        return false;
-      }
-    }
-
-    function normalise(value) {
-      return String(value || "")
-        .trim()
-        .toLocaleLowerCase("en-GB")
-        .replace(/\s+/g, " ");
-    }
-
-    function isDuplicate(candidate) {
-      return shops.some(shop => {
-        if (
-          candidate.osmId &&
-          shop.osmId &&
-          candidate.osmId === shop.osmId
-        ) {
-          return true;
-        }
-
-        return (
-          normalise(shop.name) === normalise(candidate.name) &&
-          normalise(shop.town) === normalise(candidate.town)
-        );
-      });
-    }
-
-    function validCoordinates(shop) {
-      return (
-        typeof shop.lat === "number" &&
-        typeof shop.lng === "number" &&
-        Number.isFinite(shop.lat) &&
-        Number.isFinite(shop.lng) &&
-        shop.lat >= -90 &&
-        shop.lat <= 90 &&
-        shop.lng >= -180 &&
-        shop.lng <= 180
-      );
-    }
-
-    function safeWebsite(value) {
-      if (!value) return "";
-
-      try {
-        const url = new URL(value);
-
-        if (
-          url.protocol !== "https:" &&
-          url.protocol !== "http:"
-        ) {
-          return "";
-        }
-
-        return url.href;
-      } catch {
-        return "";
-      }
-    }
-
-    function initMap() {
-      if (typeof L === "undefined") {
-        $("map").textContent =
-          "Map unavailable. Please check your internet connection.";
-        return;
-      }
-
-      map = L.map("map").setView([56.4, -4.2], 6);
-
-      L.tileLayer(
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          maxZoom: 19,
-          attribution: "&copy; OpenStreetMap contributors"
-        }
-      ).addTo(map);
-
-      savedMarkers = L.featureGroup().addTo(map);
-      discoveredMarkers = L.featureGroup().addTo(map);
-    }
-
-    function fitMapToMarkers(preferDiscovered = false) {
-      if (!map) return;
-
-      const layers = [];
-
-      if (preferDiscovered && discoveredMarkers.getLayers().length) {
-        layers.push(...discoveredMarkers.getLayers());
-      } else {
-        layers.push(
-          ...savedMarkers.getLayers(),
-          ...discoveredMarkers.getLayers()
-        );
-      }
-
-      if (layers.length) {
-        const bounds = L.featureGroup(layers).getBounds();
-
-        map.fitBounds(bounds.pad(0.15), {
-          maxZoom: 13
-        });
-      }
-    }
-
-    function filteredShops() {
-      const query = normalise($("search").value);
-      const status = $("statusFilter").value;
-
-      return shops.filter(shop => {
-        const haystack = normalise(
-          `${shop.name} ${shop.town}`
-        );
-
-        return (
-          haystack.includes(query) &&
-          (!status || shop.status === status)
-        );
-      });
-    }
-
-    function makeButton(text, onClick, secondary = false) {
-      const button = createElement(
-        "button",
-        text,
-        `btn small${secondary ? " secondary" : ""}`
-      );
-
-      button.type = "button";
-      button.addEventListener("click", onClick);
-
-      return button;
-    }
-
-    function renderSavedShops() {
-      const results = filteredShops();
-      const list = $("shopList");
-
-      list.replaceChildren();
-
-      if (savedMarkers) {
-        savedMarkers.clearLayers();
-      }
-
-      if (!results.length) {
-        list.append(
-          createElement(
-            "p",
-            "No saved bookshops match your search.",
-            "empty"
-          )
-        );
-      }
-
-      for (const shop of results) {
-        const card = createElement("article", undefined, "shop");
-
-        card.append(
-          createElement("h3", shop.name),
-          createElement("p", shop.town),
-          createElement(
-            "p",
-            `Status: ${STATUSES[shop.status] || "Prospect"}`
-          )
-        );
-
-        if (shop.email) {
-          card.append(
-            createElement("p", `Email: ${shop.email}`)
-          );
-        }
-
-        if (shop.notes) {
-          card.append(createElement("p", shop.notes));
-        }
-
-        const actions = createElement(
-          "div",
-          undefined,
-          "shop-actions"
-        );
-
-        actions.append(
-          makeButton("Edit", () => editShop(shop.id), true)
-        );
-
-        const website = safeWebsite(shop.website);
-
-        if (website) {
-          actions.append(
-            makeButton(
-              "Website",
-              () => window.open(
-                website,
-                "_blank",
-                "noopener,noreferrer"
-              ),
-              true
-            )
-          );
-        }
-
-        if (
-          shop.email &&
-          shop.status !== "opted-out"
-        ) {
-          actions.append(
-            makeButton(
-              "Draft email",
-              () => draftEmail(shop)
-            )
-          );
-        }
-
-        card.append(actions);
-        list.append(card);
-
-        if (savedMarkers && validCoordinates(shop)) {
-          const marker = L.circleMarker(
-            [shop.lat, shop.lng],
-            {
-              radius: 8,
-              color: "#f1d0a2",
-              weight: 2,
-              fillColor: "#b87333",
-              fillOpacity: .95
-            }
-          );
-
-          marker.bindPopup(
-            createElement(
-              "strong",
-              `${shop.name} — ${shop.town}`
-            )
-          );
-
-          savedMarkers.addLayer(marker);
-        }
-      }
-    }
-
-    function renderDiscoveredShops() {
-      const container = $("discoveryResults");
-      container.replaceChildren();
-
-      if (discoveredMarkers) {
-        discoveredMarkers.clearLayers();
-      }
-
-      for (const shop of discoveredShops) {
-        const card = createElement(
-          "article",
-          undefined,
-          "discovery-card"
-        );
-
-        card.append(
-          createElement(
-            "span",
-            "OPENSTREETMAP RESULT · UNVERIFIED",
-            "result-meta"
-          ),
-          createElement("h3", shop.name),
-          createElement("p", shop.address || shop.town)
-        );
-
-        if (shop.website) {
-          card.append(
-            createElement("p", `Website: ${shop.website}`)
-          );
-        }
-
-        if (shop.email) {
-          card.append(
-            createElement("p", `Public email: ${shop.email}`)
-          );
-        }
-
-        const actions = createElement(
-          "div",
-          undefined,
-          "result-actions"
-        );
-
-        const alreadySaved = isDuplicate(shop);
-
-        const saveButton = makeButton(
-          alreadySaved ? "Already saved" : "Add to directory",
-          () => addDiscoveredShop(shop)
-        );
-
-        saveButton.disabled = alreadySaved;
-        actions.append(saveButton);
-
-        if (shop.website) {
-          actions.append(
-            makeButton(
-              "Visit website",
-              () => window.open(
-                shop.website,
-                "_blank",
-                "noopener,noreferrer"
-              ),
-              true
-            )
-          );
-        }
-
-        actions.append(
-          makeButton(
-            "View on map",
-            () => {
-              if (!map) return;
-
-              map.setView([shop.lat, shop.lng], 16);
-              $("map").scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-              });
-            },
-            true
-          )
-        );
-
-        card.append(actions);
-        container.append(card);
-
-        if (discoveredMarkers && validCoordinates(shop)) {
-          const marker = L.circleMarker(
-            [shop.lat, shop.lng],
-            {
-              radius: 7,
-              color: "#d5f4f5",
-              weight: 2,
-              fillColor: "#4aabb0",
-              fillOpacity: .9
-            }
-          );
-
-          marker.bindPopup(
-            createElement("strong", shop.name)
-          );
-
-          discoveredMarkers.addLayer(marker);
-        }
-      }
-    }
-
-    function render() {
-      renderSavedShops();
-      renderDiscoveredShops();
-    }
-
-    function resetForm() {
-      editingId = null;
-      $("shopForm").reset();
-      $("formHeading").textContent = "Add a bookshop";
-      setFeedback("saveFeedback", "");
-    }
-
-    function editShop(id) {
-      const shop = shops.find(item => item.id === id);
-
-      if (!shop) return;
-
-      editingId = id;
-
-      $("name").value = shop.name;
-      $("town").value = shop.town;
-      $("email").value = shop.email || "";
-      $("website").value = shop.website || "";
-      $("lat").value = shop.lat ?? "";
-      $("lng").value = shop.lng ?? "";
-      $("status").value = shop.status;
-      $("notes").value = shop.notes || "";
-
-      $("formHeading").textContent = "Edit bookshop";
-
-      $("editor").scrollIntoView({
-        behavior: "smooth"
-      });
-    }
-
-    function addDiscoveredShop(shop) {
-      if (isDuplicate(shop)) {
-        setFeedback(
-          "finderFeedback",
-          "This bookshop is already in your directory.",
-          "error"
-        );
-        return;
-      }
-
-      const record = {
-        id: crypto.randomUUID(),
-        osmId: shop.osmId,
-        name: shop.name,
-        town: shop.town,
-        email: shop.email,
-        website: shop.website,
-        lat: shop.lat,
-        lng: shop.lng,
-        status: "prospect",
-        notes: [
-          "Discovered via OpenStreetMap.",
-          `OSM reference: ${shop.osmId}`,
-          `Address: ${shop.address || "Not supplied"}`,
-          "Independent status and current trading status not verified.",
-          "Contact and stocking policy require verification."
-        ].join("\n")
-      };
-
-      if (!persistShops([...shops, record])) return;
-
-      render();
-
-      setFeedback(
-        "finderFeedback",
-        `${shop.name} has been added as an unverified prospect.`,
-        "success"
-      );
-    }
-
-    function draftEmail(shop) {
-      if (
-        !shop.email ||
-        shop.status === "opted-out"
-      ) {
-        return;
-      }
-
-      const subject =
-        "Blackwood Publishing — paperback stocking enquiry";
-
-      const body = [
-        "Hello,",
-        "",
-        "I'm getting in touch from Blackwood Publishing, an independent Scottish publishing imprint.",
-        "",
-        "We're introducing our paperback catalogue to independent bookshops and wondered whether you might consider selected titles.",
-        "",
-        "Our current IngramSpark catalogue includes:",
-        "Gualachulain Bothy: The Second Silence — 9781919555560",
-        "Holdfast — 9781919555522",
-        "Love, Abused — 9781919555539",
-        "The Black Bothy — 9781919555584",
-        "Corrour: The First Summoning — 9781919555508",
-        "",
-        "We can provide current ordering and trade information on request.",
-        "",
-        "Would you be happy for us to send over further details?",
-        "",
-        "Kind regards,",
-        "Blackwood Publishing",
-        "https://blackwoodpublishing.co.uk",
-        "",
-        "If you'd prefer not to receive further trade enquiries, please let us know."
-      ].join("\n");
-
-      window.location.href =
-        `mailto:${encodeURIComponent(shop.email)}` +
-        `?subject=${encodeURIComponent(subject)}` +
-        `&body=${encodeURIComponent(body)}`;
-    }
-
-    function getTag(tags, keys) {
-      for (const key of keys) {
-        if (typeof tags[key] === "string" && tags[key].trim()) {
-          return tags[key].trim();
-        }
-      }
-
-      return "";
-    }
-
-    function extractWebsite(tags) {
-      const value = getTag(tags, [
-        "website",
-        "contact:website",
-        "website:official",
-        "url"
-      ]);
-
-      return safeWebsite(value);
-    }
-
-    function extractEmail(tags) {
-      const value = getTag(tags, [
-        "email",
-        "contact:email"
-      ]);
-
-      if (
-        !value ||
-        value.includes(" ") ||
-        value.includes(",") ||
-        value.includes(";") ||
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-      ) {
-        return "";
-      }
-
-      return value;
-    }
-
-    function extractAddress(tags, fallbackTown) {
-      const parts = [
-        getTag(tags, ["addr:housenumber"]),
-        getTag(tags, ["addr:street"]),
-        getTag(tags, ["addr:city", "addr:town", "addr:village"])
-      ].filter(Boolean);
-
-      return parts.length
-        ? parts.join(" ")
-        : fallbackTown;
-    }
-
-    function parseBookshop(element, town) {
-      const tags = element.tags || {};
-
-      const name = getTag(tags, ["name", "name:en"]);
-
-      if (!name) return null;
-
-      if (tags.disused === "yes" ||
-          tags.abandoned === "yes" ||
-          tags["disused:shop"] ||
-          tags["abandoned:shop"] ||
-          tags.shop !== "books") {
-        return null;
-      }
-
-      const lat = Number(
-        element.lat ?? element.center?.lat
-      );
-
-      const lng = Number(
-        element.lon ?? element.center?.lon
-      );
-
-      const shop = {
-        osmId: `${element.type}/${element.id}`,
-        name,
-        town: getTag(tags, [
-          "addr:city",
-          "addr:town",
-          "addr:village"
-        ]) || town,
-        address: extractAddress(tags, town),
-        email: extractEmail(tags),
-        website: extractWebsite(tags),
-        lat,
-        lng
-      };
-
-      return validCoordinates(shop) ? shop : null;
-    }
-
-    async function fetchWithTimeout(url, options = {}) {
-      const controller = new AbortController();
-
-      const timer = setTimeout(
-        () => controller.abort(),
-        REQUEST_TIMEOUT_MS
-      );
-
-      try {
-        const response = await fetch(url, {
-          ...options,
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `Request failed with HTTP ${response.status}`
-          );
-        }
-
-        return response.json();
-      } finally {
-        clearTimeout(timer);
-      }
-    }
-
-    async function geocodeTown(town) {
-      const params = new URLSearchParams({
-        q: `${town}, United Kingdom`,
-        format: "jsonv2",
-        limit: "5",
-        addressdetails: "1"
-      });
-
-      const results = await fetchWithTimeout(
-        `${NOMINATIM_URL}?${params.toString()}`
-      );
-
-      if (!Array.isArray(results) || !results.length) {
-        throw new Error(
-          `No UK location was found for "${town}".`
-        );
-      }
-
-      const valid = results.find(result =>
-        result.address?.country_code === "gb" &&
-        Number.isFinite(Number(result.lat)) &&
-        Number.isFinite(Number(result.lon))
-      );
-
-      if (!valid) {
-        throw new Error(
-          "The location could not be verified as a UK town or city."
-        );
-      }
-
-      return {
-        lat: Number(valid.lat),
-        lng: Number(valid.lon),
-        displayName: valid.display_name
-      };
-    }
-
-    async function queryOverpass(lat, lng, radius) {
-      const query = `
-        [out:json][timeout:20];
-        (
-          node["shop"="books"](around:${radius},${lat},${lng});
-          way["shop"="books"](around:${radius},${lat},${lng});
-          relation["shop"="books"](around:${radius},${lat},${lng});
-        );
-        out center;
-      `;
-
-      let lastError;
-
-      for (const endpoint of OVERPASS_ENDPOINTS) {
-        try {
-          const data = await fetchWithTimeout(endpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/x-www-form-urlencoded;charset=UTF-8"
-            },
-            body: new URLSearchParams({ data: query })
-          });
-
-          if (!Array.isArray(data.elements)) {
-            throw new Error(
-              "The map service returned an unexpected response."
-            );
-          }
-
-          return data.elements;
-        } catch (error) {
-          lastError = error;
-          console.warn(
-            "Bookshop discovery endpoint unavailable:",
-            endpoint,
-            error
-          );
-        }
-      }
-
-      throw lastError || new Error(
-        "Bookshop discovery is temporarily unavailable."
-      );
-    }
-
-    async function findBookshops(event) {
-      event.preventDefault();
-
-      if (searching) return;
-
-      const town = $("finderTown").value.trim();
-      const radius = Number($("finderRadius").value);
-
-      if (town.length < 2) {
-        setFeedback(
-          "finderFeedback",
-          "Please enter a town or city.",
-          "error"
-        );
-        return;
-      }
-
-      if (![3000, 5000, 10000, 20000].includes(radius)) {
-        return;
-      }
-
-      const now = Date.now();
-
-      if (now - lastSearchStarted < 1500) {
-        setFeedback(
-          "finderFeedback",
-          "Please wait briefly before searching again.",
-          "error"
-        );
-        return;
-      }
-
-      lastSearchStarted = now;
-      searching = true;
-
-      const button = $("findBtn");
-      button.disabled = true;
-      button.textContent = "Searching…";
-
-      discoveredShops = [];
-      renderDiscoveredShops();
-
-      setFeedback(
-        "finderFeedback",
-        `Locating ${town}…`
-      );
-
-      try {
-        const location = await geocodeTown(town);
-
-        if (map) {
-          map.setView(
-            [location.lat, location.lng],
-            11
-          );
-        }
-
-        setFeedback(
-          "finderFeedback",
-          `Searching OpenStreetMap for bookshops near ${town}…`
-        );
-
-        const elements = await queryOverpass(
-          location.lat,
-          location.lng,
-          radius
-        );
-
-        const unique = new Map();
-
-        for (const element of elements) {
-          const shop = parseBookshop(element, town);
-
-          if (!shop) continue;
-
-          const key = normalise(
-            `${shop.name}|${shop.town}|${shop.address}`
-          );
-
-          if (!unique.has(key)) {
-            unique.set(key, shop);
-          }
-        }
-
-        discoveredShops = [...unique.values()]
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .slice(0, MAX_RESULTS);
-
-        renderDiscoveredShops();
-
-        if (discoveredShops.length) {
-          fitMapToMarkers(true);
-
-          setFeedback(
-            "finderFeedback",
-            `Found ${discoveredShops.length} mapped bookshop(s) near ${town}. Review each result before saving.`,
-            "success"
-          );
-        } else {
-          setFeedback(
-            "finderFeedback",
-            `No mapped bookshops were found within the selected radius of ${town}. Try a larger radius or another location.`
-          );
-        }
-      } catch (error) {
-        console.error("Bookshop search failed:", error);
-
-        setFeedback(
-          "finderFeedback",
-          `${error.message} The public mapping services may be busy or temporarily unavailable.`,
-          "error"
-        );
-      } finally {
-        searching = false;
-        button.disabled = false;
-        button.textContent = "Find bookshops";
-      }
-    }
-
-    $("shopForm").addEventListener("submit", event => {
-      event.preventDefault();
-
-      const latText = $("lat").value.trim();
-      const lngText = $("lng").value.trim();
-
-      if ((latText === "") !== (lngText === "")) {
-        setFeedback(
-          "saveFeedback",
-          "Enter both coordinates or leave both blank.",
-          "error"
-        );
-        return;
-      }
-
-      const existing = editingId
-        ? shops.find(shop => shop.id === editingId)
-        : null;
-
-      const record = {
-        id: editingId || crypto.randomUUID(),
-        osmId: existing?.osmId || "",
-        name: $("name").value.trim(),
-        town: $("town").value.trim(),
-        email: $("email").value.trim(),
-        website: safeWebsite($("website").value.trim()),
-        lat: latText === "" ? null : Number(latText),
-        lng: lngText === "" ? null : Number(lngText),
-        status: $("status").value,
-        notes: $("notes").value.trim()
-      };
-
-      if (!record.name || !record.town) return;
-
-      if (
-        latText !== "" &&
-        !validCoordinates(record)
-      ) {
-        setFeedback(
-          "saveFeedback",
-          "Please enter valid latitude and longitude.",
-          "error"
-        );
-        return;
-      }
-
-      if (
-        shops.some(shop =>
-          shop.id !== record.id &&
-          normalise(shop.name) === normalise(record.name) &&
-          normalise(shop.town) === normalise(record.town)
-        )
-      ) {
-        setFeedback(
-          "saveFeedback",
-          "That bookshop is already in your directory.",
-          "error"
-        );
-        return;
-      }
-
-      const nextShops = editingId
-        ? shops.map(shop =>
-            shop.id === editingId ? record : shop
-          )
-        : [...shops, record];
-
-      if (!persistShops(nextShops)) return;
-
-      resetForm();
-      render();
-
-      setFeedback(
-        "saveFeedback",
-        `${record.name} saved successfully.`,
-        "success"
-      );
-    });
-
-    $("finderForm").addEventListener(
-      "submit",
-      findBookshops
-    );
-
-    $("clearResultsBtn").addEventListener("click", () => {
-      discoveredShops = [];
-      renderDiscoveredShops();
-      setFeedback("finderFeedback", "Search results cleared.");
-      fitMapToMarkers();
-    });
-
-    $("search").addEventListener(
-      "input",
-      renderSavedShops
-    );
-
-    $("statusFilter").addEventListener(
-      "change",
-      renderSavedShops
-    );
-
-    $("resetBtn").addEventListener(
-      "click",
-      resetForm
-    );
-
-    $("exportBtn").addEventListener("click", () => {
-      const blob = new Blob(
-        [JSON.stringify(shops, null, 2)],
-        { type: "application/json" }
-      );
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = "blackwood-bookshop-outreach.json";
-
-      document.body.append(link);
-      link.click();
-      link.remove();
-
-      setTimeout(
-        () => URL.revokeObjectURL(url),
-        1000
-      );
-    });
-
-    initMap();
-    render();
-  </script>
 </body>
 </html>
