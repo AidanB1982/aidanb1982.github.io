@@ -1,7 +1,12 @@
 
 name: Refresh Scottish bookshop directory
- 
-"on":
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/bookshop-discovery.yml"
   workflow_dispatch:
   schedule:
     - cron: "23 5 * * 0"
