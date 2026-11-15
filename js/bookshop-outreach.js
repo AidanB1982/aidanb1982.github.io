@@ -14,10 +14,12 @@ const STATUSES = {
 const NOMINATIM_URL =
   "https://nominatim.openstreetmap.org/search";
 
+
 const OVERPASS_ENDPOINTS = [
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://overpass-api.de/api/interpreter"
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter"
 ];
+
 
 const MAX_RESULTS = 60;
 const REQUEST_TIMEOUT_MS = 25000;
@@ -234,6 +236,7 @@ function filteredShops() {
   });
 }
 
+
 function renderSaved() {
   const list = $("shopList");
   const results = filteredShops();
@@ -252,28 +255,68 @@ function renderSaved() {
         "empty"
       )
     );
+    return;
   }
 
   for (const shop of results) {
     const card = element("article", undefined, "shop");
 
-    card.append(
-      element("h3", shop.name),
-      element("p", shop.town),
+    // A native details element gives us accessible
+    // click-to-expand behaviour without extra libraries.
+    const details = document.createElement("details");
+    details.className = "shop-details";
+
+    const summary = document.createElement("summary");
+    summary.className = "shop-summary";
+
+    const name = element("strong", shop.name);
+    const town = element("span", shop.town, "shop-town");
+
+    summary.append(name, town);
+
+    // Everything below is hidden until the shop is opened.
+    const content = element(
+      "div",
+      undefined,
+      "shop-expanded"
+    );
+
+    if (shop.notes) {
+      // Show a short blurb rather than a huge block
+      // of notes in the directory.
+      const blurb = shop.notes
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const shortBlurb =
+        blurb.length > 240
+          ? `${blurb.slice(0, 237).trimEnd()}…`
+          : blurb;
+
+      content.append(
+        element("p", shortBlurb, "shop-blurb")
+      );
+    } else {
+      content.append(
+        element(
+          "p",
+          "Independent bookshop prospect. More details to be added.",
+          "shop-blurb"
+        )
+      );
+    }
+
+    content.append(
       element(
         "p",
-        `Status: ${STATUSES[shop.status] || "Prospect"}`
+        `Outreach: ${STATUSES[shop.status] || "Prospect"}`
       )
     );
 
     if (shop.email) {
-      card.append(
+      content.append(
         element("p", `Email: ${shop.email}`)
       );
-    }
-
-    if (shop.notes) {
-      card.append(element("p", shop.notes));
     }
 
     const actions = element(
@@ -283,7 +326,11 @@ function renderSaved() {
     );
 
     actions.append(
-      makeButton("Edit", () => editShop(shop.id), true)
+      makeButton(
+        "Edit details",
+        () => editShop(shop.id),
+        true
+      )
     );
 
     const website = safeWebsite(shop.website);
@@ -314,9 +361,12 @@ function renderSaved() {
       );
     }
 
-    card.append(actions);
+    content.append(actions);
+    details.append(summary, content);
+    card.append(details);
     list.append(card);
 
+    // Keep the existing map functionality.
     if (savedMarkers && validCoordinates(shop)) {
       const marker = L.circleMarker(
         [shop.lat, shop.lng],
@@ -330,13 +380,17 @@ function renderSaved() {
       );
 
       marker.bindPopup(
-        element("strong", `${shop.name} — ${shop.town}`)
+        element(
+          "strong",
+          `${shop.name} — ${shop.town}`
+        )
       );
 
       savedMarkers.addLayer(marker);
     }
   }
 }
+
 
 function renderDiscovered() {
   const container = $("discoveryResults");
@@ -652,13 +706,13 @@ function parseBookshop(item, fallbackTown) {
   return validCoordinates(shop) ? shop : null;
 }
 
+
 async function fetchJSON(url, options = {}) {
   const controller = new AbortController();
 
-  const timer = setTimeout(
-    () => controller.abort(),
-    REQUEST_TIMEOUT_MS
-  );
+  const timer = setTimeout(() => {
+    controller.abort();
+  }, REQUEST_TIMEOUT_MS);
 
   try {
     const response = await fetch(url, {
@@ -667,16 +721,31 @@ async function fetchJSON(url, options = {}) {
     });
 
     if (!response.ok) {
+      const service = url.includes("nominatim")
+        ? "Town lookup (Nominatim)"
+        : "Bookshop search (Overpass)";
+
       throw new Error(
-        `Search service returned HTTP ${response.status}.`
+        `${service} returned HTTP ${response.status}.`
       );
     }
 
     return await response.json();
+
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error(
+        "The search timed out. Please try again shortly."
+      );
+    }
+
+    throw error;
+
   } finally {
     clearTimeout(timer);
   }
 }
+
 
 async function geocodeTown(town) {
   const params = new URLSearchParams({
