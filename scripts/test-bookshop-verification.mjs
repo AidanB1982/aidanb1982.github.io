@@ -72,3 +72,12 @@ test("candidate module only saves after explicit click and does not send email",
   assert.match(moduleText,/saveShops\(\[\.\.\.api\.getShops\(\), saved\]\)/);
   assert.doesNotMatch(moduleText,/functions\.invoke|sendPreparedEmailViaOutlook|mailto:/);
 });
+
+test("new review candidates cannot use contact action until verified", () => {
+  const app=fs.readFileSync("js/bookshop-outreach.js","utf8");
+  const desk=fs.readFileSync("js/bookshop-verification-desk.js","utf8");
+  assert.match(desk,/reviewOrigin: "public-directory"/);
+  assert.match(app,/shop\.reviewOrigin !== "public-directory"/);
+  assert.match(app,/statusOf\(shop\) === "verified-independent"/);
+  assert.match(desk,/email: ""/);
+});
