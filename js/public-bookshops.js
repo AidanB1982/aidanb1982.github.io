@@ -9,7 +9,7 @@
   const DATA_URL = "/data/public-bookshops.json";
   const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
   const MAX_CARDS = 36;
-  const state = { shops: [], results: [], map: null, markers: null, canvasRenderer: null, coverage: null, searchId: 0, baseResults: [], resultDescription: "All bookshops" };
+  const state = { shops: [], results: [], map: null, markers: null, canvasRenderer: null, coverage: null, searchId: 0, baseResults: [], resultDescription: "All bookshops", areaMode: false };
   const el = id => document.getElementById(id);
 
   function textElement(tag, text, className) {
@@ -103,6 +103,7 @@
       }).bindPopup(makePopup(shop));
       state.markers.addLayer(marker);
     });
+    if (state.areaMode) return;
     if (results.length) {
       state.map.fitBounds(state.markers.getBounds().pad(0.12), { maxZoom: 13 });
     } else {
@@ -170,13 +171,13 @@
     ++state.searchId;
     el("pb-search").value = "";
     const bounds = state.map.getBounds();
+    state.areaMode = true;
     const matches = state.shops.filter(shop => bounds.contains([shop.lat, shop.lng]));
     update(matches, matches.length
       ? "Bookshops in the selected map area."
       : "No cached bookshops found in this map area. Coverage is still expanding.");
-    // Filtering should not zoom out to encompass all results; keep the map
-    // where the visitor chose to search.
-    state.map.fitBounds(bounds, { animate: false });
+    // Keep the selected viewport in place. The map markers update without
+    // triggering the default automatic fit-to-results.
   }
 
   function normalise(value) {
@@ -207,6 +208,7 @@
   async function search(event) {
     event.preventDefault();
     const searchId = ++state.searchId;
+    state.areaMode = false;
     const query = el("pb-search").value.trim().slice(0, 120);
     const radius = Number(el("pb-radius").value);
     if (!query) {
@@ -265,6 +267,7 @@
     el("pb-reset").addEventListener("click", () => {
       ++state.searchId;
       el("pb-search").value = "";
+      state.areaMode = false;
       el("pb-websites").checked = false;
       update(state.shops, "Showing all bookshops in the current public directory.");
     });
