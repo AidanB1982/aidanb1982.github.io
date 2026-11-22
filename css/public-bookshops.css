@@ -240,7 +240,7 @@ body.public-bookshops-page {
   align-items: center;
   width: 46px !important;
   height: 46px !important;
-  margin: 0 !important;
+  /* Keep Leaflet anchor margins to centre the cluster icon. */
   background: transparent;
   border: 0;
   box-shadow: none;
