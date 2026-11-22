@@ -67,7 +67,7 @@
   <!-- Outreach styles load after shared styles -->
   <link
     rel="stylesheet"
-    href="/css/bookshop-outreach.css?v=8"
+    href="/css/bookshop-outreach.css?v=9"
   >
 
   <!-- Shared Blackwood header/footer loader -->
@@ -95,7 +95,7 @@
     after successful verification.
   -->
   <script
-    src="/js/bookshop-outreach-access.js?v=1"
+    src="/js/bookshop-outreach-access.js?v=2"
     defer
   ></script>
 
@@ -472,23 +472,14 @@
             role="region"
           ></div>
 
-          <div class="map-legend">
+          <div class="map-legend" aria-label="Map marker colours">
 
-            <span>
-              <i
-                class="legend-dot saved"
-                aria-hidden="true"
-              ></i>
-              Saved prospects
-            </span>
-
-            <span>
-              <i
-                class="legend-dot found"
-                aria-hidden="true"
-              ></i>
-              Search results
-            </span>
+            <span><i class="legend-dot prospect" aria-hidden="true"></i> Prospect</span>
+            <span><i class="legend-dot contacted" aria-hidden="true"></i> Contacted</span>
+            <span><i class="legend-dot interested" aria-hidden="true"></i> Interested</span>
+            <span><i class="legend-dot stockist" aria-hidden="true"></i> Stockist</span>
+            <span><i class="legend-dot opted-out" aria-hidden="true"></i> Do not contact</span>
+            <span><i class="legend-dot found" aria-hidden="true"></i> Discovered, not saved</span>
 
           </div>
 
