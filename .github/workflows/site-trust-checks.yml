@@ -1,0 +1,33 @@
+name: Check public site trust and bookshop wording
+
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "footer.html"
+      - "pages/about.html"
+      - "pages/LimitedEditions.html"
+      - "pages/resources.html"
+      - "pages/refund-policy.html"
+      - "pages/terms-of-service.html"
+      - "pages/find-bookshops.html"
+      - "js/public-bookshops.js"
+      - "css/publisher-about.css"
+      - "scripts/test-public-site-trust.mjs"
+      - ".github/workflows/site-trust-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate public page destinations and discovery copy
+        run: node --test scripts/test-public-site-trust.mjs

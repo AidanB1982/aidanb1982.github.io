@@ -340,11 +340,11 @@
       if (!Array.isArray(data.shops)) throw new Error("Invalid bookshop data.");
       state.shops = data.shops.filter(validShop);
       state.coverage = typeof data.scope === "string"
-        ? data.scope : "Scotland-focused directory";
+        ? data.scope : "UK-wide bookshop discovery directory; regional coverage varies";
       const disclaimer = el("pb-disclaimer");
       if (disclaimer) {
         disclaimer.textContent = (Number(data.ukCount) > 0
-          ? "UK-wide discovery is underway, but coverage varies by region."
+          ? "The UK bookshop discovery map covers the country, but regional data quality varies."
           : "Scotland-focused for now, including nearby border towns.") +
           " Listings may be incomplete or out of date. Inclusion does not confirm independence, opening hours or that a bookshop stocks Blackwood titles.";
       }
