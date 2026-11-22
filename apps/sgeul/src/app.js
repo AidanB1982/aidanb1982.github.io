@@ -7,6 +7,7 @@ import { startAtmosphere } from "../../../js/BP-reading-atmosphere.js";
 import { OfflineLibrary } from "../../../js/BP-reading-offline.js";
 import { loadShop } from "./shop.js";
 import { isOnline, initialiseConnectivity } from "./connectivity.js";
+import { createAuthorInduction } from "./author-induction.js";
 const $ = (id) => document.getElementById(id),
   offline = new OfflineLibrary();
 const loginLoading = createLoginLoading($("auth-loading"), [
@@ -14,6 +15,7 @@ const loginLoading = createLoginLoading($("auth-loading"), [
   document.querySelector(".app-nav"),
 ]);
 const atmosphere = startAtmosphere($("home"));
+const authorInduction = createAuthorInduction({ client, isOnline });
 window.addEventListener("pagehide", (event) => {
   if (!event.persisted) atmosphere.destroy();
 });
@@ -40,7 +42,7 @@ export async function openExternal(value) {
 }
 function showView(next) {
   view = next;
-  for (const name of ["home", "shop", "account"])
+  for (const name of ["home", "shop", "authors", "account"])
     $(name).hidden = !user || name !== next;
   $("sign-in").hidden = Boolean(user);
   document.querySelectorAll("[data-view]").forEach((button) => {
@@ -49,6 +51,7 @@ function showView(next) {
     else button.removeAttribute("aria-current");
   });
   if (user && next === "shop") void loadShop(openExternal);
+  if (user && next === "authors") void authorInduction.open(user);
 }
 function connection() {
   $("connection").hidden = isOnline();
@@ -79,6 +82,7 @@ async function loadAccount() {
   }
   $("startup-status").hidden = true;
   if (!user) {
+    authorInduction.clear();
     showView("home");
     return;
   }
@@ -193,6 +197,7 @@ $("sign-out").onclick = async () => {
     }
     const { error } = await client.auth.signOut({ scope: "local" });
     if (error) throw error;
+    authorInduction.clear();
     user = null;
     await loadAccount();
   } catch {
@@ -208,6 +213,7 @@ $("password-help").onclick = () => {
     "https://blackwoodpublishing.co.uk/pages/members.html?reset-password=1",
   );
 };
+$("account-author-entry").onclick = () => showView("authors");
 document
   .querySelectorAll("[data-view]")
   .forEach((button) => (button.onclick = () => showView(button.dataset.view)));
