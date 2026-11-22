@@ -5,6 +5,11 @@ import path from "node:path";
 
 const read = filename => fs.readFileSync(filename, "utf8");
 const about = read("pages/about.html");
+const charter = read("pages/author-charter.html");
+const submissions = read("pages/submissions.html");
+const charterStyles = read("css/author-charter.css");
+const submissionStyles = read("css/submissions.css");
+const readinessDoc = read("docs/author-intake-readiness.md");
 const limited = read("pages/LimitedEditions.html");
 const home = read("index.html");
 const publicFinder = read("pages/find-bookshops.html");
@@ -44,6 +49,8 @@ test("About links to established authors, books and the contact page", () => {
 test("New landing pages contain only valid existing local destinations and assets", () => {
   for (const [filename,content] of [
     ["pages/about.html",about],
+    ["pages/author-charter.html",charter],
+    ["pages/submissions.html",submissions],
     ["pages/resources.html",resources],
     ["pages/refund-policy.html",refunds],
     ["pages/terms-of-service.html",terms]
@@ -152,4 +159,69 @@ test("Core values render in a responsive, About-only section", () => {
   assert.match(css, /body\.publisher-about-page \.publisher-values-grid/);
   assert.match(css, /@media \(max-width: 700px\)/);
   assert.match(css, /grid-template-columns: 1fr;/);
+});
+
+
+test("The Author Charter is visible from About, submissions and the footer", () => {
+  assert.match(about, /href="\/pages\/author-charter\.html"/);
+  assert.match(submissions, /href="\/pages\/author-charter\.html"/);
+  assert.match(footer, /href="\/pages\/author-charter\.html"/);
+  assert.match(charter, /<h1>Our Author Charter<\/h1>/);
+  assert.match(charter, /href="\/pages\/submissions\.html"/);
+  assert.match(charter, /href="\/pages\/about\.html"/);
+  assert.match(charter, /id="main-content"/);
+  assert.match(charter, /id="footer-placeholder"/);
+  assert.equal((charter.match(/<h1\b/g) || []).length, 1);
+});
+
+test("Charter preserves the approved author mission and stated acquisition principles", () => {
+  assert.match(charter, /Independent voices\. Extraordinary stories\./);
+  assert.match(charter, /To give independent voices the opportunity to be heard, stories the care they deserve, and readers new worlds to discover\./);
+  assert.match(charter, /do not charge authors a manuscript reading or consideration fee/);
+  assert.match(charter, /The author retains copyright/);
+  assert.match(charter, /publishing rights expressly agreed in a signed publishing agreement/);
+  assert.match(charter, /house carries the ordinary financial and operational risk/);
+  assert.match(charter, /funds the editorial, design, production and publishing work agreed/);
+  assert.match(charter, /emerging, independent and overlooked authors/);
+});
+
+test("Charter distinguishes approved principles from unfinished author terms", () => {
+  assert.match(charter, /The standards we are building/);
+  assert.match(charter, /not claims that every system or term is already in place/);
+  assert.match(charter, /royalties, calculation bases, deductions, reporting arrangements and payment terms/);
+  assert.match(charter, /not a contract, an offer to publish or a statement of agreed royalty percentages/);
+  assert.match(charter, /must be set out in an individual written agreement/);
+  assert.doesNotMatch(charter, /guaranteed royalty|minimum earnings|guaranteed publication/i);
+});
+
+test("The submissions page honestly remains closed without obsolete opening promises", () => {
+  assert.match(submissions, /Submissions are currently closed\./);
+  assert.match(submissions, /Our next manuscript reading window has not yet been announced/);
+  assert.match(submissions, /secure submission route/);
+  assert.match(submissions, /Please do not send a manuscript through the general contact form/);
+  assert.match(submissions, /Not yet announced/);
+  assert.match(submissions, /emerging, independent and\s+overlooked authors/);
+  assert.doesNotMatch(submissions, /Opening in November|Opening November 2026|will open its next manuscript\s+submission window in November/i);
+});
+
+test("Neither the charter nor submissions expose an unapproved upload or sign-up", () => {
+  for (const page of [charter, submissions]) {
+    assert.doesNotMatch(page, /<form\b/i);
+    assert.doesNotMatch(page, /<input\b[^>]*type=["']?file/i);
+    assert.doesNotMatch(page, /formspree\.io|supabase\.functions\.invoke|author_role|createAuthorProfile/i);
+  }
+  assert.match(charter, /There is no open application or manuscript upload route at present/);
+  assert.match(readinessDoc, /Gate A — before announcing a manuscript reading window/);
+  assert.match(readinessDoc, /Gate B — future Sgeul author induction/);
+  assert.match(readinessDoc, /No automatic import, role upgrade, author payment or launch is in PR #16/);
+});
+
+test("Charter and submissions signpost styles are scoped and responsive", () => {
+  assert.match(charterStyles, /body\.publisher-charter-page/);
+  assert.match(charterStyles, /@media \(max-width: 620px\)/);
+  assert.match(charterStyles, /grid-template-columns: 1fr/);
+  assert.match(submissionStyles, /\.submissions-charter/);
+  assert.match(submissionStyles, /@media \(max-width: 640px\)/);
+  assert.match(charter, /rel="canonical"/);
+  assert.match(charter, /og:description/);
 });
