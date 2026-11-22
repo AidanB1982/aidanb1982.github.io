@@ -41,6 +41,9 @@ const CURATED_DATA_URL =
 const UK_BOOKSHOP_DATA_URL =
   "/data/uk-bookshops.json";
 
+const PUBLIC_REVIEW_DATA_URL =
+  "/data/public-bookshops.json";
+
 const NOMINATIM_URL =
   "https://nominatim.openstreetmap.org/search";
 
@@ -184,6 +187,12 @@ let emailCloseButton = null;
 let activeEmailShopId = null;
 let outlookSending = false;
 
+let verificationDialog = null;
+let activeVerificationShopId = null;
+let reviewCandidates = [];
+let reviewCandidatePage = 0;
+let reviewCandidateLoaded = false;
+let reviewCandidateError = "";
 let contactDialog = null;
 let contactTypeSelect = null;
 let contactDateInput = null;
@@ -758,6 +767,12 @@ function renderContactOverview() {
 
   const items = [
     ["Saved bookshops", shops.length],
+    ["Verified independent", shops.filter(shop =>
+      window.BlackwoodVerification?.statusOf(shop) === "verified-independent"
+    ).length],
+    ["Unreviewed", shops.filter(shop =>
+      window.BlackwoodVerification?.statusOf(shop) === "unreviewed"
+    ).length],
     ["Prospects", counts.prospect],
     ["Contacted", counts.contacted],
     ["Interested", counts.interested],
@@ -863,6 +878,7 @@ function filteredShops() {
 
   const status =
     $("statusFilter").value;
+  const verificationStatus = $("verificationFilter")?.value || "";
 
   return shops.filter(shop => {
     const searchable = normalise(
@@ -871,7 +887,9 @@ function filteredShops() {
 
     return (
       searchable.includes(query) &&
-      (!status || shop.status === status)
+      (!status || shop.status === status) &&
+      (!verificationStatus ||
+        window.BlackwoodVerification?.statusOf(shop) === verificationStatus)
     );
   });
 }
@@ -974,6 +992,28 @@ function renderSaved() {
         }`
       )
     );
+
+    const reviewHelper = window.BlackwoodVerification;
+    if (reviewHelper) {
+      content.append(element(
+        "p",
+        "Verification: " +
+          reviewHelper.LABELS[reviewHelper.statusOf(shop)] +
+          (shop.verification?.checkedAt
+            ? " · checked " + formatDate(shop.verification.checkedAt)
+            : "")
+      ));
+      if (shop.verification?.sourceUrl) {
+        const evidence = reviewHelper.evidenceUrl(shop.verification.sourceUrl);
+        if (evidence) {
+          const reviewLink = element("a", "Review evidence");
+          reviewLink.href = evidence;
+          reviewLink.target = "_blank";
+          reviewLink.rel = "noopener noreferrer";
+          content.append(reviewLink);
+        }
+      }
+    }
 
     if (shop.email) {
       content.append(
@@ -1114,6 +1154,16 @@ function renderSaved() {
       )
     );
 
+    if (window.BlackwoodReviewDesk) {
+      actions.append(
+        makeButton(
+          "Verify bookshop",
+          () => window.BlackwoodReviewDesk.openReview(shop),
+          true
+        )
+      );
+    }
+
     actions.append(
       makeButton(
         "Record contact",
@@ -1140,7 +1190,9 @@ function renderSaved() {
 
     if (
       shop.email &&
-      shop.status !== "opted-out"
+      shop.status !== "opted-out" &&
+      (shop.reviewOrigin !== "public-directory" ||
+        window.BlackwoodVerification?.statusOf(shop) === "verified-independent")
     ) {
       actions.append(
         makeButton(
@@ -3804,6 +3856,20 @@ function initialise() {
     "click",
     exportJSON
   );
+
+  $("verificationFilter")?.addEventListener(
+    "change",
+    renderSaved
+  );
+
+  // The review desk is inert until this administrator-approved application
+  // has loaded. Its only persistence is the existing browser-local store.
+  window.BlackwoodReviewDesk?.initialise({
+    getShops: () => shops,
+    saveShops, updateShopRecord, sameBookshop, newId,
+    safeWebsite, validCoordinates, localDate, render,
+    statusLabels: STATUSES
+  });
 
   initMap();
   render();
