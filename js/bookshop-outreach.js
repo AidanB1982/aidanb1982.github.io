@@ -3936,6 +3936,10 @@ function initialise() {
     getShops: () => shops, localDate, focusSavedShop: focusFollowUpShop
   });
 
+  window.BlackwoodBackupDesk?.initialise({
+    getShops: () => shops, saveShops, sameBookshop, render
+  });
+
   initMap();
   render();
 }
