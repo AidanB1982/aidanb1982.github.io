@@ -233,6 +233,57 @@ body.public-bookshops-page {
 #pb-map .leaflet-control-container .leaflet-left { left: 0; }
 #pb-map .leaflet-control-container .leaflet-right { right: 0; }
 
+/* Counted map clusters. Styled independently of global site buttons/images. */
+#pb-map .pb-cluster-icon {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  width: 46px !important;
+  height: 46px !important;
+  margin: 0 !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+#pb-map .pb-cluster-count {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  width: 46px;
+  height: 46px;
+  border: 3px solid #f6e8cf;
+  border-radius: 50%;
+  background: #a65c25;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .4);
+  color: #fff7e9;
+  font: 700 15px/1 Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#pb-map .pb-cluster-icon:hover .pb-cluster-count,
+#pb-map .pb-cluster-icon:focus-visible .pb-cluster-count {
+  background: #7d3e13;
+  box-shadow: 0 0 0 3px #f0d1a4, 0 2px 10px rgba(0,0,0,.4);
+}
+#pb-map .leaflet-control-zoom a {
+  box-sizing: border-box;
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 42px !important;
+  font: 700 26px/42px Arial, sans-serif !important;
+  text-align: center;
+  background: #13221b !important;
+  color: #f8e9d1 !important;
+  border-color: #d1a971 !important;
+}
+#pb-map .leaflet-control-zoom a:hover,
+#pb-map .leaflet-control-zoom a:focus-visible {
+  background: #284032 !important;
+}
+#pb-map .leaflet-control-zoom a.leaflet-disabled {
+  opacity: .55;
+}
 .pb-map-note { margin: 15px 0 0; }
 .pb-results {
   max-height: 610px;
