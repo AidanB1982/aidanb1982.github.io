@@ -1,0 +1,131 @@
+/* Author Charter: scoped presentation for Blackwood's principles and future standards. */
+body.publisher-charter-page {
+  background: #111914;
+  color: #eee6d6;
+}
+.publisher-charter-page .charter-wrap {
+  padding-top: clamp(25px, 5vw, 54px);
+}
+.publisher-charter-page .charter-hero {
+  background: radial-gradient(circle at 92% 12%, rgba(170, 104, 58, .18), transparent 55%),
+    linear-gradient(135deg, #222d24, #131f19);
+  border-color: #86643e;
+  padding: clamp(30px, 6vw, 62px);
+}
+.publisher-charter-page .charter-hero h1 {
+  font-size: clamp(37px, 5vw, 62px);
+}
+.publisher-charter-page .charter-hero p:not(.publisher-kicker) {max-width: 785px;}
+.publisher-charter-page .charter-lead {
+  color: #f3ddbd;
+  font: 400 clamp(21px, 2.7vw, 31px)/1.5 Georgia, "Times New Roman", serif;
+}
+.publisher-charter-page .charter-motto {
+  margin-top: 22px;
+  color: #eab77e;
+  font: 400 19px/1.4 Georgia, serif;
+}
+.publisher-charter-page .charter-mission {
+  margin-top: 24px;
+}
+.publisher-charter-page .charter-mission-text {
+  color: #f1ddc1;
+  font: 400 clamp(21px, 2.6vw, 31px)/1.5 Georgia, serif;
+}
+.publisher-charter-page .charter-section {
+  padding: clamp(30px, 5vw, 58px) 0;
+}
+.publisher-charter-page .charter-section-heading {
+  max-width: 880px;
+  margin-bottom: 25px;
+}
+.publisher-charter-page .charter-section-heading h2 {
+  font-size: clamp(29px, 3.7vw, 44px);
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+.publisher-charter-page .charter-section-heading p:not(.publisher-kicker) {
+  color: #d6d1c6;
+}
+.publisher-charter-page .charter-section a,
+.publisher-charter-page .charter-footnote a {
+  color: #e9bd87;
+  text-underline-offset: 4px;
+}
+.publisher-charter-page .charter-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.publisher-charter-page .charter-card-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.publisher-charter-page .charter-card {
+  min-width: 0;
+  padding: clamp(21px, 3vw, 32px);
+  border: 1px solid #665037;
+  border-radius: 9px;
+  background: #1a2720;
+}
+.publisher-charter-page .charter-number {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #e2b57a;
+  font: 400 18px Georgia, serif;
+}
+.publisher-charter-page .charter-card h3 {
+  margin: 0 0 14px;
+  font-size: clamp(23px, 2.4vw, 28px);
+}
+.publisher-charter-page .charter-card p {
+  color: #d1cbc1;
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 0;
+}
+.publisher-charter-page .charter-status {
+  border-color: #86643e;
+}
+.publisher-charter-page .charter-status h2 {
+  font-size: clamp(27px, 3.6vw, 39px);
+}
+.publisher-charter-page .charter-status p:not(.publisher-kicker) {
+  max-width: 850px;
+  color: #d5cfc5;
+}
+.publisher-charter-page .charter-footnote {
+  max-width: 920px;
+  padding: 22px 5px;
+}
+.publisher-charter-page .charter-footnote h2 {
+  font-size: 24px;
+  margin: 0 0 9px;
+}
+.publisher-charter-page .charter-footnote p {
+  margin: 0;
+  color: #c5c3ba;
+  font-size: 14px;
+}
+@media (max-width: 900px) {
+  .publisher-charter-page .charter-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .publisher-charter-page .charter-card-grid,
+  .publisher-charter-page .charter-card-grid--two {
+    grid-template-columns: 1fr;
+  }
+  .publisher-charter-page .charter-hero {
+    padding: 30px 23px;
+  }
+  .publisher-charter-page .charter-card {
+    padding: 23px;
+  }
+  .publisher-charter-page .publisher-actions .button {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+}

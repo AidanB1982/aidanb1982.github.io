@@ -983,3 +983,50 @@
     }
 
 }
+
+
+/* Author Charter signpost: values made discoverable from acquisitions. */
+.submissions-charter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(22px, 4vw, 55px);
+    margin: clamp(32px, 6vw, 68px) 0;
+    padding: clamp(24px, 5vw, 48px);
+    border: 1px solid rgba(184, 138, 86, .5);
+    border-radius: 10px;
+    background: linear-gradient(120deg, #19231d, #101817);
+}
+.submissions-charter > div {
+    flex: 1 1 400px;
+    min-width: 0;
+    max-width: 780px;
+}
+.submissions-charter h2 {
+    margin: 0 0 17px;
+    color: #f1e6d5;
+    font: 400 clamp(28px, 3.8vw, 41px)/1.25 Georgia, "Times New Roman", serif;
+}
+.submissions-charter p:not(.submissions-kicker) {
+    max-width: 740px;
+    color: #d8d4cc;
+    line-height: 1.7;
+}
+.submissions-charter a.button {
+    flex: 0 1 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    text-align: center;
+}
+@media (max-width: 640px) {
+    .submissions-charter {
+        padding: 24px 21px;
+    }
+    .submissions-charter a.button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

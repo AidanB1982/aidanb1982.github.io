@@ -6,6 +6,8 @@ on:
       - "index.html"
       - "footer.html"
       - "pages/about.html"
+      - "pages/author-charter.html"
+      - "pages/submissions.html"
       - "pages/LimitedEditions.html"
       - "pages/resources.html"
       - "pages/refund-policy.html"
@@ -13,6 +15,9 @@ on:
       - "pages/find-bookshops.html"
       - "js/public-bookshops.js"
       - "css/publisher-about.css"
+      - "css/author-charter.css"
+      - "css/submissions.css"
+      - "docs/author-intake-readiness.md"
       - "scripts/test-public-site-trust.mjs"
       - ".github/workflows/site-trust-checks.yml"
   workflow_dispatch:
