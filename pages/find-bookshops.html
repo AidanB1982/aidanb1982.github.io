@@ -13,13 +13,13 @@
   <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoakqTxI=" crossorigin="">
-  <link rel="stylesheet" href="/css/public-bookshops.css?v=20261122b">
+  <link rel="stylesheet" href="/css/public-bookshops.css?v=20261122c">
   <script src="/js/analytics-consent.js?v=20261116" defer></script>
   <script src="/js/header.js?v=20261122-indie" defer></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin="" defer></script>
-  <script src="/js/public-bookshops.js?v=20261122b" defer></script>
+  <script src="/js/public-bookshops.js?v=20261122c" defer></script>
 </head>
 <body class="sub-page public-bookshops-page">
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -47,6 +47,10 @@
         </label>
         <button type="submit" class="pb-button">Find bookshops</button>
         <button type="button" id="pb-reset" class="pb-button pb-button-secondary">Show all</button>
+        <label class="pb-website-filter" for="pb-websites">
+          <input id="pb-websites" type="checkbox">
+          Only show shops with a website
+        </label>
       </form>
       <p id="pb-status" role="status" aria-live="polite">Opening the bookshop directory…</p>
     </section>
@@ -55,6 +59,10 @@
       <section class="pb-panel pb-map-panel" aria-labelledby="pb-map-heading">
         <h2 id="pb-map-heading">Explore the map</h2>
         <div id="pb-map" role="region" aria-label="Map of bookshop listings from the public UK discovery directory"></div>
+        <div class="pb-map-actions">
+          <button type="button" id="pb-search-area" class="pb-button pb-button-secondary">Search this map area</button>
+          <p>Zoom or drag to a region, then show bookshops within the visible map.</p>
+        </div>
         <p class="pb-map-note">Map tiles and place searches are provided by OpenStreetMap services. Move or zoom the map to explore the area, and select a marker to see the shop details.</p>
       </section>
       <section class="pb-panel pb-results-panel" aria-labelledby="pb-results-heading">

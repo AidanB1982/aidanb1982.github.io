@@ -89,3 +89,41 @@ test("incomplete source coverage cannot reduce an established public list drasti
     assert.equal(JSON.parse(fs.readFileSync(path.join(root,"data/public-bookshops.json"),"utf8")).count,100);
   } finally { fs.rmSync(root,{recursive:true,force:true}); }
 });
+
+test("national charity-chain bookshops are excluded from public indie results", () => {
+  const root=fixture({
+    "scotland-bookshops.json":{shops:[
+      {osmId:"node/20",name:"Oxfam Books & Music",town:"Edinburgh",lat:55.94,lng:-3.19},
+      {osmId:"node/21",name:"The Lantern Bookshop",town:"Edinburgh",lat:55.95,lng:-3.2}
+    ],coverage:{complete:false}},
+    "uk-bookshops.json":{shops:[],coverage:{complete:false}},
+    "blackwood-bookshops.json":{shops:[]}
+  });
+  try {
+    const result=execute(root);
+    assert.equal(result.status,0,result.stderr);
+    const feed=JSON.parse(fs.readFileSync(path.join(root,"data/public-bookshops.json"),"utf8"));
+    assert.deepEqual(feed.shops.map(shop=>shop.name),["The Lantern Bookshop"]);
+    assert.equal(feed.quality.excludedMajorChains,1);
+  } finally { fs.rmSync(root,{recursive:true,force:true}); }
+});
+
+test("distinct bookshops at different addresses are not silently merged", () => {
+  const root=fixture({
+    "scotland-bookshops.json":{shops:[
+      {osmId:"node/31",name:"The Reading Room",town:"Edinburgh",
+        address:"10 High Street",lat:55.95,lng:-3.19},
+      {osmId:"node/32",name:"The Reading Room",town:"Edinburgh",
+        address:"12 High Street",lat:55.9501,lng:-3.1901}
+    ],coverage:{complete:false}},
+    "uk-bookshops.json":{shops:[],coverage:{complete:false}},
+    "blackwood-bookshops.json":{shops:[]}
+  });
+  try {
+    const result=execute(root);
+    assert.equal(result.status,0,result.stderr);
+    const feed=JSON.parse(fs.readFileSync(path.join(root,"data/public-bookshops.json"),"utf8"));
+    assert.equal(feed.shops.length,2);
+    assert.ok(feed.quality.possibleDuplicatesForReview >= 1);
+  } finally { fs.rmSync(root,{recursive:true,force:true}); }
+});
