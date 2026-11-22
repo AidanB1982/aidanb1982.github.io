@@ -554,5 +554,13 @@ async function main() {
 
 main().catch(error => {
   console.error(error);
-  process.exitCode = 1;
+  if (error?.message ===
+      "Every Overpass request failed. Existing dataset preserved.") {
+    // Dedicated outage code: scheduler can report a visible warning,
+    // retain the cached dataset and still regenerate the public feed.
+    process.exitCode = 2;
+  } else {
+    // Any other error (invalid data, filesystem, programming) is fatal.
+    process.exitCode = 1;
+  }
 });
