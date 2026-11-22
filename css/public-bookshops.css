@@ -1,0 +1,205 @@
+/* Blackwood public independent bookshop finder: no admin or outreach UI. */
+body.public-bookshops-page {
+  min-height: 100vh;
+  color: #efe7dc;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.95)),
+    url("/assets/ArchiveFilesBG.png") center top / cover fixed no-repeat,
+    #080a09;
+}
+.public-bookshops-wrap {
+  width: min(100%, 1180px);
+  margin: 0 auto;
+  padding: 116px clamp(18px, 4vw, 40px) 72px;
+}
+.pb-intro {
+  max-width: 790px;
+  margin: 0 auto 38px;
+  text-align: center;
+}
+.pb-kicker {
+  color: #d4b88b;
+  font: 700 11px/1.5 Arial, sans-serif;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+.pb-intro h1 {
+  font: 400 clamp(31px, 4vw, 52px)/1.13 Georgia, serif;
+  margin: 10px 0 18px;
+}
+.pb-intro > p:not(.pb-kicker) {
+  color: #d8d0c3;
+  line-height: 1.75;
+  font-size: 15px;
+}
+.pb-intro .pb-disclaimer {
+  padding: 15px 18px;
+  margin-top: 20px;
+  border: 1px solid rgba(212,184,139,.24);
+  border-radius: 6px;
+  color: #cfc4b7;
+  background: rgba(255,255,255,.025);
+  font-size: 13px !important;
+}
+.pb-panel {
+  min-width: 0;
+  margin-bottom: 24px;
+  border: 1px solid rgba(184,115,51,.26);
+  border-radius: 5px;
+  padding: clamp(20px, 2.6vw, 30px);
+  background: linear-gradient(135deg, rgba(23,26,22,.96), rgba(9,12,10,.97));
+}
+.pb-panel h2 {
+  color: #efe7dc;
+  font: 400 clamp(24px, 2.4vw, 31px)/1.25 Georgia, serif;
+  margin: 0 0 18px;
+}
+.pb-search-form {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(125px, 150px) auto auto;
+  align-items: end;
+  gap: 12px;
+}
+.pb-search-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  color: #d3c3ad;
+  font: 12px/1.45 Arial, sans-serif;
+}
+.pb-search-form input,
+.pb-search-form select {
+  min-width: 0;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid #8d7656;
+  border-radius: 5px;
+  color: #f5ead5;
+  background: #111b17;
+  font: 16px/1.4 Arial, sans-serif;
+}
+.pb-button,
+.pb-card-map {
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 1px solid #d1a971;
+  border-radius: 5px;
+  background: #b8874a;
+  color: #160f09;
+  cursor: pointer;
+  font: 700 12px/1.45 Arial, sans-serif;
+}
+.pb-button:hover,
+.pb-card-map:hover { background: #e2b77b; }
+.pb-button:disabled { opacity: .6; cursor: progress; }
+.pb-button-secondary {
+  background: transparent;
+  color: #ead6b9;
+}
+.pb-button-secondary:hover {
+  background: rgba(212,184,139,.15);
+}
+#pb-status,
+.pb-count,
+.pb-map-note,
+.pb-credits p {
+  color: #d3c8b7;
+  font: 13px/1.75 Arial, sans-serif;
+}
+#pb-status { margin: 16px 0 0; }
+.pb-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, .9fr);
+  gap: 24px;
+  align-items: start;
+}
+#pb-map {
+  height: 590px;
+  width: 100%;
+  z-index: 0;
+  border-radius: 5px;
+  background: #25352c;
+  isolation: isolate;
+}
+#pb-map img,
+#pb-map .leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.pb-map-note { margin: 15px 0 0; }
+.pb-results {
+  max-height: 610px;
+  overflow-y: auto;
+  padding-right: 4px;
+  display: grid;
+  gap: 12px;
+}
+.pb-count { margin: -5px 0 18px; }
+.pb-card {
+  padding: 16px;
+  border: 1px solid rgba(212,184,139,.2);
+  border-radius: 4px;
+  background: rgba(255,255,255,.025);
+}
+.pb-card h3 {
+  font: 400 21px/1.25 Georgia, serif;
+  color: #f4e7d1;
+  margin: 0 0 7px;
+}
+.pb-card p {
+  color: #d4c9bc;
+  font: 13px/1.65 Arial, sans-serif;
+  margin: 0 0 12px;
+}
+.pb-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.pb-card-actions a,
+.pb-credits a {
+  color: #e0bc87;
+  font: 13px/1.6 Arial, sans-serif;
+  text-underline-offset: 4px;
+}
+.pb-card-map {
+  min-height: 38px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #ecd1ad;
+  font-size: 12px;
+}
+.pb-card-map:hover { color: #17100a; }
+.pb-popup {
+  color: #202820;
+  font: 13px/1.5 Arial, sans-serif;
+  max-width: 220px;
+}
+.pb-popup strong { font-size: 15px; }
+.pb-popup p { margin: 8px 0; }
+.pb-popup a { color: #195b69; }
+.pb-credits { margin-top: 0; }
+.pb-noscript { padding: 20px; text-align: center; }
+@media (max-width: 920px) {
+  .pb-layout { grid-template-columns: 1fr; }
+  #pb-map { height: 450px; }
+  .pb-results { max-height: none; overflow: visible; }
+}
+@media (max-width: 760px) {
+  .pb-search-form { grid-template-columns: 1fr 1fr; }
+  .pb-search-form label:first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 510px) {
+  .public-bookshops-wrap { padding-top: 98px; }
+  .pb-search-form { grid-template-columns: 1fr; }
+  .pb-search-form label:first-child { grid-column: auto; }
+  #pb-map { height: 360px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
