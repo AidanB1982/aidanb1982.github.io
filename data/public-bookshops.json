@@ -6,7 +6,7 @@
   "coverageComplete": false,
   "coverageFailedTiles": 2,
   "verification": "Bookshop listings are not independently verified as open, independent or stocking Blackwood titles.",
-  "count": 203,
+  "count": 195,
   "shops": [
     {
       "name": "20 Storey",
@@ -1053,78 +1053,6 @@
       "source": "openstreetmap"
     },
     {
-      "name": "Oxfam Books & Music",
-      "town": "Dundee",
-      "address": "45 Reform Street, Dundee",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-books-music-dundee/",
-      "lat": 56.4615333,
-      "lng": -2.9711135,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Books & Music",
-      "town": "Aberdeen",
-      "address": "5 Back Wynd, Aberdeen",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-books-music-aberdeen/",
-      "lat": 57.1466401,
-      "lng": -2.100011,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Bookshop",
-      "town": "Edinburgh",
-      "address": "25 Raeburn Place, Edinburgh",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-raeburn-place/",
-      "lat": 55.9588659,
-      "lng": -3.2111897,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Bookshop",
-      "town": "",
-      "address": "79 Murray Place",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-stirling/",
-      "lat": 56.1194505,
-      "lng": -3.9375009,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Bookshop",
-      "town": "",
-      "address": "5 Royal Exchange Square",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-royal-exchange-square/",
-      "lat": 55.859819,
-      "lng": -4.2523473,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Bookshop",
-      "town": "Edinburgh",
-      "address": "116 Nicolson Street, Edinburgh",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-nicolson-street/",
-      "lat": 55.9443038,
-      "lng": -3.1834963,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Bookshop",
-      "town": "Edinburgh",
-      "address": "Morningside Road, Edinburgh",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-morningside-road/",
-      "lat": 55.9283372,
-      "lng": -3.2096631,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Oxfam Bookshop",
-      "town": "Hexham",
-      "address": "10 Battle Hill, Hexham",
-      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-hexham/",
-      "lat": 54.9698393,
-      "lng": -2.1017627,
-      "source": "openstreetmap"
-    },
-    {
       "name": "Pauline Books & Media",
       "town": "",
       "address": "36 St Enoch Square",
@@ -1835,5 +1763,13 @@
       "lng": -3.1599133,
       "source": "openstreetmap"
     }
-  ]
+  ],
+  "quality": {
+    "excludedMajorChains": 8,
+    "mergedDuplicates": 0,
+    "possibleDuplicatesForReview": 0,
+    "invalidRecords": 0,
+    "withoutWebsite": 110,
+    "withoutTown": 84
+  }
 }
