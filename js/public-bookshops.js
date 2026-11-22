@@ -168,7 +168,7 @@
     const query = el("pb-search").value.trim().slice(0, 120);
     const radius = Number(el("pb-radius").value);
     if (!query) {
-      update(state.shops, "Showing all available Scottish bookshop listings.");
+      update(state.shops, "Showing all available bookshop listings in the Scotland-focused dataset.");
       return;
     }
     if (![10000, 25000, 50000].includes(radius)) return;
@@ -200,7 +200,7 @@
       update(nearby, nearby.length
         ? "Bookshops within " + (radius / 1000) + " km of " + query + ". Please verify details before visiting."
         : "No cached bookshops found within " + (radius / 1000) + " km of " + query +
-          ". Scottish coverage is incomplete.");
+          ". Scotland-focused coverage is incomplete.");
       return;
     }
     const textMatches = state.shops.filter(shop =>
@@ -215,7 +215,7 @@
     el("pb-reset").addEventListener("click", () => {
       ++state.searchId;
       el("pb-search").value = "";
-      update(state.shops, "Showing all available Scottish bookshop listings.");
+      update(state.shops, "Showing all available bookshop listings in the Scotland-focused dataset.");
     });
     createMap();
     try {
@@ -225,7 +225,7 @@
       if (!Array.isArray(data.shops)) throw new Error("Invalid bookshop data.");
       state.shops = data.shops.filter(validShop);
       update(state.shops,
-        state.shops.length + " Scottish bookshop listings loaded. This is a discovery guide, not a verified list of independent shops.");
+        state.shops.length + " bookshop listings in the Scotland-focused dataset loaded. This is a discovery guide, not a verified list of independent shops.");
     } catch (error) {
       el("pb-status").textContent = "We could not load the directory right now. Please try again later.";
       console.error("Public bookshop finder:", error);
