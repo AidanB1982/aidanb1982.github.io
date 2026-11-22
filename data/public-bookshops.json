@@ -66,7 +66,7 @@
       "name": "Alnwick Lions Bookshop",
       "town": "Alnwick",
       "address": "Bondgate Within, Alnwick",
-      "website": "",
+      "website": "https://alnwick-lions.org.uk/bookshop/",
       "lat": 55.413128,
       "lng": -1.704743,
       "source": "openstreetmap"
@@ -84,7 +84,7 @@
       "name": "Argonaut Books",
       "town": "Edinburgh",
       "address": "15-17 Leith Walk, Edinburgh",
-      "website": "",
+      "website": "https://www.argonautbooks.co.uk/",
       "lat": 55.970096,
       "lng": -3.1718798,
       "source": "openstreetmap"
@@ -93,7 +93,7 @@
       "name": "Argyll Book Centre",
       "town": "",
       "address": "Unit 2 Lorne Street",
-      "website": "",
+      "website": "https://uk.bookshop.org/shop/argyllbookcentre",
       "lat": 56.0379035,
       "lng": -5.4335156,
       "source": "openstreetmap"
@@ -111,7 +111,7 @@
       "name": "At the Sign of the Dragon",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://www.atthesignofthedragon.co.uk/",
       "lat": 54.8710999,
       "lng": -4.444237,
       "source": "openstreetmap"
@@ -120,7 +120,7 @@
       "name": "Atkinson-Pryce Books",
       "town": "Biggar",
       "address": "27 High Street, Biggar",
-      "website": "",
+      "website": "https://www.atkinson-pryce.co.uk/",
       "lat": 55.6229094,
       "lng": -3.5269165,
       "source": "openstreetmap"
@@ -129,7 +129,7 @@
       "name": "Aye-Aye Books",
       "town": "Glasgow",
       "address": "123 Allison Street, Glasgow",
-      "website": "",
+      "website": "https://www.aye-ayebooks.com/",
       "lat": 55.8367977,
       "lng": -4.2652074,
       "source": "openstreetmap"
@@ -201,7 +201,7 @@
       "name": "Better World Books",
       "town": "Dunfermline",
       "address": "Queensferry Road, Dunfermline",
-      "website": "",
+      "website": "https://www.betterworldbooks.co.uk/",
       "lat": 56.0553359,
       "lng": -3.4396519,
       "source": "openstreetmap"
@@ -255,7 +255,7 @@
       "name": "Book Lovers Bookshop",
       "town": "Edinburgh",
       "address": "5 Melville Terrace, Edinburgh",
-      "website": "",
+      "website": "https://www.bookloversbookshop.co.uk/",
       "lat": 55.9397539,
       "lng": -3.1831934,
       "source": "openstreetmap"
@@ -264,7 +264,7 @@
       "name": "Bookcase",
       "town": "Carlisle",
       "address": "17-19 Castle Street, Carlisle",
-      "website": "",
+      "website": "https://www.bookcasecarlisle.co.uk/",
       "lat": 54.8955592,
       "lng": -2.9392297,
       "source": "openstreetmap"
@@ -309,7 +309,7 @@
       "name": "Bookspeed Wholesalers",
       "town": "Edinburgh",
       "address": "16 Salamander Yards, Edinburgh",
-      "website": "",
+      "website": "https://www.bookspeed.com/",
       "lat": 55.9721528,
       "lng": -3.1552656,
       "source": "openstreetmap"
@@ -318,7 +318,7 @@
       "name": "Bouquiniste",
       "town": "St Andrews",
       "address": "31 Market Street, St Andrews",
-      "website": "",
+      "website": "https://www.bouquinistebookshop.com/",
       "lat": 56.340337,
       "lng": -2.7930768,
       "source": "openstreetmap"
@@ -327,7 +327,7 @@
       "name": "Byre Books",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "http://www.byrebooks.co.uk/",
       "lat": 54.8673518,
       "lng": -4.4429863,
       "source": "openstreetmap"
@@ -336,7 +336,7 @@
       "name": "Caberfeidh Horizons Bookshop",
       "town": "Kingussie",
       "address": "16 High Street, Kingussie",
-      "website": "",
+      "website": "https://caberfeidhhorizons.com/",
       "lat": 57.0799554,
       "lng": -4.0521151,
       "source": "openstreetmap"
@@ -345,7 +345,7 @@
       "name": "Caffeinated Escapism",
       "town": "Alexandria",
       "address": "Alexandria, Scotland",
-      "website": "",
+      "website": "https://www.caffeinatedescapism.shop/",
       "lat": 55.9881112,
       "lng": -4.5827038,
       "source": "curated"
@@ -354,7 +354,7 @@
       "name": "Caledonia Books",
       "town": "Glasgow",
       "address": "483 Great Western Road, Glasgow",
-      "website": "",
+      "website": "https://www.caledoniabooks.co.uk/",
       "lat": 55.8752924,
       "lng": -4.2818928,
       "source": "openstreetmap"
@@ -363,7 +363,7 @@
       "name": "Calton Books",
       "town": "Glasgow",
       "address": "159 London Road, Glasgow",
-      "website": "",
+      "website": "https://calton-books.co.uk/",
       "lat": 55.8546249,
       "lng": -4.2396627,
       "source": "openstreetmap"
@@ -372,7 +372,7 @@
       "name": "Carmina Gadelica",
       "town": "Portree",
       "address": "Bank Street, Portree",
-      "website": "",
+      "website": "http://www.aros.co.uk/plan-your-visit/gift-shop/carmina-gadelica/",
       "lat": 57.4126751,
       "lng": -6.1921261,
       "source": "openstreetmap"
@@ -399,7 +399,7 @@
       "name": "Category Is Books",
       "town": "Glasgow",
       "address": "34 Allison Street, Glasgow",
-      "website": "",
+      "website": "https://www.categoryisbooks.com/",
       "lat": 55.8368753,
       "lng": -4.2682839,
       "source": "openstreetmap"
@@ -408,7 +408,7 @@
       "name": "Choose Books",
       "town": "Edinburgh",
       "address": "126 Newhaven Road, Edinburgh",
-      "website": "",
+      "website": "https://www.instagram.com/choosebooks_/",
       "lat": 55.9737549,
       "lng": -3.1886567,
       "source": "openstreetmap"
@@ -417,7 +417,7 @@
       "name": "Cogito Bookshop",
       "town": "Hexham",
       "address": "5 St Mary's Chare, Hexham",
-      "website": "",
+      "website": "https://www.cogitobooks.com/",
       "lat": 54.9709137,
       "lng": -2.1015032,
       "source": "openstreetmap"
@@ -561,7 +561,7 @@
       "name": "Evangelical Books",
       "town": "",
       "address": "16 North Bank Street",
-      "website": "",
+      "website": "https://www.evangelicalbooks.com/",
       "lat": 55.9496973,
       "lng": -3.1945062,
       "source": "openstreetmap"
@@ -615,7 +615,7 @@
       "name": "fm Bookshops",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "http://www.fmbookshops.org/",
       "lat": 57.50536,
       "lng": -1.7816379,
       "source": "openstreetmap"
@@ -624,7 +624,7 @@
       "name": "Forbidden Planet",
       "town": "",
       "address": "Sauchiehall Street",
-      "website": "",
+      "website": "https://forbiddenplanet.co.uk/",
       "lat": 55.8648512,
       "lng": -4.2575742,
       "source": "openstreetmap"
@@ -633,7 +633,7 @@
       "name": "Forbidden Planet",
       "town": "Edinburgh",
       "address": "40-41 South Bridge, Edinburgh",
-      "website": "",
+      "website": "https://forbiddenplanet.co.uk/our-stores/edinburgh/",
       "lat": 55.9485279,
       "lng": -3.1865203,
       "source": "openstreetmap"
@@ -660,7 +660,7 @@
       "name": "Forum Bookshop",
       "town": "Corbridge",
       "address": "Corbridge",
-      "website": "",
+      "website": "https://www.forumbooksshop.com/",
       "lat": 54.9742014,
       "lng": -2.0192645,
       "source": "openstreetmap"
@@ -687,7 +687,7 @@
       "name": "Fruitmarket Bookshop",
       "town": "Edinburgh",
       "address": "45 Market Street, Edinburgh",
-      "website": "",
+      "website": "https://fruitmarketbookshop.myshopify.com/",
       "lat": 55.9512543,
       "lng": -3.189396,
       "source": "openstreetmap"
@@ -696,7 +696,7 @@
       "name": "Ginger and Pickles",
       "town": "Edinburgh",
       "address": "51 St Stephen Street, Edinburgh",
-      "website": "",
+      "website": "https://www.gingerandpicklesbookshop.com/",
       "lat": 55.9580776,
       "lng": -3.2065103,
       "source": "openstreetmap"
@@ -714,7 +714,7 @@
       "name": "Golden Hare Books",
       "town": "Edinburgh",
       "address": "68 St Stephen Street, Edinburgh",
-      "website": "",
+      "website": "https://goldenharebooks.com/",
       "lat": 55.9579063,
       "lng": -3.2062917,
       "source": "openstreetmap"
@@ -723,7 +723,7 @@
       "name": "Good Press",
       "town": "",
       "address": "32 St Andrew's Street",
-      "website": "",
+      "website": "https://goodpress.co.uk/",
       "lat": 55.8552384,
       "lng": -4.2439869,
       "source": "openstreetmap"
@@ -741,7 +741,7 @@
       "name": "Hanselled Books",
       "town": "Burntisland",
       "address": "19 Kirkgate, Burntisland",
-      "website": "",
+      "website": "http://www.hanselledbooks.co.uk/",
       "lat": 56.0585973,
       "lng": -3.2333323,
       "source": "openstreetmap"
@@ -750,7 +750,7 @@
       "name": "Heron and Willow",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://heronandwillow.scot/",
       "lat": 55.4777806,
       "lng": -2.5548799,
       "source": "openstreetmap"
@@ -822,7 +822,7 @@
       "name": "John Kay's",
       "town": "Edinburgh",
       "address": "8 Victoria Street, Edinburgh",
-      "website": "",
+      "website": "http://www.oldtownbookshop-edinburgh.co.uk/",
       "lat": 55.9487972,
       "lng": -3.1931459,
       "source": "openstreetmap"
@@ -840,7 +840,7 @@
       "name": "Karnak Comics",
       "town": "Callander",
       "address": "30 Main Street, Callander",
-      "website": "",
+      "website": "https://karnakcomics.com/",
       "lat": 56.2440836,
       "lng": -4.2167214,
       "source": "openstreetmap"
@@ -885,7 +885,7 @@
       "name": "La Belle Adventure",
       "town": "Edinburgh",
       "address": "225 Leith Walk, Edinburgh",
-      "website": "",
+      "website": "https://labelleadventure.com/",
       "lat": 55.9667052,
       "lng": -3.1747682,
       "source": "openstreetmap"
@@ -894,7 +894,7 @@
       "name": "Leakey's",
       "town": "Inverness",
       "address": "Church Street, Inverness",
-      "website": "",
+      "website": "https://leakeysbookshop.com/",
       "lat": 57.4802558,
       "lng": -4.2286393,
       "source": "openstreetmap"
@@ -912,7 +912,7 @@
       "name": "Lighthouse Bookshop - Edinburgh's Radical Bookshop",
       "town": "Edinburgh",
       "address": "43 West Nicolson Street, Edinburgh",
-      "website": "",
+      "website": "https://lighthousebookshop.com/",
       "lat": 55.9446069,
       "lng": -3.1855056,
       "source": "openstreetmap"
@@ -921,7 +921,7 @@
       "name": "Little Shop of Heroes",
       "town": "Dunfermline",
       "address": "8 Maygate, Dunfermline",
-      "website": "",
+      "website": "https://www.littleshopofheroes.co.uk/",
       "lat": 56.0707961,
       "lng": -3.4635171,
       "source": "openstreetmap"
@@ -939,7 +939,7 @@
       "name": "M. E. McCarty",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://www.wigtown-booktown.co.uk/bookshop_info.asp?businessID=41",
       "lat": 54.868415,
       "lng": -4.4429943,
       "source": "openstreetmap"
@@ -975,7 +975,7 @@
       "name": "McLaren Books",
       "town": "Helensburgh",
       "address": "22 John Street, Helensburgh",
-      "website": "",
+      "website": "https://www.mclarenbooks.com/",
       "lat": 56.0043771,
       "lng": -4.7390772,
       "source": "openstreetmap"
@@ -984,7 +984,7 @@
       "name": "McNaughtan's Bookshop",
       "town": "Edinburgh",
       "address": "3A-4A, Edinburgh",
-      "website": "",
+      "website": "http://www.mcnaughtansbookshop.com/",
       "lat": 55.959345,
       "lng": -3.183892,
       "source": "openstreetmap"
@@ -993,7 +993,7 @@
       "name": "Mercat Bookshop",
       "town": "Aberdeen",
       "address": "45 Castle Street, Aberdeen",
-      "website": "",
+      "website": "https://www.vsa.org.uk/mercat-bookshop",
       "lat": 57.147922,
       "lng": -2.092823,
       "source": "openstreetmap"
@@ -1002,7 +1002,7 @@
       "name": "Nairn Bookshop",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "http://nairnbookshop.co.uk/",
       "lat": 57.5857088,
       "lng": -3.8670332,
       "source": "openstreetmap"
@@ -1011,7 +1011,7 @@
       "name": "Night Owl Books",
       "town": "East Linton",
       "address": "1 Bridge Street, East Linton",
-      "website": "",
+      "website": "https://nightowlbooks.co.uk/",
       "lat": 55.9851925,
       "lng": -2.656223,
       "source": "openstreetmap"
@@ -1029,7 +1029,7 @@
       "name": "Old Aberdeen Bookshop",
       "town": "Aberdeen",
       "address": "140 Spital, Aberdeen",
-      "website": "",
+      "website": "http://www.oldaberdeen-bookshop.co.uk/",
       "lat": 57.1604172,
       "lng": -2.1003462,
       "source": "openstreetmap"
@@ -1056,7 +1056,7 @@
       "name": "Oxfam Books & Music",
       "town": "Dundee",
       "address": "45 Reform Street, Dundee",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-books-music-dundee/",
       "lat": 56.4615333,
       "lng": -2.9711135,
       "source": "openstreetmap"
@@ -1065,7 +1065,7 @@
       "name": "Oxfam Books & Music",
       "town": "Aberdeen",
       "address": "5 Back Wynd, Aberdeen",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-books-music-aberdeen/",
       "lat": 57.1466401,
       "lng": -2.100011,
       "source": "openstreetmap"
@@ -1074,7 +1074,7 @@
       "name": "Oxfam Bookshop",
       "town": "Edinburgh",
       "address": "25 Raeburn Place, Edinburgh",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-raeburn-place/",
       "lat": 55.9588659,
       "lng": -3.2111897,
       "source": "openstreetmap"
@@ -1083,7 +1083,7 @@
       "name": "Oxfam Bookshop",
       "town": "",
       "address": "79 Murray Place",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-stirling/",
       "lat": 56.1194505,
       "lng": -3.9375009,
       "source": "openstreetmap"
@@ -1092,7 +1092,7 @@
       "name": "Oxfam Bookshop",
       "town": "",
       "address": "5 Royal Exchange Square",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-royal-exchange-square/",
       "lat": 55.859819,
       "lng": -4.2523473,
       "source": "openstreetmap"
@@ -1101,7 +1101,7 @@
       "name": "Oxfam Bookshop",
       "town": "Edinburgh",
       "address": "116 Nicolson Street, Edinburgh",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-nicolson-street/",
       "lat": 55.9443038,
       "lng": -3.1834963,
       "source": "openstreetmap"
@@ -1110,7 +1110,7 @@
       "name": "Oxfam Bookshop",
       "town": "Edinburgh",
       "address": "Morningside Road, Edinburgh",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-morningside-road/",
       "lat": 55.9283372,
       "lng": -3.2096631,
       "source": "openstreetmap"
@@ -1119,7 +1119,7 @@
       "name": "Oxfam Bookshop",
       "town": "Hexham",
       "address": "10 Battle Hill, Hexham",
-      "website": "",
+      "website": "https://www.oxfam.org.uk/shops/oxfam-bookshop-hexham/",
       "lat": 54.9698393,
       "lng": -2.1017627,
       "source": "openstreetmap"
@@ -1128,7 +1128,7 @@
       "name": "Pauline Books & Media",
       "town": "",
       "address": "36 St Enoch Square",
-      "website": "",
+      "website": "https://www.paulineuk.org/",
       "lat": 55.8574373,
       "lng": -4.255664,
       "source": "openstreetmap"
@@ -1137,7 +1137,7 @@
       "name": "Peter Bell Books",
       "town": "Edinburgh",
       "address": "68 West Port, Edinburgh",
-      "website": "",
+      "website": "https://peterbell.net/",
       "lat": 55.9463119,
       "lng": -3.1999342,
       "source": "openstreetmap"
@@ -1155,7 +1155,7 @@
       "name": "Pitlochry Station Bookshop",
       "town": "",
       "address": "Station Road",
-      "website": "",
+      "website": "https://www.pitlochrystationbookshop.co.uk/",
       "lat": 56.702477,
       "lng": -3.7354956,
       "source": "openstreetmap"
@@ -1164,7 +1164,7 @@
       "name": "PortaLibri",
       "town": "Edinburgh",
       "address": "167-171 Portobello High Street, Edinburgh",
-      "website": "",
+      "website": "https://www.tillsbookshop.co.uk/",
       "lat": 55.9526447,
       "lng": -3.1141789,
       "source": "openstreetmap"
@@ -1173,7 +1173,7 @@
       "name": "Priorsford Books",
       "town": "Peebles",
       "address": "11 Northgate, Peebles",
-      "website": "",
+      "website": "https://www.priorsfordbooks.co.uk/",
       "lat": 55.6525756,
       "lng": -3.1891749,
       "source": "openstreetmap"
@@ -1191,7 +1191,7 @@
       "name": "Rare Birds Book Shop",
       "town": "Edinburgh",
       "address": "13 Raeburn Place, Edinburgh",
-      "website": "",
+      "website": "https://rarebirdsbooks.com/pages/visit-us",
       "lat": 55.958828,
       "lng": -3.2107233,
       "source": "openstreetmap"
@@ -1200,7 +1200,7 @@
       "name": "Read & Relax",
       "town": "Kinross",
       "address": "157 High Street, Kinross",
-      "website": "",
+      "website": "https://www.readandrelax.co.uk/",
       "lat": 56.2025491,
       "lng": -3.4210781,
       "source": "openstreetmap"
@@ -1227,7 +1227,7 @@
       "name": "RIAS Bookshop",
       "town": "Edinburgh",
       "address": "15 Rutland Square, Edinburgh",
-      "website": "",
+      "website": "https://bookshop.rias.org.uk/",
       "lat": 55.9482653,
       "lng": -3.2092869,
       "source": "openstreetmap"
@@ -1245,7 +1245,7 @@
       "name": "Robert Murray Stamp Shop",
       "town": "Edinburgh",
       "address": "5-6 Inverleith Gardens, Edinburgh",
-      "website": "",
+      "website": "https://www.stamp-shop.com/",
       "lat": 55.9710379,
       "lng": -3.2098421,
       "source": "openstreetmap"
@@ -1317,7 +1317,7 @@
       "name": "Shelter Scotland Bookshop",
       "town": "Edinburgh",
       "address": "106A Raeburn Place, Edinburgh",
-      "website": "",
+      "website": "https://scotland.shelter.org.uk/shops/edinburgh_stockbridge_books_community_shop",
       "lat": 55.9593198,
       "lng": -3.2141238,
       "source": "openstreetmap"
@@ -1353,7 +1353,7 @@
       "name": "Summerfield Books",
       "town": "Penrith",
       "address": "Skirsgill Business Park, Penrith",
-      "website": "",
+      "website": "https://www.summerfieldbooks.com/",
       "lat": 54.6512724,
       "lng": -2.7618975,
       "source": "openstreetmap"
@@ -1362,7 +1362,7 @@
       "name": "TGJones",
       "town": "Airdrie",
       "address": "60/62 Graham Street, Airdrie",
-      "website": "",
+      "website": "https://www.tgjonesonline.co.uk/stores/graham-street-airdrie",
       "lat": 55.8659957,
       "lng": -3.9788289,
       "source": "openstreetmap"
@@ -1389,7 +1389,7 @@
       "name": "TGJones",
       "town": "Largs",
       "address": "34 Main Street, Largs",
-      "website": "",
+      "website": "https://www.tgjonesonline.co.uk/stores/main-street-largs",
       "lat": 55.7941612,
       "lng": -4.8694201,
       "source": "openstreetmap"
@@ -1398,7 +1398,7 @@
       "name": "The Accidental Bookshop",
       "town": "Alnwick",
       "address": "4 Narrowgate, Alnwick",
-      "website": "",
+      "website": "https://www.forumbooksshop.com/",
       "lat": 55.4141683,
       "lng": -1.7073979,
       "source": "openstreetmap"
@@ -1407,7 +1407,7 @@
       "name": "The Bethany Bookshop",
       "town": "Edinburgh",
       "address": "33A, Edinburgh",
-      "website": "",
+      "website": "https://www.bethanychristiantrust.com/",
       "lat": 55.9606774,
       "lng": -3.1820407,
       "source": "openstreetmap"
@@ -1416,7 +1416,7 @@
       "name": "The Birnam Reader",
       "town": "Dunkeld",
       "address": "Station Road, Dunkeld",
-      "website": "",
+      "website": "https://www.facebook.com/thebirnamreader",
       "lat": 56.5578407,
       "lng": -3.5770795,
       "source": "openstreetmap"
@@ -1434,7 +1434,7 @@
       "name": "The Book Nook",
       "town": "Stirling",
       "address": "24 Upper Craigs, Stirling",
-      "website": "",
+      "website": "https://www.thebooknookstirling.co.uk/",
       "lat": 56.1159717,
       "lng": -3.9357514,
       "source": "openstreetmap"
@@ -1461,7 +1461,7 @@
       "name": "The BookShop",
       "town": "Wigtown",
       "address": "17 North Main Street, Wigtown",
-      "website": "",
+      "website": "https://www.the-bookshop.com/",
       "lat": 54.8682649,
       "lng": -4.4434567,
       "source": "openstreetmap"
@@ -1488,7 +1488,7 @@
       "name": "The Ceilidh Place",
       "town": "",
       "address": "14 West Argyle Street",
-      "website": "",
+      "website": "https://www.theceilidhplace.com/",
       "lat": 57.89578,
       "lng": -5.1634582,
       "source": "openstreetmap"
@@ -1497,7 +1497,7 @@
       "name": "The Cookbook Shop",
       "town": "Edinburgh",
       "address": "19A, Edinburgh",
-      "website": "",
+      "website": "https://thecookbookshop.co.uk/",
       "lat": 55.9601726,
       "lng": -3.1827803,
       "source": "openstreetmap"
@@ -1515,7 +1515,7 @@
       "name": "The Edinburgh Bookshop",
       "town": "Edinburgh",
       "address": "176 Bruntsfield Place, Edinburgh",
-      "website": "",
+      "website": "https://www.edinburghbookshop.com/",
       "lat": 55.9362033,
       "lng": -3.2092761,
       "source": "openstreetmap"
@@ -1524,7 +1524,7 @@
       "name": "The Gently Mad Book Shop & Bookbinder",
       "town": "Edinburgh",
       "address": "2, Edinburgh",
-      "website": "",
+      "website": "https://www.thegentlymad.co.uk/",
       "lat": 55.9638923,
       "lng": -3.2020449,
       "source": "openstreetmap"
@@ -1542,7 +1542,7 @@
       "name": "The Highland Bookshop",
       "town": "Fort William",
       "address": "60 High Street, Fort William",
-      "website": "",
+      "website": "https://www.highlandbookshop.com/",
       "lat": 56.8174531,
       "lng": -5.1118925,
       "source": "openstreetmap"
@@ -1569,7 +1569,7 @@
       "name": "The New Bookshop",
       "town": "Cockermouth",
       "address": "42-44 Main Street, Cockermouth",
-      "website": "",
+      "website": "https://www.newbookshop.co.uk/",
       "lat": 54.6638466,
       "lng": -3.3644658,
       "source": "openstreetmap"
@@ -1578,7 +1578,7 @@
       "name": "The Next Chapter",
       "town": "Edinburgh",
       "address": "10 William Street, Edinburgh",
-      "website": "",
+      "website": "https://thenextchapter.org/",
       "lat": 55.9495077,
       "lng": -3.2117645,
       "source": "openstreetmap"
@@ -1605,7 +1605,7 @@
       "name": "The Portobello Bookshop",
       "town": "Edinburgh",
       "address": "46 Portobello High Street, Edinburgh",
-      "website": "",
+      "website": "https://www.theportobellobookshop.com/",
       "lat": 55.954997,
       "lng": -3.1175411,
       "source": "openstreetmap"
@@ -1614,7 +1614,7 @@
       "name": "The Reading Room",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://www.thereadingroommelrose.com/",
       "lat": 55.5979004,
       "lng": -2.7204193,
       "source": "openstreetmap"
@@ -1623,7 +1623,7 @@
       "name": "The Shetland Bookshop",
       "town": "Shetland",
       "address": "71-79 Commercial Street, Shetland",
-      "website": "",
+      "website": "https://www.shetlandbookshop.co.uk/",
       "lat": 60.1530112,
       "lng": -1.1413615,
       "source": "openstreetmap"
@@ -1632,7 +1632,7 @@
       "name": "The Watermill",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://www.aberfeldywatermill.com/",
       "lat": 56.6194242,
       "lng": -3.8672755,
       "source": "openstreetmap"
@@ -1641,7 +1641,7 @@
       "name": "The Wedale Bookshop",
       "town": "Stow",
       "address": "231 Galashiels Road, Stow",
-      "website": "",
+      "website": "https://wedalebooks.scot/",
       "lat": 55.6917966,
       "lng": -2.8617043,
       "source": "openstreetmap"
@@ -1659,7 +1659,7 @@
       "name": "Thistle Books",
       "town": "Glasgow",
       "address": "55 Otago Street, Glasgow",
-      "website": "",
+      "website": "https://www.thistlebooks.co.uk/",
       "lat": 55.8735685,
       "lng": -4.2819473,
       "source": "openstreetmap"
@@ -1695,7 +1695,7 @@
       "name": "Topping & Company Booksellers",
       "town": "Edinburgh",
       "address": "2 Blenheim Place, Edinburgh",
-      "website": "",
+      "website": "https://www.toppingbooks.co.uk/",
       "lat": 55.9576475,
       "lng": -3.1842848,
       "source": "openstreetmap"
@@ -1713,7 +1713,7 @@
       "name": "Transreal",
       "town": "Edinburgh",
       "address": "46 Candlemaker Row, Edinburgh",
-      "website": "",
+      "website": "http://www.transreal.co.uk/",
       "lat": 55.9471125,
       "lng": -3.1918096,
       "source": "openstreetmap"
@@ -1731,7 +1731,7 @@
       "name": "Typewronger Books",
       "town": "Edinburgh",
       "address": "22 Bruntsfield Place, Edinburgh",
-      "website": "",
+      "website": "https://typewronger.com/",
       "lat": 55.93979,
       "lng": -3.2046911,
       "source": "openstreetmap"
@@ -1740,7 +1740,7 @@
       "name": "Ullapool Bookshop",
       "town": "Ullapool",
       "address": "Quay Street, Ullapool",
-      "website": "",
+      "website": "https://www.ullapoolbookshop.co.uk/",
       "lat": 57.895912,
       "lng": -5.1599444,
       "source": "openstreetmap"
@@ -1749,7 +1749,7 @@
       "name": "Unity Books",
       "town": "Glasgow",
       "address": "69 Dixon Road, Glasgow",
-      "website": "",
+      "website": "https://unitybooks.co.uk/",
       "lat": 55.8333755,
       "lng": -4.2528525,
       "source": "openstreetmap"
@@ -1758,7 +1758,7 @@
       "name": "Verey Books",
       "town": "Pooley Bridge",
       "address": "Pooley Bridge",
-      "website": "",
+      "website": "https://vereybooks.co.uk/",
       "lat": 54.6123561,
       "lng": -2.8200987,
       "source": "openstreetmap"
@@ -1767,7 +1767,7 @@
       "name": "Village Bookshop",
       "town": "Barnard Castle",
       "address": "51 Market Place, Barnard Castle",
-      "website": "",
+      "website": "http://villagebookshop.co.uk/",
       "lat": 54.6252173,
       "lng": -2.0839101,
       "source": "openstreetmap"
@@ -1776,7 +1776,7 @@
       "name": "Voltaire and Rousseau",
       "town": "Glasgow",
       "address": "12 Otago Lane, Glasgow",
-      "website": "",
+      "website": "https://voltaireandrousseaubooks.com/",
       "lat": 55.8728343,
       "lng": -4.2822065,
       "source": "openstreetmap"
@@ -1794,7 +1794,7 @@
       "name": "Wild Fungarium",
       "town": "Edinburgh",
       "address": "13 Randolph Place, Edinburgh",
-      "website": "",
+      "website": "https://www.wildfungarium.com/",
       "lat": 55.9512402,
       "lng": -3.2100013,
       "source": "openstreetmap"
@@ -1812,7 +1812,7 @@
       "name": "Yeadons of Elgin",
       "town": "Elgin",
       "address": "32 Commerce Street, Elgin",
-      "website": "",
+      "website": "https://www.yeadons.co.uk/",
       "lat": 57.6481098,
       "lng": -3.3129773,
       "source": "openstreetmap"
