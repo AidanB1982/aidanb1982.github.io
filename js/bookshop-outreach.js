@@ -41,6 +41,9 @@ const CURATED_DATA_URL =
 const UK_BOOKSHOP_DATA_URL =
   "/data/uk-bookshops.json";
 
+const PUBLIC_REVIEW_DATA_URL =
+  "/data/public-bookshops.json";
+
 const NOMINATIM_URL =
   "https://nominatim.openstreetmap.org/search";
 
@@ -184,6 +187,12 @@ let emailCloseButton = null;
 let activeEmailShopId = null;
 let outlookSending = false;
 
+let verificationDialog = null;
+let activeVerificationShopId = null;
+let reviewCandidates = [];
+let reviewCandidatePage = 0;
+let reviewCandidateLoaded = false;
+let reviewCandidateError = "";
 let contactDialog = null;
 let contactTypeSelect = null;
 let contactDateInput = null;
@@ -863,6 +872,7 @@ function filteredShops() {
 
   const status =
     $("statusFilter").value;
+  const verificationStatus = $("verificationFilter")?.value || "";
 
   return shops.filter(shop => {
     const searchable = normalise(
@@ -871,7 +881,9 @@ function filteredShops() {
 
     return (
       searchable.includes(query) &&
-      (!status || shop.status === status)
+      (!status || shop.status === status) &&
+      (!verificationStatus ||
+        window.BlackwoodVerification?.statusOf(shop) === verificationStatus)
     );
   });
 }
