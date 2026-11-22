@@ -9,7 +9,7 @@
   const DATA_URL = "/data/public-bookshops.json";
   const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
   const MAX_CARDS = 36;
-  const state = { shops: [], results: [], map: null, markers: null, searchId: 0 };
+  const state = { shops: [], results: [], map: null, markers: null, canvasRenderer: null, coverage: null, searchId: 0 };
   const el = id => document.getElementById(id);
 
   function textElement(tag, text, className) {
@@ -57,8 +57,20 @@
       maxZoom: 18,
       attribution: "&copy; OpenStreetMap contributors"
     }).addTo(state.map);
+    state.canvasRenderer = L.canvas({ padding: 0.3 });
     state.markers = L.featureGroup().addTo(state.map);
-    requestAnimationFrame(() => state.map.invalidateSize());
+
+    const updateSize = () => {
+      requestAnimationFrame(() => {
+        if (state.map) state.map.invalidateSize({ pan: false });
+      });
+    };
+    updateSize();
+    if ("ResizeObserver" in window) {
+      const observer = new ResizeObserver(updateSize);
+      observer.observe(el("pb-map"));
+    }
+    window.addEventListener("resize", updateSize);
   }
 
   function makeWebsiteLink(shop) {
@@ -86,7 +98,8 @@
     results.forEach(shop => {
       const marker = L.circleMarker([shop.lat, shop.lng], {
         radius: 7, weight: 2, color: "#f6e8cf",
-        fillColor: "#b87333", fillOpacity: 0.9
+        fillColor: "#b87333", fillOpacity: 0.9,
+        renderer: state.canvasRenderer
       }).bindPopup(makePopup(shop));
       state.markers.addLayer(marker);
     });
@@ -168,7 +181,7 @@
     const query = el("pb-search").value.trim().slice(0, 120);
     const radius = Number(el("pb-radius").value);
     if (!query) {
-      update(state.shops, "Showing all available bookshop listings in the Scotland-focused dataset.");
+      update(state.shops, "Showing all bookshops in the current public directory.");
       return;
     }
     if (![10000, 25000, 50000].includes(radius)) return;
@@ -200,7 +213,7 @@
       update(nearby, nearby.length
         ? "Bookshops within " + (radius / 1000) + " km of " + query + ". Please verify details before visiting."
         : "No cached bookshops found within " + (radius / 1000) + " km of " + query +
-          ". Scotland-focused coverage is incomplete.");
+          ". Directory coverage is still being expanded.");
       return;
     }
     const textMatches = state.shops.filter(shop =>
@@ -215,7 +228,7 @@
     el("pb-reset").addEventListener("click", () => {
       ++state.searchId;
       el("pb-search").value = "";
-      update(state.shops, "Showing all available bookshop listings in the Scotland-focused dataset.");
+      update(state.shops, "Showing all bookshops in the current public directory.");
     });
     createMap();
     try {
@@ -224,8 +237,18 @@
       const data = await response.json();
       if (!Array.isArray(data.shops)) throw new Error("Invalid bookshop data.");
       state.shops = data.shops.filter(validShop);
+      state.coverage = typeof data.scope === "string"
+        ? data.scope : "Scotland-focused directory";
+      const disclaimer = el("pb-disclaimer");
+      if (disclaimer) {
+        disclaimer.textContent = (Number(data.ukCount) > 0
+          ? "UK-wide discovery is underway, but coverage varies by region."
+          : "Scotland-focused for now, including nearby border towns.") +
+          " Listings may be incomplete or out of date. Inclusion does not confirm independence, opening hours or that a bookshop stocks Blackwood titles.";
+      }
       update(state.shops,
-        state.shops.length + " bookshop listings in the Scotland-focused dataset loaded. This is a discovery guide, not a verified list of independent shops.");
+        state.shops.length + " bookshop listings loaded. " +
+        state.coverage + ". This is a discovery guide, not a verified list of independent shops.");
     } catch (error) {
       el("pb-status").textContent = "We could not load the directory right now. Please try again later.";
       console.error("Public bookshop finder:", error);

@@ -1,0 +1,16 @@
+{
+  "source": "OpenStreetMap / Overpass",
+  "region": "England, Wales and Northern Ireland",
+  "generatedAt": null,
+  "count": 0,
+  "coverage": {
+    "totalTiles": 48,
+    "successfulTiles": 0,
+    "failedTiles": 0,
+    "complete": false,
+    "succeeded": [],
+    "failed": [],
+    "notYetFetched": true
+  },
+  "shops": []
+}

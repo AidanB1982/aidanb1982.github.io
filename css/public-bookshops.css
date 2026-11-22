@@ -122,14 +122,79 @@ body.public-bookshops-page {
   background: #25352c;
   isolation: isolate;
 }
-#pb-map img,
-#pb-map .leaflet-tile {
+/*
+  Leaflet tile isolation: shared Blackwood image styles must not stretch
+  or reposition map tiles. Explicit map-pane sizing also prevents oversized
+  image fragments and blank map space on narrow mobile viewports.
+*/
+#pb-map.leaflet-container {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate;
+}
+#pb-map .leaflet-pane,
+#pb-map .leaflet-map-pane,
+#pb-map .leaflet-tile-container,
+#pb-map .leaflet-overlay-pane,
+#pb-map .leaflet-tile-pane,
+#pb-map .leaflet-marker-pane,
+#pb-map .leaflet-shadow-pane,
+#pb-map .leaflet-popup-pane {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+}
+#pb-map .leaflet-tile,
+#pb-map .leaflet-pane img {
+  position: absolute !important;
+  display: block !important;
+  width: 256px !important;
+  height: 256px !important;
   max-width: none !important;
   max-height: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   filter: none !important;
+  object-fit: fill !important;
 }
+/* Fallback positioning for browsers where the Leaflet CDN stylesheet
+   fails to apply. Keep map layers contained inside the map panel. */
+#pb-map .leaflet-pane > svg,
+#pb-map .leaflet-pane > canvas {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+}
+#pb-map .leaflet-tile-pane { z-index: 200; }
+#pb-map .leaflet-overlay-pane { z-index: 400; }
+#pb-map .leaflet-shadow-pane { z-index: 500; }
+#pb-map .leaflet-marker-pane { z-index: 600; }
+#pb-map .leaflet-tooltip-pane { z-index: 650; }
+#pb-map .leaflet-popup-pane { z-index: 700; }
+#pb-map .leaflet-control { position: relative; z-index: 800; }
+
+#pb-map .leaflet-marker-icon,
+#pb-map .leaflet-marker-shadow {
+  width: auto;
+  height: auto;
+  max-width: none !important;
+  max-height: none !important;
+}
+#pb-map .leaflet-control-container .leaflet-top,
+#pb-map .leaflet-control-container .leaflet-bottom {
+  position: absolute;
+  z-index: 1000;
+}
+#pb-map .leaflet-control-container .leaflet-top { top: 0; }
+#pb-map .leaflet-control-container .leaflet-bottom { bottom: 0; }
+#pb-map .leaflet-control-container .leaflet-left { left: 0; }
+#pb-map .leaflet-control-container .leaflet-right { right: 0; }
+
 .pb-map-note { margin: 15px 0 0; }
 .pb-results {
   max-height: 610px;

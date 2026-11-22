@@ -38,6 +38,9 @@ const BOOKSHOP_DATA_URL =
 const CURATED_DATA_URL =
   "/data/blackwood-bookshops.json";
 
+const UK_BOOKSHOP_DATA_URL =
+  "/data/uk-bookshops.json";
+
 const NOMINATIM_URL =
   "https://nominatim.openstreetmap.org/search";
 
@@ -3276,8 +3279,14 @@ async function loadBookshopDataset() {
     {
       url: CURATED_DATA_URL,
       source: "curated"
+    },
+    {
+      url: UK_BOOKSHOP_DATA_URL,
+      source: "openstreetmap"
     }
   ];
+
+  let coverageIncomplete = false;
 
   const outcomes =
     await Promise.allSettled(
@@ -3299,6 +3308,10 @@ async function loadBookshopDataset() {
             throw new Error(
               `Invalid bookshop data in ${entry.url}`
             );
+          }
+
+          if (data.coverage?.complete === false) {
+            coverageIncomplete = true;
           }
 
           return data.shops.map(
@@ -3341,13 +3354,13 @@ async function loadBookshopDataset() {
     sources.length
   ) {
     throw new Error(
-      "Neither bookshop dataset could be loaded. Please try again later."
+      "No bookshop datasets could be loaded. Please try again later."
     );
   }
 
   if (failures.length) {
     console.warn(
-      "Some discovery data is unavailable:",
+      "Some discovery sources are unavailable:",
       failures.join(", ")
     );
   }
@@ -3355,7 +3368,8 @@ async function loadBookshopDataset() {
   bookshopDataset = {
     shops: combined,
     partial:
-      failures.length > 0
+      failures.length > 0 ||
+      coverageIncomplete
   };
 
   return bookshopDataset;
@@ -3645,7 +3659,7 @@ async function findBookshops(event) {
 
       feedback(
         "finderFeedback",
-        `${current} Note: one discovery dataset could not be loaded.`,
+        `${current} Note: coverage may be incomplete in some regions.`,
         "error"
       );
     }
