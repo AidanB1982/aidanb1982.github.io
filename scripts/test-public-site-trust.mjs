@@ -37,7 +37,7 @@ test("About links to established authors, books and the contact page", () => {
     "/pages/martin-hales.html", "/pages/publications.html",
     "/pages/store.html", "/pages/contact.html"
   ]) assert.ok(about.includes('href="' + destination + '"'),destination);
-  assert.match(about, /bookshop discovery/);
+  assert.match(about, /bookshop trail is a discovery directory/);
   assert.match(about, /not automatically verified independents/);
 });
 
