@@ -15,6 +15,10 @@ on:
       - "css/sgeul-author-induction-admin.css"
       - "supabase/migrations/20261122165000_sgeul_author_induction.sql"
       - "docs/sgeul-author-induction.md"
+      - "pages/privacy-policy.html"
+      - "supabase/diagnostics/sgeul-author-induction-preflight.sql"
+      - "docs/sgeul-induction-privacy-pilot.md"
+      - "docs/sgeul-induction-security-review.md"
       - "tests/sgeul-author-induction-sql.cjs"
       - ".github/workflows/sgeul-author-induction.yml"
   workflow_dispatch:
@@ -43,3 +47,33 @@ jobs:
         run: npm install --prefix "$RUNNER_TEMP/sgeul-pg" --no-save --no-package-lock @electric-sql/pglite@0.5.10
       - name: Assert applicant, administrator and private-profile RLS
         run: NODE_PATH="$RUNNER_TEMP/sgeul-pg/node_modules" node tests/sgeul-author-induction-sql.cjs
+
+  android-debug:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/sgeul/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: android-actions/setup-android@v3
+      - name: Install required Android build tools
+        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+      - name: Build local Android debug APK only
+        working-directory: apps/sgeul
+        run: |
+          npm ci
+          npm run android:debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sgeul-author-induction-closed-debug-apk
+          path: apps/sgeul/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
