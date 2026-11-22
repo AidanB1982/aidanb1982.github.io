@@ -8,6 +8,11 @@ on:
       - "scripts/refresh-geofabrik-bookshops.sh"
       - "scripts/test-geofabrik-bookshops.mjs"
       - "scripts/build-public-bookshops.mjs"
+      - "js/bookshop-cluster-grid.js"
+      - "js/public-bookshops.js"
+      - "css/public-bookshops.css"
+      - "pages/find-bookshops.html"
+      - "scripts/test-bookshop-clusters.mjs"
       - ".github/workflows/bookshop-discovery.yml"
       - ".github/workflows/bookshop-extract-checks.yml"
   workflow_dispatch:
@@ -34,5 +39,8 @@ jobs:
           node --check scripts/build-geofabrik-bookshops.mjs
           node --check scripts/build-public-bookshops.mjs
           bash -n scripts/refresh-geofabrik-bookshops.sh
-      - name: Validate extraction and data safety on local fixtures
-        run: node --test scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
+      - name: Validate extraction, clustering and data safety on local fixtures
+        run: |
+          node --check js/public-bookshops.js
+          node --check js/bookshop-cluster-grid.js
+          node --test scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs

@@ -9,6 +9,7 @@
   const DATA_URL = "/data/public-bookshops.json";
   const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
   const MAX_CARDS = 36;
+  const CLUSTER_REVEAL_ZOOM = 15;
   const state = { shops: [], results: [], map: null, markers: null, canvasRenderer: null, coverage: null, searchId: 0, baseResults: [], resultDescription: "All bookshops", areaMode: false };
   const el = id => document.getElementById(id);
 
@@ -71,6 +72,7 @@
       observer.observe(el("pb-map"));
     }
     window.addEventListener("resize", updateSize);
+    state.map.on("zoomend", () => drawMarkers(state.results));
   }
 
   function makeWebsiteLink(shop) {
@@ -92,23 +94,90 @@
     return box;
   }
 
-  function renderMarkers(results) {
+  function makeIndividualMarker(shop) {
+    return L.circleMarker([shop.lat, shop.lng], {
+      radius: 7, weight: 2, color: "#f6e8cf",
+      fillColor: "#b87333", fillOpacity: 0.9,
+      renderer: state.canvasRenderer
+    }).bindPopup(makePopup(shop));
+  }
+
+  function makeClusterMarker(cluster) {
+    const label = cluster.count + " bookshop listings. Zoom in to explore.";
+    const icon = L.divIcon({
+      className: "pb-cluster-icon",
+      html: '<span class="pb-cluster-count">' +
+        cluster.count + '</span>',
+      iconSize: [46, 46],
+      iconAnchor: [23, 23]
+    });
+    const marker = L.marker([cluster.lat, cluster.lng], {
+      icon, title: label, alt: label, keyboard: true, riseOnHover: true
+    });
+    marker.on("click", () => {
+      if (!state.map) return;
+      const nextZoom = Math.min(CLUSTER_REVEAL_ZOOM, state.map.getZoom() + 2);
+      const clusterBounds = L.latLngBounds(
+        cluster.shops.map(shop => [shop.lat, shop.lng]));
+      if (clusterBounds.isValid() && cluster.shops.length > 1) {
+        state.map.fitBounds(clusterBounds.pad(0.3), {
+          maxZoom: nextZoom, animate: false
+        });
+      }
+      // Keep advancing even when multiple bookshops share a coordinate
+      // or fitBounds would choose the same zoom.
+      if (state.map.getZoom() < nextZoom) {
+        state.map.setView([cluster.lat, cluster.lng], nextZoom, {
+          animate: false
+        });
+      }
+    });
+    return marker;
+  }
+
+  function drawMarkers(results) {
     if (!state.map || !state.markers) return;
     state.markers.clearLayers();
-    results.forEach(shop => {
-      const marker = L.circleMarker([shop.lat, shop.lng], {
-        radius: 7, weight: 2, color: "#f6e8cf",
-        fillColor: "#b87333", fillOpacity: 0.9,
-        renderer: state.canvasRenderer
-      }).bindPopup(makePopup(shop));
-      state.markers.addLayer(marker);
-    });
-    if (state.areaMode) return;
-    if (results.length) {
-      state.map.fitBounds(state.markers.getBounds().pad(0.12), { maxZoom: 13 });
-    } else {
-      state.map.setView([56.2, -4.2], 6);
+    const clusterer = window.BlackwoodBookshopGrid;
+    const clusters = clusterer
+      ? clusterer.groupShops(
+        results,
+        (lat, lng, zoom) => state.map.project([lat, lng], zoom),
+        state.map.getZoom(),
+        {cellSize: 108, revealZoom: CLUSTER_REVEAL_ZOOM}
+      )
+      : results.map(shop => ({
+        shops: [shop], count: 1, lat: shop.lat, lng: shop.lng
+      }));
+    for (const cluster of clusters) {
+      state.markers.addLayer(cluster.count > 1
+        ? makeClusterMarker(cluster)
+        : makeIndividualMarker(cluster.shops[0]));
     }
+  }
+
+  function renderMarkers(results) {
+    if (!state.map || !state.markers) return;
+    // Fit the true shop coordinates, never the representative cluster points.
+    if (!state.areaMode) {
+      if (results.length) {
+        state.map.fitBounds(L.latLngBounds(
+          results.map(shop => [shop.lat, shop.lng])).pad(0.12),
+          {maxZoom: 13});
+      } else {
+        state.map.setView([56.2, -4.2], 6);
+      }
+    }
+    drawMarkers(results);
+  }
+
+  function showShopOnMap(shop) {
+    if (!state.map) return;
+    state.map.setView([shop.lat, shop.lng], 16, {animate: false});
+    // Open this exact listing, even if two shops share coordinates.
+    L.popup().setLatLng([shop.lat, shop.lng])
+      .setContent(makePopup(shop)).openOn(state.map);
+    el("pb-map").scrollIntoView({behavior: "smooth", block: "center"});
   }
 
   function renderCards(results) {
@@ -130,15 +199,7 @@
       if (website) actions.append(website);
       const view = textElement("button", "Show on map", "pb-card-map");
       view.type = "button";
-      view.addEventListener("click", () => {
-        if (!state.map || !state.markers) return;
-        state.map.setView([shop.lat, shop.lng], 15);
-        state.markers.eachLayer(layer => {
-          const ll = layer.getLatLng();
-          if (ll.lat === shop.lat && ll.lng === shop.lng) layer.openPopup();
-        });
-        el("pb-map").scrollIntoView({ behavior: "smooth", block: "center" });
-      });
+      view.addEventListener("click", () => showShopOnMap(shop));
       actions.append(view);
       card.append(actions);
       wrap.append(card);
