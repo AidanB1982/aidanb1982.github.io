@@ -22,6 +22,9 @@ on:
       - "scripts/test-bookshop-verification.mjs"
       - "scripts/test-bookshop-contact-review.mjs"
       - "scripts/test-bookshop-followups.mjs"
+      - "scripts/test-bookshop-backup-restore.mjs"
+      - "js/bookshop-backup-restore-core.js"
+      - "js/bookshop-backup-restore-desk.js"
       - "js/bookshop-followup-core.js"
       - "js/bookshop-followup-desk.js"
       - "js/bookshop-contact-review-core.js"
@@ -63,4 +66,6 @@ jobs:
           node --check js/bookshop-contact-review-desk.js
           node --check js/bookshop-followup-core.js
           node --check js/bookshop-followup-desk.js
-          node --test scripts/test-bookshop-followups.mjs scripts/test-bookshop-contact-review.mjs scripts/test-bookshop-verification.mjs scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
+          node --check js/bookshop-backup-restore-core.js
+          node --check js/bookshop-backup-restore-desk.js
+          node --test scripts/test-bookshop-backup-restore.mjs scripts/test-bookshop-followups.mjs scripts/test-bookshop-contact-review.mjs scripts/test-bookshop-verification.mjs scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
