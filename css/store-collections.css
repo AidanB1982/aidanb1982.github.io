@@ -1,0 +1,111 @@
+/* Store collections gateway — scoped to pages/store.html.
+   Static links keep the existing Shopify Buy Button catalogue independent. */
+.store-worlds-panel .store-worlds-kicker {
+    margin: 0 0 10px;
+    color: #c49a6c;
+    font: 700 11px/1.5 Arial, Helvetica, sans-serif;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+.store-worlds-group + .store-worlds-group {
+    margin-top: 34px;
+}
+.store-worlds-group-heading {
+    margin: 0 0 16px;
+    padding: 0 0 12px;
+    border-bottom: 1px solid rgba(184, 115, 51, .22);
+}
+.store-worlds-group-heading h3 {
+    margin: 0 0 6px;
+    color: #f1ece4;
+    font: 400 clamp(23px, 2.5vw, 29px)/1.25 Georgia, "Times New Roman", serif;
+}
+.store-worlds-group-heading p {
+    margin: 0;
+    color: rgba(215, 208, 198, .73);
+    font: 14px/1.7 Arial, Helvetica, sans-serif;
+}
+.store-worlds-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+.store-worlds-grid--single {
+    grid-template-columns: minmax(0, 1fr);
+}
+.store-world-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 208px;
+    padding: 24px 22px;
+    border: 1px solid rgba(184, 115, 51, .29);
+    border-radius: 4px;
+    background: linear-gradient(145deg, rgba(56, 38, 25, .38), rgba(10, 10, 10, .9));
+    text-align: left;
+    color: #f1ece4;
+    text-decoration: none;
+    transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.store-world-card:visited {
+    color: #f1ece4;
+}
+.store-world-card:hover,
+.store-world-card:focus-visible {
+    border-color: rgba(212, 184, 139, .82);
+    background: linear-gradient(145deg, rgba(75, 49, 30, .48), rgba(12, 12, 12, .95));
+    transform: translateY(-2px);
+}
+.store-world-card:focus-visible {
+    outline: 2px solid #d4b88b;
+    outline-offset: 3px;
+}
+.store-world-card-label {
+    color: #c49a6c;
+    font: 700 10px/1.45 Arial, Helvetica, sans-serif;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+.store-world-card-title {
+    color: #f1ece4;
+    font: 400 clamp(21px, 2vw, 26px)/1.23 Georgia, "Times New Roman", serif;
+}
+.store-world-card-description {
+    color: rgba(215, 208, 198, .76);
+    font: 14px/1.7 Arial, Helvetica, sans-serif;
+}
+.store-world-card-cta {
+    margin-top: auto;
+    padding-top: 8px;
+    color: #d4b88b;
+    font: 700 11px/1.5 Arial, Helvetica, sans-serif;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.store-world-card-cta span {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 15px;
+}
+.store-worlds-dispatch {
+    margin: 30px 0 0;
+    padding: 18px 20px;
+    border-left: 2px solid rgba(212, 184, 139, .65);
+    background: rgba(255, 255, 255, .025);
+    color: rgba(215, 208, 198, .8);
+    font: 13px/1.7 Arial, Helvetica, sans-serif;
+}
+@media (max-width: 900px) {
+    .store-worlds-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 590px) {
+    .store-worlds-grid { grid-template-columns: minmax(0, 1fr); }
+    .store-world-card { min-height: 0; padding: 20px; }
+    .store-worlds-group + .store-worlds-group { margin-top: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .store-world-card { transition: none; }
+    .store-world-card:hover,
+    .store-world-card:focus-visible { transform: none; }
+}
