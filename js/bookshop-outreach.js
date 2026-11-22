@@ -1190,7 +1190,9 @@ function renderSaved() {
 
     if (
       shop.email &&
-      shop.status !== "opted-out"
+      shop.status !== "opted-out" &&
+      (shop.reviewOrigin !== "public-directory" ||
+        window.BlackwoodVerification?.statusOf(shop) === "verified-independent")
     ) {
       actions.append(
         makeButton(
