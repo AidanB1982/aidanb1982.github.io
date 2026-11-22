@@ -174,20 +174,9 @@
   function showShopOnMap(shop) {
     if (!state.map) return;
     state.map.setView([shop.lat, shop.lng], 16, {animate: false});
-    drawMarkers(state.results);
-    let found = false;
-    state.markers.eachLayer(layer => {
-      if (found || !layer.getPopup) return;
-      const ll = layer.getLatLng();
-      if (ll.lat === shop.lat && ll.lng === shop.lng) {
-        layer.openPopup();
-        found = true;
-      }
-    });
-    if (!found) {
-      L.popup().setLatLng([shop.lat, shop.lng])
-        .setContent(makePopup(shop)).openOn(state.map);
-    }
+    // Open this exact listing, even if two shops share coordinates.
+    L.popup().setLatLng([shop.lat, shop.lng])
+      .setContent(makePopup(shop)).openOn(state.map);
     el("pb-map").scrollIntoView({behavior: "smooth", block: "center"});
   }
 
