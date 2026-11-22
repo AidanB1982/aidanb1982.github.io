@@ -1024,6 +1024,29 @@ function renderSaved() {
       );
     }
 
+    if (shop.reviewOrigin === "public-directory") {
+      const contactReview = shop.contactReview;
+      const ready = window.BlackwoodContactReview?.isReady(shop) === true;
+      content.append(element(
+        "p",
+        ready
+          ? "Business contact: human-reviewed for individual trade enquiry"
+          : contactReview?.sourceUrl
+            ? "Business contact: evidence saved; approval or verification pending"
+            : "Business contact: public source and manual approval still needed"
+      ));
+      const source = window.BlackwoodContactReview?.publicSourceUrl(
+        contactReview?.sourceUrl
+      );
+      if (source) {
+        const link = element("a", "Business contact evidence");
+        link.href = source;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        content.append(link);
+      }
+    }
+
     const history =
       activityHistory(shop);
 
@@ -1164,6 +1187,17 @@ function renderSaved() {
       );
     }
 
+    if (shop.reviewOrigin === "public-directory" &&
+        window.BlackwoodContactDesk) {
+      actions.append(
+        makeButton(
+          "Review public contact",
+          () => window.BlackwoodContactDesk.openReview(shop),
+          true
+        )
+      );
+    }
+
     actions.append(
       makeButton(
         "Record contact",
@@ -1192,7 +1226,7 @@ function renderSaved() {
       shop.email &&
       shop.status !== "opted-out" &&
       (shop.reviewOrigin !== "public-directory" ||
-        window.BlackwoodVerification?.statusOf(shop) === "verified-independent")
+        window.BlackwoodContactReview?.isReady(shop) === true)
     ) {
       actions.append(
         makeButton(
@@ -2335,7 +2369,9 @@ function createEmailComposer() {
 function openEmailComposer(shop) {
   if (
     !shop.email ||
-    shop.status === "opted-out"
+    shop.status === "opted-out" ||
+    (shop.reviewOrigin === "public-directory" &&
+      window.BlackwoodContactReview?.isReady(shop) !== true)
   ) {
     return;
   }
@@ -2383,7 +2419,9 @@ function getPreparedEmail() {
   if (
     !shop ||
     !shop.email ||
-    shop.status === "opted-out"
+    shop.status === "opted-out" ||
+    (shop.reviewOrigin === "public-directory" &&
+      window.BlackwoodContactReview?.isReady(shop) !== true)
   ) {
     setEmailFeedback(
       "This bookshop is no longer available for contact.",
@@ -3869,6 +3907,10 @@ function initialise() {
     saveShops, updateShopRecord, sameBookshop, newId,
     safeWebsite, validCoordinates, localDate, render,
     statusLabels: STATUSES
+  });
+
+  window.BlackwoodContactDesk?.initialise({
+    getShops: () => shops, updateShopRecord, localDate, render
   });
 
   initMap();
