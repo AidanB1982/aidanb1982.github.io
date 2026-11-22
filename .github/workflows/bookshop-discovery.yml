@@ -6,7 +6,7 @@ on:
       scope:
         description: "Which discovery cache should be refreshed?"
         required: true
-        default: both
+        default: scotland
         type: choice
         options:
           - scotland
@@ -28,7 +28,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 110
 
     steps:
       - name: Check out repository
@@ -63,24 +63,30 @@ jobs:
           echo "scope=$scope" >> "$GITHUB_OUTPUT"
           echo "Selected refresh scope: $scope"
 
+      - name: Install Osmium for offline extract processing
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends osmium-tool
+
       - name: Validate code and public data safeguards
         run: |
-          node --check scripts/update-bookshops.mjs
-          node --check scripts/update-uk-bookshops.mjs
+          node --check scripts/build-geofabrik-bookshops.mjs
+          node --check scripts/geofabrik-bookshops-core.mjs
           node --check scripts/build-public-bookshops.mjs
-          node --test scripts/test-bookshop-pipeline.mjs
+          bash -n scripts/refresh-geofabrik-bookshops.sh
+          node --test scripts/test-bookshop-pipeline.mjs scripts/test-geofabrik-bookshops.mjs
 
       - name: Refresh Scottish discovery cache
         if: steps.select.outputs.scope == 'scotland' || steps.select.outputs.scope == 'both'
         run: |
           set +e
-          node scripts/update-bookshops.mjs
+          bash scripts/refresh-geofabrik-bookshops.sh scotland
           code=$?
           set -e
           if [ "$code" -eq 2 ]; then
-            echo "::warning::Scottish Overpass sources unavailable; retaining the previous Scottish cache."
+            echo "::warning::Scottish Geofabrik extract download unavailable; retaining the previous Scottish cache."
           elif [ "$code" -ne 0 ]; then
-            echo "::error::Scottish discovery failed with a non-network error ($code)."
+            echo "::error::Scottish extract validation/processing failed ($code); existing cache preserved."
             exit "$code"
           fi
 
@@ -88,13 +94,13 @@ jobs:
         if: steps.select.outputs.scope == 'rest_uk' || steps.select.outputs.scope == 'both'
         run: |
           set +e
-          node scripts/update-uk-bookshops.mjs
+          bash scripts/refresh-geofabrik-bookshops.sh uk
           code=$?
           set -e
           if [ "$code" -eq 2 ]; then
-            echo "::warning::UK Overpass sources unavailable; retaining the previous UK cache."
+            echo "::warning::UK Geofabrik extract download unavailable; retaining the previous UK cache."
           elif [ "$code" -ne 0 ]; then
-            echo "::error::UK discovery failed with a non-network error ($code)."
+            echo "::error::UK extract validation/processing failed ($code); existing cache preserved."
             exit "$code"
           fi
 
