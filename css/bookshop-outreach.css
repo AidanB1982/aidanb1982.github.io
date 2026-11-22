@@ -1006,3 +1006,32 @@ body.bookshop-outreach-page .followup-item .btn {
   margin-top: 8px;
   min-height: 44px;
 }
+
+/* Private backup restore: preview does not mutate saved records. */
+body.bookshop-outreach-page .backup-restore-controls label {
+  display: grid;
+  gap: 9px;
+  max-width: 560px;
+  font: 13px/1.5 Arial, sans-serif;
+}
+body.bookshop-outreach-page .backup-restore-controls input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  font: 15px/1.5 Arial, sans-serif;
+}
+body.bookshop-outreach-page .backup-restore-preview {
+  padding: 15px;
+  margin: 14px 0;
+  border: 1px solid #806344;
+  border-radius: 8px;
+  background: #202720;
+}
+body.bookshop-outreach-page .backup-restore-preview p {
+  color: #f5ead5;
+  font: 14px/1.6 Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+body.bookshop-outreach-page .backup-restore-preview .btn {
+  min-height: 44px;
+}
