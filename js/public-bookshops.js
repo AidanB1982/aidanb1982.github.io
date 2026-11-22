@@ -9,7 +9,7 @@
   const DATA_URL = "/data/public-bookshops.json";
   const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
   const MAX_CARDS = 36;
-  const state = { shops: [], results: [], map: null, markers: null, canvasRenderer: null, coverage: null, searchId: 0 };
+  const state = { shops: [], results: [], map: null, markers: null, canvasRenderer: null, coverage: null, searchId: 0, baseResults: [], resultDescription: "All bookshops" };
   const el = id => document.getElementById(id);
 
   function textElement(tag, text, className) {
@@ -145,10 +145,38 @@
   }
 
   function update(results, message) {
+    state.baseResults = results;
+    state.resultDescription = message;
+    applyWebsiteFilter();
+  }
+
+  function applyWebsiteFilter() {
+    const websitesOnly = el("pb-websites").checked;
+    const results = websitesOnly
+      ? state.baseResults.filter(shop => Boolean(safeWebsite(shop.website)))
+      : state.baseResults;
     state.results = results;
     renderCards(results);
     renderMarkers(results);
-    el("pb-status").textContent = message;
+    el("pb-status").textContent = state.resultDescription +
+      (websitesOnly ? " Showing only listings with websites." : "");
+  }
+
+  function searchCurrentMapArea() {
+    if (!state.map) {
+      el("pb-status").textContent = "The map is unavailable; use town or bookshop search.";
+      return;
+    }
+    ++state.searchId;
+    el("pb-search").value = "";
+    const bounds = state.map.getBounds();
+    const matches = state.shops.filter(shop => bounds.contains([shop.lat, shop.lng]));
+    update(matches, matches.length
+      ? "Bookshops in the selected map area."
+      : "No cached bookshops found in this map area. Coverage is still expanding.");
+    // Filtering should not zoom out to encompass all results; keep the map
+    // where the visitor chose to search.
+    state.map.fitBounds(bounds, { animate: false });
   }
 
   function normalise(value) {
@@ -178,6 +206,7 @@
 
   async function search(event) {
     event.preventDefault();
+    const searchId = ++state.searchId;
     const query = el("pb-search").value.trim().slice(0, 120);
     const radius = Number(el("pb-radius").value);
     if (!query) {
@@ -185,8 +214,14 @@
       return;
     }
     if (![10000, 25000, 50000].includes(radius)) return;
-    const searchId = ++state.searchId;
     const lowered = normalise(query);
+    // Prefer a known town over a similarly named bookshop. It avoids
+    // presenting one shop when the visitor wants a whole town directory.
+    const byTown = state.shops.filter(shop => normalise(shop.town) === lowered);
+    if (byTown.length) {
+      update(byTown, "Bookshops listed in " + query + ".");
+      return;
+    }
     const byName = state.shops.filter(shop => normalise(shop.name).includes(lowered));
     if (byName.length) {
       update(byName, "Found bookshops matching “" + query + "”.");
@@ -225,9 +260,12 @@
 
   async function init() {
     el("pb-search-form").addEventListener("submit", search);
+    el("pb-websites").addEventListener("change", applyWebsiteFilter);
+    el("pb-search-area").addEventListener("click", searchCurrentMapArea);
     el("pb-reset").addEventListener("click", () => {
       ++state.searchId;
       el("pb-search").value = "";
+      el("pb-websites").checked = false;
       update(state.shops, "Showing all bookshops in the current public directory.");
     });
     createMap();
