@@ -767,6 +767,12 @@ function renderContactOverview() {
 
   const items = [
     ["Saved bookshops", shops.length],
+    ["Verified independent", shops.filter(shop =>
+      window.BlackwoodVerification?.statusOf(shop) === "verified-independent"
+    ).length],
+    ["Unreviewed", shops.filter(shop =>
+      window.BlackwoodVerification?.statusOf(shop) === "unreviewed"
+    ).length],
     ["Prospects", counts.prospect],
     ["Contacted", counts.contacted],
     ["Interested", counts.interested],
@@ -987,6 +993,28 @@ function renderSaved() {
       )
     );
 
+    const reviewHelper = window.BlackwoodVerification;
+    if (reviewHelper) {
+      content.append(element(
+        "p",
+        "Verification: " +
+          reviewHelper.LABELS[reviewHelper.statusOf(shop)] +
+          (shop.verification?.checkedAt
+            ? " · checked " + formatDate(shop.verification.checkedAt)
+            : "")
+      ));
+      if (shop.verification?.sourceUrl) {
+        const evidence = reviewHelper.evidenceUrl(shop.verification.sourceUrl);
+        if (evidence) {
+          const reviewLink = element("a", "Review evidence");
+          reviewLink.href = evidence;
+          reviewLink.target = "_blank";
+          reviewLink.rel = "noopener noreferrer";
+          content.append(reviewLink);
+        }
+      }
+    }
+
     if (shop.email) {
       content.append(
         element(
@@ -1125,6 +1153,16 @@ function renderSaved() {
         true
       )
     );
+
+    if (window.BlackwoodReviewDesk) {
+      actions.append(
+        makeButton(
+          "Verify bookshop",
+          () => window.BlackwoodReviewDesk.openReview(shop),
+          true
+        )
+      );
+    }
 
     actions.append(
       makeButton(
@@ -3816,6 +3854,20 @@ function initialise() {
     "click",
     exportJSON
   );
+
+  $("verificationFilter")?.addEventListener(
+    "change",
+    renderSaved
+  );
+
+  // The review desk is inert until this administrator-approved application
+  // has loaded. Its only persistence is the existing browser-local store.
+  window.BlackwoodReviewDesk?.initialise({
+    getShops: () => shops,
+    saveShops, updateShopRecord, sameBookshop, newId,
+    safeWebsite, validCoordinates, localDate, render,
+    statusLabels: STATUSES
+  });
 
   initMap();
   render();
