@@ -213,11 +213,6 @@ function parseShop(item) {
     getTag(tags, ["addr:street"])
   ].filter(Boolean).join(" ");
 
-  const email = getTag(tags, [
-    "email",
-    "contact:email"
-  ]);
-
   return {
     osmId: `${item.type}/${item.id}`,
     name,
@@ -233,10 +228,6 @@ function parseShop(item) {
         "url"
       ])
     ),
-    email:
-      /^[^\s@;,]+@[^\s@;,]+\.[^\s@;,]+$/.test(email)
-        ? email
-        : "",
     lat,
     lng
   };
