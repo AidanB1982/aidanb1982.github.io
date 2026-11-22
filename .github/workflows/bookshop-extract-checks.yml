@@ -13,6 +13,13 @@ on:
       - "css/public-bookshops.css"
       - "pages/find-bookshops.html"
       - "scripts/test-bookshop-clusters.mjs"
+      - "js/bookshop-verification-core.js"
+      - "js/bookshop-verification-desk.js"
+      - "js/bookshop-outreach.js"
+      - "js/bookshop-outreach-access.js"
+      - "css/bookshop-outreach.css"
+      - "pages/bookshop-outreach.html"
+      - "scripts/test-bookshop-verification.mjs"
       - ".github/workflows/bookshop-discovery.yml"
       - ".github/workflows/bookshop-extract-checks.yml"
   workflow_dispatch:
@@ -43,4 +50,7 @@ jobs:
         run: |
           node --check js/public-bookshops.js
           node --check js/bookshop-cluster-grid.js
-          node --test scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
+          node --check js/bookshop-outreach.js
+          node --check js/bookshop-verification-core.js
+          node --check js/bookshop-verification-desk.js
+          node --test scripts/test-bookshop-verification.mjs scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
