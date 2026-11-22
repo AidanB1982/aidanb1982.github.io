@@ -67,7 +67,7 @@
   <!-- Outreach styles load after shared styles -->
   <link
     rel="stylesheet"
-    href="/css/bookshop-outreach.css?v=9"
+    href="/css/bookshop-outreach.css?v=10"
   >
 
   <!-- Shared Blackwood header/footer loader -->
@@ -94,8 +94,9 @@
     script tag here: the access controller loads it
     after successful verification.
   -->
+  <script src="/js/bookshop-verification-core.js?v=20261122a" defer></script>
   <script
-    src="/js/bookshop-outreach-access.js?v=3"
+    src="/js/bookshop-outreach-access.js?v=4"
     defer
   ></script>
 
@@ -375,6 +376,26 @@
 
       </section>
 
+      <!-- PRIVATE REVIEW QUEUE: data only loads after admin verification -->
+      <section class="panel bookshop-review-desk" aria-labelledby="review-desk-heading">
+        <p class="eyebrow">Bookshop quality control · Manual review</p>
+        <h2 id="review-desk-heading">Verify bookshops before outreach</h2>
+        <p class="section-intro">Review the public discovery candidates one at a time. Save promising shops to your private browser directory, then record whether they are independently operated, still trading and supported by evidence. Verification is not consent to email and does not establish Blackwood stockist status.</p>
+        <div class="review-toolbar">
+          <label for="reviewCandidateSearch">Find a candidate
+            <input type="search" id="reviewCandidateSearch" maxlength="120" placeholder="Bookshop name, town or address">
+          </label>
+          <button type="button" class="btn secondary" id="reviewReload">Refresh candidates</button>
+        </div>
+        <p id="reviewQueueStatus" class="feedback" role="status" aria-live="polite">Open the private review queue to browse candidates.</p>
+        <div id="reviewQueue" class="review-queue"></div>
+        <div class="review-pagination">
+          <button type="button" id="reviewPrev" class="btn secondary" disabled>Previous</button>
+          <button type="button" id="reviewNext" class="btn secondary" disabled>Next page</button>
+        </div>
+        <p class="notice">Candidate records are public OpenStreetMap discovery data. They are not verified independents, contact permissions or Blackwood stockists. Private review notes stay in this browser and remain in your JSON backup.</p>
+      </section>
+
       <!-- SAVED DIRECTORY TOOLBAR -->
       <div class="toolbar">
 
@@ -424,6 +445,16 @@
             Do not contact
           </option>
 
+        </select>
+
+        <label class="sr-only" for="verificationFilter">Filter saved bookshops by verification</label>
+        <select id="verificationFilter" aria-label="Filter saved bookshops by verification">
+          <option value="">All verification states</option>
+          <option value="unreviewed">Not yet checked</option>
+          <option value="needs-review">Research needed</option>
+          <option value="verified-independent">Manually verified independent</option>
+          <option value="not-independent">Not independent</option>
+          <option value="closed">Closed / no longer trading</option>
         </select>
 
         <button
