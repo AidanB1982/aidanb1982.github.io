@@ -212,3 +212,25 @@ See [Sgeul Author Induction](../../docs/sgeul-author-induction.md) for the SQL
 migration, negative RLS tests, author profile limitations, manual go-live gates,
 and separation from Blackwood manuscript acquisitions and the private Author Desk.
 Do **not** assume that merging the PR deploys SQL or ships an updated Android app.
+
+
+### PR #19 verification and debug Android test builds
+
+The public Privacy Policy now has a dedicated
+\`#sgeul-author-induction-privacy\` section, linked directly from the
+Authors screen. When an Android user opens the Charter or privacy link,
+Sgeul uses the system browser rather than replacing its trusted local
+WebView with a website.
+
+The GitHub workflow \`.github/workflows/sgeul-author-induction.yml\`
+runs app, database-policy and closed-gate tests, then builds an
+**internal debug-signed Android APK** in a private GitHub Actions
+artifact for device smoke testing. It does not publish anything to
+Google Play or enable author applications. Do not install a debug-signed
+APK over your current release-signed app: signatures may differ and
+uninstalling can delete local reader copies. Use a dedicated test
+device/profile.
+
+See \`docs/sgeul-induction-privacy-pilot.md\` for the owner sign-offs
+and \`docs/sgeul-induction-security-review.md\` for the live read-only
+preflight and existing adviser warnings.

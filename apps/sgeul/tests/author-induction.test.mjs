@@ -68,3 +68,29 @@ test("Profile inputs are not an author permission, publication or book entitleme
   assert.doesNotMatch(js, /service_role|is_admin\s*[:=]\s*true|desk_access_enabled\s*[:=]\s*true/);
   assert.doesNotMatch(js, /storage\.from|\.upload\(/);
 });
+
+
+test("Induction privacy is linked from the native app and described on the public site", () => {
+  const html = readFileSync(new URL("../src/index.html", import.meta.url), "utf8");
+  const privacy = readFileSync(new URL("../../../pages/privacy-policy.html", import.meta.url), "utf8");
+  const canonical = "https://blackwoodpublishing.co.uk/pages/privacy-policy.html#sgeul-author-induction-privacy";
+  assert.equal((html.match(/https:\/\/blackwoodpublishing\.co\.uk\/pages\/privacy-policy\.html#sgeul-author-induction-privacy/g)||[]).length,2);
+  assert.match(html, /id="induction-charter"/);
+  assert.match(html, /id="induction-privacy"/);
+  assert.match(privacy, /id="sgeul-author-induction-privacy"/);
+  assert.match(privacy, /<strong>Applications are not currently open\.<\/strong>/);
+  assert.match(privacy, /private author profile draft/);
+  assert.match(privacy, /not displayed to the public or other readers/);
+  assert.match(privacy, /withdraw your request or private profile/);
+  assert.match(privacy, /retention and deletion schedule must be approved before applications open/);
+  assert.ok(canonical.endsWith("#sgeul-author-induction-privacy"));
+});
+
+test("Android author Charter and privacy links are sent to the system browser", () => {
+  const author = readFileSync(new URL("../src/author-induction.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../src/app.js", import.meta.url), "utf8");
+  assert.match(author, /openExternal\(link\.href\)/);
+  assert.match(author, /event\.preventDefault\(\)/);
+  assert.match(app, /createAuthorInduction\(\{ client, isOnline, openExternal \}\)/);
+  assert.match(app, /Capacitor\.isNativePlatform\(\)\) await Browser\.open/);
+});

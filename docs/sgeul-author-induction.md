@@ -96,3 +96,26 @@ ownership. Build an explicit, reviewed linkage when ready.
 
 This release does not collect payments, calculate royalties, change legal
 agreements, accept manuscripts or reassign Sgeul reader/ARC access.
+
+
+## PR #19 launch-readiness supplement
+
+The SQL from PR #18 has been installed and the live Supabase schema checked
+read-only. All **14** tests in
+\`supabase/diagnostics/sgeul-author-induction-preflight.sql\` passed on
+22 November 2026. This confirms structure and grants, not end-to-end access
+using real Supabase Auth sessions. No application or author record was created.
+
+- Privacy disclosure: \`pages/privacy-policy.html#sgeul-author-induction-privacy\`.
+- Unapproved decisions, applicant withdrawal, deletion/retention and pilot:
+  \`docs/sgeul-induction-privacy-pilot.md\`.
+- Security adviser findings and a scoped review:
+  \`docs/sgeul-induction-security-review.md\`.
+- CI checks include an optional internal **debug-signed Android APK**
+  artifact, for limited device smoke testing. It is **not** a Play-signed
+  release and cannot overwrite a differently signed app without removing
+  the original (which may delete locally saved copies). Test on a separate
+  device/profile; do not uninstall an existing reader's installation.
+- Blackwood's new Authors tab still has \`AUTHOR_INDUCTION_ENABLED=false\`.
+  The upcoming pilot requires a separately reviewed enablement, a fresh
+  Android version code and the privacy and author eligibility decisions.

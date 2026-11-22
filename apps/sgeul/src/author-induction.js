@@ -36,7 +36,7 @@ function safeWebsite(value) {
   }
 }
 
-export function createAuthorInduction({ client, isOnline, enabled = AUTHOR_INDUCTION_ENABLED }) {
+export function createAuthorInduction({ client, isOnline, openExternal, enabled = AUTHOR_INDUCTION_ENABLED }) {
   const $ = id => document.getElementById(id);
   const form = $("author-induction-form");
   const profileForm = $("author-profile-form");
@@ -49,6 +49,21 @@ export function createAuthorInduction({ client, isOnline, enabled = AUTHOR_INDUC
   let saving = false;
 
   const setStatus = message => { state.textContent = message; };
+  // Capacitor must not navigate its trusted local WebView to a remote website.
+  // Open the two approved public information pages using the native system browser.
+  const authorLinks = document.querySelectorAll(
+    '#authors a[href^="https://blackwoodpublishing.co.uk/pages/"]'
+  );
+  for (const link of authorLinks) {
+    link.addEventListener("click", event => {
+      if (typeof openExternal !== "function") return;
+      event.preventDefault();
+      void openExternal(link.href).catch(() => {
+        setStatus("We could not open that page. Please visit blackwoodpublishing.co.uk in your browser.");
+      });
+    });
+  }
+
   const show = (applicationForm = false, approvedForm = false) => {
     form.hidden = !applicationForm;
     profileForm.hidden = !approvedForm;

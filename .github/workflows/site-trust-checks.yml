@@ -9,6 +9,7 @@ on:
       - "footer.html"
       - "pages/about.html"
       - "pages/author-charter.html"
+      - "pages/privacy-policy.html"
       - "pages/submissions.html"
       - "pages/LimitedEditions.html"
       - "pages/resources.html"
