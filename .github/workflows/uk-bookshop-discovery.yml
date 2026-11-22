@@ -38,6 +38,9 @@ jobs:
           node --check scripts/update-uk-bookshops.mjs
           node --check scripts/build-public-bookshops.mjs
 
+      - name: Test public directory privacy and refresh safeguards
+        run: node --test scripts/test-bookshop-pipeline.mjs
+
       - name: Fetch bookshops across England, Wales and Northern Ireland
         run: node scripts/update-uk-bookshops.mjs
 
