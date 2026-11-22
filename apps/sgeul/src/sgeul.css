@@ -289,3 +289,57 @@ select:focus-visible {
   min-height: 44px;
   padding: 10px 0;
 }
+
+
+/* Private induction foundation — respects Sgeul's reader layout and typography. */
+.author-studio {
+  border-color: #82694c;
+  background: linear-gradient(150deg, #1d2d32, #172732);
+}
+.author-studio > h2 { font-size: clamp(28px, 5vw, 38px); }
+.author-studio > p { max-width: 680px; }
+.author-studio textarea {
+  display: block;
+  width: 100%;
+  min-height: 110px;
+  margin: 9px 0;
+  padding: 14px;
+  color: var(--cream);
+  background: #0e1c26;
+  border: 1px solid #60717a;
+  border-radius: 8px;
+  font: 16px/1.5 system-ui, sans-serif;
+  resize: vertical;
+}
+.author-studio textarea:focus-visible,
+.author-studio a:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+.author-studio form {
+  border-top: 1px solid #51636e;
+  margin-top: 25px;
+  padding-top: 20px;
+}
+.author-studio .author-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  line-height: 1.55;
+}
+.author-studio .author-check input {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 4px 0 0;
+}
+.author-studio .author-check a { color: #e6bd83; }
+#author-induction-status:not(:empty) {
+  padding: 12px 14px;
+  border: 1px solid #4b6271;
+  border-radius: 8px;
+  background: #21333d;
+}
+@media (max-width: 400px) {
+  .app-nav button { padding: 13px 5px; font-size: 13px; }
+  .author-studio { padding: 18px; }
+}
