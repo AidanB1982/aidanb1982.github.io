@@ -58,6 +58,15 @@ const STATUSES = {
   "opted-out": "Do not contact"
 };
 
+const MAP_STATUS_COLOURS = Object.freeze({
+  prospect: "#b87333",
+  contacted: "#5c86bd",
+  interested: "#d3a64c",
+  stockist: "#418b65",
+  "opted-out": "#9b6262",
+  found: "#4aabb0"
+});
+
 const CONTACT_TYPES = {
   "email-sent": "Email sent",
   "reply-received": "Reply received",
@@ -542,8 +551,9 @@ function isDuplicate(
 ========================================= */
 
 function bookshopIcon(type = "found") {
-  const saved =
-    type === "saved";
+  const colour =
+    MAP_STATUS_COLOURS[type] ||
+    MAP_STATUS_COLOURS.found;
 
   return L.divIcon({
     className:
@@ -558,11 +568,7 @@ function bookshopIcon(type = "found") {
           width:36px;
           height:36px;
           border-radius:50%;
-          background:${
-            saved
-              ? "#b87333"
-              : "#4aabb0"
-          };
+          background:${colour};
           border:2px solid #f5ead5;
           box-shadow:0 3px 10px rgba(0,0,0,.35);
           font-size:20px;
@@ -803,6 +809,44 @@ function renderContactOverview() {
 
     overview.append(card);
   }
+}
+
+function createSavedMapPopup(shop, card, details) {
+  const popup = element("div", undefined, "bookshop-map-popup");
+  popup.append(element("strong", shop.name));
+
+  if (shop.town) popup.append(element("p", shop.town));
+  popup.append(element("p", "Status: " + (STATUSES[shop.status] || "Prospect")));
+  if (shop.email) popup.append(element("p", "Email: " + shop.email));
+
+  const website = safeWebsite(shop.website);
+  if (website) {
+    const link = element("a", "Bookshop website");
+    link.href = website;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    popup.append(link);
+  }
+
+  const lastContact = activityHistory(shop)
+    .filter(entry => entry.type !== "note" && validDate(entry.date))
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  if (lastContact) {
+    popup.append(element("p", "Last contact: " + formatDate(lastContact.date)));
+  }
+
+  const open = makeButton(
+    "Open directory record",
+    () => {
+      details.open = true;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+      details.querySelector("summary")?.focus({ preventScroll: true });
+    },
+    true
+  );
+  open.classList.add("bookshop-map-open");
+  popup.append(open);
+  return popup;
 }
 
 /* =========================================
@@ -1115,17 +1159,16 @@ function renderSaved() {
       const marker = L.marker(
         [shop.lat, shop.lng],
         {
-          icon: bookshopIcon("saved"),
+          icon: bookshopIcon(
+            STATUSES[shop.status] ? shop.status : "prospect"
+          ),
           title:
             `${shop.name} — ${shop.town}`
         }
       );
 
       marker.bindPopup(
-        element(
-          "strong",
-          `${shop.name} — ${shop.town}`
-        )
+        createSavedMapPopup(shop, card, details)
       );
 
       savedMarkers.addLayer(marker);
