@@ -924,6 +924,7 @@ function renderSaved() {
       undefined,
       "shop"
     );
+    card.dataset.shopId = shop.id;
 
     const details =
       document.createElement("details");
@@ -1421,6 +1422,24 @@ function renderDiscovered() {
 function render() {
   renderSaved();
   renderDiscovered();
+  window.BlackwoodFollowUpDesk?.render();
+}
+
+/* Navigation only: displays the existing saved record without sending email. */
+function focusFollowUpShop(id) {
+  const current = shops.find(item => item.id === id);
+  if (!current) return;
+  $("search").value = "";
+  $("statusFilter").value = "";
+  if ($("verificationFilter")) $("verificationFilter").value = "";
+  renderSaved();
+  const card = Array.from($("shopList").querySelectorAll(".shop"))
+    .find(item => item.dataset.shopId === id);
+  if (!card) return;
+  const details = card.querySelector("details");
+  if (details) details.open = true;
+  card.scrollIntoView({behavior: "smooth", block: "center"});
+  details?.querySelector("summary")?.focus({preventScroll: true});
 }
 
 /* =========================================
@@ -3911,6 +3930,10 @@ function initialise() {
 
   window.BlackwoodContactDesk?.initialise({
     getShops: () => shops, updateShopRecord, localDate, render
+  });
+
+  window.BlackwoodFollowUpDesk?.initialise({
+    getShops: () => shops, localDate, focusSavedShop: focusFollowUpShop
   });
 
   initMap();
