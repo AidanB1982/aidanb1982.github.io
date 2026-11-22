@@ -375,6 +375,10 @@
                         About Blackwood
                     </a>
 
+                    <a href="/pages/author-charter.html" role="menuitem">
+                        Our Author Charter
+                    </a>
+
                     <a href="/pages/submissions.html" role="menuitem">
                         Submissions
                     </a>

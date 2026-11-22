@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - "index.html"
+      - "header.html"
+      - "js/header.js"
       - "footer.html"
       - "pages/about.html"
       - "pages/author-charter.html"
