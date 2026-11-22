@@ -1,0 +1,182 @@
+/* About Blackwood and public resource/policy landing pages.
+   Scoped to these pages; no changes to the existing author or store styles. */
+body.publisher-about-page,
+body.publisher-resources-page,
+body.publisher-policy-page {
+  background: #111914;
+  color: #eee6d6;
+}
+.publisher-about,
+.publisher-info {
+  width: min(1160px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 45px 0 90px;
+}
+.publisher-about h1,
+.publisher-about h2,
+.publisher-about h3,
+.publisher-info h1,
+.publisher-info h2,
+.publisher-info h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  color: #f6e9d5;
+  letter-spacing: -.018em;
+}
+.publisher-about p,
+.publisher-info p {
+  line-height: 1.75;
+}
+.publisher-kicker {
+  margin: 0 0 12px;
+  color: #d5a76c;
+  font: 700 12px/1.4 Arial, sans-serif !important;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.publisher-about-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(55px, 9vw, 120px) clamp(23px, 6vw, 75px);
+  border: 1px solid #584735;
+  border-radius: 12px;
+  background: linear-gradient(120deg, rgba(13,23,18,.92), rgba(16,28,22,.85)),
+    url("/assets/forest.png") center / cover;
+}
+.publisher-about-hero-inner {
+  position: relative;
+  max-width: 750px;
+}
+.publisher-about-hero h1 {
+  margin: 0 0 20px;
+  font-size: clamp(38px, 5.6vw, 70px);
+  line-height: 1.12;
+}
+.publisher-about-hero .publisher-lead {
+  font-family: Georgia, serif;
+  font-size: clamp(20px, 2.3vw, 27px);
+  line-height: 1.5;
+  color: #ecd4b8;
+}
+.publisher-about-hero p:not(.publisher-kicker) {max-width: 690px;}
+.publisher-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+.publisher-actions .button {min-height: 44px; display: inline-flex; align-items: center;}
+.publisher-statement {
+  display: grid;
+  grid-template-columns: minmax(230px, .75fr) minmax(0, 1.25fr);
+  gap: clamp(25px, 6vw, 90px);
+  padding: clamp(45px, 7vw, 85px) 0;
+  border-bottom: 1px solid #514433;
+}
+.publisher-statement h2,
+.publisher-section-heading h2,
+.publisher-contact h2,
+.publisher-info h1 {font-size: clamp(30px, 4vw, 47px); line-height: 1.2;}
+.publisher-statement h2 {margin: 0;}
+.publisher-statement p {margin: 0 0 15px; color: #d5d1c7; max-width: 720px;}
+.publisher-people,
+.publisher-routes {padding-top: clamp(50px, 7vw, 85px);}
+.publisher-section-heading {max-width: 740px; margin: 0 0 30px;}
+.publisher-section-heading h2 {margin: 0 0 15px;}
+.publisher-section-heading > p:last-child {color: #c9c6bb;}
+.publisher-author-grid,
+.publisher-route-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.publisher-author-card,
+.publisher-route-grid article {
+  min-width: 0;
+  border: 1px solid #5c4935;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #1b2720;
+}
+.publisher-author-card img {
+  display: block;
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  object-position: center 24%;
+  background: #0e1612;
+}
+.publisher-author-card:nth-child(3) img {object-fit: contain; padding: 18px; box-sizing: border-box;}
+.publisher-author-body,
+.publisher-route-grid article {padding: 24px;}
+.publisher-author-body h3,
+.publisher-route-grid h3 {font-size: 26px; margin: 0 0 12px;}
+.publisher-author-body p:not(.publisher-kicker),
+.publisher-route-grid p {color: #d0cbc2; font-size: 15px;}
+.publisher-author-body a,
+.publisher-route-grid a,
+.publisher-info a:not(.button) {
+  color: #e9bd87;
+  text-underline-offset: 4px;
+}
+.publisher-author-body a {display: inline-block; margin-top: 12px; font-weight: 600;}
+.publisher-routes {padding-bottom: clamp(50px, 7vw, 85px);}
+.publisher-route-grid article {display: flex; flex-direction: column;}
+.publisher-route-grid a {margin-top: auto; padding-top: 12px;}
+.publisher-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 35px;
+  padding: clamp(30px, 5vw, 55px);
+  border: 1px solid #725436;
+  border-radius: 9px;
+  background: #222820;
+}
+.publisher-contact > div:first-child {max-width: 690px;}
+.publisher-contact h2 {margin: 0 0 15px;}
+.publisher-contact p:not(.publisher-kicker) {color: #d0cbc2;}
+.publisher-contact .publisher-actions {flex: 0 0 240px; align-items: flex-start; flex-direction: column;}
+.publisher-info {
+  width: min(960px, calc(100% - 40px));
+}
+.publisher-info-hero,
+.publisher-info-section {
+  padding: clamp(25px, 5vw, 48px);
+  margin: 0 0 22px;
+  border: 1px solid #5c4935;
+  border-radius: 9px;
+  background: #1b2720;
+}
+.publisher-info-hero h1 {margin: 0 0 14px;}
+.publisher-info-hero > p:last-child {max-width: 730px;}
+.publisher-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.publisher-info-grid article {
+  padding: 25px;
+  border: 1px solid #5c4935;
+  border-radius: 8px;
+  background: #1b2720;
+}
+.publisher-info-grid h2,
+.publisher-info-section h2 {font-size: 26px; margin: 0 0 12px;}
+.publisher-info-grid p {color: #d0cbc2;}
+.publisher-info-grid a {display: inline-block; margin-top: 8px;}
+.publisher-info .publisher-actions a {white-space: normal;}
+@media (max-width: 850px) {
+  .publisher-statement {grid-template-columns: 1fr;}
+  .publisher-author-grid {grid-template-columns: repeat(2, minmax(0, 1fr));}
+  .publisher-contact {display: block;}
+  .publisher-contact .publisher-actions {flex-direction: row;}
+}
+@media (max-width: 600px) {
+  .publisher-about, .publisher-info {width: min(100% - 28px, 1160px); padding-top: 20px;}
+  .publisher-about-hero {padding: 42px 23px;}
+  .publisher-author-grid, .publisher-route-grid, .publisher-info-grid {grid-template-columns: 1fr;}
+  .publisher-author-card img {height: 240px;}
+  .publisher-contact {padding: 25px;}
+  .publisher-actions .button {width: 100%; box-sizing: border-box; justify-content: center;}
+}
