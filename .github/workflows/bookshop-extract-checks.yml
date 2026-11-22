@@ -20,6 +20,9 @@ on:
       - "css/bookshop-outreach.css"
       - "pages/bookshop-outreach.html"
       - "scripts/test-bookshop-verification.mjs"
+      - "scripts/test-bookshop-contact-review.mjs"
+      - "js/bookshop-contact-review-core.js"
+      - "js/bookshop-contact-review-desk.js"
       - ".github/workflows/bookshop-discovery.yml"
       - ".github/workflows/bookshop-extract-checks.yml"
   workflow_dispatch:
@@ -53,4 +56,6 @@ jobs:
           node --check js/bookshop-outreach.js
           node --check js/bookshop-verification-core.js
           node --check js/bookshop-verification-desk.js
-          node --test scripts/test-bookshop-verification.mjs scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
+          node --check js/bookshop-contact-review-core.js
+          node --check js/bookshop-contact-review-desk.js
+          node --test scripts/test-bookshop-contact-review.mjs scripts/test-bookshop-verification.mjs scripts/test-bookshop-clusters.mjs scripts/test-geofabrik-bookshops.mjs scripts/test-bookshop-pipeline.mjs
