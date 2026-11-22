@@ -1,5 +1,5 @@
 
-name: Refresh Scottish bookshop directory
+name: Refresh Scottish bookshops and public directory
 
 on:
   push:
@@ -33,12 +33,20 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Validate discovery scripts
+        run: |
+          node --check scripts/update-bookshops.mjs
+          node --check scripts/build-public-bookshops.mjs
+
       - name: Fetch OpenStreetMap bookshops
         run: node scripts/update-bookshops.mjs
 
+      - name: Rebuild privacy-safe public bookshop feed
+        run: node scripts/build-public-bookshops.mjs
+
       - name: Commit updated data
         run: |
-          if git diff --quiet -- data/scotland-bookshops.json; then
+          if git diff --quiet -- data/scotland-bookshops.json data/public-bookshops.json; then
             echo "No changes to bookshop data."
             exit 0
           fi
@@ -46,6 +54,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/scotland-bookshops.json
-          git commit -m "Update Scottish bookshop discovery data"
+          git add data/scotland-bookshops.json data/public-bookshops.json
+          git commit -m "Refresh Scottish bookshops and public finder"
           git push
