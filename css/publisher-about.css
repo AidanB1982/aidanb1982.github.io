@@ -40,8 +40,8 @@ body.publisher-policy-page {
   padding: clamp(55px, 9vw, 120px) clamp(23px, 6vw, 75px);
   border: 1px solid #584735;
   border-radius: 12px;
-  background: linear-gradient(120deg, rgba(13,23,18,.92), rgba(16,28,22,.85)),
-    url("/assets/forest.png") center / cover;
+  background: radial-gradient(circle at 88% 12%, rgba(122,82,48,.20), transparent 45%),
+    linear-gradient(120deg, #102019, #17261e 58%, #121b16);
 }
 .publisher-about-hero-inner {
   position: relative;
@@ -173,7 +173,7 @@ body.publisher-policy-page {
   .publisher-contact .publisher-actions {flex-direction: row;}
 }
 @media (max-width: 600px) {
-  .publisher-about, .publisher-info {width: min(100% - 28px, 1160px); padding-top: 20px;}
+  .publisher-about, .publisher-info {width: min(calc(100% - 28px), 1160px); padding-top: 20px;}
   .publisher-about-hero {padding: 42px 23px;}
   .publisher-author-grid, .publisher-route-grid, .publisher-info-grid {grid-template-columns: 1fr;}
   .publisher-author-card img {height: 240px;}
