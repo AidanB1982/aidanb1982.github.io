@@ -29,7 +29,7 @@
         "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 
     const OUTREACH_SCRIPT_URL =
-        "/js/bookshop-outreach.js?v=13";
+        "/js/bookshop-outreach.js?v=14";
 
     const MEMBERS_URL =
         "/pages/members.html";
