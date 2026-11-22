@@ -38,6 +38,9 @@ jobs:
           node --check scripts/update-bookshops.mjs
           node --check scripts/build-public-bookshops.mjs
 
+      - name: Test public directory privacy and refresh safeguards
+        run: node --test scripts/test-bookshop-pipeline.mjs
+
       - name: Fetch OpenStreetMap bookshops
         run: node scripts/update-bookshops.mjs
 
