@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
 
-const ctx = {window:{}};
+const ctx = {window:{}, URL};
 vm.runInNewContext(
   fs.readFileSync("js/bookshop-verification-core.js", "utf8"), ctx
 );
