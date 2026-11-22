@@ -67,7 +67,7 @@
   <!-- Outreach styles load after shared styles -->
   <link
     rel="stylesheet"
-    href="/css/bookshop-outreach.css?v=10"
+    href="/css/bookshop-outreach.css?v=11"
   >
 
   <!-- Shared Blackwood header/footer loader -->
@@ -98,6 +98,8 @@
   <script src="/js/bookshop-verification-desk.js?v=20261122a" defer></script>
   <script src="/js/bookshop-contact-review-core.js?v=20261122a" defer></script>
   <script src="/js/bookshop-contact-review-desk.js?v=20261122a" defer></script>
+  <script src="/js/bookshop-followup-core.js?v=20261122a" defer></script>
+  <script src="/js/bookshop-followup-desk.js?v=20261122a" defer></script>
   <script
     src="/js/bookshop-outreach-access.js?v=4"
     defer
@@ -397,6 +399,29 @@
           <button type="button" id="reviewNext" class="btn secondary" disabled>Next page</button>
         </div>
         <p class="notice">Candidate records are public OpenStreetMap discovery data. They are not verified independents, contact permissions or Blackwood stockists. Private review notes stay in this browser and remain in your JSON backup.</p>
+      </section>
+
+      <!-- PRIVATE FOLLOW-UP DASHBOARD: populated only after administrator approval -->
+      <section id="followupDashboard" class="panel bookshop-followups" aria-labelledby="followup-heading">
+        <p class="eyebrow">Relationship management · Private planning</p>
+        <h2 id="followup-heading">Bookshop follow-up planner</h2>
+        <p class="section-intro">Use your existing saved reminders and contact history to decide what needs attention next. No messages are sent, drafted or scheduled by this dashboard; every outreach action requires your separate review.</p>
+        <div id="followupCounts" class="followup-counts" aria-label="Follow-up summary"></div>
+        <div class="followup-controls">
+          <label for="followupView">Show follow-ups
+            <select id="followupView">
+              <option value="all">All planning priorities</option>
+              <option value="overdue">Overdue</option>
+              <option value="today">Due today</option>
+              <option value="upcoming">Due within 14 days</option>
+              <option value="unscheduled">Contacted or interested, no date planned</option>
+            </select>
+          </label>
+        </div>
+        <p id="followupStatus" class="feedback" role="status" aria-live="polite"></p>
+        <div id="followupList" class="followup-list"></div>
+        <button id="followupMore" type="button" class="btn secondary" hidden>Show more saved records</button>
+        <p class="notice">These are planning reminders, not permission to contact. Bookshops marked Do not contact, closed, not independent or confirmed stockist are excluded from follow-up prompts. Later-dated reminders remain in their saved records. Everything stays in this browser and its JSON backup.</p>
       </section>
 
       <!-- SAVED DIRECTORY TOOLBAR -->
