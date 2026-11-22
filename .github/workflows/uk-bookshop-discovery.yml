@@ -1,0 +1,71 @@
+name: Refresh UK bookshop discovery
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/uk-bookshop-discovery.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "11 4 * * 3"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bookshop-discovery
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate discovery scripts
+        run: |
+          node --check scripts/update-uk-bookshops.mjs
+          node --check scripts/build-public-bookshops.mjs
+
+      - name: Fetch bookshops across England, Wales and Northern Ireland
+        run: node scripts/update-uk-bookshops.mjs
+
+      - name: Build privacy-safe public bookshop directory
+        run: node scripts/build-public-bookshops.mjs
+
+      - name: Check privacy of public feed
+        run: |
+          node --input-type=module -e '
+            import fs from "node:fs";
+            const data = JSON.parse(fs.readFileSync("data/public-bookshops.json", "utf8"));
+            const keys = ["name", "town", "address", "website", "lat", "lng", "source"];
+            if (!Array.isArray(data.shops) || !data.shops.length ||
+                data.count !== data.shops.length ||
+                data.shops.some(shop => Object.keys(shop).sort().join(",") !== [...keys].sort().join(","))) {
+              throw Error("Unsafe or invalid public bookshop feed.");
+            }
+            console.log(data.count + " public-safe bookshop listings.");
+          '
+
+      - name: Commit updated bookshop feeds
+        run: |
+          if git diff --quiet -- data/uk-bookshops.json data/public-bookshops.json; then
+            echo "No bookshop data changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/uk-bookshops.json data/public-bookshops.json
+          git commit -m "Refresh UK bookshop discovery and public finder"
+          git push
