@@ -1,26 +1,34 @@
-
-name: Refresh Scottish bookshops and public directory
+name: Refresh Blackwood bookshop directories
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/bookshop-discovery.yml"
   workflow_dispatch:
+    inputs:
+      scope:
+        description: "Which discovery cache should be refreshed?"
+        required: true
+        default: both
+        type: choice
+        options:
+          - scotland
+          - rest_uk
+          - both
   schedule:
-    - cron: "23 5 * * 0"
+    - cron: "23 5 * * 0"  # Scotland, Sunday
+    - cron: "11 4 * * 3"  # England, Wales and Northern Ireland, Wednesday
 
 permissions:
   contents: write
 
+# Only one directory refresh may write source/public feeds at a time.
+# No push trigger: a deployment or workflow edit cannot create extra runs.
 concurrency:
-  group: bookshop-discovery
+  group: blackwood-bookshop-directory-writer
   cancel-in-progress: false
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
 
     steps:
       - name: Check out repository
@@ -33,30 +41,96 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Validate discovery scripts
+      - name: Select discovery scope
+        id: select
+        env:
+          REQUESTED_SCOPE: ${{ inputs.scope || '' }}
+          SCHEDULE: ${{ github.event.schedule || '' }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            scope="$REQUESTED_SCOPE"
+          else
+            case "$SCHEDULE" in
+              "23 5 * * 0") scope="scotland" ;;
+              "11 4 * * 3") scope="rest_uk" ;;
+              *) echo "::error::Unknown discovery schedule"; exit 1 ;;
+            esac
+          fi
+          case "$scope" in
+            scotland|rest_uk|both) ;;
+            *) echo "::error::Invalid discovery scope"; exit 1 ;;
+          esac
+          echo "scope=$scope" >> "$GITHUB_OUTPUT"
+          echo "Selected refresh scope: $scope"
+
+      - name: Validate code and public data safeguards
         run: |
           node --check scripts/update-bookshops.mjs
+          node --check scripts/update-uk-bookshops.mjs
           node --check scripts/build-public-bookshops.mjs
+          node --test scripts/test-bookshop-pipeline.mjs
 
-      - name: Test public directory privacy and refresh safeguards
-        run: node --test scripts/test-bookshop-pipeline.mjs
+      - name: Refresh Scottish discovery cache
+        if: steps.select.outputs.scope == 'scotland' || steps.select.outputs.scope == 'both'
+        run: |
+          set +e
+          node scripts/update-bookshops.mjs
+          code=$?
+          set -e
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::Scottish Overpass sources unavailable; retaining the previous Scottish cache."
+          elif [ "$code" -ne 0 ]; then
+            echo "::error::Scottish discovery failed with a non-network error ($code)."
+            exit "$code"
+          fi
 
-      - name: Fetch OpenStreetMap bookshops
-        run: node scripts/update-bookshops.mjs
+      - name: Refresh England, Wales and Northern Ireland cache
+        if: steps.select.outputs.scope == 'rest_uk' || steps.select.outputs.scope == 'both'
+        run: |
+          set +e
+          node scripts/update-uk-bookshops.mjs
+          code=$?
+          set -e
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::UK Overpass sources unavailable; retaining the previous UK cache."
+          elif [ "$code" -ne 0 ]; then
+            echo "::error::UK discovery failed with a non-network error ($code)."
+            exit "$code"
+          fi
 
-      - name: Rebuild privacy-safe public bookshop feed
+      - name: Build sanitized public bookshop directory
         run: node scripts/build-public-bookshops.mjs
 
-      - name: Commit updated data
+      - name: Verify public directory privacy
         run: |
-          if git diff --quiet -- data/scotland-bookshops.json data/public-bookshops.json; then
-            echo "No changes to bookshop data."
+          node --input-type=module -e '
+            import fs from "node:fs";
+            const data = JSON.parse(fs.readFileSync("data/public-bookshops.json", "utf8"));
+            const keys = ["name", "town", "address", "website", "lat", "lng", "source"].sort().join(",");
+            if (!Array.isArray(data.shops) || !data.shops.length ||
+                data.count !== data.shops.length ||
+                data.shops.some(shop => Object.keys(shop).sort().join(",") !== keys)) {
+              throw Error("Public feed is invalid or includes private fields.");
+            }
+            console.log(data.count + " privacy-safe public bookshop listings.");
+          '
+
+      - name: Commit only if source branch is unchanged
+        run: |
+          if git diff --quiet -- data/scotland-bookshops.json data/uk-bookshops.json data/public-bookshops.json; then
+            echo "No changes to cached bookshop data."
             exit 0
+          fi
+
+          # Never overwrite newer commits, including new human-reviewed records.
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "::error::Main changed during the refresh. Cached data was not pushed; rerun later."
+            exit 1
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add data/scotland-bookshops.json data/public-bookshops.json
-          git commit -m "Refresh Scottish bookshops and public finder"
-          git push
+          git add data/scotland-bookshops.json data/uk-bookshops.json data/public-bookshops.json
+          git commit -m "Refresh Blackwood bookshop discovery and public directory"
+          git push origin HEAD:main
