@@ -162,7 +162,7 @@ async function main() {
   const output = {
     title: "Blackwood Independent Bookshop Finder — Public Discovery Data",
     scope: countriesCovered,
-    source: "OpenStreetMap / Overpass and Blackwood curated public listings",
+    source: "OpenStreetMap (Geofabrik extracts and historical Overpass caches) and Blackwood curated public listings",
     sourceGeneratedAt: [scotland.generatedAt, uk.generatedAt]
       .filter(Boolean).sort().at(-1) || null,
     coverageComplete: Boolean(scotland.coverage?.complete && uk.coverage?.complete),
