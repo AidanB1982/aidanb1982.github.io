@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Find an Independent Bookshop | Blackwood Publishing</title>
+  <meta name="description" content="Explore independent and local bookshops in Scotland with Blackwood Publishing's public bookshop map.">
+  <link rel="canonical" href="https://blackwoodpublishing.co.uk/pages/find-bookshops.html">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="stylesheet" href="/css/header.css?v=20261115">
+  <link rel="stylesheet" href="/css/styles.css?v=20260913">
+  <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoakqTxI=" crossorigin="">
+  <link rel="stylesheet" href="/css/public-bookshops.css?v=20261122">
+  <script src="/js/analytics-consent.js?v=20261116" defer></script>
+  <script src="/js/header.js?v=20261116" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin="" defer></script>
+  <script src="/js/public-bookshops.js?v=20261122" defer></script>
+</head>
+<body class="sub-page public-bookshops-page">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div id="header-placeholder"></div>
+  <main id="main-content" class="public-bookshops-wrap">
+    <header class="pb-intro">
+      <p class="pb-kicker">The independent bookshop trail</p>
+      <h1>Find a bookshop near you.</h1>
+      <p>Discover local bookshops, explore the map and follow the trail to the shelves. This is a public directory for readers — no account or administrator access needed.</p>
+      <p class="pb-disclaimer">Scotland only for now. Listings come from OpenStreetMap and publicly curated records, and may be incomplete or out of date. Inclusion does not confirm that a shop is independent, currently open or stocks Blackwood titles.</p>
+    </header>
+
+    <section class="pb-panel" aria-labelledby="pb-search-heading">
+      <h2 id="pb-search-heading">Search bookshops</h2>
+      <form id="pb-search-form" class="pb-search-form" role="search">
+        <label for="pb-search">Town, city or bookshop name
+          <input id="pb-search" type="search" maxlength="120" placeholder="Edinburgh, Glasgow, Inverness…" autocomplete="off">
+        </label>
+        <label for="pb-radius">Distance from town
+          <select id="pb-radius">
+            <option value="10000">10 km</option>
+            <option value="25000" selected>25 km</option>
+            <option value="50000">50 km</option>
+          </select>
+        </label>
+        <button type="submit" class="pb-button">Find bookshops</button>
+        <button type="button" id="pb-reset" class="pb-button pb-button-secondary">Show all</button>
+      </form>
+      <p id="pb-status" role="status" aria-live="polite">Opening the bookshop directory…</p>
+    </section>
+
+    <div class="pb-layout">
+      <section class="pb-panel pb-map-panel" aria-labelledby="pb-map-heading">
+        <h2 id="pb-map-heading">Explore the map</h2>
+        <div id="pb-map" role="region" aria-label="Map of public bookshop listings in Scotland"></div>
+        <p class="pb-map-note">Map tiles and place searches are provided by OpenStreetMap services. Move or zoom the map to explore the area, and select a marker to see the shop details.</p>
+      </section>
+      <section class="pb-panel pb-results-panel" aria-labelledby="pb-results-heading">
+        <h2 id="pb-results-heading">Bookshops</h2>
+        <p id="pb-count" class="pb-count" aria-live="polite"></p>
+        <div id="pb-results" class="pb-results"></div>
+      </section>
+    </div>
+
+    <section class="pb-panel pb-credits" aria-labelledby="pb-notes-title">
+      <h2 id="pb-notes-title">A note about the directory</h2>
+      <p>This is a discovery guide, not a verified list of Blackwood Publishing stockists. Check opening hours and accessibility directly with each bookshop before visiting. Contact details and outreach records from the private management system are never included here.</p>
+      <p>Map and place information: &copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer">OpenStreetMap contributors</a> (ODbL). Scottish coverage is still being expanded.</p>
+      <p><a href="/pages/reading-lists.html">Explore Blackwood's reading lists</a> or <a href="/pages/store.html">browse the Blackwood store</a>.</p>
+    </section>
+  </main>
+  <div id="footer-placeholder"></div>
+  <noscript><p class="pb-noscript">JavaScript is required for the map and directory search.</p></noscript>
+</body>
+</html>
