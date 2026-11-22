@@ -108,3 +108,48 @@ test("No private outreach system or checkout data imported into public pages", (
   }
   assert.ok(fs.existsSync("pages/bookshop-outreach.html"));
 });
+
+
+test("About leads with Blackwood's exact author-centred mission and motto", () => {
+  assert.match(about, /Independent voices\. Extraordinary stories\./);
+  assert.match(about, /To give independent voices the opportunity to be heard, stories the care they deserve, and readers new worlds to discover\./);
+  const purposeAt = about.indexOf('id="publisher-mission-title"');
+  const writersAt = about.indexOf('id="publisher-people-title"');
+  assert.ok(purposeAt !== -1 && purposeAt < writersAt,
+    "mission should appear before writer profiles");
+  assert.match(about, /emerging, independent and overlooked authors/);
+});
+
+test("All five Blackwood values appear once and in the founding order", () => {
+  const values = [
+    "Every Voice Matters",
+    "Fairness Without Compromise",
+    "Stories Worth Telling",
+    "Stronger Through Community",
+    "Progress With Purpose"
+  ];
+  const positions = values.map(value => {
+    assert.equal(about.split('<h3>' + value + '</h3>').length - 1, 1,
+      "value heading should appear exactly once: " + value);
+    return about.indexOf('<h3>' + value + '</h3>');
+  });
+  assert.deepEqual([...positions].sort((a, b) => a - b), positions);
+  assert.match(about, /<ol class="publisher-values-grid">/);
+  assert.equal((about.match(/class="publisher-value"/g) || []).length, 5);
+  assert.match(about, /Technology should serve stories and people, never overshadow them\./);
+});
+
+test("Fairness and author rights are values, not undeveloped contractual claims", () => {
+  assert.match(about, /fair rewards and control over their creative work/);
+  assert.match(about, /Individual rights, royalties and publication terms must always be explained in a written agreement/);
+  assert.match(about, /does not replace those terms or guarantee publication/);
+  assert.doesNotMatch(about, /guaranteed royalties|guaranteed acceptance/i);
+});
+
+test("Core values render in a responsive, About-only section", () => {
+  assert.match(about, /<section class="publisher-purpose" aria-labelledby="publisher-mission-title">/);
+  assert.match(about, /<section class="publisher-values" aria-labelledby="publisher-values-title">/);
+  assert.match(css, /body\.publisher-about-page \.publisher-values-grid/);
+  assert.match(css, /@media \(max-width: 700px\)/);
+  assert.match(css, /grid-template-columns: 1fr;/);
+});

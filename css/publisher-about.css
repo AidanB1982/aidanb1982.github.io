@@ -180,3 +180,79 @@ body.publisher-policy-page {
   .publisher-contact {padding: 25px;}
   .publisher-actions .button {width: 100%; box-sizing: border-box; justify-content: center;}
 }
+
+
+/* Mission and founding values: About page only. */
+body.publisher-about-page .publisher-purpose {
+  margin-top: clamp(24px, 5vw, 46px);
+  padding: clamp(28px, 5vw, 54px);
+  border: 1px solid #8a6642;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #222c23, #18251e);
+}
+body.publisher-about-page .publisher-purpose h2 {
+  margin: 0 0 18px;
+  font-size: clamp(30px, 4vw, 46px);
+}
+body.publisher-about-page .publisher-mission-text {
+  max-width: 970px;
+  margin: 0 0 22px;
+  color: #f4dbb8;
+  font: 400 clamp(22px, 2.8vw, 34px)/1.5 Georgia, "Times New Roman", serif;
+}
+body.publisher-about-page .publisher-mission-note {
+  max-width: 740px;
+  margin: 0;
+  color: #d6d0c2;
+}
+body.publisher-about-page .publisher-values {
+  padding-top: clamp(48px, 7vw, 85px);
+  border-bottom: 1px solid #514433;
+  padding-bottom: clamp(48px, 7vw, 85px);
+}
+body.publisher-about-page .publisher-values-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: blackwood-value;
+}
+body.publisher-about-page .publisher-value {
+  min-width: 0;
+  counter-increment: blackwood-value;
+  padding: clamp(20px, 3.2vw, 30px);
+  border: 1px solid #68503a;
+  border-radius: 9px;
+  background: #1b2720;
+}
+body.publisher-about-page .publisher-value::before {
+  display: block;
+  margin-bottom: 15px;
+  content: "0" counter(blackwood-value);
+  color: #d9ab70;
+  font: 400 17px/1.3 Georgia, serif;
+}
+body.publisher-about-page .publisher-value h3 {
+  margin: 0 0 10px;
+  font-size: clamp(23px, 2.5vw, 29px);
+  line-height: 1.25;
+}
+body.publisher-about-page .publisher-value p {
+  margin: 0;
+  color: #d0cbc2;
+  font-size: 15px;
+  line-height: 1.75;
+}
+body.publisher-about-page .publisher-values-note {
+  max-width: 930px;
+  margin: 24px 0 0;
+  color: #bfc0b8;
+  font-size: 14px;
+}
+@media (max-width: 700px) {
+  body.publisher-about-page .publisher-values-grid {
+    grid-template-columns: 1fr;
+  }
+}
