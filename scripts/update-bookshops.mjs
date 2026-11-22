@@ -321,22 +321,23 @@ function insideBounds(shop, bbox) {
 }
 
 function mergeSuccessfulTile(unique, bbox, elements) {
-  // A successful tile is authoritative for its area.
-  // Remove stale records there, but retain all records
-  // outside it, including areas whose requests failed.
+  // Preserve cached bookshops if an apparently successful Overpass
+  // response is unexpectedly empty or dramatically reduced.
+  const previous = [...unique.values()]
+    .filter(shop => insideBounds(shop, bbox));
+  const parsed = elements.map(parseShop).filter(Boolean);
+
+  if (previous.length && parsed.length === 0) {
+    throw new Error("Suspiciously empty tile; previous records retained.");
+  }
+  if (previous.length >= 5 && parsed.length < previous.length * 0.2) {
+    throw new Error("Suspiciously reduced tile; previous records retained.");
+  }
+
   for (const [id, shop] of unique) {
-    if (insideBounds(shop, bbox)) {
-      unique.delete(id);
-    }
+    if (insideBounds(shop, bbox)) unique.delete(id);
   }
-
-  for (const item of elements) {
-    const shop = parseShop(item);
-
-    if (shop) {
-      unique.set(shop.osmId, shop);
-    }
-  }
+  for (const shop of parsed) unique.set(shop.osmId, shop);
 }
 
 async function main() {
