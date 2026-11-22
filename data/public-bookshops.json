@@ -2,11 +2,21 @@
   "title": "Blackwood Independent Bookshop Finder — Public Discovery Data",
   "scope": "Scotland-focused, including some nearby border towns; not UK-wide",
   "source": "OpenStreetMap / Overpass and Blackwood curated public listings",
-  "sourceGeneratedAt": "2026-11-15T15:27:21.026Z",
+  "sourceGeneratedAt": "2026-11-22T09:22:08.833Z",
   "coverageComplete": false,
   "coverageFailedTiles": 2,
   "verification": "Bookshop listings are not independently verified as open, independent or stocking Blackwood titles.",
-  "count": 195,
+  "ukCount": 0,
+  "scotlandCount": 275,
+  "quality": {
+    "excludedMajorChains": 75,
+    "mergedDuplicates": 3,
+    "possibleDuplicatesForReview": 0,
+    "invalidRecords": 0,
+    "withoutWebsite": 110,
+    "withoutTown": 84
+  },
+  "count": 198,
   "shops": [
     {
       "name": "20 Storey",
@@ -1278,6 +1288,15 @@
       "source": "openstreetmap"
     },
     {
+      "name": "Stornoway Religious Book Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "lat": 58.2097374,
+      "lng": -6.3877022,
+      "source": "openstreetmap"
+    },
+    {
       "name": "Summerfield Books",
       "town": "Penrith",
       "address": "Skirsgill Business Park, Penrith",
@@ -1299,7 +1318,7 @@
       "name": "TGJones",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://www.tgjonesonline.co.uk/stores/almondvale-shopping-centre-livingston",
       "lat": 55.8842054,
       "lng": -3.5109368,
       "source": "openstreetmap"
@@ -1308,9 +1327,18 @@
       "name": "TGJones",
       "town": "Banchory",
       "address": "33 High Street, Banchory",
-      "website": "",
+      "website": "https://www.tgjonesonline.co.uk/stores/high-street-banchory",
       "lat": 57.051482,
       "lng": -2.5039378,
+      "source": "openstreetmap"
+    },
+    {
+      "name": "TGJones",
+      "town": "St Andrews",
+      "address": "90-92 South Street, St Andrews",
+      "website": "https://www.tgjonesonline.co.uk/stores/south-street-st-andrews",
+      "lat": 56.339163,
+      "lng": -2.7959764,
       "source": "openstreetmap"
     },
     {
@@ -1329,6 +1357,15 @@
       "website": "https://www.forumbooksshop.com/",
       "lat": 55.4141683,
       "lng": -1.7073979,
+      "source": "openstreetmap"
+    },
+    {
+      "name": "The Baltic Bookshop",
+      "town": "Stornoway",
+      "address": "8-10 Cromwell Street, Stornoway",
+      "website": "",
+      "lat": 58.2086383,
+      "lng": -6.3883047,
       "source": "openstreetmap"
     },
     {
@@ -1558,8 +1595,8 @@
     },
     {
       "name": "The Watermill",
-      "town": "",
-      "address": "",
+      "town": "Aberfeldy",
+      "address": "Mill Street, Aberfeldy",
       "website": "https://www.aberfeldywatermill.com/",
       "lat": 56.6194242,
       "lng": -3.8672755,
@@ -1763,13 +1800,5 @@
       "lng": -3.1599133,
       "source": "openstreetmap"
     }
-  ],
-  "quality": {
-    "excludedMajorChains": 8,
-    "mergedDuplicates": 0,
-    "possibleDuplicatesForReview": 0,
-    "invalidRecords": 0,
-    "withoutWebsite": 110,
-    "withoutTown": 84
-  }
+  ]
 }

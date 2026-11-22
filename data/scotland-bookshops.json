@@ -1,8 +1,8 @@
 {
   "source": "OpenStreetMap / Overpass",
   "region": "Scotland",
-  "generatedAt": "2026-11-15T15:27:21.026Z",
-  "count": 273,
+  "generatedAt": "2026-11-22T09:22:08.833Z",
+  "count": 275,
   "coverage": {
     "totalTiles": 16,
     "successfulTiles": 14,
@@ -10,23 +10,23 @@
     "complete": false,
     "succeeded": [
       "Southern Scotland — southwest",
-      "Southern Scotland — southeast",
       "Southern Scotland — northwest",
       "Southern Scotland — northeast",
       "Central Scotland — southwest",
       "Central Scotland — southeast",
       "Central Scotland — northwest",
       "Central Scotland — northeast",
-      "Northern Scotland — southwest",
       "Northern Scotland — southeast",
       "Northern Scotland — northwest",
       "Northern Scotland — northeast",
+      "Highlands and Islands — southwest",
       "Highlands and Islands — southeast",
+      "Highlands and Islands — northwest",
       "Highlands and Islands — northeast"
     ],
     "failed": [
-      "Highlands and Islands — southwest",
-      "Highlands and Islands — northwest"
+      "Southern Scotland — southeast",
+      "Northern Scotland — southwest"
     ]
   },
   "shops": [
@@ -1541,6 +1541,16 @@
       "lng": -3.1875949
     },
     {
+      "osmId": "node/5310640336",
+      "name": "Stornoway Religious Book Shop",
+      "town": "",
+      "address": "",
+      "website": "",
+      "email": "",
+      "lat": 58.2097374,
+      "lng": -6.3877022
+    },
+    {
       "osmId": "node/6579709126",
       "name": "Summerfield Books",
       "town": "Penrith",
@@ -1575,7 +1585,7 @@
       "name": "TGJones",
       "town": "",
       "address": "",
-      "website": "",
+      "website": "https://www.tgjonesonline.co.uk/stores/almondvale-shopping-centre-livingston",
       "email": "",
       "lat": 55.8842054,
       "lng": -3.5109368
@@ -1585,10 +1595,20 @@
       "name": "TGJones",
       "town": "Banchory",
       "address": "33 High Street, Banchory",
-      "website": "",
+      "website": "https://www.tgjonesonline.co.uk/stores/high-street-banchory",
       "email": "",
       "lat": 57.051482,
       "lng": -2.5039378
+    },
+    {
+      "osmId": "node/321209857",
+      "name": "TGJones",
+      "town": "St Andrews",
+      "address": "90-92 South Street, St Andrews",
+      "website": "https://www.tgjonesonline.co.uk/stores/south-street-st-andrews",
+      "email": "",
+      "lat": 56.339163,
+      "lng": -2.7959764
     },
     {
       "osmId": "node/7851246034",
@@ -1609,6 +1629,16 @@
       "email": "",
       "lat": 55.4141683,
       "lng": -1.7073979
+    },
+    {
+      "osmId": "node/5310640545",
+      "name": "The Baltic Bookshop",
+      "town": "Stornoway",
+      "address": "8-10 Cromwell Street, Stornoway",
+      "website": "",
+      "email": "balticbookshop@rsmiths.co.uk",
+      "lat": 58.2086383,
+      "lng": -6.3883047
     },
     {
       "osmId": "node/2920296538",
@@ -2117,8 +2147,8 @@
       "address": "190-198 High Street, Ayr",
       "website": "https://www.theworks.co.uk/Store?storeId=1198",
       "email": "",
-      "lat": 55.4614282,
-      "lng": -4.6290308
+      "lat": 55.4614548,
+      "lng": -4.6289237
     },
     {
       "osmId": "node/5107942407",
@@ -2187,8 +2217,8 @@
       "address": "",
       "website": "https://www.theworks.co.uk/Store?storeId=1002",
       "email": "",
-      "lat": 55.9387194,
-      "lng": -3.3150488
+      "lat": 55.9387192,
+      "lng": -3.3150491
     },
     {
       "osmId": "way/875514443",
@@ -2659,16 +2689,6 @@
       "email": "",
       "lat": 55.0370932,
       "lng": -1.7097688
-    },
-    {
-      "osmId": "node/321209857",
-      "name": "WHSmith",
-      "town": "St Andrews",
-      "address": "90-92 South Street, St Andrews",
-      "website": "https://www.tgjonesonline.co.uk/stores/south-street-st-andrews",
-      "email": "",
-      "lat": 56.339163,
-      "lng": -2.7959764
     },
     {
       "osmId": "node/3469686850",
