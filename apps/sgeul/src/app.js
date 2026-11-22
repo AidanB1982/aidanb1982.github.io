@@ -15,7 +15,7 @@ const loginLoading = createLoginLoading($("auth-loading"), [
   document.querySelector(".app-nav"),
 ]);
 const atmosphere = startAtmosphere($("home"));
-const authorInduction = createAuthorInduction({ client, isOnline });
+const authorInduction = createAuthorInduction({ client, isOnline, openExternal });
 window.addEventListener("pagehide", (event) => {
   if (!event.persisted) atmosphere.destroy();
 });
