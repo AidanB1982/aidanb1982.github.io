@@ -119,6 +119,7 @@
       lat: item.lat,
       lng: item.lng,
       status: "prospect",
+      reviewOrigin: "public-directory",
       verification: {
         status: "unreviewed", sourceUrl: "", notes: "", checkedAt: ""
       },
