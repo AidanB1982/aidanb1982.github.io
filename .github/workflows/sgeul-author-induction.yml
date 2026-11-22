@@ -63,9 +63,13 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      - uses: android-actions/setup-android@v3
-      - name: Install required Android build tools
-        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+      # GitHub's Ubuntu image already includes Android SDK command-line tools.
+      # setup-android@v3 currently invokes the removed "tools" SDK package.
+      - name: Verify hosted Android SDK and install required build tools
+        run: |
+          test -n "$ANDROID_HOME"
+          command -v sdkmanager
+          sdkmanager "platforms;android-36" "build-tools;35.0.0"
       - name: Build local Android debug APK only
         working-directory: apps/sgeul
         run: |
