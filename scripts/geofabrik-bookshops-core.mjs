@@ -22,23 +22,27 @@ function safeWebsite(value) {
 }
 
 function boundsOfCoordinates(geometry) {
-  const coordinates = [];
+  let minLat = Infinity, maxLat = -Infinity;
+  let minLng = Infinity, maxLng = -Infinity;
+  let points = 0;
   function traverse(value) {
     if (!Array.isArray(value)) return;
     if (value.length >= 2 && typeof value[0] === "number" &&
         typeof value[1] === "number") {
-      coordinates.push(value);
+      minLng = Math.min(minLng, value[0]);
+      maxLng = Math.max(maxLng, value[0]);
+      minLat = Math.min(minLat, value[1]);
+      maxLat = Math.max(maxLat, value[1]);
+      points += 1;
       return;
     }
     value.forEach(traverse);
   }
   if (!geometry || !Array.isArray(geometry.coordinates)) return null;
   traverse(geometry.coordinates);
-  if (!coordinates.length) return null;
-  const xs = coordinates.map(item => item[0]);
-  const ys = coordinates.map(item => item[1]);
-  const lat = (Math.min(...ys) + Math.max(...ys)) / 2;
-  const lng = (Math.min(...xs) + Math.max(...xs)) / 2;
+  if (!points) return null;
+  const lat = (minLat + maxLat) / 2;
+  const lng = (minLng + maxLng) / 2;
   if (!Number.isFinite(lat) || !Number.isFinite(lng) ||
       lat < 49 || lat > 61.5 || lng < -9 || lng > 2.5) return null;
   return {lat, lng};
