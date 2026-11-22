@@ -1,6 +1,6 @@
 {
   "title": "Blackwood Independent Bookshop Finder — Public Discovery Data",
-  "scope": "Scotland",
+  "scope": "Scotland-focused, including some nearby border towns; not UK-wide",
   "source": "OpenStreetMap / Overpass and Blackwood curated public listings",
   "sourceGeneratedAt": "2026-11-15T15:27:21.026Z",
   "coverageComplete": false,
