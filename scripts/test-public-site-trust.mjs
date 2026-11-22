@@ -5,6 +5,8 @@ import path from "node:path";
 
 const read = filename => fs.readFileSync(filename, "utf8");
 const about = read("pages/about.html");
+const globalNav = read("js/header.js");
+const fallbackHeader = read("header.html");
 const charter = read("pages/author-charter.html");
 const submissions = read("pages/submissions.html");
 const charterStyles = read("css/author-charter.css");
@@ -224,4 +226,30 @@ test("Charter and submissions signpost styles are scoped and responsive", () => 
   assert.match(submissionStyles, /@media \(max-width: 640px\)/);
   assert.match(charter, /rel="canonical"/);
   assert.match(charter, /og:description/);
+});
+
+
+test("Our Author Charter appears under About Blackwood in the shared About dropdown", () => {
+  const aboutOpen = globalNav.indexOf('aria-label="About"');
+  const nextMenu = globalNav.indexOf('aria-label="Community"', aboutOpen);
+  assert.ok(aboutOpen >= 0 && nextMenu > aboutOpen);
+  const aboutMenu = globalNav.slice(aboutOpen, nextMenu);
+  const aboutPage = aboutMenu.indexOf('href="/pages/about.html"');
+  const charterPage = aboutMenu.indexOf('href="/pages/author-charter.html"');
+  const submissionsPage = aboutMenu.indexOf('href="/pages/submissions.html"');
+  assert.ok(aboutPage >= 0 && charterPage > aboutPage && submissionsPage > charterPage,
+    "About Blackwood → Our Author Charter → Submissions should be in order");
+  assert.equal((aboutMenu.match(/href="\/pages\/author-charter\.html"/g) || []).length, 1);
+  assert.match(aboutMenu, /href="\/pages\/author-charter\.html" role="menuitem"/);
+  assert.ok(fallbackHeader.includes('href="/pages/author-charter.html"'));
+});
+
+test("Key entry pages refresh the shared navigation script version", () => {
+  const expected = '/js/header.js?v=20261122-author-charter-nav';
+  for (const [page, html] of [
+    ["Homepage", home], ["About Blackwood", about],
+    ["Author Charter", charter], ["Submissions", submissions]
+  ]) {
+    assert.ok(html.includes(expected), page + " should load refreshed navigation");
+  }
 });
