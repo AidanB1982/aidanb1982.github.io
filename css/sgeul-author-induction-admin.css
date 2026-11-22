@@ -1,0 +1,29 @@
+
+/* Sgeul Author Induction Review lives inside the verified Management Hub. */
+.sgeul-admin-applications {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+  gap: 15px;
+  margin-top: 18px;
+}
+.sgeul-induction-card {
+  padding: 22px;
+  border: 1px solid rgba(196, 150, 96, .40);
+  border-radius: 9px;
+  background: rgba(15, 25, 22, .50);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sgeul-induction-card h3 { margin: 0 0 12px; font-size: 23px; }
+.sgeul-induction-card h4 { margin: 18px 0 5px; font-size: 17px; }
+.sgeul-induction-card p { line-height: 1.65; }
+.sgeul-induction-state { color: #e9be87; font-weight: 700; }
+.sgeul-induction-note { font-size: 13px; opacity: .85; }
+.sgeul-induction-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.sgeul-induction-actions button { min-height: 44px; }
+.sgeul-induction-actions button:disabled { opacity: .5; }

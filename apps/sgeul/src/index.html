@@ -88,6 +88,45 @@
         <div id="shop-products" class="shop-grid"></div>
         <p id="shop-status" role="status"></p>
       </section>
+      <section id="authors" class="panel author-studio" hidden>
+        <p class="eyebrow">INDEPENDENT VOICES</p>
+        <h2>For authors</h2>
+        <p>Every voice matters. Sgeul is preparing a separate induction route for emerging, independent and overlooked authors.</p>
+        <p class="muted">Induction is not a manuscript submission, publication offer, author contract or permission to upload books. Your reader account and any ARC access remain unchanged.</p>
+        <p id="author-induction-status" class="muted" role="status" aria-live="polite"></p>
+        <div id="author-induction-intro">
+          <p>Applications will open after Blackwood has approved the intake, privacy and moderation arrangements. No manuscript uploads or public profiles are available yet.</p>
+        </div>
+        <form id="author-induction-form" hidden>
+          <h3>Apply for author induction</h3>
+          <label for="induction-pen-name">Publishing name or pen name
+            <input id="induction-pen-name" name="publishing_name" minlength="2" maxlength="100" required autocomplete="nickname"></label>
+          <label for="induction-biography">Tell us about your writing (40–1,200 characters)
+            <textarea id="induction-biography" name="biography" minlength="40" maxlength="1200" rows="5" required></textarea></label>
+          <label for="induction-genres">Genres and interests (optional)
+            <input id="induction-genres" name="genres" maxlength="180"></label>
+          <label for="induction-website">Website (optional; HTTPS)
+            <input id="induction-website" name="website_url" type="url" maxlength="300" placeholder="https://"></label>
+          <label for="induction-motivation">Why would you like to join Sgeul? (25–1,000 characters)
+            <textarea id="induction-motivation" name="motivation" minlength="25" maxlength="1000" rows="4" required></textarea></label>
+          <label class="author-check"><input id="induction-charter" type="checkbox" required> I have read the <a href="https://blackwoodpublishing.co.uk/pages/author-charter.html" target="_blank" rel="noopener noreferrer">Blackwood Author Charter</a>.</label>
+          <label class="author-check"><input id="induction-privacy" type="checkbox" required> I understand that Blackwood will use these details to review my induction request and contact me about it, in line with the <a href="https://blackwoodpublishing.co.uk/pages/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</label>
+          <button type="submit" id="induction-submit">Request induction</button>
+        </form>
+        <form id="author-profile-form" hidden>
+          <h3>Your private author profile draft</h3>
+          <p class="muted">Your profile is visible only to you and authorised Blackwood staff. It is not published to readers and does not give access to book uploads or earnings.</p>
+          <label for="author-profile-name">Publishing name
+            <input id="author-profile-name" name="publishing_name" minlength="2" maxlength="100" required></label>
+          <label for="author-profile-bio">Author biography (40–1,200 characters)
+            <textarea id="author-profile-bio" name="biography" minlength="40" maxlength="1200" rows="5" required></textarea></label>
+          <label for="author-profile-genres">Genres and interests
+            <input id="author-profile-genres" name="genres" maxlength="180"></label>
+          <label for="author-profile-website">Website (optional; HTTPS)
+            <input id="author-profile-website" name="website_url" type="url" maxlength="300" placeholder="https://"></label>
+          <button type="submit" id="author-profile-save">Save private profile</button>
+        </form>
+      </section>
       <section id="account" class="panel" hidden>
         <h2>Your account</h2>
         <p id="account-email"></p>
@@ -98,6 +137,7 @@
         <button id="sign-out">Sign out</button>
         <p id="account-status" role="status"></p>
         <div class="account-links">
+          <button type="button" id="account-author-entry" class="text-button">Author induction &amp; profiles</button>
           <button
             class="text-button"
             data-external="https://blackwoodpublishing.co.uk/security-policy.html"
@@ -148,7 +188,7 @@
     <nav class="app-nav" aria-label="Sgeul">
       <button data-view="home" aria-current="page">Home</button
       ><button data-view="shop">Bookshop</button
-      ><button data-view="account">Account</button>
+      ><button data-view="authors">Authors</button><button data-view="account">Account</button>
     </nav>
     <div
       id="auth-loading"

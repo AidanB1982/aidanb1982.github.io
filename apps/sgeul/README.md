@@ -197,3 +197,18 @@ controls, expanding a series and opening a title, and reopening saved books in
 airplane mode. Check reduced-motion presentation and social links opening in the
 external browser. Account entitlements and existing offline-copy deadlines remain
 server-controlled.
+
+
+## Staged author induction foundation (PR #18 — not yet launched)
+
+Sgeul now contains a guarded **Authors** tab and private-profile draft flows.
+\`apps/sgeul/src/author-induction.js\` leaves the application gate **disabled**
+until the new database migration, privacy arrangements, admin acceptance checks,
+and an incremented Play test build are expressly approved. The review queue
+lives in the existing Behind the Files / Blackwood Management Hub; no standalone
+administrator site or new author privileges are created.
+
+See [Sgeul Author Induction](../../docs/sgeul-author-induction.md) for the SQL
+migration, negative RLS tests, author profile limitations, manual go-live gates,
+and separation from Blackwood manuscript acquisitions and the private Author Desk.
+Do **not** assume that merging the PR deploys SQL or ships an updated Android app.

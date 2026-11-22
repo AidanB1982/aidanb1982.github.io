@@ -1,0 +1,45 @@
+name: Verify Sgeul author induction foundation
+
+on:
+  pull_request:
+    paths:
+      - "apps/sgeul/src/**"
+      - "apps/sgeul/tests/**"
+      - "apps/sgeul/README.md"
+      - "apps/sgeul/scripts/build.mjs"
+      - "apps/sgeul/package.json"
+      - "apps/sgeul/package-lock.json"
+      - "js/sgeul-author-induction-admin.js"
+      - "js/behind-files-admin.js"
+      - "pages/behind-files-admin.html"
+      - "css/sgeul-author-induction-admin.css"
+      - "supabase/migrations/20261122165000_sgeul_author_induction.sql"
+      - "docs/sgeul-author-induction.md"
+      - "tests/sgeul-author-induction-sql.cjs"
+      - ".github/workflows/sgeul-author-induction.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/sgeul/package-lock.json
+      - name: Build the existing native Sgeul bundle
+        working-directory: apps/sgeul
+        run: |
+          npm ci
+          npm run build
+          npm test
+      - name: Install pinned isolated PostgreSQL test engine
+        run: npm install --prefix "$RUNNER_TEMP/sgeul-pg" --no-save --no-package-lock @electric-sql/pglite@0.5.10
+      - name: Assert applicant, administrator and private-profile RLS
+        run: NODE_PATH="$RUNNER_TEMP/sgeul-pg/node_modules" node tests/sgeul-author-induction-sql.cjs

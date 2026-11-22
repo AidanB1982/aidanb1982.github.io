@@ -28,7 +28,9 @@
     <!-- JS -->
     <script src="/js/header.js?v=20261116" defer></script>
     <link rel="stylesheet" href="/css/publishing-desk.css?v=20261108">
+    <link rel="stylesheet" href="/css/sgeul-author-induction-admin.css?v=20261122">
     <script src="/js/publishing-desk.js?v=20261029-meta2" defer></script>
+    <script src="/js/sgeul-author-induction-admin.js?v=20261122" defer></script>
     <script src="/js/behind-files-admin.js?v=20261107-protected-feed" defer></script>
     <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
 </head>
@@ -235,6 +237,14 @@
 
                     <article class="bfa-department bfa-department--active"><p class="bfa-card-kicker">Publishing Operations</p><h3>ARC &amp; Content</h3><p>Assign advance copies, prepare Outlook notices and plan Facebook, Instagram, TikTok and monthly newsletters.</p><a href="#publishing-operations" class="bfa-button">Open Publishing Operations</a></article>
 
+                    <!-- SGEUL AUTHOR INDUCTION: SAME MANAGEMENT HUB -->
+                    <article class="bfa-department bfa-department--active">
+                        <p class="bfa-card-kicker">Publishing Operations · Sgeul</p>
+                        <h3>Author Induction Review</h3>
+                        <p>Review Sgeul author requests and approve access to private profile drafts. This does not grant book uploads, publishing rights or Author Desk access.</p>
+                        <a href="#sgeul-author-induction" class="bfa-button">Open Author Induction Review</a>
+                    </article>
+
                     <!-- ADMINISTRATOR-ONLY BOOKSHOP OUTREACH -->
                     <article class="bfa-department bfa-department--active">
                         <p class="bfa-card-kicker">Publishing Operations · Bookshops</p>
@@ -252,6 +262,17 @@
 
             </div>
         </section>
+
+<section class="bfa-panel" id="sgeul-author-induction" aria-labelledby="sgeul-admin-title">
+  <div class="bfa-panel-inner">
+    <p class="bfa-card-kicker">Sgeul · Author Induction</p>
+    <h2 id="sgeul-admin-title">Author Induction Review</h2>
+    <p>Applications remain private and are subject to Blackwood administrator approval. Approval enables only a private author-profile draft, not publication, manuscript acceptance, catalogue uploads or Author Desk permissions.</p>
+    <p id="sgeul-admin-status" role="status" aria-live="polite">The review desk opens after administrator verification.</p>
+    <button type="button" id="sgeul-admin-refresh" class="bfa-button">Refresh induction applications</button>
+    <div id="sgeul-admin-applications" class="sgeul-admin-applications" aria-label="Author induction applications"></div>
+  </div>
+</section>
 
 <section class="bfa-panel ops-desk" id="publishing-operations" aria-labelledby="ops-heading">
  <div class="bfa-panel-inner">
