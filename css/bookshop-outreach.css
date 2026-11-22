@@ -940,3 +940,69 @@ body.bookshop-outreach-page .review-form textarea {
   font: 16px/1.5 Arial, sans-serif;
 }
 body.bookshop-outreach-page .review-form textarea { min-height: 100px; }
+
+
+/* Private relationship follow-up planner: read-only; no contact controls. */
+body.bookshop-outreach-page .followup-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+body.bookshop-outreach-page .followup-count {
+  padding: 15px;
+  background: #1c231f;
+  border: 1px solid #544332;
+  border-radius: 8px;
+}
+body.bookshop-outreach-page .followup-count strong {
+  display: block;
+  font: 400 26px/1.2 Georgia, serif;
+  color: #e7bd83;
+}
+body.bookshop-outreach-page .followup-count span {
+  display: block;
+  margin-top: 6px;
+  font: 13px/1.5 Arial, sans-serif;
+  color: #c9c7bd;
+}
+body.bookshop-outreach-page .followup-controls label {
+  display: grid;
+  gap: 8px;
+  max-width: 420px;
+  font: 13px/1.5 Arial, sans-serif;
+}
+body.bookshop-outreach-page .followup-controls select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  font: 16px/1.4 Arial, sans-serif;
+}
+body.bookshop-outreach-page .followup-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+body.bookshop-outreach-page .followup-item {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #604b36;
+  border-radius: 8px;
+  background: #202720;
+}
+body.bookshop-outreach-page .followup-item h3 {
+  margin: 0 0 8px;
+  font: 400 19px/1.35 Georgia, serif;
+  color: #f4e7d1;
+}
+body.bookshop-outreach-page .followup-item p,
+body.bookshop-outreach-page .followup-empty {
+  margin: 8px 0;
+  font: 13px/1.55 Arial, sans-serif;
+  color: #d3c8b7;
+}
+body.bookshop-outreach-page .followup-item .btn {
+  margin-top: 8px;
+  min-height: 44px;
+}
