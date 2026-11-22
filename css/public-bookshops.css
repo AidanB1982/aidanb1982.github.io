@@ -131,7 +131,6 @@ body.public-bookshops-page {
   position: relative !important;
   overflow: hidden !important;
   isolation: isolate;
-  touch-action: pan-x pan-y;
 }
 #pb-map .leaflet-pane,
 #pb-map .leaflet-map-pane,
@@ -163,6 +162,22 @@ body.public-bookshops-page {
   filter: none !important;
   object-fit: fill !important;
 }
+/* Fallback positioning for browsers where the Leaflet CDN stylesheet
+   fails to apply. Keep map layers contained inside the map panel. */
+#pb-map .leaflet-pane > svg,
+#pb-map .leaflet-pane > canvas {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+}
+#pb-map .leaflet-tile-pane { z-index: 200; }
+#pb-map .leaflet-overlay-pane { z-index: 400; }
+#pb-map .leaflet-shadow-pane { z-index: 500; }
+#pb-map .leaflet-marker-pane { z-index: 600; }
+#pb-map .leaflet-tooltip-pane { z-index: 650; }
+#pb-map .leaflet-popup-pane { z-index: 700; }
+#pb-map .leaflet-control { position: relative; z-index: 800; }
+
 #pb-map .leaflet-marker-icon,
 #pb-map .leaflet-marker-shadow {
   width: auto;
