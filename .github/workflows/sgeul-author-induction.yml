@@ -63,13 +63,20 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      # GitHub's Ubuntu image already includes Android SDK command-line tools.
-      # setup-android@v3 currently invokes the removed "tools" SDK package.
-      - name: Verify hosted Android SDK and install required build tools
+      # Runner SDK exists, but ANDROID_HOME is not always exported.
+      # setup-android@v3 currently attempts to install the removed 'tools' package.
+      - name: Configure hosted Android SDK
+        shell: bash
         run: |
-          test -n "$ANDROID_HOME"
-          command -v sdkmanager
-          sdkmanager "platforms;android-36" "build-tools;35.0.0"
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          test -d "$sdk"
+          manager="$(find "$sdk/cmdline-tools" -maxdepth 3 -type f -name sdkmanager | head -n 1)"
+          test -n "$manager"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          echo "$(dirname "$manager")" >> "$GITHUB_PATH"
+      - name: Install required Android build tools
+        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
       - name: Build local Android debug APK only
         working-directory: apps/sgeul
         run: |
