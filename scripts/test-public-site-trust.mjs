@@ -9,6 +9,7 @@ const globalNav = read("js/header.js");
 const fallbackHeader = read("header.html");
 const charter = read("pages/author-charter.html");
 const submissions = read("pages/submissions.html");
+const privacy = read("pages/privacy-policy.html");
 const charterStyles = read("css/author-charter.css");
 const submissionStyles = read("css/submissions.css");
 const readinessDoc = read("docs/author-intake-readiness.md");
@@ -252,4 +253,17 @@ test("Key entry pages refresh the shared navigation script version", () => {
   ]) {
     assert.ok(html.includes(expected), page + " should load refreshed navigation");
   }
+});
+
+
+test("Sgeul Author Induction privacy disclosure preserves the closed application gate", () => {
+  assert.match(privacy, /id="sgeul-author-induction-privacy"/);
+  assert.match(privacy, /Applications are not currently open/);
+  assert.match(privacy, /private author profile draft/);
+  assert.match(privacy, /not displayed to the public or other readers/);
+  assert.match(privacy, /withdraw your request or private profile/);
+  assert.match(privacy, /retention and deletion schedule must be approved before applications open/);
+  assert.match(privacy, /id="sgeul-beta-privacy"/);
+  assert.match(privacy, /Last updated: 22 November 2026/);
+  assert.match(privacy, /mailto:aidan@blackwoodpublishing.co.uk\?subject=Sgeul%20Author%20Induction%20Privacy/);
 });
