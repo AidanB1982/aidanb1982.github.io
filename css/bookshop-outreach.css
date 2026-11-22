@@ -424,12 +424,83 @@ body.bookshop-outreach-page
   vertical-align: middle;
 }
 
-.legend-dot.saved {
-  background: var(--copper);
+.legend-dot.prospect {
+  background: #b87333;
+}
+
+.legend-dot.contacted {
+  background: #5c86bd;
+}
+
+.legend-dot.interested {
+  background: #d3a64c;
+}
+
+.legend-dot.stockist {
+  background: #418b65;
+}
+
+.legend-dot.opted-out {
+  background: #9b6262;
 }
 
 .legend-dot.found {
   background: var(--teal);
+}
+
+.bookshop-map-popup {
+  min-width: 185px;
+  color: #202821;
+  font: 13px/1.5 Arial, Helvetica, sans-serif;
+}
+
+.bookshop-map-popup strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.bookshop-map-popup p {
+  margin: 5px 0;
+  overflow-wrap: anywhere;
+}
+
+.bookshop-map-popup a {
+  color: #185c69;
+  text-decoration: underline;
+}
+
+.bookshop-map-popup .bookshop-map-open {
+  margin: 12px 0 0;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid #765334;
+  border-radius: 5px;
+  background: #3c2b20;
+  color: #fff5e6;
+  font: 600 12px/1.4 Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+
+.bookshop-map-popup .bookshop-map-open:hover,
+.bookshop-map-popup .bookshop-map-open:focus-visible {
+  background: #5a3b24;
+}
+
+.map-legend {
+  align-items: center;
+  row-gap: 12px;
+}
+
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-legend .legend-dot {
+  flex: 0 0 10px;
 }
 
 /* =========================================
