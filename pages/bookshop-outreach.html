@@ -67,7 +67,7 @@
   <!-- Outreach styles load after shared styles -->
   <link
     rel="stylesheet"
-    href="/css/bookshop-outreach.css?v=11"
+    href="/css/bookshop-outreach.css?v=12"
   >
 
   <!-- Shared Blackwood header/footer loader -->
@@ -100,6 +100,8 @@
   <script src="/js/bookshop-contact-review-desk.js?v=20261122a" defer></script>
   <script src="/js/bookshop-followup-core.js?v=20261122a" defer></script>
   <script src="/js/bookshop-followup-desk.js?v=20261122a" defer></script>
+  <script src="/js/bookshop-backup-restore-core.js?v=20261122a" defer></script>
+  <script src="/js/bookshop-backup-restore-desk.js?v=20261122a" defer></script>
   <script
     src="/js/bookshop-outreach-access.js?v=4"
     defer
@@ -422,6 +424,24 @@
         <div id="followupList" class="followup-list"></div>
         <button id="followupMore" type="button" class="btn secondary" hidden>Show more saved records</button>
         <p class="notice">These are planning reminders, not permission to contact. Bookshops marked Do not contact, closed, not independent or confirmed stockist are excluded from follow-up prompts. Later-dated reminders remain in their saved records. Everything stays in this browser and its JSON backup.</p>
+      </section>
+
+      <!-- PRIVATE JSON BACKUP RESTORE: disabled until administrator-approved application initialises -->
+      <section class="panel bookshop-backup" aria-labelledby="backup-heading">
+        <p class="eyebrow">Private workspace · Backup protection</p>
+        <h2 id="backup-heading">Restore saved bookshops from JSON</h2>
+        <p class="section-intro">Use a JSON file previously exported from this management desk. Selecting the file only previews what can be added. Existing saved shops, notes, contact history, verification evidence and Outlook settings are never overwritten by this restore.</p>
+        <div class="backup-restore-controls">
+          <label for="backupRestoreFile">Choose your exported bookshop backup
+            <input id="backupRestoreFile" type="file" accept=".json,application/json">
+          </label>
+        </div>
+        <p id="backupRestoreStatus" class="feedback" role="status" aria-live="polite">Sign in as an administrator to use backup restore.</p>
+        <div id="backupRestorePreview" class="backup-restore-preview" hidden>
+          <p id="backupRestoreSummary"></p>
+          <button id="backupRestoreConfirm" type="button" class="btn" disabled>Confirm: add new bookshops</button>
+        </div>
+        <p class="notice">Only the existing array-format JSON export is accepted (maximum 5 MB). Duplicates are skipped, and nothing is imported until you explicitly confirm. Before importing, export a current backup as an extra precaution. Private records remain in this browser; this is not cloud synchronisation.</p>
       </section>
 
       <!-- SAVED DIRECTORY TOOLBAR -->
