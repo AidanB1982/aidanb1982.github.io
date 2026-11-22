@@ -409,6 +409,10 @@
                         Community Spotlight
                     </a>
 
+                    <a href="/pages/find-bookshops.html" role="menuitem">
+                        Independent Bookshops
+                    </a>
+
                     <a href="/pages/members.html" role="menuitem">
                         The Archivists
                     </a>
