@@ -1,0 +1,109 @@
+name: Build Sgeul signed AAB (owner-approved manual run)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sgeul-owner-signed-aab
+  cancel-in-progress: false
+
+jobs:
+  signed-aab:
+    if: github.ref == 'refs/heads/main' && github.repository == 'AidanB1982/aidanb1982.github.io'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: sgeul-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/sgeul/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Configure hosted Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          test -d "$sdk"
+          manager="$(find "$sdk/cmdline-tools" -maxdepth 3 -type f -name sdkmanager | head -n 1)"
+          test -n "$manager"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          echo "$(dirname "$manager")" >> "$GITHUB_PATH"
+      - name: Install required Android SDK components
+        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+      - name: Validate 0.2.1 source and regression tests
+        working-directory: apps/sgeul
+        run: |
+          npm ci
+          npm run build
+          npm test
+      - name: Restore owner's private upload key for this job only
+        shell: bash
+        env:
+          UPLOAD_KEYSTORE_B64: ${{ secrets.SGEUL_UPLOAD_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "$UPLOAD_KEYSTORE_B64" ]; then
+            echo "::error::Missing SGEUL_UPLOAD_KEYSTORE_BASE64 in the sgeul-release environment."
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$UPLOAD_KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/sgeul-upload.p12"
+          test -s "$RUNNER_TEMP/sgeul-upload.p12"
+      - name: Verify upload certificate matches the historical Sgeul signer
+        shell: bash
+        env:
+          SGEUL_UPLOAD_STORE_PASSWORD: ${{ secrets.SGEUL_UPLOAD_STORE_PASSWORD }}
+          SGEUL_UPLOAD_KEY_ALIAS: ${{ secrets.SGEUL_UPLOAD_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$SGEUL_UPLOAD_STORE_PASSWORD"
+          test -n "$SGEUL_UPLOAD_KEY_ALIAS"
+          keytool -exportcert -alias "$SGEUL_UPLOAD_KEY_ALIAS" \
+            -keystore "$RUNNER_TEMP/sgeul-upload.p12" \
+            -storetype PKCS12 \
+            -storepass:env SGEUL_UPLOAD_STORE_PASSWORD \
+            > "$RUNNER_TEMP/sgeul-upload-cert.der"
+          actual="$(sha256sum "$RUNNER_TEMP/sgeul-upload-cert.der" | awk '{print $1}')"
+          expected="198d1a0680c47891a757649e7196155f2f9c829958bb5eae4a82ab13dd53c8f2"
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::The configured upload certificate does not match the existing 0.1.3 upload certificate."
+            exit 1
+          fi
+          echo "Public upload-certificate fingerprint verified."
+      - name: Build signed 0.2.1/code7 Play AAB
+        working-directory: apps/sgeul
+        env:
+          SGEUL_UPLOAD_KEYSTORE: ${{ runner.temp }}/sgeul-upload.p12
+          SGEUL_UPLOAD_STORE_PASSWORD: ${{ secrets.SGEUL_UPLOAD_STORE_PASSWORD }}
+          SGEUL_UPLOAD_KEY_ALIAS: ${{ secrets.SGEUL_UPLOAD_KEY_ALIAS }}
+          SGEUL_UPLOAD_KEY_PASSWORD: ${{ secrets.SGEUL_UPLOAD_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$SGEUL_UPLOAD_KEY_PASSWORD"
+          npm run android:bundle
+          bundle="android/app/build/outputs/bundle/release/app-release.aab"
+          test -s "$bundle"
+          jarsigner -verify "$bundle" >/dev/null
+          echo "Release AAB exists and its JAR signature verifies."
+      - name: Save signed AAB for owner review (no Play upload)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sgeul-0.2.1-code7-owner-signed-AAB
+          path: apps/sgeul/android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove temporary upload key
+        if: always()
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/sgeul-upload.p12" "$RUNNER_TEMP/sgeul-upload-cert.der"
