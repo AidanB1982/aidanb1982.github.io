@@ -3,6 +3,7 @@ import { App } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { client } from "./client.js";
 import { createLoginLoading } from "./login-loading.js";
+import { clearReadingStateForUser } from "./logout-cleanup.js";
 import { startAtmosphere } from "../../../js/BP-reading-atmosphere.js";
 import { OfflineLibrary } from "../../../js/BP-reading-offline.js";
 import { loadShop } from "./shop.js";
@@ -185,12 +186,11 @@ $("sign-out").onclick = async () => {
   const previous = user.id;
   try {
     await offline.clear(previous);
-    for (const key of Object.keys(localStorage))
-      if (key.startsWith("bp-reading:" + previous + ":"))
-        localStorage.removeItem(key);
+    clearReadingStateForUser(localStorage, previous);
     localStorage.removeItem("bp-reading-offline-account-v1");
     if (!isOnline()) {
       client.auth.stopAutoRefresh();
+      authorInduction.clear();
       localStorage.removeItem("sb-bmnlynjldlnxfvunqbqq-auth-token");
       location.replace("/index.html");
       return;
