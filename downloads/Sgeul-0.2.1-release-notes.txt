@@ -1,0 +1,13 @@
+<en-GB>
+Sgeul 0.2.1 brings a smoother reading experience.
+
+- Swipe to turn pages and browse expandable series.
+- Enjoy refreshed reading-room screens, atmospheric backgrounds and quotations.
+- Improved sign-in feedback and Blackwood social links.
+- Improved sign-out cleanup for saved reading state.
+- Explore the new Authors information area. Applications are not yet open.
+- Updated Account privacy information link.
+
+Please test saved books in airplane mode, sign-out and ARC access after updating.
+Send feedback: https://blackwoodpublishing.co.uk/pages/sgeul-feedback.html
+</en-GB>
