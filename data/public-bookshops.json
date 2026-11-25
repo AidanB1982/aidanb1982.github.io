@@ -2,21 +2,21 @@
   "title": "Blackwood Independent Bookshop Finder — Public Discovery Data",
   "scope": "UK-wide discovery in progress; coverage varies by region",
   "source": "OpenStreetMap (Geofabrik extracts and historical Overpass caches) and Blackwood curated public listings",
-  "sourceGeneratedAt": "2026-11-22T09:55:29.766Z",
+  "sourceGeneratedAt": "2026-11-25T14:19:42.294Z",
   "coverageComplete": false,
   "coverageFailedTiles": 2,
   "verification": "Bookshop listings are not independently verified as open, independent or stocking Blackwood titles.",
-  "ukCount": 2334,
+  "ukCount": 2332,
   "scotlandCount": 275,
   "quality": {
     "excludedMajorChains": 919,
     "mergedDuplicates": 208,
-    "possibleDuplicatesForReview": 7,
+    "possibleDuplicatesForReview": 6,
     "invalidRecords": 0,
     "withoutWebsite": 893,
-    "withoutTown": 603
+    "withoutTown": 605
   },
-  "count": 1483,
+  "count": 1481,
   "shops": [
     {
       "name": "20 Storey",
@@ -1675,6 +1675,15 @@
       "source": "openstreetmap"
     },
     {
+      "name": "Books & The Bookshop",
+      "town": "",
+      "address": "83 Dyke Road",
+      "website": "",
+      "lat": 50.8295896,
+      "lng": -0.1470885,
+      "source": "openstreetmap"
+    },
+    {
       "name": "Books Alive",
       "town": "",
       "address": "",
@@ -2113,6 +2122,15 @@
       "website": "",
       "lat": 51.522337449999995,
       "lng": -0.07150005000000001,
+      "source": "openstreetmap"
+    },
+    {
+      "name": "Bridge Street Books",
+      "town": "",
+      "address": "4a Bridge Street",
+      "website": "https://bridgestreetbooks.co.uk/",
+      "lat": 55.3338466,
+      "lng": -1.5826845,
       "source": "openstreetmap"
     },
     {
@@ -4568,8 +4586,8 @@
       "town": "London",
       "address": "85a Whitechapel High Street, London",
       "website": "http://www.freedompress.org.uk/",
-      "lat": 51.51612725,
-      "lng": -0.07066595,
+      "lat": 51.5161351,
+      "lng": -0.07070585,
       "source": "openstreetmap"
     },
     {
@@ -5992,15 +6010,6 @@
       "website": "",
       "lat": 55.0428804,
       "lng": -1.4509272,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "Keel Row Bookshop - Secondhand books",
-      "town": "North Shields",
-      "address": "North Shields",
-      "website": "https://www.keelrowbookshop.co.uk/",
-      "lat": 55.0115611,
-      "lng": -1.4489445,
       "source": "openstreetmap"
     },
     {
@@ -8038,15 +8047,6 @@
       "source": "openstreetmap"
     },
     {
-      "name": "Plurabelle Books",
-      "town": "Cambridge",
-      "address": "Coldhams Road, Cambridge",
-      "website": "https://www.plurabellebooks.com/",
-      "lat": 52.2085804,
-      "lng": 0.1488443,
-      "source": "openstreetmap"
-    },
-    {
       "name": "Pocket Shop",
       "town": "",
       "address": "",
@@ -9199,15 +9199,6 @@
       "source": "openstreetmap"
     },
     {
-      "name": "Shelf Life",
-      "town": "Cardiff",
-      "address": "188 Cowbridge Road East, Cardiff",
-      "website": "https://www.shelflifebookshop.com/",
-      "lat": 51.481854,
-      "lng": -3.2023799,
-      "source": "openstreetmap"
-    },
-    {
       "name": "Shelter Scotland Bookshop",
       "town": "Edinburgh",
       "address": "106A Raeburn Place, Edinburgh",
@@ -10299,7 +10290,7 @@
     {
       "name": "TGJones",
       "town": "Sheffield",
-      "address": "39-40 Fargate, Sheffield",
+      "address": "38-40 Fargate, Sheffield",
       "website": "https://www.tgjonesonline.co.uk/stores/fargate-sheffield",
       "lat": 53.38157665,
       "lng": -1.4696789,
@@ -10343,6 +10334,15 @@
     },
     {
       "name": "TGJones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "lat": 51.80328455,
+      "lng": -4.967234700000001,
+      "source": "openstreetmap"
+    },
+    {
+      "name": "TGJones",
       "town": "Beccles",
       "address": "9 New Market, Beccles",
       "website": "https://www.tgjonesonline.co.uk/stores/new-market-place-beccles",
@@ -10379,8 +10379,8 @@
     },
     {
       "name": "TGJones",
-      "town": "",
-      "address": "Church Street",
+      "town": "Frodsham",
+      "address": "16 Church Street, Frodsham",
       "website": "https://www.tgjonesonline.co.uk/stores/church-street-frodsham",
       "lat": 53.29483795,
       "lng": -2.72502165,
@@ -10591,24 +10591,6 @@
       "website": "https://www.facebook.com/thebirnamreader",
       "lat": 56.5578407,
       "lng": -3.5770795,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "The Book Annex",
-      "town": "Harwich",
-      "address": "18, Harwich",
-      "website": "",
-      "lat": 51.946121500000004,
-      "lng": 1.2875587,
-      "source": "openstreetmap"
-    },
-    {
-      "name": "The Book Annex",
-      "town": "Harwich",
-      "address": "Harwich",
-      "website": "",
-      "lat": 51.94638955,
-      "lng": 1.28765095,
       "source": "openstreetmap"
     },
     {

@@ -1,8 +1,8 @@
 {
   "source": "OpenStreetMap / Geofabrik",
   "region": "United Kingdom",
-  "generatedAt": "2026-11-22T09:55:29.766Z",
-  "count": 2334,
+  "generatedAt": "2026-11-25T14:19:42.294Z",
+  "count": 2332,
   "coverage": {
     "totalTiles": 1,
     "successfulTiles": 1,
@@ -19,7 +19,7 @@
     "method": "osmium tags-filter + GeoJSONSeq",
     "note": "OSM bookshops are candidate listings, not independently verified stockists."
   },
-  "parsedFeatures": 3068,
+  "parsedFeatures": 3065,
   "shops": [
     {
       "osmId": "way/115664997",
@@ -1795,6 +1795,15 @@
       "lng": 1.5638183
     },
     {
+      "osmId": "node/6443445842",
+      "name": "Books & The Bookshop",
+      "town": "",
+      "address": "83 Dyke Road",
+      "website": "",
+      "lat": 50.8295896,
+      "lng": -0.1470885
+    },
+    {
       "osmId": "node/9317307930",
       "name": "Books Alive",
       "town": "",
@@ -2234,6 +2243,15 @@
       "website": "",
       "lat": 51.522337449999995,
       "lng": -0.07150005000000001
+    },
+    {
+      "osmId": "node/14412615401",
+      "name": "Bridge Street Books",
+      "town": "",
+      "address": "4a Bridge Street",
+      "website": "https://bridgestreetbooks.co.uk/",
+      "lat": 55.3338466,
+      "lng": -1.5826845
     },
     {
       "osmId": "node/13056496201",
@@ -4743,8 +4761,8 @@
       "town": "London",
       "address": "85a Whitechapel High Street, London",
       "website": "http://www.freedompress.org.uk/",
-      "lat": 51.51612725,
-      "lng": -0.07066595
+      "lat": 51.5161351,
+      "lng": -0.07070585
     },
     {
       "osmId": "node/1782182230",
@@ -6176,15 +6194,6 @@
       "website": "",
       "lat": 55.0428804,
       "lng": -1.4509272
-    },
-    {
-      "osmId": "node/4698771286",
-      "name": "Keel Row Bookshop - Secondhand books",
-      "town": "North Shields",
-      "address": "North Shields",
-      "website": "https://www.keelrowbookshop.co.uk/",
-      "lat": 55.0115611,
-      "lng": -1.4489445
     },
     {
       "osmId": "way/935398233",
@@ -8896,15 +8905,6 @@
       "lng": -0.314025
     },
     {
-      "osmId": "node/12673976201",
-      "name": "Plurabelle Books",
-      "town": "Cambridge",
-      "address": "Coldhams Road, Cambridge",
-      "website": "https://www.plurabellebooks.com/",
-      "lat": 52.2085804,
-      "lng": 0.1488443
-    },
-    {
       "osmId": "node/3319937905",
       "name": "Pocket Shop",
       "town": "",
@@ -10057,15 +10057,6 @@
       "lng": -1.4632149
     },
     {
-      "osmId": "node/9965578922",
-      "name": "Shelf Life",
-      "town": "Cardiff",
-      "address": "188 Cowbridge Road East, Cardiff",
-      "website": "https://www.shelflifebookshop.com/",
-      "lat": 51.481854,
-      "lng": -3.2023799
-    },
-    {
       "osmId": "node/10544458471",
       "name": "Shelter Scotland Bookshop",
       "town": "Edinburgh",
@@ -11194,7 +11185,7 @@
       "osmId": "way/1040376478",
       "name": "TGJones",
       "town": "Sheffield",
-      "address": "39-40 Fargate, Sheffield",
+      "address": "38-40 Fargate, Sheffield",
       "website": "https://www.tgjonesonline.co.uk/stores/fargate-sheffield",
       "lat": 53.38157665,
       "lng": -1.4696789
@@ -11236,6 +11227,15 @@
       "lng": -4.3076039
     },
     {
+      "osmId": "way/1528062870",
+      "name": "TGJones",
+      "town": "",
+      "address": "",
+      "website": "",
+      "lat": 51.80328455,
+      "lng": -4.967234700000001
+    },
+    {
       "osmId": "way/154508148",
       "name": "TGJones",
       "town": "Beccles",
@@ -11274,8 +11274,8 @@
     {
       "osmId": "way/338463367",
       "name": "TGJones",
-      "town": "",
-      "address": "Church Street",
+      "town": "Frodsham",
+      "address": "16 Church Street, Frodsham",
       "website": "https://www.tgjonesonline.co.uk/stores/church-street-frodsham",
       "lat": 53.29483795,
       "lng": -2.72502165
@@ -11486,24 +11486,6 @@
       "website": "https://www.facebook.com/thebirnamreader",
       "lat": 56.55784075,
       "lng": -3.5770795
-    },
-    {
-      "osmId": "way/139883194",
-      "name": "The Book Annex",
-      "town": "Harwich",
-      "address": "18, Harwich",
-      "website": "",
-      "lat": 51.946121500000004,
-      "lng": 1.2875587
-    },
-    {
-      "osmId": "way/139885180",
-      "name": "The Book Annex",
-      "town": "Harwich",
-      "address": "Harwich",
-      "website": "",
-      "lat": 51.94638955,
-      "lng": 1.28765095
     },
     {
       "osmId": "node/4232008166",
