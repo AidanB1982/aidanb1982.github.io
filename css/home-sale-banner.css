@@ -1,0 +1,92 @@
+/* Blackwood Black Friday / Cyber Monday 2026 */
+
+.blackwood-sale-banner[hidden] {
+    display: none !important;
+}
+
+.blackwood-sale-banner {
+    box-sizing: border-box;
+    width: 100%;
+    background: linear-gradient(
+        135deg,
+        #171512,
+        #2c2018,
+        #171512
+    );
+    border-top: 1px solid #8e6947;
+    border-bottom: 1px solid #8e6947;
+    text-align: center;
+}
+
+.blackwood-sale-banner a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 18px 20px;
+    color: #f4e3ca;
+    text-decoration: none;
+}
+
+.blackwood-sale-kicker {
+    color: #d4a873;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.blackwood-sale-title {
+    font-size: clamp(19px, 3vw, 29px);
+    line-height: 1.3;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: #f4e3ca;
+}
+
+.blackwood-sale-date {
+    color: #d8c8b3;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.blackwood-sale-action {
+    margin-top: 5px;
+    padding: 7px 16px;
+    border: 1px solid #c69b65;
+    color: #e2bd88;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.blackwood-sale-banner a:hover .blackwood-sale-action {
+    background: #c69b65;
+    color: #171512;
+}
+
+.blackwood-sale-banner a:focus-visible {
+    outline: 2px solid #e2bd88;
+    outline-offset: -4px;
+}
+
+@media (max-width: 600px) {
+    .blackwood-sale-banner a {
+        padding: 14px 12px;
+    }
+
+    .blackwood-sale-kicker {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+    }
+
+    .blackwood-sale-date {
+        font-size: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .blackwood-sale-action {
+        transition: none;
+    }
+}
