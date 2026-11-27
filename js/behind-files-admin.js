@@ -274,6 +274,7 @@
             window.BlackwoodPlanner?.activate(user.id);
             window.BlackwoodOperations?.activate(user.id,supabaseClient);
             window.BlackwoodAuthorInduction?.activate(user.id,supabaseClient);
+            window.BlackwoodAcquisitionGuide?.activate();
 
         } catch (error) {
             if (checkVersion !== accessCheckVersion) {
@@ -300,6 +301,7 @@
         if(clearOperations)window.BlackwoodOperations?.lock();
         else window.BlackwoodOperations?.suspend();
         window.BlackwoodAuthorInduction?.suspend();
+        window.BlackwoodAcquisitionGuide?.suspend();
         const adminContent =
             document.getElementById("bfa-admin-content");
 
