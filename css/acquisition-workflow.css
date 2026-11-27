@@ -1,0 +1,35 @@
+/* Private acquisition journey reference; used only inside the existing management hub. */
+#acquisition-workflow-reference[hidden] { display: none !important; }
+#acquisition-workflow-reference .acquisition-reference-head {
+  display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+}
+#acquisition-workflow-reference .acquisition-reference-links {
+  display: flex; gap: .65rem; flex-wrap: wrap; margin: .75rem 0 1rem;
+}
+#acquisition-workflow-reference .acquisition-reference-links a { text-underline-offset: 3px; }
+#acquisition-workflow-reference .acquisition-journey-select {
+  display: block; margin: 0 0 1.2rem; width: min(100%, 34rem); max-width: 100%;
+  background: #18191b; color: #f4efe9; border: 1px solid #9b7455; border-radius: .35rem;
+  padding: .7rem; font: inherit;
+}
+#acquisition-workflow-reference .acquisition-step-list {
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,17rem),1fr));
+  gap: .75rem; margin: .75rem 0 1.2rem; padding-left: 1.35rem;
+}
+#acquisition-workflow-reference .acquisition-step-list li { padding: .55rem .6rem .6rem; }
+#acquisition-workflow-reference .acquisition-step-list .bfa-button {
+  text-align: left; max-width: 100%; line-height: 1.35;
+}
+#acquisition-workflow-reference .acquisition-step-list p { margin: .5rem 0 0; line-height: 1.55; }
+#acquisition-workflow-reference .acquisition-selected {
+  border: 1px solid rgba(180,138,98,.6); border-radius: .4rem; padding: 1rem;
+  background: rgba(16,15,15,.28); overflow-wrap: anywhere;
+}
+#acquisition-workflow-reference .acquisition-selected h4 { margin-top: 0; }
+#acquisition-workflow-reference .acquisition-selected p:last-child { margin-bottom: 0; }
+#acquisition-workflow-reference .acquisition-reference-safety {
+  border-left: 3px solid #b58e60; padding: .35rem 0 .35rem 1rem;
+}
+@media (max-width: 580px) {
+  #acquisition-workflow-reference .acquisition-step-list { grid-template-columns: 1fr; }
+}

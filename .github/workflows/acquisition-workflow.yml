@@ -1,0 +1,38 @@
+name: Verify Blackwood acquisition and onboarding workflow
+
+on:
+  pull_request:
+    paths:
+      - "js/blackwood-acquisition-workflow.js"
+      - "js/blackwood-acquisition-admin.js"
+      - "css/acquisition-workflow.css"
+      - "pages/submissions.html"
+      - "pages/authordesk.html"
+      - "pages/behind-files-admin.html"
+      - "js/behind-files-admin.js"
+      - "tests/acquisition-workflow.cjs"
+      - "tests/acquisition-page-links.cjs"
+      - ".github/workflows/acquisition-workflow.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate two workflow stage gates
+        run: node tests/acquisition-workflow.cjs
+      - name: Validate public closed status and private-page boundaries
+        run: node tests/acquisition-page-links.cjs
+      - name: Check new browser scripts parse
+        run: |
+          node --check js/blackwood-acquisition-workflow.js
+          node --check js/blackwood-acquisition-admin.js
+          node --check js/behind-files-admin.js

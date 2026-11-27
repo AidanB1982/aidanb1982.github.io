@@ -29,8 +29,11 @@
     <script src="/js/header.js?v=20261116" defer></script>
     <link rel="stylesheet" href="/css/publishing-desk.css?v=20261108">
     <link rel="stylesheet" href="/css/sgeul-author-induction-admin.css?v=20261122">
+    <link rel="stylesheet" href="/css/acquisition-workflow.css?v=20261127">
     <script src="/js/publishing-desk.js?v=20261029-meta2" defer></script>
     <script src="/js/sgeul-author-induction-admin.js?v=20261122" defer></script>
+    <script src="/js/blackwood-acquisition-workflow.js?v=20261127" defer></script>
+    <script src="/js/blackwood-acquisition-admin.js?v=20261127" defer></script>
     <script src="/js/behind-files-admin.js?v=20261107-protected-feed" defer></script>
     <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
 </head>
@@ -237,6 +240,14 @@
 
                     <article class="bfa-department bfa-department--active"><p class="bfa-card-kicker">Publishing Operations</p><h3>ARC &amp; Content</h3><p>Assign advance copies, prepare Outlook notices and plan Facebook, Instagram, TikTok and monthly newsletters.</p><a href="#publishing-operations" class="bfa-button">Open Publishing Operations</a></article>
 
+                    <!-- BOOK ACQUISITIONS: separate from Sgeul author induction -->
+                    <article class="bfa-department bfa-department--active">
+                        <p class="bfa-card-kicker">Publishing Operations · Acquisitions</p>
+                        <h3>Manuscripts &amp; Publishing Offers</h3>
+                        <p>Review the two Blackwood workflows: manuscript assessment and the separate contract-to-Author-Desk introduction. Internal process guide only; public submissions remain closed.</p>
+                        <a href="#acquisition-workflow-reference" class="bfa-button">Review Acquisition Workflows</a>
+                    </article>
+
                     <!-- SGEUL AUTHOR INDUCTION: SAME MANAGEMENT HUB -->
                     <article class="bfa-department bfa-department--active">
                         <p class="bfa-card-kicker">Publishing Operations · Sgeul</p>
@@ -262,6 +273,33 @@
 
             </div>
         </section>
+
+<section class="bfa-panel" id="acquisition-workflow-reference" aria-labelledby="acquisition-workflow-title" hidden>
+  <div class="bfa-panel-inner">
+    <div class="acquisition-reference-head">
+      <div>
+        <p class="bfa-card-kicker">Publishing Operations · Internal Reference</p>
+        <h2 id="acquisition-workflow-title">Acquisitions &amp; Author Onboarding</h2>
+      </div>
+      <p class="bfa-muted">Two connected journeys · no automatic acceptance or access</p>
+    </div>
+    <p class="acquisition-reference-safety">This is an internal workflow reference, <strong>not a live manuscript intake or saved application tracker</strong>. Submissions are still closed. An offer is not a signed agreement, and an author does not gain Author Desk access until independent identity, contract and book permissions have been verified.</p>
+    <nav class="acquisition-reference-links" aria-label="Publishing workflow reference pages">
+      <a href="/pages/submissions.html">Manuscript Submissions (currently closed)</a>
+      <a href="/pages/author-charter.html">Author Charter</a>
+      <a href="/pages/authordesk.html">Existing private Author Desk</a>
+    </nav>
+    <label for="acquisition-workflow-journey">View the process for</label>
+    <select id="acquisition-workflow-journey" class="acquisition-journey-select">
+      <option value="submission">A manuscript submitted during an approved reading window</option>
+      <option value="offer">A publisher-initiated offer or approved submission</option>
+    </select>
+    <p id="acquisition-workflow-status" role="status" aria-live="polite">Administrator verification required.</p>
+    <div id="acquisition-workflow-steps"></div>
+    <div class="acquisition-selected" id="acquisition-workflow-selected" aria-label="Stage requirements"></div>
+    <p class="bfa-muted">Onboarding concludes by handing the verified author and Book Record to the <strong>existing</strong> Author Desk. The eight subsequent publication stages remain in Blackwood's current production records. This guide does not create accounts, send documents or change any status.</p>
+  </div>
+</section>
 
 <section class="bfa-panel" id="sgeul-author-induction" aria-labelledby="sgeul-admin-title">
   <div class="bfa-panel-inner">
