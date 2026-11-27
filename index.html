@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="no-js">
 <head>
@@ -21,6 +22,7 @@
     <link rel="stylesheet" href="/css/site-polish.css?v=20261120">
     <link rel="stylesheet" href="/css/home-dispatches.css?v=20261107-panel">
     <link rel="stylesheet" href="/css/home-indie-bookshops.css?v=20261122">
+    <link rel="stylesheet" href="/css/home-sale-banner.css?v=20261127">
 </head>
 
 <body class="home-page">
@@ -29,6 +31,34 @@
 
 <!-- HEADER -->
 <div id="header-placeholder"></div>
+
+<!-- BLACK FRIDAY / CYBER MONDAY OFFER -->
+<section
+    id="blackwood-sale-banner"
+    class="blackwood-sale-banner"
+    aria-label="Black Friday and Cyber Monday book sale"
+    hidden
+>
+    <a href="/pages/store.html">
+
+        <span class="blackwood-sale-kicker">
+            Black Friday &amp; Cyber Monday
+        </span>
+
+        <strong class="blackwood-sale-title">
+            20% OFF ALL BLACKWOOD BOOKS
+        </strong>
+
+        <span class="blackwood-sale-date">
+            Limited-time offer · Ends Monday 30th November
+        </span>
+
+        <span class="blackwood-sale-action">
+            Explore the sale <span aria-hidden="true">→</span>
+        </span>
+
+    </a>
+</section>
 
 <!--
 <section
@@ -113,6 +143,7 @@
         <noscript><p class="home-dispatches__intro">Enable JavaScript to load public updates, or visit <a href="/pages/members.html#circle-panel-behindFiles">the Archivists member area</a>.</p></noscript>
     </div>
 </section>
+
 <dialog class="home-dispatch-dialog" id="home-dispatch-dialog" aria-labelledby="home-dispatch-dialog-title">
     <div class="home-dispatch-dialog__bar"><button class="button" type="button" data-dispatch-close>Close update</button></div>
     <p class="home-dispatch-dialog__meta" data-dispatch-meta></p>
@@ -376,6 +407,7 @@
     </div>
 
 </section>
+
 <!-- ARCHIVE PARTNERS -->
 <section class="archive-partners fade-in">
 
@@ -398,6 +430,7 @@
     </a>
 
 </section>
+
 <!-- CLOSING -->
 <section class="closing-line fade-in" style="margin-top:120px;">
 
@@ -425,6 +458,7 @@
 <script src="/js/header.js?v=20261122-author-charter-nav" defer></script>
 <script src="/js/dispatches.js?v=20261107a" defer></script>
 <script src="/js/home-dispatches.js?v=20261107-panel" defer></script>
+<script src="/js/home-sale-banner.js?v=20261127" defer></script>
 
 <script>
 window.addEventListener("load", async () => {
