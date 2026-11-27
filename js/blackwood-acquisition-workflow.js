@@ -69,10 +69,10 @@
   function next(journey, stage) {
     const ids = stages(journey).map(step => step[0]);
     const index = ids.indexOf(stage);
+    if (journey === "submission" && stage === "information_requested") return ["eligibility","withdrawn"];
     if (index < 0 || stage === "withdrawn" || stage === "declined") return [];
     if (journey === "submission") {
       if (stage === "acquisition_decision") return ["offer_review","declined","information_requested"];
-      if (stage === "information_requested") return ["eligibility","withdrawn"];
       return [ids[index + 1], "withdrawn"].filter(Boolean);
     }
     return [ids[index + 1]].filter(Boolean);
