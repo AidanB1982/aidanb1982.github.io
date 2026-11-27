@@ -192,8 +192,10 @@ test("Charter distinguishes approved principles from unfinished author terms", (
   assert.match(charter, /The standards we are building/);
   assert.match(charter, /not claims that every system or term is already in place/);
   assert.match(charter, /royalties, calculation bases, deductions, reporting arrangements and payment terms/);
-  assert.match(charter, /not a contract, an offer to publish or a statement of agreed royalty percentages/);
-  assert.match(charter, /must be set out in an individual written agreement/);
+  assert.match(charter, /The author retains copyright/);
+  assert.match(charter, /publishing rights expressly agreed in a signed publishing agreement/);
+  assert.match(charter, /We will not advertise a fixed royalty rate until one has been approved/);
+  assert.doesNotMatch(charter, /About this charter|id="charter-scope-title"/);
   assert.doesNotMatch(charter, /guaranteed royalty|minimum earnings|guaranteed publication/i);
 });
 
